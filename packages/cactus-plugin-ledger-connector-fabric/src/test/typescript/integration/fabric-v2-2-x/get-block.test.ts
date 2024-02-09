@@ -38,7 +38,7 @@ import {
   GetBlockRequestV1,
   FabricContractInvocationType,
   FabricSigningCredential,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 /**
  * Functional test of GetBlockEndpointV1 on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)

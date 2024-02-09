@@ -39,7 +39,7 @@ jest.mock("fs");
   publicKey.export({ type: "spki", format: "pem" }),
 );
 
-import { VerifierAuthentication } from "../../../main/typescript/verifier/VerifierAuthentication";
+import { VerifierAuthentication } from "../../../main/typescript/verifier/VerifierAuthentication.js";
 
 //////////////////////////
 // UNIT TESTS

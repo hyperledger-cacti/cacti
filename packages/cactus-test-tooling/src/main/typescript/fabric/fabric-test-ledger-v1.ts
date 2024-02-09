@@ -13,8 +13,8 @@ import { Wallets, Gateway, Wallet, X509Identity } from "fabric-network";
 import FabricCAServices from "fabric-ca-client";
 
 import Joi from "joi";
-import { ITestLedger } from "../i-test-ledger";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Containers } from "../common/containers.js";
 import {
   Checks,
   Logger,
@@ -33,7 +33,7 @@ import {
 import path from "path";
 import fs from "fs";
 import yaml from "js-yaml";
-import { envMapToDocker } from "../common/env-map-to-docker";
+import { envMapToDocker } from "../common/env-map-to-docker.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 export interface organizationDefinitionFabricV2 {

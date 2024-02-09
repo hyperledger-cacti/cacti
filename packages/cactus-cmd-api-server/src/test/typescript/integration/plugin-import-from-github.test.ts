@@ -11,7 +11,7 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 const logLevel: LogLevelDesc = "TRACE";
 

@@ -1,18 +1,18 @@
-export * from "./generated/openapi/typescript-axios";
+export * from "./generated/openapi/typescript-axios/index.js";
 
 export {
   PluginLedgerConnectorEthereum,
   IPluginLedgerConnectorEthereumOptions,
-} from "./plugin-ledger-connector-ethereum";
+} from "./plugin-ledger-connector-ethereum.js";
 
-export * from "./sign-utils";
+export * from "./sign-utils.js";
 
-export * from "./types/model-type-guards";
+export * from "./types/model-type-guards.js";
 
-export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector.js";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
-import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector.js";
 
 export {
   EthereumApiClient,
@@ -22,9 +22,9 @@ export {
   EthereumRequestInputContract,
   EthereumRequestInputMethod,
   EthereumRequestInputArgs,
-} from "./api-client/ethereum-api-client";
+} from "./api-client/ethereum-api-client.js";
 
-export * from "./generated/openapi/typescript-axios/api";
+export * from "./generated/openapi/typescript-axios/api.js";
 
 export async function createPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,

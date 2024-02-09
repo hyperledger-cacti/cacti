@@ -2,7 +2,7 @@ import { Given, When, Then, Before, After } from "cucumber";
 import { expect } from "chai";
 import axios from "axios";
 import CryptoMaterial from "../../../../crypto-material/crypto-material.json";
-import { getEthAddress, getFabricId, getUserFromPseudonim } from "./common";
+import { getEthAddress, getFabricId, getUserFromPseudonim } from "./common.js";
 import {
   deleteFabricAssetReference,
   fabricAssetReferenceExists,
@@ -11,7 +11,7 @@ import {
   readFabricAssetReference,
   resetFabric,
   refundFabricTokens,
-} from "../fabric-helper";
+} from "../fabric-helper.js";
 
 const FABRIC_CHANNEL_NAME = "mychannel";
 const FABRIC_CONTRACT_CBDC_ERC20_NAME = "cbdc";

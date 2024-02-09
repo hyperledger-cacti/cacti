@@ -7,7 +7,7 @@ import { safeStringifyException } from "@hyperledger/cactus-common";
 import {
   handleRestEndpointException,
   IHandleRestEndpointExceptionOptions,
-} from "../../../main/typescript/public-api"; // replace with the correct path to your module
+} from "../../../main/typescript/public-api.js"; // replace with the correct path to your module
 
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import {

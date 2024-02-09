@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { IAsyncProvider } from "@hyperledger/cactus-common";
-import { IEndpointAuthzOptions } from "./i-endpoint-authz-options";
-import { IExpressRequestHandler } from "./i-express-request-handler";
+import { IEndpointAuthzOptions } from "./i-endpoint-authz-options.js";
+import { IExpressRequestHandler } from "./i-express-request-handler.js";
 
 /**
  * Implementers of this interface are responsible for providing an API endpoint

@@ -18,7 +18,7 @@ import {
   BesuApiClientOptions,
   PluginFactoryLedgerConnector,
   PluginLedgerConnectorBesu,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 describe(__filename, () => {
   const logLevel: LogLevelDesc = "TRACE";

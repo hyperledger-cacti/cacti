@@ -9,7 +9,7 @@ import {
   Returns,
   Transaction,
 } from "fabric-contract-api";
-import { AssetReference } from "./asset-reference";
+import { AssetReference } from "./asset-reference.js";
 
 const bridgedOutAmountKey = "amountBridgedOut";
 

@@ -59,7 +59,7 @@ import {
   WatchBlocksListenerTypeV1,
   WatchBlocksResponseV1,
   signProposal,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({

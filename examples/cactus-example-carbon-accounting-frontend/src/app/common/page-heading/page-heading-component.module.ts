@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 
 import { IonicModule } from "@ionic/angular";
 
-import { PageHeadingComponent } from "./page-heading.component";
+import { PageHeadingComponent } from "./page-heading.component.js";
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule],

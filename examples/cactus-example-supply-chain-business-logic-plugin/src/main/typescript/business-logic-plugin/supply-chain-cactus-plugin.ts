@@ -16,15 +16,15 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { InsertBambooHarvestEndpoint } from "./web-services/insert-bamboo-harvest-endpoint";
+import { InsertBambooHarvestEndpoint } from "./web-services/insert-bamboo-harvest-endpoint.js";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
-import { ListBambooHarvestEndpoint } from "./web-services/list-bamboo-harvest-endpoint";
-import { ISupplyChainContractDeploymentInfo } from "../i-supply-chain-contract-deployment-info";
-import { InsertBookshelfEndpoint } from "./web-services/insert-bookshelf-endpoint";
-import { ListBookshelfEndpoint } from "./web-services/list-bookshelf-endpoint";
-import { InsertShipmentEndpoint } from "./web-services/insert-shipment-endpoint";
-import { ListShipmentEndpoint } from "./web-services/list-shipment-endpoint";
+import { ListBambooHarvestEndpoint } from "./web-services/list-bamboo-harvest-endpoint.js";
+import { ISupplyChainContractDeploymentInfo } from "../i-supply-chain-contract-deployment-info.js";
+import { InsertBookshelfEndpoint } from "./web-services/insert-bookshelf-endpoint.js";
+import { ListBookshelfEndpoint } from "./web-services/list-bookshelf-endpoint.js";
+import { InsertShipmentEndpoint } from "./web-services/insert-shipment-endpoint.js";
+import { ListShipmentEndpoint } from "./web-services/list-shipment-endpoint.js";
 
 export interface OrgEnv {
   CORE_PEER_LOCALMSPID: string;

@@ -8,12 +8,12 @@ import { GluegunCommand } from 'gluegun'
 import {
   fabricHelper,
   getKeyAndCertForRemoteRequestbyUserName
-} from '../../helpers/fabric-functions'
+} from "../../helpers/fabric-functions.js"
 import {
   commandHelp,
   handlePromise,
   getNetworkConfig
-} from '../../helpers/helpers'
+} from "../../helpers/helpers.js"
 
 const command: GluegunCommand = {
   name: 'getKeyAndCert',

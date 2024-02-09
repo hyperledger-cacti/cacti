@@ -6,7 +6,7 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { GetNodeJwsResponse } from "../generated/openapi/typescript-axios";
+import { GetNodeJwsResponse } from "./../generated/openapi/typescript-axios/index.js";
 
 import {
   Logger,
@@ -22,7 +22,7 @@ import {
 } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginConsortiumManual } from "../plugin-consortium-manual";
+import { PluginConsortiumManual } from "../plugin-consortium-manual.js";
 
 export interface IGetNodeJwsEndpointOptions {
   plugin: PluginConsortiumManual;

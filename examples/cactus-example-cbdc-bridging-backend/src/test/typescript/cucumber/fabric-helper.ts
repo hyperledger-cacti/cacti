@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getUserFromPseudonim } from "./steps/common";
+import { getUserFromPseudonim } from "./steps/common.js";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 
 const FABRIC_CHANNEL_NAME = "mychannel";

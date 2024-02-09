@@ -7,7 +7,7 @@ import {
   PostgresTestContainer,
   IKeyPair,
   isIKeyPair,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 const logLevel: LogLevelDesc = "TRACE";

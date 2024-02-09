@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp } from '../helpers/helpers'
+import { commandHelp } from "../helpers/helpers.js"
 
 const command: GluegunCommand = {
   name: 'chaincode',

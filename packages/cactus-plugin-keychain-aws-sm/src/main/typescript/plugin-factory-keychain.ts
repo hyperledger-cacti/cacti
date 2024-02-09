@@ -9,7 +9,7 @@ import {
 import {
   IPluginKeychainAwsSmOptions,
   PluginKeychainAwsSm,
-} from "./plugin-keychain-aws-sm";
+} from "./plugin-keychain-aws-sm.js";
 
 export class PluginFactoryKeychain extends PluginFactory<
   IPluginKeychain,

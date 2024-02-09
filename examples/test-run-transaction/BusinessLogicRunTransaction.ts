@@ -6,16 +6,16 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "./RequestInfo";
-//import { MeterManagement } from './MeterManagement';
-//import { MeterInfo } from './MeterInfo';
-import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo";
-import { transactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
-//import { makeRawTransaction } from './TransactionEthereum'
-import { LedgerEvent } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
-import { json2str } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon";
+import { RequestInfo } from "./RequestInfo.js";
+//import { MeterManagement } from "./MeterManagement.js";
+//import { MeterInfo } from "./MeterInfo.js";
+import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo.js";
+import { transactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index.js";
+import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index.js";
+import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase.js";
+//import { makeRawTransaction } from "./TransactionEthereum.js"
+import { LedgerEvent } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin.js";
+import { json2str } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon.js";
 
 const fs = require("fs");
 const path = require("path");

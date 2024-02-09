@@ -5,7 +5,7 @@ import {
   BesuTestLedger,
   IKeyPair,
   isIKeyPair,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 
 test("constructor throws if invalid input is provided", (assert: Test) => {
   assert.ok(BesuTestLedger);

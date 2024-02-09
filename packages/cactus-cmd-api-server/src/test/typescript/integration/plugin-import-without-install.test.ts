@@ -10,7 +10,7 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 import lmify from "lmify";
 import fs from "fs-extra";
 import { readFile } from "fs/promises";

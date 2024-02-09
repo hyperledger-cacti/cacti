@@ -15,7 +15,7 @@ import networksPb from "@hyperledger/cacti-weaver-protos-js/networks/networks_pb
 import common_ack_pb from "@hyperledger/cacti-weaver-protos-js/common/ack_pb";
 import eventsPb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
 import statePb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
-import * as helpers from "./helpers";
+import * as helpers from "./helpers.js";
 /**
  * The Relay class represents a relay in the target blockchain network.
  */

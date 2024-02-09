@@ -48,8 +48,8 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
-import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint-json-object";
+import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint.js";
+import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint-json-object.js";
 
 import {
   DeployContractSolidityBytecodeV1Request,
@@ -70,18 +70,18 @@ import {
   WatchBlocksV1Options,
   InvokeRawWeb3EthMethodV1Request,
   InvokeRawWeb3EthContractV1Request,
-} from "./generated/openapi/typescript-axios/";
+} from "./generated/openapi/typescript-axios/index.js";
 
-import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
-import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
-import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-endpoint-json-object";
-import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
-import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
-import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3eth-method-v1-endpoint";
-import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3eth-contract-v1-endpoint";
+import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint.js";
+import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint.js";
+import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-endpoint-json-object.js";
+import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint.js";
+import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1.js";
+import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3eth-method-v1-endpoint.js";
+import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3eth-contract-v1-endpoint.js";
 
-import { isWeb3SigningCredentialNone } from "./model-type-guards";
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { isWeb3SigningCredentialNone } from "./model-type-guards.js";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 export interface IPluginLedgerConnectorQuorumOptions

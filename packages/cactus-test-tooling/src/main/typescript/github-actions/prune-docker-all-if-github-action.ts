@@ -3,8 +3,8 @@ import {
   Containers,
   IPruneDockerResourcesRequest,
   IPruneDockerResourcesResponse,
-} from "../common/containers";
-import { isRunningInGithubAction } from "./is-running-in-github-action";
+} from "../common/containers.js";
+import { isRunningInGithubAction } from "./is-running-in-github-action.js";
 
 /**
  * Github Actions started to run out of disk space recently (as of March, 2021) so we have this

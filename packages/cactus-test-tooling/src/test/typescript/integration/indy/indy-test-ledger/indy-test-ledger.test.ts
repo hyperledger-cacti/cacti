@@ -22,7 +22,7 @@ const testLogLevel: LogLevelDesc = "info";
 import {
   IndyTestLedger,
   pruneDockerAllIfGithubAction,
-} from "../../../../../main/typescript/index";
+} from "../../../../../main/typescript/index.js";
 
 import {
   LogLevelDesc,

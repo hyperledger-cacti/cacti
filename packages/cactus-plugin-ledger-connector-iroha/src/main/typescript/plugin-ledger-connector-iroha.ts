@@ -4,7 +4,7 @@ import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
 import type { Express } from "express";
 
-import { IrohaTransactionWrapper } from "./iroha-transaction-wrapper";
+import { IrohaTransactionWrapper } from "./iroha-transaction-wrapper.js";
 
 import OAS from "../json/openapi.json";
 
@@ -39,16 +39,16 @@ import {
   RunTransactionResponse,
   WatchBlocksV1,
   IrohaSocketIOTransactV1,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 
-import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
-import { GenerateTransactionEndpoint } from "./web-services/generate-transaction-endpoint";
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { IrohaSocketIOEndpoint } from "./web-services/iroha-socketio-endpoint";
+import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint.js";
+import { GenerateTransactionEndpoint } from "./web-services/generate-transaction-endpoint.js";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
+import { IrohaSocketIOEndpoint } from "./web-services/iroha-socketio-endpoint.js";
 import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
-} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1.js";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.iroha.keychain_not_found";
 

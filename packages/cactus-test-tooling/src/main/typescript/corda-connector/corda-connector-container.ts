@@ -11,7 +11,7 @@ import {
   Bools,
 } from "@hyperledger/cactus-common";
 
-import { Containers } from "../common/containers";
+import { Containers } from "../common/containers.js";
 
 /*
  * Provides default options for Corda connector server

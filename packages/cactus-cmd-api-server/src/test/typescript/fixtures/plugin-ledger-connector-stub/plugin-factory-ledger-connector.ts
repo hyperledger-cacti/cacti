@@ -6,7 +6,7 @@ import {
 import {
   IPluginLedgerConnectorStubOptions,
   PluginLedgerConnectorStub,
-} from "./plugin-ledger-connector-stub";
+} from "./plugin-ledger-connector-stub.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorStub,

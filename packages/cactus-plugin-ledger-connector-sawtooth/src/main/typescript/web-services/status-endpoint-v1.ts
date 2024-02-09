@@ -18,7 +18,7 @@ import type {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginLedgerConnectorSawtooth } from "../plugin-ledger-connector-sawtooth";
+import { PluginLedgerConnectorSawtooth } from "../plugin-ledger-connector-sawtooth.js";
 
 import type { Express, Request, Response } from "express";
 

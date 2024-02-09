@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Objects } from "../../../../main/typescript/public-api";
-import { A } from "../../fixtures/dummy-classes";
+import { Objects } from "../../../../main/typescript/public-api.js";
+import { A } from "../../fixtures/dummy-classes.js";
 
 test("handles inheritance correctly", async () => {
   const a = new A();

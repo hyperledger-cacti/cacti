@@ -11,8 +11,8 @@ import {
   getCurrentNetworkCredentialPath,
   getCredentialPath,
   fabricHelper
-} from '../fabric-functions'
-import { handlePromise, getNetworkConfig } from '../helpers'
+} from "../fabric-functions.js"
+import { handlePromise, getNetworkConfig } from "../helpers.js"
 import { MembershipManager } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 const helperInvoke = async (userId, ccFunc, ccArg, ...args) => {

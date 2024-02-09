@@ -43,8 +43,8 @@ import {
   InvokeContractV1Request,
   JvmTypeKind,
   PublicKey,
-} from "../../../main/typescript/generated/openapi/typescript-axios/index";
-import { CordaApiClient } from "../../../main/typescript/api-client/corda-api-client";
+} from "../../../main/typescript/generated/openapi/typescript-axios/index.js";
+import { CordaApiClient } from "../../../main/typescript/api-client/corda-api-client.js";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import { Subscription } from "rxjs";
 

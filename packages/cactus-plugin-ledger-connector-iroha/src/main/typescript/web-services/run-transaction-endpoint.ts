@@ -15,7 +15,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorIroha } from "../plugin-ledger-connector-iroha";
+import { PluginLedgerConnectorIroha } from "../plugin-ledger-connector-iroha.js";
 
 import OAS from "../../json/openapi.json";
 

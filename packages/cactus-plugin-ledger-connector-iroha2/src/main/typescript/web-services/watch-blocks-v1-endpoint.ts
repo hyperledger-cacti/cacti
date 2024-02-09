@@ -16,15 +16,15 @@ import {
   WatchBlocksOptionsV1,
   WatchBlocksResponseV1,
   BlockTypeV1,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 
-import { safeStringifyException, stringifyBigIntReplacer } from "../utils";
+import { safeStringifyException, stringifyBigIntReplacer } from "../utils.js";
 
 import { Torii as ToriiClient } from "@iroha2/client";
 
 import safeStringify from "fast-safe-stringify";
 import { VersionedCommittedBlock } from "@iroha2/data-model";
-import { IrohaV2PrerequisitesProvider } from "../cactus-iroha-sdk-wrapper/prerequisites-provider";
+import { IrohaV2PrerequisitesProvider } from "../cactus-iroha-sdk-wrapper/prerequisites-provider.js";
 
 /**
  * Iroha2WatchBlocksEndpointV1 configuration.

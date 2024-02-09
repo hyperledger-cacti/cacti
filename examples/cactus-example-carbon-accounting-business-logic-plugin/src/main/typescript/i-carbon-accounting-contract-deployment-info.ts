@@ -1,5 +1,5 @@
-import { IEthContractDeployment } from "./i-eth-contract-deployment";
-import { IFabricContractDeployment } from "./i-fabric-contract-deployment";
+import { IEthContractDeployment } from "./i-eth-contract-deployment.js";
+import { IFabricContractDeployment } from "./i-fabric-contract-deployment.js";
 
 export interface ICarbonAccountingXdaiContractDeploymentInfo {
   daoToken: IEthContractDeployment;

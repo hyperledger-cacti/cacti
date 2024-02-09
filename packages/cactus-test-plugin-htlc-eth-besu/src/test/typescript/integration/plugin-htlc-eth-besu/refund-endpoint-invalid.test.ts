@@ -32,7 +32,7 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { DataTest } from "../data-test";
+import { DataTest } from "../data-test.js";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/main/solidity/contracts/HashTimeLock.json";
 

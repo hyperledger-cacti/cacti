@@ -12,7 +12,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
+import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu.js";
 import OAS from "../../json/openapi.json";
 
 export interface IGetSingleStatusEndpointOptions {

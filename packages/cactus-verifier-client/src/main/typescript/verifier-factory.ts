@@ -5,7 +5,7 @@
  * verifier-factory.ts
  */
 
-import { Verifier } from "./verifier";
+import { Verifier } from "./verifier.js";
 
 import {
   Checks,
@@ -19,7 +19,7 @@ import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 import {
   ClientApiConfig,
   getValidatorApiClient,
-} from "./get-validator-api-client";
+} from "./get-validator-api-client.js";
 
 //////////////////////////////////
 // Type Declarations

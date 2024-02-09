@@ -6,14 +6,14 @@ import {
   PluginFactoryLedgerConnector,
   ReceiptType,
   Web3SigningCredentialType,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
-import { GetTransactionV1Request } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
+import { GetTransactionV1Request } from "../../../../main/typescript/generated/openapi/typescript-axios/api.js";
 
 test("can get past logs of an account", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";

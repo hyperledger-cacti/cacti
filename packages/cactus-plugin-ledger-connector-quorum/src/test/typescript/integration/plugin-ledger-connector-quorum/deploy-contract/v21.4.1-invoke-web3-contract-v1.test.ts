@@ -20,7 +20,7 @@ import {
   InvokeRawWeb3EthContractV1Request,
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
-} from "../../../../../main/typescript/index";
+} from "../../../../../main/typescript/index.js";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,

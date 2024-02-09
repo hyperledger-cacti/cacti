@@ -49,7 +49,7 @@ import "jest-extended";
 import { cloneDeep } from "lodash";
 
 // Mock default config
-import * as ConfigUtil from "../../../main/typescript/routing-interface/util/ConfigUtil";
+import * as ConfigUtil from "../../../main/typescript/routing-interface/util/ConfigUtil.js";
 jest.mock("../../../main/typescript/routing-interface/util/ConfigUtil");
 (ConfigUtil as any)["__configMock"] = defaultConfig;
 
@@ -69,12 +69,12 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: logLevel,
 });
 
-import { Verifier } from "../../../main/typescript/verifier/Verifier";
+import { Verifier } from "../../../main/typescript/verifier/Verifier.js";
 
 import {
   LedgerEvent,
   IVerifierEventListener,
-} from "../../../main/typescript/verifier/LedgerPlugin";
+} from "../../../main/typescript/verifier/LedgerPlugin.js";
 
 import { SocketIOTestSetupHelpers } from "@hyperledger/cactus-test-tooling";
 

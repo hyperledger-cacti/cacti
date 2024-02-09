@@ -26,7 +26,7 @@ import {
   EthContractInvocationType,
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
-} from "../../../main/typescript/index";
+} from "../../../main/typescript/index.js";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 
 jest.setTimeout(60 * 1000); // 1 minute timeout

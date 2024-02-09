@@ -11,7 +11,7 @@ import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-import { getAccountBalance } from "./transaction-ethereum";
+import { getAccountBalance } from "./transaction-ethereum.js";
 const moduleName = "balance";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;

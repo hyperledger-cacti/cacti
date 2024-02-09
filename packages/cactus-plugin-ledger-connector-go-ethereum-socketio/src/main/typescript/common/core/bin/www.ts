@@ -11,7 +11,7 @@
  * Connector: a part independent of end-chains
  */
 
-import app from "../app";
+import app from "../app.js";
 import https = require("https");
 
 // Overwrite config read path
@@ -32,10 +32,10 @@ const logger = getLogger("connector_main[" + process.pid + "]");
 logger.level = configRead("logLevel", "info");
 
 // implementation class of a part dependent of end-chains (server plugin)
-import { ServerPlugin } from "../../../connector/ServerPlugin";
+import { ServerPlugin } from "../../../connector/ServerPlugin.js";
 
 // destination dependency (MONITOR) implementation class
-import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin";
+import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin.js";
 
 // Normalize a port into a number, string, or false.
 function normalizePort(val: string) {

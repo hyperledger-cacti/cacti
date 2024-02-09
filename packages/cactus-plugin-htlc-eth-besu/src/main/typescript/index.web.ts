@@ -1,4 +1,4 @@
 export {
   PluginHtlcEthBesu,
   IPluginHtlcEthBesuOptions,
-} from "./plugin-htlc-eth-besu";
+} from "./plugin-htlc-eth-besu.js";

@@ -18,7 +18,7 @@ import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginConsortiumManual } from "../plugin-consortium-manual";
+import { PluginConsortiumManual } from "../plugin-consortium-manual.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   logLevel?: LogLevelDesc;

@@ -26,7 +26,7 @@ import {
   PluginLedgerConnectorIroha,
   DefaultApi as IrohaApi,
   PluginFactoryLedgerConnector,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 import { Configuration } from "@hyperledger/cactus-core-api";
 
@@ -34,7 +34,7 @@ import {
   IrohaCommand,
   KeyPair,
   RunTransactionRequestV1,
-} from "../../../../main/typescript/generated/openapi/typescript-axios";
+} from "./../../../../main/typescript/generated/openapi/typescript-axios/index.js";
 import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 
 import OAS from "../../../../main/json/openapi.json";

@@ -15,7 +15,7 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway";
+import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway.js";
 import OAS from "../../../json/openapi.json";
 
 export interface ITransferInitiationResponseEndpointOptions {

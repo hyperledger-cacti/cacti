@@ -1,7 +1,7 @@
 import { AddressInfo, ListenOptions } from "net";
 import { Server, createServer } from "http";
 import { Server as SecureServer } from "https";
-import { Checks } from "./checks";
+import { Checks } from "./checks.js";
 
 export interface IListenOptions {
   server: Server | SecureServer;

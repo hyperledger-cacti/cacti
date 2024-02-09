@@ -41,8 +41,8 @@ import {
   createAccountId,
   createAssetDefinitionId,
   createAssetId,
-} from "./data-factories";
-import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider";
+} from "./data-factories.js";
+import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider.js";
 
 /**
  * Action context for specific query.

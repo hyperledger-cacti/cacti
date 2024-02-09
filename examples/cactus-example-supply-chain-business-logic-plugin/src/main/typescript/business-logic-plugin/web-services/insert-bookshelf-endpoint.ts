@@ -21,7 +21,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import OAS from "../../../json/openapi.json";
-import { InsertBookshelfRequest } from "../../generated/openapi/typescript-axios/index";
+import { InsertBookshelfRequest } from "../../generated/openapi/typescript-axios/index.js";
 
 export interface IInsertBookshelfEndpointOptions {
   logLevel?: LogLevelDesc;

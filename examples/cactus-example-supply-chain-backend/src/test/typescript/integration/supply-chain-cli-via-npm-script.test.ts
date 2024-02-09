@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import * as publicApi from "../../../main/typescript/public-api";
+import * as publicApi from "../../../main/typescript/public-api.js";
 
 const testCase =
   "can launch via CLI with generated API server .config.json file";

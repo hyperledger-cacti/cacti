@@ -8,7 +8,7 @@ import {
   Bools,
 } from "@hyperledger/cactus-common";
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { Containers } from "../common/containers";
+import { Containers } from "../common/containers.js";
 import { RuntimeError } from "run-time-error-cjs";
 import { EventEmitter } from "events";
 

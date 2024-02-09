@@ -8,9 +8,9 @@ import {
   Bools,
   Checks,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { IKeyPair } from "../i-key-pair";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { IKeyPair } from "../i-key-pair.js";
+import { Containers } from "../common/containers.js";
 
 /*
  * Contains options for Iroha container

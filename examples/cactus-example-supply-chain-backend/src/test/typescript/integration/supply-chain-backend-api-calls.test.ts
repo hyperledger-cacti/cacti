@@ -5,9 +5,9 @@ import { AuthorizationProtocol } from "@hyperledger/cactus-cmd-api-server";
 import { IAuthorizationConfig } from "@hyperledger/cactus-cmd-api-server";
 import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
 
-import * as publicApi from "../../../main/typescript/public-api";
-import { ISupplyChainAppOptions } from "../../../main/typescript/public-api";
-import { SupplyChainApp } from "../../../main/typescript/public-api";
+import * as publicApi from "../../../main/typescript/public-api.js";
+import { ISupplyChainAppOptions } from "../../../main/typescript/public-api.js";
+import { SupplyChainApp } from "../../../main/typescript/public-api.js";
 
 const testCase =
   "can launch via CLI with generated API server .config.json file";

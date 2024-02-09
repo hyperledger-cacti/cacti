@@ -3,7 +3,7 @@ import test, { Test } from "tape";
 import {
   CryptoUtil,
   ECCurveType,
-} from "../../../main/typescript/identity/internal/crypto-util";
+} from "../../../main/typescript/identity/internal/crypto-util.js";
 const KJ = KJUR as any;
 test("cryptoUtil", (t: Test) => {
   t.test("encodeASN1Sig", (t: Test) => {

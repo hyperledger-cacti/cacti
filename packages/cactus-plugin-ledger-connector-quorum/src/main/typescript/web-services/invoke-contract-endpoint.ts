@@ -14,10 +14,10 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
+import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum.js";
 
 import OAS from "../../json/openapi.json";
-import { InvokeContractV1Request } from "../generated/openapi/typescript-axios/api";
+import { InvokeContractV1Request } from "../generated/openapi/typescript-axios/api.js";
 
 export interface IInvokeContractEndpointOptions {
   logLevel?: LogLevelDesc;

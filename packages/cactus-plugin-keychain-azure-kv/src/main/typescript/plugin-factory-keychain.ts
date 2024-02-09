@@ -8,7 +8,7 @@ import {
 import {
   IPluginKeychainAzureKvOptions,
   PluginKeychainAzureKv,
-} from "./plugin-keychain-azure-kv";
+} from "./plugin-keychain-azure-kv.js";
 
 export class PluginFactoryKeychain extends PluginFactory<
   IPluginKeychain,

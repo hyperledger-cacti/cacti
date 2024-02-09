@@ -21,12 +21,12 @@ import {
   GetBalanceV1Request,
   GetBalanceV1Response,
   Web3TransactionReceipt,
-} from "./generated/openapi/typescript-axios/index";
+} from "./generated/openapi/typescript-axios/index.js";
 
 import {
   GetPastLogsV1Request,
   GetPastLogsV1Response,
-} from "./generated/openapi/typescript-axios/index";
+} from "./generated/openapi/typescript-axios/index.js";
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -53,7 +53,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
+import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint.js";
 
 import {
   WatchBlocksV1,
@@ -77,29 +77,29 @@ import {
   GetBlockV1Response,
   GetBesuRecordV1Request,
   GetBesuRecordV1Response,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 
-import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
-import { isWeb3SigningCredentialNone } from "./model-type-guards";
-import { BesuSignTransactionEndpointV1 } from "./web-services/sign-transaction-endpoint-v1";
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint.js";
+import { isWeb3SigningCredentialNone } from "./model-type-guards.js";
+import { BesuSignTransactionEndpointV1 } from "./web-services/sign-transaction-endpoint-v1.js";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
 import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
-} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
-import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1.js";
+import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint.js";
 import { RuntimeError } from "run-time-error-cjs";
-import { GetBalanceEndpoint } from "./web-services/get-balance-endpoint";
-import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint";
-import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint";
-import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
-import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-";
-import { GetBesuRecordEndpointV1 } from "./web-services/get-besu-record-endpoint-v1";
+import { GetBalanceEndpoint } from "./web-services/get-balance-endpoint.js";
+import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint.js";
+import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint.js";
+import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint.js";
+import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-.js";
+import { GetBesuRecordEndpointV1 } from "./web-services/get-besu-record-endpoint-v1.js";
 import { AbiItem } from "web3-utils";
 import {
   GetOpenApiSpecV1Endpoint,
   IGetOpenApiSpecV1EndpointOptions,
-} from "./web-services/get-open-api-spec-v1-endpoint";
+} from "./web-services/get-open-api-spec-v1-endpoint.js";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 

@@ -5,8 +5,11 @@ import {
 } from "@hyperledger/cactus-common";
 import Vault, { client } from "node-vault";
 import { KJUR, KEYUTIL } from "jsrsasign";
-import { InternalIdentityClient, ISignatureResponse } from "./internal/client";
-import { ECCurveType } from "./internal/crypto-util";
+import {
+  InternalIdentityClient,
+  ISignatureResponse,
+} from "./internal/client.js";
+import { ECCurveType } from "./internal/crypto-util.js";
 
 export interface IVaultTransitClientOptions {
   // full url of vault server

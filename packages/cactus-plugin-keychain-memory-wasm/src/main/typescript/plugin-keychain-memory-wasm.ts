@@ -12,10 +12,10 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import OAS from "../json/openapi.json";
-import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
-import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1";
-import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
-import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
+import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1.js";
+import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1.js";
+import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1.js";
+import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1.js";
 
 export interface IPluginKeychainMemoryWasmOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;

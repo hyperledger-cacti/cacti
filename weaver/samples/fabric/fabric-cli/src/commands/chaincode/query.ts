@@ -6,9 +6,9 @@
 
 import { GluegunCommand } from 'gluegun'
 import * as fs from 'fs'
-import { query } from '../../helpers/fabric-functions'
-import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
-import logger from '../../helpers/logger'
+import { query } from "../../helpers/fabric-functions.js"
+import { commandHelp, getNetworkConfig } from "../../helpers/helpers.js"
+import logger from "../../helpers/logger.js"
 const command: GluegunCommand = {
   name: 'query',
   alias: ['q'],

@@ -5,23 +5,23 @@ import { v4 as uuidV4 } from "uuid";
 import {
   ILocalLog,
   PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+} from "../../../../main/typescript/gateway/plugin-satp-gateway.js";
 
-import { SessionData } from "../../../../main/typescript/public-api";
+import { SessionData } from "../../../../main/typescript/public-api.js";
 import { SHA256 } from "crypto-js";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway.js";
 import {
   FabricSatpGateway,
   IFabricSatpGatewayConstructorOptions,
-} from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+} from "../../../../main/typescript/gateway/fabric-satp-gateway.js";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper.js";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper.js";
 
 import {
   knexClientConnection,
   knexRemoteConnection,
   knexServerConnection,
-} from "../../knex.config";
+} from "../../knex.config.js";
 
 let sourceGatewayConstructor: IFabricSatpGatewayConstructorOptions;
 

@@ -15,7 +15,7 @@ const containerImageVersion = "2021-05-03-quorum-v21.4.1";
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorQuorum } from "../../../../../main/typescript/index";
+import { PluginLedgerConnectorQuorum } from "../../../../../main/typescript/index.js";
 import {
   QuorumTestLedger,
   pruneDockerAllIfGithubAction,

@@ -1,9 +1,9 @@
 import promClient, { Registry } from "prom-client";
-import { NodeCount } from "./response.type";
+import { NodeCount } from "./response.type.js";
 import {
   totalTxCount,
   K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT,
-} from "./metrics";
+} from "./metrics.js";
 
 export interface IPrometheusExporterOptions {
   pollingIntervalInMin?: number;

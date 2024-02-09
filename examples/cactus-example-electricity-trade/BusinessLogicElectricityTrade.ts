@@ -6,20 +6,20 @@
  */
 
 import type { Request } from "express";
-import { RequestInfo } from "./RequestInfo";
-import { MeterManagement } from "./MeterManagement";
-import { MeterInfo } from "./MeterInfo";
+import { RequestInfo } from "./RequestInfo.js";
+import { MeterManagement } from "./MeterManagement.js";
+import { MeterInfo } from "./MeterInfo.js";
 import {
   BusinessLogicBase,
   LedgerEvent,
   json2str,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socketio-server";
-import { sendEthereumTransaction } from "./TransactionEthereum";
+import { sendEthereumTransaction } from "./TransactionEthereum.js";
 
 const config: any = ConfigUtil.getConfig() as any;
 import { getLogger } from "log4js";
-import { getSawtoothApiClient } from "./sawtooth-connector";
+import { getSawtoothApiClient } from "./sawtooth-connector.js";
 import {
   isWatchBlocksV1CactiTransactionsResponse,
   WatchBlocksV1ListenerType,

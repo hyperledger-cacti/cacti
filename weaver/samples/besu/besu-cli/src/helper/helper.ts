@@ -9,7 +9,7 @@ import * as path from 'path'
 import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
-import logger from './logger'
+import logger from "./logger.js"
 
 // Used for getting network configuration from config.json file.
 const getNetworkConfig = (

@@ -14,10 +14,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "../plugin-registry";
+import { PluginRegistry } from "../plugin-registry.js";
 
-import { registerWebServiceEndpoint } from "./register-web-service-endpoint";
-import { handleRestEndpointException } from "./handle-rest-endpoint-exception";
+import { registerWebServiceEndpoint } from "./register-web-service-endpoint.js";
+import { handleRestEndpointException } from "./handle-rest-endpoint-exception.js";
 
 export interface IGetOpenApiSpecV1EndpointBaseOptions<S, P> {
   logLevel?: LogLevelDesc;

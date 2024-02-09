@@ -2,7 +2,7 @@ import { createServer } from "http";
 import { AddressInfo } from "net";
 import "jest-extended";
 
-import { Servers } from "../../../main/typescript/index";
+import { Servers } from "../../../main/typescript/index.js";
 
 const testCase = "Servers";
 

@@ -23,7 +23,7 @@ import {
   Logger,
 } from "@hyperledger/cactus-common";
 
-import PostgresDatabaseClient from "../../../main/typescript/db-client/db-client";
+import PostgresDatabaseClient from "../../../main/typescript/db-client/db-client.js";
 
 import "jest-extended";
 

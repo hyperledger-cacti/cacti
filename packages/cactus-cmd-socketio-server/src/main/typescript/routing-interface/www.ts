@@ -1,3 +1,3 @@
-import { startCactusSocketIOServer } from "./CactusSocketIOServer";
+import { startCactusSocketIOServer } from "./CactusSocketIOServer.js";
 
 startCactusSocketIOServer();

@@ -66,7 +66,7 @@ import {
   SocketIOApiClient,
   verifyValidatorJwt,
   SocketLedgerEvent,
-} from "../../../main/typescript/socketio-api-client";
+} from "../../../main/typescript/socketio-api-client.js";
 
 //////////////////////////////////
 // Test Timeout

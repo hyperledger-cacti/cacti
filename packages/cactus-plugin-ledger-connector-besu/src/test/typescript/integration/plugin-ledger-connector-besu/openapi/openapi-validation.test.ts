@@ -17,7 +17,7 @@ import {
   GetPastLogsV1Request,
   GetBlockV1Request,
   GetBesuRecordV1Request,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
@@ -37,7 +37,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import { AddressInfo } from "net";
-import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client";
+import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client.js";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../../main/json/openapi.json";

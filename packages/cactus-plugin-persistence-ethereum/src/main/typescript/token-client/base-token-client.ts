@@ -16,7 +16,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
-import { getRuntimeErrorCause } from "../utils";
+import { getRuntimeErrorCause } from "../utils.js";
 
 /**
  * Base class for calling ethereum token contract methods.

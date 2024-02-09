@@ -5,8 +5,8 @@
  * ContractInfoHolder.ts
  */
 
-import { DBAccess } from "./DBAccess";
-import { ConfigUtil } from "../util/ConfigUtil";
+import { DBAccess } from "./DBAccess.js";
+import { ConfigUtil } from "../util/ConfigUtil.js";
 
 const fs = require("fs");
 const path = require("path");

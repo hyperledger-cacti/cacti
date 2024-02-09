@@ -1,1 +1,1 @@
-export * from "./generated/openapi/typescript-axios/index";
+export * from "./generated/openapi/typescript-axios/index.js";

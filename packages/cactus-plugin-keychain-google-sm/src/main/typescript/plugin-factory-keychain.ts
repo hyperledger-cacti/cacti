@@ -7,7 +7,7 @@ import {
 import {
   IPluginKeychainGoogleSmOptions,
   PluginKeychainGoogleSm,
-} from "./plugin-keychain-google-sm";
+} from "./plugin-keychain-google-sm.js";
 
 export class PluginFactoryKeychain extends PluginFactory<
   PluginKeychainGoogleSm,

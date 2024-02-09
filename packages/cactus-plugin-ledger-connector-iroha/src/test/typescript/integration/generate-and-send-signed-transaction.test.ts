@@ -52,12 +52,12 @@ import {
   DefaultApi as IrohaApi,
   PluginFactoryLedgerConnector,
   signIrohaTransaction,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 import {
   IrohaCommand,
   IrohaQuery,
-} from "../../../main/typescript/generated/openapi/typescript-axios";
+} from "./../../../main/typescript/generated/openapi/typescript-axios/index.js";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({

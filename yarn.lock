@@ -9177,6 +9177,7 @@ __metadata:
     tap: 16.3.8
     tape: 5.6.6
     tape-promise: 4.0.0
+    to-esm-imports: 1.0.0
     ts-jest: 29.1.1
     ts-loader: 9.4.4
     ts-node: 10.9.1
@@ -29691,6 +29692,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ignore@npm:5.3.1":
+  version: 5.3.1
+  resolution: "ignore@npm:5.3.1"
+  checksum: 71d7bb4c1dbe020f915fd881108cbe85a0db3d636a0ea3ba911393c53946711d13a9b1143c7e70db06d571a5822c0a324a6bcde5c9904e7ca5047f01f1bf8cd3
+  languageName: node
+  linkType: hard
+
 "ignore@npm:^3.0.11, ignore@npm:^3.0.9, ignore@npm:^3.2.0, ignore@npm:^3.3.3":
   version: 3.3.10
   resolution: "ignore@npm:3.3.10"
@@ -34992,6 +35000,13 @@ __metadata:
   version: 1.8.1
   resolution: "loglevel@npm:1.8.1"
   checksum: a1a62db40291aaeaef2f612334c49e531bff71cc1d01a2acab689ab80d59e092f852ab164a5aedc1a752fdc46b7b162cb097d8a9eb2cf0b299511106c29af61d
+  languageName: node
+  linkType: hard
+
+"loglevel@npm:1.9.1":
+  version: 1.9.1
+  resolution: "loglevel@npm:1.9.1"
+  checksum: e1c8586108c4d566122e91f8a79c8df728920e3a714875affa5120566761a24077ec8ec9e5fc388b022e39fc411ec6e090cde1b5775871241b045139771eeb06
   languageName: node
   linkType: hard
 
@@ -47264,6 +47279,19 @@ __metadata:
   version: 1.1.1
   resolution: "to-buffer@npm:1.1.1"
   checksum: 6c897f58c2bdd8b8b1645ea515297732fec6dafb089bf36d12370c102ff5d64abf2be9410e0b1b7cfc707bada22d9a4084558010bfc78dd7023748dc5dd9a1ce
+  languageName: node
+  linkType: hard
+
+"to-esm-imports@npm:1.0.0":
+  version: 1.0.0
+  resolution: "to-esm-imports@npm:1.0.0"
+  dependencies:
+    ignore: 5.3.1
+    loglevel: 1.9.1
+    yargs: 17.7.2
+  bin:
+    to-esm-imports: dist/index.js
+  checksum: 35eb89041f9d777c2c5c77050e1bdf66cfe2f2b8eaa14059a4df522dfc7edee8fe7d2e16eeb264cec6077c80836a5d1c6897d3f2e461186ab28bfcf7de890bb6
   languageName: node
   linkType: hard
 

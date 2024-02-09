@@ -5,7 +5,7 @@
  * MeterManagement.ts
  */
 
-import { MeterInfo } from "./MeterInfo";
+import { MeterInfo } from "./MeterInfo.js";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import fs from "fs"
 import yaml from "js-yaml"

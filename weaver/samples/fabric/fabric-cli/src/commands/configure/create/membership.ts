@@ -5,8 +5,8 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
-import logger from '../../../helpers/logger'
+import { commandHelp, getNetworkConfig } from "../../../helpers/helpers.js"
+import logger from "../../../helpers/logger.js"
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
@@ -14,7 +14,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 import {
   generateMembership,
   getCurrentNetworkCredentialPath
-} from '../../../helpers/fabric-functions'
+} from "../../../helpers/fabric-functions.js"
 
 const command: GluegunCommand = {
   name: 'membership',

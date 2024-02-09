@@ -37,7 +37,7 @@ import {
 import {
   CarbonAccountingApp,
   ICarbonAccountingAppOptions,
-} from "../../../main/typescript/carbon-accounting-app";
+} from "../../../main/typescript/carbon-accounting-app.js";
 
 const testCase = "can enroll new admin users onto the Fabric org";
 const logLevel: LogLevelDesc = "TRACE";

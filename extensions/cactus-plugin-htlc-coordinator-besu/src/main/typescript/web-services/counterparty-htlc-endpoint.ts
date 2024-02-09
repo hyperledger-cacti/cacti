@@ -17,8 +17,8 @@ import {
   PluginRegistry,
   registerWebServiceEndpoint,
 } from "@hyperledger/cactus-core";
-import { CounterpartyHTLCRequest } from "../generated/openapi/typescript-axios";
-import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu";
+import { CounterpartyHTLCRequest } from "./../generated/openapi/typescript-axios/index.js";
+import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu.js";
 import OAS from "../../json/openapi.json";
 
 export interface ICounterpartyHTLCOptions {

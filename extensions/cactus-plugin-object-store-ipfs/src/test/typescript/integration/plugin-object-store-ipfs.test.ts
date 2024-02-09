@@ -17,8 +17,8 @@ import {
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 
-import { PluginObjectStoreIpfs } from "../../../main/typescript";
-import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
+import { PluginObjectStoreIpfs } from "./../../../main/typescript/index.js";
+import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api.js";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "can work with go-ipfs container get/set/has operations";

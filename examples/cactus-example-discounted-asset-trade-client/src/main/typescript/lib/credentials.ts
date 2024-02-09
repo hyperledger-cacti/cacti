@@ -8,7 +8,7 @@ import {
   CredentialRecordBinding,
   CredentialPreviewAttribute,
 } from "@aries-framework/core";
-import { AnoncredAgent } from "./agent-setup";
+import { AnoncredAgent } from "./agent-setup.js";
 
 // Constants
 const WAIT_FOR_ISSUE_ACCEPT_POLL_INTERVAL = 1000;

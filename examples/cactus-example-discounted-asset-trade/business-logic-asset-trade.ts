@@ -8,20 +8,20 @@
 import { Request } from "express";
 import { RequestInfo } from "@hyperledger/cactus-cmd-socketio-server";
 import { TradeInfo } from "@hyperledger/cactus-cmd-socketio-server";
-import { TransactionInfoManagement } from "./transaction-info-management";
-import { TransactionInfo } from "./transaction-info";
-import { TransactionData } from "./transaction-data";
-import { BusinessLogicInquireAssetTradeStatus } from "./business-logic-inquire-asset-trade-status";
-import { TxInfoData } from "./tx-info-data";
+import { TransactionInfoManagement } from "./transaction-info-management.js";
+import { TransactionInfo } from "./transaction-info.js";
+import { TransactionData } from "./transaction-data.js";
+import { BusinessLogicInquireAssetTradeStatus } from "./business-logic-inquire-asset-trade-status.js";
+import { TxInfoData } from "./tx-info-data.js";
 import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
-import { transferOwnership } from "./transaction-fabric";
-import { isEmploymentCredentialProofValid } from "./transaction-indy";
+import { transferOwnership } from "./transaction-fabric.js";
+import { isEmploymentCredentialProofValid } from "./transaction-indy.js";
 import {
   LedgerEvent,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socketio-server";
 import { json2str } from "@hyperledger/cactus-cmd-socketio-server";
-import { AssetTradeStatus } from "./define";
+import { AssetTradeStatus } from "./define.js";
 import {
   WatchBlocksCactusTransactionsEventV1 as FabricWatchBlocksCactusTransactionsEventV1,
   WatchBlocksListenerTypeV1 as FabricWatchBlocksListenerTypeV1,
@@ -35,8 +35,8 @@ import {
   createSigningToken,
   getFabricApiClient,
   getSignerIdentity,
-} from "./fabric-connector";
-import { sendEthereumTransaction } from "./transaction-ethereum";
+} from "./fabric-connector.js";
+import { sendEthereumTransaction } from "./transaction-ethereum.js";
 import { hasKey } from "@hyperledger/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
 

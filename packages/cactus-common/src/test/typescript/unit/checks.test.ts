@@ -1,7 +1,7 @@
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 
-import { Checks, CodedError } from "../../../main/typescript";
+import { Checks, CodedError } from "./../../../main/typescript/index.js";
 
 describe("Checks", () => {
   test("Checks#nonBlankString()", () => {

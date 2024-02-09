@@ -12,7 +12,7 @@ import {
   HtlcPackage,
   OwnHTLCRequest,
   Configuration,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import {
   DefaultApi as BesuApi,
   EthContractInvocationType,

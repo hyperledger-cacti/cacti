@@ -16,10 +16,10 @@ import {
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { RegisterHistoryDataEndpoint } from "./web-services/register-history-data-v1-endpoint";
-import { GetLineageDataEndpoint } from "./web-services/get-lineage-v1-endpoint";
-import { SearchLineageByHeaderEndpoint } from "./web-services/search-lineage-by-header-v1-endpoint";
-import { SearchLineageByGlobalDataEndpoint } from "./web-services/search-lineage-by-globaldata-v1-endpoint";
+import { RegisterHistoryDataEndpoint } from "./web-services/register-history-data-v1-endpoint.js";
+import { GetLineageDataEndpoint } from "./web-services/get-lineage-v1-endpoint.js";
+import { SearchLineageByHeaderEndpoint } from "./web-services/search-lineage-by-header-v1-endpoint.js";
+import { SearchLineageByGlobalDataEndpoint } from "./web-services/search-lineage-by-globaldata-v1-endpoint.js";
 
 import OAS from "../json/openapi.json";
 import {
@@ -32,12 +32,12 @@ import {
   SearchLineageRequestV1,
   SearchLineageResponseV1,
   RegisterHistoryDataV1Response,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 import {
   HTTP_HEADER_SUBSCRIPTION_KEY,
   getAuthorizationHeaders,
-} from "./type-defs";
-import { CDLGateway } from "./cdl-gateway";
+} from "./type-defs.js";
+import { CDLGateway } from "./cdl-gateway.js";
 
 export interface IPluginLedgerConnectorCDLOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;

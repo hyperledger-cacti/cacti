@@ -1,19 +1,19 @@
 import {
   SatpMessageType,
   PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+} from "../../../../main/typescript/gateway/plugin-satp-gateway.js";
 import {
   SessionData,
   TransferCompleteV1Request,
-} from "../../../../main/typescript/generated/openapi/typescript-axios/api";
+} from "../../../../main/typescript/generated/openapi/typescript-axios/api.js";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
 import { randomInt } from "crypto";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
-import { knexRemoteConnection } from "../../knex.config";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway.js";
+import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway.js";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper.js";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper.js";
+import { knexRemoteConnection } from "../../knex.config.js";
 
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;

@@ -5,9 +5,9 @@
  * LPInfoHolder.ts
  */
 
-import { DBAccess } from "./DBAccess";
-import { ConfigUtil } from "../util/ConfigUtil";
-import { LedgerPluginInfo } from "../../verifier/validator-registry";
+import { DBAccess } from "./DBAccess.js";
+import { ConfigUtil } from "../util/ConfigUtil.js";
+import { LedgerPluginInfo } from "../../verifier/validator-registry.js";
 
 const fs = require("fs");
 const path = require("path");

@@ -7,7 +7,7 @@ import fs from "fs-extra";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error-cjs";
 import fastSafeStringify from "fast-safe-stringify";
-import { INpmListDependencyV1, npmList } from "./npm-list";
+import { INpmListDependencyV1, npmList } from "./npm-list.js";
 
 const execAsync = promisify(exec);
 

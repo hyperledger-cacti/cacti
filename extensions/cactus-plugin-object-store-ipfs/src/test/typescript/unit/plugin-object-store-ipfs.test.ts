@@ -9,9 +9,9 @@ import { Servers } from "@hyperledger/cactus-common";
 import type { IListenOptions, LogLevelDesc } from "@hyperledger/cactus-common";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
-import { PluginObjectStoreIpfs } from "../../../main/typescript";
-import type { IPluginObjectStoreIpfsOptions } from "../../../main/typescript";
-import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
+import { PluginObjectStoreIpfs } from "./../../../main/typescript/index.js";
+import type { IPluginObjectStoreIpfsOptions } from "./../../../main/typescript/index.js";
+import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api.js";
 
 test("PluginObjectStoreIpfs", async (t1: Test) => {
   const logLevel: LogLevelDesc = "TRACE";

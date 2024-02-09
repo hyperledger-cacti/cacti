@@ -5,7 +5,7 @@ import { LoggerProvider } from "@hyperledger/cactus-common";
 import {
   ICarbonAccountingAppOptions,
   CarbonAccountingApp,
-} from "./carbon-accounting-app";
+} from "./carbon-accounting-app.js";
 
 export async function launchApp(): Promise<void> {
   const configService = new ConfigService();

@@ -14,7 +14,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
+import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai.js";
 
 import OAS from "../../json/openapi.json";
 

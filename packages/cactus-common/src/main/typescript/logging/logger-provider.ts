@@ -1,4 +1,4 @@
-import { Logger, ILoggerOptions } from "./logger";
+import { Logger, ILoggerOptions } from "./logger.js";
 import { LogLevelDesc } from "loglevel";
 
 export class LoggerProvider {

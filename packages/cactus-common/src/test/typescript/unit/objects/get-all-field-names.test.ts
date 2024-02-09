@@ -1,4 +1,4 @@
-import { Objects } from "../../../../main/typescript/public-api";
+import { Objects } from "../../../../main/typescript/public-api.js";
 import "jest-extended";
 
 test("tests for get the properties of object", async () => {

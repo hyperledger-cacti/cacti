@@ -18,8 +18,8 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
-import { DeployContractGoSourceV1Request } from "../generated/openapi/typescript-axios/index";
+import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric.js";
+import { DeployContractGoSourceV1Request } from "../generated/openapi/typescript-axios/index.js";
 import OAS from "../../json/openapi.json";
 
 export interface IDeployContractGoSourceEndpointV1Options {

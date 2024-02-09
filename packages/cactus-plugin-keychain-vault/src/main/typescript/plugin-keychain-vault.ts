@@ -17,16 +17,16 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
 
 import {
   IGetPrometheusExporterMetricsEndpointV1Options,
   GetPrometheusExporterMetricsEndpointV1,
-} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
-import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-endpoint-v1";
-import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
-import { HasKeychainEntryEndpointV1 } from "./web-services/has-keychain-entry-endpoint-v1";
-import { DeleteKeychainEntryEndpointV1 } from "./web-services/delete-keychain-entry-endpoint-v1";
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1.js";
+import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-endpoint-v1.js";
+import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1.js";
+import { HasKeychainEntryEndpointV1 } from "./web-services/has-keychain-entry-endpoint-v1.js";
+import { DeleteKeychainEntryEndpointV1 } from "./web-services/delete-keychain-entry-endpoint-v1.js";
 
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;

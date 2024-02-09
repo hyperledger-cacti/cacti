@@ -1,8 +1,8 @@
 const path = require("path");
 const packageDir = process.cwd();
 const pkg = require(`${packageDir}/package.json`);
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 const packageNameNoScope = pkg.name.substring(pkg.name.lastIndexOf("/") + 1);
 const libraryName = `${packageNameNoScope}`;
@@ -54,6 +54,11 @@ module.exports = {
   ],
   resolve: {
     extensions: [".ts", ".js"],
+    extensionAlias: {
+      ".js": [".js", ".ts"],
+      ".cjs": [".cjs", ".cts"],
+      ".mjs": [".mjs", ".mts"],
+    },
   },
   output: {
     filename: "[name]",

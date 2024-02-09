@@ -7,11 +7,11 @@ import {
   DefaultApi as SupplyChainApi,
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
-import { BESU_DEMO_LEDGER_ID } from "../../../constants";
-import { ShipmentDetailPage } from "../shipment-detail/shipment-detail.page";
+import { BESU_DEMO_LEDGER_ID } from "../../../constants.js";
+import { ShipmentDetailPage } from "../shipment-detail/shipment-detail.page.js";
 import { ModalController } from "@ionic/angular";
 
-import { AuthConfig } from "../../common/auth-config";
+import { AuthConfig } from "../../common/auth-config.js";
 
 @Component({
   selector: "app-shipment-list",

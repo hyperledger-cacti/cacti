@@ -5,9 +5,9 @@
 /* eslint-disable */
 
 import * as grpc from "@grpc/grpc-js";
-import * as networks_networks_pb from "../networks/networks_pb";
-import * as common_ack_pb from "../common/ack_pb";
-import * as common_state_pb from "../common/state_pb";
+import * as networks_networks_pb from "../networks/networks_pb.js";
+import * as common_ack_pb from "../common/ack_pb.js";
+import * as common_state_pb from "../common/state_pb.js";
 
 interface INetworkService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     requestState: INetworkService_IRequestState;

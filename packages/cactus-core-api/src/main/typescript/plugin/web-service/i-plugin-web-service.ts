@@ -1,6 +1,6 @@
 import type { Application } from "express";
-import { IWebServiceEndpoint } from "./i-web-service-endpoint";
-import { ICactusPlugin } from "../i-cactus-plugin";
+import { IWebServiceEndpoint } from "./i-web-service-endpoint.js";
+import { ICactusPlugin } from "../i-cactus-plugin.js";
 import type { Server as SocketIoServer } from "socket.io";
 
 export interface IPluginWebService extends ICactusPlugin {

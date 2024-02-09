@@ -4,11 +4,14 @@ import * as grpc from "@grpc/grpc-js";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
-import { ApiServer, ConfigService } from "../../../main/typescript/public-api";
-import { AuthorizationProtocol } from "../../../main/typescript/public-api";
-import { default_service } from "../../../main/typescript/public-api";
-import { health_check_response_pb } from "../../../main/typescript/public-api";
-import { empty } from "../../../main/typescript/public-api";
+import {
+  ApiServer,
+  ConfigService,
+} from "../../../main/typescript/public-api.js";
+import { AuthorizationProtocol } from "../../../main/typescript/public-api.js";
+import { default_service } from "../../../main/typescript/public-api.js";
+import { health_check_response_pb } from "../../../main/typescript/public-api.js";
+import { empty } from "../../../main/typescript/public-api.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 const testCase = "API server: runs gRPC TS-proto web services";

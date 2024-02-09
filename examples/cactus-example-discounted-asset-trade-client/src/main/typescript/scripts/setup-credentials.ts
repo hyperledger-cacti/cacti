@@ -13,7 +13,7 @@ import {
   connectAgents,
   issueCredential,
   checkCredentialProof,
-} from "../public-api";
+} from "../public-api.js";
 
 // Logger setup
 const logLevel = process.env.LOG_LEVEL ?? "INFO";

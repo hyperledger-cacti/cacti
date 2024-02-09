@@ -14,10 +14,10 @@ import { v4 as uuidv4 } from "uuid";
 import { ICryptoKey } from "fabric-common";
 import { Contract } from "fabric-network";
 import eventsPb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
-import { Relay } from "./Relay";
-import { InteropJSON } from "./types";
-import { getPolicyCriteriaForAddress, createAddress, signMessage } from "./InteroperableHelper";
-import * as helpers from "./helpers";
+import { Relay } from "./Relay.js";
+import { InteropJSON } from "./types.js";
+import { getPolicyCriteriaForAddress, createAddress, signMessage } from "./InteroperableHelper.js";
+import * as helpers from "./helpers.js";
 
 const logger = log4js.getLogger("EventsManager");
 

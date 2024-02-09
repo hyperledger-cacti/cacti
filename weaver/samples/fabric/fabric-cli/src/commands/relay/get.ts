@@ -6,8 +6,8 @@
 
 import { GluegunCommand } from 'gluegun'
 import { RelayHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
-import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
-import logger from '../../helpers/logger'
+import { commandHelp, getNetworkConfig } from "../../helpers/helpers.js"
+import logger from "../../helpers/logger.js"
 
 const command: GluegunCommand = {
   name: 'get',

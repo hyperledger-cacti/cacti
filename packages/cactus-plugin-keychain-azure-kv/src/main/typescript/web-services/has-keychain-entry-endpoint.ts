@@ -16,7 +16,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginKeychainAzureKv } from "../plugin-keychain-azure-kv";
+import { PluginKeychainAzureKv } from "../plugin-keychain-azure-kv.js";
 
 import OAS from "../../json/openapi.json";
 

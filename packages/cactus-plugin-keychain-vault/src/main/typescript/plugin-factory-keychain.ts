@@ -8,14 +8,14 @@ import {
 import {
   Configuration,
   DefaultApi,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 
 import {
   IPluginKeychainVaultOptions,
   PluginKeychainVault,
-} from "./plugin-keychain-vault";
+} from "./plugin-keychain-vault.js";
 
-import { PluginKeychainVaultRemoteAdapter } from "./plugin-keychain-vault-remote-adapter";
+import { PluginKeychainVaultRemoteAdapter } from "./plugin-keychain-vault-remote-adapter.js";
 
 export class PluginFactoryKeychain extends PluginFactory<
   IPluginKeychain,

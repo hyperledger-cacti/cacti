@@ -5,7 +5,7 @@
  */
 
 import { build } from 'gluegun/build'
-import { customHelp } from './helpers/helpers'
+import { customHelp } from "./helpers/helpers.js"
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'

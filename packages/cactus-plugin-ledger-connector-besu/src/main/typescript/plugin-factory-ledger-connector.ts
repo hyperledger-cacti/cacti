@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
-} from "./plugin-ledger-connector-besu";
+} from "./plugin-ledger-connector-besu.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorBesu,

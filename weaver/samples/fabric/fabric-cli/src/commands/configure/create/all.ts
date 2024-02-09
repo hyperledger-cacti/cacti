@@ -5,9 +5,9 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
-import { getCredentialPath, enrollAndRecordWalletIdentity } from '../../../helpers/fabric-functions'
-import logger from '../../../helpers/logger'
+import { commandHelp, getNetworkConfig } from "../../../helpers/helpers.js"
+import { getCredentialPath, enrollAndRecordWalletIdentity } from "../../../helpers/fabric-functions.js"
+import logger from "../../../helpers/logger.js"
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'
@@ -18,7 +18,7 @@ import {
   getCurrentNetworkCredentialPath,
   generateVerificationPolicy,
   generateMembership
-} from '../../../helpers/fabric-functions'
+} from "../../../helpers/fabric-functions.js"
 
 const command: GluegunCommand = {
   name: 'all',

@@ -47,8 +47,8 @@ import {
   DeployContractV1Request,
   ContractKeychainDefinition,
   signTransaction,
-} from "../../../main/typescript/public-api";
-import { K_CACTI_ETHEREUM_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+} from "../../../main/typescript/public-api.js";
+import { K_CACTI_ETHEREUM_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics.js";
 
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";

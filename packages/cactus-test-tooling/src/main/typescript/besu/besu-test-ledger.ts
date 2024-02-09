@@ -11,10 +11,10 @@ import {
   LoggerProvider,
   Bools,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { Streams } from "../common/streams";
-import { IKeyPair } from "../i-key-pair";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Streams } from "../common/streams.js";
+import { IKeyPair } from "../i-key-pair.js";
+import { Containers } from "../common/containers.js";
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;

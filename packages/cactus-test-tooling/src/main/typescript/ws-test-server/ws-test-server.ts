@@ -9,7 +9,7 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 
-import { Containers } from "../common/containers";
+import { Containers } from "../common/containers.js";
 
 export const WS_IDENTITY_IMAGE_NAME = `ghcr.io/brioux/ws-identity`;
 export const WS_IDENTITY_IMAGE_VERSION = "0.0.1";

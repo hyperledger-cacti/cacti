@@ -1,7 +1,7 @@
 import {
   WatchBlocksV1CactiTransactionsResponse,
   WatchBlocksV1FullResponse,
-} from "../generated/openapi/typescript-axios/api";
+} from "../generated/openapi/typescript-axios/api.js";
 
 export function isWatchBlocksV1CactiTransactionsResponse(
   response: unknown,

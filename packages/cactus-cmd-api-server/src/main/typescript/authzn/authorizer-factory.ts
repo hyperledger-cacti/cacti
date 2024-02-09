@@ -15,10 +15,10 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
-import { AuthorizationProtocol } from "../config/authorization-protocol";
-import { ICactusApiServerOptions } from "../config/config-service";
-import { IAuthorizationConfig } from "./i-authorization-config";
-import { isExpressJwtOptions } from "./is-express-jwt-options-type-guard";
+import { AuthorizationProtocol } from "../config/authorization-protocol.js";
+import { ICactusApiServerOptions } from "../config/config-service.js";
+import { IAuthorizationConfig } from "./i-authorization-config.js";
+import { isExpressJwtOptions } from "./is-express-jwt-options-type-guard.js";
 
 export const K_WARN_NO_AUTHORIZATION_PROTOCOL =
   "The API server configuration specified no authorization protocol. " +

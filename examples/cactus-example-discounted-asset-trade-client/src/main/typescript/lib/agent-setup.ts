@@ -43,7 +43,7 @@ import { anoncreds } from "@hyperledger/anoncreds-nodejs";
 import {
   setupAcceptingCredentialListener,
   setupAcceptingProofListener,
-} from "../public-api";
+} from "../public-api.js";
 
 // Constants
 const ALICE_AGENT_NAME = "aliceCactiAgent";

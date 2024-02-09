@@ -61,7 +61,7 @@ import {
   WatchBlocksListenerTypeV1,
   WatchBlocksCactusTransactionsResponseV1,
   FabricSigningCredential,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import { Observable } from "rxjs";
 
 // Logger setup

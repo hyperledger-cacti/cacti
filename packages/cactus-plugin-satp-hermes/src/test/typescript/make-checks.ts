@@ -1,4 +1,4 @@
-import { PluginSatpGateway } from "../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSatpGateway } from "../../main/typescript/gateway/plugin-satp-gateway.js";
 
 export async function makeSessionDataChecks(
   pluginSourceGateway: PluginSatpGateway,

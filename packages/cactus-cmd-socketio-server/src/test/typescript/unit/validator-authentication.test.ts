@@ -48,7 +48,7 @@ import config from "config";
   return entry;
 });
 
-import { signMessageJwt } from "../../../main/typescript/verifier/validator-authentication";
+import { signMessageJwt } from "../../../main/typescript/verifier/validator-authentication.js";
 
 //////////////////////////
 // UNIT TESTS

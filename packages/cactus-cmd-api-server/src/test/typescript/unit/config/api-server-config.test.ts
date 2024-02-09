@@ -3,7 +3,7 @@ import {
   ApiServer,
   // AuthorizationProtocol,
   ConfigService,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 describe("api-server shutdown-hook configuration tests", () => {
   // create a config service as base for the following UTs

@@ -13,7 +13,7 @@ import { LogLevelDesc, Checks } from "@hyperledger/cactus-common";
 import {
   PluginLedgerConnectorUbiquity,
   IPluginLedgerConnectorUbiquity,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 const testCase = "obtain all txs";
 const logLevel: LogLevelDesc = "TRACE";

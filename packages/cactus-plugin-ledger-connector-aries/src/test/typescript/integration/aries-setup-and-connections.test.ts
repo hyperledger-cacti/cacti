@@ -43,7 +43,7 @@ import {
   AriesApiClient,
   AriesAgentSummaryV1,
   AgentConnectionRecordV1,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({

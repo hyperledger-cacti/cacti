@@ -5,7 +5,7 @@ import {
 import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,
-} from "./plugin-consortium-manual";
+} from "./plugin-consortium-manual.js";
 
 export class PluginFactoryWebService extends PluginFactory<
   PluginConsortiumManual,

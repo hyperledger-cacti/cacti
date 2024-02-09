@@ -14,10 +14,10 @@
  * Module dependencies.
  */
 
- import app from "../app";
+ import app from "../app.js";
  const debug = require("debug")("connector:server");
  import https = require("https");
- import * as config from "../config";
+ import * as config from "../config.js";
  import fs = require("fs");
  import { Server } from "socket.io"
 
@@ -27,7 +27,7 @@
  logger.level = config.read('logLevel', 'info');
 
  // destination dependency (MONITOR) implementation class
- import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin";
+ import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin.js";
  const Smonitor = new ServerMonitorPlugin();
 
  /**

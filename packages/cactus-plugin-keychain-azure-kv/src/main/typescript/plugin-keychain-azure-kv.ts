@@ -16,16 +16,16 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
-import { SetKeychainEntryEndpoint } from "./web-services/set-keychain-entry-endpoint";
-import { GetKeychainEntryEndpoint } from "./web-services/get-keychain-entry-endpoint";
-import { DeleteKeychainEntryEndpoint } from "./web-services/delete-keychain-entry-endpoint";
+import { SetKeychainEntryEndpoint } from "./web-services/set-keychain-entry-endpoint.js";
+import { GetKeychainEntryEndpoint } from "./web-services/get-keychain-entry-endpoint.js";
+import { DeleteKeychainEntryEndpoint } from "./web-services/delete-keychain-entry-endpoint.js";
 
 import { KeyVaultSecret, SecretClient } from "@azure/keyvault-secrets";
 import {
   UsernamePasswordCredential,
   DefaultAzureCredential,
 } from "@azure/identity";
-import { HasKeychainEntryEndpoint } from "./web-services/has-keychain-entry-endpoint";
+import { HasKeychainEntryEndpoint } from "./web-services/has-keychain-entry-endpoint.js";
 
 // TODO: Writing the getExpressRequestHandler() method for
 

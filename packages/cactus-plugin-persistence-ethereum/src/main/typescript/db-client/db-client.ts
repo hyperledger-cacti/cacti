@@ -9,8 +9,8 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { Database as DatabaseSchemaType } from "./database.types";
-import { getRuntimeErrorCause } from "../utils";
+import { Database as DatabaseSchemaType } from "./database.types.js";
+import { getRuntimeErrorCause } from "../utils.js";
 
 import fs from "fs";
 import path from "path";

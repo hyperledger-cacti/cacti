@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorAriesOptions,
   PluginLedgerConnectorAries,
-} from "./plugin-ledger-connector-aries";
+} from "./plugin-ledger-connector-aries.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorAries,

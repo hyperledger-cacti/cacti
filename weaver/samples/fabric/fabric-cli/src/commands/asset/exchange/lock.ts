@@ -5,9 +5,9 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { fabricHelper } from '../../../helpers/fabric-functions'
-import logger from '../../../helpers/logger'
-import { commandHelp, getNetworkConfig, handlePromise } from '../../../helpers/helpers'
+import { fabricHelper } from "../../../helpers/fabric-functions.js"
+import logger from "../../../helpers/logger.js"
+import { commandHelp, getNetworkConfig, handlePromise } from "../../../helpers/helpers.js"
 import { AssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 const command: GluegunCommand = {

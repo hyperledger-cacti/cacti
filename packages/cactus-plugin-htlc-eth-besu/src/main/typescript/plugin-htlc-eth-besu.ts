@@ -10,12 +10,12 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
 
-import { GetSingleStatusEndpoint } from "./web-services/get-single-status-endpoint";
-import { GetStatusEndpoint } from "./web-services/get-status-endpoint";
-import { NewContractEndpoint } from "./web-services/new-contract-endpoint";
-import { RefundEndpoint } from "./web-services/refund-endpoint";
-import { WithdrawEndpoint } from "./web-services/withdraw-endpoint";
-import { InitializeEndpoint } from "./web-services/initialize-endpoint";
+import { GetSingleStatusEndpoint } from "./web-services/get-single-status-endpoint.js";
+import { GetStatusEndpoint } from "./web-services/get-status-endpoint.js";
+import { NewContractEndpoint } from "./web-services/new-contract-endpoint.js";
+import { RefundEndpoint } from "./web-services/refund-endpoint.js";
+import { WithdrawEndpoint } from "./web-services/withdraw-endpoint.js";
+import { InitializeEndpoint } from "./web-services/initialize-endpoint.js";
 import {
   EthContractInvocationType,
   InvokeContractV1Response,
@@ -35,7 +35,7 @@ import {
   GetStatusRequest,
   GetSingleStatusRequest,
   Web3SigningCredentialPrivateKeyHex,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 export interface IPluginHtlcEthBesuOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   instanceId: string;

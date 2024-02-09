@@ -6,7 +6,7 @@ import {
 import {
   IPluginLedgerConnectorCordaOptions,
   PluginLedgerConnectorCorda,
-} from "./plugin-ledger-connector-corda";
+} from "./plugin-ledger-connector-corda.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorCorda,

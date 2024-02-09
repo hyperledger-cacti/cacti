@@ -18,7 +18,7 @@ import {
   InvokeRawWeb3EthContractV1Request,
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
-} from "../../../main/typescript/index";
+} from "../../../main/typescript/index.js";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   GethTestLedger,

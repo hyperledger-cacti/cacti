@@ -6,15 +6,15 @@ import { IonicModule, IonicRouteStrategy } from "@ionic/angular";
 import { SplashScreen } from "@ionic-native/splash-screen/ngx";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
 
-import { AppComponent } from "./app.component";
-import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./app.component.js";
+import { AppRoutingModule } from "./app-routing.module.js";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   BESU_DEMO_LEDGER_ID,
   CACTUS_API_URL,
   FABRIC_DEMO_LEDGER_ID,
-} from "../constants";
+} from "../constants.js";
 import { ApiClient } from "@hyperledger/cactus-api-client";
 
 LoggerProvider.setLogLevel("TRACE");

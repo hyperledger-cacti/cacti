@@ -5,7 +5,7 @@ import {
 import {
   IPluginHtlcEthBesuErc20Options,
   PluginHtlcEthBesuErc20,
-} from "./plugin-htlc-eth-besu-erc20";
+} from "./plugin-htlc-eth-besu-erc20.js";
 
 export class PluginFactoryHtlcEthBesuErc20 extends PluginFactory<
   PluginHtlcEthBesuErc20,

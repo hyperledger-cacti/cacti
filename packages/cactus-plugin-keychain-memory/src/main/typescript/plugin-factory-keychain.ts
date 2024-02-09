@@ -6,7 +6,7 @@ import { PluginFactory } from "@hyperledger/cactus-core-api";
 import {
   IPluginKeychainMemoryOptions,
   PluginKeychainMemory,
-} from "./plugin-keychain-memory";
+} from "./plugin-keychain-memory.js";
 
 export class PluginFactoryKeychain extends PluginFactory<
   PluginKeychainMemory,

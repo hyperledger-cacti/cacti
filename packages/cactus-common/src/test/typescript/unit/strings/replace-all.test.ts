@@ -1,4 +1,4 @@
-import { Strings } from "../../../../main/typescript/strings";
+import { Strings } from "../../../../main/typescript/strings.js";
 import "jest-extended";
 
 test("Strings#replaceAll() replaces strings", async () => {

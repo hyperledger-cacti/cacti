@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 
-import { BookshelfListPage } from "./bookshelf-list/bookshelf-list.page";
+import { BookshelfListPage } from "./bookshelf-list/bookshelf-list.page.js";
 
 const routes: Routes = [
   {

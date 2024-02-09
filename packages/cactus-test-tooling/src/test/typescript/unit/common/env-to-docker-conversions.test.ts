@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { envNodeToDocker } from "../../../../main/typescript/public-api";
-import { envMapToDocker } from "../../../../main/typescript/public-api";
-import { envNodeToMap } from "../../../../main/typescript/public-api";
+import { envNodeToDocker } from "../../../../main/typescript/public-api.js";
+import { envMapToDocker } from "../../../../main/typescript/public-api.js";
+import { envNodeToMap } from "../../../../main/typescript/public-api.js";
 
 describe("test-tooling#envMapToDocker()", () => {
   test("Empty Map", () => {

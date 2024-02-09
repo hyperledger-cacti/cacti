@@ -19,7 +19,7 @@ import {
 import { DeleteKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainMemory } from "../plugin-keychain-memory";
+import { PluginKeychainMemory } from "../plugin-keychain-memory.js";
 
 export interface IDeleteKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;

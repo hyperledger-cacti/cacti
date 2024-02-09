@@ -6,9 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { RIFUtil } from "../util/RIFUtil";
-import { ConfigUtil } from "../util/ConfigUtil";
-import { RIFError, BadRequestError, InternalServerError } from "../RIFError";
+import { RIFUtil } from "../util/RIFUtil.js";
+import { ConfigUtil } from "../util/ConfigUtil.js";
+import { RIFError, BadRequestError, InternalServerError } from "../RIFError.js";
 
 const fs = require("fs");
 const path = require("path");

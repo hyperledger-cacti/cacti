@@ -1,4 +1,4 @@
-import { CordaTestLedger } from "../../../../../main/typescript/public-api";
+import { CordaTestLedger } from "../../../../../main/typescript/public-api.js";
 import "jest-extended";
 
 test("constructor throws if invalid input is provided", () => {

@@ -15,7 +15,7 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorUbiquity } from "../../plugin-ledger-connector-ubiquity";
+import { PluginLedgerConnectorUbiquity } from "../../plugin-ledger-connector-ubiquity.js";
 
 import OAS from "../../../json/openapi.json";
 

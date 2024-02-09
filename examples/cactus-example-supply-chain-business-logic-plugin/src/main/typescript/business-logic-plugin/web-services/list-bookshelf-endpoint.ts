@@ -21,7 +21,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import OAS from "../../../json/openapi.json";
-import { BookshelfConverter } from "../../model/converter/bookshelf-converter";
+import { BookshelfConverter } from "../../model/converter/bookshelf-converter.js";
 
 export interface IListBookshelfEndpointOptions {
   logLevel?: LogLevelDesc;

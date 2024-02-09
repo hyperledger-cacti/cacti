@@ -3,9 +3,9 @@ import Web3 from "web3";
 
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { WatchBlocksV1Progress } from "../generated/openapi/typescript-axios";
-import { WatchBlocksV1 } from "../generated/openapi/typescript-axios";
-import { Web3BlockHeader } from "../generated/openapi/typescript-axios";
+import { WatchBlocksV1Progress } from "./../generated/openapi/typescript-axios/index.js";
+import { WatchBlocksV1 } from "./../generated/openapi/typescript-axios/index.js";
+import { Web3BlockHeader } from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IWatchBlocksV1EndpointOptions {
   logLevel?: LogLevelDesc;

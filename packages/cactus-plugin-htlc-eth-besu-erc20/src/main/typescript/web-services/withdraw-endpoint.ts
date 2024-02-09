@@ -12,9 +12,9 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { WithdrawRequest } from "../generated/openapi/typescript-axios";
+import { WithdrawRequest } from "./../generated/openapi/typescript-axios/index.js";
 import OAS from "../../json/openapi.json";
-import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
+import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20.js";
 
 export interface IWithdrawEndpointOptions {
   logLevel?: LogLevelDesc;

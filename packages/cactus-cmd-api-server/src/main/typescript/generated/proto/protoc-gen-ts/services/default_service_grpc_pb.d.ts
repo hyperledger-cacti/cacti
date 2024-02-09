@@ -5,9 +5,9 @@
 /* eslint-disable */
 
 import * as grpc from "@grpc/grpc-js";
-import * as services_default_service_pb from "../services/default_service_pb";
+import * as services_default_service_pb from "../services/default_service_pb.js";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
-import * as models_health_check_response_pb_pb from "../models/health_check_response_pb_pb";
+import * as models_health_check_response_pb_pb from "../models/health_check_response_pb_pb.js";
 
 interface IDefaultServiceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     getHealthCheckV1: IDefaultServiceService_IGetHealthCheckV1;

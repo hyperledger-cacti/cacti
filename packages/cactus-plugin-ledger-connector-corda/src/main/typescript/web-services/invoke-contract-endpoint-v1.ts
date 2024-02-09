@@ -22,7 +22,7 @@ import {
   DefaultApi,
   InvokeContractV1Request,
   InvokeContractV1Response,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IInvokeContractEndpointV1Options {
   logLevel?: LogLevelDesc;

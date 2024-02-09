@@ -8,7 +8,7 @@ import fs from 'fs';
 import { credentials } from '@grpc/grpc-js';
 import datatransfer_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/events_grpc_pb';
-import logger from './logger';
+import logger from "./logger.js";
 
 function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
     if (x == y) {

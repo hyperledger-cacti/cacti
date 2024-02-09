@@ -1,4 +1,4 @@
-import { IPluginFactoryOptions } from "../i-plugin-factory-options";
+import { IPluginFactoryOptions } from "../i-plugin-factory-options.js";
 export abstract class PluginFactory<T, K, C extends IPluginFactoryOptions> {
   constructor(public readonly options: C) {}
 

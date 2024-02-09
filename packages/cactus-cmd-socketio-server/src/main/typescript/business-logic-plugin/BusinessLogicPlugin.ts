@@ -6,7 +6,7 @@
  */
 
 import { Request } from "express";
-import { LedgerEvent } from "../verifier/LedgerPlugin";
+import { LedgerEvent } from "../verifier/LedgerPlugin.js";
 
 export interface BusinessLogicPlugin {
   startTransaction(

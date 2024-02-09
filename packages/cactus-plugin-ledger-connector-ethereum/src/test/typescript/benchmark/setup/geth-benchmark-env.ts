@@ -39,7 +39,7 @@ import {
 import {
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
-} from "../../../../main/typescript/index";
+} from "../../../../main/typescript/index.js";
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";
 
 const log: Logger = LoggerProvider.getOrCreate({

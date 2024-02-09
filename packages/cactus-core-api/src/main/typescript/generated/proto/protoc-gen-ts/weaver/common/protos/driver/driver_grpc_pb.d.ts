@@ -5,9 +5,9 @@
 /* eslint-disable */
 
 import * as grpc from "@grpc/grpc-js";
-import * as driver_driver_pb from "../driver/driver_pb";
-import * as common_ack_pb from "../common/ack_pb";
-import * as common_query_pb from "../common/query_pb";
+import * as driver_driver_pb from "../driver/driver_pb.js";
+import * as common_ack_pb from "../common/ack_pb.js";
+import * as common_query_pb from "../common/query_pb.js";
 
 interface IDriverCommunicationService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     requestDriverState: IDriverCommunicationService_IRequestDriverState;

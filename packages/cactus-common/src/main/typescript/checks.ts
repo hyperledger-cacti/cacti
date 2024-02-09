@@ -1,4 +1,4 @@
-import { CodedError } from "./error-utils";
+import { CodedError } from "./error-utils.js";
 
 export class Checks {
   /**

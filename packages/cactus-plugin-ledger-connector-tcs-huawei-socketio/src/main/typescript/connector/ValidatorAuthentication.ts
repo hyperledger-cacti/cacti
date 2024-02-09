@@ -8,7 +8,7 @@
 const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-import * as config from "../common/core/config";
+import * as config from "../common/core/config.js";
 import { getLogger } from "log4js";
 const logger = getLogger("ValidatorAuthentication[" + process.pid + "]");
 logger.level = config.read("logLevel", "info");

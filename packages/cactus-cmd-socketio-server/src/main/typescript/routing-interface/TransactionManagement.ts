@@ -6,11 +6,11 @@
  */
 
 import type { Request } from "express";
-import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin";
-import { BLPRegistry } from "./util/BLPRegistry";
-import { IVerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin";
-import { getTargetBLPInstance } from "../business-logic-plugin/BLP_config";
-import { ConfigUtil } from "./util/ConfigUtil";
+import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin.js";
+import { BLPRegistry } from "./util/BLPRegistry.js";
+import { IVerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin.js";
+import { getTargetBLPInstance } from "../business-logic-plugin/BLP_config.js";
+import { ConfigUtil } from "./util/ConfigUtil.js";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";

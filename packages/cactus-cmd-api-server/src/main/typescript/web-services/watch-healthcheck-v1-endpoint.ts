@@ -2,8 +2,8 @@ import { Socket as SocketIoSocket } from "socket.io";
 
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { HealthCheckResponse } from "../generated/openapi/typescript-axios";
-import { WatchHealthcheckV1 } from "../generated/openapi/typescript-axios";
+import { HealthCheckResponse } from "./../generated/openapi/typescript-axios/index.js";
+import { WatchHealthcheckV1 } from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IWatchHealthcheckV1EndpointOptions {
   logLevel?: LogLevelDesc;

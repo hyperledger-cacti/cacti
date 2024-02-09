@@ -1,5 +1,5 @@
-import { Logger } from "./logging/logger";
-import { LoggerProvider } from "./logging/logger-provider";
+import { Logger } from "./logging/logger.js";
+import { LoggerProvider } from "./logging/logger-provider.js";
 import { LogLevelDesc } from "loglevel";
 
 import secp256k1 from "secp256k1";

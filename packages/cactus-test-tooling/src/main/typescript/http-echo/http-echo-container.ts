@@ -2,7 +2,7 @@ import Docker, { Container, ContainerInfo } from "dockerode";
 import isPortReachable from "is-port-reachable";
 import Joi from "joi";
 import { EventEmitter } from "events";
-import { ITestLedger } from "../i-test-ledger";
+import { ITestLedger } from "../i-test-ledger.js";
 import { Stream } from "stream";
 
 const OPTS_SCHEMA: Joi.Schema = Joi.object().keys({

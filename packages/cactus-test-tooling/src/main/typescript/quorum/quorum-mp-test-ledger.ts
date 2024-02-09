@@ -6,8 +6,8 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Containers } from "../common/containers.js";
 
 export interface IQuorumMultiPartyTestLedgerOptions {
   readonly containerImageName?: string;

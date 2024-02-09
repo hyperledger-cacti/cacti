@@ -14,7 +14,7 @@ import {
   WatchBlocksV1Options,
   WatchBlocksV1Progress,
   Configuration,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 
 export class SawtoothApiClientOptions extends Configuration {
   readonly logLevel?: LogLevelDesc;

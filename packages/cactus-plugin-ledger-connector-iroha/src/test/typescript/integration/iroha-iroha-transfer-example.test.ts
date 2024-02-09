@@ -24,7 +24,7 @@ import {
   PluginLedgerConnectorIroha,
   DefaultApi as IrohaApi,
   PluginFactoryLedgerConnector,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 import { Configuration } from "@hyperledger/cactus-core-api";
 
@@ -32,7 +32,7 @@ import {
   IrohaCommand,
   IrohaQuery,
   KeyPair,
-} from "../../../main/typescript/generated/openapi/typescript-axios";
+} from "./../../../main/typescript/generated/openapi/typescript-axios/index.js";
 import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 import { Constants } from "@hyperledger/cactus-core-api";
 

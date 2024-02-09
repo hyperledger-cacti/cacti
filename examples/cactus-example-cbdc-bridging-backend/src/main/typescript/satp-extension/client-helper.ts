@@ -5,8 +5,8 @@ import {
   ClientGatewayHelper,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import { SatpMessageType } from "@hyperledger/cactus-plugin-satp-hermes";
-import { FabricSatpGateway } from "./fabric-satp-gateway";
-import { BesuSatpGateway } from "./besu-satp-gateway";
+import { FabricSatpGateway } from "./fabric-satp-gateway.js";
+import { BesuSatpGateway } from "./besu-satp-gateway.js";
 
 export class ClientHelper extends ClientGatewayHelper {
   async sendTransferInitializationRequest(

@@ -1,5 +1,5 @@
 import { KJUR } from "jsrsasign";
-import { ECCurveType } from "./crypto-util";
+import { ECCurveType } from "./crypto-util.js";
 
 export interface ISignatureResponse {
   sig: Buffer;

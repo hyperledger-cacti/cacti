@@ -5,7 +5,7 @@
  */
 
 import { Gateway, Wallets, Contract, X509Identity } from 'fabric-network'
-import { commandHelp, getNetworkConfig, saveUserCertToFile, handlePromise } from './helpers'
+import { commandHelp, getNetworkConfig, saveUserCertToFile, handlePromise } from "./helpers.js"
 import * as FabricCAServices from 'fabric-ca-client'
 import { Certificate } from '@fidm/x509'
 import { Utils, ICryptoKey } from 'fabric-common'

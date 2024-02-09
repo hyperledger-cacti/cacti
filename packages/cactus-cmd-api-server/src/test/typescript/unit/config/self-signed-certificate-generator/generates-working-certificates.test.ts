@@ -4,7 +4,7 @@ import { Server, createServer, request, RequestOptions } from "https";
 import {
   SelfSignedPkiGenerator,
   IPki,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
 const log: Logger = LoggerProvider.getOrCreate({

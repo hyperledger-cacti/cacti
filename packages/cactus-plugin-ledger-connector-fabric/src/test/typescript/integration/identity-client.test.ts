@@ -8,12 +8,12 @@ import {
   WS_IDENTITY_HTTP_PORT,
 } from "@hyperledger/cactus-test-tooling";
 import test, { Test } from "tape-promise/tape";
-import { InternalIdentityClient } from "../../../main/typescript/identity/internal/client";
-import { VaultTransitClient } from "../../../main/typescript/identity/vault-client";
-import { WebSocketClient } from "../../../main/typescript/identity/web-socket-client";
+import { InternalIdentityClient } from "../../../main/typescript/identity/internal/client.js";
+import { VaultTransitClient } from "../../../main/typescript/identity/vault-client.js";
+import { WebSocketClient } from "../../../main/typescript/identity/web-socket-client.js";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { createHash } from "crypto";
-import { ECCurveType } from "../../../main/typescript/identity/internal/crypto-util";
+import { ECCurveType } from "../../../main/typescript/identity/internal/crypto-util.js";
 import { KJUR } from "jsrsasign";
 import { WsWallet, ECCurveType as ECCurveTypeW } from "ws-wallet";
 import { WsIdentityClient } from "ws-identity-client";

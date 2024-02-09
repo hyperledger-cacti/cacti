@@ -6,10 +6,10 @@
  */
 
 import { Request } from "express";
-import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
-import { LedgerEvent } from "../verifier/LedgerPlugin";
-import { json2str } from "../verifier/DriverCommon";
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
+import { BusinessLogicPlugin } from "./BusinessLogicPlugin.js";
+import { LedgerEvent } from "../verifier/LedgerPlugin.js";
+import { json2str } from "../verifier/DriverCommon.js";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
 
 const fs = require("fs");
 const path = require("path");

@@ -18,8 +18,8 @@ import { Socket as SocketIoSocket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { RuntimeError } from "run-time-error-cjs";
 
-import { assertFabricFunctionIsAvailable } from "../common/utils";
-import { SignPayloadCallback } from "../plugin-ledger-connector-fabric";
+import { assertFabricFunctionIsAvailable } from "../common/utils.js";
+import { SignPayloadCallback } from "../plugin-ledger-connector-fabric.js";
 import {
   WatchBlocksV1,
   WatchBlocksResponseV1,
@@ -27,7 +27,7 @@ import {
   WatchBlocksOptionsV1,
   WatchBlocksCactusTransactionsEventV1,
   WatchBlocksDelegatedSignOptionsV1,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 
 const {
   newFilteredBlockEvent,

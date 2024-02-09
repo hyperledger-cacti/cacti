@@ -1,7 +1,7 @@
-import { BusinessLogicElectricityTrade } from "./BusinessLogicElectricityTrade";
+import { BusinessLogicElectricityTrade } from "./BusinessLogicElectricityTrade.js";
 import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socketio-server";
-import { initEthereumConnector } from "./ethereum-connector";
-import { initSawtoothConnector } from "./sawtooth-connector";
+import { initEthereumConnector } from "./ethereum-connector.js";
+import { initSawtoothConnector } from "./sawtooth-connector.js";
 
 async function startBLP() {
   try {

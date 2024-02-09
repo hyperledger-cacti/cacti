@@ -2,13 +2,13 @@ export {
   E_KEYCHAIN_NOT_FOUND,
   IPluginLedgerConnectorXdaiOptions,
   PluginLedgerConnectorXdai,
-} from "./plugin-ledger-connector-xdai";
-export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+} from "./plugin-ledger-connector-xdai.js";
+export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector.js";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
-import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector.js";
 
-export * from "./generated/openapi/typescript-axios/index";
+export * from "./generated/openapi/typescript-axios/index.js";
 
 export async function createPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,

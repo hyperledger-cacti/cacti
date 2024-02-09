@@ -11,10 +11,10 @@ import * as fs from 'fs';
 import iin_agent_pb from '@hyperledger/cacti-weaver-protos-js/identity/agent_pb';
 import { InteroperableHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
 
-import { LedgerBase } from '../common/ledgerBase';
-import { handlePromise, signMessage } from '../common/utils';
-import { walletSetup, getWallet } from './walletUtils';
-import { getAllMSPConfigurations, invokeFabricChaincode, queryFabricChaincode } from './networkUtils';
+import { LedgerBase } from "../common/ledgerBase.js";
+import { handlePromise, signMessage } from "../common/utils.js";
+import { walletSetup, getWallet } from "./walletUtils.js";
+import { getAllMSPConfigurations, invokeFabricChaincode, queryFabricChaincode } from "./networkUtils.js";
 
 export class FabricConnector extends LedgerBase {
     connectionProfilePath: string;

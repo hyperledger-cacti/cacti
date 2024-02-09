@@ -9,7 +9,7 @@ import {
   ServerGatewayHelper,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 
-import { FabricSatpGateway } from "./fabric-satp-gateway";
+import { FabricSatpGateway } from "./fabric-satp-gateway.js";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 export interface IServerHelperOptions {

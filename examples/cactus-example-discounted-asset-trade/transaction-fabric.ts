@@ -13,7 +13,7 @@ import {
   createSigningToken,
   getFabricConnector,
   getSignerIdentity,
-} from "./fabric-connector";
+} from "./fabric-connector.js";
 import { FabricContractInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
 const moduleName = "TransactionFabric";

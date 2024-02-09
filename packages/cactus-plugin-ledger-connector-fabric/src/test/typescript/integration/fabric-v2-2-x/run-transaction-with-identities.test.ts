@@ -1,6 +1,6 @@
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import test, { Test } from "tape-promise/tape";
-import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
+import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric.js";
 import { v4 as uuidv4 } from "uuid";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -11,7 +11,7 @@ import {
   PluginLedgerConnectorFabric,
   IIdentityData,
   FabricContractInvocationType,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import { DiscoveryOptions } from "fabric-network";
 
 const logLevel: LogLevelDesc = "TRACE";

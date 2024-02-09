@@ -18,7 +18,7 @@ import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm";
+import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   logLevel?: LogLevelDesc;

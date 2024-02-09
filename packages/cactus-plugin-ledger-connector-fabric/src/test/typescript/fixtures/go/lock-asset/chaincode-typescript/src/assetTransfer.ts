@@ -9,7 +9,7 @@ import {
   Returns,
   Transaction,
 } from "fabric-contract-api";
-import { Asset } from "./asset";
+import { Asset } from "./asset.js";
 
 @Info({
   title: "AssetTransfer",

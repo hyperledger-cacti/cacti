@@ -1,16 +1,16 @@
-export * from "./generated/openapi/typescript-axios";
+export * from "./generated/openapi/typescript-axios/index.js";
 
 export {
   PluginLedgerConnectorCDL,
   IPluginLedgerConnectorCDLOptions,
-} from "./plugin-ledger-connector-cdl";
+} from "./plugin-ledger-connector-cdl.js";
 
-export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector.js";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
-import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector.js";
 
-export * from "./generated/openapi/typescript-axios/api";
+export * from "./generated/openapi/typescript-axios/api.js";
 
 export async function createPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,

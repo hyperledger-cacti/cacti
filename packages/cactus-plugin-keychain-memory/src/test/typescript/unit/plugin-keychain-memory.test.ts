@@ -10,11 +10,11 @@ import { v4 as uuidv4 } from "uuid";
 import {
   IPluginKeychainMemoryOptions,
   PluginKeychainMemory,
-} from "../../../main/typescript";
+} from "./../../../main/typescript/index.js";
 
-import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "../../../main/typescript/prometheus-exporter/metrics.js";
 
-import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api";
+import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api.js";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testcase = "PluginKeychainMemory";

@@ -6,9 +6,9 @@
 
 import { GluegunCommand } from 'gluegun'
 import * as fs from 'fs'
-import { invoke } from '../../helpers/fabric-functions'
-import logger from '../../helpers/logger'
-import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
+import { invoke } from "../../helpers/fabric-functions.js"
+import logger from "../../helpers/logger.js"
+import { commandHelp, getNetworkConfig } from "../../helpers/helpers.js"
 const command: GluegunCommand = {
   name: 'invoke',
   alias: ['inv'],

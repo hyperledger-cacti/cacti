@@ -28,9 +28,9 @@ import {
   FileBase64,
   PluginLedgerConnectorFabric,
   RunTransactionRequest,
-} from "../../../../main/typescript/public-api";
-import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api";
-import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
+} from "../../../../main/typescript/public-api.js";
+import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api.js";
+import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric.js";
 import { DiscoveryOptions } from "fabric-network";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { Configuration } from "@hyperledger/cactus-core-api";

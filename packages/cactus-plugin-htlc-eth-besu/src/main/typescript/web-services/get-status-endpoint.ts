@@ -13,7 +13,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
-import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
+import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu.js";
 export interface IGetStatusEndpointOptions {
   logLevel?: LogLevelDesc;
   plugin: PluginHtlcEthBesu;

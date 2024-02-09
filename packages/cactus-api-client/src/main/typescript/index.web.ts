@@ -1,2 +1,2 @@
-export { ApiClient } from "./api-client";
-export { DefaultConsortiumProvider } from "./default-consortium-provider";
+export { ApiClient } from "./api-client.js";
+export { DefaultConsortiumProvider } from "./default-consortium-provider.js";

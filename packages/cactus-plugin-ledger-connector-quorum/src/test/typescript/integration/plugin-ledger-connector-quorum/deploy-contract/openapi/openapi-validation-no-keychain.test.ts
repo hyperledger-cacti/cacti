@@ -16,7 +16,7 @@ import {
   DefaultApi as QuorumApi,
   DeployContractSolidityBytecodeJsonObjectV1Request,
   InvokeContractJsonObjectV1Request,
-} from "../../../../../../main/typescript/public-api";
+} from "../../../../../../main/typescript/public-api.js";
 
 import {
   QuorumTestLedger,

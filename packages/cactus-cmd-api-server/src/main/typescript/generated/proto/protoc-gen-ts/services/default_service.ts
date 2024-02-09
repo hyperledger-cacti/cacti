@@ -3,8 +3,8 @@
  * compiler version: 3.19.1
  * source: services/default_service.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
-import * as dependency_1 from "./../google/protobuf/empty";
-import * as dependency_2 from "./../models/health_check_response_pb";
+import * as dependency_1 from "./../google/protobuf/empty.js";
+import * as dependency_2 from "./../models/health_check_response_pb.js";
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace org.hyperledger.cactus.cmd_api_server {

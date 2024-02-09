@@ -13,8 +13,8 @@ import {
   CommitFinalV1Response,
   CommitFinalV1Request,
   TransferCompleteV1Request,
-} from "../../public-api";
-import { SatpMessageType, PluginSatpGateway } from "../plugin-satp-gateway";
+} from "../../public-api.js";
+import { SatpMessageType, PluginSatpGateway } from "../plugin-satp-gateway.js";
 
 export class ServerGatewayHelper {
   public static readonly CLASS_NAME: string = "ServerGatewayHelper";

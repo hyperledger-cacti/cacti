@@ -15,13 +15,13 @@
 
 // configuration file
 const SplugUtil = require("./PluginUtil");
-import * as config from "../common/core/config";
+import * as config from "../common/core/config.js";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
 logger.level = config.read("logLevel", "info");
 // utility
-import { ValidatorAuthentication } from "./ValidatorAuthentication";
+import { ValidatorAuthentication } from "./ValidatorAuthentication.js";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 import https from "https";

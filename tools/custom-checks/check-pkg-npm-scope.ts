@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
-import { hasKey } from "../has-key";
+import { hasKey } from "../has-key.js";
 // eslint-disable-next-line prettier/prettier
 import lernaCfg from "../../lerna.json" assert { type: "json" };
 

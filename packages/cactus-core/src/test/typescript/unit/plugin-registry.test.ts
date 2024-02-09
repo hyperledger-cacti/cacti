@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 
-import { PluginRegistry } from "../../../main/typescript/public-api";
+import { PluginRegistry } from "../../../main/typescript/public-api.js";
 
 import { ICactusPlugin, IPluginKeychain } from "@hyperledger/cactus-core-api";
 

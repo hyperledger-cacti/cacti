@@ -52,20 +52,20 @@ import {
   Servers,
 } from "@hyperledger/cactus-common";
 
-import { ICactusApiServerOptions } from "./config/config-service";
+import { ICactusApiServerOptions } from "./config/config-service.js";
 import OAS from "../json/openapi.json";
 
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { AuthorizerFactory } from "./authzn/authorizer-factory";
-import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios";
-import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint";
-import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
-import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
-import { determineAddressFamily } from "./common/determine-address-family";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
+import { AuthorizerFactory } from "./authzn/authorizer-factory.js";
+import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios/index.js";
+import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint.js";
+import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service.js";
+import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server.js";
+import { determineAddressFamily } from "./common/determine-address-family.js";
 import {
   GetOpenApiSpecV1Endpoint,
   IGetOpenApiSpecV1EndpointOptions,
-} from "./web-services/get-open-api-spec-v1-endpoint";
+} from "./web-services/get-open-api-spec-v1-endpoint.js";
 
 export interface IApiServerConstructorOptions {
   readonly pluginManagerOptions?: { pluginsPath: string };

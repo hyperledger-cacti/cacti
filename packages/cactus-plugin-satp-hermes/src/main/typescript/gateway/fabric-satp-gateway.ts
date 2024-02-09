@@ -9,8 +9,8 @@ import {
 import {
   IPluginSatpGatewayConstructorOptions,
   PluginSatpGateway,
-} from "./plugin-satp-gateway";
-import { SessionDataRollbackActionsPerformedEnum } from "../generated/openapi/typescript-axios";
+} from "./plugin-satp-gateway.js";
+import { SessionDataRollbackActionsPerformedEnum } from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IFabricSatpGatewayConstructorOptions
   extends IPluginSatpGatewayConstructorOptions {

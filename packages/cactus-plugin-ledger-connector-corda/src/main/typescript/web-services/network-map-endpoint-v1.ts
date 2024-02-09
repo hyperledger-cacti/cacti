@@ -18,7 +18,10 @@ import {
 import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { DefaultApi, NodeInfo } from "../generated/openapi/typescript-axios";
+import {
+  DefaultApi,
+  NodeInfo,
+} from "./../generated/openapi/typescript-axios/index.js";
 
 export interface INetworkMapEndpointV1Options {
   logLevel?: LogLevelDesc;

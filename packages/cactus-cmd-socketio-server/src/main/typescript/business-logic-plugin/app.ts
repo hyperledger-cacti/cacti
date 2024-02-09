@@ -15,9 +15,9 @@ import cookieParser = require("cookie-parser");
 import logger = require("morgan");
 import bodyParser = require("body-parser");
 
-import indexRouter from "../routing-interface/routes/index";
-import loginRouter from "../routing-interface/routes/login";
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
+import indexRouter from "../routing-interface/routes/index.js";
+import loginRouter from "../routing-interface/routes/login.js";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
 
 const config: any = ConfigUtil.getConfig();
 

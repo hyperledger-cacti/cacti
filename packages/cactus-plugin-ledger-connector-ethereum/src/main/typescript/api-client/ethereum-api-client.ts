@@ -11,8 +11,8 @@ import {
   WatchBlocksV1,
   WatchBlocksV1Options,
   WatchBlocksV1Progress,
-} from "../generated/openapi/typescript-axios";
-import { Configuration } from "../generated/openapi/typescript-axios/configuration";
+} from "./../generated/openapi/typescript-axios/index.js";
+import { Configuration } from "../generated/openapi/typescript-axios/configuration.js";
 import { ContractAbi } from "web3";
 
 export class EthereumApiClientOptions extends Configuration {

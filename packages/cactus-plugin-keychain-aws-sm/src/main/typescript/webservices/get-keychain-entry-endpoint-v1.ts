@@ -16,7 +16,7 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm";
+import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm.js";
 
 export interface IGetKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;

@@ -1,7 +1,7 @@
 import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { SubstrateTestLedger } from "../../../../main/typescript/substrate-test-ledger/substrate-test-ledger";
-import { pruneDockerAllIfGithubAction } from "../../../../main/typescript/github-actions/prune-docker-all-if-github-action";
+import { SubstrateTestLedger } from "../../../../main/typescript/substrate-test-ledger/substrate-test-ledger.js";
+import { pruneDockerAllIfGithubAction } from "../../../../main/typescript/github-actions/prune-docker-all-if-github-action.js";
 
 const testCase = "Instantiate plugin";
 const logLevel: LogLevelDesc = "TRACE";

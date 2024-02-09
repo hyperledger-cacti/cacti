@@ -22,7 +22,7 @@ import {
   DefaultApi,
   ListFlowsV1Request,
   ListFlowsV1Response,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IListFlowsEndpointV1Options {
   logLevel?: LogLevelDesc;

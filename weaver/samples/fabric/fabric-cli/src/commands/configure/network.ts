@@ -5,10 +5,10 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp } from '../../helpers/helpers'
-import { getCredentialPath, enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
-import { configureNetwork } from '../../helpers/interop-setup/configure-network'
-import logger from '../../helpers/logger'
+import { commandHelp } from "../../helpers/helpers.js"
+import { getCredentialPath, enrollAndRecordWalletIdentity } from "../../helpers/fabric-functions.js"
+import { configureNetwork } from "../../helpers/interop-setup/configure-network.js"
+import logger from "../../helpers/logger.js"
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'

@@ -3,9 +3,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
-import { hasProperty } from "./has-property";
-import { isStdLibRecord } from "./is-std-lib-record";
-import { isOpenApiV3SupportedHttpVerb } from "./open-api-http-verbs";
+import { hasProperty } from "./has-property.js";
+import { isStdLibRecord } from "./is-std-lib-record.js";
+import { isOpenApiV3SupportedHttpVerb } from "./open-api-http-verbs.js";
 
 /**
  * Verifies that the openapi.json files in the entire project are conformant to

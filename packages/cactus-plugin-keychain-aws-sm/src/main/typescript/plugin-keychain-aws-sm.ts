@@ -23,15 +23,15 @@ import {
   IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { GetPrometheusExporterMetricsEndpointV1 } from "./webservices/get-prometheus-exporter-metrics-endpoint-v1";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
+import { GetPrometheusExporterMetricsEndpointV1 } from "./webservices/get-prometheus-exporter-metrics-endpoint-v1.js";
 
 import { homedir } from "os";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
-import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1";
-import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
-import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
+import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1.js";
+import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1.js";
+import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1.js";
+import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1.js";
 
 export enum AwsCredentialType {
   LocalFile = "LOCAL_FILE",

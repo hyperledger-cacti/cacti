@@ -33,16 +33,16 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import {
   ICarbonAccountingFabricContractDeploymentInfo,
   ICarbonAccountingXdaiContractDeploymentInfo,
-} from "../i-carbon-accounting-contract-deployment-info";
+} from "../i-carbon-accounting-contract-deployment-info.js";
 
-import { GetAllowanceEndpoint } from "./web-services/dao-token/get-allowance-endpoint";
+import { GetAllowanceEndpoint } from "./web-services/dao-token/get-allowance-endpoint.js";
 
 import {
   EnrollAdminInfo,
   EnrollAdminV1Request,
   EnrollAdminV1Response,
-} from "../generated/openapi/typescript-axios";
-import { EnrollAdminV1Endpoint } from "./web-services/utility-emissions-channel/enroll-admin-v1-endpoint";
+} from "./../generated/openapi/typescript-axios/index.js";
+import { EnrollAdminV1Endpoint } from "./web-services/utility-emissions-channel/enroll-admin-v1-endpoint.js";
 
 export interface OrgEnv {
   CORE_PEER_LOCALMSPID: string;

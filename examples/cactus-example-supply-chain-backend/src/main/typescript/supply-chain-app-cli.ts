@@ -2,7 +2,7 @@
 
 import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { ISupplyChainAppOptions, SupplyChainApp } from "./supply-chain-app";
+import { ISupplyChainAppOptions, SupplyChainApp } from "./supply-chain-app.js";
 
 export async function launchApp(
   env?: NodeJS.ProcessEnv,

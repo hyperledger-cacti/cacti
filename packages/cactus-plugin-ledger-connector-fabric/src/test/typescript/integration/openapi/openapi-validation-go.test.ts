@@ -19,13 +19,13 @@ import {
   DefaultEventHandlerStrategy,
   PluginLedgerConnectorFabric,
   DeployContractGoSourceV1Request,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
-import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
+import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source.js";
 
-import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api";
+import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api.js";
 
-import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
+import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric.js";
 
 import { DiscoveryOptions } from "fabric-network";
 import { Configuration } from "@hyperledger/cactus-core-api";

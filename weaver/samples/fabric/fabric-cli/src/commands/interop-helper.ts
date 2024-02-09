@@ -8,7 +8,7 @@ import { GluegunCommand } from 'gluegun'
 import * as fs from 'fs'
 import {
   fabricHelper
-} from '../helpers/fabric-functions'
+} from "../helpers/fabric-functions.js"
 import {
   commandHelp,
   getNetworkConfig,
@@ -16,10 +16,10 @@ import {
   generateViewAddress,
   handlePromise,
   interopHelper
-} from '../helpers/helpers'
+} from "../helpers/helpers.js"
 import { v4 as uuidv4 } from 'uuid'
 
-import logger from '../helpers/logger'
+import logger from "../helpers/logger.js"
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })

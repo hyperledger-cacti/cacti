@@ -6,7 +6,7 @@ import {
 import {
   IPluginHTLCCoordinatorBesuOptions,
   PluginHTLCCoordinatorBesu,
-} from "./plugin-htlc-coordinator-besu";
+} from "./plugin-htlc-coordinator-besu.js";
 
 export class PluginFactoryHTLCCoordinatorBesu extends PluginFactory<
   PluginHTLCCoordinatorBesu,

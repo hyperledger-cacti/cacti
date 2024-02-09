@@ -13,8 +13,8 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Containers } from "../common/containers.js";
 
 /**
  * Input options to Iroha2TestLedger constructor.

@@ -4,7 +4,7 @@ import {
   Web3SigningCredentialNone,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
-} from "./generated/openapi/typescript-axios/api";
+} from "./generated/openapi/typescript-axios/api.js";
 
 export function isWeb3SigningCredentialPrivateKeyHex(x?: {
   type?: Web3SigningCredentialType;

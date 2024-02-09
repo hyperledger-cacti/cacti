@@ -3,13 +3,13 @@ import {
   isWeb3SigningCredentialGethKeychainPassword,
   isWeb3SigningCredentialNone,
   isWeb3SigningCredentialPrivateKeyHex,
-} from "../../../main/typescript/model-type-guards";
+} from "../../../main/typescript/model-type-guards.js";
 import {
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialType,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialNone,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 describe("Type guards for OpenAPI spec model type definitions", () => {
   test("isWeb3SigningCredentialGethKeychainPassword()", () => {

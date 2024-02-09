@@ -5,8 +5,8 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, handlePromise } from '../../helpers/helpers'
-import logger from '../../helpers/logger'
+import { commandHelp, handlePromise } from "../../helpers/helpers.js"
+import logger from "../../helpers/logger.js"
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'

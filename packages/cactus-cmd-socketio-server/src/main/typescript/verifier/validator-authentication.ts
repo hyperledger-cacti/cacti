@@ -6,7 +6,7 @@
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { configRead } from "../util/config";
+import { configRead } from "../util/config.js";
 
 type PayloadType = Parameters<typeof jwt.sign>[0];
 

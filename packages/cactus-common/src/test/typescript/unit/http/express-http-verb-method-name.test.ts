@@ -1,7 +1,7 @@
 import {
   ALL_EXPRESS_HTTP_VERB_METHOD_NAMES,
   isExpressHttpVerbMethodName,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 describe("isExpressHttpVerbMethodName", () => {
   it("should return true for valid HTTP verb method names", () => {

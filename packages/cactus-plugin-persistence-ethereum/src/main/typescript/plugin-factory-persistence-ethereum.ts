@@ -5,7 +5,7 @@ import {
 import {
   IPluginPersistenceEthereumOptions,
   PluginPersistenceEthereum,
-} from "./plugin-persistence-ethereum";
+} from "./plugin-persistence-ethereum.js";
 
 export class PluginFactoryLedgerPersistence extends PluginFactory<
   PluginPersistenceEthereum,

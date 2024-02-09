@@ -3,12 +3,12 @@
 */
 
 import { ChaincodeStub, Iterators } from "fabric-shim";
-import { State } from "./state";
+import { State } from "./state.js";
 import {
   ErrStateNotFound,
   ErrInvalidQueryString,
   ErrStateAlreadyExists,
-} from "./const";
+} from "./const.js";
 /**
  * WorldState class is a wrapper around chaincode stub
  * for managing lifecycle of a asset of type T (interface) on HL fabric

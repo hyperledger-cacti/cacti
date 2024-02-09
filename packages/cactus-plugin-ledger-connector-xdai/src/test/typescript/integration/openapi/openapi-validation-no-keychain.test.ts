@@ -7,7 +7,7 @@ import {
   DefaultApi as XdaiApi,
   DeployContractJsonObjectV1Request,
   InvokeContractJsonObjectV1Request,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import {
   Containers,
   K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,

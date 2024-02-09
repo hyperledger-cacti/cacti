@@ -15,7 +15,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorAries } from "../plugin-ledger-connector-aries";
+import { PluginLedgerConnectorAries } from "../plugin-ledger-connector-aries.js";
 import OAS from "../../json/openapi.json";
 
 export interface IAcceptInvitationOptions {

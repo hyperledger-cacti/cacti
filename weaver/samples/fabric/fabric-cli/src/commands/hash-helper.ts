@@ -5,8 +5,8 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import logger from '../helpers/logger'
-import { commandHelp } from '../helpers/helpers'
+import logger from "../helpers/logger.js"
+import { commandHelp } from "../helpers/helpers.js"
 import { HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 const command: GluegunCommand = {

@@ -13,7 +13,7 @@ import {
   IPluginKeychainMemoryOptions,
   DefaultApi as KeychainMemoryApi,
   PluginKeychainMemory,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 describe("PluginKeychainMemory", () => {
   let addressInfo: AddressInfo;
