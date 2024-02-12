@@ -14,7 +14,7 @@
     "dev": "nodemon out/server.js",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node out/server.js",
-    "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
+    "test": "NODE_OPTIONS='--import tsx' nyc mocha --exclude 'test/data/**/*.js' --recursive  -t 10000",
     "tsc": "tsc",
     "watch": "tsc --watch"
   },
