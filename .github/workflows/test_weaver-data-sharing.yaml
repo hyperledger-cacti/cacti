@@ -38,9 +38,9 @@ jobs:
         with:
           filters: |
             weaver_code_changed:
-              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/**'
               - '.github/workflows/test_weaver-data-sharing.yaml'
-    
+
   data-sharing:
     needs: check_code_changed
     if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
@@ -425,7 +425,7 @@ jobs:
         with:
           filters: |
             weaver_code_changed:
-              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/**'
               - '.github/workflows/test_weaver-data-sharing.yaml'
 
       - name: Set up JDK 8
@@ -850,7 +850,7 @@ jobs:
         with:
           filters: |
             weaver_code_changed:
-              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/**'
               - '.github/workflows/test_weaver-data-sharing.yaml'
 
       - name: Set up JDK 8

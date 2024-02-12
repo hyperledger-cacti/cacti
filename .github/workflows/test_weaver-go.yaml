@@ -31,21 +31,21 @@ jobs:
         with:
           filters: |
             interopcc_changed:
-              - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - 'weaver/common/protos-go/**'
+              - 'weaver/core/network/fabric-interop-cc/**'
               - '.github/workflows/test_weaver-go.yaml'
 
             simplestate_changed:
-              - 'weaver/samples/fabric/simplestate/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - 'weaver/samples/fabric/simplestate/**'
 
             simpleasset_changed:
-              - 'weaver/samples/fabric/simpleasset/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - 'weaver/samples/fabric/simpleasset/**'
 
             simpleassetandinterop_changed:
-              - 'weaver/samples/fabric/simpleassetandinterop/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - 'weaver/samples/fabric/simpleassetandinterop/**'
 
             simpleassettransfer_changed:
-              - 'weaver/samples/fabric/simpleassettransfer/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - 'weaver/samples/fabric/simpleassettransfer/**'
 
   unit_test_interopcc:
     needs: check_code_changed

@@ -34,7 +34,7 @@ jobs:
         with:
           filters: |
             weaver_code_changed:
-              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/**'
               - '.github/workflows/test_weaver-asset-exchange-besu.yaml'
 
   asset-exchange-besu:
