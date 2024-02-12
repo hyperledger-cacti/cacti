@@ -30,8 +30,8 @@ jobs:
         with:
           filters: |
             interop_cordapp_changed:
-              - './weaver/common/protos-java-kt/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/core/network/corda-interop-app/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos-java-kt/**'
+              - './weaver/core/network/corda-interop-app/**'
               - '.github/workflows/test_weaver-corda-interop-app.yaml'
 
   unit_test_interop_cordapp:
@@ -46,15 +46,15 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
-  
+
     - name: Build Protos (Local)
       run: make build
       working-directory: weaver/common/protos-java-kt
-      
+
     - name: Build Corda Interop App (Local)
       run: make build-local
       working-directory: weaver/core/network/corda-interop-app
-      
+
     - name: Run Tests (Local)
       run: make test
       working-directory: weaver/core/network/corda-interop-app

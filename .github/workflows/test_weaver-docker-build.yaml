@@ -33,30 +33,30 @@ jobs:
         with:
           filters: |
             relay_changed:
-              - './weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos-rs/**'
+              - './weaver/core/relay/**'
               - '.github/workflows/test_weaver-docker-build.yaml'
 
             fabric_driver_changed:
-              - './weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/common/protos-js/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/sdks/fabric/interoperation-node-sdk/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/weaver/core/drivers/fabric-driver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos/**'
+              - './weaver/common/protos-js/**'
+              - './weaver/sdks/fabric/interoperation-node-sdk/**'
+              - './weaver/weaver/core/drivers/fabric-driver/**'
               - '.github/workflows/test_weaver-docker-build.yaml'
 
             corda_driver_changed:
-              - './weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/common/protos-java-kt/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/core/network/corda-interop-app/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/sdks/corda/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/core/drivers/corda-driver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos/**'
+              - './weaver/common/protos-java-kt/**'
+              - './weaver/core/network/corda-interop-app/**'
+              - './weaver/sdks/corda/**'
+              - './weaver/core/drivers/corda-driver/**'
               - '.github/workflows/test_weaver-docker-build.yaml'
 
             iin_agent_changed:
-              - './weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/common/protos-js/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/sdks/fabric/interoperation-node-sdk/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - './weaver/core/identity-management/iin-agent/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos/**'
+              - './weaver/common/protos-js/**'
+              - './weaver/sdks/fabric/interoperation-node-sdk/**'
+              - './weaver/core/identity-management/iin-agent/**'
               - '.github/workflows/test_weaver-docker-build.yaml'
 
   build_docker_relay:

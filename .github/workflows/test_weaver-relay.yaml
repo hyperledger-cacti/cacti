@@ -27,9 +27,9 @@ jobs:
         with:
           filters: |
             relay_changed:
-              - '.weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - '.weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - '.weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.weaver/common/protos/**'
+              - '.weaver/common/protos-rs/**'
+              - '.weaver/core/relay/**'
               - .github/workflows/test_weaver-relay.yaml'
 
   unit_test_relay_local:
