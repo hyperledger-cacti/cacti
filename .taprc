@@ -1,9 +1,9 @@
-no-check-coverage: true
+# vim: set filetype=yaml :
+disable-coverage: true
 node-arg:
   - --max-old-space-size=4096
 jobs: 1
 timeout: 3600
-ts: true
 files:
   - ./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts
@@ -120,3 +120,6 @@ files:
   - ./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts
   - ./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts
   - ./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts
+plugin:
+  - "!@tapjs/typescript"
+  - "@tapjs/tsx"
