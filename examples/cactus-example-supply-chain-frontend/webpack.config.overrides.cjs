@@ -20,6 +20,12 @@ module.exports = {
     winston: "winston",
   },
   resolve: {
+    extensions: [".ts", ".js"],
+    extensionAlias: {
+      ".js": [".js", ".ts"],
+      ".cjs": [".cjs", ".cts"],
+      ".mjs": [".mjs", ".mts"],
+    },
     fallback: {
       constants: require.resolve("constants-browserify"),
       crypto: require.resolve("crypto-browserify"),

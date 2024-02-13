@@ -9136,6 +9136,7 @@ __metadata:
     ts-jest: 29.1.1
     ts-loader: 9.4.4
     ts-node: 10.9.1
+    tsx: 4.7.1
     typescript: 5.3.3
     web3: 4.1.1
     web3-core: 4.1.1
@@ -48191,7 +48192,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.1.2":
+"tsx@npm:4.7.1, tsx@npm:^4.1.2":
   version: 4.7.1
   resolution: "tsx@npm:4.7.1"
   dependencies:

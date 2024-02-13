@@ -14,7 +14,7 @@
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
             "customWebpackConfig": {
-              "path": "./webpack.config.overrides.js",
+              "path": "./webpack.config.overrides.cjs",
               "mergeRules": {
                 "externals": "replace"
               }
@@ -86,7 +86,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
             "browserTarget": "app:build",
             "proxyConfig": "proxy.conf.json"
@@ -95,9 +95,7 @@
             "production": {
               "browserTarget": "app:build:production"
             },
-            "ci": {
-
-            }
+            "ci": {}
           }
         },
         "extract-i18n": {

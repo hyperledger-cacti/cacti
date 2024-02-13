@@ -10,19 +10,21 @@ const routes: Routes = [
   {
     path: "bamboo-harvest-list",
     loadChildren: () =>
-      import("./bamboo-harvest/bamboo-harvest.module").then(
+      import("./bamboo-harvest/bamboo-harvest.module.js").then(
         (m) => m.BambooHarvestPageModule,
       ),
   },
   {
     path: "bookshelf-list",
     loadChildren: () =>
-      import("./bookshelf/bookshelf.module").then((m) => m.BookshelfPageModule),
+      import("./bookshelf/bookshelf.module.js").then(
+        (m) => m.BookshelfPageModule,
+      ),
   },
   {
     path: "shipment-list",
     loadChildren: () =>
-      import("./shipment/shipment.module").then((m) => m.ShipmentPageModule),
+      import("./shipment/shipment.module.js").then((m) => m.ShipmentPageModule),
   },
 ];
 
