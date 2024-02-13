@@ -2,7 +2,6 @@
   "name": "@hyperledger/cactus-example-supply-chain-frontend",
   "version": "2.0.0-alpha.2",
   "description": "The frontend component of an example project demonstrating how Cacti can be used for cross-chain dapp development.",
-  "type": "module",
   "keywords": [
     "Hyperledger",
     "Cacti",
@@ -35,6 +34,7 @@
       "url": "https://accenture.com"
     }
   ],
+  "type": "module",
   "files": [
     "www/*"
   ],

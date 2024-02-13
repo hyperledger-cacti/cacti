@@ -8,7 +8,6 @@
     "Blockchain Integration",
     "Distributed Ledger Technology"
   ],
-  "type": "module",
   "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger/cacti/issues"
@@ -35,6 +34,7 @@
       "url": "https://accenture.com"
     }
   ],
+  "type": "module",
   "files": [
     "www/*"
   ],

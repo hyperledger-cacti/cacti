@@ -72,7 +72,7 @@
     "webpack:dev:web": "lerna run webpack:dev:web",
     "webpack:dev:node": "lerna run webpack:dev:node",
     "test:jest:all": "NODE_OPTIONS=\"--max_old_space_size=3072 --experimental-vm-modules\" jest",
-    "test:tap:all": "NODE_OPTIONS=\"--experimental-vm-modules\" tap",
+    "test:tap:all": "tap build && NODE_OPTIONS=\"--experimental-vm-modules\" tap",
     "test:all": "NODE_OPTIONS=\"--experimental-vm-modules\" yarn test:jest:all && yarn test:tap:all",
     "prettier": "prettier --write --config .prettierrc.js \"./**/src/main/json/openapi.json\"",
     "lerna-publish-canary": "lerna publish --canary --force-publish --dist-tag $(git branch --show-current) --preid $(git branch --show-current) --loglevel=silly --ignore-scripts --ignore-prepublish",
