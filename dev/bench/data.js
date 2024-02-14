@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706862335853,
+  "lastUpdate": 1707893813743,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -38,6 +38,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.39%",
             "unit": "ops/sec",
             "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "9fd38983feb9a114e383294224121f850070093a",
+          "message": "build(deps): fix CVE-2022-25887 by upgrading sanitize-html to v2.11.0\n\nAlso upgraded the typings to the latest available one.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>\n(cherry picked from commit ad4e91bbcd216eaa36a371278a65a033698754a8)",
+          "timestamp": "2024-02-13T22:41:10-08:00",
+          "tree_id": "f65d627d885a87439d730fa78bba8431ffdcefce",
+          "url": "https://github.com/hyperledger/cacti/commit/9fd38983feb9a114e383294224121f850070093a"
+        },
+        "date": 1707893811587,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 618,
+            "range": "±1.64%",
+            "unit": "ops/sec",
+            "extra": "179 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 384,
+            "range": "±1.50%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
