@@ -40,6 +40,9 @@
 		"ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
 		"ghcr.io/devcontainers-contrib/features/protoc:1": {
 			"version": "v3.20.3"
+		},
+		"ghcr.io/dhoeric/features/trivy:1.0.0": {
+			"version": "0.49.1"
 		}
 	},
 	"customizations": {
