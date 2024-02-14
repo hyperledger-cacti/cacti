@@ -148,6 +148,41 @@ The docs are then located in `build/dokka/driver-corda`. Opening
 `index.html` in your browser will allow you to navigate through the project
 structure.
 
+## Trivy Security Audit of Dependencies
+
+> Note you either need to be using the VSCode Dev Container or having installed
+> Trivy yourself prior to running these steps.
+
+[Trivy Documentation & Install Guide](https://github.com/aquasecurity/trivy)
+
+The following command generates a `pom.xml` file with the same exact dependencies
+declared as they are in the build.gradle file.
+
+The reason why we need this step is because Trivy does not yet support build.gradle
+files, only pom.xml files.
+
+```sh
+./gradlew generatePomFileForPublication
+```
+
+After this step, we now have a pom.xml file, but with the wrong name because
+Trivy will only accept these if the file is called exactly `pom.xml` but the
+script above will name it as `pom-default.xml` which Trivy ignores, so we rename:
+
+```sh
+mv ./build/publications/maven/pom-default.xml ./build/publications/maven/pom.xml
+```
+
+Finally, we are ready to point Trivy to the directory where the `pom.xml` file
+is located and actually run the scan:
+
+```sh
+trivy fs --scanners=vuln ./build/publications/maven/
+```
+
+More information about the Maven Publish Plugin can be found here:
+https://docs.gradle.org/current/userguide/publishing_maven.html
+
 ## TODO
 
 1. Create an Error class

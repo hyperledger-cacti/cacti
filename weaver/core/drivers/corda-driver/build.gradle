@@ -33,6 +33,18 @@ plugins {
     id "application"
     id "com.google.protobuf" version "0.8.12"
     id 'org.jetbrains.dokka' version '0.10.1'
+    id 'maven-publish'
+}
+
+// Can be used to generate a pom.xml file which in turn can be used to run a 
+// trivy security audit of the dependencies to check for vulnerable versions.
+// Check the package README.md file for an example to do it via bash commands.
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 Properties constants = new Properties()

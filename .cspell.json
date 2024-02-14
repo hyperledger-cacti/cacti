@@ -50,6 +50,7 @@
         "dids",
         "Dids",
         "DockerOde",
+        "dokka",
         "ealen",
         "ecparams",
         "embeddable",
@@ -158,6 +159,7 @@
         "thream",
         "tlsca",
         "tlscacerts",
+        "Trivy",
         "txid",
         "txqueue",
         "Uisrs",
@@ -166,6 +168,7 @@
         "Unmarshal",
         "uuidv",
         "vscc",
+        "vuln",
         "wasm",
         "Xdai"
     ],
