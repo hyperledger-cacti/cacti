@@ -74,7 +74,8 @@
     "@types/fs-extra": "11.0.3",
     "@types/tape": "4.13.4",
     "@types/uuid": "9.0.6",
-    "express": "4.18.2"
+    "express": "4.18.2",
+    "fabric-network": "2.2.19"
   },
   "engines": {
     "node": ">=18",
