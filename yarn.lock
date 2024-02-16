@@ -8473,7 +8473,7 @@ __metadata:
     sanitize-html: 2.11.0
     socket.io: 4.5.4
     socket.io-client-fixed-types: 4.5.4
-    undici: 5.26.2
+    undici: 5.28.3
     uuid: 8.3.2
   languageName: unknown
   linkType: soft
@@ -48465,12 +48465,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:5.26.2":
-  version: 5.26.2
-  resolution: "undici@npm:5.26.2"
+"undici@npm:5.28.3":
+  version: 5.28.3
+  resolution: "undici@npm:5.28.3"
   dependencies:
     "@fastify/busboy": ^2.0.0
-  checksum: 04691e736d32319ec56e430dc706625ba79b98852e47f408d253329d833e6d252a84cef9e698c7f78c7f5955c052c8d4790254b0d3a8ee388df02bb0c2a8994c
+  checksum: fa1e65aff896c5e2ee23637b632e306f9e3a2b32a3dc0b23ea71e5555ad350bcc25713aea894b3dccc0b7dc2c5e92a5a58435ebc2033b731a5524506f573dfd2
   languageName: node
   linkType: hard
 
