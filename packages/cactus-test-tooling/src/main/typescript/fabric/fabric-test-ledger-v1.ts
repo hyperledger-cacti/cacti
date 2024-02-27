@@ -389,20 +389,20 @@ export class FabricTestLedgerV1 implements ITestLedger {
       // peer0.org1.example.com
       const privatePort = 7051;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-      ccp.peers["peer0.org1.example.com"].url = `grpcs://127.0.0.1:${hostPort}`;
+      ccp.peers["peer0.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
     }
     if (ccp.peers["peer1.org1.example.com"]) {
       // peer1.org1.example.com
       const privatePort = 8051;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-      ccp.peers["peer1.org1.example.com"].url = `grpcs://127.0.0.1:${hostPort}`;
+      ccp.peers["peer1.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
     }
     {
       // ca_peerOrg1
       const privatePort = 7054;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
       const { certificateAuthorities: cas } = ccp;
-      cas["ca.org1.example.com"].url = `https://127.0.0.1:${hostPort}`;
+      cas["ca.org1.example.com"].url = `https://localhost:${hostPort}`;
     }
 
     // FIXME - this still doesn't work. At this moment the only successful tests
@@ -417,7 +417,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       const privatePort = 7050;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-      const url = `grpcs://127.0.0.1:${hostPort}`;
+      const url = `grpcs://localhost:${hostPort}`;
       const ORDERER_PEM_PATH_FABRIC_V1 =
         "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
       const ORDERER_PEM_PATH_FABRIC_V2 =
@@ -462,11 +462,11 @@ export class FabricTestLedgerV1 implements ITestLedger {
       // with discovery
       // {
       //   const { grpcOptions } = ccp.peers["peer0.org1.example.com"];
-      //   grpcOptions.hostnameOverride = `127.0.0.1`;
+      //   grpcOptions.hostnameOverride = `localhost`;
       // }
       // {
       //   const { grpcOptions } = ccp.peers["peer1.org1.example.com"];
-      //   grpcOptions.hostnameOverride = `127.0.0.1`;
+      //   grpcOptions.hostnameOverride = `localhost`;
       // }
     }
     return ccp;
@@ -516,7 +516,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const privatePortPeer0 = parseFloat(urlGrpcs.replace(/^\D+/g, ""));
 
       const hostPort = await Containers.getPublicPort(privatePortPeer0, cInfo);
-      ccp["peers"][peer0Name]["url"] = `grpcs://127.0.0.1:${hostPort}`;
+      ccp["peers"][peer0Name]["url"] = `grpcs://localhost:${hostPort}`;
 
       // if there is a peer1
       if (ccp.peers["peer1.org" + orgName + ".example.com"]) {
@@ -527,7 +527,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
           privatePortPeer1,
           cInfo,
         );
-        ccp["peers"][peer1Name]["url"] = `grpcs://127.0.0.1:${hostPortPeer1}`;
+        ccp["peers"][peer1Name]["url"] = `grpcs://localhost:${hostPortPeer1}`;
       }
       {
         // ca_peerOrg1
@@ -537,7 +537,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
         const caHostPort = await Containers.getPublicPort(caPort, cInfo);
         const { certificateAuthorities: cas } = ccp;
-        cas[caName].url = `https://127.0.0.1:${caHostPort}`;
+        cas[caName].url = `https://localhost:${caHostPort}`;
       }
 
       // FIXME - this still doesn't work. At this moment the only successful tests
@@ -552,7 +552,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
         const privatePort = 7050;
         const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-        const url = `grpcs://127.0.0.1:${hostPort}`;
+        const url = `grpcs://localhost:${hostPort}`;
         const ORDERER_PEM_PATH_FABRIC_V1 =
           "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
         const ORDERER_PEM_PATH_FABRIC_V2 =
@@ -597,11 +597,11 @@ export class FabricTestLedgerV1 implements ITestLedger {
         // with discovery
         // {
         //   const { grpcOptions } = ccp.peers["peer0.org1.example.com"];
-        //   grpcOptions.hostnameOverride = `127.0.0.1`;
+        //   grpcOptions.hostnameOverride = `localhost`;
         // }
         // {
         //   const { grpcOptions } = ccp.peers["peer1.org1.example.com"];
-        //   grpcOptions.hostnameOverride = `127.0.0.1`;
+        //   grpcOptions.hostnameOverride = `localhost`;
         // }
       }
       return ccp;
@@ -1277,7 +1277,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const containerInfo = await this.getContainerInfo();
     const port = await Containers.getPublicPort(22, containerInfo);
     const sshConfig: SshConfig = {
-      host: "127.0.0.1",
+      host: "localhost",
       privateKey,
       username: "root",
       port,
