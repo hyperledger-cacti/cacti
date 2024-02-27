@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707893813743,
+  "lastUpdate": 1709070396669,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -74,6 +74,44 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 384,
             "range": "±1.50%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "anmolbansal1807@gmail.com",
+            "name": "Anmol Bansal",
+            "username": "AnmolBansalDEV"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "6a476a0f1143380d2fd6bf81c68b0842c13c6ae2",
+          "message": "feat(connector-polkadot): add connector pkg, openapi specs, test suite\n\nPrimary Changes\n---------------\n1. Created openapi specs for get-prometheus-exporter-metrics, get-transaction-info,\n   get-raw-transaction, sign-raw-transaction, run-transaction, deploy-contract-ink,\n   and invoke-contract endpoints\n2. Created relevant types for the request as well as response for the above endpoints\n3. Added generated code for these endpoints\n4. Created connector class with functions to interact with the polkadot ledger\n5. Created webservices to interact with the endpoint and the relevant class method\n6. Created unit and integration testcases in jest to test base functionality of the connector\n\nSecondary Changes\n-----------------\n1. Added an ink! contract for running the testcases\n2. Added the polkadot connector to ci workflow\n3. Created substrate.md to docs-cactus\n4. Added the polkadot connector to tsconfig.json\n\nSigned-off-by: Anmol Bansal <anmolbansal1807@gmail.com>\n\n=======================================================================\n\nfeat(polkadot): creation of polkadot AIO image\n\nPrimary Changes\n---------------\n1. Updated docker image to include multi-stage build\n2. Added healthcheck to the image\n3. Added Supervisord and removed unneccessary start script\n4. Updated the Readme with relevant commands\n\nSigned-off-by: Anmol Bansal <anmolbansal1807@gmail.com>\n\n=======================================================================\n\nfeat(polkadot): update substrate test tooling\n\nPrimary Changes\n---------------\n1. Added correct healthcheck for ledger container\n2. Update the Substrate test ledger testcases\n\nSigned-off-by: Anmol Bansal <anmolbansal1807@gmail.com>\n\n=======================================================================\n\nfeat(polkadot): creation of readme and architecture reference diagrams\n\nPrimary Changes\n---------------\n1. Added README.md for the connector\n2. Added Architecture diagrams for the plugin\n\nSecondary Changes\n-----------------\n1. Added the docker image for the polkadot connector\n\nFixes hyperledger/cacti#726\nFixes hyperledger/cacti#727\nFixes hyperledger/cacti#627\n\nCo-authored-by: Peter Somogyvari <peter.somogyvari@accenture.com>\n\nSigned-off-by: Anmol Bansal <anmolbansal1807@gmail.com>\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-02-27T13:31:05-08:00",
+          "tree_id": "1e627dac65b9400842418f4e0039467a9c3443eb",
+          "url": "https://github.com/hyperledger/cacti/commit/6a476a0f1143380d2fd6bf81c68b0842c13c6ae2"
+        },
+        "date": 1709070394642,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 649,
+            "range": "±1.66%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 415,
+            "range": "±2.27%",
             "unit": "ops/sec",
             "extra": "182 samples"
           }
