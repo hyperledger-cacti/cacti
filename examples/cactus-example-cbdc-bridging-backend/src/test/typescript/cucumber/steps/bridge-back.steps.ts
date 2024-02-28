@@ -1,8 +1,7 @@
 import { Then } from "cucumber";
-import { expect } from "chai";
 import axios from "axios";
 import CryptoMaterial from "../../../../crypto-material/crypto-material.json";
-import { getFabricId, getEthAddress } from "./common";
+import { getFabricId, getEthAddress, assertEqual } from "./common";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -64,21 +63,20 @@ Then(
       },
     );
 
-    expect(response.status).to.equal(200);
+    assertEqual(response.status, 200);
   },
 );
 
 Then(
-  "{string} fails to initiate bridge back of {int} CBDC referenced by id {string} to {string} address in the source chain",
+  "{string} fails to initiate bridge back of {int} CBDC referenced by id {string}",
   { timeout: 60 * 1000 },
   async function (
     user: string,
     amount: number,
     assetRefID: string,
-    finalUser: string,
   ) {
     const address = getEthAddress(user);
-    const fabricID = getFabricId(finalUser);
+    const fabricID = getFabricId(user);
 
     const assetProfile = {
       expirationDate: new Date(2060, 11, 24).toString(),
@@ -126,7 +124,7 @@ Then(
         },
       )
       .catch((err) => {
-        expect(err.response.status).to.equal(500);
+        assertEqual(err.response.status, 500);
       });
   },
 );
