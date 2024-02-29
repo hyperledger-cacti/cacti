@@ -44,9 +44,15 @@ test("successful run ODAP instance", async () => {
 
   expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
   expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
+  
+  expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
+  
+  await pluginSourceGateway.remoteRepository?.reset();
+  await pluginRecipientGateway.remoteRepository?.reset();
 
   const dummyPath = { apiHost: "dummyPath" };
 
