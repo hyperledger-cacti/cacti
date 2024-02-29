@@ -57,8 +57,17 @@ beforeEach(async () => {
     throw new Error("Database is not correctly initialized");
   }
 
+  expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
+
+  expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
+
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
+  
+  await pluginSourceGateway.remoteRepository?.reset();
+  await pluginRecipientGateway.remoteRepository?.reset();
 
   sessionID = uuidv4();
   sequenceNumber = randomInt(100);
