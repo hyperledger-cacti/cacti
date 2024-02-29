@@ -84,11 +84,11 @@ beforeAll(async () => {
 
     pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
-    expect(
-      pluginRecipientGateway.localRepository?.database,
-    ).not.toBeUndefined();
+    expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();  
+    expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();  
 
     await pluginRecipientGateway.localRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
 
     await pluginRecipientGateway.registerWebServices(serverExpressApp);
   }
@@ -123,11 +123,11 @@ beforeAll(async () => {
 
     pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
 
-    if (pluginSourceGateway.localRepository?.database == undefined) {
-      throw new Error("Database is not correctly initialized");
-    }
+    expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();  
 
     await pluginSourceGateway.localRepository?.reset();
+    await pluginSourceGateway.remoteRepository?.reset();
 
     await pluginSourceGateway.registerWebServices(clientExpressApp);
 
@@ -218,10 +218,10 @@ test("server gateway crashes after transfer initiation flow", async () => {
 });
 
 afterAll(async () => {
-  pluginSourceGateway.localRepository?.destroy();
-  pluginRecipientGateway.localRepository?.destroy();
-  pluginSourceGateway.remoteRepository?.destroy();
-  pluginRecipientGateway.remoteRepository?.destroy();
+  await pluginSourceGateway.localRepository?.destroy();
+  await pluginRecipientGateway.localRepository?.destroy();
+  await pluginSourceGateway.remoteRepository?.destroy();
+  await pluginRecipientGateway.remoteRepository?.destroy();
 
   await Servers.shutdown(sourceGatewayServer);
   await Servers.shutdown(recipientGatewayserver);
