@@ -81,7 +81,7 @@
     "run-time-error-cjs": "1.4.0",
     "rxjs": "7.8.1",
     "sanitize-filename": "1.6.3",
-    "sanitize-html": "2.11.0",
+    "sanitize-html": "2.12.1",
     "secp256k1": "4.0.3",
     "socket.io-client-fixed-types": "4.5.4",
     "temp": "0.9.4",
