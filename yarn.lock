@@ -7369,7 +7369,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-besu-simpleasset@workspace:weaver/samples/besu/simpleasset"
   dependencies:
     "@lazyledger/protobuf3-solidity-lib": 0.6.0
-    "@openzeppelin/contracts": 4.9.3
+    "@openzeppelin/contracts": 4.9.6
     "@truffle/contract": 4.6.28
     chai: 4.3.7
     dotenv: 16.3.1
@@ -7385,7 +7385,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-besu-simplestate@workspace:weaver/samples/besu/simplestate"
   dependencies:
-    "@openzeppelin/contracts": 4.9.3
+    "@openzeppelin/contracts": 4.9.6
     "@truffle/contract": 4.6.28
     chai: 4.3.7
     dotenv: 16.3.1
@@ -7811,7 +7811,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-xdai": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
-    "@openzeppelin/contracts": 4.9.3
+    "@openzeppelin/contracts": 4.9.6
     "@openzeppelin/contracts-upgradeable": 4.9.3
     "@types/express": 4.17.19
     "@types/fs-extra": 9.0.13
@@ -7913,7 +7913,7 @@ __metadata:
     "@hyperledger/cactus-plugin-object-store-ipfs": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-satp-hermes": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
-    "@openzeppelin/contracts": 4.9.3
+    "@openzeppelin/contracts": 4.9.6
     "@openzeppelin/contracts-upgradeable": 4.9.3
     "@types/crypto-js": 4.1.1
     "@types/cucumber": 4.0.4
@@ -12192,10 +12192,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:4.9.3":
-  version: 4.9.3
-  resolution: "@openzeppelin/contracts@npm:4.9.3"
-  checksum: 4932063e733b35fa7669b9fe2053f69b062366c5c208b0c6cfa1ac451712100c78acff98120c3a4b88d94154c802be05d160d71f37e7d74cadbe150964458838
+"@openzeppelin/contracts@npm:4.9.6":
+  version: 4.9.6
+  resolution: "@openzeppelin/contracts@npm:4.9.6"
+  checksum: 274b6e968268294f12d5ca4f0278f6e6357792c8bb4d76664f83dbdc325f780541538a127e6a6e97e4f018088b42f65952014dec9c745c0fa25081f43ef9c4bf
   languageName: node
   linkType: hard
 
