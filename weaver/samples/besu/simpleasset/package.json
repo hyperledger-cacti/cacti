@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@lazyledger/protobuf3-solidity-lib": "0.6.0",
-    "@openzeppelin/contracts": "4.9.3",
+    "@openzeppelin/contracts": "4.9.6",
     "@truffle/contract": "4.6.28",
     "chai": "4.3.7",
     "dotenv": "16.3.1",
