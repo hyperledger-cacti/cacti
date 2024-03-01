@@ -7812,7 +7812,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-xdai": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@openzeppelin/contracts": 4.9.3
-    "@openzeppelin/contracts-upgradeable": 4.9.3
+    "@openzeppelin/contracts-upgradeable": 4.9.6
     "@types/express": 4.17.19
     "@types/fs-extra": 9.0.13
     "@types/json-stable-stringify": 1.0.34
@@ -7914,7 +7914,7 @@ __metadata:
     "@hyperledger/cactus-plugin-satp-hermes": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@openzeppelin/contracts": 4.9.3
-    "@openzeppelin/contracts-upgradeable": 4.9.3
+    "@openzeppelin/contracts-upgradeable": 4.9.6
     "@types/crypto-js": 4.1.1
     "@types/cucumber": 4.0.4
     "@types/express": 4.17.19
@@ -12185,10 +12185,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts-upgradeable@npm:4.9.3":
-  version: 4.9.3
-  resolution: "@openzeppelin/contracts-upgradeable@npm:4.9.3"
-  checksum: bda0240b1d44c913ec5a4e109c622f216c2bbd7b468d210822f75782a5f7fe0609d08bf03b78b253333625e99e507cf2f75212f1de3b274bd9fc64ae967aeec3
+"@openzeppelin/contracts-upgradeable@npm:4.9.6":
+  version: 4.9.6
+  resolution: "@openzeppelin/contracts-upgradeable@npm:4.9.6"
+  checksum: 481075e7222cab025ae55304263fca69a2d04305521957bc16d2aece9fa2b86b6914711724822493e3d04df7e793469cd0bcb1e09f0ddd10cb4e360ac7eed12a
   languageName: node
   linkType: hard
 

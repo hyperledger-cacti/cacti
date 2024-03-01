@@ -63,7 +63,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openzeppelin/contracts": "4.9.3",
-    "@openzeppelin/contracts-upgradeable": "4.9.3",
+    "@openzeppelin/contracts-upgradeable": "4.9.6",
     "async-exit-hook": "2.0.1",
     "fabric-network": "2.2.20",
     "fs-extra": "10.1.0",
