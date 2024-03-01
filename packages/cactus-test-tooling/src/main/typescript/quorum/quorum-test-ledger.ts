@@ -1,4 +1,3 @@
-import { Stream } from "stream";
 import { EventEmitter } from "events";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
@@ -415,22 +414,25 @@ export class QuorumTestLedger implements ITestLedger {
   private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
-        if (pullError) {
-          reject(pullError);
-        } else {
-          docker.modem.followProgress(
-            stream,
-            (progressError: unknown, output: unknown[]) => {
-              if (progressError) {
-                reject(progressError);
-              } else {
-                resolve(output);
-              }
-            },
-          );
-        }
-      });
+      docker.pull(
+        containerNameAndTag,
+        (pullError: unknown, stream: NodeJS.ReadableStream) => {
+          if (pullError) {
+            reject(pullError);
+          } else {
+            docker.modem.followProgress(
+              stream,
+              (progressError: unknown, output: unknown[]) => {
+                if (progressError) {
+                  reject(progressError);
+                } else {
+                  resolve(output);
+                }
+              },
+            );
+          }
+        },
+      );
     });
   }
 
