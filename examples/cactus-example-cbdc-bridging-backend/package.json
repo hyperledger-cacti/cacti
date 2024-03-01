@@ -68,7 +68,7 @@
     "@hyperledger/cactus-plugin-satp-hermes": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openzeppelin/contracts": "4.9.3",
-    "@openzeppelin/contracts-upgradeable": "4.9.3",
+    "@openzeppelin/contracts-upgradeable": "4.9.6",
     "async-exit-hook": "2.0.1",
     "axios": "1.6.0",
     "crypto-js": "4.2.0",
