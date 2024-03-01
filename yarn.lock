@@ -7734,7 +7734,7 @@ __metadata:
     loglevel: 1.7.1
     loglevel-plugin-prefix: 0.8.4
     run-time-error-cjs: 1.4.0
-    sanitize-html: 2.11.0
+    sanitize-html: 2.12.1
     secp256k1: 4.0.3
     sha3: 2.1.4
     uuid: 8.3.2
@@ -8519,7 +8519,7 @@ __metadata:
     body-parser: 1.20.2
     express: 4.18.2
     jest-extended: 4.0.1
-    sanitize-html: 2.7.0
+    sanitize-html: 2.12.1
     uuid: 8.3.2
   languageName: unknown
   linkType: soft
@@ -8581,7 +8581,7 @@ __metadata:
     prom-client: 13.2.0
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
-    sanitize-html: 2.11.0
+    sanitize-html: 2.12.1
     socket.io: 4.5.4
     socket.io-client-fixed-types: 4.5.4
     typescript-optional: 2.0.1
@@ -8641,7 +8641,7 @@ __metadata:
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
     sanitize-filename: 1.6.3
-    sanitize-html: 2.11.0
+    sanitize-html: 2.12.1
     secp256k1: 4.0.3
     socket.io: 4.5.4
     socket.io-client-fixed-types: 4.5.4
@@ -8712,7 +8712,7 @@ __metadata:
     jest: 29.6.2
     jest-extended: 4.0.1
     rxjs: 7.8.1
-    sanitize-html: 2.11.0
+    sanitize-html: 2.12.1
     socket.io: 4.5.4
     socket.io-client-fixed-types: 4.5.4
     undici: 5.28.3
@@ -8746,7 +8746,7 @@ __metadata:
     prom-client: 13.1.0
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
-    sanitize-html: 2.11.0
+    sanitize-html: 2.12.1
     socket.io: 4.5.4
     socket.io-client-fixed-types: 4.5.4
     typescript-optional: 2.0.1
@@ -8824,7 +8824,7 @@ __metadata:
     prom-client: 13.2.0
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
-    sanitize-html: 2.11.0
+    sanitize-html: 2.12.1
     socket.io: 4.5.4
     socket.io-client-fixed-types: 4.5.4
     typescript-optional: 2.0.1
@@ -45445,9 +45445,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sanitize-html@npm:2.11.0":
-  version: 2.11.0
-  resolution: "sanitize-html@npm:2.11.0"
+"sanitize-html@npm:2.12.1":
+  version: 2.12.1
+  resolution: "sanitize-html@npm:2.12.1"
   dependencies:
     deepmerge: ^4.2.2
     escape-string-regexp: ^4.0.0
@@ -45455,21 +45455,7 @@ __metadata:
     is-plain-object: ^5.0.0
     parse-srcset: ^1.0.2
     postcss: ^8.3.11
-  checksum: 44807f22b0feb5a6a883b4bc04bcd8690ec3bbd6dacb24d6e52226ffe0c0e4fad43d6a882ce60e3884a327fae2de01e67e566e3a211491add50ff0160be2e98a
-  languageName: node
-  linkType: hard
-
-"sanitize-html@npm:2.7.0":
-  version: 2.7.0
-  resolution: "sanitize-html@npm:2.7.0"
-  dependencies:
-    deepmerge: ^4.2.2
-    escape-string-regexp: ^4.0.0
-    htmlparser2: ^6.0.0
-    is-plain-object: ^5.0.0
-    parse-srcset: ^1.0.2
-    postcss: ^8.3.11
-  checksum: 73a4d66f69578bace3506519ca0734279b7117e15c33c7e4d075cdb483b1586261a18acd35934f6c6109f3b2a4a82f82c242171a94d5dc23fba5b09b01ea5b22
+  checksum: fb96ea7170d51b5af2607f5cfd84464c78fc6f47e339407f55783e781c6a0288a8d40bbf97ea6a8758924ba9b2d33dcc4846bb94caacacd90d7f2de10ed8541a
   languageName: node
   linkType: hard
 

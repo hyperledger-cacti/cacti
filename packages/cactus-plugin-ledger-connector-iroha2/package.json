@@ -58,7 +58,7 @@
     "fast-safe-stringify": "2.1.1",
     "hada": "0.0.8",
     "rxjs": "7.8.1",
-    "sanitize-html": "2.11.0",
+    "sanitize-html": "2.12.1",
     "socket.io": "4.4.1",
     "socket.io-client-fixed-types": "4.5.4",
     "undici": "5.28.3"
