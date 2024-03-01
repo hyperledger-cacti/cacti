@@ -1,5 +1,5 @@
 import path from "path";
-import { Duplex, Stream } from "stream";
+import { Duplex } from "stream";
 import { IncomingMessage } from "http";
 import throttle from "lodash/throttle";
 import { Container, ContainerInfo } from "dockerode";
@@ -443,7 +443,10 @@ export class Containers {
         log.debug(JSON.stringify(msg.progress || msg.status));
       }, 1000);
 
-      const pullStreamStartedHandler = (pullError: unknown, stream: Stream) => {
+      const pullStreamStartedHandler = (
+        pullError: unknown,
+        stream: NodeJS.ReadableStream,
+      ) => {
         if (pullError) {
           log.error(`Could not even start ${imageFqn} pull:`, pullError);
           reject(pullError);
