@@ -7,6 +7,7 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
+  Strings,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -103,13 +104,16 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
         channelName: "mychannel",
         contractName: "shipment",
         invocationType: FabricContractInvocationType.Call,
-        methodName: "getListShipment",
+        methodName: "GetListShipment",
         params: [],
       };
       const {
-        data: { functionOutput },
+        data: { functionOutput: fnOutJsonRaw },
       } = await this.opts.fabricApi.runTransactionV1(request);
-      const output = JSON.parse(functionOutput);
+      // The functionOutput might come back as an empty string which fails to
+      // JSON parse and if that happens we just massage it into an empty array.
+      const fnOutJson = Strings.isNonBlank(fnOutJsonRaw) ? fnOutJsonRaw : "[]";
+      const output = JSON.parse(fnOutJson);
       const body = { data: output };
       res.status(200);
       res.json(body);

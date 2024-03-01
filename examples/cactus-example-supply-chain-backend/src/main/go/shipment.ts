@@ -1,15 +1,23 @@
 export const SHIPMENT_CONTRACT_GO_SOURCE = `package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
+	"strings"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"github.com/hyperledger/fabric/protos/peer"
 )
 
+func isNonBlank(str *string) bool {
+	if str == nil {
+		return false
+	}
+	return strings.TrimSpace(*str) != ""
+}
+
 type ShipmentChaincode struct {
+	contractapi.Contract
 }
 
 type Shipment struct {
@@ -18,85 +26,79 @@ type Shipment struct {
 }
 
 func main() {
-	if err := shim.Start(new(ShipmentChaincode)); err != nil {
-		fmt.Printf("Error starting ShipmentChaincode chaincode: %s", err)
+	shipmentChaincode, err := contractapi.NewChaincode(&ShipmentChaincode{})
+	if err != nil {
+		log.Panicf("Error creating supply-chain shipment chaincode: %v", err)
+	}
+
+	if err := shipmentChaincode.Start(); err != nil {
+		log.Panicf("Error starting supply-chain shipment chaincode: %v", err)
 	}
 }
 
-func (t *ShipmentChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
-	return shim.Success(nil)
+// InitLedger adds a base set of assets to the ledger
+func (t *ShipmentChaincode) InitLedger(ctx contractapi.TransactionContextInterface) error {
+
+	log.Println("InitLedger ran for supply-chain shipment chaincode. %v", t)
+	
+	return nil
 }
 
-func (t *ShipmentChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
-	fn, args := stub.GetFunctionAndParameters()
-
-	if fn == "insertShipment" {
-		return t.insertShipment(stub, args)
-	} else if fn == "getListShipment" {
-		return t.getListShipment(stub, args)
-	}
-	return shim.Error("Unknown function")
-}
-
-func (t *ShipmentChaincode) insertShipment(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	if len(args) != 2 {
-		return shim.Error("Incorrect arguments. Expecting an id and a bookshelfId")
+func (t *ShipmentChaincode) InsertShipment(ctx contractapi.TransactionContextInterface, newShipmentId string, bookshelfId string) (string, error) {
+	if !isNonBlank(&newShipmentId) {
+		return "E_NEW_SHIPMENT_ID_BLANK", fmt.Errorf("Incorrect arguments. Expecting a shipment ID as a non-blank string.")
+	} 
+	if !isNonBlank(&bookshelfId) {
+		return "E_NEW_BOOKSHELF_ID_BLANK", fmt.Errorf("Incorrect arguments. Expecting a bookshelf ID as a non-blank string.")
 	}
 
 	var newShipment Shipment
-	newShipment.Id = args[0]
-	newShipment.BookshelfId = args[1]
+	newShipment.Id = newShipmentId
+	newShipment.BookshelfId = bookshelfId
 
 	newShipmentJSON, err := json.Marshal(newShipment)
 	if err != nil {
-		return shim.Error(err.Error())
+		return "OP_FAILED", fmt.Errorf("Failed to JSON marshal new shipment data: %v", err)
 	}
 
-	err2 := stub.PutState(args[0], newShipmentJSON)
+	stub := ctx.GetStub()
+
+	err2 := stub.PutState(newShipmentId, newShipmentJSON)
 	if err2 != nil {
-		return shim.Error("Failed to insert shipment:" + args[0] + err2.Error())
+		return "E_PUT_STATE_FAIL", fmt.Errorf("Failed to insert new shipment to ledger state: %v --- %v", newShipmentJSON, err2)
 	}
 
-	return shim.Success([]byte(args[0]))
+	return newShipmentId, nil
 }
 
-func (t *ShipmentChaincode) getListShipment(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	if len(args) != 0 {
-		return shim.Error("Incorrect arguments. No arguments expected")
-	}
-	bookmark := ""
+func (t *ShipmentChaincode) GetListShipment(ctx contractapi.TransactionContextInterface) ([]Shipment, error) {
 
-	resultsIterator, _, err := stub.GetStateByRangeWithPagination("", "", 25, bookmark)
+	stub := ctx.GetStub()
+
+	resultsIterator, _, err := stub.GetStateByRangeWithPagination("", "", 25, "")
 	if err != nil {
-		return shim.Error("Error in getListShipment: " + err.Error())
+		return nil, fmt.Errorf("Error in GetListShipment: %v", err)
 	}
 	defer resultsIterator.Close()
 
-	var listShipment []Shipment
+	var shipments []Shipment
 
 	for resultsIterator.HasNext() {
-		var buffer bytes.Buffer
-		var aux Shipment
 		response, err := resultsIterator.Next()
 		if err != nil {
-			return shim.Error("Error in iterator: " + err.Error())
+			return nil, fmt.Errorf("Error in shipment result iterator: %v", err)
 		}
 
-		buffer.WriteString(string(response.Value))
+		var aux Shipment
+		if err := json.Unmarshal(response.Value, &aux); err != nil {
+			return nil, fmt.Errorf("Error un-marshalling shipment: %v", err)
+		}
 
-		_ = json.Unmarshal(buffer.Bytes(), &aux)
-
-		listShipment = append(listShipment, aux)
+		shipments = append(shipments, aux)
 	}
 
-	jsonResponse, err := json.Marshal(listShipment)
-	if err != nil {
-		return shim.Error("Error get result: " + err.Error())
-	}
-
-	return shim.Success(jsonResponse)
-}
-`;
+	return shipments, nil
+}`;
 
 const exportSourceToFs = async () => {
   const path = await import("path");

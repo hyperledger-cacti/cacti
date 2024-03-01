@@ -1,53 +1,79 @@
 import path from "path";
-import { spawn } from "child_process";
+import { promisify } from "util";
+import { spawn, exec } from "child_process";
+import { v4 as uuidV4 } from "uuid";
 import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import * as publicApi from "../../../main/typescript/public-api";
 
-const testCase =
-  "can launch via CLI with generated API server .config.json file";
+const testCase = "SupplyChainApp can launch via root package.json script";
 const logLevel: LogLevelDesc = "TRACE";
 
-test.skip("BEFORE " + testCase, async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
 
-// FIXME: remove the skip once this issue is fixed:
-// https://github.com/hyperledger/cactus/issues/1518
-test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
+async function psFilter(filter?: string): Promise<Map<number, string>> {
+  const execAsync = promisify(exec);
+  try {
+    const { stdout } = await execAsync("ps -wo pid,cmd");
+    const rows = stdout.split("\n");
+    const map = new Map<number, string>();
+    rows.forEach((row) => {
+      const [pidStr, ...cmdParts] = row.split(" ");
+      if (pidStr === "") {
+        return;
+      }
+      const cmd = cmdParts.join(" ");
+      console.log("pid=%o, cmd=%o", pidStr, cmd);
+      const pid = parseInt(pidStr, 10);
+      if (filter && cmd.includes(filter)) {
+        map.set(pid, cmd);
+      }
+    });
+    return map;
+  } catch (e: unknown) {
+    console.error("Crashed while running ps binary. Are you on Linux?", e);
+    throw e;
+  }
+}
+
+test(testCase, async (t: Test) => {
   t.ok(publicApi, "Public API of the package imported OK");
   test.onFinish(async () => await pruneDockerAllIfGithubAction({ logLevel }));
 
+  const uuid = uuidV4();
+
   const projectRoot = path.join(__dirname, "../../../../../../");
 
-  const child = spawn("npm", ["run", "start:example-supply-chain"], {
-    cwd: projectRoot,
-  });
+  // used to find the processes to kill after we are done with the test
+  const beaconCliArg = "--" + uuid;
 
-  const logs = [];
-  for await (const data of child.stdout) {
-    console.log(`[child]: ${data}`);
-    logs.push(data);
-  }
+  const child = spawn(
+    "npm",
+    ["run", "start:example-supply-chain", "--", beaconCliArg],
+    {
+      cwd: projectRoot,
+    },
+  );
 
-  for await (const data of child.stderr) {
-    console.error(`[child]: ${data}`);
-    logs.push(data);
-  }
+  let apiIsHealthy = false;
 
   const childProcessPromise = new Promise<void>((resolve, reject) => {
     child.once("exit", (code: number, signal: NodeJS.Signals) => {
-      if (code === 0) {
+      t.comment(`EVENT:exit child process exited gracefully.`);
+      t.comment(`EVENT:exit signal=${signal}`);
+      t.comment(`EVENT:exit exitCode=${code}`);
+      t.comment(`EVENT:exit apiIsHealthy=${apiIsHealthy}`);
+      if (apiIsHealthy) {
         resolve();
       } else {
         const msg = `Child process crashed. exitCode=${code}, signal=${signal}`;
         reject(new Error(msg));
       }
-      t.comment(`EVENT:exit signal=${signal}`);
-      t.comment(`EVENT:exit exitCode=${code}`);
     });
     child.on("close", (code: number, signal: NodeJS.Signals) => {
       t.comment(`EVENT:close signal=${signal}`);
@@ -62,7 +88,28 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
     });
   });
 
+  const logs = [];
+  for await (const data of child.stdout) {
+    console.log(`[child]: ${data}`);
+    if (data.includes("Cactus API reachable http")) {
+      console.log("Sending kill signal to child process...");
+      apiIsHealthy = true;
+      const killedOK = child.kill("SIGKILL");
+      console.log("Sent kill signal, success=%o", killedOK);
+
+      const processMap = await psFilter(uuid);
+      processMap.forEach((v, k) => {
+        console.log("Killing sub-process with pid: %o (cmd=%o) ", k, v);
+        process.kill(k);
+      });
+      break;
+    }
+    logs.push(data);
+  }
+
   await t.doesNotReject(childProcessPromise, "childProcessPromise resolves OK");
 
   t.end();
+
+  process.exit(0);
 });

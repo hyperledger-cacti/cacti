@@ -60,10 +60,9 @@ import {
   DefaultEventHandlerStrategy,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
-import {
-  SupplyChainAppDummyInfrastructure,
-  org1Env,
-} from "./infrastructure/supply-chain-app-dummy-infrastructure";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger/cactus-test-tooling";
+
+import { SupplyChainAppDummyInfrastructure } from "./infrastructure/supply-chain-app-dummy-infrastructure";
 import {
   Configuration,
   DefaultApi as SupplyChainApi,
@@ -193,6 +192,7 @@ export class SupplyChainApp {
 
     if (!this.options.disableSignalHandlers) {
       exitHook((callback: IAsyncExitHookDoneCallback) => {
+        console.log(`Executing Registered signal handler to stop container.`);
         this.stop().then(callback);
       });
       this.log.debug(`Registered signal handlers for graceful auto-shutdown`);
@@ -388,7 +388,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
-          fabricEnvironment: org1Env,
+          fabricEnvironment: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         }),
         this.keychain,
       ],
@@ -403,7 +403,7 @@ export class SupplyChainApp {
       instanceId: "PluginLedgerConnectorFabric_C",
       dockerBinary: "/usr/local/bin/docker",
       peerBinary: "peer",
-      cliContainerEnv: org1Env,
+      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
       connectionProfile: connectionProfile,
       sshConfig: sshConfig,
       logLevel: "INFO",

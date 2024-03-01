@@ -1,44 +1,66 @@
-FROM cruizba/ubuntu-dind:19.03.11 as runner
+FROM cruizba/ubuntu-dind:jammy-24.0.7-compose-2.24.0 as runner
 
 USER root
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
-RUN apt -y upgrade
+RUN apt-get update && \
+    apt -y upgrade
 
 # Need curl for healthchecks
-RUN apt-get -y install --no-install-recommends curl
-
 # The file binary is used to inspect exectubles when debugging container image issues
-RUN apt-get -y install --no-install-recommends file
-
-
-RUN apt-get -y install --no-install-recommends ca-certificates
-RUN apt-get -y install --no-install-recommends tzdata
+RUN apt-get -y install --no-install-recommends -y \
+    curl \
+    file \
+    ca-certificates \
+    tzdata \
+    git \
+    jq
 
 ARG APP=/usr/src/app/
 
 ENV TZ=Etc/UTC
 ENV APP_USER=appuser
 
-RUN useradd -m ${APP_USER}
-RUN usermod -a -G ${APP_USER} ${APP_USER}
-RUN mkdir -p ${APP}
+RUN useradd -m ${APP_USER} && \
+    usermod -a -G ${APP_USER} ${APP_USER} && \
+    mkdir -p ${APP}
 
-RUN mkdir -p "${APP}/log/"
-RUN chown -R $APP_USER:$APP_USER "${APP}/"
+RUN mkdir -p "${APP}/log/" && \
+    chown -R $APP_USER:$APP_USER "${APP}/"
 
 # TODO: Can we hack it together so that the whole thing works rootless?
 USER ${APP_USER}
 WORKDIR ${APP}
 
+# COPY --chown=${APP_USER}:${APP_USER} examples/cactus-example-supply-chain-backend/tpl.package.json /usr/src/app/package.json
+
+# RUN touch /usr/src/app/package.json
+
 SHELL ["/bin/bash", "--login", "-i", "-c"]
-# Installing Node Version Manager (nvm)
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-ARG NPM_PKG_VERSION=latest
+# Installing NodeJS via Node Version Manager (nvm)
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+ARG NPM_PKG_VERSION="latest"
 RUN source ~/.bashrc && \
-    nvm install 16.15.1 && \
-    npm install -g yarn && \
-    yarn add @hyperledger/cactus-example-supply-chain-backend@${NPM_PKG_VERSION} --ignore-engines --production
+    nvm install 18.18.2 && \
+    npm i -g corepack && corepack enable && corepack prepare yarn@4.1.0 --activate && \
+    yarn init --yes --private && \
+    yarn config set nodeLinker node-modules && \
+    yarn add @hyperledger/cactus-example-supply-chain-backend@${NPM_PKG_VERSION} --exact && \
+    yarn add ethers@6.8.1 --exact && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-test-tooling": "\($NPM_PKG_VERSION)" }' | tee /usr/src/app/package.json && \ 
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-api-client": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-cmd-api-server": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-common": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core-api": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-business-logic-plugin": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-frontend": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-consortium-manual": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-keychain-memory": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-besu": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-fabric": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-quorum": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    yarn install
 
 SHELL ["/bin/bash", "--login", "-c"]
 
