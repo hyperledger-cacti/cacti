@@ -15,7 +15,7 @@ Usage
       \-p 4000:4000 \\
       \-p 4100:4100 \\
       \-p 4200:4200 \\
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2022-04-05--feat-1579
+      ghcr.io/hyperledger/cactus-example-supply-chain-app:2024-03-08--pr-3059-1
 
 2.  Observe the example application pulling up in the logs
 

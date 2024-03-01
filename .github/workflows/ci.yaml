@@ -612,6 +612,8 @@ jobs:
   cactus-example-supply-chain-backend:
     continue-on-error: false
     env:
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: examples/cactus-example-supply-chain-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
