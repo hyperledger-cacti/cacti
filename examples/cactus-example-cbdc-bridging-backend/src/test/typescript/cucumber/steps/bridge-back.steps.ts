@@ -70,11 +70,7 @@ Then(
 Then(
   "{string} fails to initiate bridge back of {int} CBDC referenced by id {string}",
   { timeout: 60 * 1000 },
-  async function (
-    user: string,
-    amount: number,
-    assetRefID: string,
-  ) {
+  async function (user: string, amount: number, assetRefID: string) {
     const address = getEthAddress(user);
     const fabricID = getFabricId(user);
 

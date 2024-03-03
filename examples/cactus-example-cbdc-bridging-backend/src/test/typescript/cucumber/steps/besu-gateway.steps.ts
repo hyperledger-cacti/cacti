@@ -9,7 +9,12 @@ import {
 } from "../besu-helper";
 import AssetReferenceContractJson from "../../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../../solidity/cbdc-erc-20/CBDCcontract.json";
-import { getEthAddress, getPrvKey, assertEqual, assertStringContains } from "./common";
+import {
+  getEthAddress,
+  getPrvKey,
+  assertEqual,
+  assertStringContains,
+} from "./common";
 
 const BESU_CONTRACT_CBDC_ERC20_NAME = CBDCcontractJson.contractName;
 const BESU_CONTRACT_ASSET_REF_NAME = AssetReferenceContractJson.contractName;
@@ -156,7 +161,8 @@ Then(
       getPrvKey(user),
       assetRefID,
     ).catch((err) => {
-      assertStringContains(err.response.data.error,
+      assertStringContains(
+        err.response.data.error,
         `Transaction has been reverted by the EVM`,
       );
     });
