@@ -81,7 +81,7 @@
     "openapi-types": "12.1.3",
     "sqlite3": "5.1.5",
     "typescript-optional": "2.0.1",
-    "uuid": "8.3.2",
+    "uuid": "9.0.1",
     "web3-core": "1.5.2",
     "web3-utils": "1.5.2"
   },
@@ -92,7 +92,7 @@
     "@types/express-jwt": "6.0.2",
     "@types/fs-extra": "9.0.13",
     "@types/node": "10.17.60",
-    "@types/uuid": "8.3.4",
+    "@types/uuid": "9.0.8",
     "cucumber": "5.0.3",
     "hardhat": "2.17.2",
     "http-status-codes": "2.1.4",

@@ -67,7 +67,7 @@
     "body-parser": "1.20.2",
     "express": "4.18.2",
     "jest-extended": "4.0.1",
-    "uuid": "8.3.2"
+    "uuid": "9.0.1"
   },
   "engines": {
     "node": ">=18",

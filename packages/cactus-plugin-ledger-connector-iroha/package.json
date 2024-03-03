@@ -79,7 +79,7 @@
     "@types/body-parser": "1.19.4",
     "@types/express": "4.17.19",
     "@types/sanitize-html": "2.9.5",
-    "@types/uuid": "9.0.6",
+    "@types/uuid": "9.0.8",
     "body-parser": "1.20.2",
     "internal-ip": "6.2.0",
     "socket.io": "4.5.4",
