@@ -7825,7 +7825,7 @@ __metadata:
     http-status-codes: 2.1.4
     jose: 4.9.2
     json-stable-stringify: 1.0.2
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     typescript-optional: 2.0.1
     uuid: 8.3.2
     web3-core: 1.6.1
@@ -7851,7 +7851,7 @@ __metadata:
     async-exit-hook: 2.0.1
     axios: 1.6.0
     express: 4.18.2
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     typescript-optional: 2.0.1
     uuid: 8.3.2
   languageName: unknown
@@ -7935,7 +7935,7 @@ __metadata:
     knex: 2.5.1
     kubo-rpc-client: 3.0.1
     nyc: 13.1.0
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     remix-tests: 0.1.34
     sqlite3: 5.1.5
     ts-node: 7.0.1
@@ -8085,7 +8085,7 @@ __metadata:
     express-jwt: 8.4.1
     fabric-network: 2.2.20
     jose: 4.9.2
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     solc: 0.8.6
     typescript-optional: 2.0.1
     uuid: 8.3.2
@@ -8112,7 +8112,7 @@ __metadata:
     async-exit-hook: 2.0.1
     axios: 1.6.0
     express: 4.18.2
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     run-time-error-cjs: 1.4.0
     typescript-optional: 2.0.1
     uuid: 8.3.2
@@ -8246,7 +8246,7 @@ __metadata:
     express: 4.18.2
     fast-safe-stringify: 2.1.1
     joi: 14.3.1
-    openapi-types: 7.0.1
+    openapi-types: 12.1.3
     prom-client: 13.1.0
     run-time-error-cjs: 1.4.0
     socket.io: 4.5.4
@@ -8270,7 +8270,7 @@ __metadata:
     axios: 1.6.0
     express: 4.18.2
     joi: 17.9.1
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     typescript-optional: 2.0.1
   languageName: unknown
   linkType: soft
@@ -8294,7 +8294,7 @@ __metadata:
     express: 4.18.2
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
     joi: 17.9.1
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     typescript-optional: 2.0.1
     web3js-quorum: 22.4.0
   languageName: unknown
@@ -8318,7 +8318,7 @@ __metadata:
     express: 4.18.2
     http-status-codes: 2.1.4
     internal-ip: 6.2.0
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     prom-client: 13.2.0
     typescript-optional: 2.0.1
     uuid: 9.0.1
@@ -8343,7 +8343,7 @@ __metadata:
     express: 4.18.2
     http-status-codes: 2.1.4
     internal-ip: 6.2.0
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     typescript-optional: 2.0.1
     uuid: 9.0.1
   languageName: unknown
@@ -8368,7 +8368,7 @@ __metadata:
     google-gax: 4.0.5
     http-status-codes: 2.1.4
     internal-ip: 6.2.0
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     typescript-optional: 2.0.1
     uuid: 9.0.1
   languageName: unknown
@@ -8430,7 +8430,7 @@ __metadata:
     http-status-codes: 2.1.4
     internal-ip: 6.2.0
     node-vault: 0.9.22
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     prom-client: 13.2.0
     typescript-optional: 2.0.1
     uuid: 9.0.1
@@ -8488,7 +8488,7 @@ __metadata:
     http-errors: 2.0.0
     joi: 17.9.1
     key-encoder: 2.0.3
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     prom-client: 13.2.0
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
@@ -8636,7 +8636,7 @@ __metadata:
     ngo: 2.7.0
     node-ssh: 13.1.0
     node-vault: 0.9.22
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     prom-client: 13.2.0
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
@@ -8742,7 +8742,7 @@ __metadata:
     internal-ip: 6.2.0
     iroha-helpers: 1.5.0
     key-encoder: 2.0.3
-    openapi-types: 7.0.1
+    openapi-types: 12.1.3
     prom-client: 13.1.0
     run-time-error-cjs: 1.4.0
     rxjs: 7.8.1
@@ -8788,7 +8788,7 @@ __metadata:
     joi: 14.3.1
     multer: 1.4.2
     ngo: 2.6.2
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     prom-client: 13.2.0
     run-time-error: 1.4.0
     supertest: 6.1.6
@@ -8924,7 +8924,7 @@ __metadata:
     body-parser: 1.20.2
     express: 4.18.2
     joi: 17.9.1
-    openapi-types: 9.1.0
+    openapi-types: 12.1.3
     prom-client: 13.2.0
     run-time-error-cjs: 1.4.0
     typescript-optional: 2.0.1
@@ -39975,20 +39975,6 @@ __metadata:
   version: 12.1.3
   resolution: "openapi-types@npm:12.1.3"
   checksum: 7fa5547f87a58d2aa0eba6e91d396f42d7d31bc3ae140e61b5d60b47d2fd068b48776f42407d5a8da7280cf31195aa128c2fc285e8bb871d1105edee5647a0bb
-  languageName: node
-  linkType: hard
-
-"openapi-types@npm:7.0.1":
-  version: 7.0.1
-  resolution: "openapi-types@npm:7.0.1"
-  checksum: c513edcb14c5d41e6b8ec63011cace8d13d2308b680784aac7fea4071ca958a576cee0b4f004b9cded8b31fe5c097ecc3802aa13c9ea03124b3545f37835dd0c
-  languageName: node
-  linkType: hard
-
-"openapi-types@npm:9.1.0":
-  version: 9.1.0
-  resolution: "openapi-types@npm:9.1.0"
-  checksum: 8ae57949c00ff70bc98b45d688fcdf848b9f2a44a3f70869d1cbd892dbac1d05f5f72350394ba1e254245090900722ce0fd305aadca0e9168cbfbf3a20b9df72
   languageName: node
   linkType: hard
 

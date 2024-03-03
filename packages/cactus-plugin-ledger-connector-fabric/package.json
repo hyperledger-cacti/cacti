@@ -76,7 +76,7 @@
     "ngo": "2.7.0",
     "node-ssh": "13.1.0",
     "node-vault": "0.9.22",
-    "openapi-types": "9.1.0",
+    "openapi-types": "12.1.3",
     "prom-client": "13.2.0",
     "run-time-error-cjs": "1.4.0",
     "rxjs": "7.8.1",
