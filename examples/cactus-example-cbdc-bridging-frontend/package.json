@@ -44,11 +44,11 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "typescript": "5.3.3",
-    "uuid": "^9.0.1",
+    "uuid": "9.0.1",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.7"
+    "@types/uuid": "9.0.8"
   },
   "engines": {
     "node": ">=18",

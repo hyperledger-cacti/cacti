@@ -60,7 +60,7 @@
     "jose": "4.9.2"
   },
   "devDependencies": {
-    "@types/uuid": "9.0.6",
+    "@types/uuid": "9.0.8",
     "uuid": "9.0.1"
   },
   "engines": {

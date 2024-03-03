@@ -86,7 +86,7 @@
     "socket.io-client-fixed-types": "4.5.4",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
-    "uuid": "8.3.2",
+    "uuid": "9.0.1",
     "ws-identity-client": "1.0.2"
   },
   "devDependencies": {
@@ -102,7 +102,7 @@
     "@types/node-vault": "0.9.13",
     "@types/sanitize-html": "2.9.5",
     "@types/temp": "0.9.1",
-    "@types/uuid": "8.3.4",
+    "@types/uuid": "9.0.8",
     "body-parser": "1.20.2",
     "fs-extra": "10.1.0",
     "internal-ip": "6.2.0",

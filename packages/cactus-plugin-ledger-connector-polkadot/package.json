@@ -88,7 +88,7 @@
     "temp": "0.9.1",
     "tslint": "6.1.3",
     "typescript-optional": "2.0.1",
-    "uuid": "8.3.2"
+    "uuid": "9.0.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
@@ -100,7 +100,7 @@
     "@types/ssh2": "0.5.44",
     "@types/supertest": "2.0.11",
     "@types/temp": "0.9.1",
-    "@types/uuid": "8.3.1",
+    "@types/uuid": "9.0.8",
     "axios": "1.6.0",
     "supertest": "6.1.6"
   },

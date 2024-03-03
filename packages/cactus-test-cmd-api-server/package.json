@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
-    "@types/uuid": "9.0.6"
+    "@types/uuid": "9.0.8"
   },
   "engines": {
     "node": ">=18",
