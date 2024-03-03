@@ -264,15 +264,15 @@ export class IrohaV2TestEnv {
 
     if (this.socketioServer) {
       this.log.info("Stop the SocketIO server connector...");
-      await new Promise<void>(
-        (resolve) => this.socketioServer?.close(() => resolve()),
+      await new Promise<void>((resolve) =>
+        this.socketioServer?.close(() => resolve()),
       );
     }
 
     if (this.connectorServer) {
       this.log.info("Stop the iroha2 connector...");
-      await new Promise<void>(
-        (resolve) => this.connectorServer?.close(() => resolve()),
+      await new Promise<void>((resolve) =>
+        this.connectorServer?.close(() => resolve()),
       );
     }
 

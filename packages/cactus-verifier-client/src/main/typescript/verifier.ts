@@ -26,9 +26,8 @@ export {
 /**
  * Utility type for retrieving monitoring event / new block type from generic ISocketApiClient interface.
  */
-type BlockTypeFromSocketApi<T> = T extends ISocketApiClient<infer U>
-  ? U
-  : never;
+type BlockTypeFromSocketApi<T> =
+  T extends ISocketApiClient<infer U> ? U : never;
 
 /**
  * Extends ledger connector ApiClient with additional monitoring methods (using callbacks, instead of reactive).
