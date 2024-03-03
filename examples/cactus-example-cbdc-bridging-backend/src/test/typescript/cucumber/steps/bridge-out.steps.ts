@@ -1,7 +1,13 @@
 import { When, Then } from "cucumber";
 import axios from "axios";
 import CryptoMaterial from "../../../../crypto-material/crypto-material.json";
-import { getUserFromPseudonim, getFabricId, getEthAddress, assertEqual, assertStringContains } from "./common";
+import {
+  getUserFromPseudonim,
+  getFabricId,
+  getEthAddress,
+  assertEqual,
+  assertStringContains,
+} from "./common";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -87,7 +93,7 @@ When(
         recipientLedgerAssetID: "FABRIC_ASSET_ID",
       },
     );
-    
+
     assertEqual(response.status, 200);
   },
 );

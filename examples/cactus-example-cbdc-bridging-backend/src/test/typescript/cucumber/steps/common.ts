@@ -52,10 +52,7 @@ export function getPrvKey(user: string): string {
   }
 }
 
-export function assertEqual(
-  value_1: unknown,
-  value_2: unknown,
-) {
+export function assertEqual(value_1: unknown, value_2: unknown) {
   if (value_1 !== value_2) {
     throw Error(`Expected ${value_1} to be equal to ${value_2}`);
   }
@@ -66,7 +63,7 @@ export function assertStringContains(
   subString: string,
 ): void {
   if (!mainString.includes(subString)) {
-      throw new Error(`String "${mainString}" does not contain "${subString}"`);
+    throw new Error(`String "${mainString}" does not contain "${subString}"`);
   }
 }
 

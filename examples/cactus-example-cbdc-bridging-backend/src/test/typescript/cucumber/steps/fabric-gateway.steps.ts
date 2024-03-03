@@ -7,7 +7,7 @@ import {
   getUserFromPseudonim,
   assertEqual,
   assertNonNullish,
-  assertStringContains
+  assertStringContains,
 } from "./common";
 import {
   deleteFabricAssetReference,
@@ -94,7 +94,7 @@ When(
 
 When(
   "bob refunds {int} CBDC to {string} in the source chain",
-    { timeout: 10 * 1000 },
+  { timeout: 10 * 1000 },
   async function (amount: number, userTo: string) {
     const finalUserFabricID = getFabricId(userTo);
     const finalUserEthAddress = getEthAddress(userTo);
@@ -123,14 +123,17 @@ Then(
         },
       )
       .catch((err) => {
-        assertStringContains(err.response.data.error, `client is not authorized to perform the operation`);
+        assertStringContains(
+          err.response.data.error,
+          `client is not authorized to perform the operation`,
+        );
       });
   },
 );
 
 Then(
   "{string} fails to transfer {int} CBDC to {string}",
-    { timeout: 10 * 1000 },
+  { timeout: 10 * 1000 },
   async function (userFrom: string, amount: number, userTo: string) {
     const recipient = getFabricId(userTo);
 
@@ -157,32 +160,32 @@ Then(
 
 Then(
   "{string} has {int} CBDC available in the source chain",
-    { timeout: 10 * 1000 },
+  { timeout: 10 * 1000 },
   async function (user: string, amount: number) {
-    assertEqual((await getFabricBalance(getFabricId(user))), amount)
+    assertEqual(await getFabricBalance(getFabricId(user)), amount);
   },
 );
 
 Then(
   "the asset reference chaincode has an asset reference with id {string}",
-    { timeout: 10 * 1000 },
+  { timeout: 10 * 1000 },
   async function (assetRefID: string) {
-    assertNonNullish((await readFabricAssetReference(assetRefID)));
+    assertNonNullish(await readFabricAssetReference(assetRefID));
   },
 );
 
 Then(
   "the asset reference with id {string} is locked in the source chain",
-    { timeout: 10 * 1000 },
+  { timeout: 10 * 1000 },
   async function (assetRefID: string) {
-    assertEqual((await readFabricAssetReference(assetRefID)).isLocked, true)
+    assertEqual((await readFabricAssetReference(assetRefID)).isLocked, true);
   },
 );
 
 Then(
   "the asset reference chaincode has no asset reference with id {string}",
-    { timeout: 10 * 1000 },
+  { timeout: 10 * 1000 },
   async function (assetRefID: string) {
-    assertEqual(await fabricAssetReferenceExists(assetRefID), "false")
+    assertEqual(await fabricAssetReferenceExists(assetRefID), "false");
   },
 );
