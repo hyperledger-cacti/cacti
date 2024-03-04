@@ -112,7 +112,7 @@ const BESU_ASSET_ID = uuidv4();
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
-  label: "odap-rollback-after-crash-test",
+  label: "odap-rollback",
 });
 
 beforeAll(async () => {
@@ -134,10 +134,8 @@ beforeAll(async () => {
       emitContainerLogs: true,
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-      imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-      envVars: new Map([
-        ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
-      ]),
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel,
     });
 
@@ -541,8 +539,16 @@ beforeAll(async () => {
       pluginRecipientGateway.localRepository?.database,
     ).not.toBeUndefined();
 
+    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.remoteRepository?.database,
+    ).not.toBeUndefined();
+
     await pluginSourceGateway.localRepository?.reset();
     await pluginRecipientGateway.localRepository?.reset();
+
+    await pluginSourceGateway.remoteRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
   }
   {
     // Server Gateway configuration
