@@ -51,15 +51,17 @@ beforeEach(async () => {
   pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
-  if (
-    pluginSourceGateway.localRepository?.database == undefined ||
-    pluginRecipientGateway.localRepository?.database == undefined
-  ) {
-    throw new Error("Database is not correctly initialized");
-  }
+  expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
+
+  expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
+  
+  await pluginSourceGateway.remoteRepository?.reset();
+  await pluginRecipientGateway.remoteRepository?.reset();
 
   sequenceNumber = randomInt(100);
   sessionID = uuidv4();
@@ -88,16 +90,6 @@ beforeEach(async () => {
     operation: "create",
     data: COMMIT_ACK_CLAIM,
   });
-
-  if (
-    pluginSourceGateway.localRepository?.database == undefined ||
-    pluginRecipientGateway.localRepository?.database == undefined
-  ) {
-    throw new Error("Database is not correctly initialized");
-  }
-
-  await pluginSourceGateway.localRepository?.reset();
-  await pluginRecipientGateway.localRepository?.reset();
 });
 
 afterEach(async () => {
