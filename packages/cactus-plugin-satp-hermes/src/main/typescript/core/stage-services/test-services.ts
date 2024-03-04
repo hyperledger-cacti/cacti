@@ -1,5 +1,5 @@
 import { ConnectRouter } from "@connectrpc/connect";
-import { Message } from "../../generated/proto/test/message_pb";
+// import { Message } from "../../generated/proto/test/message_pb";
 import { TestService } from "../../generated/proto/test/message_connect";
 
 export const testRouter = (router: ConnectRouter) =>
@@ -8,8 +8,7 @@ export const testRouter = (router: ConnectRouter) =>
     // implements rpc Say
     async sendMessage(req) {
       return {
-        sentence: `You said: ${req}`
-      }
+        sentence: `You said: ${req}`,
+      };
     },
   });
-

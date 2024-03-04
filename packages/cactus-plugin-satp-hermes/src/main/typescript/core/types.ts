@@ -1,12 +1,4 @@
-import {
-  Secp256k1Keys,
-  Logger,
-  Checks,
-  LoggerProvider,
-  JsObjectSigner,
-  IJsObjectSignerOptions,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { Secp256k1Keys, LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
 
 export enum CurrentDrafts {

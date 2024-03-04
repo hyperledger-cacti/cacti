@@ -3,53 +3,29 @@ import {
   Logger,
   Checks,
   LoggerProvider,
-  JsObjectSigner,
-  IJsObjectSignerOptions,
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
 import { v4 as uuidv4 } from "uuid";
 
 import {
-  ICactusPlugin,
-  IPluginWebService,
-  IWebServiceEndpoint,
-  Configuration,
-} from "@hyperledger/cactus-core-api";
-
-import {
-  MinLength,
-  MaxLength,
-  IsNotEmpty,
-  ValidateNested,
   IsDefined,
   IsNotEmptyObject,
   IsObject,
   IsString,
   Contains,
 } from "class-validator";
-import { Type } from "class-transformer";
 
-import fs from "fs";
 import path from "path";
-import swaggerUi = require("swagger-ui-express");
+
 import {
-  IPluginSatpGatewayConstructorOptions,
-  PluginSATPGateway,
-} from "./plugin-satp-gateway";
-import { Server } from "node:http";
-import {
-  CurrentDrafts,
-  DraftVersions,
   SATPGatewayConfig,
   GatewayIdentity,
   ShutdownHook,
   SupportedGatewayImplementations,
 } from "./core/types";
-import { pass } from "jest-extended";
 import { GatewayOrchestrator } from "./gol/gateway-orchestrator";
-import { log } from "console";
 export { SATPGatewayConfig };
-import express, { Express, Request, Response } from 'express';
+import express from "express";
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import http from "http";
 import { configureRoutes } from "./web-services/router";
@@ -76,7 +52,7 @@ export class SATPGateway {
   private server: any | undefined;
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   // private sessions: Map<string, Session> = new Map();
-  
+
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.label}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -110,27 +86,25 @@ export class SATPGateway {
       this.server = express();
       this.server.use(expressConnectMiddleware({ routes: configureRoutes }));
       http.createServer(this.server).listen(this.options.gid?.port);
-
-    } else  {
+    } else {
       this.logger.warn("Server already running");
     }
   }
-async shutdownServer(): Promise<void> {
-  const fnTag = `${this.label}#shutdown()`;
-  this.logger.debug(`Entering ${fnTag}`);
-  if (this.server) {
-    try {
-      this.server.close();
-      this.server = undefined;
-      this.logger.info("Server shut down");
-    } catch (error) {
-      this.logger.error(`Error shutting down the server: ${error}`);
+  async shutdownServer(): Promise<void> {
+    const fnTag = `${this.label}#shutdown()`;
+    this.logger.debug(`Entering ${fnTag}`);
+    if (this.server) {
+      try {
+        this.server.close();
+        this.server = undefined;
+        this.logger.info("Server shut down");
+      } catch (error) {
+        this.logger.error(`Error shutting down the server: ${error}`);
+      }
+    } else {
+      this.logger.warn("Server is not running.");
     }
-  } else {
-    this.logger.warn("Server is not running.");
   }
-}
-
 
   async addGateways(IDs: string[]): Promise<void> {
     const fnTag = `${this.label}#connectToGateway()`;
@@ -206,7 +180,7 @@ async shutdownServer(): Promise<void> {
     const specPath = path.join(__dirname, "../../", "/json", "openapi.json");
     this.logger.debug(`Loading OpenAPI specification from ${specPath}`);
 
-    const OpenAPISpec = JSON.parse(fs.readFileSync(specPath).toString());
+    //const OpenAPISpec = JSON.parse(fs.readFileSync(specPath).toString());
     this.logger.info(
       `OpenAPI docs and documentation set up at 📖: \n ${this.config.gid?.address}:${this.config.gid?.port}/api-docs`,
     );
@@ -312,9 +286,8 @@ async shutdownServer(): Promise<void> {
     return this.config.gid!;
   }
 
-  async shutdown(): Promise<number>   {
+  async shutdown(): Promise<number> {
     this.logger.info("Shutting down Gateway Coordinator");
     return await this.gatewayConnectionManager.disconnectAll();
-    
   }
 }
