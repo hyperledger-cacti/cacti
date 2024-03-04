@@ -56,14 +56,14 @@ export class State {
     return this.version.toString();
   }
 
-  public pruneState(tI: string, tF: string): void {
-    const tInum = parseInt(tI);
-    const tFnum = parseInt(tF);
+  public pruneState(tsStart: string, tsEnd: string): void {
+    const tsStartNum = parseInt(tsStart);
+    const tsEndNum = parseInt(tsEnd);
     // eslint-disable-next-line prefer-const
     this.transactions.forEach((element, index) => {
       if (
-        parseInt(element.getTimeStamp()) < tInum ||
-        parseInt(element.getTimeStamp()) > tFnum
+        parseInt(element.getTimeStamp()) < tsStartNum ||
+        parseInt(element.getTimeStamp()) > tsEndNum
       ) {
         this.version = this.version - 1;
         this.transactions.splice(index, 1); //Remove tx

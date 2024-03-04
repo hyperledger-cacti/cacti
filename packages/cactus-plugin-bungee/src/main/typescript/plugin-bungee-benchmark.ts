@@ -81,33 +81,33 @@ export class PluginBUNGEEBenchmark {
   private level: LogLevelDesc;
   private logger: Logger;
   public pluginRegistry: PluginRegistry;
-  private tIgetAllAssetsKey: number;
-  private tFgetAllAssetsKey: number;
-  private tIgetAllTxByKey: number;
-  private tFgetAllTxByKey: number;
-  private tIfabricGetTxReceiptByTxIDV1: number;
-  private tFfabricGetTxReceiptByTxIDV1: number;
-  private tIgenerateLedgerStates: number;
-  private tFgenerateLedgerStates: number;
-  private tIgenerateSnapshot: number;
-  private tFgenerateSnapshot: number;
-  private tIgenerateView: number;
-  private tFgenerateView: number;
+  private tsStartGetAllAssetsKey: number;
+  private tsEndGetAllAssetsKey: number;
+  private tsStartGetAllTxByKey: number;
+  private tsEndGetAllTxByKey: number;
+  private tsStartfabricGetTxReceiptByTxIDV1: number;
+  private tsEndfabricGetTxReceiptByTxIDV1: number;
+  private tsStartgenerateLedgerStates: number;
+  private tsEndgenerateLedgerStates: number;
+  private tsStartgenerateSnapshot: number;
+  private tsEndgenerateSnapshot: number;
+  private tsStartGenerateView: number;
+  private tsEndGenerateView: number;
   private fileNameDate = Date.now();
 
   constructor(public readonly options: IPluginBUNGEEOptions) {
-    this.tIgetAllAssetsKey = 0;
-    this.tFgetAllAssetsKey = 0;
-    this.tIgetAllTxByKey = 0;
-    this.tFgetAllTxByKey = 0;
-    this.tIfabricGetTxReceiptByTxIDV1 = 0;
-    this.tFfabricGetTxReceiptByTxIDV1 = 0;
-    this.tIgenerateLedgerStates = 0;
-    this.tFgenerateLedgerStates = 0;
-    this.tIgenerateSnapshot = 0;
-    this.tFgenerateSnapshot = 0;
-    this.tIgenerateView = 0;
-    this.tFgenerateView = 0;
+    this.tsStartGetAllAssetsKey = 0;
+    this.tsEndGetAllAssetsKey = 0;
+    this.tsStartGetAllTxByKey = 0;
+    this.tsEndGetAllTxByKey = 0;
+    this.tsStartfabricGetTxReceiptByTxIDV1 = 0;
+    this.tsEndfabricGetTxReceiptByTxIDV1 = 0;
+    this.tsStartgenerateLedgerStates = 0;
+    this.tsEndgenerateLedgerStates = 0;
+    this.tsStartgenerateSnapshot = 0;
+    this.tsEndgenerateSnapshot = 0;
+    this.tsStartGenerateView = 0;
+    this.tsEndGenerateView = 0;
 
     this.className = "pluginBUNGEE";
     this.level = options.logLevel || "INFO";
@@ -187,7 +187,7 @@ export class PluginBUNGEEBenchmark {
    * @abstract Create ledger state. Get all keys, iterate every key and get the respective transactions. For each transaction get the receipt
    * */
   public async generateLedgerStates(): Promise<string> {
-    this.tIgenerateLedgerStates = performance.now();
+    this.tsStartgenerateLedgerStates = performance.now();
     this.logger.info(`Generating ledger snapshot`);
 
     const assetsKey = await this.getAllAssetsKey();
@@ -254,7 +254,7 @@ export class PluginBUNGEEBenchmark {
       this.tF = asset9.getFinalTime();
     }
 
-    this.tFgenerateLedgerStates = performance.now();
+    this.tsEndgenerateLedgerStates = performance.now();
 
     return "";
   }
@@ -264,10 +264,10 @@ export class PluginBUNGEEBenchmark {
    * @abstract Returns Snapshot
    * */
   public generateSnapshot(): Snapshot {
-    this.tIgenerateSnapshot = performance.now();
+    this.tsStartgenerateSnapshot = performance.now();
     const snapShotId = uuidv4();
     const snapshot = new Snapshot(snapShotId, this.participant, this.states);
-    this.tFgenerateSnapshot = performance.now();
+    this.tsEndgenerateSnapshot = performance.now();
     return snapshot;
   }
 
@@ -278,7 +278,7 @@ export class PluginBUNGEEBenchmark {
    * @param snapshot - Ledger Snapshot
    * */
   public generateView(snapshot: Snapshot): string {
-    this.tIgenerateView = performance.now();
+    this.tsStartGenerateView = performance.now();
     const crypto = require("crypto");
 
     this.logger.warn(this.pubKeyBungee);
@@ -302,7 +302,7 @@ export class PluginBUNGEEBenchmark {
       JSON.stringify(signedView, null, 2),
     );
 
-    this.tFgenerateView = performance.now();
+    this.tsEndGenerateView = performance.now();
     return JSON.stringify(signedView);
   }
 
@@ -313,7 +313,7 @@ export class PluginBUNGEEBenchmark {
    * @param transactionId - Transaction id to return the receipt
    * */
   async fabricGetTxReceiptByTxIDV1(transactionId: string): Promise<string> {
-    this.tIfabricGetTxReceiptByTxIDV1 = performance.now();
+    this.tsStartfabricGetTxReceiptByTxIDV1 = performance.now();
 
     const receiptLockRes = await this.fabricApi?.getTransactionReceiptByTxIDV1({
       signingCredential: this.fabricSigningCredential,
@@ -324,7 +324,7 @@ export class PluginBUNGEEBenchmark {
       params: [this.fabricChannelName, transactionId],
     } as FabricRunTransactionRequest);
 
-    this.tFfabricGetTxReceiptByTxIDV1 = performance.now();
+    this.tsEndfabricGetTxReceiptByTxIDV1 = performance.now();
     return JSON.stringify(receiptLockRes?.data);
   }
 
@@ -333,7 +333,7 @@ export class PluginBUNGEEBenchmark {
    * @abstract Returns all assets key found in the world state.
    * */
   async getAllAssetsKey(): Promise<string> {
-    this.tIgetAllAssetsKey = performance.now();
+    this.tsStartGetAllAssetsKey = performance.now();
     const response = await this.fabricApi?.runTransactionV1({
       signingCredential: this.fabricSigningCredential,
       channelName: this.fabricChannelName,
@@ -344,7 +344,7 @@ export class PluginBUNGEEBenchmark {
     } as FabricRunTransactionRequest);
 
     if (response != undefined) {
-      this.tFgetAllAssetsKey = performance.now();
+      this.tsEndGetAllAssetsKey = performance.now();
       return response.data.functionOutput;
     }
 
@@ -358,7 +358,7 @@ export class PluginBUNGEEBenchmark {
    * @param key - Key used to get correspondent transactions
    * */
   async getAllTxByKey(key: string): Promise<Transaction[]> {
-    this.tIgetAllTxByKey = performance.now();
+    this.tsStartGetAllTxByKey = performance.now();
     const response = await this.fabricApi?.runTransactionV1({
       signingCredential: this.fabricSigningCredential,
       channelName: this.fabricChannelName,
@@ -369,7 +369,7 @@ export class PluginBUNGEEBenchmark {
     } as FabricRunTransactionRequest);
 
     if (response != undefined) {
-      this.tFgetAllTxByKey = performance.now();
+      this.tsEndGetAllTxByKey = performance.now();
       return Utils.txsStringToTxs(response.data.functionOutput);
     }
 
@@ -401,29 +401,29 @@ export class PluginBUNGEEBenchmark {
 
   public generateBenchmarkReport(
     numberOfTransactions: number,
-    tItotalTime: number,
-    tFtotalTime: number,
-    tItransactionsTime: number,
-    tFtransactionsTime: number,
+    tsStartTotalTime: number,
+    tsEndTotalTime: number,
+    tsStartTransactionsTime: number,
+    tsEndTransactionsTime: number,
   ): void {
     const report = {
-      tIgetAllAssetsKey: this.tIgetAllAssetsKey,
-      tFgetAllAssetsKey: this.tFgetAllAssetsKey,
-      tIgetAllTxByKey: this.tIgetAllTxByKey,
-      tFgetAllTxByKey: this.tFgetAllTxByKey,
-      tIfabricGetTxReceiptByTxIDV1: this.tIfabricGetTxReceiptByTxIDV1,
+      tsStartGetAllAssetsKey: this.tsStartGetAllAssetsKey,
+      tsEndGetAllAssetsKey: this.tsEndGetAllAssetsKey,
+      tsStartGetAllTxByKey: this.tsStartGetAllTxByKey,
+      tsEndGetAllTxByKey: this.tsEndGetAllTxByKey,
+      tsStartfabricGetTxReceiptByTxIDV1: this.tsStartfabricGetTxReceiptByTxIDV1,
       numberOfTransactions: numberOfTransactions,
-      tFfabricGetTxReceiptByTxIDV1: this.tFfabricGetTxReceiptByTxIDV1,
-      tIgenerateLedgerStates: this.tIgenerateLedgerStates,
-      tFgenerateLedgerStates: this.tFgenerateLedgerStates,
-      tIgenerateSnapshot: this.tIgenerateSnapshot,
-      tFgenerateSnapshot: this.tFgenerateSnapshot,
-      tIgenerateView: this.tIgenerateView,
-      tFgenerateView: this.tFgenerateView,
-      tItotalTime: tItotalTime,
-      tFtotalTime: tFtotalTime,
-      tItransactionsTime: tItransactionsTime,
-      tFtransactionsTime: tFtransactionsTime,
+      tsEndfabricGetTxReceiptByTxIDV1: this.tsEndfabricGetTxReceiptByTxIDV1,
+      tsStartgenerateLedgerStates: this.tsStartgenerateLedgerStates,
+      tsEndgenerateLedgerStates: this.tsEndgenerateLedgerStates,
+      tsStartgenerateSnapshot: this.tsStartgenerateSnapshot,
+      tsEndgenerateSnapshot: this.tsEndgenerateSnapshot,
+      tsStartGenerateView: this.tsStartGenerateView,
+      tsEndGenerateView: this.tsEndGenerateView,
+      tsStartTotalTime: tsStartTotalTime,
+      tsEndTotalTime: tsEndTotalTime,
+      tsStartTransactionsTime: tsStartTransactionsTime,
+      tsEndTransactionsTime: tsEndTransactionsTime,
     };
     const reportString = JSON.stringify(report, null, 2);
     this.saveToFile(
