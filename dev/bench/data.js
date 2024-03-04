@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709569072036,
+  "lastUpdate": 1709574889881,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -304,6 +304,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.56%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "59dbd6ac571a246fc2859dff7000ef37fc0609ff",
+          "message": "refactor(test-tooling): fix types of streams: use NodeJS.ReadableStream\n\n1. The container management library that we use in the test infrastructure\n(called dockerode) is expecting streams that are defined in the global\nnamespace of the `@types/node` library, e.g. the standard library of NodeJS\nitself.\n2. Previously we were using the \"streams\" package to provide type information\nto the streams that we were passing around to dockerode and it was working\nfine, but after some changes that seem unrelated this has broken the\ncompilation process.\n3. The mentioned changes are not yet on the main branch, but we expect\nthem to be there soon and so this change is laying the groundwork for that\nby pre-emptively fixing the broken build's root cause which is that the\ntest-tooling package does not declare it's typings related dependencies\ncorrectly: It implicitly uses the NodeJS standard library's types but\nso far had not declared them on the package level.\n4. This change is therefore to rectify the issue of the `@types/node`\ndependency missing from the test-tooling package and also the refactoring\nof some of the test ledger classes which were relying on the `streams`\nbuiltin package instead of correctly using the NodeJS.ReadableStream global.\n5. Earlier the reasoning for this was that we try to avoid pulling in\ntypes from the global scope because we try to avoid any sort of dependency\non the global scope in general. Once we have proof though that this is\ncausing issues with the build, then we must give up the principle for\npractical reasons (and only in the minimum viable scope, e.g. this does\nnot change the fact that everywhere else in the codebase we should still\ndo our best to avoid using the global scoped classes, types, functions,\netc..).\n\nThank you to @AndreAugusto11 and @RafaelAPB for pointing out this issue\nthrough the pull request of his that is currently being worked on at the\ntime of this writing:\nhttps://github.com/RafaelAPB/blockchain-integration-framework/pull/72\n\nRelated to but does not address #2811\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-03-04T09:39:35-08:00",
+          "tree_id": "944e4462cdd9a66dbef02ef55d5e38ff14929194",
+          "url": "https://github.com/hyperledger/cacti/commit/59dbd6ac571a246fc2859dff7000ef37fc0609ff"
+        },
+        "date": 1709574888720,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 626,
+            "range": "±1.74%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 399,
+            "range": "±1.21%",
+            "unit": "ops/sec",
+            "extra": "184 samples"
           }
         ]
       }
