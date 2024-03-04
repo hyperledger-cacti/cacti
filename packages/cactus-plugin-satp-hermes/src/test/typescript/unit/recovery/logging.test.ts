@@ -86,15 +86,19 @@ beforeEach(async () => {
   pluginSourceGateway.sessions.set(sessionID, sessionData);
   pluginRecipientGateway.sessions.set(sessionID, sessionData);
 
-  if (
-    pluginSourceGateway.localRepository?.database == undefined ||
-    pluginRecipientGateway.localRepository?.database == undefined
-  ) {
-    throw new Error("Database is not correctly initialized");
-  }
+  expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
+
+  expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
+  
+  await pluginSourceGateway.remoteRepository?.reset();
+  await pluginRecipientGateway.remoteRepository?.reset();
+  await pluginSourceGateway.remoteRepository?.reset();
+  await pluginRecipientGateway.remoteRepository?.reset();
 });
 
 test("successful translation of log keys", async () => {

@@ -114,8 +114,8 @@ const FABRIC_ASSET_ID = uuidv4();
 const BESU_ASSET_ID = uuidv4();
 
 const log = LoggerProvider.getOrCreate({
-  level: "INFO",
-  label: "satpTestWithLedgerConnectors",
+  level: logLevel,
+  label: "client-crash-after-lock-asset",
 });
 
 beforeAll(async () => {
@@ -137,7 +137,8 @@ beforeAll(async () => {
       emitContainerLogs: true,
       publishAllPorts: true,
       imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-      envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel,
     });
 
@@ -545,8 +546,16 @@ beforeAll(async () => {
       pluginRecipientGateway.localRepository?.database,
     ).not.toBeUndefined();
 
+    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.remoteRepository?.database,
+    ).not.toBeUndefined();
+
     await pluginSourceGateway.localRepository?.reset();
     await pluginRecipientGateway.localRepository?.reset();
+
+    await pluginSourceGateway.remoteRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
   }
   {
     // Server Gateway configuration
