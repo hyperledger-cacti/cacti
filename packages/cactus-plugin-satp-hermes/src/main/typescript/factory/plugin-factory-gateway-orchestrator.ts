@@ -2,10 +2,7 @@ import {
   IPluginFactoryOptions,
   PluginFactory,
 } from "@hyperledger/cactus-core-api";
-import {
-  SATPGateway,
-  SATPGatewayConfig,
-} from "../gateway-refactor";
+import { SATPGateway, SATPGatewayConfig } from "../gateway-refactor";
 import { validateOrReject } from "class-validator";
 
 export class PluginFactorySATPGateway extends PluginFactory<
@@ -13,9 +10,7 @@ export class PluginFactorySATPGateway extends PluginFactory<
   SATPGatewayConfig,
   IPluginFactoryOptions
 > {
-  async create(
-    pluginOptions: SATPGatewayConfig,
-  ): Promise<SATPGateway> {
+  async create(pluginOptions: SATPGatewayConfig): Promise<SATPGateway> {
     const coordinator = new SATPGateway(pluginOptions);
 
     try {
