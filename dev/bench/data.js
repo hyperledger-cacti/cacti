@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709516646277,
+  "lastUpdate": 1709533959452,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -188,6 +188,44 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 388,
             "range": "±1.31%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "f58576cd04be418e2626b5c5feed0431e3321aa4",
+          "message": "build(deps): upgrade pkg openapi-types to v12.1.3 project-wide\n\nThe command used to perform this upgrade was:\n\n`yarn up openapi-types --exact`\n\nSimple quality of life improvement. The openapi-types package is used\nmainly as a helper for dealing with Open API spec related logic in a\ncleaner manner. It doesn't really affect the runtime behavior of the\ncode that much.\nWith all that said, it is worthwhile to consolidate the versions we use\nbecause strange/hard to debug compiler bugs can (and do) emerge from\ntime to time just on account of us juggling multiple different versions\nof certain libraries.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-03-03T22:16:35-08:00",
+          "tree_id": "5ec75fdc84e6b2c5fd1e42af8733210ceb8e3311",
+          "url": "https://github.com/hyperledger/cacti/commit/f58576cd04be418e2626b5c5feed0431e3321aa4"
+        },
+        "date": 1709533956955,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 608,
+            "range": "±1.73%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 389,
+            "range": "±1.35%",
             "unit": "ops/sec",
             "extra": "183 samples"
           }
