@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import express, { Express } from "express";
 import {
   IListenOptions,
+  LogLevelDesc,
+  LoggerProvider,
   Secp256k1Keys,
   Servers,
 } from "@hyperledger/cactus-common";
@@ -27,6 +29,9 @@ import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 
 import { knexClientConnection, knexRemoteConnection } from "../knex.config";
+import { pruneDockerAllIfGithubAction, Containers } from "@hyperledger/cactus-test-tooling";
+
+const logLevel: LogLevelDesc = "INFO";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -53,7 +58,21 @@ let serverListenOptions: IListenOptions;
 let clientExpressApp: Express;
 let clientListenOptions: IListenOptions;
 
+const log = LoggerProvider.getOrCreate({
+  level: "INFO",
+  label: "server-crash-after-create-asset",
+});
+
 beforeAll(async () => {
+  pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+    
   {
     // Server Gateway configuration
     serverGatewayPluginOptions = {
@@ -84,11 +103,11 @@ beforeAll(async () => {
 
     pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
-    expect(
-      pluginRecipientGateway.localRepository?.database,
-    ).not.toBeUndefined();
+    expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();  
+    expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();  
 
     await pluginRecipientGateway.localRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
 
     await pluginRecipientGateway.registerWebServices(serverExpressApp);
   }
@@ -123,11 +142,11 @@ beforeAll(async () => {
 
     pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
 
-    if (pluginSourceGateway.localRepository?.database == undefined) {
-      throw new Error("Database is not correctly initialized");
-    }
+    expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();  
 
     await pluginSourceGateway.localRepository?.reset();
+    await pluginSourceGateway.remoteRepository?.reset();
 
     await pluginSourceGateway.registerWebServices(clientExpressApp);
 
@@ -218,10 +237,10 @@ test("server gateway crashes after transfer initiation flow", async () => {
 });
 
 afterAll(async () => {
-  pluginSourceGateway.localRepository?.destroy();
-  pluginRecipientGateway.localRepository?.destroy();
-  pluginSourceGateway.remoteRepository?.destroy();
-  pluginRecipientGateway.remoteRepository?.destroy();
+  await pluginSourceGateway.localRepository?.destroy();
+  await pluginRecipientGateway.localRepository?.destroy();
+  await pluginSourceGateway.remoteRepository?.destroy();
+  await pluginRecipientGateway.remoteRepository?.destroy();
 
   await Servers.shutdown(sourceGatewayServer);
   await Servers.shutdown(recipientGatewayserver);
