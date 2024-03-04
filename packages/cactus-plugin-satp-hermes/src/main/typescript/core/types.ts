@@ -1,12 +1,4 @@
-import {
-  Secp256k1Keys,
-  Logger,
-  Checks,
-  LoggerProvider,
-  JsObjectSigner,
-  IJsObjectSignerOptions,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { Secp256k1Keys, LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
 
 export enum CurrentDrafts {
@@ -18,7 +10,11 @@ export enum CurrentDrafts {
 export type DraftVersions = {
   [K in CurrentDrafts]: string;
 };
-export type ShutdownHook = () => Promise<void>;
+
+export type ShutdownHook = {
+  name: string;
+  hook: () => Promise<void>;
+};
 
 export enum SupportedGatewayImplementations {
   FABRIC = "FabricSATPGateway",
@@ -35,7 +31,8 @@ export type GatewayIdentity = {
   version: DraftVersions[];
   supportedChains: SupportedGatewayImplementations[];
   proofID?: string;
-  port?: number;
+  gatewayServerPort?: number;
+  gatewayClientPort?: number;
   address?:
     | `http://${string}`
     | `https://${string}`
