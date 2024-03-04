@@ -141,6 +141,8 @@ import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
 import { querySystemChainCode } from "./common/query-system-chain-code";
 import { isSshExecOk } from "./common/is-ssh-exec-ok";
 import { asBuffer, assertFabricFunctionIsAvailable } from "./common/utils";
+import { findAndReplaceFabricLoggingSpec } from "./common/find-and-replace-fabric-logging-spec";
+import { deployContractGoSourceImplFabricV256 } from "./deploy-contract-go-source/deploy-contract-go-source-impl-fabric-v2-5-6";
 
 const { loadFromConfig } = require("fabric-network/lib/impl/ccp/networkconfig");
 assertFabricFunctionIsAvailable(loadFromConfig, "loadFromConfig");
@@ -392,7 +394,7 @@ export class PluginLedgerConnectorFabric
       }
 
       temp.track();
-      const tmpDirPrefix = `hyperledger-cactus-${this.className}`;
+      const tmpDirPrefix = `hyperledger-cacti-${this.className}`;
       const tmpDirPath = temp.mkdirSync(tmpDirPrefix);
 
       const remoteDirPath = path.join(this.cliContainerGoPath, "src/", ccLabel);
@@ -429,31 +431,12 @@ export class PluginLedgerConnectorFabric
         ` --workdir=${remoteDirPath}` +
         ` cli `;
 
-      const r1 = new RegExp(
-        `\\s+(-e|--env)\\s+CORE_LOGGING_LEVEL='?"?\\w+'?"?\\s+`,
-        "gmi",
-      );
-      const r2 = new RegExp(`FABRIC_LOGGING_SPEC=('?"?\\w+'?"?)`, "gmi");
-
       // Need to make sure that the logging is turned off otherwise it
       // mangles the JSON syntax and makes the output invalid...
-      const dockerBuildCmdInfoLog = dockerBuildCmd
-        .replace(r1, " ")
-        .replace(r2, " FABRIC_LOGGING_SPEC=ERROR ");
-
-      // await this.sshExec(
-      //   `${dockerBinary} exec cli mkdir -p ${remoteDirPath}/`,
-      //   "Create ChainCode project (go module) directory",
-      //   ssh,
-      //   sshCmdOptions,
-      // );
-
-      // await this.sshExec(
-      //   `${dockerBinary} exec cli go version`,
-      //   "Print go version",
-      //   ssh,
-      //   sshCmdOptions,
-      // );
+      const dockerBuildCmdInfoLog = findAndReplaceFabricLoggingSpec(
+        dockerBuildCmd,
+        "ERROR",
+      );
 
       for (const sourceFile of sourceFiles) {
         const { filename, filepath, body } = sourceFile;
@@ -469,13 +452,6 @@ export class PluginLedgerConnectorFabric
       log.debug(`SCP OK %o`, remoteDirPath);
 
       if (ccLang === ChainCodeProgrammingLanguage.Golang) {
-        // const cliRemoteDirPath = path.join(remoteDirPath, "../");
-        // const copyToCliCmd = `${dockerBinary} cp ${remoteDirPath} cli:${cliRemoteDirPath}`;
-        // log.debug(`Copy to CLI Container CMD: ${copyToCliCmd}`);
-        // const copyToCliRes = await ssh.execCommand(copyToCliCmd, sshCmdOptions);
-        // log.debug(`Copy to CLI Container CMD Response: %o`, copyToCliRes);
-        // Checks.truthy(copyToCliRes.code === null, `copyToCliRes.code === null`);
-
         {
           const label = "docker copy go code to cli container";
           const cliRemoteDirPath = path.join(remoteDirPath, "../");
@@ -670,191 +646,14 @@ export class PluginLedgerConnectorFabric
   public async deployContractGoSourceV1(
     req: DeployContractGoSourceV1Request,
   ): Promise<DeployContractGoSourceV1Response> {
-    const fnTag = `${this.className}#deployContract()`;
     const { log } = this;
-
-    const ssh = new NodeSSH();
-    await ssh.connect(this.opts.sshConfig);
-    log.debug(`SSH connection OK`);
-
-    try {
-      log.debug(`${fnTag} Deploying .go source: ${req.goSource.filename}`);
-
-      Checks.truthy(req.goSource, `${fnTag}:req.goSource`);
-
-      temp.track();
-      const tmpDirPrefix = `hyperledger-cactus-${this.className}`;
-      const tmpDirPath = temp.mkdirSync(tmpDirPrefix);
-
-      // The module name of the chain-code, for example this will extract
-      // ccName to be "hello-world" from a filename of "hello-world.go"
-      const inferredModuleName = path.basename(req.goSource.filename, ".go");
-      log.debug(`Inferred module name: ${inferredModuleName}`);
-      const ccName = req.moduleName || inferredModuleName;
-      log.debug(`Determined ChainCode name: ${ccName}`);
-
-      const remoteDirPath = path.join(this.cliContainerGoPath, "src/", ccName);
-      log.debug(`Remote dir path on CLI container: ${remoteDirPath}`);
-
-      const localFilePath = path.join(tmpDirPath, req.goSource.filename);
-      fs.writeFileSync(localFilePath, req.goSource.body, "base64");
-
-      const remoteFilePath = path.join(remoteDirPath, req.goSource.filename);
-
-      log.debug(`SCP from/to %o => %o`, localFilePath, remoteFilePath);
-      await ssh.putFile(localFilePath, remoteFilePath);
-      log.debug(`SCP OK %o`, remoteFilePath);
-
-      const sshCmdOptions: SSHExecCommandOptions = {
-        execOptions: {
-          pty: true,
-          env: {
-            // just in case go modules would be otherwise disabled
-            GO111MODULE: "on",
-            FABRIC_LOGGING_SPEC: "DEBUG",
-          },
-        },
-        cwd: remoteDirPath,
-      };
-
-      const dockerExecEnv = Object.entries(this.opts.cliContainerEnv)
-        .map(([key, value]) => `--env ${key}=${value}`)
-        .join(" ");
-
-      const { dockerBinary } = this;
-      const dockerBuildCmd =
-        `${dockerBinary} exec ` +
-        dockerExecEnv +
-        ` --env GO111MODULE=on` +
-        ` --workdir=${remoteDirPath}` +
-        ` cli `;
-
-      await this.sshExec(
-        `${dockerBinary} exec cli mkdir -p ${remoteDirPath}/`,
-        "Create ChainCode project (go module) directory",
-        ssh,
-        sshCmdOptions,
-      );
-
-      await this.sshExec(
-        `${dockerBinary} exec cli go version`,
-        "Print go version",
-        ssh,
-        sshCmdOptions,
-      );
-
-      const copyToCliCmd = `${dockerBinary} cp ${remoteFilePath} cli:${remoteFilePath}`;
-      log.debug(`Copy to CLI Container CMD: ${copyToCliCmd}`);
-      const copyToCliRes = await ssh.execCommand(copyToCliCmd, sshCmdOptions);
-      log.debug(`Copy to CLI Container CMD Response: %o`, copyToCliRes);
-      Checks.truthy(copyToCliRes.code === 0, `copyToCliRes.code === 0`);
-
-      {
-        const goModInitCmd = `${dockerBuildCmd} go mod init ${ccName}`;
-        log.debug(`go mod init CMD: ${goModInitCmd}`);
-        const goModInitRes = await ssh.execCommand(goModInitCmd, sshCmdOptions);
-        log.debug(`go mod init CMD Response: %o`, goModInitRes);
-        Checks.truthy(goModInitRes.code === 0, `goModInitRes.code === 0`);
-      }
-
-      const pinnedDeps = req.pinnedDeps || [];
-      for (const dep of pinnedDeps) {
-        const goGetCmd = `${dockerBuildCmd} go get ${dep}`;
-        log.debug(`go get CMD: ${goGetCmd}`);
-        const goGetRes = await ssh.execCommand(goGetCmd, sshCmdOptions);
-        log.debug(`go get CMD Response: %o`, goGetRes);
-        Checks.truthy(goGetRes.code === 0, `goGetRes.code === 0`);
-      }
-
-      {
-        const goModTidyCmd = `${dockerBuildCmd} go mod tidy`;
-        log.debug(`go mod tidy CMD: ${goModTidyCmd}`);
-        const goModTidyRes = await ssh.execCommand(goModTidyCmd, sshCmdOptions);
-        log.debug(`go mod tidy CMD Response: %o`, goModTidyRes);
-        Checks.truthy(goModTidyRes.code === 0, `goModTidyRes.code === 0`);
-      }
-
-      {
-        const goVendorCmd = `${dockerBuildCmd} go mod vendor`;
-        log.debug(`go mod vendor CMD: ${goVendorCmd}`);
-        const goVendorRes = await ssh.execCommand(goVendorCmd, sshCmdOptions);
-        log.debug(`go mod vendor CMD Response: %o`, goVendorRes);
-        Checks.truthy(goVendorRes.code === 0, `goVendorRes.code === 0`);
-      }
-
-      {
-        const goBuildCmd = `${dockerBuildCmd} go build`;
-        log.debug(`go build CMD: ${goBuildCmd}`);
-        const goBuildRes = await ssh.execCommand(goBuildCmd, sshCmdOptions);
-        log.debug(`go build CMD Response: %o`, goBuildRes);
-        Checks.truthy(goBuildRes.code === 0, `goBuildRes.code === 0`);
-      }
-
-      const installationCommandResponses: SSHExecCommandResponse[] = [];
-      // https://github.com/hyperledger/fabric-samples/blob/release-1.4/fabcar/startFabric.sh
-      for (const org of req.targetOrganizations) {
-        const env =
-          ` --env CORE_PEER_LOCALMSPID=${org.CORE_PEER_LOCALMSPID}` +
-          ` --env CORE_PEER_ADDRESS=${org.CORE_PEER_ADDRESS}` +
-          ` --env CORE_PEER_MSPCONFIGPATH=${org.CORE_PEER_MSPCONFIGPATH}` +
-          ` --env CORE_PEER_TLS_ROOTCERT_FILE=${org.CORE_PEER_TLS_ROOTCERT_FILE}`;
-
-        const anInstallationCommandResponse = await this.sshExec(
-          dockerBinary +
-            ` exec ${env} cli peer chaincode install` +
-            ` --name ${ccName} ` +
-            ` --path ${ccName} ` +
-            ` --version ${req.chainCodeVersion} ` +
-            ` --lang golang`,
-          `Install ChainCode in ${org.CORE_PEER_LOCALMSPID}`,
-          ssh,
-          sshCmdOptions,
-        );
-
-        installationCommandResponses.push(anInstallationCommandResponse);
-      }
-
-      let success = true;
-
-      const ctorArgsJson = JSON.stringify(req.constructorArgs || {});
-      const ordererCaFile =
-        "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt";
-
-      const instantiateCmd =
-        `${dockerBuildCmd} peer chaincode instantiate ` +
-        ` --name ${ccName} ` +
-        ` --version ${req.chainCodeVersion} ` +
-        ` --ctor '${ctorArgsJson}' ` +
-        ` --channelID ${req.channelId} ` +
-        ` --peerAddresses ${req.targetPeerAddresses[0]} ` +
-        ` --lang golang ` +
-        ` --tlsRootCertFiles ${req.tlsRootCertFiles}` +
-        ` --policy "${req.policyDslSource}"` +
-        ` --tls --cafile ${ordererCaFile}`;
-
-      log.debug(`Instantiate CMD: %o`, instantiateCmd);
-      const instantiationCommandResponse = await ssh.execCommand(
-        instantiateCmd,
-        sshCmdOptions,
-      );
-
-      log.debug(`Instantiate CMD Response:%o`, instantiationCommandResponse);
-      success = success && isSshExecOk(instantiationCommandResponse);
-
-      log.debug(`EXIT doDeploy()`);
-      const res: DeployContractGoSourceV1Response = {
-        success,
-        installationCommandResponses,
-        instantiationCommandResponse,
-      };
-      return res;
-    } finally {
-      try {
-        ssh.dispose();
-      } finally {
-        temp.cleanup();
-      }
-    }
+    const ctx = {
+      log,
+      opts: this.opts,
+      dockerBinary: this.dockerBinary,
+      className: this.className,
+    };
+    return deployContractGoSourceImplFabricV256(ctx, req);
   }
 
   /**
