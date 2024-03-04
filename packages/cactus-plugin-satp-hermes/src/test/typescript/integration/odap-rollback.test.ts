@@ -21,10 +21,10 @@ import {
   pruneDockerAllIfGithubAction,
   BesuTestLedger,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { ClientV1Request } from "../../../main/typescript/public-api";
@@ -112,7 +112,7 @@ const BESU_ASSET_ID = uuidv4();
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
-  label: "odap-rollback-after-crash-test",
+  label: "odap-rollback",
 });
 
 beforeAll(async () => {
@@ -134,10 +134,8 @@ beforeAll(async () => {
       emitContainerLogs: true,
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-      imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-      envVars: new Map([
-        ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
-      ]),
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel,
     });
 
@@ -174,6 +172,8 @@ beforeAll(async () => {
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
       pluginRegistry,
+      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+      sshConfig,
       logLevel,
       connectionProfile,
       discoveryOptions,
@@ -296,26 +296,11 @@ beforeAll(async () => {
       sourceFiles,
       ccName: fabricContractName,
       targetOrganizations: [
-        {
-          CORE_PEER_LOCALMSPID:
-            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
-          CORE_PEER_ADDRESS:
-            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
-          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
-          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
-          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
-        },
-        {
-          CORE_PEER_LOCALMSPID:
-            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
-          CORE_PEER_ADDRESS:
-            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
-          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
-          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
-          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
-        },
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
       ],
-      caFile: peer0Org1Certs.ordererTlsRootCert,
+      caFile:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
       ccLabel: "basic-asset-transfer-2",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
@@ -541,8 +526,16 @@ beforeAll(async () => {
       pluginRecipientGateway.localRepository?.database,
     ).not.toBeUndefined();
 
+    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.remoteRepository?.database,
+    ).not.toBeUndefined();
+
     await pluginSourceGateway.localRepository?.reset();
     await pluginRecipientGateway.localRepository?.reset();
+
+    await pluginSourceGateway.remoteRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
   }
   {
     // Server Gateway configuration
