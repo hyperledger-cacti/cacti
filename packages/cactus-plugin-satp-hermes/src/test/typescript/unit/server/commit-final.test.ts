@@ -52,15 +52,17 @@ beforeEach(async () => {
   pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
-  if (
-    pluginSourceGateway.localRepository?.database == undefined ||
-    pluginRecipientGateway.localRepository?.database == undefined
-  ) {
-    throw new Error("Database is not correctly initialized");
-  }
+  expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
+
+  expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
+  
+  await pluginSourceGateway.remoteRepository?.reset();
+  await pluginRecipientGateway.remoteRepository?.reset();
 
   dummyCommitPreparationResponseMessageHash = SHA256(
     "commitPreparationResponseMessageData",
@@ -93,16 +95,6 @@ beforeEach(async () => {
     operation: "delete",
     data: COMMIT_FINAL_CLAIM,
   } as ILocalLog);
-
-  if (
-    pluginSourceGateway.localRepository?.database == undefined ||
-    pluginRecipientGateway.localRepository?.database == undefined
-  ) {
-    throw new Error("Database is not correctly initialized");
-  }
-
-  await pluginSourceGateway.localRepository?.reset();
-  await pluginRecipientGateway.localRepository?.reset();
 });
 
 test("valid commit final request", async () => {
