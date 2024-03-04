@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709541049301,
+  "lastUpdate": 1709569072036,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -266,6 +266,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.40%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "d9b5a0d11e75dbeaba27ceace5d30297ee76af87",
+          "message": "build(deps): upgrade to prettier@3.2.5, eslint@8.57.0\n\nAlso upgraded the ESLint related packages such as the typescript parser\nplugin and all the other plugins or configuration management packages\nrelated to ESLint in general.\n\nThe reason why it's important that we keep up to date with ESLint is\nbecause newer versions of Typescript are not getting backported to older\nversions of ESLint fast enough (if at all) so to be able to reliably\nlint our newer Typescript code, we need to keep up to date with ESLint\nas well.\n\nIn addition to the dependency upgrades we are also applying the automatic\nformatter's changes that it started making after the upgrade.\n\nTo-do for later: Consolidate the ESLint versions used among the different\ncomponents of the project because right now we still have a few packages\nthat declare much older versions of ESLint such as 3.x and 4.x.\n\nDepends on #3052 because that pull request also applies some of the\nautomatic formatting changes that were forgotten in an earlier pull request.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-03-04T08:02:33-08:00",
+          "tree_id": "7003e08f6677f5581a3eb9335a580cd7df609883",
+          "url": "https://github.com/hyperledger/cacti/commit/d9b5a0d11e75dbeaba27ceace5d30297ee76af87"
+        },
+        "date": 1709569070318,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 616,
+            "range": "±1.56%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 389,
+            "range": "±1.56%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
