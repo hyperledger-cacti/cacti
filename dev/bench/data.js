@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709114528995,
+  "lastUpdate": 1709516646277,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -152,6 +152,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.66%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "777bc7edc22649a68539da4bcc1b0516adf79d2e",
+          "message": "build(deps): bump sanitize-html from 2.7.0 to 2.12.1\n\nBumps [sanitize-html](https://github.com/apostrophecms/sanitize-html) from 2.7.0 to 2.12.1.\n- [Changelog](https://github.com/apostrophecms/sanitize-html/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/apostrophecms/sanitize-html/compare/2.7.0...2.12.1)\n\n---\nupdated-dependencies:\n- dependency-name: sanitize-html\n  dependency-type: direct:production\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2024-03-03T17:27:53-08:00",
+          "tree_id": "32291af004349416ed6de17da00b3a7b3906d6c6",
+          "url": "https://github.com/hyperledger/cacti/commit/777bc7edc22649a68539da4bcc1b0516adf79d2e"
+        },
+        "date": 1709516644201,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 615,
+            "range": "±1.81%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 388,
+            "range": "±1.31%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
