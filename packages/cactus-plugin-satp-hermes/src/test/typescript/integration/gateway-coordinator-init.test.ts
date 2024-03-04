@@ -1,18 +1,20 @@
 import "jest-extended";
 import {
   Containers,
-  FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
-  BesuTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 // import coordinator factory, coordinator and coordinator options
-import { SATPGateway, SATPGatewayConfig } from "../../../main/typescript/gateway-refactor";
+import {
+  SATPGateway,
+  SATPGatewayConfig,
+} from "../../../main/typescript/gateway-refactor";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
-  IPluginFactoryOptions, PluginImportType,
+  IPluginFactoryOptions,
+  PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { SupportedGatewayImplementations } from './../../../main/typescript/core/types';
+import { SupportedGatewayImplementations } from "./../../../main/typescript/core/types";
 
 const logLevel: LogLevelDesc = "INFO";
 const log = LoggerProvider.getOrCreate({
@@ -21,7 +23,7 @@ const log = LoggerProvider.getOrCreate({
 });
 const factoryOptions: IPluginFactoryOptions = {
   pluginImportType: PluginImportType.Local,
-}
+};
 const factory = new PluginFactorySATPGateway(factoryOptions);
 
 beforeAll(async () => {
@@ -36,7 +38,6 @@ beforeAll(async () => {
 });
 
 describe("SATPGateway initialization", () => {
-
   it("initiates with default config", async () => {
     const options: SATPGatewayConfig = {};
     const gateway = await factory.create(options);
@@ -140,7 +141,6 @@ describe("SATPGateway initialization", () => {
     await gateway.startupServer();
     await gateway.shutdown();
   });
-
 });
 
 afterAll(async () => {
