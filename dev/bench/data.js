@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709604665546,
+  "lastUpdate": 1709663536492,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -380,6 +380,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.45%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "7fd9d7b8de1ed3dd0c5e05f5a73e13849e9e51af",
+          "message": "build(deps): bump mio from 0.8.9 to 0.8.11 in /packages/cactus-core-api\n\nBumps [mio](https://github.com/tokio-rs/mio) from 0.8.9 to 0.8.11.\n- [Release notes](https://github.com/tokio-rs/mio/releases)\n- [Changelog](https://github.com/tokio-rs/mio/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/tokio-rs/mio/compare/v0.8.9...v0.8.11)\n\n---\nupdated-dependencies:\n- dependency-name: mio\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2024-03-05T10:22:36-08:00",
+          "tree_id": "c7947b7dedb3a5fdddada05a33da6f8187605d65",
+          "url": "https://github.com/hyperledger/cacti/commit/7fd9d7b8de1ed3dd0c5e05f5a73e13849e9e51af"
+        },
+        "date": 1709663534103,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 613,
+            "range": "±1.68%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 377,
+            "range": "±1.47%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
