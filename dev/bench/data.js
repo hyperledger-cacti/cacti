@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709574889881,
+  "lastUpdate": 1709604665546,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -342,6 +342,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.21%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "76cb99c798cbd1d4101bb3cb098d93eaa8bd7a69",
+          "message": "build(deps): bump mio\n\nBumps [mio](https://github.com/tokio-rs/mio) from 0.8.6 to 0.8.11.\n- [Release notes](https://github.com/tokio-rs/mio/releases)\n- [Changelog](https://github.com/tokio-rs/mio/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/tokio-rs/mio/compare/v0.8.6...v0.8.11)\n\n---\nupdated-dependencies:\n- dependency-name: mio\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2024-03-04T18:01:14-08:00",
+          "tree_id": "98b1c30c67bfb078fb88ba24d815dc0f1e408c12",
+          "url": "https://github.com/hyperledger/cacti/commit/76cb99c798cbd1d4101bb3cb098d93eaa8bd7a69"
+        },
+        "date": 1709604663326,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 619,
+            "range": "±1.72%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 390,
+            "range": "±1.45%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
