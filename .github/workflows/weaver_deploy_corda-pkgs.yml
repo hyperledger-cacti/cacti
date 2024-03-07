@@ -14,7 +14,7 @@ on:
 
 jobs:
   publish-protos-java-kt:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
@@ -51,7 +51,7 @@ jobs:
   publish-interop-app:
     if: always()
     needs: publish-protos-java-kt
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
@@ -91,7 +91,7 @@ jobs:
   publish-sdk:
     if: always()
     needs: [publish-protos-java-kt, publish-interop-app]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
@@ -131,7 +131,7 @@ jobs:
   publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-java-kt, publish-interop-app, publish-sdk]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read

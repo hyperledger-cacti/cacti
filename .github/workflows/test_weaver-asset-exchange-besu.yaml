@@ -25,7 +25,7 @@ jobs:
   check_code_changed:
     outputs:
       status: ${{ steps.changes.outputs.weaver_code_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
 
@@ -41,7 +41,7 @@ jobs:
     needs: check_code_changed
     if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
@@ -223,7 +223,7 @@ jobs:
   asset-exchange-besu-local:
     needs: check_code_changed
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false

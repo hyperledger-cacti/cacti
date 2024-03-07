@@ -22,7 +22,7 @@ jobs:
       simpleasset_changed: ${{ steps.changes.outputs.simpleasset_changed }}
       simpleassetandinterop_changed: ${{ steps.changes.outputs.simpleassetandinterop_changed }}
       simpleassettransfer_changed: ${{ steps.changes.outputs.simpleassettransfer_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
 
@@ -50,7 +50,7 @@ jobs:
   unit_test_interopcc:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.interopcc_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 
@@ -75,7 +75,7 @@ jobs:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.interopcc_changed == 'true'
     # if: ${{ false }}  # disable
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 
@@ -99,7 +99,7 @@ jobs:
   unit_test_simplestate:
     needs: check_code_changed
     if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simplestate_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 
@@ -123,7 +123,7 @@ jobs:
   unit_test_simpleasset:
     needs: check_code_changed
     if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleasset_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 
@@ -147,7 +147,7 @@ jobs:
   unit_test_simpleassetandinterop:
     needs: check_code_changed
     if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassetandinterop_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 
@@ -171,7 +171,7 @@ jobs:
   unit_test_simpleassettransfer:
     needs: check_code_changed
     if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassettransfer_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 

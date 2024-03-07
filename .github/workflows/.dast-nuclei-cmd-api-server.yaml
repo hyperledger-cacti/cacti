@@ -12,7 +12,7 @@ on:
 
 jobs:
   nuclei-scan:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Install Indy SDK
         run: >
