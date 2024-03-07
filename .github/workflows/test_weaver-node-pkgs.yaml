@@ -27,7 +27,7 @@ jobs:
       fabric_sdk_changed: ${{ steps.changes.outputs.fabric_sdk_changed }}
       iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
       docs_changed: ${{ steps.changes.outputs.docs_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
 
@@ -54,7 +54,7 @@ jobs:
 
   unit_test_weaver_node_sdk_local:
     needs: check_code_changed
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
@@ -92,7 +92,7 @@ jobs:
 
   unit_test_iin_agent_local:
     needs: check_code_changed
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
@@ -135,7 +135,7 @@ jobs:
   build_docs:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.docs_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1

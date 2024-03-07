@@ -21,7 +21,7 @@ jobs:
   check_code_changed:
     outputs:
       interop_cordapp_changed: ${{ steps.changes.outputs.interop_cordapp_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
 
@@ -37,7 +37,7 @@ jobs:
   unit_test_interop_cordapp:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.interop_cordapp_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1
 

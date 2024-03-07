@@ -18,7 +18,7 @@ jobs:
   check_code_changed:
     outputs:
       relay_changed: ${{ steps.changes.outputs.relay_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
 
@@ -36,7 +36,7 @@ jobs:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -89,7 +89,7 @@ jobs:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -141,7 +141,7 @@ jobs:
   unit_test_relay:
     needs: check_code_changed
     if: ${{ false && needs.check_code_changed.outputs.relay_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -181,7 +181,7 @@ jobs:
   unit_test_relay_tls:
     needs: check_code_changed
     if: ${{ false && needs.check_code_changed.outputs.relay_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1

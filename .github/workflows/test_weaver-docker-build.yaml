@@ -24,7 +24,7 @@ jobs:
       fabric_driver_changed: ${{ steps.changes.outputs.fabric_driver_changed }}
       corda_driver_changed: ${{ steps.changes.outputs.corda_driver_changed }}
       iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
 
@@ -63,7 +63,7 @@ jobs:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -76,7 +76,7 @@ jobs:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.fabric_driver_changed == 'true'
     # if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -108,7 +108,7 @@ jobs:
   build_docker_fabric_driver_packages:
     needs: check_code_changed
     if: ${{ false && needs.check_code_changed.outputs.fabric_driver_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -127,7 +127,7 @@ jobs:
   build_docker_corda_driver_local:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.corda_driver_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -157,7 +157,7 @@ jobs:
   build_docker_corda_driver_packages:
     needs: check_code_changed
     if: ${{ false && needs.check_code_changed.outputs.corda_driver_changed == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
@@ -187,7 +187,7 @@ jobs:
   build_docker_iin_agent_local:
     needs: check_code_changed
     if: needs.check_code_changed.outputs.iin_agent_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1

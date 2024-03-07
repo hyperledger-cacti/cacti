@@ -15,7 +15,7 @@ on:
 jobs:
   publish-protos-rs:
       if: github.repository_owner == 'hyperledger'
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
       permissions:
         packages: write
         contents: read
@@ -40,7 +40,7 @@ jobs:
   publish-relay-image:
     if: github.repository_owner == 'hyperledger'
     needs: publish-protos-rs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
