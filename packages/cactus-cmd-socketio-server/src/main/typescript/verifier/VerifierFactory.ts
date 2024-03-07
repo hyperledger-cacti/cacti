@@ -36,9 +36,8 @@ export class VerifierFactory {
     if (VerifierFactory.verifierHash[validatorId]) {
       return VerifierFactory.verifierHash[validatorId];
     } else {
-      const ledgerPluginInfo: string = this.connectInfo.getLegerPluginInfo(
-        validatorId,
-      );
+      const ledgerPluginInfo: string =
+        this.connectInfo.getLegerPluginInfo(validatorId);
       // TODO: I want to manage an instance using the validatorId as a key instead of a dedicated member variable
       VerifierFactory.verifierHash[validatorId] = new Verifier(
         ledgerPluginInfo,

@@ -63,9 +63,9 @@ export class ServerMonitorPlugin {
       args: ["a"],
     });
     //- (not recommended - only for development): Temporarily set CertCheck to false when using a self-signed certificate
-    var CertCheck = config.read<boolean>("CertCheck")
-    if (CertCheck == undefined){
-      CertCheck = true
+    let CertCheck = config.read<boolean>("CertCheck");
+    if (CertCheck == undefined) {
+      CertCheck = true;
     }
     const options: https.RequestOptions = {
       hostname: "agent",
@@ -123,9 +123,9 @@ export class ServerMonitorPlugin {
       to_query_func_name: "GetBlockByNumber",
       args: [targetBlockNum.toString()],
     });
-    var CertCheck = config.read<boolean>("CertCheck")
-    if (CertCheck == undefined){
-      CertCheck = true
+    let CertCheck = config.read<boolean>("CertCheck");
+    if (CertCheck == undefined) {
+      CertCheck = true;
     }
     const options: https.RequestOptions = {
       hostname: "agent",

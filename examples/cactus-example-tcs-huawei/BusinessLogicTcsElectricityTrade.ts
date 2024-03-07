@@ -280,7 +280,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  getOperationStatus(tradeID: string): object {
+  getOperationStatus(): object {
     logger.debug(`##in getOperationStatus()`);
     return {};
   }
@@ -290,7 +290,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     targetIndex: number,
   ): string | null {
     logger.debug(`##in getTxIDFromEvent`);
-    //        logger.debug(`##event: ${json2str(ledgerEvent)}`);
 
     switch (ledgerEvent.verifierId) {
       case config.electricityTradeInfo.tcsHuawei.validatorID:

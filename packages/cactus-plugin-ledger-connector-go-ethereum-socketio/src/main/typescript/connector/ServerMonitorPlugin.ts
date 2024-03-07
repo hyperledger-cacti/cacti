@@ -131,7 +131,7 @@ export class ServerMonitorPlugin {
    */
   async stopMonitor(clientId: string) {
     // Implement a process to end EC monitoring
-    let sub = this._subscriptionTable.get(clientId);
+    const sub = this._subscriptionTable.get(clientId);
     if (sub) {
       // Stop the subscription & Remove it from table
       logger.info("stop watching and remove subscription.");

@@ -5,36 +5,36 @@
  */
 
 export type InvocationSpec = {
-    ccArgs: string[];
-    channel: string;
-    ccFunc: string;
-    contractName: string;
+  ccArgs: string[];
+  channel: string;
+  ccFunc: string;
+  contractName: string;
 };
 
 export type Flow = {
-    flowArgs: string[];
-    cordappAddress: string;
-    flowId: string;
-    cordappId: string;
+  flowArgs: string[];
+  cordappAddress: string;
+  flowId: string;
+  cordappId: string;
 };
 
 export type InteropJSON = {
-    address?: string;
-    ChaincodeFunc?: string;
-    ChaincodeID?: string;
-    ChannelID?: string;
-    RemoteEndpoint?: string;
-    NetworkID?: string;
-    Sign: boolean;
-    ccArgs?: string[];
+  address?: string;
+  ChaincodeFunc?: string;
+  ChaincodeID?: string;
+  ChannelID?: string;
+  RemoteEndpoint?: string;
+  NetworkID?: string;
+  Sign: boolean;
+  ccArgs?: string[];
 };
 
 export type RemoteJSON = {
-    LocalRelayEndpoint: string;
-    viewRequests: {
-        [key: string]: {
-            invokeArgIndices: Array<number>;
-            interopJSONs: Array<InteropJSON>;
-        };
+  LocalRelayEndpoint: string;
+  viewRequests: {
+    [key: string]: {
+      invokeArgIndices: Array<number>;
+      interopJSONs: Array<InteropJSON>;
     };
+  };
 };

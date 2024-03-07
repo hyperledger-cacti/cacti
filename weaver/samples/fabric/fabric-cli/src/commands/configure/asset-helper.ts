@@ -4,32 +4,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GluegunCommand } from 'gluegun'
-import { commandHelp } from '../../helpers/helpers'
+import { GluegunCommand } from "gluegun";
+import { commandHelp } from "../../helpers/helpers";
 
 const command: GluegunCommand = {
-  name: 'asset',
+  name: "asset",
   alias: [],
-  description: 'Configure for asset networks',
-  run: async toolbox => {
+  description: "Configure for asset networks",
+  run: async (toolbox) => {
     const {
       print,
-      parameters: { options }
-    } = toolbox
+      parameters: { options },
+    } = toolbox;
     if (options.help || options.h) {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli configure asset add --target-network=network1 --type=bond',
-        'fabric-cli configure asset <subcommand>',
+        "fabric-cli configure asset add --target-network=network1 --type=bond",
+        "fabric-cli configure asset <subcommand>",
         [],
         command,
-        ['configure', 'asset']
-      )
-      return
+        ["configure", "asset"],
+      );
+      return;
     }
-    print.info('Command does nothing by itself')
-  }
-}
+    print.info("Command does nothing by itself");
+  },
+};
 
-module.exports = command
+module.exports = command;

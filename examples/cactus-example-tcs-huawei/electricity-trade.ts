@@ -26,7 +26,7 @@ export const transactionManagement: TransactionManagement =
 // Request Execution of Trade
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   try {
-    logger.warn("pre startBusinessLogic ")
+    logger.warn("pre startBusinessLogic ");
     const tradeID = transactionManagement.startBusinessLogic(req);
     if (!tradeID) {
       throw new RIFError(`Could not run BLP, tradeId = ${tradeID}`);
@@ -69,7 +69,7 @@ router.post(
 
       next(err);
     }
-  }
+  },
 );
 
 export default router;

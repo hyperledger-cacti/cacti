@@ -33,7 +33,7 @@ const VALIDATOR_TYPE = {
   SOCKET: "socketio",
   OPENAPI: "openapi",
 } as const;
-type VALIDATOR_TYPE = typeof VALIDATOR_TYPE[keyof typeof VALIDATOR_TYPE]; // 'socketio' | 'openapi'
+type VALIDATOR_TYPE = (typeof VALIDATOR_TYPE)[keyof typeof VALIDATOR_TYPE]; // 'socketio' | 'openapi'
 
 // abolish template-trade
 // const validatorRregistryConf: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/validator-registry.yaml", 'utf8'));

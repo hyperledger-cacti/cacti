@@ -1,5 +1,5 @@
 import { globby } from "globby";
-import { rm, rmdir } from "fs";
+import { rm } from "fs";
 import { readFile } from "fs/promises";
 import { dirname } from "path";
 import { fileURLToPath } from "url";

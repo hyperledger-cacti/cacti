@@ -66,7 +66,7 @@ export function getPackageInfoList(ignorePatterns = []) {
 
   /** @type {PackageInfo[]} */
   const pkgInfoList = JSON.parse(processOutput).filter(
-    (pkgInfo) => !ignorePatterns.some((ip) => ip.test(pkgInfo.name))
+    (pkgInfo) => !ignorePatterns.some((ip) => ip.test(pkgInfo.name)),
   );
 
   pkgInfoList.forEach((pkgInfo) => {

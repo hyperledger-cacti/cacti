@@ -7,8 +7,7 @@
 
 import { MeterInfo } from "./MeterInfo";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
-import fs from "fs"
-import yaml from "js-yaml"
+import fs from "fs";
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "MeterManagement";
@@ -52,7 +51,7 @@ export class MeterManagement {
     };
     let existFlag = false;
     let action = "";
-    meterInfoTable.forEach((meterInfoJSON, index) => {
+    meterInfoTable.forEach((meterInfoJSON) => {
       const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
 
       // Determine if it is a target record
@@ -105,7 +104,7 @@ export class MeterManagement {
 
     // Search target records
     let retMeterInfo: MeterInfo | null = null;
-    meterInfoTable.forEach((meterInfoJSON, index) => {
+    meterInfoTable.forEach((meterInfoJSON) => {
       const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
 
       // Determine if it is a target record
@@ -117,188 +116,4 @@ export class MeterManagement {
 
     return retMeterInfo;
   }
-
-  /*
-    setStatus(tradeInfo: TradeInfo, status: CartradeStatus) {
-
-        // Existence check of table file
-        try {
-            fs.statSync(this.fileName);
-        } catch (err) {
-            throw err;
-        }
-
-        // Read table file
-        const fileData: string = fs.readFileSync(this.fileName, 'utf8');
-        const transactionInfoTable: string[] = JSON.parse(fileData).table as string[];
-
-        // Search target records / replace data
-        const transactionInfoTableNew = {
-            table: []
-        };
-        transactionInfoTable.forEach((transactionInfoJSON, index) => {
-            const transactionInfo: TransactionInfo = JSON.parse(transactionInfoJSON) as TransactionInfo;
-
-            // Determine if it is a target record
-            if (transactionInfo.businessLogicID === tradeInfo.businessLogicID && transactionInfo.tradeID === tradeInfo.tradeID) {
-                // Change Status
-                transactionInfo.status = status;
-            }
-
-            // Register Record
-            const transactionInfoJson: string = JSON.stringify(transactionInfo);
-            transactionInfoTableNew.table.push(transactionInfoJson);
-        });
-
-        // Table File Write
-        const transactionInfoTableNewJson: string = JSON.stringify(transactionInfoTableNew);
-        fs.writeFileSync(this.fileName, transactionInfoTableNewJson, 'utf8');
-
-        this.fileDump();
-    }
-
-    setTransactionData(tradeInfo: TradeInfo, transactionData: TransactionData) {
-
-        // Existence check of table file
-        try {
-            fs.statSync(this.fileName);
-        } catch (err) {
-            throw err;
-        }
-
-        // Read table file
-        const fileData: string = fs.readFileSync(this.fileName, 'utf8');
-        const transactionInfoTable: string[] = JSON.parse(fileData).table as string[];
-
-        // Search target records / replace data
-        const transactionInfoTableNew = {
-            table: []
-        };
-        transactionInfoTable.forEach((transactionInfoJSON, index) => {
-            const transactionInfo: TransactionInfo = JSON.parse(transactionInfoJSON) as TransactionInfo;
-
-            // Determine if it is a target record
-            if (transactionInfo.businessLogicID === tradeInfo.businessLogicID && transactionInfo.tradeID === tradeInfo.tradeID) {
-
-                // Determine if it is the target transaction
-                if (transactionData.target === "escrow") {
-                    // escrow: dataset
-                    transactionInfo.escrowLedger = transactionData.ledger;
-                    transactionInfo.escrowTxID = transactionData.txID;
-                }
-                else if (transactionData.target === "transfer") {
-                    // transfer: dataset
-                    transactionInfo.transferLedger = transactionData.ledger;
-                    transactionInfo.transferTxID = transactionData.txID;
-                }
-                else if (transactionData.target === "settlement") {
-                    // settlement: dataset
-                    transactionInfo.settlementLedger = transactionData.ledger;
-                    transactionInfo.settlementTxID = transactionData.txID;
-                }
-
-            }
-
-            // Register Record
-            const transactionInfoJson: string = JSON.stringify(transactionInfo);
-            transactionInfoTableNew.table.push(transactionInfoJson);
-        });
-
-        // Table File Write
-        const transactionInfoTableNewJson: string = JSON.stringify(transactionInfoTableNew);
-        fs.writeFileSync(this.fileName, transactionInfoTableNewJson, 'utf8');
-
-        this.fileDump();
-    }
-
-    setTxInfo(tradeInfo: TradeInfo, txInfoData: TxInfoData) {
-
-        // Existence check of table file
-        try {
-            fs.statSync(this.fileName);
-        } catch (err) {
-            throw err;
-        }
-
-        // Read table file
-        const fileData: string = fs.readFileSync(this.fileName, 'utf8');
-        const transactionInfoTable: string[] = JSON.parse(fileData).table as string[];
-
-        // Search target records / replace data
-        const transactionInfoTableNew = {
-            table: []
-        };
-        transactionInfoTable.forEach((transactionInfoJSON, index) => {
-            const transactionInfo: TransactionInfo = JSON.parse(transactionInfoJSON) as TransactionInfo;
-
-            // Determine if it is a target record
-            if (transactionInfo.businessLogicID === tradeInfo.businessLogicID && transactionInfo.tradeID === tradeInfo.tradeID) {
-
-                // Determine if it is the target transaction
-                if (txInfoData.target === "escrow") {
-                    // escrow: dataset
-                    transactionInfo.escrowTxInfo = txInfoData.txInfo;
-                }
-                else if (txInfoData.target === "transfer") {
-                    // transfer: dataset
-                    transactionInfo.transferTxInfo = txInfoData.txInfo;
-                }
-                else if (txInfoData.target === "settlement") {
-                    // settlement: dataset
-                    transactionInfo.settlementTxInfo = txInfoData.txInfo;
-                }
-
-            }
-
-            // Register Record
-            const transactionInfoJson: string = JSON.stringify(transactionInfo);
-            transactionInfoTableNew.table.push(transactionInfoJson);
-        });
-
-        // Table File Write
-        const transactionInfoTableNewJson: string = JSON.stringify(transactionInfoTableNew);
-        fs.writeFileSync(this.fileName, transactionInfoTableNewJson, 'utf8');
-
-        this.fileDump();
-    }
-*/
-  /**
-   * Get transaction data corresponding to the specified txId.
-   * (*Return if any of escrowTxID, transferTxID, settlementTxID matches txId)
-   *
-   * @return Transaction data corresponding to txId. Returns null if it does not exist.
-   *
-   */
-  /*
-    getTransactionInfoByTxId(txId: string): TransactionInfo {
-
-        // Existence check of table file
-        try {
-            fs.statSync(this.fileName);
-        } catch (err) {
-            throw err;
-        }
-
-        // Read table file
-        const fileData: string = fs.readFileSync(this.fileName, 'utf8');
-        const transactionInfoTable: string[] = JSON.parse(fileData).table as string[];
-
-        // Search target records
-        const transactionInfoTableNew = {
-            table: []
-        };
-        let retTransactionInfo: TransactionInfo | null = null;
-        transactionInfoTable.forEach((transactionInfoJSON, index) => {
-            const transactionInfo: TransactionInfo = JSON.parse(transactionInfoJSON) as TransactionInfo;
-
-            // Determine if it is a target record
-            if (transactionInfo.escrowTxID === txId || transactionInfo.transferTxID === txId || transactionInfo.settlementTxID === txId) {
-                retTransactionInfo = transactionInfo;
-                return;
-            }
-        });
-
-        return retTransactionInfo;
-    }
-*/
 }

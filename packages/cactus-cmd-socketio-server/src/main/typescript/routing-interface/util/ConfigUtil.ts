@@ -10,11 +10,9 @@ const yaml = require("js-yaml");
 
 function readConfig(path: string, encoding = "utf8"): object {
   try {
-    return yaml.safeLoad(
-      fs.readFileSync(path, encoding)
-    );
+    return yaml.safeLoad(fs.readFileSync(path, encoding));
   } catch (err: unknown) {
-    return {}
+    return {};
   }
 }
 

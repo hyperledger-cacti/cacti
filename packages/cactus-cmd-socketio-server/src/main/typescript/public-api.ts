@@ -2,7 +2,7 @@
 export { Verifier } from "./verifier/Verifier";
 export { LedgerEvent } from "./verifier/LedgerPlugin";
 export { json2str } from "./verifier/DriverCommon";
-export { signMessageJwt } from './verifier/validator-authentication';
+export { signMessageJwt } from "./verifier/validator-authentication";
 
 // Routing Interface
 export { RIFError } from "./routing-interface/RIFError";

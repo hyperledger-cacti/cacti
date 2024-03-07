@@ -19,7 +19,7 @@
  import https = require("https");
  import * as config from "../config";
  import fs = require("fs");
- import { Server } from "socket.io"
+ import { Server } from "socket.io";
 
  // Log settings
  import { getLogger } from "log4js";

@@ -172,10 +172,8 @@ describe("SocketIO Validator Tests", function () {
   let sut: Verifier;
 
   beforeAll(async () => {
-    [
-      testServer,
-      testServerPort,
-    ] = await SocketIOTestSetupHelpers.createListeningMockServer();
+    [testServer, testServerPort] =
+      await SocketIOTestSetupHelpers.createListeningMockServer();
   }, setupTimeout);
 
   afterAll((done) => {
@@ -230,7 +228,7 @@ describe("SocketIO Validator Tests", function () {
     });
 
     test("Sends request2 with valid arguments", () => {
-      let reqReceived = new Promise<any>((resolve) => {
+      const reqReceived = new Promise<any>((resolve) => {
         serverSocket.on("request2", (req: any) => resolve(req));
       });
 
@@ -417,7 +415,9 @@ describe("SocketIO Validator Tests", function () {
       };
 
       // Two listeners
-      const listenerMockFirst: IVerifierEventListener = { onEvent: onEventMock };
+      const listenerMockFirst: IVerifierEventListener = {
+        onEvent: onEventMock,
+      };
       const listenerMockSecond: IVerifierEventListener = {
         onEvent: onEventMock,
       };
@@ -540,7 +540,7 @@ describe("SocketIO Validator Tests", function () {
     }, setupTimeout);
 
     test("Sends request2 with valid args for socketio verifier", () => {
-      let reqReceived = new Promise<any>((resolve) => {
+      const reqReceived = new Promise<any>((resolve) => {
         serverSocket.on("request2", (req: any) => resolve(req));
       });
 
