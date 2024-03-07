@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709663536492,
+  "lastUpdate": 1709778562621,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -418,6 +418,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.47%",
             "unit": "ops/sec",
             "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "f59f3695366f0e35b5a4feb06ab5837c48e5e662",
+          "message": "test(test-tooling): migrate AIO image to Fabric v2.5.6, add constants\n\n1. The Fabric v2 image has been migrated to the current LTS release\nwhich has increased stability and of course adheres to general best\npractices more thoroughly since now we are in sync with the Fabric\nmaintainers in terms of LTS.\n2. The newer versions of the fabric-samples test-net containers have\nsome of the configuration files under different paths and this had to be\nreverse engineered by manually inspecting the containers at runtime and\nsearching for the same files in different directories. To make this\neasier in the future for people who are using the AIO image, we've added\na collection of constants to the test-tooling package that stores the\npaths hardcoded that are exported via verbose variable names that pin these\nto the specific Fabric version they are related to so that in the future\nif these paths change again, we can accommodate the change in a way that\nis not too confusing by exporting more variables with slightly different\nnames and values.\n3. The image built from the updated `Dockerfile_v2` is accessible on GHCR\nas: `ghcr.io/hyperledger/cactus-fabric2-all-in-one:2024-03-03--issue-2945-fabric-v2-5-6`\nwhich has the v2.5.6 versioned container images pre-cached (embedded) so that\nnetwork transfer does not need to occur and rate limiting doesn't produce\nCI flakes (DockerHub has rate limits for image downloading that we regularly\nhit when we don't embed the Fabric container images this way...).\n4. Why can't we just pull the values for these constants directly from the\ncontainer at runtime?\n4.1. The list of constants and their names/values change based on the\nFabric version that's being used by the AIO image.\n4.2. The only ones that could be pulled are the ones that belong to the\nfirst organization because this is the one that the CLI container uses.\n4.3. Configuration files that store the constants' values for the second\norganization are also located in different directories depending on the\nFabric version being used.\n4.4. The fabric-samples repo have been known to make breaking changes\nto older releases which would then make it even harder to debug if we\nhad logic for identifying the constants that suddenly broke (this specific\nincident has happened in the past unfortunately)\n4.5. In short, there is definitely a case for applying the DRY principle\nhere, but in this particular case it appears to be not worth it due to\nthe increased complexity that the convoluted additional logic would bring.\n\nRelated but does not fix https://github.com/hyperledger/cacti/issues/1899\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-03-06T18:19:52-08:00",
+          "tree_id": "5ddb7936c3b127725a5827734a38e9561b5f508c",
+          "url": "https://github.com/hyperledger/cacti/commit/f59f3695366f0e35b5a4feb06ab5837c48e5e662"
+        },
+        "date": 1709778560605,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 623,
+            "range": "±1.67%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 397,
+            "range": "±1.55%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
