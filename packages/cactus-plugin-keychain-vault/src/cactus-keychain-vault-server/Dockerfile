@@ -1,4 +1,8 @@
-FROM rust:1.63.0 as builder
+FROM rust:1.76.0-slim-bookworm as builder
+
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y libssl-dev pkg-config
 
 WORKDIR /
 RUN USER=root cargo new --bin cactus-keychain-vault-server
@@ -6,11 +10,13 @@ WORKDIR /cactus-keychain-vault-server
 ADD ./rust/gen/ ./
 RUN cargo build --release --example server
 
-FROM debian:buster-slim
+FROM ubuntu:24.04
 ARG APP=/usr/src/app
 
-RUN apt-get update
-RUN apt-get install -y ca-certificates tzdata curl tini
+
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y ca-certificates tzdata curl tini
 RUN rm -rf /var/lib/apt/lists/*
 
 
