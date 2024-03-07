@@ -5,7 +5,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import fs from "fs-extra";
 import { globby, Options as GlobbyOptions } from "globby";
-import { RuntimeError } from "run-time-error-cjs";
+import { RuntimeError } from "run-time-error";
 import prettier from "prettier";
 import { OpenAPIV3_1 } from "openapi-types";
 import { isValidSemVer } from "semver-parser";

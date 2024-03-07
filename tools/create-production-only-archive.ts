@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import { deleteAsync } from "del";
 import fs from "fs-extra";
 import { globby, Options as GlobbyOptions } from "globby";
-import { RuntimeError } from "run-time-error-cjs";
+import { RuntimeError } from "run-time-error";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { simpleGit, SimpleGit, SimpleGitOptions } from "simple-git";
