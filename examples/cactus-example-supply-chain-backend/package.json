@@ -71,7 +71,7 @@
     "express": "4.18.2",
     "express-jwt": "8.4.1",
     "fabric-network": "2.2.20",
-    "jose": "4.9.2",
+    "jose": "4.15.5",
     "openapi-types": "12.1.3",
     "solc": "0.8.6",
     "typescript-optional": "2.0.1",
