@@ -5,63 +5,61 @@
  */
 
 module.exports = {
-  title: 'Weaver: DLT Interoperability Framework',
-  tagline: 'Documentation',
-  url: 'https://hyperledger.github.io',
-  baseUrl: '/cacti/',
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'shared/favicon.ico',
-  organizationName: 'hyperledger',
-  projectName: 'hyperledger.github.io',
+  title: "Weaver: DLT Interoperability Framework",
+  tagline: "Documentation",
+  url: "https://hyperledger.github.io",
+  baseUrl: "/cacti/",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
+  favicon: "shared/favicon.ico",
+  organizationName: "hyperledger",
+  projectName: "hyperledger.github.io",
   themeConfig: {
     prism: {
-        additionalLanguages: ['java', 'kotlin', 'groovy', 'toml'],
+      additionalLanguages: ["java", "kotlin", "groovy", "toml"],
     },
     navbar: {
-      title: 'Weaver',
+      title: "Weaver",
       logo: {
-        alt: 'Weaver',
-        src: 'shared/logo.svg',
+        alt: "Weaver",
+        src: "shared/logo.svg",
       },
       items: [
         {
-          to: 'docs/external/introduction',
-          activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
+          to: "docs/external/introduction",
+          activeBasePath: "docs",
+          label: "Docs",
+          position: "left",
         },
         {
-          to: 'blog',
-          label: 'Blog',
-          position: 'left'
+          to: "blog",
+          label: "Blog",
+          position: "left",
         },
         {
-          href: 'https://github.com/hyperledger/cacti',
-          label: 'GitHub',
-          position: 'right',
+          href: "https://github.com/hyperledger/cacti",
+          label: "GitHub",
+          position: "right",
         },
       ],
     },
     footer: {
-      style: 'light',
-      links: [        
-      ],
+      style: "light",
+      links: [],
       copyright: `Copyright © ${new Date().getFullYear()} Weaver Framework.`,
     },
   },
   presets: [
     [
-      '@docusaurus/preset-classic',
+      "@docusaurus/preset-classic",
       {
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
-          editUrl:
-            'https://github.com/hyperledger/cacti/edit/main/',
-        },        
+          editUrl: "https://github.com/hyperledger/cacti/edit/main/",
+        },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve("./src/css/custom.css"),
         },
       },
     ],

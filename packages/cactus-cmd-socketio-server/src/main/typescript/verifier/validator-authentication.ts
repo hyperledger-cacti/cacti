@@ -33,7 +33,7 @@ let privateKey: string;
  * @param expirationTime - JWT expiration time
  * @returns JWT signed message that can be sent over the wire.
  */
- export function signValidatorMessageJwt(
+export function signValidatorMessageJwt(
   privateKey: jwt.Secret,
   payload: PayloadType,
   jwtAlgo: jwt.Algorithm = "ES256",
@@ -75,11 +75,11 @@ let privateKey: string;
 export function signMessageJwt(payload: object): string {
   if (!privateKey) {
     try {
-      privateKey = configRead<string>('sslParam.keyValue');
+      privateKey = configRead<string>("sslParam.keyValue");
     } catch {
-      privateKey = fs.readFileSync(configRead('sslParam.key'), "ascii");
+      privateKey = fs.readFileSync(configRead("sslParam.key"), "ascii");
     }
   }
-  const jwtAlgo = configRead<jwt.Algorithm>('sslParam.jwtAlgo', 'ES256');
+  const jwtAlgo = configRead<jwt.Algorithm>("sslParam.jwtAlgo", "ES256");
   return signValidatorMessageJwt(privateKey, payload, jwtAlgo);
 }

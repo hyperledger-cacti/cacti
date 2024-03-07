@@ -28,7 +28,6 @@ export async function checkPackageJsonSort(
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const SCRIPT_DIR = __dirname;
-  const LERNA_JSON = "lerna.json";
   const PROJECT_DIR = path.join(SCRIPT_DIR, "../../");
   const PACKAGE_JSON = "package.json";
   console.log(`${TAG} SCRIPT_DIR=${SCRIPT_DIR}`);

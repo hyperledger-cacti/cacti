@@ -20,4 +20,3 @@ export class RequestedData {
   dataName = "";
   dataType = "";
 }
-

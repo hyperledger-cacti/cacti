@@ -11,7 +11,8 @@ import { VerifierFactory } from "../../verifier/VerifierFactory";
 import escapeHtml from "escape-html";
 
 const router: Router = Router();
-export const transactionManagement: TransactionManagement = new TransactionManagement();
+export const transactionManagement: TransactionManagement =
+  new TransactionManagement();
 export const verifierFactory: VerifierFactory = new VerifierFactory(
   transactionManagement,
 );
@@ -100,9 +101,9 @@ router.delete(
   "/api/v1/bl/wallets/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render(
-        "Not Implemented (Delete a Wallet" + ", id=" + escapeHtml(req.params.id) + ")\n",
-      );
+      const walletIdEsc = escapeHtml(req.params.id);
+      const out = "Not Implemented (Delete a Wallet, id=" + walletIdEsc + ")\n";
+      res.status(501).send(out);
     } catch (err) {
       next(err);
     }

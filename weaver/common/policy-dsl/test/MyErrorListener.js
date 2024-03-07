@@ -9,11 +9,11 @@
  * ANTLR and converting these to an array of messages
  */
 export default class MyErrorListener {
-    constructor() {
-        this.result = [];
-    }
+  constructor() {
+    this.result = [];
+  }
 
-    syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-        this.result.push({message: msg, errorSrc: recognizer.constructor.name });
-    }
+  syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+    this.result.push({ message: msg, errorSrc: recognizer.constructor.name });
+  }
 }

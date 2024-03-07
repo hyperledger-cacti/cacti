@@ -160,7 +160,7 @@ export async function startGoEthereumSocketIOConnector() {
     // TODO: "request2" -> "request"
     client.on("request2", function (data) {
       const methodType = data.method.type;
-      let args: Record<string, any> = {
+      const args: Record<string, any> = {
         contract: data.contract,
         method: data.method,
         args: data.args,

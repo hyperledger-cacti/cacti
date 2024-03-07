@@ -11,7 +11,6 @@ import { MeterManagement } from "./MeterManagement";
 import { MeterInfo } from "./MeterInfo";
 import {
   BusinessLogicBase,
-  LedgerEvent,
   json2str,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socketio-server";
@@ -141,7 +140,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       });
   }
 
-  onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
+  onEvent(): void {
     logger.error(
       "onEvent() ERROR - No monitors are running, should not be called!",
     );

@@ -8,7 +8,6 @@
  * config.js
  */
 
-
 import config from "config";
 
 /**

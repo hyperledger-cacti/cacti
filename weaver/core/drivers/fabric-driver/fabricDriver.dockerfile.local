@@ -14,8 +14,6 @@ ADD server /driver/fabric/server
 ADD constants /driver/fabric/constants
 ADD config.json .
 ADD tsconfig.json .
-ADD .eslintrc .
-ADD .prettierrc .
 
 RUN npm run build
 

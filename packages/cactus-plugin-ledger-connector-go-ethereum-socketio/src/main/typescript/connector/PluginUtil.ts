@@ -67,4 +67,4 @@ export function convNum(value: number | string, defaultValue: number | string) {
   }
 
   return retValue;
-};
+}

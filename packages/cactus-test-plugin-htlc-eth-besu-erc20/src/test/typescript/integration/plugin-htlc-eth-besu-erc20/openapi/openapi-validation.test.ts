@@ -775,7 +775,7 @@ test(testCase, async (t: Test) => {
 
     try {
       // eslint-disable-next-line prettier/prettier
-      await api.getSingleStatusV1((parameters as any) as GetSingleStatusRequest);
+      await api.getSingleStatusV1(parameters as any as GetSingleStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,

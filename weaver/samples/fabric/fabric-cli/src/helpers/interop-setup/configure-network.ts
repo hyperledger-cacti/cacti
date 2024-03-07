@@ -4,124 +4,130 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from "fs";
+import * as path from "path";
 import {
   invoke,
   getCurrentNetworkCredentialPath,
   getCredentialPath,
-  fabricHelper
-} from '../fabric-functions'
-import { handlePromise, getNetworkConfig } from '../helpers'
-import { MembershipManager } from '@hyperledger/cacti-weaver-sdk-fabric'
+  fabricHelper,
+} from "../fabric-functions";
+import { handlePromise, getNetworkConfig } from "../helpers";
+import { MembershipManager } from "@hyperledger/cacti-weaver-sdk-fabric";
 
 const helperInvoke = async (userId, ccFunc, ccArg, ...args) => {
-  const [contractName, channelName, connProfilePath, networkName, logger] = args
+  const [contractName, channelName, connProfilePath, networkName, logger] =
+    args;
   const [invokeResponse, invokeError] = await handlePromise(
     invoke(
       {
         contractName,
         channel: channelName,
         ccFunc: ccFunc,
-        args: [ccArg]
+        args: [ccArg],
       },
       connProfilePath,
       networkName,
       global.__DEFAULT_MSPID__,
       logger,
       userId,
-      (userId === '')
-    )
-  )
-  logger.debug(`${ccFunc} Invoke ${JSON.stringify(invokeResponse)}`)
+      userId === "",
+    ),
+  );
+  logger.debug(`${ccFunc} Invoke ${JSON.stringify(invokeResponse)}`);
   if (invokeError) {
-    logger.error(`${ccFunc} Invoke Error: ${ccFunc}: ${ccArg}`)
-    throw new Error(`${ccFunc} Invoke Error ${invokeError}`)
+    logger.error(`${ccFunc} Invoke Error: ${ccFunc}: ${ccArg}`);
+    throw new Error(`${ccFunc} Invoke Error ${invokeError}`);
   } else {
-    logger.info(`Successfully invoked ${ccFunc}`)
+    logger.info(`Successfully invoked ${ccFunc}`);
   }
-}
+};
 
-const configureNetwork = async (mainNetwork: string, members: Array<string> = [global.__DEFAULT_MSPID__], logger: any = console, iinAgent: boolean = false) => {
-  const networkEnv = getNetworkConfig(mainNetwork)
-  logger.debug(`NetworkEnv: ${JSON.stringify(networkEnv)}`)
+const configureNetwork = async (
+  mainNetwork: string,
+  members: Array<string> = [global.__DEFAULT_MSPID__],
+  logger: any = console,
+  iinAgent: boolean = false,
+) => {
+  const networkEnv = getNetworkConfig(mainNetwork);
+  logger.debug(`NetworkEnv: ${JSON.stringify(networkEnv)}`);
   if (!networkEnv.relayEndpoint || !networkEnv.connProfilePath) {
     logger.error(
-      'Please use a valid --local-network. If valid network please check if your environment variables are configured properly'
-    )
-    return
+      "Please use a valid --local-network. If valid network please check if your environment variables are configured properly",
+    );
+    return;
   }
 
-  const credentialFolderPath = getCredentialPath()
+  const credentialFolderPath = getCredentialPath();
   const networkFolders = fs
     .readdirSync(credentialFolderPath, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(item => item.name)
+    .filter((dirent) => dirent.isDirectory())
+    .map((item) => item.name);
   // Reorder the array so that the local network is the first element
   // We need to record local membership before recording other networks' memberships
-  networkFolders.splice(networkFolders.indexOf(mainNetwork), 1)
-  networkFolders.splice(0, 0, mainNetwork)
+  networkFolders.splice(networkFolders.indexOf(mainNetwork), 1);
+  networkFolders.splice(0, 0, mainNetwork);
 
   for (const index in networkFolders) {
-    const network = networkFolders[index]
+    const network = networkFolders[index];
     if (network === mainNetwork) {
       // A network needs to load/record only other networks' credentials
       await loadLocalHelper(
         networkEnv.connProfilePath,
         mainNetwork,
-        process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
+        process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : "mychannel",
         process.env.DEFAULT_CHAINCODE
           ? process.env.DEFAULT_CHAINCODE
-          : 'interop',
+          : "interop",
         members,
-        logger
-      )
+        logger,
+      );
       continue;
     }
     const accessControlPath = path.join(
       getCurrentNetworkCredentialPath(network),
-      'access-control.json'
-    )
-    let membershipPath = ""
-    if (!network.startsWith('network')) {
-        membershipPath = path.join(
-          getCurrentNetworkCredentialPath(network),
-          'membership.json'
-        )
+      "access-control.json",
+    );
+    let membershipPath = "";
+    if (!network.startsWith("network")) {
+      membershipPath = path.join(
+        getCurrentNetworkCredentialPath(network),
+        "membership.json",
+      );
     } else if (iinAgent) {
       membershipPath = path.join(
         getCurrentNetworkCredentialPath(network),
-        'attested-membership-' + mainNetwork + '.proto.serialized'
-      )
+        "attested-membership-" + mainNetwork + ".proto.serialized",
+      );
     }
     const verificationPolicyPath = path.join(
       getCurrentNetworkCredentialPath(network),
-      'verification-policy.json'
-    )
+      "verification-policy.json",
+    );
     if (
       !fs.existsSync(accessControlPath) ||
       !fs.existsSync(verificationPolicyPath) ||
       (membershipPath !== "" && !fs.existsSync(membershipPath))
     ) {
-      logger.error(`Missing credential file for network: ${network}`)
+      logger.error(`Missing credential file for network: ${network}`);
     } else {
       await configureNetworkHelper(
         networkEnv.connProfilePath,
         mainNetwork,
-        process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
+        process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : "mychannel",
         process.env.DEFAULT_CHAINCODE
           ? process.env.DEFAULT_CHAINCODE
-          : 'interop',
+          : "interop",
         network,
         accessControlPath,
         membershipPath,
         verificationPolicyPath,
         logger,
-        iinAgent
-      )
+        iinAgent,
+      );
     }
   }
-}
+};
 
 const loadLocalHelper = async (
   connProfilePath: string,
@@ -129,7 +135,7 @@ const loadLocalHelper = async (
   channelName: string,
   contractName: string,
   members: Array<string>,
-  logger: any = console
+  logger: any = console,
 ): Promise<void> => {
   //const localMembership = Buffer.from(fs.readFileSync(localMembershipPath)).toString()
   const { gateway } = await fabricHelper({
@@ -138,19 +144,31 @@ const loadLocalHelper = async (
     connProfilePath: connProfilePath,
     networkName: networkName,
     mspId: global.__DEFAULT_MSPID__,
-    userString: 'networkadmin',
-    registerUser: false
-  })
+    userString: "networkadmin",
+    registerUser: false,
+  });
   try {
-    const response = await MembershipManager.createLocalMembership(gateway, members, networkName, channelName, contractName)
-    logger.info('CreateLocalMembership Successful.')
+    const response = await MembershipManager.createLocalMembership(
+      gateway,
+      members,
+      networkName,
+      channelName,
+      contractName,
+    );
+    logger.info("CreateLocalMembership Successful.");
   } catch (e) {
-    logger.error(e)
-    logger.info('CreateLocalMembership attempting Update')
-    const response = await MembershipManager.updateLocalMembership(gateway, members, networkName, channelName, contractName)
-    logger.info('UpdateLocalMembership response: success: ', response)
+    logger.error(e);
+    logger.info("CreateLocalMembership attempting Update");
+    const response = await MembershipManager.updateLocalMembership(
+      gateway,
+      members,
+      networkName,
+      channelName,
+      contractName,
+    );
+    logger.info("UpdateLocalMembership response: success: ", response);
   }
-}
+};
 
 const configureNetworkHelper = async (
   connProfilePath: string,
@@ -162,69 +180,79 @@ const configureNetworkHelper = async (
   membershipPath: string,
   verificationPolicyPath: string,
   logger: any = console,
-  iinAgent: boolean = false
+  iinAgent: boolean = false,
 ): Promise<void> => {
-  logger.info(`Target Network: ${targetNetwork}`)
+  logger.info(`Target Network: ${targetNetwork}`);
   const accessControl = Buffer.from(
-    fs.readFileSync(accessControlPath)
-  ).toString()
+    fs.readFileSync(accessControlPath),
+  ).toString();
 
   const verificationPolicy = Buffer.from(
-    fs.readFileSync(verificationPolicyPath)
-  ).toString()
+    fs.readFileSync(verificationPolicyPath),
+  ).toString();
 
   const helperInvokeArgs = [
     contractName,
     channelName,
     connProfilePath,
     networkName,
-    logger
-  ]
+    logger,
+  ];
 
-  const adminUser = 'networkadmin'
+  const adminUser = "networkadmin";
 
   try {
     await helperInvoke(
       adminUser,
-      'CreateAccessControlPolicy',
+      "CreateAccessControlPolicy",
       accessControl,
-      ...helperInvokeArgs
-    )
+      ...helperInvokeArgs,
+    );
   } catch (e) {
-    logger.info('CreateAccessControlPolicy attempting Update')
+    logger.info("CreateAccessControlPolicy attempting Update");
     await helperInvoke(
       adminUser,
-      'UpdateAccessControlPolicy',
+      "UpdateAccessControlPolicy",
       accessControl,
-      ...helperInvokeArgs
-    )
+      ...helperInvokeArgs,
+    );
   }
   try {
     await helperInvoke(
       adminUser,
-      'CreateVerificationPolicy',
+      "CreateVerificationPolicy",
       verificationPolicy,
-      ...helperInvokeArgs
-    )
+      ...helperInvokeArgs,
+    );
   } catch (e) {
-    logger.info('CreateVerificationPolicy attempting Update')
+    logger.info("CreateVerificationPolicy attempting Update");
     await helperInvoke(
       adminUser,
-      'UpdateVerificationPolicy',
+      "UpdateVerificationPolicy",
       verificationPolicy,
-      ...helperInvokeArgs
-    )
+      ...helperInvokeArgs,
+    );
   }
-  if (iinAgent || !targetNetwork.startsWith('network')) {
-    const membership = Buffer.from(fs.readFileSync(membershipPath)).toString()
-    const memberRecordingUser = iinAgent ? 'iinagent': adminUser    // HACK until we add IIN Agents for Corda networks
+  if (iinAgent || !targetNetwork.startsWith("network")) {
+    const membership = Buffer.from(fs.readFileSync(membershipPath)).toString();
+    const memberRecordingUser = iinAgent ? "iinagent" : adminUser; // HACK until we add IIN Agents for Corda networks
     try {
-      await helperInvoke(memberRecordingUser, 'CreateMembership', membership, ...helperInvokeArgs)
+      await helperInvoke(
+        memberRecordingUser,
+        "CreateMembership",
+        membership,
+        ...helperInvokeArgs,
+      );
     } catch (e) {
-      logger.info('CreateMembership attempting Update')
-      await helperInvoke(memberRecordingUser, 'UpdateMembership', membership, ...helperInvokeArgs)
+      logger.info("CreateMembership attempting Update");
+      await helperInvoke(
+        memberRecordingUser,
+        "UpdateMembership",
+        membership,
+        ...helperInvokeArgs,
+      );
     }
   }
-}
+};
 
-export { configureNetworkHelper, configureNetwork }
+export { configureNetworkHelper, configureNetwork };

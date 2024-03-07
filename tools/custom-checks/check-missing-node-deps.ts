@@ -41,7 +41,7 @@ export async function checkMissingNodeDeps(
       "sandbox",
       "dist",
       "bower_components",
-      "node_modules"
+      "node_modules",
     ],
     ignoreMatches: [
       // ignore dependencies that matches these globs
@@ -50,7 +50,7 @@ export async function checkMissingNodeDeps(
       "tape-promise",
       "tape",
       "tap",
-      "@ionic-native/*"
+      "@ionic-native/*",
     ],
     // parsers: {
     //   // the target parsers
