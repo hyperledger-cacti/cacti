@@ -62,7 +62,7 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@types/jsonwebtoken": "9.0.0",
     "@types/lodash": "4.14.195",
-    "@types/node": "20.8.10",
+    "@types/node": "18.11.9",
     "lodash": "4.17.21"
   },
   "engines": {

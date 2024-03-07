@@ -44,7 +44,7 @@
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
-    "@types/node": "14.18.54",
+    "@types/node": "18.11.9",
     "body-parser": "1.20.2",
     "config": "3.3.7",
     "cookie-parser": "1.4.5",
@@ -77,7 +77,7 @@
     "@types/jsonwebtoken": "9.0.0",
     "@types/lodash": "4.14.195",
     "@types/morgan": "1.9.1",
-    "@types/node": "14.18.54",
+    "@types/node": "18.11.9",
     "@types/shelljs": "0.8.11",
     "http-terminator": "3.2.0",
     "lodash": "4.17.21",

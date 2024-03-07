@@ -7233,7 +7233,7 @@ __metadata:
     "@testing-library/react": "npm:^13.4.0"
     "@testing-library/user-event": "npm:^13.5.0"
     "@types/jest": "npm:^27.5.2"
-    "@types/node": "npm:^16.18.66"
+    "@types/node": "npm:18.11.9"
     "@types/react": "npm:^18.2.39"
     "@types/react-dom": "npm:^18.2.17"
     "@types/uuid": "npm:9.0.8"
@@ -7305,7 +7305,7 @@ __metadata:
     "@hyperledger/cacti-weaver-sdk-besu": "npm:2.0.0-alpha.2"
     "@truffle/contract": "npm:4.6.28"
     "@types/jest": "npm:29.5.3"
-    "@types/node": "npm:16.18.41"
+    "@types/node": "npm:18.11.9"
     gluegun: "npm:5.1.6"
     jest: "npm:29.6.2"
     ts-jest: "npm:29.1.1"
@@ -7358,7 +7358,7 @@ __metadata:
     "@grpc/grpc-js": "npm:1.9.5"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-alpha.2"
-    "@types/node": "npm:16.18.41"
+    "@types/node": "npm:18.11.9"
     dotenv: "npm:8.6.0"
     fabric-ca-client: "npm:2.2.20"
     fabric-common: "npm:2.2.20"
@@ -7384,7 +7384,7 @@ __metadata:
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-alpha.2"
     "@types/express": "npm:4.17.19"
     "@types/jest": "npm:29.5.3"
-    "@types/node": "npm:12.20.55"
+    "@types/node": "npm:18.11.9"
     body-parser: "npm:1.20.2"
     crypto: "npm:1.0.1"
     dotenv: "npm:8.6.0"
@@ -7421,7 +7421,7 @@ __metadata:
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-alpha.2"
     "@types/jsrsasign": "npm:10.5.11"
-    "@types/node": "npm:16.18.41"
+    "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:9.0.8"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
@@ -7462,7 +7462,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-sdk-besu@workspace:weaver/sdks/besu/node"
   dependencies:
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
-    "@types/node": "npm:16.18.41"
+    "@types/node": "npm:18.11.9"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
     log4js: "npm:6.9.1"
@@ -7486,7 +7486,7 @@ __metadata:
     "@grpc/grpc-js": "npm:1.9.5"
     "@grpc/proto-loader": "npm:0.7.8"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
-    "@types/node": "npm:16.18.41"
+    "@types/node": "npm:18.11.9"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
     elliptic: "npm:6.5.4"
@@ -7522,7 +7522,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-alpha.2"
     "@types/jsonwebtoken": "npm:9.0.0"
     "@types/lodash": "npm:4.14.195"
-    "@types/node": "npm:20.8.10"
+    "@types/node": "npm:18.11.9"
     jsonwebtoken: "npm:9.0.0"
     lodash: "npm:4.17.21"
     rxjs: "npm:7.8.1"
@@ -7615,7 +7615,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:9.0.0"
     "@types/lodash": "npm:4.14.195"
     "@types/morgan": "npm:1.9.1"
-    "@types/node": "npm:14.18.54"
+    "@types/node": "npm:18.11.9"
     "@types/shelljs": "npm:0.8.11"
     body-parser: "npm:1.20.2"
     config: "npm:3.3.7"
@@ -7842,7 +7842,7 @@ __metadata:
     "@types/express": "npm:4.17.19"
     "@types/express-jwt": "npm:6.0.2"
     "@types/fs-extra": "npm:9.0.13"
-    "@types/node": "npm:10.17.60"
+    "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:9.0.8"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.6.0"
@@ -7909,7 +7909,7 @@ __metadata:
     "@types/express": "npm:4.17.19"
     "@types/jsonwebtoken": "npm:9.0.2"
     "@types/jsrsasign": "npm:10.5.8"
-    "@types/node": "npm:14.18.54"
+    "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:9.0.8"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
@@ -7950,7 +7950,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "npm:2.0.0-alpha.2"
     "@types/escape-html": "npm:1.0.1"
     "@types/express": "npm:4.17.19"
-    "@types/node": "npm:14.18.54"
+    "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:9.0.8"
     body-parser: "npm:1.20.2"
     cookie-parser: "npm:1.4.6"
@@ -8090,7 +8090,7 @@ __metadata:
     "@types/cookie-parser": "npm:1.4.2"
     "@types/escape-html": "npm:1.0.1"
     "@types/express": "npm:4.17.19"
-    "@types/node": "npm:14.18.54"
+    "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:9.0.8"
     body-parser: "npm:1.20.2"
     cookie-parser: "npm:1.4.6"
@@ -8575,7 +8575,7 @@ __metadata:
     "@types/cookie-parser": "npm:1.4.5"
     "@types/express": "npm:4.17.19"
     "@types/http-errors": "npm:2.0.1"
-    "@types/node": "npm:15.14.9"
+    "@types/node": "npm:18.11.9"
     "@types/shelljs": "npm:0.8.12"
     body-parser: "npm:1.20.2"
     config: "npm:3.3.9"
@@ -8780,7 +8780,7 @@ __metadata:
     "@types/cookie-parser": "npm:1.4.5"
     "@types/express": "npm:4.17.19"
     "@types/http-errors": "npm:2.0.1"
-    "@types/node": "npm:14.18.54"
+    "@types/node": "npm:18.11.9"
     body-parser: "npm:1.20.2"
     cbor: "npm:6.0.1"
     config: "npm:3.3.7"
@@ -9222,7 +9222,7 @@ __metadata:
     "@hyperledger/cactus-verifier-client": "npm:2.0.0-alpha.2"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.19"
-    "@types/node": "npm:14.18.54"
+    "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:9.0.8"
     body-parser: "npm:1.20.2"
     express: "npm:4.18.2"
@@ -9315,7 +9315,7 @@ __metadata:
     "@types/benchmark": "npm:2.1.5"
     "@types/fs-extra": "npm:9.0.13"
     "@types/jest": "npm:29.5.3"
-    "@types/node": "npm:16.18.41"
+    "@types/node": "npm:18.11.9"
     "@types/node-fetch": "npm:2.6.4"
     "@types/tape": "npm:4.13.4"
     "@types/tape-promise": "npm:4.0.1"
@@ -15250,41 +15250,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:10.17.60, @types/node@npm:^10.1.0":
-  version: 10.17.60
-  resolution: "@types/node@npm:10.17.60"
-  checksum: 10/f9161493b3284b1d41d5d594c2768625acdd9e33f992f71ccde47861916e662e2ae438d2cc5f1b285053391a31b52a7564ecedc22d485610d236bfad9c7e6a1c
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:12.20.55, @types/node@npm:^12.12.6":
-  version: 12.20.55
-  resolution: "@types/node@npm:12.20.55"
-  checksum: 10/1f916a06fff02faadb09a16ed6e31820ce170798b202ef0b14fc244bfbd721938c54a3a99836e185e4414ca461fe96c5bb5c67c3d248f153555b7e6347f061dd
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:14.18.54":
-  version: 14.18.54
-  resolution: "@types/node@npm:14.18.54"
-  checksum: 10/097e1f786813d7f55288b3b4cf81d831c2e43c4217eb366ece0deb2544324e9c0054f5e47605f74890d0d880bfc67e1a1d606abc481a4e409a999b21af2f8a46
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:15.14.9":
-  version: 15.14.9
-  resolution: "@types/node@npm:15.14.9"
-  checksum: 10/5c9cc5346ca0c565e02f11ae605911aa0892134099a5c730f49b4662635e5fbbbbeb24b2b56752ee14f092d1ca90837a35de428b9e243d7ab63c5907bfb07d89
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:16.18.41":
-  version: 16.18.41
-  resolution: "@types/node@npm:16.18.41"
-  checksum: 10/2dd7b16b39b6f8c00a2ee388f7a8e4d8408f4ddd080fd8c322f5284f9f17ee5aeaa4c021ae5148f80fe7def2967c92816c24e73a86d6d018fc6b98b79eb2b723
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:18.11.9":
   version: 18.11.9
   resolution: "@types/node@npm:18.11.9"
@@ -15306,19 +15271,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.8.10":
-  version: 20.8.10
-  resolution: "@types/node@npm:20.8.10"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10/8930039077c8ad74de74c724909412bea8110c3f8892bcef8dda3e9629073bed65632ee755f94b252bcdae8ca71cf83e89a4a440a105e2b1b7c9797b43483049
+"@types/node@npm:^10.1.0":
+  version: 10.17.60
+  resolution: "@types/node@npm:10.17.60"
+  checksum: 10/f9161493b3284b1d41d5d594c2768625acdd9e33f992f71ccde47861916e662e2ae438d2cc5f1b285053391a31b52a7564ecedc22d485610d236bfad9c7e6a1c
   languageName: node
   linkType: hard
 
-"@types/node@npm:^16.18.66":
-  version: 16.18.66
-  resolution: "@types/node@npm:16.18.66"
-  checksum: 10/992b264562c11de1332f8fe637c4b5d3df986348b972a57d09eca33db7b7d9abf5d348e70c37a4f05e42a717820bb7d5120b9a5a956fd0f975296a8fd910f2b5
+"@types/node@npm:^12.12.6":
+  version: 12.20.55
+  resolution: "@types/node@npm:12.20.55"
+  checksum: 10/1f916a06fff02faadb09a16ed6e31820ce170798b202ef0b14fc244bfbd721938c54a3a99836e185e4414ca461fe96c5bb5c67c3d248f153555b7e6347f061dd
   languageName: node
   linkType: hard
 
@@ -49607,13 +49570,6 @@ __metadata:
   version: 2.0.5
   resolution: "undefsafe@npm:2.0.5"
   checksum: 10/f42ab3b5770fedd4ada175fc1b2eb775b78f609156f7c389106aafd231bfc210813ee49f54483d7191d7b76e483bc7f537b5d92d19ded27156baf57592eb02cc
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~5.26.4":
-  version: 5.26.5
-  resolution: "undici-types@npm:5.26.5"
-  checksum: 10/0097779d94bc0fd26f0418b3a05472410408877279141ded2bd449167be1aed7ea5b76f756562cb3586a07f251b90799bab22d9019ceba49c037c76445f7cddd
   languageName: node
   linkType: hard
 

@@ -20,7 +20,7 @@
     "web3-utils": "1.10.0"
   },
   "devDependencies": {
-    "@types/node": "16.18.41",
+    "@types/node": "18.11.9",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "mocha": "5.2.0",

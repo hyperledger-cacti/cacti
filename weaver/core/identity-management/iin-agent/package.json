@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/jsrsasign": "10.5.11",
-    "@types/node": "16.18.41",
+    "@types/node": "18.11.9",
     "@types/uuid": "9.0.8",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
