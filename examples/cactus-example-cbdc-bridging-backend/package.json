@@ -91,7 +91,7 @@
     "@types/express": "4.17.19",
     "@types/express-jwt": "6.0.2",
     "@types/fs-extra": "9.0.13",
-    "@types/node": "10.17.60",
+    "@types/node": "18.11.9",
     "@types/uuid": "9.0.8",
     "cucumber": "5.0.3",
     "hardhat": "2.17.2",
