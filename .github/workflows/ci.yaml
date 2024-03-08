@@ -1730,33 +1730,31 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  # cactus-plugin-satp-hermes:
-  #   continue-on-error: false
-  #   env:
-  #     FULL_BUILD_DISABLED: true
-  #     JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-  #     JEST_TEST_RUNNER_DISABLED: false
-  #     TAPE_TEST_RUNNER_DISABLED: true
-  #   needs: build-dev
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
-  #       uses: actions/setup-node@v4.0.2
-  #       with:
-  #         node-version: ${{ env.NODEJS_VERSION }}
-  #     - uses: actions/checkout@v4.1.1
-  #     - id: yarn-cache-dir-path
-  #       name: Get yarn cache directory path
-  #       run: echo "::set-output name=dir::$(yarn cache dir)"
-  #     - id: yarn-cache
-  #       name: Restore Yarn Cache
-  #       uses: actions/cache@v4.0.1
-  #       with:
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-  #         path: ./.yarn/
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
-  #     - run: ./tools/ci.sh
+  cactus-plugin-satp-hermes:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit/.*/*.test.ts|integration/(client-.*.test.ts|odap.test.ts|odap-api.*.test.ts|server-.*.test.ts|backup-.*.test.ts|odap-rollback-.*.test.ts))
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
   cactus-plugin-connector-ubiquity:
     continue-on-error: false
     env:
