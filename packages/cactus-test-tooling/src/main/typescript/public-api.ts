@@ -167,12 +167,6 @@ export {
 } from "./corda/sample-cordapp-enum";
 
 export {
-  IRustcContainerOptions,
-  K_DEFAULT_RUSTC_CONTAINER_CMD,
-  RustcContainer,
-} from "./rustc-container/rustc-container";
-
-export {
   ISawtoothTestLedgerOptions,
   SAWTOOTH_LEDGER_DEFAULT_OPTIONS,
   SawtoothTestLedger,
@@ -182,8 +176,6 @@ export {
   ISubstrateTestLedgerOptions,
   SubstrateTestLedger,
 } from "./substrate-test-ledger/substrate-test-ledger";
-
-export { RustcBuildCmd } from "./rustc-container/rustc-build-cmd";
 
 export { Streams } from "./common/streams";
 
