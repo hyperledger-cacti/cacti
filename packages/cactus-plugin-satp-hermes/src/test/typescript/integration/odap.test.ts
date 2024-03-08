@@ -13,12 +13,32 @@ import { FabricSATPGateway } from "../../../main/typescript/core/fabric-satp-gat
 import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { pruneDockerAllIfGithubAction, Containers } from "@hyperledger/cactus-test-tooling";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
 let pluginSourceGateway: PluginSATPGateway;
 let pluginRecipientGateway: PluginSATPGateway;
+
+const logLevel: LogLevelDesc = "INFO";
+
+const log = LoggerProvider.getOrCreate({
+  level: "INFO",
+  label: "odap",
+});
+
+beforeAll(async () => {
+  pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+});
 
 test("successful run ODAP instance", async () => {
   console.log(knexRemoteConnection);

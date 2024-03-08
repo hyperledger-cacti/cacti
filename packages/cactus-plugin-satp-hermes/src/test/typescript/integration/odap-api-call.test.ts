@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as SatpApi } from "../../../main/typescript/public-api";
 
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
+import { IListenOptions, LogLevelDesc, LoggerProvider, Servers } from "@hyperledger/cactus-common";
 
 import { Configuration } from "@hyperledger/cactus-core-api";
 
@@ -25,6 +25,9 @@ import { FabricSATPGateway } from "../../../main/typescript/core/fabric-satp-gat
 import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
+import { Containers, pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+
+const logLevel: LogLevelDesc = "INFO";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -37,6 +40,22 @@ let recipientGatewayserver: Server;
 
 let pluginSourceGateway: PluginSATPGateway;
 let pluginRecipientGateway: PluginSATPGateway;
+
+const log = LoggerProvider.getOrCreate({
+  level: "INFO",
+  label: "odap-api-call-with-ledger-connector",
+});
+
+beforeAll(async () => {
+  pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+});
 
 test("runs ODAP between two gateways via openApi", async () => {
   const clientGatewayPluginOptions: IPluginSatpGatewayConstructorOptions = {
