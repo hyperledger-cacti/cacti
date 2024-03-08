@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import express, { Express } from "express";
 import {
   IListenOptions,
+  LogLevelDesc,
+  LoggerProvider,
   Secp256k1Keys,
   Servers,
 } from "@hyperledger/cactus-common";
@@ -27,6 +29,9 @@ import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 
 import { knexClientConnection, knexRemoteConnection } from "../knex.config";
+import { pruneDockerAllIfGithubAction, Containers } from "@hyperledger/cactus-test-tooling";
+
+const logLevel: LogLevelDesc = "INFO";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -53,7 +58,21 @@ let serverListenOptions: IListenOptions;
 let clientExpressApp: Express;
 let clientListenOptions: IListenOptions;
 
+const log = LoggerProvider.getOrCreate({
+  level: "INFO",
+  label: "server-crash-after-create-asset",
+});
+
 beforeAll(async () => {
+  pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+    
   {
     // Server Gateway configuration
     serverGatewayPluginOptions = {

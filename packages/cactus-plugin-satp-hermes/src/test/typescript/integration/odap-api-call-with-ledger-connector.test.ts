@@ -19,6 +19,10 @@ import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   BesuTestLedger,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -105,7 +109,7 @@ const BESU_ASSET_ID = uuidv4();
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
-  label: "satpTestWithLedgerConnectors",
+  label: "odap-api-call-with-ledger-connector",
 });
 
 beforeAll(async () => {
@@ -127,7 +131,8 @@ beforeAll(async () => {
       emitContainerLogs: true,
       publishAllPorts: true,
       imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-      envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel,
     });
 
@@ -163,50 +168,13 @@ beforeAll(async () => {
       asLocalhost: true,
     };
 
-    // This is the directory structure of the Fabirc 2.x CLI container (fabric-tools image)
-    // const orgCfgDir = "/fabric-samples/test-network/organizations/";
-    const orgCfgDir =
-      "/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/";
-
-    // these below mirror how the fabric-samples sets up the configuration
-    const org1Env = {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org1MSP",
-
-      ORDERER_CA: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      CORE_PEER_TLS_ROOTCERT_FILE: `${orgCfgDir}peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt`,
-      CORE_PEER_MSPCONFIGPATH: `${orgCfgDir}peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp`,
-      CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
-      ORDERER_TLS_ROOTCERT_FILE: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
-
-    // these below mirror how the fabric-samples sets up the configuration
-    const org2Env = {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org2MSP",
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      ORDERER_CA: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
-      CORE_PEER_MSPCONFIGPATH: `${orgCfgDir}peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp`,
-      CORE_PEER_TLS_ROOTCERT_FILE: `${orgCfgDir}peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt`,
-      ORDERER_TLS_ROOTCERT_FILE: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
-
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
       dockerBinary: "/usr/local/bin/docker",
       peerBinary: "/fabric-samples/bin/peer",
       goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: org1Env,
+      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
       sshConfig,
       logLevel,
       connectionProfile,
@@ -312,8 +280,12 @@ beforeAll(async () => {
       ccVersion: "1.0.0",
       sourceFiles,
       ccName: fabricContractName,
-      targetOrganizations: [org1Env, org2Env],
-      caFile: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
+      targetOrganizations: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+      ],
+      caFile:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
       ccLabel: "basic-asset-transfer-2",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
@@ -507,14 +479,18 @@ beforeAll(async () => {
     pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
     expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
-    expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
-    
+    expect(
+      pluginRecipientGateway.localRepository?.database,
+    ).not.toBeUndefined();
+
     expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
-    expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
-  
+    expect(
+      pluginRecipientGateway.remoteRepository?.database,
+    ).not.toBeUndefined();
+
     await pluginSourceGateway.localRepository?.reset();
     await pluginRecipientGateway.localRepository?.reset();
-    
+
     await pluginSourceGateway.remoteRepository?.reset();
     await pluginRecipientGateway.remoteRepository?.reset();
   }
