@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709778562621,
+  "lastUpdate": 1709917441918,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -456,6 +456,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.55%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "dc1f4072e6de53fadc99aec19a65c2d2ca83b248",
+          "message": "build(deps): bump jose from 4.9.2 to 4.15.5\n\nBumps [jose](https://github.com/panva/jose) from 4.9.2 to 4.15.5.\n- [Release notes](https://github.com/panva/jose/releases)\n- [Changelog](https://github.com/panva/jose/blob/v4.15.5/CHANGELOG.md)\n- [Commits](https://github.com/panva/jose/compare/v4.9.2...v4.15.5)\n\n---\nupdated-dependencies:\n- dependency-name: jose\n  dependency-type: direct:production\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2024-03-08T08:48:58-08:00",
+          "tree_id": "3f8749c44d50563b280a5be099c1c2dd309a74bc",
+          "url": "https://github.com/hyperledger/cacti/commit/dc1f4072e6de53fadc99aec19a65c2d2ca83b248"
+        },
+        "date": 1709917439089,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 626,
+            "range": "±1.79%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 393,
+            "range": "±1.48%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
