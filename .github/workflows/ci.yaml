@@ -2358,36 +2358,6 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-  ghcr-test-npm-registry:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-test-npm-registry
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile -t cactus-test-npm-registry
-      - name: Run Trivy vulnerability scan for cactus-test-npm-registry
-        uses: aquasecurity/trivy-action@0.11.2
-        with:
-          image-ref: 'cactus-test-npm-registry'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-  ghcr-whitepaper:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-whitepaper
-        run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile -t cactus-whitepaper
-      - name: Run Trivy vulnerability scan for cactus-whitepaper
-        uses: aquasecurity/trivy-action@0.11.2
-        with:
-          image-ref: 'cactus-whitepaper'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
 name: Cactus_CI
 'on':
   pull_request:
