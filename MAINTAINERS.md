@@ -12,6 +12,7 @@ Maintainers
 | Jagpreet Singh Sasan | [jagpreetsinghsasan][jagpreetsinghsasan] | jagpreetsinghsasan |
 | Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | vramaiitkgp |
 | Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn |
+| Rafael Belchior | [RafaelAPB][RafaelAPB] | rafaelapb |
 
 [izuru0]: https://github.com/izuru0
 [outSH]: https://github.com/outSH
@@ -20,6 +21,7 @@ Maintainers
 [jagpreetsinghsasan]: https://github.com/jagpreetsinghsasan
 [VRamakrishna]: https://github.com/VRamakrishna
 [sandeepnRES]: https://github.com/sandeepnRES
+[RafaelAPB]: https://github.com/RafaelAPB
 
 **Emeritus Maintainers**
 
