@@ -29,11 +29,11 @@ jobs:
 
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
 
       - name: npm_install_@devcontainers/cli@0.44.0
         run: npm install -g @devcontainers/cli@0.44.0
