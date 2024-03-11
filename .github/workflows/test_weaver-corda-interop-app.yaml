@@ -23,7 +23,7 @@ jobs:
       interop_cordapp_changed: ${{ steps.changes.outputs.interop_cordapp_changed }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -39,7 +39,7 @@ jobs:
     if: needs.check_code_changed.outputs.interop_cordapp_changed == 'true'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up JDK 8
       uses: actions/setup-java@v3.11.0

@@ -19,7 +19,7 @@ jobs:
       status: ${{ steps.early.outputs.status }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Ignore if not a release PR
         id: early
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Get release verison from PR title
         run: |
@@ -143,7 +143,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Get release verison from PR title
         run: |
