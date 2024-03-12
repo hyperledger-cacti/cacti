@@ -440,6 +440,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@apidevtools/json-schema-ref-parser@npm:9.0.6":
+  version: 9.0.6
+  resolution: "@apidevtools/json-schema-ref-parser@npm:9.0.6"
+  dependencies:
+    "@jsdevtools/ono": "npm:^7.1.3"
+    call-me-maybe: "npm:^1.0.1"
+    js-yaml: "npm:^3.13.1"
+  checksum: 10/bfdff3d3c54fac0e864322dfa62c018cbcf90f66df6cbe33868a0134bee5bc4d013f980aac0f3e83ffabf4b9c13ffedbf5bae3578ce7db7d4cb559e874b16950
+  languageName: node
+  linkType: hard
+
 "@apidevtools/json-schema-ref-parser@npm:9.0.9":
   version: 9.0.9
   resolution: "@apidevtools/json-schema-ref-parser@npm:9.0.9"
@@ -461,6 +472,51 @@ __metadata:
     call-me-maybe: "npm:^1.0.1"
     js-yaml: "npm:^4.1.0"
   checksum: 10/7553f994974c5c6f99d14b9f47e9dccaedbcdd1565a099bbf7413494c71e1a246562bd6bfa394b6be026d176c734ff89aed87e2c3a92d01ff4350c64514bfb48
+  languageName: node
+  linkType: hard
+
+"@apidevtools/openapi-schemas@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@apidevtools/openapi-schemas@npm:2.1.0"
+  checksum: 10/4ca78f79ee2e5a162d16d140f939ca90d51265014ea2e500955286ad3acd11b75db4179b7b4bae245b09a981baeb8d80b81bc24c61d6c471a4a4707ed277ebf2
+  languageName: node
+  linkType: hard
+
+"@apidevtools/swagger-cli@npm:4.0.4":
+  version: 4.0.4
+  resolution: "@apidevtools/swagger-cli@npm:4.0.4"
+  dependencies:
+    "@apidevtools/swagger-parser": "npm:^10.0.1"
+    chalk: "npm:^4.1.0"
+    js-yaml: "npm:^3.14.0"
+    yargs: "npm:^15.4.1"
+  bin:
+    swagger-cli: bin/swagger-cli.js
+  checksum: 10/7dd8cfd996a445052ba7d316ffa7b46343a9d463b7342e1511ddd5f547f34a6135a6a0dfb94d0bab6b0d561eb6c7795131acc61c7d058046b5f47d1431ab4677
+  languageName: node
+  linkType: hard
+
+"@apidevtools/swagger-methods@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@apidevtools/swagger-methods@npm:3.0.2"
+  checksum: 10/d06b1ac5c1956613c4c6be695612ef860cd4e962b93a509ca551735a328a856cae1e33399cac1dcbf8333ba22b231746f3586074769ef0e172cf549ec9e7eaae
+  languageName: node
+  linkType: hard
+
+"@apidevtools/swagger-parser@npm:^10.0.1":
+  version: 10.1.0
+  resolution: "@apidevtools/swagger-parser@npm:10.1.0"
+  dependencies:
+    "@apidevtools/json-schema-ref-parser": "npm:9.0.6"
+    "@apidevtools/openapi-schemas": "npm:^2.1.0"
+    "@apidevtools/swagger-methods": "npm:^3.0.2"
+    "@jsdevtools/ono": "npm:^7.1.3"
+    ajv: "npm:^8.6.3"
+    ajv-draft-04: "npm:^1.0.0"
+    call-me-maybe: "npm:^1.0.1"
+  peerDependencies:
+    openapi-types: ">=7"
+  checksum: 10/24f7f6524334887ff3ef1c8c768698963f4a03e6824719fdbe98ba5444c9f1cdca9a11789e90362c882321dedec3e66f414e05035054084921fe1d2527724adb
   languageName: node
   linkType: hard
 
@@ -4656,6 +4712,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@connectrpc/protoc-gen-connect-es@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@connectrpc/protoc-gen-connect-es@npm:1.4.0"
+  dependencies:
+    "@bufbuild/protobuf": "npm:^1.7.2"
+    "@bufbuild/protoplugin": "npm:^1.7.2"
+  peerDependencies:
+    "@bufbuild/protoc-gen-es": ^1.7.2
+    "@connectrpc/connect": 1.4.0
+  peerDependenciesMeta:
+    "@bufbuild/protoc-gen-es":
+      optional: true
+    "@connectrpc/connect":
+      optional: true
+  bin:
+    protoc-gen-connect-es: bin/protoc-gen-connect-es
+  checksum: 10/41aca6dd648857504595acb063e5061aa058f629b4939bb9941464f292915b4b40d63793e6567745517ec187d069b6110827f6649ecea203b1ca99de5efca4d9
+  languageName: node
+  linkType: hard
+
 "@cspell/cspell-bundled-dicts@npm:^5.21.2":
   version: 5.21.2
   resolution: "@cspell/cspell-bundled-dicts@npm:5.21.2"
@@ -8218,6 +8294,33 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cactus-plugin-bungee@workspace:packages/cactus-plugin-bungee":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cactus-plugin-bungee@workspace:packages/cactus-plugin-bungee"
+  dependencies:
+    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-core": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-core-api": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-test-tooling": "npm:2.0.0-alpha.2"
+    "@types/body-parser": "npm:1.19.4"
+    "@types/crypto-js": "npm:4.0.1"
+    "@types/express": "npm:4.17.19"
+    "@types/fs-extra": "npm:11.0.3"
+    "@types/tape": "npm:4.13.4"
+    "@types/uuid": "npm:9.0.6"
+    axios: "npm:1.6.0"
+    express: "npm:4.18.2"
+    fabric-network: "npm:2.2.20"
+    typescript-optional: "npm:2.0.1"
+    uuid: "npm:9.0.1"
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/cactus-plugin-consortium-manual@npm:2.0.0-alpha.2, @hyperledger/cactus-plugin-consortium-manual@workspace:packages/cactus-plugin-consortium-manual":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-consortium-manual@workspace:packages/cactus-plugin-consortium-manual"
@@ -8989,6 +9092,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes"
   dependencies:
+    "@apidevtools/swagger-cli": "npm:4.0.4"
     "@bufbuild/buf": "npm:1.29.0"
     "@bufbuild/protobuf": "npm:1.7.2"
     "@bufbuild/protoc-gen-es": "npm:1.7.2"
@@ -9005,6 +9109,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-alpha.2"
+    "@quobix/vacuum": "npm:^0.9.10"
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
     "@types/express": "npm:4.17.21"
@@ -9026,6 +9131,7 @@ __metadata:
     secp256k1: "npm:4.0.3"
     socket.io: "npm:4.5.4"
     sqlite3: "npm:5.1.5"
+    swagger-cli: "npm:^4.0.4"
     swagger-ui-express: "npm:5.0.0"
     typescript: "npm:5.3.3"
     typescript-optional: "npm:2.0.1"
@@ -12773,6 +12879,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@quobix/vacuum@npm:^0.9.10":
+  version: 0.9.10
+  resolution: "@quobix/vacuum@npm:0.9.10"
+  dependencies:
+    node-fetch: "npm:^3.2.10"
+    tar: "npm:^6.1.11"
+  bin:
+    vacuum: bin/vacuum.js
+  checksum: 10/9a6b2a2f70cdfd493b0d64e4dff9ec9c2b6b1b29d90192cad40ca25678ebdb950f6ebab4b155eaef75090d07690e495874815cbb48797117834be567f9af685a
+  languageName: node
+  linkType: hard
+
 "@redux-saga/core@npm:^1.0.0":
   version: 1.2.3
   resolution: "@redux-saga/core@npm:1.2.3"
@@ -14821,18 +14939,6 @@ __metadata:
     "@types/qs": "npm:*"
     "@types/serve-static": "npm:*"
   checksum: 10/e2959a5fecdc53f8a524891a16e66dfc330ee0519e89c2579893179db686e10cfa6079a68e0fb8fd00eedbcaf3eabfd10916461939f3bc02ef671d848532c37e
-  languageName: node
-  linkType: hard
-
-"@types/express@npm:^4.17.18":
-  version: 4.17.21
-  resolution: "@types/express@npm:4.17.21"
-  dependencies:
-    "@types/body-parser": "npm:*"
-    "@types/express-serve-static-core": "npm:^4.17.33"
-    "@types/qs": "npm:*"
-    "@types/serve-static": "npm:*"
-  checksum: 10/7a6d26cf6f43d3151caf4fec66ea11c9d23166e4f3102edfe45a94170654a54ea08cf3103d26b3928d7ebcc24162c90488e33986b7e3a5f8941225edd5eb18c7
   languageName: node
   linkType: hard
 
@@ -33606,7 +33712,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:3.14.1, js-yaml@npm:^3.13.1, js-yaml@npm:^3.14.1, js-yaml@npm:^3.5.1, js-yaml@npm:^3.9.1":
+"js-yaml@npm:3.14.1, js-yaml@npm:^3.13.1, js-yaml@npm:^3.14.0, js-yaml@npm:^3.14.1, js-yaml@npm:^3.5.1, js-yaml@npm:^3.9.1":
   version: 3.14.1
   resolution: "js-yaml@npm:3.14.1"
   dependencies:
@@ -34960,9 +35066,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.10.57
-  resolution: "libphonenumber-js@npm:1.10.57"
-  checksum: 10/7344dd7e8f35b0bd19c5a4fecfd5f252ba3e1f2fa938e552662a34fbc0bc3bf02d3c0a7ce5adf369280a741c7c7d54940232092e997890b71cb3cb1114e9184b
+  version: 1.10.58
+  resolution: "libphonenumber-js@npm:1.10.58"
+  checksum: 10/8ac5a23a8b37ad4a8e75de29e0436270272429e1deebf090257f23c67a23138938619822c260408c1ade7170e1859e4ced732b80011e38148ed9a0848dd9a850
   languageName: node
   linkType: hard
 
@@ -37694,7 +37800,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^3.3.2":
+"node-fetch@npm:^3.2.10, node-fetch@npm:^3.3.2":
   version: 3.3.2
   resolution: "node-fetch@npm:3.3.2"
   dependencies:
@@ -47194,10 +47300,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"swagger-cli@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "swagger-cli@npm:4.0.4"
+  dependencies:
+    "@apidevtools/swagger-cli": "npm:4.0.4"
+  bin:
+    swagger-cli: swagger-cli.js
+  checksum: 10/2ac9557dd76014d109a6ad47b079fee0aa77f35941481626528e9e4a5d7d2051499381244eccee8521a495fc7d979f834bd69011438239185dcc95ce9f805ee2
+  languageName: node
+  linkType: hard
+
 "swagger-ui-dist@npm:>=5.0.0":
-  version: 5.11.9
-  resolution: "swagger-ui-dist@npm:5.11.9"
-  checksum: 10/6446adfda2b5dd3fe0272fc8ba0ff030e726d842a6776ceb2d963077fa200defd3d21f4523142272c6a98e5eaaf8d1131467bf1ae971106730f39450b6a9880f
+  version: 5.12.0
+  resolution: "swagger-ui-dist@npm:5.12.0"
+  checksum: 10/2e52f3958b6e6cbdc1a904828f7c15eee34b3327696c4a26a6987a5036582a04aa22d8cc4587af4849de0ba10ec4e036390fa4ecad3a2e90184b0f4437fabde3
   languageName: node
   linkType: hard
 
@@ -49163,7 +49280,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^5.28.3":
+"undici@npm:^5.28.2, undici@npm:^5.28.3":
   version: 5.28.4
   resolution: "undici@npm:5.28.4"
   dependencies:
@@ -54065,7 +54182,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^15.0.2":
+"yargs@npm:^15.0.2, yargs@npm:^15.4.1":
   version: 15.4.1
   resolution: "yargs@npm:15.4.1"
   dependencies:
