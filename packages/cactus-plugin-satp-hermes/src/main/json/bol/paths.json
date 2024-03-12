@@ -1,0 +1,300 @@
+{
+  "/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact": {
+    "post": {
+      "tags": ["transaction"],
+      "summary": "Submit a transaction intent",
+      "description": "Allows users to queue intents for transactions based on specified parameters.",
+      "operationId": "Transact",
+      "x-hyperledger-cacti": {
+        "http": {
+          "verbLowerCase": "post",
+          "path": "/transact"
+        }
+      },
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "./schemas.json#/TransactRequest"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "200": {
+          "description": "Transaction successfully queued",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/TransactResponse"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "An error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/APIError"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel": {
+    "post": {
+      "tags": ["transaction"],
+      "summary": "Cancel a transaction session",
+      "description": "Attempts to cancel a previously submitted transaction intent using its session ID.",
+      "operationId": "Cancel",
+      "x-hyperledger-cacti": {
+        "http": {
+          "verbLowerCase": "post",
+          "path": "/cancel"
+        }
+      },
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "./schemas.json#/CancelRequest"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "200": {
+          "description": "Transaction cancellation attempted",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/CancelResponse"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "An error occurred or transaction cannot be cancelled",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/APIError"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/@hyperledger/cactus-plugin-satp-hermes/status": {
+    "get": {
+      "summary": "Get SATP current session data",
+      "description": "Retrieve the status of a SATP session",
+      "operationId": "GetStatus",
+      "tags": [
+        "admin"
+      ],
+      "x-hyperledger-cacti": {
+        "http": {
+          "verbLowerCase": "get",
+          "path": "/status"
+        }
+      },
+      "parameters": [
+        {
+          "name": "SessionID",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/SessionID"
+          },
+          "required": true,
+          "description": "Unique identifier for the session."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/StatusResponse"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Bad request"
+        },
+        "404": {
+          "description": "Transaction not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/api/v1/@hyperledger/cactus-plugin-satp-hermes/routes": {
+    "get": {
+      "description": "Get a list of possible routes for swapping one asset for another across multiple exchanges",
+      "summary": "Get a list of routes for a gateway-to-gateway asset transfer",
+      "tags": ["transaction"],
+      "operationId": "GetRoutes",
+      "x-hyperledger-cacti": {
+        "http": {
+          "verbLowerCase": "get",
+          "path": "/routes"
+        }
+      },
+      "parameters": [
+        {
+          "name": "fromNetworkID",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/DLTNetworkID"
+          },
+          "required": true,
+          "description": "The sending DLT Network."
+        },
+        {
+          "name": "fromAmount",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/AmountString"
+          },
+          "required": true,
+          "description": "The amount that should be sent including all decimals."
+        },
+        {
+          "name": "fromToken",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/Address"
+          },
+          "required": true,
+          "description": "The token that should be transferred. Can be the address or the symbol."
+        },
+        {
+          "name": "toDLTNetwork",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/DLTNetworkID"
+          },
+          "required": true,
+          "description": "The receiving DLT Network."
+        },
+        {
+          "name": "toToken",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/Address"
+          },
+          "required": true,
+          "description": "The token that should be transferred to. Can be the address or the symbol."
+        },
+        {
+          "name": "fromAddress",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/Address"
+          },
+          "required": true,
+          "description": "The sending wallet address."
+        },
+        {
+          "name": "toAddress",
+          "in": "query",
+          "schema": {
+            "$ref": "./schemas.json#/Address"
+          },
+          "required": true,
+          "description": "The receiving wallet address. If none is provided, the fromAddress will be used."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/RoutesResponse"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "An error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/APIError"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit": {
+    "get": {
+      "tags": ["admin"],
+      "summary": "Audit transactions",
+      "description": "Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.",
+      "operationId": "GetAudit",
+      "x-hyperledger-cacti": {
+        "http": {
+          "verbLowerCase": "get",
+          "path": "/audit"
+        }
+      },
+      "parameters": [
+        {
+          "name": "auditStartDate",
+          "in": "query",
+          "description": "The start date for the audit period.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "name": "auditEndDate",
+          "in": "query",
+          "description": "The end date for the audit period.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "name": "includeProofs",
+          "in": "query",
+          "description": "Include proofs generated from each gateway transaction.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Audit results",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./schemas.json#/getAuditResponse"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
