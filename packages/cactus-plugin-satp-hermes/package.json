@@ -51,9 +51,13 @@
     "codegen:proto": "npm run generate-proto",
     "generate-proto": "cd src/main/proto && buf generate --template buf.gen.yaml --config buf.yaml --verbose",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "lint": "npm-run-all 'buf lint' eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
-    "lint-protobuf": "buf lint --path src/main/proto --verbose",
+    "generate-sdk:typescript-axios-gateway": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "bundle-openapi": "swagger-cli bundle ./src/main/json/bol/openapi-blo.json -o ./src/main/json/bol/openapi-blo-bundled.json -r",
+    "generate-sdk:typescript-axios-bol": "yarn bundle-openapi && openapi-generator-cli generate -i ./src/main/json/bol/openapi-blo-bundled.json -g typescript-axios -o ./src/main/typescript/generated/openapi-blo/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
+    "lint": "run-p 'lint:*'",
+    "lint:protobuf": "buf lint --path src/main/proto --verbose",
+    "lint:eslint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
+    "lint:oapi": "vacuum lint -d -e ./src/main/json/bol/openapi-blo-bundled.json",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch"
@@ -97,9 +101,11 @@
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4",
     "@bufbuild/buf": "1.29.0",
     "@bufbuild/protobuf": "1.7.2",
     "@bufbuild/protoc-gen-es": "1.7.2",
+    "@quobix/vacuum": "^0.9.10",
     "@types/body-parser": "1.19.4",
     "@types/crypto-js": "4.0.1",
     "@types/express": "4.17.21",
@@ -112,6 +118,7 @@
     "express": "4.18.2",
     "fabric-network": "2.2.20",
     "kubo-rpc-client": "3.0.1",
+    "swagger-cli": "^4.0.4",
     "typescript": "5.3.3"
   },
   "engines": {
