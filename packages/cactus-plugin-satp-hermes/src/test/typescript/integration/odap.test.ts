@@ -14,7 +14,10 @@ import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { pruneDockerAllIfGithubAction, Containers } from "@hyperledger/cactus-test-tooling";
+import {
+  pruneDockerAllIfGithubAction,
+  Containers,
+} from "@hyperledger/cactus-test-tooling";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -64,13 +67,13 @@ test("successful run ODAP instance", async () => {
 
   expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
   expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
-  
+
   expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
   expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
-  
+
   await pluginSourceGateway.remoteRepository?.reset();
   await pluginRecipientGateway.remoteRepository?.reset();
 
