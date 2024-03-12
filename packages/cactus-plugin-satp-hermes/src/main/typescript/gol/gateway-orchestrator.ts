@@ -98,9 +98,11 @@ export class GatewayOrchestrator {
     let counter = 0;
     this.channels.forEach(async (channel) => {
       this.logger.info(`${fnTag}, Disconnecting from ${channel.id}`);
+      // ! todo implement disconnect
       this.logger.error("Not implemented");
       counter++;
     });
+    this.channels.clear();
     return counter;
   }
 }

@@ -3,7 +3,7 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Logger, LoggerProvider } from "@hyperledger/cactus-common";
 // import coordinator factory, coordinator and coordinator options
 import {
   SATPGateway,
@@ -14,10 +14,10 @@ import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { SupportedGatewayImplementations } from "./../../../main/typescript/core/types";
+import { ShutdownHook, SupportedGatewayImplementations } from "./../../../main/typescript/core/types";
 
 const logLevel: LogLevelDesc = "INFO";
-const log = LoggerProvider.getOrCreate({
+const logger = LoggerProvider.getOrCreate({
   level: "INFO",
   label: "satp-gateway-orchestrator-init-test",
 });
@@ -29,7 +29,7 @@ const factory = new PluginFactorySATPGateway(factoryOptions);
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
-      log.info("Pruning throw OK");
+      logger.info("Pruning throw OK");
     })
     .catch(async () => {
       await Containers.logDiagnostics({ logLevel });
@@ -60,7 +60,7 @@ describe("SATPGateway initialization", () => {
       SupportedGatewayImplementations.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID1");
-    expect(identity.port).toBe(3000);
+    expect(identity.gatewayServerPort).toBe(3010);
     expect(identity.address).toBe("http://localhost");
   });
 
@@ -82,7 +82,7 @@ describe("SATPGateway initialization", () => {
           SupportedGatewayImplementations.BESU,
         ],
         proofID: "mockProofID10",
-        port: 3001,
+        gatewayServerPort: 3010,
         address: "https://localhost",
       },
     };
@@ -106,7 +106,7 @@ describe("SATPGateway initialization", () => {
       SupportedGatewayImplementations.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID10");
-    expect(identity.port).toBe(3001);
+    expect(identity.gatewayServerPort).toBe(3010);
     expect(identity.address).toBe("https://localhost");
   });
 
@@ -128,7 +128,6 @@ describe("SATPGateway initialization", () => {
           SupportedGatewayImplementations.BESU,
         ],
         proofID: "mockProofID10",
-        port: 3010,
         address: "https://localhost",
       },
     };
@@ -136,19 +135,78 @@ describe("SATPGateway initialization", () => {
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const identity = gateway.getIdentity();
-    expect(identity.port).toBe(3010);
+    // default servers
+    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.gatewayClientPort).toBe(3011);
     expect(identity.address).toBe("https://localhost");
-    await gateway.startupServer();
+    await gateway.startup();
     await gateway.shutdown();
+  });
+
+  it("shutdown hooks work", async () => {
+const options: SATPGatewayConfig = {
+      gid: {
+        id: "mockID",
+        name: "CustomGateway",
+        version: [
+          {
+            Core: "v02",
+            Architecture: "v02",
+            Crash: "v02",
+          },
+        ],
+        supportedChains: [
+          SupportedGatewayImplementations.FABRIC,
+          SupportedGatewayImplementations.BESU,
+        ],
+        proofID: "mockProofID10",
+        gatewayServerPort: 3014,
+        gatewayClientPort: 3015,
+        address: "https://localhost",
+      },
+    };
+
+    const gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+    
+    // ensure logger is called with "mockHook"
+    const loggerSpy = jest.spyOn(logger, 'info');
+
+    // ensure mockHookFn is called on shutdown
+    const mockHookFn = jest.fn(async () => {
+        logger.info("mockHook");
+      });
+
+
+    const shutdownHook: ShutdownHook = {
+      name: "mockHook",
+      hook: async () => {
+        logger.info("mockHook");
+      },
+    };
+    
+    const shutdownHookFn: ShutdownHook = {
+      name: "mockHookFn",
+      hook: mockHookFn
+    };
+    
+    gateway.onShutdown(shutdownHook);
+    gateway.onShutdown(shutdownHookFn);
+    await gateway.startup();
+    await gateway.shutdown();
+
+    expect(loggerSpy).toHaveBeenCalledWith("mockHook");
+    expect(mockHookFn).toHaveBeenCalled();
+
+    // for now, technically not needed. However if we use more tests with loggerSpy, conflicts could arise. This is a reminder to restore the spy after each test
+    loggerSpy.mockRestore();
   });
 });
 
 afterAll(async () => {
-  // shutdown channels
-
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
-      log.info("Pruning throw OK");
+      logger.info("Pruning throw OK");
     })
     .catch(async () => {
       await Containers.logDiagnostics({ logLevel });

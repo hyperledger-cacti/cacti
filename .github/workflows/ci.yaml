@@ -1735,7 +1735,7 @@ jobs:
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit/.*/*.test.ts|integration/(client-.*.test.ts|odap.test.ts|odap-api.*.test.ts|server-.*.test.ts|backup-.*.test.ts|odap-rollback-.*.test.ts))
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration)/.*\.test\.ts
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-22.04
