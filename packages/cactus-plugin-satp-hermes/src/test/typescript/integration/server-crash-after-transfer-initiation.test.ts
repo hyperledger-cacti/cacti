@@ -29,7 +29,10 @@ import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 
 import { knexClientConnection, knexRemoteConnection } from "../knex.config";
-import { pruneDockerAllIfGithubAction, Containers } from "@hyperledger/cactus-test-tooling";
+import {
+  pruneDockerAllIfGithubAction,
+  Containers,
+} from "@hyperledger/cactus-test-tooling";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -72,7 +75,7 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-    
+
   {
     // Server Gateway configuration
     serverGatewayPluginOptions = {
@@ -103,8 +106,12 @@ beforeAll(async () => {
 
     pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
-    expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();  
-    expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();  
+    expect(
+      pluginRecipientGateway.localRepository?.database,
+    ).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.remoteRepository?.database,
+    ).not.toBeUndefined();
 
     await pluginRecipientGateway.localRepository?.reset();
     await pluginRecipientGateway.remoteRepository?.reset();
@@ -143,7 +150,7 @@ beforeAll(async () => {
     pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
 
     expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
-    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();  
+    expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
 
     await pluginSourceGateway.localRepository?.reset();
     await pluginSourceGateway.remoteRepository?.reset();
