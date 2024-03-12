@@ -1914,6 +1914,31 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  cactus-plugin-bungee-hermes:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
   ct-api-client:
     continue-on-error: false
     env:
