@@ -5,7 +5,7 @@ import { Optional } from "typescript-optional";
 import type { Express } from "express";
 import { v4 as uuidV4 } from "uuid";
 import { Knex } from "knex";
-import OAS from "../json/openapi.json";
+import OAS from "../json/openapi-gateway-bundled.json";
 import {
   Secp256k1Keys,
   Logger,
