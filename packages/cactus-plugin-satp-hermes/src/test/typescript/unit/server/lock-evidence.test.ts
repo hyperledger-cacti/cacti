@@ -58,10 +58,10 @@ beforeEach(async () => {
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
-  
+
   await pluginSourceGateway.remoteRepository?.reset();
   await pluginRecipientGateway.remoteRepository?.reset();
-  
+
   dummyTransferCommenceResponseMessageHash = SHA256(
     "transferCommenceResponseMessageData",
   ).toString();
