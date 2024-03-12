@@ -9,9 +9,9 @@ import { DiscoveryOptions } from "fabric-network";
 const { BlockDecoder } = require("fabric-common");
 
 import {
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -51,8 +51,8 @@ import {
 
 // Ledger settings
 const imageName = DEFAULT_FABRIC_2_AIO_IMAGE_NAME;
-const imageVersion = DEFAULT_FABRIC_2_AIO_IMAGE_VERSION;
-const fabricEnvVersion = DEFAULT_FABRIC_2_AIO_FABRIC_VERSION;
+const imageVersion = FABRIC_25_LTS_AIO_IMAGE_VERSION;
+const fabricEnvVersion = FABRIC_25_LTS_AIO_FABRIC_VERSION;
 const fabricEnvCAVersion = "1.4.9";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";

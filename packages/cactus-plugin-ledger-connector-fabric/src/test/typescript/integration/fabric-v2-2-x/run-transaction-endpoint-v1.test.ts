@@ -9,9 +9,9 @@ import express from "express";
 
 import {
   Containers,
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -48,24 +48,23 @@ import { Configuration } from "@hyperledger/cactus-core-api";
  * ```
  */
 
-const testCase = "runs tx on a Fabric v2.2.0 ledger";
+const testCase = "runs tx on a Fabric v2.5.6 ledger";
 
 describe(testCase, () => {
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
-  const logLevel: LogLevelDesc = "TRACE";
-  const level = "INFO";
+  const logLevel: LogLevelDesc = "INFO";
   const label = "fabric run transaction test";
-  const log = LoggerProvider.getOrCreate({ level, label });
+  const log = LoggerProvider.getOrCreate({ level: logLevel, label });
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
     imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
     envVars: new Map([
-      ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
+      ["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION],
       ["CA_VERSION", "1.4.9"],
     ]),
   });
