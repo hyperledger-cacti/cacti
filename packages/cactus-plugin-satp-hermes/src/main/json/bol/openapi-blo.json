@@ -1,0 +1,46 @@
+{
+ "openapi": "3.0.3",
+  "info": {
+    "title": "SATP Gateway Client (Business Logic Orchestrator)",
+    "version": "v0.0.1",
+    "description": "SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.\n\nThis API defines the gateway client facing API (business logic orchestrator, or BLO), which is named API-Type 3 in the SATP-Core specification.\n\n**Additional Resources**:\n- [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/)\n- [SATP Core draft](https://datatracker.ietf.org/doc/draft-ietf-satp-core)\n- [SATP Crash Recovery draft](https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/)\n- [SATP Architecture draft](https://datatracker.ietf.org/doc/draft-ietf-satp-architecture/)\n- [SATP Use-Cases draft](https://datatracker.ietf.org/doc/draft-ramakrishna-sat-use-cases/)\n- [SATP Data sharing draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-data-sharing)\n- [SATP View Addresses draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-views-addresses)",
+    "contact": {
+      "name": "Hyperledger Cacti"
+    },
+    "x-logo": {
+      "altText": "Cacti logo",
+      "backgroundColor": "#fafafa",
+      "url": "https://github.com/hyperledger/cacti/blob/main/images/HL_Cacti_Logo_Color.png"
+    }
+  },
+  "externalDocs": {
+    "description": "For more information about the SATP Gateway Client, refer to the official documentation.",
+    "url": "https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-satp-hermes/README.md"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:3011"
+    },
+    {
+      "url": "http://localhost:3011"
+    }
+  ],
+  "tags": [
+    {
+      "name": "transaction",
+      "description": "API endpoints for interacting with blockchains via gateways"
+    },
+    {
+      "name": "admin",
+      "description": "API endpoints for fetching information on SATP sessions"
+    }
+  ],
+  "paths": {
+    "$ref": "./paths.json"
+  },
+  "components": {
+    "schemas": {
+      "$ref": "./schemas.json"
+    }
+  }
+}
