@@ -7,9 +7,6 @@
 //////////////////////////////////
 
 // Ledger settings
-const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
-const imageVersion = "2021-09-02--fix-876-supervisord-retries";
-const fabricEnvVersion = "2.2.0";
 const fabricEnvCAVersion = "1.4.9";
 const ledgerChannelName = "mychannel";
 const assetTradeContractName = "copyAssetTrade";
@@ -47,6 +44,9 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   Containers,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -97,15 +97,20 @@ describe("Delegated signing tests", () => {
 
     // Start Ledger
     log.info("Start FabricTestLedgerV1...");
-    log.debug("Version:", fabricEnvVersion, "CA Version:", fabricEnvCAVersion);
+    log.debug(
+      "Fabric Version:",
+      FABRIC_25_LTS_AIO_FABRIC_VERSION,
+      "CA Version:",
+      fabricEnvCAVersion,
+    );
     ledger = new FabricTestLedgerV1({
       emitContainerLogs: false,
       publishAllPorts: true,
       logLevel: testLogLevel,
-      imageName,
-      imageVersion,
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([
-        ["FABRIC_VERSION", fabricEnvVersion],
+        ["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION],
         ["CA_VERSION", fabricEnvCAVersion],
         ["CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP", "1"],
       ]),
@@ -336,7 +341,7 @@ describe("Delegated signing tests", () => {
       expect(initQueryResponse.status).toEqual(200);
       const initQueryOutput = JSON.parse(initQueryResponse.data.functionOutput);
       expect(initQueryOutput["ID"]).toEqual("asset1");
-      expect(initQueryOutput["owner"]).not.toEqual(newAssetOwner);
+      expect(initQueryOutput["Owner"]).not.toEqual(newAssetOwner);
 
       // Transfer ownership
       const sendResponse = await apiClient.runTransactionV1({
@@ -367,7 +372,7 @@ describe("Delegated signing tests", () => {
       expect(queryResponse.status).toEqual(200);
       const queryOutput = JSON.parse(queryResponse.data.functionOutput);
       expect(queryOutput["ID"]).toEqual("asset1");
-      expect(queryOutput["owner"]).toEqual(newAssetOwner);
+      expect(queryOutput["Owner"]).toEqual(newAssetOwner);
     },
     testTimeout,
   );
@@ -392,7 +397,7 @@ describe("Delegated signing tests", () => {
     expect(initQueryResponse.status).toEqual(200);
     const initQueryOutput = JSON.parse(initQueryResponse.data.functionOutput);
     expect(initQueryOutput["ID"]).toEqual("asset1");
-    expect(initQueryOutput["owner"]).not.toEqual(newAssetOwner);
+    expect(initQueryOutput["Owner"]).not.toEqual(newAssetOwner);
     checkMockSigningCallbacksAndClear(initQueryId, 2);
 
     // Transfer ownership
@@ -433,7 +438,7 @@ describe("Delegated signing tests", () => {
     expect(queryResponse.status).toEqual(200);
     const queryOutput = JSON.parse(queryResponse.data.functionOutput);
     expect(queryOutput["ID"]).toEqual("asset1");
-    expect(queryOutput["owner"]).toEqual(newAssetOwner);
+    expect(queryOutput["Owner"]).toEqual(newAssetOwner);
     checkMockSigningCallbacksAndClear(finalQueryId, 2);
   });
 

@@ -3,9 +3,9 @@
 import test, { Test } from "tape-promise/tape";
 
 import {
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -26,8 +26,8 @@ test(testCase, async (t: Test) => {
     emitContainerLogs: true,
     publishAllPorts: true,
     imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
+    imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
   });
   const tearDown = async () => {
     await ledger.stop();
