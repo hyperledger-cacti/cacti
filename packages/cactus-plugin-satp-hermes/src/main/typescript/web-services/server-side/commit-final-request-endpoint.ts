@@ -16,7 +16,7 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginSATPGateway } from "../../plugin-satp-gateway";
-import OAS from "../../../json/openapi.json";
+import OAS from "../../../json/openapi-gateway-bundled.json";
 
 export interface ICommitFinalRequestEndpointOptions {
   logLevel?: LogLevelDesc;
