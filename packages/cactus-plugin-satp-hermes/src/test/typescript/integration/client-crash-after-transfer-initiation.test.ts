@@ -31,7 +31,10 @@ import {
   knexRemoteConnection,
   knexServerConnection,
 } from "../knex.config";
-import { Containers, pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import {
+  Containers,
+  pruneDockerAllIfGithubAction,
+} from "@hyperledger/cactus-test-tooling";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -68,13 +71,13 @@ const log = LoggerProvider.getOrCreate({
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
-  .then(() => {
-    log.info("Pruning throw OK");
-  })
-  .catch(async () => {
-    await Containers.logDiagnostics({ logLevel });
-    fail("Pruning didn't throw OK");
-  });
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
 
   {
     // Server Gateway configuration
@@ -107,9 +110,13 @@ beforeAll(async () => {
 
     pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
-    expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
-    expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
-  
+    expect(
+      pluginRecipientGateway.localRepository?.database,
+    ).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.remoteRepository?.database,
+    ).not.toBeUndefined();
+
     await pluginRecipientGateway.localRepository?.reset();
     await pluginRecipientGateway.remoteRepository?.reset();
 
