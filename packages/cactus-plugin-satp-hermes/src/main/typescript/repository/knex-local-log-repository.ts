@@ -7,7 +7,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
 
   public constructor(config: Knex.Config | undefined) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const configFile = require("../../../knex/knexfile.ts")[
+    const configFile = require("../../../../knex/knexfile.ts")[
       process.env.ENVIRONMENT || "development"
     ];
 
