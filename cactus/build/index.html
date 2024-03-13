@@ -4206,7 +4206,7 @@ nvm use 16.14.2</p>
 <ul>
 <li>name: Setup upterm session uses: lhotari/action-upterm@v1 with: repo-token: ${{ secrets.GITHUB_TOKEN }}</li>
 </ul>
-<p>Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v3.1.0) to ensure that the CI doesn’t hang without before the debugging step occurs. Editing the <code>ci.yml</code> will create a new upterm session within <code>.github/workflows</code> by adding a new build step. For more details, see the <a href="https://github.com/marketplace/actions/debugging-with-ssh">Debug your GitHub Actions by using ssh</a>.</p>
+<p>Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v4.1.1) to ensure that the CI doesn’t hang without before the debugging step occurs. Editing the <code>ci.yml</code> will create a new upterm session within <code>.github/workflows</code> by adding a new build step. For more details, see the <a href="https://github.com/marketplace/actions/debugging-with-ssh">Debug your GitHub Actions by using ssh</a>.</p>
 <p>By creating a PR for the edited <code>ci.yml</code> file, this will the CI to run their tests. There are two ways to navigate to CIs.</p>
 <ol>
 <li>
