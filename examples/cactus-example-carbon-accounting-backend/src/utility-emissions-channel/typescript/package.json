@@ -24,7 +24,7 @@
     "ts-node": "10.9.1"
   },
   "dependencies": {
-    "crypto-js": "4.1.1",
+    "crypto-js": "4.2.0",
     "fabric-shim": "2.2.2"
   }
 }
