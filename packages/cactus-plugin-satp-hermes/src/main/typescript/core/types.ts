@@ -30,10 +30,10 @@ export type GatewayChannel = {
   id: string;
 };
 
-export type Address = 
-    | `http://${string}`
-    | `https://${string}`
-    | `${number}.${number}.${number}.${number}.`;
+export type Address =
+  | `http://${string}`
+  | `https://${string}`
+  | `${number}.${number}.${number}.${number}.`;
 
 export type GatewayIdentity = {
   id: string;

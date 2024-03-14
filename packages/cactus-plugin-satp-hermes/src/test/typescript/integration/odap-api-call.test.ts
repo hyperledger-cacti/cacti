@@ -6,7 +6,12 @@ import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as SatpApi } from "../../../main/typescript/public-api";
 
-import { IListenOptions, LogLevelDesc, LoggerProvider, Servers } from "@hyperledger/cactus-common";
+import {
+  IListenOptions,
+  LogLevelDesc,
+  LoggerProvider,
+  Servers,
+} from "@hyperledger/cactus-common";
 
 import { Configuration } from "@hyperledger/cactus-core-api";
 
@@ -25,7 +30,10 @@ import { FabricSATPGateway } from "../../../main/typescript/core/fabric-satp-gat
 import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
-import { Containers, pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import {
+  Containers,
+  pruneDockerAllIfGithubAction,
+} from "@hyperledger/cactus-test-tooling";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -81,13 +89,13 @@ test("runs ODAP between two gateways via openApi", async () => {
 
   expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
   expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
-  
+
   expect(pluginSourceGateway.remoteRepository?.database).not.toBeUndefined();
   expect(pluginRecipientGateway.remoteRepository?.database).not.toBeUndefined();
 
   await pluginSourceGateway.localRepository?.reset();
   await pluginRecipientGateway.localRepository?.reset();
-  
+
   await pluginSourceGateway.remoteRepository?.reset();
   await pluginRecipientGateway.remoteRepository?.reset();
 

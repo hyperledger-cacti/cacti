@@ -3,7 +3,7 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 // import coordinator factory, coordinator and coordinator options
 import {
   SATPGateway,
@@ -14,7 +14,10 @@ import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { ShutdownHook, SupportedGatewayImplementations } from "./../../../main/typescript/core/types";
+import {
+  ShutdownHook,
+  SupportedGatewayImplementations,
+} from "./../../../main/typescript/core/types";
 
 const logLevel: LogLevelDesc = "INFO";
 const logger = LoggerProvider.getOrCreate({
@@ -144,7 +147,7 @@ describe("SATPGateway initialization", () => {
   });
 
   it("should activate shutdown hooks", async () => {
-const options: SATPGatewayConfig = {
+    const options: SATPGatewayConfig = {
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -168,15 +171,14 @@ const options: SATPGatewayConfig = {
 
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
-    
+
     // ensure logger is called with "mockHook"
-    const loggerSpy = jest.spyOn(logger, 'info');
+    const loggerSpy = jest.spyOn(logger, "info");
 
     // ensure mockHookFn is called on shutdown
     const mockHookFn = jest.fn(async () => {
-        logger.info("mockHook");
-      });
-
+      logger.info("mockHook");
+    });
 
     const shutdownHook: ShutdownHook = {
       name: "mockHook",
@@ -184,12 +186,12 @@ const options: SATPGatewayConfig = {
         logger.info("mockHook");
       },
     };
-    
+
     const shutdownHookFn: ShutdownHook = {
       name: "mockHookFn",
-      hook: mockHookFn
+      hook: mockHookFn,
     };
-    
+
     gateway.onShutdown(shutdownHook);
     gateway.onShutdown(shutdownHookFn);
     await gateway.startup();

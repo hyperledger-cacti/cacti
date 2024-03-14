@@ -25,11 +25,14 @@ import {
 } from "./core/types";
 import { GatewayOrchestrator } from "./gol/gateway-orchestrator";
 export { SATPGatewayConfig };
-import express, { Express } from 'express';
+import express, { Express } from "express";
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import http from "http";
 import { configureRoutes } from "./web-services/router";
-import { DEFAULT_PORT_GATEWAY_CLIENT, DEFAULT_PORT_GATEWAY_SERVER } from "./core/constants";
+import {
+  DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_SERVER,
+} from "./core/constants";
 import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
 
 export class SATPGateway {
@@ -118,7 +121,6 @@ export class SATPGateway {
     //      this._app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(OpenAPISpec));
   }
 
-  
   static ProcessGatewayCoordinatorConfig(
     pluginOptions: SATPGatewayConfig,
   ): SATPGatewayConfig {
@@ -151,7 +153,7 @@ export class SATPGateway {
       if (!pluginOptions.gid.id) {
         pluginOptions.gid.id = id;
       }
-      
+
       if (!pluginOptions.gid.name) {
         pluginOptions.gid.name = id;
       }
@@ -184,7 +186,6 @@ export class SATPGateway {
       if (!pluginOptions.gid.gatewayClientPort) {
         pluginOptions.gid.gatewayClientPort = DEFAULT_PORT_GATEWAY_CLIENT;
       }
-
 
       if (!pluginOptions.logLevel) {
         pluginOptions.logLevel = "DEBUG";
@@ -223,39 +224,45 @@ export class SATPGateway {
 
     this.logger.info("Both GatewayServer and BLOServer have started");
   }
-async startupGatewayServer(): Promise<void> {
-  const fnTag = `${this.label}#startupGatewayServer()`;
-  this.logger.trace(`Entering ${fnTag}`);
-  this.logger.info("Starting gateway server");
-  const port = this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
+  async startupGatewayServer(): Promise<void> {
+    const fnTag = `${this.label}#startupGatewayServer()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    this.logger.info("Starting gateway server");
+    const port =
+      this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
 
-  return new Promise((resolve, reject) => {
-    if (!this.gatewayApplication || !this.gatewayServer) {
-      this.gatewayApplication = express();
-      this.gatewayApplication.use(expressConnectMiddleware({ routes: configureRoutes }));
-      this.gatewayServer = http.createServer(this.gatewayApplication);
+    return new Promise((resolve, reject) => {
+      if (!this.gatewayApplication || !this.gatewayServer) {
+        this.gatewayApplication = express();
+        this.gatewayApplication.use(
+          expressConnectMiddleware({ routes: configureRoutes }),
+        );
+        this.gatewayServer = http.createServer(this.gatewayApplication);
 
-      this.gatewayServer.listen(port, () => {
-        this.logger.info(`Gateway server started and listening on port ${port}`);
+        this.gatewayServer.listen(port, () => {
+          this.logger.info(
+            `Gateway server started and listening on port ${port}`,
+          );
+          resolve();
+        });
+
+        this.gatewayServer.on("error", (error) => {
+          this.logger.error(`Gateway server failed to start: ${error}`);
+          reject(error);
+        });
+      } else {
+        this.logger.warn("Server already running");
         resolve();
-      });
-
-      this.gatewayServer.on('error', (error) => {
-        this.logger.error(`Gateway server failed to start: ${error}`);
-        reject(error);
-      });
-    } else {
-      this.logger.warn("Server already running");
-      resolve();
-    }
-  });
-}
+      }
+    });
+  }
 
   async startupBOLServer(): Promise<void> {
     const fnTag = `${this.label}#startupBOLServer()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting BOL server");
-    const port = this.options.gid?.gatewayClientPort ?? DEFAULT_PORT_GATEWAY_CLIENT;
+    const port =
+      this.options.gid?.gatewayClientPort ?? DEFAULT_PORT_GATEWAY_CLIENT;
 
     return new Promise(async (resolve, reject) => {
       if (!this.BLOApplication || !this.BLOServer) {
@@ -280,7 +287,7 @@ async startupGatewayServer(): Promise<void> {
           resolve();
         });
 
-        this.BLOServer.on('error', (error) => {
+        this.BLOServer.on("error", (error) => {
           this.logger.error(`BOL server failed to start: ${error}`);
           reject(error);
         });
@@ -299,7 +306,7 @@ async startupGatewayServer(): Promise<void> {
    * These operations are fundamental for setting up and managing gateway connections within the system.
    */
 
-  // TODO: addGateways as an admin endpoint 
+  // TODO: addGateways as an admin endpoint
   public async addGateways(IDs: string[]): Promise<void> {
     const fnTag = `${this.label}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -414,26 +421,26 @@ async startupGatewayServer(): Promise<void> {
     const fnTag = `${this.label}#getIdentity()`;
     this.logger.trace(`Entering ${fnTag}`);
     if (!this.config.gid) {
-    throw new Error("GatewayIdentity is not defined");
+      throw new Error("GatewayIdentity is not defined");
     }
     return this.config.gid!;
   }
 
-/**
- * Shutdown Methods
- * -----------------
- * This section includes methods responsible for cleanly shutting down the server and its associated services.
- */
+  /**
+   * Shutdown Methods
+   * -----------------
+   * This section includes methods responsible for cleanly shutting down the server and its associated services.
+   */
   public onShutdown(hook: ShutdownHook): void {
     const fnTag = `${this.label}#onShutdown()`;
     this.logger.trace(`Entering ${fnTag}`);
-    this.logger.debug(`Adding shutdown hook: ${hook.name}`);    
+    this.logger.debug(`Adding shutdown hook: ${hook.name}`);
     this.shutdownHooks.push(hook);
   }
 
   public async shutdown(): Promise<number> {
     const fnTag = `${this.label}#getGatewaySeeds()`;
-    this.logger.debug(`Entering ${fnTag}`);    
+    this.logger.debug(`Entering ${fnTag}`);
 
     this.logger.info("Shutting down Node server - Gateway");
     await this.shutdownGatewayServer();
@@ -442,19 +449,20 @@ async startupGatewayServer(): Promise<void> {
     await this.shutdownBLOServer();
 
     this.logger.debug("Running shutdown hooks");
-    for (const hook of this.shutdownHooks) {  
+    for (const hook of this.shutdownHooks) {
       this.logger.debug(`Running shutdown hook: ${hook.name}`);
       await hook.hook();
     }
 
-    this.logger.info("Shutting down Gateway Connection Manager")
-    const connectionsClosed = await this.gatewayConnectionManager.disconnectAll();
+    this.logger.info("Shutting down Gateway Connection Manager");
+    const connectionsClosed =
+      await this.gatewayConnectionManager.disconnectAll();
 
     this.logger.info(`Closed ${connectionsClosed} connections`);
     this.logger.info("Gateway Coordinator shut down");
     return connectionsClosed;
   }
-  
+
   private async shutdownGatewayServer(): Promise<void> {
     const fnTag = `${this.label}#shutdownServer()`;
     this.logger.debug(`Entering ${fnTag}`);
@@ -464,13 +472,15 @@ async startupGatewayServer(): Promise<void> {
         this.gatewayServer = undefined;
         this.logger.info("Server shut down");
       } catch (error) {
-        this.logger.error(`Error shutting down the gatewayApplication: ${error}`);
+        this.logger.error(
+          `Error shutting down the gatewayApplication: ${error}`,
+        );
       }
     } else {
       this.logger.warn("Server is not running.");
     }
   }
-  
+
   private async shutdownBLOServer(): Promise<void> {
     const fnTag = `${this.label}#shutdownBLOServer()`;
     this.logger.debug(`Entering ${fnTag}`);
@@ -480,12 +490,12 @@ async startupGatewayServer(): Promise<void> {
         this.BLOServer = undefined;
         this.logger.info("Server shut down");
       } catch (error) {
-        this.logger.error(`Error shutting down the gatewayApplication: ${error}`);
+        this.logger.error(
+          `Error shutting down the gatewayApplication: ${error}`,
+        );
       }
     } else {
       this.logger.warn("Server is not running.");
     }
   }
-
-} 
-
+}
