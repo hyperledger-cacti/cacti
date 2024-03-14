@@ -19,10 +19,16 @@
   },
   "servers": [
     {
-      "url": "https://localhost:3011"
-    },
-    {
-      "url": "http://localhost:3011"
+      "url": "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes",
+      "description": "Development server",
+      "variables": {
+        "host": {
+          "default": "localhost"
+        },
+        "port": {
+          "default": "3011"
+        }
+      }
     }
   ],
   "tags": [

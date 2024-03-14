@@ -19,7 +19,7 @@ import type { Configuration } from './configuration';
 import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 
-export const BASE_PATH = "https://localhost:3011".replace(/\/+$/, "");
+export const BASE_PATH = "http://localhost:3011/api/v1/@hyperledger/cactus-plugin-satp-hermes".replace(/\/+$/, "");
 
 /**
  *
