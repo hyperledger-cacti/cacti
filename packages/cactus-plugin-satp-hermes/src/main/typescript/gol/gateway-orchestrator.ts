@@ -22,7 +22,7 @@ export class GatewayOrchestrator {
     this.logger = options.logger;
     this.logger.info("Initializing Gateway Connection Manager");
     for (const identity of identities) {
-      this.gatewayIDs.push(identity.id);
+      this.gatewayIDs.push(identity.id);  
       this.gateways.set(identity.id, identity);
     }
     this.logger.info(
