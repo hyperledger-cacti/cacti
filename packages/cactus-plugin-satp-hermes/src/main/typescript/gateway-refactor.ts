@@ -30,6 +30,7 @@ import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import http from "http";
 import { configureRoutes } from "./web-services/router";
 import { DEFAULT_PORT_GATEWAY_CLIENT, DEFAULT_PORT_GATEWAY_SERVER } from "./core/constants";
+import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
 
 export class SATPGateway {
   // todo more checks; example port from config is between 3000 and 9000
@@ -53,8 +54,9 @@ export class SATPGateway {
 
   private gatewayApplication?: Express;
   private gatewayServer?: http.Server;
-  private BOLApplication?: Express;
-  private BOLServer?: http.Server;
+  private BLOApplication?: Express;
+  private BLOServer?: http.Server;
+  private BLODispatcher?: BLODispatcher;
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   // private sessions: Map<string, Session> = new Map();
@@ -83,6 +85,18 @@ export class SATPGateway {
     this.gatewayConnectionManager = new GatewayOrchestrator(seedGateways, {
       logger: this.logger,
     });
+
+    const dispatcherOps: BLODispatcherOptions = {
+      logger: this.logger,
+      logLevel: this.config.logLevel,
+      instanceId: this.config.gid!.id,
+    };
+
+    if (!this.config.gid || !dispatcherOps.instanceId) {
+      throw new Error("Invalid configuration");
+    }
+
+    this.BLODispatcher = new BLODispatcher(dispatcherOps);
   }
 
   // todo load docs for gateway coordinator and expose them in a http gatewayApplication
@@ -195,50 +209,86 @@ export class SATPGateway {
    * Startup Methods
    * ----------------
    * This section includes methods responsible for starting up the server and its associated services.
-   * It ensures that both the GatewayServer and BOLServer are initiated concurrently for efficient launch.
+   * It ensures that both the GatewayServer and BLOServer are initiated concurrently for efficient launch.
    */
   async startup(): Promise<void> {
     const fnTag = `${this.label}#startup()`;
     this.logger.trace(`Entering ${fnTag}`);
 
     await Promise.all([
+      // TODO! need to add TLS support for Connect and gRPC to work
       this.startupGatewayServer(),
       this.startupBOLServer(),
     ]);
 
-    this.logger.info("Both GatewayServer and BOLServer have started");
+    this.logger.info("Both GatewayServer and BLOServer have started");
   }
+async startupGatewayServer(): Promise<void> {
+  const fnTag = `${this.label}#startupGatewayServer()`;
+  this.logger.trace(`Entering ${fnTag}`);
+  this.logger.info("Starting gateway server");
+  const port = this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
 
-  async startupGatewayServer(): Promise<void> {
-    const fnTag = `${this.label}#startupGatewayServer()`;
-    this.logger.trace(`Entering ${fnTag}`);
-    this.logger.info("Starting gateway server");
-    const port = this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
-
+  return new Promise((resolve, reject) => {
     if (!this.gatewayApplication || !this.gatewayServer) {
       this.gatewayApplication = express();
       this.gatewayApplication.use(expressConnectMiddleware({ routes: configureRoutes }));
-      this.gatewayServer = http.createServer(this.gatewayApplication).listen(port);
+      this.gatewayServer = http.createServer(this.gatewayApplication);
+
+      this.gatewayServer.listen(port, () => {
+        this.logger.info(`Gateway server started and listening on port ${port}`);
+        resolve();
+      });
+
+      this.gatewayServer.on('error', (error) => {
+        this.logger.error(`Gateway server failed to start: ${error}`);
+        reject(error);
+      });
     } else {
       this.logger.warn("Server already running");
+      resolve();
     }
-  }
+  });
+}
 
-  
   async startupBOLServer(): Promise<void> {
     const fnTag = `${this.label}#startupBOLServer()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting BOL server");
-    const port = (this.options.gid?.gatewayClientPort ?? DEFAULT_PORT_GATEWAY_CLIENT);
+    const port = this.options.gid?.gatewayClientPort ?? DEFAULT_PORT_GATEWAY_CLIENT;
 
-    if (!this.BOLApplication || !this.BOLServer) {
-      this.BOLApplication = express();
-      // todo
-      // this.BOLApplication.use(expressConnectMiddleware());
-      this.BOLServer = http.createServer(this.BOLApplication).listen(port);
-    } else {
-      this.logger.warn("Server already running");
-    }
+    return new Promise(async (resolve, reject) => {
+      if (!this.BLOApplication || !this.BLOServer) {
+        if (!this.BLODispatcher) {
+          throw new Error("BLODispatcher is not defined");
+        }
+        this.BLOApplication = express();
+        try {
+          const webServices = await this.BLODispatcher.getOrCreateWebServices();
+          for (const service of webServices) {
+            this.logger.debug(`Registering web service: ${service.getPath()}`);
+            await service.registerExpress(this.BLOApplication);
+          }
+        } catch (error) {
+          throw new Error(`Failed to register web services: ${error}`);
+        }
+
+        this.BLOServer = http.createServer(this.BLOApplication);
+
+        this.BLOServer.listen(port, () => {
+          this.logger.info(`BOL server started and listening on port ${port}`);
+          resolve();
+        });
+
+        this.BLOServer.on('error', (error) => {
+          this.logger.error(`BOL server failed to start: ${error}`);
+          reject(error);
+        });
+      } else {
+        this.logger.warn("BOL Server already running.");
+        resolve();
+      }
+    });
   }
 
   /**
@@ -249,6 +299,7 @@ export class SATPGateway {
    * These operations are fundamental for setting up and managing gateway connections within the system.
    */
 
+  // TODO: addGateways as an admin endpoint 
   public async addGateways(IDs: string[]): Promise<void> {
     const fnTag = `${this.label}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -358,9 +409,13 @@ export class SATPGateway {
     return mockGatewayIdentity;
   }
 
-  public getIdentity(): GatewayIdentity {
+  // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
+  public get Identity(): GatewayIdentity {
     const fnTag = `${this.label}#getIdentity()`;
     this.logger.trace(`Entering ${fnTag}`);
+    if (!this.config.gid) {
+    throw new Error("GatewayIdentity is not defined");
+    }
     return this.config.gid!;
   }
 
@@ -384,7 +439,7 @@ export class SATPGateway {
     await this.shutdownGatewayServer();
 
     this.logger.info("Shutting down Node server - BOL");
-    await this.shutdownBOLServer();
+    await this.shutdownBLOServer();
 
     this.logger.debug("Running shutdown hooks");
     for (const hook of this.shutdownHooks) {  
@@ -416,13 +471,13 @@ export class SATPGateway {
     }
   }
   
-  private async shutdownBOLServer(): Promise<void> {
-    const fnTag = `${this.label}#shutdownBOLServer()`;
+  private async shutdownBLOServer(): Promise<void> {
+    const fnTag = `${this.label}#shutdownBLOServer()`;
     this.logger.debug(`Entering ${fnTag}`);
-    if (this.BOLServer) {
+    if (this.BLOServer) {
       try {
-        await this.BOLServer.close();
-        this.BOLServer = undefined;
+        await this.BLOServer.close();
+        this.BLOServer = undefined;
         this.logger.info("Server shut down");
       } catch (error) {
         this.logger.error(`Error shutting down the gatewayApplication: ${error}`);
