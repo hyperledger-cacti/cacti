@@ -14,10 +14,11 @@ export class NonExistantGatewayIdentity extends Error {
   }
 }
 
-
 export class GetStatusError extends Error {
   constructor(sessionID: string, message: string) {
-    super(`Could not GetStatus at Session: with id ${sessionID}. Reason: ${message}`);
+    super(
+      `Could not GetStatus at Session: with id ${sessionID}. Reason: ${message}`,
+    );
     this.name = this.constructor.name;
     Object.setPrototypeOf(this, GetStatusError.prototype);
   }

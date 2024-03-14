@@ -3,7 +3,7 @@
   "info": {
     "title": "SATP Gateway Client (Business Logic Orchestrator)",
     "version": "v0.0.1",
-    "description": "SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.\n\nThis API defines the gateway client facing API (business logic orchestrator, or BLO), which is named API-Type 3 in the SATP-Core specification.\n\n**Additional Resources**:\n- [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/)\n- [SATP Core draft](https://datatracker.ietf.org/doc/draft-ietf-satp-core)\n- [SATP Crash Recovery draft](https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/)\n- [SATP Architecture draft](https://datatracker.ietf.org/doc/draft-ietf-satp-architecture/)\n- [SATP Use-Cases draft](https://datatracker.ietf.org/doc/draft-ramakrishna-sat-use-cases/)\n- [SATP Data sharing draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-data-sharing)\n- [SATP View Addresses draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-views-addresses)",
+    "description": "SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.\n\nThis API defines the gateway client facing API (business logic orchestrator, or BLO), which is named API-Type 1 in the SATP-Core specification.\n\n**Additional Resources**:\n- [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/)\n- [SATP Core draft](https://datatracker.ietf.org/doc/draft-ietf-satp-core)\n- [SATP Crash Recovery draft](https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/)\n- [SATP Architecture draft](https://datatracker.ietf.org/doc/draft-ietf-satp-architecture/)\n- [SATP Use-Cases draft](https://datatracker.ietf.org/doc/draft-ramakrishna-sat-use-cases/)\n- [SATP Data sharing draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-data-sharing)\n- [SATP View Addresses draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-views-addresses)",
     "contact": {
       "name": "Hyperledger Cacti"
     },
@@ -124,8 +124,7 @@
                       "logoURI": {
                         "type": "string",
                         "description": "The logo of a token, chain, dex etc.",
-                        "format": "uri",
-                        "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                        "format": "uri"
                       },
                       "tags": {
                         "type": "array",
@@ -224,8 +223,7 @@
                       "logoURI": {
                         "type": "string",
                         "description": "The logo of a token, chain, dex etc.",
-                        "format": "uri",
-                        "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                        "format": "uri"
                       },
                       "tags": {
                         "type": "array",
@@ -963,8 +961,7 @@
                               "logoURI": {
                                 "type": "string",
                                 "description": "The logo of a token, chain, dex etc.",
-                                "format": "uri",
-                                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                "format": "uri"
                               },
                               "tags": {
                                 "type": "array",
@@ -1068,8 +1065,7 @@
                               "logoURI": {
                                 "type": "string",
                                 "description": "The logo of a token, chain, dex etc.",
-                                "format": "uri",
-                                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                "format": "uri"
                               },
                               "tags": {
                                 "type": "array",
@@ -1187,8 +1183,7 @@
                                         "logoURI": {
                                           "type": "string",
                                           "description": "The logo of a token, chain, dex etc.",
-                                          "format": "uri",
-                                          "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                          "format": "uri"
                                         },
                                         "tags": {
                                           "type": "array",
@@ -1282,8 +1277,7 @@
                                         "logoURI": {
                                           "type": "string",
                                           "description": "The logo of a token, chain, dex etc.",
-                                          "format": "uri",
-                                          "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                          "format": "uri"
                                         },
                                         "tags": {
                                           "type": "array",
@@ -1491,8 +1485,7 @@
                                               "logoURI": {
                                                 "type": "string",
                                                 "description": "The logo of a token, chain, dex etc.",
-                                                "format": "uri",
-                                                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                                "format": "uri"
                                               },
                                               "tags": {
                                                 "type": "array",
@@ -2044,8 +2037,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
@@ -2144,8 +2136,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
@@ -2509,8 +2500,7 @@
       "LogoURI": {
         "type": "string",
         "description": "The logo of a token, chain, dex etc.",
-        "format": "uri",
-        "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+        "format": "uri"
       },
       "RoutesResponse": {
         "type": "object",
@@ -2598,8 +2588,7 @@
                     "logoURI": {
                       "type": "string",
                       "description": "The logo of a token, chain, dex etc.",
-                      "format": "uri",
-                      "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                      "format": "uri"
                     },
                     "tags": {
                       "type": "array",
@@ -2703,8 +2692,7 @@
                     "logoURI": {
                       "type": "string",
                       "description": "The logo of a token, chain, dex etc.",
-                      "format": "uri",
-                      "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                      "format": "uri"
                     },
                     "tags": {
                       "type": "array",
@@ -2822,8 +2810,7 @@
                               "logoURI": {
                                 "type": "string",
                                 "description": "The logo of a token, chain, dex etc.",
-                                "format": "uri",
-                                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                "format": "uri"
                               },
                               "tags": {
                                 "type": "array",
@@ -2917,8 +2904,7 @@
                               "logoURI": {
                                 "type": "string",
                                 "description": "The logo of a token, chain, dex etc.",
-                                "format": "uri",
-                                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                "format": "uri"
                               },
                               "tags": {
                                 "type": "array",
@@ -3126,8 +3112,7 @@
                                     "logoURI": {
                                       "type": "string",
                                       "description": "The logo of a token, chain, dex etc.",
-                                      "format": "uri",
-                                      "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                      "format": "uri"
                                     },
                                     "tags": {
                                       "type": "array",
@@ -3373,8 +3358,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
@@ -3478,8 +3462,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
@@ -3597,8 +3580,7 @@
                         "logoURI": {
                           "type": "string",
                           "description": "The logo of a token, chain, dex etc.",
-                          "format": "uri",
-                          "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                          "format": "uri"
                         },
                         "tags": {
                           "type": "array",
@@ -3692,8 +3674,7 @@
                         "logoURI": {
                           "type": "string",
                           "description": "The logo of a token, chain, dex etc.",
-                          "format": "uri",
-                          "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                          "format": "uri"
                         },
                         "tags": {
                           "type": "array",
@@ -3901,8 +3882,7 @@
                               "logoURI": {
                                 "type": "string",
                                 "description": "The logo of a token, chain, dex etc.",
-                                "format": "uri",
-                                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                                "format": "uri"
                               },
                               "tags": {
                                 "type": "array",
@@ -4115,8 +4095,7 @@
           "logoURI": {
             "type": "string",
             "description": "The logo of a token, chain, dex etc.",
-            "format": "uri",
-            "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+            "format": "uri"
           },
           "tags": {
             "type": "array",
@@ -4245,8 +4224,7 @@
                   "logoURI": {
                     "type": "string",
                     "description": "The logo of a token, chain, dex etc.",
-                    "format": "uri",
-                    "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                    "format": "uri"
                   },
                   "tags": {
                     "type": "array",
@@ -4340,8 +4318,7 @@
                   "logoURI": {
                     "type": "string",
                     "description": "The logo of a token, chain, dex etc.",
-                    "format": "uri",
-                    "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                    "format": "uri"
                   },
                   "tags": {
                     "type": "array",
@@ -4549,8 +4526,7 @@
                         "logoURI": {
                           "type": "string",
                           "description": "The logo of a token, chain, dex etc.",
-                          "format": "uri",
-                          "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                          "format": "uri"
                         },
                         "tags": {
                           "type": "array",
@@ -4752,8 +4728,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
@@ -4847,8 +4822,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
@@ -5083,8 +5057,7 @@
                     "logoURI": {
                       "type": "string",
                       "description": "The logo of a token, chain, dex etc.",
-                      "format": "uri",
-                      "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                      "format": "uri"
                     },
                     "tags": {
                       "type": "array",
@@ -5267,8 +5240,7 @@
               "logoURI": {
                 "type": "string",
                 "description": "The logo of a token, chain, dex etc.",
-                "format": "uri",
-                "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                "format": "uri"
               },
               "tags": {
                 "type": "array",
