@@ -30,6 +30,16 @@ export async function GetStatusHandler(logger: Logger, req: StatusRequest): Prom
 // TODO call SATP core, use try catch to propagate errors
 export async function GetStatusService(logger: Logger, req: StatusRequest): Promise<StatusResponse> {
   // Implement the logic for getting status here; call core
-  logger.error("GetStatusService not implemented");
-  throw new GetStatusError(req.sessionID, "GetStatusService not implemented");
-} 
+  const mock: StatusResponse = {
+    status: "DONE",
+    substatus: "COMPLETED",
+    stage: "STAGE3",
+    step: "transfer-complete-message",
+    startTime: "2023-03-14T16:50:06.662Z"
+  };
+  
+  // logger.error("GetStatusService not implemented");
+  // throw new GetStatusError(req.sessionID, "GetStatusService not implemented");
+
+  return mock
+};
