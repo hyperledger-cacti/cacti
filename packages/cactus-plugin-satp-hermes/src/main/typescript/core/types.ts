@@ -1,10 +1,15 @@
 import { Secp256k1Keys, LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
+import { BLODispatcher } from "../blo/dispatcher";
 
 export enum CurrentDrafts {
   Core = "Core",
   Architecture = "Architecture",
   Crash = "Crash",
+}
+export interface IRequestOptions {
+  logLevel?: LogLevelDesc;
+  dispatcher: BLODispatcher;
 }
 
 export type DraftVersions = {
@@ -25,6 +30,11 @@ export type GatewayChannel = {
   id: string;
 };
 
+export type Address = 
+    | `http://${string}`
+    | `https://${string}`
+    | `${number}.${number}.${number}.${number}.`;
+
 export type GatewayIdentity = {
   id: string;
   name?: string;
@@ -33,10 +43,7 @@ export type GatewayIdentity = {
   proofID?: string;
   gatewayServerPort?: number;
   gatewayClientPort?: number;
-  address?:
-    | `http://${string}`
-    | `https://${string}`
-    | `${number}.${number}.${number}.${number}.`;
+  address?: Address;
 };
 
 export interface SATPGatewayConfig {
