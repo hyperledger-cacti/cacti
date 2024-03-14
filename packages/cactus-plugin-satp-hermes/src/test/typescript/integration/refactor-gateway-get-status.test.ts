@@ -78,13 +78,14 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         sessionID: "test-session-id",
       };
 
-      new Promise((res, rej) => {setTimeout(res,2000)});
+
       const response = await adminApiClient.getStatus(statusRequest.sessionID);
 
       // expect(response.status).toBe(200);
       expect(response).toBeDefined();
       expect(response.status).toBeDefined();
-      expect(response.status).toBe("OK");
+      expect(response.status).toBe(200)
+      expect(response.data).toBeDefined();
 
     } catch (error) {
       logger.error(`Error: ${error}`);

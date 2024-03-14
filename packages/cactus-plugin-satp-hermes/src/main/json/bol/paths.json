@@ -8,7 +8,7 @@
       "x-hyperledger-cacti": {
         "http": {
           "verbLowerCase": "post",
-          "path": "/transact"
+          "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact"
         }
       },
       "requestBody": {
@@ -54,7 +54,7 @@
       "x-hyperledger-cacti": {
         "http": {
           "verbLowerCase": "post",
-          "path": "/cancel"
+          "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel"
         }
       },
       "requestBody": {
@@ -102,7 +102,7 @@
       "x-hyperledger-cacti": {
         "http": {
           "verbLowerCase": "get",
-          "path": "/status"
+          "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/status"
         }
       },
       "parameters": [
@@ -148,7 +148,7 @@
       "x-hyperledger-cacti": {
         "http": {
           "verbLowerCase": "get",
-          "path": "/routes"
+          "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/routes"
         }
       },
       "parameters": [
@@ -249,7 +249,7 @@
       "x-hyperledger-cacti": {
         "http": {
           "verbLowerCase": "get",
-          "path": "/audit"
+          "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"
         }
       },
       "parameters": [

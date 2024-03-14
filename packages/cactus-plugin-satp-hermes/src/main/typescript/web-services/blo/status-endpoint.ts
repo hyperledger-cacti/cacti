@@ -19,6 +19,7 @@ import { PluginSATPGateway } from "../../plugin-satp-gateway";
 
 import OAS from "../../../json/bol/openapi-blo-bundled.json";
 import { IRequestOptions } from "../../core/types";
+import { StatusRequest } from "../../generated/openapi-blo/typescript-axios";
 
 
 export class GetStatusEndpointV1 implements IWebServiceEndpoint {
@@ -83,8 +84,16 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      await this.options.dispatcher.GetStatus(req.body);
-      res.status(200).json("OK");
+      const sessionId = req.query.SessionID as string;
+      if (!sessionId) {
+        res.status(400).json({ message: "SessionID query parameter is required." });
+        return;
+      }
+      let statusRequest: StatusRequest = {
+        sessionID: sessionId,
+      };
+      const result = await this.options.dispatcher.GetStatus(statusRequest);
+      res.status(200).json(result);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({
@@ -93,4 +102,5 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
       });
     }
   }
+
 }
