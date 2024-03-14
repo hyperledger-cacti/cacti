@@ -10,11 +10,11 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
-import { StatusRequest, StatusResponse, Configuration, AdminApiFactory, AdminApi } from "../../../main/typescript/generated/openapi-blo/typescript-axios";
-import { SATPGatewayConfig, SupportedGatewayImplementations } from "../../../main/typescript/core/types";
-import { SATPGateway } from "../../../main/typescript/gateway-refactor";
+import {
+  SATPGatewayConfig,
+  SupportedGatewayImplementations,
+} from "../../../main/typescript/core/types";
 import { createClient } from "../test-utils";
-import { log } from "console";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -39,9 +39,8 @@ beforeAll(async () => {
 
 // TODO create unit tests of the services to test that GetStatus functionality works (access via BLODispatcher)
 describe("GetStatus Endpoint and Functionality testing", () => {
-
   test("GetStatus endpoint works - SDK call", async () => {
-      const options: SATPGatewayConfig = {
+    const options: SATPGatewayConfig = {
       logLevel: logLevel,
       gid: {
         id: "mockID",
@@ -70,23 +69,21 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       await gateway.startup();
       const address = options.gid!.address!;
       const port = options.gid!.gatewayClientPort!;
-      const apiType = "AdminApi";
+      //const apiType = "AdminApi";
 
-      const adminApiClient = createClient('AdminApi', address, port, logger); 
+      const adminApiClient = createClient("AdminApi", address, port, logger);
 
       const statusRequest = {
         sessionID: "test-session-id",
       };
-
 
       const response = await adminApiClient.getStatus(statusRequest.sessionID);
 
       // expect(response.status).toBe(200);
       expect(response).toBeDefined();
       expect(response.status).toBeDefined();
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(200);
       expect(response.data).toBeDefined();
-
     } catch (error) {
       logger.error(`Error: ${error}`);
       throw new Error(`Unexpected error during API call`);
@@ -96,9 +93,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
   });
 
   // TODO create integration tests of the services to test that GetStatus functionality works
-  test("GetStatus functionality works", async () => {
-  });
-
+  test("GetStatus functionality works", async () => {});
 });
 
 afterAll(async () => {
@@ -111,5 +106,3 @@ afterAll(async () => {
       fail("Pruning didn't throw OK");
     });
 });
-
-

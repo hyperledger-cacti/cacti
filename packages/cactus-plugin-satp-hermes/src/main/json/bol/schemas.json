@@ -317,9 +317,9 @@
   "LogoURI": {
     "type": "string",
     "description": "The logo of a token, chain, dex etc.",
-    "format": "uri",
-    "example": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
-  },  "RoutesResponse": {
+    "format": "uri"
+  }, 
+  "RoutesResponse": {
     "type": "object",
     "description": "A collection of available and unavailable routes",
     "required": ["routes"],
