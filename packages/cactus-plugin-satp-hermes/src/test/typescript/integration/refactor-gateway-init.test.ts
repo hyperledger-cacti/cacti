@@ -38,13 +38,13 @@ beforeAll(async () => {
 });
 
 describe("SATPGateway initialization", () => {
-  it("initiates with default config", async () => {
+  it("should initiate gateway with default config", async () => {
     const options: SATPGatewayConfig = {};
     const gateway = await factory.create(options);
 
     expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.getIdentity();
+    const identity = gateway.Identity;
     expect(identity).toBeDefined();
     expect(identity.id).toBeDefined();
     expect(identity.name).toBeDefined();
@@ -64,7 +64,7 @@ describe("SATPGateway initialization", () => {
     expect(identity.address).toBe("http://localhost");
   });
 
-  test("initiates custom config Gateway Coordinator", async () => {
+  it("should initiate gateway with custom config", async () => {
     const options: SATPGatewayConfig = {
       logLevel: "INFO",
       gid: {
@@ -90,7 +90,7 @@ describe("SATPGateway initialization", () => {
 
     expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.getIdentity();
+    const identity = gateway.Identity;
     expect(identity).toBeDefined();
     expect(identity.id).toBeDefined();
     expect(identity.name).toBeDefined();
@@ -110,7 +110,7 @@ describe("SATPGateway initialization", () => {
     expect(identity.address).toBe("https://localhost");
   });
 
-  test("Gateway Server launches", async () => {
+  it("should launch gateway server", async () => {
     const options: SATPGatewayConfig = {
       logLevel: "INFO",
       gid: {
@@ -134,7 +134,7 @@ describe("SATPGateway initialization", () => {
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.getIdentity();
+    const identity = gateway.Identity;
     // default servers
     expect(identity.gatewayServerPort).toBe(3010);
     expect(identity.gatewayClientPort).toBe(3011);
@@ -143,7 +143,7 @@ describe("SATPGateway initialization", () => {
     await gateway.shutdown();
   });
 
-  it("shutdown hooks work", async () => {
+  it("should activate shutdown hooks", async () => {
 const options: SATPGatewayConfig = {
       gid: {
         id: "mockID",
