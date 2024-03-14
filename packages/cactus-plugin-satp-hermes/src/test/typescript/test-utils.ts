@@ -1,21 +1,38 @@
-import { Logger } from '@hyperledger/cactus-common';
-import { Configuration, AdminApi, TransactionApi } from '../../main/typescript/generated/openapi-blo/typescript-axios';
-import { Api } from '@bufbuild/protobuf';
+import { Logger } from "@hyperledger/cactus-common";
+import {
+  Configuration,
+  AdminApi,
+  TransactionApi,
+} from "../../main/typescript/generated/openapi-blo/typescript-axios";
+//import { Api } from "@bufbuild/protobuf";
 
-export function createClient(type: 'AdminApi', address: string, port: number, logger: Logger): AdminApi;
-export function createClient(type: 'TransactionApi', address: string, port: number, logger: Logger): TransactionApi;
+export function createClient(
+  type: "AdminApi",
+  address: string,
+  port: number,
+  logger: Logger,
+): AdminApi;
+export function createClient(
+  type: "TransactionApi",
+  address: string,
+  port: number,
+  logger: Logger,
+): TransactionApi;
 
-
-export function createClient(type: 'AdminApi' | 'TransactionApi', address: string, port: number, logger: Logger): AdminApi | TransactionApi {
+export function createClient(
+  type: "AdminApi" | "TransactionApi",
+  address: string,
+  port: number,
+  logger: Logger,
+): AdminApi | TransactionApi {
   const config = new Configuration({ basePath: `${address}:${port}` });
-  logger.debug(config)
-  
-  if (type === 'AdminApi') {
+  logger.debug(config);
+
+  if (type === "AdminApi") {
     return new AdminApi(config);
-  } else if (type === 'TransactionApi') {
+  } else if (type === "TransactionApi") {
     return new TransactionApi(config);
-  }
-  else {
-    throw new Error('Invalid api type');
+  } else {
+    throw new Error("Invalid api type");
   }
 }

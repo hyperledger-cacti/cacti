@@ -8,19 +8,15 @@ import {
 import {
   Logger,
   Checks,
-  LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginSATPGateway } from "../../plugin-satp-gateway";
-
 import OAS from "../../../json/bol/openapi-blo-bundled.json";
 import { IRequestOptions } from "../../core/types";
 import { StatusRequest } from "../../generated/openapi-blo/typescript-axios";
-
 
 export class GetStatusEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetStatusEndpointV1";
@@ -54,9 +50,8 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/status"
-    ].get.operationId;
+    return OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/status"]
+      .get.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -86,10 +81,12 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
     try {
       const sessionId = req.query.SessionID as string;
       if (!sessionId) {
-        res.status(400).json({ message: "SessionID query parameter is required." });
+        res
+          .status(400)
+          .json({ message: "SessionID query parameter is required." });
         return;
       }
-      let statusRequest: StatusRequest = {
+      const statusRequest: StatusRequest = {
         sessionID: sessionId,
       };
       const result = await this.options.dispatcher.GetStatus(statusRequest);
@@ -102,5 +99,4 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
       });
     }
   }
-
 }

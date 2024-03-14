@@ -5,17 +5,17 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 
-import {
-  ICactusPlugin,
-  IPluginWebService,
-  IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 
-import { GatewayIdentity, GatewayChannel } from "../core/types";
-import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
+//import { GatewayIdentity, GatewayChannel } from "../core/types";
+//import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
 import { GetStatusEndpointV1 } from "../web-services/blo/status-endpoint";
 
-import { GetAuditRequest, GetAuditResponse, StatusRequest, StatusResponse } from "../generated/openapi-blo/typescript-axios";
+//import { GetAuditRequest, GetAuditResponse } from "../generated/openapi-blo/typescript-axios";
+import {
+  StatusRequest,
+  StatusResponse,
+} from "../generated/openapi-blo/typescript-axios";
 import { GetStatusHandler } from "./admin/get-status-handler-service";
 
 export interface BLODispatcherOptions {
@@ -58,7 +58,6 @@ export class BLODispatcher {
       dispatcher: this,
       logLevel: this.options.logLevel,
     });
-
 
     const theEndpoints = [getStatusEndpointV1];
     this.endpoints = theEndpoints;

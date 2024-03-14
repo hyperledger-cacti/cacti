@@ -1,19 +1,19 @@
 import { GetStatusError } from "../../core/errors";
-import { StatusRequest, StatusResponse } from "../../generated/openapi-blo/typescript-axios";
 import {
-  Logger,
-  Checks,
-  LogLevelDesc,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+  StatusRequest,
+  StatusResponse,
+} from "../../generated/openapi-blo/typescript-axios";
+import { Logger } from "@hyperledger/cactus-common";
 
-
-export async function GetStatusHandler(logger: Logger, req: StatusRequest): Promise<StatusResponse> {
+export async function GetStatusHandler(
+  logger: Logger,
+  req: StatusRequest,
+): Promise<StatusResponse> {
   const fnTag = `GetStatusHandler`;
   logger.info(`${fnTag}, Obtaining status for sessionID=${req.sessionID}`);
 
   try {
-    const processedRequest = req; 
+    const processedRequest = req;
     const result = await GetStatusService(logger, processedRequest);
     return result;
   } catch (error) {
@@ -28,18 +28,22 @@ export async function GetStatusHandler(logger: Logger, req: StatusRequest): Prom
 }
 
 // TODO call SATP core, use try catch to propagate errors
-export async function GetStatusService(logger: Logger, req: StatusRequest): Promise<StatusResponse> {
+export async function GetStatusService(
+  logger: Logger,
+  req: StatusRequest,
+): Promise<StatusResponse> {
   // Implement the logic for getting status here; call core
   const mock: StatusResponse = {
     status: "DONE",
     substatus: "COMPLETED",
     stage: "STAGE3",
     step: "transfer-complete-message",
-    startTime: "2023-03-14T16:50:06.662Z"
+    startTime: "2023-03-14T16:50:06.662Z",
   };
-  
+
+  logger.info(req);
   // logger.error("GetStatusService not implemented");
   // throw new GetStatusError(req.sessionID, "GetStatusService not implemented");
 
-  return mock
-};
+  return mock;
+}
