@@ -4470,10 +4470,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/protobuf@npm:1.7.2, @bufbuild/protobuf@npm:^1.6.0, @bufbuild/protobuf@npm:^1.7.2":
+"@bufbuild/protobuf@npm:1.7.2":
   version: 1.7.2
   resolution: "@bufbuild/protobuf@npm:1.7.2"
   checksum: 10/f23ccc77066100157043cf36bd2506acdcb235f0a902f7662fbbb992e78df4202780aeb55bd2e3fd1945bd9e52a4fca759351f333f2ff779e32996e13eb56d34
+  languageName: node
+  linkType: hard
+
+"@bufbuild/protobuf@npm:1.8.0, @bufbuild/protobuf@npm:^1.6.0, @bufbuild/protobuf@npm:^1.7.2":
+  version: 1.8.0
+  resolution: "@bufbuild/protobuf@npm:1.8.0"
+  checksum: 10/f91d60ff1609c023466500e99312d2e92ac09c163d615c315fa25d9e50f1e9b76a3a9cac776786a3dd5c5065bb7061bf29388587e2a1d27306f68ed98e57a892
   languageName: node
   linkType: hard
 
@@ -4494,7 +4501,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/protoplugin@npm:1.7.2, @bufbuild/protoplugin@npm:^1.6.0":
+"@bufbuild/protoplugin@npm:1.7.2":
   version: 1.7.2
   resolution: "@bufbuild/protoplugin@npm:1.7.2"
   dependencies:
@@ -4502,6 +4509,17 @@ __metadata:
     "@typescript/vfs": "npm:^1.4.0"
     typescript: "npm:4.5.2"
   checksum: 10/412c35a04a60fed1979b62fedc570c128efa8995290005df8d84bbf84a9b35cc6a9bbea5646210ed7708fb8cd274aea8ba30720ccd25eb62c9133efda55ca733
+  languageName: node
+  linkType: hard
+
+"@bufbuild/protoplugin@npm:^1.6.0":
+  version: 1.8.0
+  resolution: "@bufbuild/protoplugin@npm:1.8.0"
+  dependencies:
+    "@bufbuild/protobuf": "npm:1.8.0"
+    "@typescript/vfs": "npm:^1.4.0"
+    typescript: "npm:4.5.2"
+  checksum: 10/e243f655dd02fe2dc857a48c00846857c4a9fae89565aabe98ae35e3a5d3002727b9e0790bc136e8f358a8e7d42c594b308ff6b47027cd679646273d3a76cb7b
   languageName: node
   linkType: hard
 
@@ -35073,9 +35091,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.10.57
-  resolution: "libphonenumber-js@npm:1.10.57"
-  checksum: 10/7344dd7e8f35b0bd19c5a4fecfd5f252ba3e1f2fa938e552662a34fbc0bc3bf02d3c0a7ce5adf369280a741c7c7d54940232092e997890b71cb3cb1114e9184b
+  version: 1.10.58
+  resolution: "libphonenumber-js@npm:1.10.58"
+  checksum: 10/8ac5a23a8b37ad4a8e75de29e0436270272429e1deebf090257f23c67a23138938619822c260408c1ade7170e1859e4ced732b80011e38148ed9a0848dd9a850
   languageName: node
   linkType: hard
 
@@ -47358,9 +47376,9 @@ __metadata:
   linkType: hard
 
 "swagger-ui-dist@npm:>=5.0.0":
-  version: 5.11.9
-  resolution: "swagger-ui-dist@npm:5.11.9"
-  checksum: 10/6446adfda2b5dd3fe0272fc8ba0ff030e726d842a6776ceb2d963077fa200defd3d21f4523142272c6a98e5eaaf8d1131467bf1ae971106730f39450b6a9880f
+  version: 5.12.0
+  resolution: "swagger-ui-dist@npm:5.12.0"
+  checksum: 10/2e52f3958b6e6cbdc1a904828f7c15eee34b3327696c4a26a6987a5036582a04aa22d8cc4587af4849de0ba10ec4e036390fa4ecad3a2e90184b0f4437fabde3
   languageName: node
   linkType: hard
 
@@ -49194,16 +49212,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^3.9.3":
-  version: 3.9.10
-  resolution: "typescript@npm:3.9.10"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10/f86a085eea24fdd665850c6be4dd69c7a71fe3d27ecc712be88cdc7a52d866f4f2416ad91c554df60f499dedcf288a24b3d8052e502833d8acc661a9d21bb98f
-  languageName: node
-  linkType: hard
-
 "typescript@patch:typescript@npm%3A4.5.2#optional!builtin<compat/typescript>":
   version: 4.5.2
   resolution: "typescript@patch:typescript@npm%3A4.5.2#optional!builtin<compat/typescript>::version=4.5.2&hash=bcec9a"
@@ -49335,7 +49343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:5.28.3":
+"undici@npm:5.28.3, undici@npm:^5.28.2":
   version: 5.28.3
   resolution: "undici@npm:5.28.3"
   dependencies:
