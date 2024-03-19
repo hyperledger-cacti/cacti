@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1710840278504,
+  "lastUpdate": 1710883597763,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -38,6 +38,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.31%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "1eacf7e2a33349de794d486a47cc6bd62d93311a",
+          "message": "fix(plugin-keychain-vault): fix CVE-2024-0553 in vault server image\n\n1. The solution here was to migrate the image from Debian to Ubuntu\nbecause it seems to not have the same vulnerabilities as the lastest\nstable Debian image does, so the change itself is to move to Ubuntu 24.04\nLTS.\n2. Also upgraded the Rust toolchain to the current latest which mandated\na couple of small code changes that are also added in this commit.\n\nThe original security report from Trivy that we've discoverd on the CI:\n\n┌─────────────┬───────────────┬──────────┬───────────────────┐\n│   Library   │ Vulnerability │ Severity │ Installed Version │\n├─────────────┼───────────────┼──────────┼───────────────────┤\n│ libgnutls30 │ CVE-2024-0553 │ HIGH     │ 3.6.7-4+deb10u11  │\n│             │               │          │                   │\n└─────────────┴───────────────┴──────────┴───────────────────┘\n...\n┬──────────────────┬───────────────────────────────────────────┐\n│  Fixed Version   │                   Title                   │\n┼──────────────────┼───────────────────────────────────────────┤\n│ 3.6.7-4+deb10u12 │ gnutls: incomplete fix for CVE-2023-5981  │\n│                  │ https://avd.aquasec.com/nvd/cve-2024-0553 │\n┴──────────────────┴───────────────────────────────────────────┘\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-03-19T14:16:45-07:00",
+          "tree_id": "029bcca022f2a0bf18102d3cb17caeeb8fb6a033",
+          "url": "https://github.com/hyperledger/cacti/commit/1eacf7e2a33349de794d486a47cc6bd62d93311a"
+        },
+        "date": 1710883595211,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 588,
+            "range": "±1.61%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 365,
+            "range": "±1.23%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
