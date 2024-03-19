@@ -45,3 +45,5 @@ export {
   ExpressHttpVerbMethodName,
   isExpressHttpVerbMethodName,
 } from "./http/express-http-verb-method-name";
+
+export { isGrpcStatusObjectWithCode } from "./grpc/is-grpc-status-object-with-code";
