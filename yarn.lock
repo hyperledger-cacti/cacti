@@ -7026,13 +7026,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:1.9.5":
-  version: 1.9.5
-  resolution: "@grpc/grpc-js@npm:1.9.5"
+"@grpc/grpc-js@npm:1.10.3":
+  version: 1.10.3
+  resolution: "@grpc/grpc-js@npm:1.10.3"
   dependencies:
-    "@grpc/proto-loader": "npm:^0.7.8"
-    "@types/node": "npm:>=12.12.47"
-  checksum: 10/5499d964d29601ad1850e45aaeccbfaa980dfffbe6bd4fdd587ef3cf4cc62d69dadf2ee8eb1d6220c468607cef70ae55d24eccfc57a51f453e965a82a3fd1f77
+    "@grpc/proto-loader": "npm:^0.7.10"
+    "@js-sdsl/ordered-map": "npm:^4.4.2"
+  checksum: 10/8217ba9ae6bbc3b25fe6e1fd4494864c75180a408bf33ece88078ab849027483dac480ebc509d2f0838ff77b99e4a0958bd0909fce1a58c380d620c23aeba9f7
   languageName: node
   linkType: hard
 
@@ -7096,7 +7096,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/proto-loader@npm:^0.7.8":
+"@grpc/proto-loader@npm:^0.7.10, @grpc/proto-loader@npm:^0.7.8":
   version: 0.7.10
   resolution: "@grpc/proto-loader@npm:0.7.10"
   dependencies:
@@ -7355,7 +7355,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-driver-fabric@workspace:weaver/core/drivers/fabric-driver"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-alpha.2"
     "@types/node": "npm:18.11.9"
@@ -7378,7 +7378,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-fabric-cli@workspace:weaver/samples/fabric/fabric-cli"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@grpc/proto-loader": "npm:0.7.8"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-alpha.2"
@@ -7417,7 +7417,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-iin-agent@workspace:weaver/core/identity-management/iin-agent"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-alpha.2"
     "@types/jsrsasign": "npm:10.5.11"
@@ -7449,7 +7449,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-protos-js@workspace:weaver/common/protos-js"
   dependencies:
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@grpc/proto-loader": "npm:0.7.8"
     google-protobuf: "npm:3.21.2"
     grpc-tools: "npm:1.12.4"
@@ -7483,7 +7483,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-sdk-fabric@workspace:weaver/sdks/fabric/interoperation-node-sdk"
   dependencies:
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@grpc/proto-loader": "npm:0.7.8"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-alpha.2"
     "@types/node": "npm:18.11.9"
@@ -7534,7 +7534,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-cmd-api-server@workspace:packages/cactus-cmd-api-server"
   dependencies:
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@grpc/proto-loader": "npm:0.7.8"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-core": "npm:2.0.0-alpha.2"
@@ -7681,7 +7681,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-core-api@workspace:packages/cactus-core-api"
   dependencies:
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@grpc/proto-loader": "npm:0.7.8"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
     "@types/express": "npm:4.17.19"
@@ -8634,7 +8634,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-iroha@workspace:packages/cactus-plugin-ledger-connector-iroha"
   dependencies:
-    "@grpc/grpc-js": "npm:1.9.5"
+    "@grpc/grpc-js": "npm:1.10.3"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-core": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-core-api": "npm:2.0.0-alpha.2"
@@ -10334,6 +10334,13 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.0.3"
     "@jridgewell/sourcemap-codec": "npm:^1.4.10"
   checksum: 10/b563ad016492becc14ec1df0edc0276087049df6974d95594ec2e5215d8ec241159d7f4aecb4e2197154732ba97982988e9accbaf496bc365fbb4506b67929f9
+  languageName: node
+  linkType: hard
+
+"@js-sdsl/ordered-map@npm:^4.4.2":
+  version: 4.4.2
+  resolution: "@js-sdsl/ordered-map@npm:4.4.2"
+  checksum: 10/ac64e3f0615ecc015461c9f527f124d2edaa9e68de153c1e270c627e01e83d046522d7e872692fd57a8c514578b539afceff75831c0d8b2a9a7a347fbed35af4
   languageName: node
   linkType: hard
 

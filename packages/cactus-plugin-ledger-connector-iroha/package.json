@@ -55,7 +55,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.9.5",
+    "@grpc/grpc-js": "1.10.3",
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
