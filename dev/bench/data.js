@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1710883597763,
+  "lastUpdate": 1710908392849,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -74,6 +74,44 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 365,
             "range": "±1.23%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "941dbad8fa5950b754dde97b02cc4c0ac0e9e0bb",
+          "message": "feat(common): add isGrpcStatusObjectWithCode user-defined type guard\n\n1. User-defined Typescript type-guard function that asserts whether a value or\nobject is a `@grpc/grpc-js` {Partial<StatusObject>} or not.\nThe reason why it checks for {Partial} is because all of the properties of\nthe {StatusObject} are defined as optional for some reason, hence we cannot\nassume anything about those being present or not by default.\n2. Therefore this method will just check if the `code` property is set or not\nand return `true` or `false` based on that.\n3. The above is also the reason why the name of the function is slightly more\nverbose than your average user-defined type-guard that could be named just\n\"isGrpcStatusObject()\" but we wanted to make sure that more specific type-guards\ncan be added later that check for other optional properities or for the\npresence of all of them together.\n\nLink to the status builder within grpc-js:\nhttps://github.com/grpc/grpc-node/blob/master/packages/grpc-js/src/status-builder.ts\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-03-19T21:04:45-07:00",
+          "tree_id": "31d57363ec0311b3921dc117045f26de55790256",
+          "url": "https://github.com/hyperledger/cacti/commit/941dbad8fa5950b754dde97b02cc4c0ac0e9e0bb"
+        },
+        "date": 1710908389235,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 600,
+            "range": "±1.74%",
+            "unit": "ops/sec",
+            "extra": "179 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 369,
+            "range": "±1.56%",
             "unit": "ops/sec",
             "extra": "182 samples"
           }
