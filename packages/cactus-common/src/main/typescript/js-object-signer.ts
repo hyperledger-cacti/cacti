@@ -108,7 +108,7 @@ export class JsObjectSigner {
    * @param data
    * @returns {string}
    */
-  private dataHash(data: unknown): string {
+  public dataHash(data: unknown): string {
     const hashObj = new sha3.SHA3Hash(256);
     hashObj.update(stringify(data));
     const hashMsg = hashObj.digest(`hex`);

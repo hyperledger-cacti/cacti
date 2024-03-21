@@ -72,6 +72,8 @@ Endpoints exposed:
   - GetPublicKey
   - GetAvailableStrategies
   - VerifyMerkleRoot
+  - MergeViewsV1
+  - ProcessViewV1
 
 
 ## Running the tests
@@ -80,7 +82,9 @@ Endpoints exposed:
   - **fabric-test-basic.test.ts**: A test using strategy-fabric and a fabric connector, testing creating views for different timeframes and states.
   - **besu-test-pruning.test.ts**: A test using strategy-besu and a besu connector, testing creating views for specific timeframes.
   - **fabric-test-pruning.test.ts**: A test using strategy-fabric and a fabric connector, testing creating views for specific timeframes.
-  - **bungee-api-test.test.ts**: A more complex test, using both besu and fabric strategies, fabric and besu connectors, and calls to bungee-hermes API. Tests bungee's API and functionality with multiple strategies. 
+  - **bungee-api-test.test.ts**: A more complex test, using multiple strategies, connectors, and calls to bungee-hermes API. Tests new functionalities like view proof validation.
+  - **bungee-merge-views.test.ts**: A test using besu-strategy and connector, to demonstrate and test the mergeView functionality of bungee-hermes. 
+  - **bungee-process-views.test.ts**: A test using besu-strategy and connector, to demonstrate and test processView functionality of the plugin.
 
 Tests developed using JEST testing framework.
 
@@ -152,8 +156,26 @@ Note that each strategy can be used to query different ledgers (ledgers of the s
 Each strategy implements the logic to query information from each different ledger (i.e. capture set of asset states), while bungee-hermes plugin handles the snapshot and view creation.
 
 
-'View' object contains a 'viewProof'. viewProof is composed by two merkle trees, one for stateProofs and another for transactionProofs.
-One can check if the content of a view has no inconsistencies, by querying the VerifyMerkleRoot endpoint with the appropriate input:
+We can merge views to create an IntegratedView. Integrated views are the result of merging multiple views, with or without using a privacy policy.
+IntegratedViews have a map of ExtendedStates (stateId -> ExtendedState). And ExtendedState is the data gathered for a specific stateId, from different views map(viewId -> State).
+
+Example:
+```typescript
+const mergeViewsNoPolicyReq = await bungeeApi.mergeViewsV1({
+    //for previously obtained views
+    serializedViews: [JSON.stringify(view.view), JSON.stringify(view2.view)],
+    //no policy. When policy is requested, take note that order of arguments matter
+    mergePolicy: undefined,
+    policyArguments: [],
+  });
+expect(mergeViewsNoPolicyReq.status).toBe(200);
+expect(mergeViewsNoPolicyReq.data.integratedView).toBeTruthy();
+expect(mergeViewsNoPolicyReq.data.signature).toBeTruthy();
+```
+
+
+'View' object contains a 'viewProof'. 'viewProof' is composed by two merkle trees, one for 'stateProofs' and another for 'transactionProofs'. The analogous exists for IntegratedView objects, a merkle tree is created for all transactions and states in the IntegratedView.
+One can check if the content of a view or integratedView has no inconsistencies, by querying the VerifyMerkleRoot endpoint with the appropriate input:
 
 ```typescript
   //using a previously created View object
@@ -162,10 +184,9 @@ One can check if the content of a view has no inconsistencies, by querying the V
     .getStateBins()
     .map((x) => JSON.stringify(x.getStateProof()));
   const transactionProofs: string[] = [];
-  view?
-    .getAllTransactions()
-            .forEach((t) => transactionProofs.push(JSON.stringify(t.getProof())));
-
+  view?.getAllTransactions()
+    .forEach((t) => transactionProofs.push(JSON.stringify(t.getProof()))),
+  );
   const verifyStateRoot = await bungeeApi.verifyMerkleRoot({
     input: stateProofs?.reverse(), //check integrity, order should not matter
     root: proof?.statesMerkleRoot,
@@ -179,12 +200,30 @@ One can check if the content of a view has no inconsistencies, by querying the V
   expect(verifyTransactionsRoot.data.result).toBeTrue();
 ```
 
+Lastly, we can also process views according to a privacy-policy as follows:
+
+```typescript
+import { hideState } from "../../../main/typescript/view-creation/privacy-policies";
+
+bungee.addViewPrivacyPolicy("policy1", hideState);
+
+const processed = await bungeeApi.processViewV1({
+    serializedView: JSON.stringify({
+      view: JSON.stringify(view.view as View),
+      signature: view.signature,
+    }),
+    policyId: "hideState",
+    policyArguments: [BESU_ASSET_ID],
+  });
+```
+This example uses the hideState policy, which takes as arguments a stateId to remove from the new view.
+When we apply a policy, the old view metadata is stored in the new View for traceability. This process can be applied multiple times
 
 
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md "CONTIRBUTING.md") to get started.
+Please review [CONTRIBUTING.md](https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.

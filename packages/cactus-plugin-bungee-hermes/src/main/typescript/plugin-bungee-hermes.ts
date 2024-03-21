@@ -24,9 +24,15 @@ import { Server as SecureServer } from "https";
 import {
   CreateViewRequest,
   CreateViewResponse,
+  MergePolicyOpts,
+  MergeViewsRequest,
+  MergeViewsResponse,
+  PrivacyPolicyOpts,
+  ProcessViewRequest,
 } from "./generated/openapi/typescript-axios";
 import { Snapshot } from "./view-creation/snapshot";
 import { View } from "./view-creation/view";
+import { IntegratedView } from "./view-merging/integrated-view";
 import {
   NetworkDetails,
   ObtainLedgerStrategy,
@@ -36,6 +42,12 @@ import { GetPublicKeyEndpointV1 } from "./web-services/get-public-key-endpoint";
 import { GetAvailableStrategiesEndpointV1 } from "./web-services/get-available-strategies-endpoint";
 import MerkleTree from "merkletreejs";
 import { VerifyMerkleRootEndpointV1 } from "./web-services/verify-merkle-root-endpoint";
+import { MergePolicies } from "./view-merging/merge-policies";
+import { deserializeView } from "./utils";
+import { MergeViewsEndpointV1 } from "./web-services/merge-views-endpoint";
+import { ProcessViewEndpointV1 } from "./web-services/process-view-endpoint";
+
+import { PrivacyPolicies } from "./view-creation/privacy-policies";
 
 export interface IKeyPair {
   publicKey: Uint8Array;
@@ -64,6 +76,10 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
 
   private strategies: Map<string, ObtainLedgerStrategy>;
 
+  private mergePolicies: MergePolicies = new MergePolicies();
+
+  private viewPrivacyPolicies: PrivacyPolicies = new PrivacyPolicies();
+
   private level: LogLevelDesc;
   private endpoints: IWebServiceEndpoint[] | undefined;
 
@@ -74,6 +90,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
 
     this.level = options.logLevel || "INFO";
     this.strategies = new Map<string, ObtainLedgerStrategy>();
+
     const label = this.className;
     const level = this.level;
 
@@ -156,12 +173,20 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     const verifyMerkleProofEndpoint = new VerifyMerkleRootEndpointV1({
       bungee: this,
     });
+    const mergeViewsEndpoint = new MergeViewsEndpointV1({
+      bungee: this,
+    });
+    const processViewEndpoint = new ProcessViewEndpointV1({
+      bungee: this,
+    });
 
     this.endpoints = [
       viewEndpoint,
       pubKeyEndpoint,
       availableStrategiesEndpoint,
       verifyMerkleProofEndpoint,
+      mergeViewsEndpoint,
+      processViewEndpoint,
     ];
     return this.endpoints;
   }
@@ -173,7 +198,77 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
   public getInstanceId(): string {
     return this.instanceId;
   }
-
+  onProcessView(request: ProcessViewRequest): CreateViewResponse {
+    const view = deserializeView(request.serializedView);
+    const signature = JSON.parse(request.serializedView).signature;
+    if (signature == undefined) {
+      throw Error("Provided view does not include signature.");
+    }
+    const parsed = JSON.parse(request.serializedView);
+    if (
+      !this.verifyViewSignature(
+        signature,
+        parsed.view,
+        JSON.parse(parsed.view).creator,
+      )
+    ) {
+      this.log.info("Some signature was deemed invalid");
+      throw Error(
+        "At least one of they views does not include a valid signature",
+      );
+    }
+    const prevVersionMetadata = {
+      viewId: view.getKey(),
+      creator: view.getCreator(),
+      viewProof: view.getViewProof(),
+      signature,
+      policy: view.getPolicy(),
+    };
+    this.processView(view, request.policyId, request.policyArguments);
+    view.addPrevVersionMetadata(prevVersionMetadata);
+    view.setCreator(this.pubKeyBungee);
+    view.setKey(uuidV4());
+    return {
+      view: JSON.stringify(view),
+      signature: this.sign(JSON.stringify(view)),
+    };
+  }
+  onMergeViews(request: MergeViewsRequest): MergeViewsResponse {
+    const policy = request.mergePolicy;
+    const views: View[] = [];
+    const signatures: string[] = [];
+    if (request.serializedViews.length <= 1) {
+      this.log.info("less than 2 views were provided");
+      throw Error("Must provide more than 1 view");
+    }
+    request.serializedViews.forEach((view) => {
+      const parsed = JSON.parse(view);
+      if (
+        !this.verifyViewSignature(
+          parsed.signature,
+          parsed.view,
+          JSON.parse(parsed.view).creator,
+        )
+      ) {
+        this.log.info("Some signature was deemed invalid");
+        throw Error(
+          "At least one of they views does not include a valid signature",
+        );
+      }
+      signatures.push(parsed.signature);
+      views.push(deserializeView(view));
+    });
+    const integratedView = this.mergeViews(
+      views,
+      signatures,
+      policy,
+      request.policyArguments ? request.policyArguments : [],
+    );
+    return {
+      integratedView: JSON.stringify(integratedView),
+      signature: integratedView.signature,
+    };
+  }
   async onCreateView(request: CreateViewRequest): Promise<CreateViewResponse> {
     //ti and tf are unix timestamps, represented as strings
     const ti: string = request.tI ? request.tI : "0";
@@ -188,11 +283,10 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
       request.networkDetails,
     );
     this.logger.info("Generating view for request: ", request);
-    const response = JSON.stringify(
-      this.generateView(snapshot, ti, tf, request.viewID),
-    );
+    const response = this.generateView(snapshot, ti, tf, request.viewID);
     return {
-      view: response,
+      view: JSON.stringify(response.view),
+      signature: response.signature,
     };
   }
 
@@ -203,13 +297,13 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     id: string | undefined,
   ): { view?: View; signature?: string } {
     if (
-      parseInt(tI) > parseInt(snapshot.getTF()) ||
-      parseInt(tF) < parseInt(snapshot.getTI()) ||
-      parseInt(tI) > parseInt(tF)
+      BigInt(tI) > BigInt(snapshot.getTF()) ||
+      BigInt(tF) < BigInt(snapshot.getTI()) ||
+      BigInt(tI) > BigInt(tF)
     ) {
       return {};
     }
-    const view = new View(tI, tF, snapshot, id);
+    const view = new View(this.pubKeyBungee, tI, tF, snapshot, id);
     snapshot.pruneStates(tI, tF);
 
     const signature = this.sign(JSON.stringify(view));
@@ -260,5 +354,109 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
       hashLeaves: true,
     });
     return tree.getRoot().toString("hex") == root;
+  }
+
+  public mergeViews(
+    views: View[],
+    signatures: string[],
+    privacyPolicy: MergePolicyOpts,
+    args: string[],
+  ): { integratedView: IntegratedView; signature: string } {
+    const policy = this.mergePolicies.getMergePolicy(privacyPolicy);
+
+    let integratedView = new IntegratedView(
+      privacyPolicy,
+      policy,
+      this.bungeeSigner,
+    );
+    for (const view of views) {
+      if (!integratedView.isParticipant(view.getParticipant())) {
+        integratedView.addParticipant(view.getParticipant());
+      }
+      integratedView.addIncludedViewMetadata({
+        viewId: view.getKey(),
+        creator: view.getCreator(),
+        viewProof: view.getViewProof(),
+        signature: signatures[views.indexOf(view)],
+        policy: view.getPolicy(),
+      });
+      for (const state of view.getSnapshot().getStateBins()) {
+        if (integratedView.getExtendedState(state.getId()) == undefined) {
+          integratedView.createExtendedState(state.getId());
+        }
+        integratedView.addStateInExtendedState(
+          state.getId(),
+          view.getKey(),
+          state,
+        );
+        if (
+          BigInt(state.getInitialTime()) < BigInt(integratedView.getTI()) ||
+          BigInt(state.getInitialTime()) < 0
+        ) {
+          integratedView.setTI(state.getInitialTime());
+        }
+
+        if (
+          BigInt(state.getFinalTime()) > BigInt(integratedView.getTF()) ||
+          BigInt(state.getFinalTime()) < 0
+        ) {
+          integratedView.setTF(state.getFinalTime());
+        }
+      }
+    }
+    if (policy) {
+      integratedView = policy(integratedView, ...args);
+    }
+    integratedView.setIntegratedViewProof();
+    return {
+      integratedView: integratedView,
+      //The paper specs suggest the integratedView should be jointly signed by all participants.
+      //That process is left to be addressed in the future
+      signature: this.sign(JSON.stringify(integratedView)),
+    };
+  }
+
+  public processView(
+    view: View,
+    policy: PrivacyPolicyOpts,
+    args: string[],
+  ): View {
+    const policyF = this.viewPrivacyPolicies.getPrivacyPolicy(policy);
+    if (policyF) {
+      view = policyF(view, ...args);
+      view.setPrivacyPolicy(policy, policyF, this.bungeeSigner);
+      view.updateViewProof();
+    }
+    return view;
+  }
+
+  verifyViewSignature(
+    signature: string,
+    view: string,
+    pubKey: string,
+  ): boolean {
+    const sourceSignature = new Uint8Array(Buffer.from(signature, "hex"));
+    const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+
+    return this.bungeeSigner.verify(view, sourceSignature, sourcePubkey);
+  }
+
+  public isSafeToCallObjectMethod(
+    object: Record<string, unknown>,
+    name: string,
+  ): boolean {
+    Checks.truthy(
+      object,
+      `${this.className}#isSafeToCallObjectMethod():contract`,
+    );
+    Checks.nonBlankString(
+      name,
+      `${this.className}#isSafeToCallObjectMethod():name`,
+    );
+
+    return (
+      Object.prototype.hasOwnProperty.call(object, name) &&
+      typeof object[name] === "function"
+    );
   }
 }
