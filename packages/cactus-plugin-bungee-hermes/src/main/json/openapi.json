@@ -26,6 +26,18 @@
     },
     "components": {
         "schemas": {
+            "PrivacyPolicyOpts":{
+                "description": "identifier of the policy used to process a view",
+                "type": "string",
+                "enum": ["pruneState"],
+                "x-enum-varnames":["PruneState"]
+            },
+            "MergePolicyOpts":{
+                "description": "identifier of the policy used to merge views (can be none)",
+                "type": "string",
+                "enum": ["pruneState", "pruneStateFromView", "NONE"],
+                "x-enum-varnames":["PruneState", "PruneStateFromView", "NONE"]
+            },
             "CreateViewRequest":{
                 "type":"object",
                 "description": "Request object for createViewV1 endpoint",
@@ -80,7 +92,7 @@
             },
             "CreateViewResponse":{
                 "type":"object",
-                "description": "This is the response for a viewRequests",
+                "description": "This is the response for a CreateViewRequest or ProcessViewRequest",
                 "properties": {
                     "view":{
                         "type":"string",
@@ -138,6 +150,72 @@
                         "example": "true"
                     }
                 }
+            },
+            "MergeViewsResponse":{
+                "type":"object",
+                "description": "This is the response of a mergeViewRequest",
+                "properties": {
+                    "integratedView":{
+                        "type":"string",
+                        "example": "Object"
+                    },
+                    "signature":{
+                        "type": "string",
+                        "example": "signature of Object"
+                    }
+                },
+                "example": {"integratedView": "Object", "signature":"signature of Object"}
+            },
+            "MergeViewsRequest":{
+                "type":"object",
+                "description": "This is the input for a mergeViewRequest",
+                "required": ["serializedViews", "mergePolicy"],
+                "properties": {
+                    "serializedViews":{
+                        "nullable": false,
+                        "type":"array",
+                        "description": "Array of serialized views",
+                        "items":{
+                            "type": "string",
+                            "nullable": false,
+                            "example": "View object stringified"
+                        }
+                    },
+                    "mergePolicy":{
+                        "$ref" : "#/components/schemas/MergePolicyOpts"
+                    },
+                    "policyArguments":{
+                        "type": "array",
+                        "description": "Arguments for the privacy policy function. Order is important",
+                        "items":{
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": {"serializedViews": ["View 1", "View2"], "mergePolicy": "undefined" }
+            },
+            "ProcessViewRequest":{
+                "type":"object",
+                "description": "This is the input for a mergeViewRequest",
+                "required": ["serializedView", "policyId", "policyArguments"],
+                "properties": {
+                    "serializedView":{
+                        "type": "string",
+                        "nullable": false,
+                        "example": "View object stringified"
+                    },
+                    "policyId":{
+                        "$ref" : "#/components/schemas/PrivacyPolicyOpts"
+                    },
+                    "policyArguments":{
+                        "type": "array",
+                        "description": "Arguments for the privacy policy function. Order is important",
+                        "items":{
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": {"serializedView": "View 1", "policyId": "policy 1", "policyArguments": ["stateId"]}
             }
         }
     },
@@ -286,6 +364,88 @@
                     }
                 }
             }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views"
+                    }
+                },
+                "operationId": "mergeViewsV1",
+                "summary": "Merges multiple views according to a privacy policy",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MergeViewsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MergeViewsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view"
+                    }
+                },
+                "operationId": "processViewV1",
+                "summary": "Creates a Blockchain View.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProcessViewRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateViewResponse"
+                                },
+                                "example": {"view": "Object", "signature":"signature of Object"}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
         }
+        
     }
 }

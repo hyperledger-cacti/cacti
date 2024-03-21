@@ -2,23 +2,43 @@ import { v4 as uuidV4 } from "uuid";
 import { Snapshot } from "./snapshot";
 import MerkleTree from "merkletreejs";
 import { Transaction } from "./transaction";
+import { IPrivacyPolicy, IPrivacyPolicyValue } from "./privacy-policies";
+import { PrivacyPolicyOpts } from "../generated/openapi/typescript-axios";
+import { JsObjectSigner } from "@hyperledger/cactus-common";
+
+export interface IViewMetadata {
+  viewId: string;
+  viewProof: {
+    transactionsMerkleRoot: string;
+    statesMerkleRoot: string;
+  };
+  policy?: IPrivacyPolicyValue;
+  creator: string;
+  signature: string;
+}
+
 export class View {
   private key: string;
   private snapshot: Snapshot;
   private tI: string;
   private tF: string;
   private participant: string;
+  private creator: string;
+  private oldVersionsMetadata: IViewMetadata[] = [];
+  private policy?: IPrivacyPolicyValue;
   private viewProof: {
     transactionsMerkleRoot: string;
     statesMerkleRoot: string;
   };
 
   constructor(
+    creator: string,
     tI: string,
     tF: string,
     snapshot: Snapshot,
     id: string | undefined,
   ) {
+    this.creator = creator;
     this.key = id ? id : uuidV4(); // FIXME receive as input maybe
     this.tI = tI;
     this.tF = tF;
@@ -27,11 +47,37 @@ export class View {
     snapshot.pruneStates(this.tI, this.tF);
     this.viewProof = this.generateViewProof();
   }
+
+  public setCreator(creator: string) {
+    this.creator = creator;
+  }
+  public getTI() {
+    return this.tI;
+  }
+  public getTF() {
+    return this.tF;
+  }
+
+  public getCreator(): string {
+    return this.creator;
+  }
+
+  public addPrevVersionMetadata(data: IViewMetadata) {
+    this.oldVersionsMetadata.push(data);
+  }
+
+  public getPolicy() {
+    return this.policy;
+  }
+
   public getKey() {
     return this.key;
   }
   public getSnapshot(): Snapshot {
     return this.snapshot;
+  }
+  public updateViewProof() {
+    this.viewProof = this.generateViewProof();
   }
   private generateViewProof(): {
     transactionsMerkleRoot: string;
@@ -76,6 +122,10 @@ export class View {
     return this.viewProof;
   }
 
+  public getParticipant(): string {
+    return this.participant;
+  }
+
   public getAllTransactions(): Transaction[] {
     const transactions: Transaction[] = [];
     this.snapshot.getStateBins().forEach((state) => {
@@ -84,5 +134,29 @@ export class View {
       });
     });
     return transactions;
+  }
+  public setPrivacyPolicyValue(value: IPrivacyPolicyValue | undefined) {
+    this.policy = value;
+  }
+  public setPrivacyPolicy(
+    policy: PrivacyPolicyOpts,
+    func: IPrivacyPolicy,
+    signer: JsObjectSigner,
+  ) {
+    this.policy = {
+      policy,
+      policyHash: signer.dataHash(func.toString()),
+    };
+  }
+
+  public setParticipant(participant: string) {
+    this.participant = participant;
+  }
+  public setKey(key: string) {
+    this.key = key;
+  }
+
+  public getOldVersionsMetadata(): IViewMetadata[] {
+    return this.oldVersionsMetadata;
   }
 }

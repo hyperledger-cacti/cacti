@@ -61,13 +61,13 @@ export class Snapshot {
   }
 
   public filterStates(tI: string, tF: string): void {
-    const finalT = parseInt(tF);
-    const initialT = parseInt(tI);
+    const finalT = BigInt(tF);
+    const initialT = BigInt(tI);
     const stateBins: State[] = [];
     for (const state of this.stateBins) {
       if (
-        parseInt(state.getInitialTime()) > finalT ||
-        parseInt(state.getFinalTime()) < initialT
+        BigInt(state.getInitialTime()) > finalT ||
+        BigInt(state.getFinalTime()) < initialT
       ) {
         continue;
       }
@@ -84,5 +84,12 @@ export class Snapshot {
     };
 
     return JSON.stringify(snapshotJson);
+  }
+
+  public removeState(stateId: string) {
+    this.stateBins = this.stateBins.filter((state) => {
+      return state.getId() !== stateId;
+    });
+    this.update_TI_TF();
   }
 }

@@ -395,7 +395,8 @@ test("test creation of views for specific timeframes", async () => {
 
   //tI is the time of the first transaction +1
   const tI = (
-    parseInt(snapshot.getStateBins()[0].getTransactions()[0].getTimeStamp()) + 1
+    BigInt(snapshot.getStateBins()[0].getTransactions()[0].getTimeStamp()) +
+    BigInt(1)
   ).toString();
 
   expect(snapshot1.getStateBins().length).toEqual(1);
@@ -410,7 +411,6 @@ test("test creation of views for specific timeframes", async () => {
     Number.MAX_SAFE_INTEGER.toString(),
     undefined,
   );
-
   //expect to return a view
   expect(view1.view).toBeTruthy();
   expect(view1.signature).toBeTruthy();

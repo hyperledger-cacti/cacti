@@ -76,13 +76,13 @@ export class State {
   }
 
   public pruneState(tI: string, tF: string): void {
-    const initialT = parseInt(tI);
-    const finalT = parseInt(tF);
+    const initialT = BigInt(tI);
+    const finalT = BigInt(tF);
     // eslint-disable-next-line prefer-const
     this.transactions.forEach((element, index) => {
       if (
-        parseInt(element.getTimeStamp()) < initialT ||
-        parseInt(element.getTimeStamp()) > finalT
+        BigInt(element.getTimeStamp()) < initialT ||
+        BigInt(element.getTimeStamp()) > finalT
       ) {
         //this.version = this.version - 1;
         this.transactions.splice(index, 1); //Remove tx

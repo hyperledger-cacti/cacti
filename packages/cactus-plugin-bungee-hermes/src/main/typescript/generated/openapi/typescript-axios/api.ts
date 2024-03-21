@@ -86,7 +86,7 @@ export interface CreateViewRequestNetworkDetails {
     'participant': string;
 }
 /**
- * This is the response for a viewRequests
+ * This is the response for a CreateViewRequest or ProcessViewRequest
  * @export
  * @interface CreateViewResponse
  */
@@ -117,6 +117,107 @@ export interface GetPublicKeyResponse {
      */
     'pubKey'?: string;
 }
+/**
+ * identifier of the policy used to merge views (can be none)
+ * @export
+ * @enum {string}
+ */
+
+export const MergePolicyOpts = {
+    PruneState: 'pruneState',
+    PruneStateFromView: 'pruneStateFromView',
+    NONE: 'NONE'
+} as const;
+
+export type MergePolicyOpts = typeof MergePolicyOpts[keyof typeof MergePolicyOpts];
+
+
+/**
+ * This is the input for a mergeViewRequest
+ * @export
+ * @interface MergeViewsRequest
+ */
+export interface MergeViewsRequest {
+    /**
+     * Array of serialized views
+     * @type {Array<string>}
+     * @memberof MergeViewsRequest
+     */
+    'serializedViews': Array<string>;
+    /**
+     * 
+     * @type {MergePolicyOpts}
+     * @memberof MergeViewsRequest
+     */
+    'mergePolicy': MergePolicyOpts;
+    /**
+     * Arguments for the privacy policy function. Order is important
+     * @type {Array<string>}
+     * @memberof MergeViewsRequest
+     */
+    'policyArguments'?: Array<string>;
+}
+
+
+/**
+ * This is the response of a mergeViewRequest
+ * @export
+ * @interface MergeViewsResponse
+ */
+export interface MergeViewsResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof MergeViewsResponse
+     */
+    'integratedView'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MergeViewsResponse
+     */
+    'signature'?: string;
+}
+/**
+ * identifier of the policy used to process a view
+ * @export
+ * @enum {string}
+ */
+
+export const PrivacyPolicyOpts = {
+    PruneState: 'pruneState'
+} as const;
+
+export type PrivacyPolicyOpts = typeof PrivacyPolicyOpts[keyof typeof PrivacyPolicyOpts];
+
+
+/**
+ * This is the input for a mergeViewRequest
+ * @export
+ * @interface ProcessViewRequest
+ */
+export interface ProcessViewRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProcessViewRequest
+     */
+    'serializedView': string;
+    /**
+     * 
+     * @type {PrivacyPolicyOpts}
+     * @memberof ProcessViewRequest
+     */
+    'policyId': PrivacyPolicyOpts;
+    /**
+     * Arguments for the privacy policy function. Order is important
+     * @type {Array<string>}
+     * @memberof ProcessViewRequest
+     */
+    'policyArguments': Array<string>;
+}
+
+
 /**
  * Set of transaction or state proofs and merkle tree root for verification
  * @export
@@ -254,6 +355,78 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Merges multiple views according to a privacy policy
+         * @param {MergeViewsRequest} mergeViewsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        mergeViewsV1: async (mergeViewsRequest: MergeViewsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'mergeViewsRequest' is not null or undefined
+            assertParamExists('mergeViewsV1', 'mergeViewsRequest', mergeViewsRequest)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(mergeViewsRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Creates a Blockchain View.
+         * @param {ProcessViewRequest} processViewRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processViewV1: async (processViewRequest: ProcessViewRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'processViewRequest' is not null or undefined
+            assertParamExists('processViewV1', 'processViewRequest', processViewRequest)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(processViewRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Checks validity of merkle tree root given an input
          * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
          * @param {*} [options] Override http request option.
@@ -331,6 +504,28 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Merges multiple views according to a privacy policy
+         * @param {MergeViewsRequest} mergeViewsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MergeViewsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.mergeViewsV1(mergeViewsRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Creates a Blockchain View.
+         * @param {ProcessViewRequest} processViewRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processViewV1(processViewRequest: ProcessViewRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateViewResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processViewV1(processViewRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Checks validity of merkle tree root given an input
          * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
          * @param {*} [options] Override http request option.
@@ -377,6 +572,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getPublicKey(options?: any): AxiosPromise<GetPublicKeyResponse> {
             return localVarFp.getPublicKey(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Merges multiple views according to a privacy policy
+         * @param {MergeViewsRequest} mergeViewsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: any): AxiosPromise<MergeViewsResponse> {
+            return localVarFp.mergeViewsV1(mergeViewsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Creates a Blockchain View.
+         * @param {ProcessViewRequest} processViewRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processViewV1(processViewRequest: ProcessViewRequest, options?: any): AxiosPromise<CreateViewResponse> {
+            return localVarFp.processViewV1(processViewRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -430,6 +645,30 @@ export class DefaultApi extends BaseAPI {
      */
     public getPublicKey(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPublicKey(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Merges multiple views according to a privacy policy
+     * @param {MergeViewsRequest} mergeViewsRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).mergeViewsV1(mergeViewsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Creates a Blockchain View.
+     * @param {ProcessViewRequest} processViewRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public processViewV1(processViewRequest: ProcessViewRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).processViewV1(processViewRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
