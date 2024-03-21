@@ -1,0 +1,221 @@
+{
+    "openapi": "3.0.3",
+    "servers": [
+        {
+          "url": "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes",
+          "description": "Development server",
+          "variables": {
+            "host": {
+              "default": "localhost"
+            },
+            "port": {
+              "default": "3000"
+            }
+          }
+        }
+      ],
+
+    "info": {
+        "title": "Hyperledger Cactus Plugin - BUNGEE-Hermes",
+        "description": "Can create blockchain views of different networks",
+        "version": "2.0.0-alpha.2",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "CreateViewRequest":{
+                "type":"object",
+                "description": "Request object for createViewV1 endpoint",
+                "required": ["strategyId", "networkDetails"],
+                "properties": {
+                    "stateIds":{
+                        "type":"array",
+                        "items":{
+                            "type": "string",
+                            "example": "id-of-asset-1"
+                        },
+                        "example": ["id-of-asset-1", "id-of-asset-2"]
+                    },
+                    "tI":{
+                        "type":"string",
+                        "example": "0"
+                    },
+                    "tF": {
+                        "type": "string",
+                        "example": "999999999999"
+                    },
+                    "viewID": {
+                        "type": "string",
+                        "example": "view-1"
+
+                    },
+                    "strategyId": {
+                        "type": "string",
+                        "example": "fabric-strategy",
+                        "nullable": false
+                    },
+                    "networkDetails": {
+                        "type": "object",
+                        "nullable": false,
+                        "required": ["connectorApiPath", "participant"],
+                        "properties": {
+                            "connectorApiPath":{
+                                "type": "string",
+                                "nullable": false,
+                                "example": "http://localhost:3000"
+                            },
+                            "participant": {
+                                "type": "string",
+                                "nullable": false,
+                                "example": "participant-1"
+                            }
+                        },
+                        "example": {"connectorApiPath": "http://localhost:3000", "participant": "participant-1"}
+                    }
+                },
+                "example": {"strategyId": "fabric-strategy", "networkDetails":{"connectorApiPath": "http://localhost:3000", "participant": "participant-1"}}
+            },
+            "CreateViewResponse":{
+                "type":"object",
+                "description": "This is the response for a viewRequests",
+                "properties": {
+                    "view":{
+                        "type":"string",
+                        "example": "Object"
+                    },
+                    "signature":{
+                        "type": "string",
+                        "example": "signature of Object"
+                    }
+                },
+                "example": {"view": "Object", "signature":"signature of Object"}
+            },
+            "GetPublicKeyResponse": {
+                "type": "object",
+                "description": "public key from bungee-hermes plugin instance",
+                "properties": {
+                    "pubKey":{
+                        "type": "string",
+                        "example": "----BEGIN CERTIFICATE----random content...."
+                    }
+                }
+            },
+            "AvailableStrategiesResponse":{
+                "type": "array",
+                "description": "Array with available strategy ids",
+                "items":{
+                    "type": "string",
+                    "example": "strategy-fabric"
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view"
+                    }
+                },
+                "operationId": "createViewV1",
+                "summary": "Creates a Blockchain View.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateViewRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateViewResponse"
+                                },
+                                "example": {"view": "Object", "signature":"signature of Object"}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key"
+                    }
+                },
+                "operationId": "GetPublicKey",
+                "summary": "Queries plugin's public key",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPublicKeyResponse"
+                                },
+                                "example": {"pubKey": "----BEGIN CERTIFICATE----random content...."}
+                            }
+                           
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies"
+                    }
+                },
+                "operationId": "GetAvailableStrategies",
+                "summary": "Queries plugin's available strategies for ledger capture",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AvailableStrategiesResponse"
+                                },
+                                "example": ["strategy-fabric"]
+                            }
+                           
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        }
+    }
+}
