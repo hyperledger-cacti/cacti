@@ -75,58 +75,9 @@ export class TransferProposalRequestMessage extends Message<TransferProposalRequ
 }
 
 /**
- * @generated from message cacti.satp.v02.TransferProposalReceiptMessage
+ * @generated from message cacti.satp.v02.TransferProposalReceiptRejectMessage
  */
-export class TransferProposalReceiptMessage extends Message<TransferProposalReceiptMessage> {
-  /**
-   * @generated from field: cacti.satp.v02.common.CommonSatp common = 1;
-   */
-  common?: CommonSatp;
-
-  /**
-   * @generated from field: string hash_transfer_init_claims = 2;
-   */
-  hashTransferInitClaims = "";
-
-  /**
-   * @generated from field: string timestamp = 3;
-   */
-  timestamp = "";
-
-  constructor(data?: PartialMessage<TransferProposalReceiptMessage>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.TransferProposalReceiptMessage";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "common", kind: "message", T: CommonSatp },
-    { no: 2, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalReceiptMessage {
-    return new TransferProposalReceiptMessage().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TransferProposalReceiptMessage {
-    return new TransferProposalReceiptMessage().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TransferProposalReceiptMessage {
-    return new TransferProposalReceiptMessage().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: TransferProposalReceiptMessage | PlainMessage<TransferProposalReceiptMessage> | undefined, b: TransferProposalReceiptMessage | PlainMessage<TransferProposalReceiptMessage> | undefined): boolean {
-    return proto3.util.equals(TransferProposalReceiptMessage, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.TransferProposalRejectMessage
- */
-export class TransferProposalRejectMessage extends Message<TransferProposalRejectMessage> {
+export class TransferProposalReceiptRejectMessage extends Message<TransferProposalReceiptRejectMessage> {
   /**
    * @generated from field: cacti.satp.v02.common.CommonSatp common = 1;
    */
@@ -147,13 +98,13 @@ export class TransferProposalRejectMessage extends Message<TransferProposalRejec
    */
   timestamp = "";
 
-  constructor(data?: PartialMessage<TransferProposalRejectMessage>) {
+  constructor(data?: PartialMessage<TransferProposalReceiptRejectMessage>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.TransferProposalRejectMessage";
+  static readonly typeName = "cacti.satp.v02.TransferProposalReceiptRejectMessage";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
     { no: 2, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -161,70 +112,20 @@ export class TransferProposalRejectMessage extends Message<TransferProposalRejec
     { no: 4, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalRejectMessage {
-    return new TransferProposalRejectMessage().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalReceiptRejectMessage {
+    return new TransferProposalReceiptRejectMessage().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TransferProposalRejectMessage {
-    return new TransferProposalRejectMessage().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TransferProposalReceiptRejectMessage {
+    return new TransferProposalReceiptRejectMessage().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TransferProposalRejectMessage {
-    return new TransferProposalRejectMessage().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TransferProposalReceiptRejectMessage {
+    return new TransferProposalReceiptRejectMessage().fromJsonString(jsonString, options);
   }
 
-  static equals(a: TransferProposalRejectMessage | PlainMessage<TransferProposalRejectMessage> | undefined, b: TransferProposalRejectMessage | PlainMessage<TransferProposalRejectMessage> | undefined): boolean {
-    return proto3.util.equals(TransferProposalRejectMessage, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.TransferProposalResponseMessage
- */
-export class TransferProposalResponseMessage extends Message<TransferProposalResponseMessage> {
-  /**
-   * @generated from oneof cacti.satp.v02.TransferProposalResponseMessage.response
-   */
-  response: {
-    /**
-     * @generated from field: cacti.satp.v02.TransferProposalReceiptMessage receipt = 1;
-     */
-    value: TransferProposalReceiptMessage;
-    case: "receipt";
-  } | {
-    /**
-     * @generated from field: cacti.satp.v02.TransferProposalRejectMessage reject = 2;
-     */
-    value: TransferProposalRejectMessage;
-    case: "reject";
-  } | { case: undefined; value?: undefined } = { case: undefined };
-
-  constructor(data?: PartialMessage<TransferProposalResponseMessage>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.TransferProposalResponseMessage";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "receipt", kind: "message", T: TransferProposalReceiptMessage, oneof: "response" },
-    { no: 2, name: "reject", kind: "message", T: TransferProposalRejectMessage, oneof: "response" },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalResponseMessage {
-    return new TransferProposalResponseMessage().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TransferProposalResponseMessage {
-    return new TransferProposalResponseMessage().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TransferProposalResponseMessage {
-    return new TransferProposalResponseMessage().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: TransferProposalResponseMessage | PlainMessage<TransferProposalResponseMessage> | undefined, b: TransferProposalResponseMessage | PlainMessage<TransferProposalResponseMessage> | undefined): boolean {
-    return proto3.util.equals(TransferProposalResponseMessage, a, b);
+  static equals(a: TransferProposalReceiptRejectMessage | PlainMessage<TransferProposalReceiptRejectMessage> | undefined, b: TransferProposalReceiptRejectMessage | PlainMessage<TransferProposalReceiptRejectMessage> | undefined): boolean {
+    return proto3.util.equals(TransferProposalReceiptRejectMessage, a, b);
   }
 }
 

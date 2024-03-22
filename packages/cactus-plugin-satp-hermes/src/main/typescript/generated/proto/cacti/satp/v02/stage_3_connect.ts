@@ -3,8 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CommitFinalAcknowledgementReceiptResponseMessage, CommitFinalAssertionRequestMessage, CommitPreparationRequestMessage, CommitReadyResponseMessage, TransferCompleteRequestMessage, TransferCompleteResponseMessage } from "./stage_3_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
+import { CommitFinalAcknowledgementReceiptResponseMessage, CommitFinalAssertionRequestMessage, CommitPreparationRequestMessage, CommitReadyResponseMessage, TransferCompleteRequestMessage } from "./stage_3_pb.js";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service cacti.satp.v02.SatpStage3Service
@@ -36,7 +36,7 @@ export const SatpStage3Service = {
     transferComplete: {
       name: "TransferComplete",
       I: TransferCompleteRequestMessage,
-      O: TransferCompleteResponseMessage,
+      O: Empty,
       kind: MethodKind.Unary,
     },
   }
