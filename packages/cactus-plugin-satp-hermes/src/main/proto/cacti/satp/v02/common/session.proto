@@ -50,7 +50,16 @@ message SessionData {
     string last_message_received_timestamp = 40;
     MessageStagesTimestamps processed_timestamps = 41;
     MessageStagesTimestamps received_timestamps = 42;
+    cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 43;
+    cacti.satp.v02.common.LockAssertionFormat lock_assertion_format = 44;
+    cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 45;
+    cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 46;
+    cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 47;
+    cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 48;
+    cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 49;
+    cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 50;
 }
+
 
 
 message MessageStagesHashes {
@@ -76,7 +85,7 @@ message Stage3Hashes {
     string commit_preparation_request_message_hash = 1;
     string commit_ready_response_message_hash = 2;
     string commit_final_assertion_request_message_hash = 3;
-    string commit_final_acknoledgement_receipt_response_message_hash = 4;
+    string commit_final_acknowledgement_receipt_response_message_hash = 4;
     string transfer_complete_request_message_hash = 5;
     string transfer_complete_response_message_hash = 6;
 }
@@ -104,9 +113,37 @@ message Stage3Signatures {
     string commit_preparation_request_message_client_signature = 1;
     string commit_ready_response_message_server_signature = 2;
     string commit_final_assertion_request_message_client_signature = 3;
-    string commit_final_acknoledgement_receipt_response_message_server_signature = 4;
+    string commit_final_acknowledgement_receipt_response_message_server_signature = 4;
     string transfer_complete_request_message_client_signature = 5;
     string transfer_complete_response_message_server_signature = 6;
+}
+
+message MessageStagesTimestamps {
+    Stage1Timestamps stage1 = 1;
+    Stage2Timestamps stage2 = 2;
+    Stage3Timestamps stage3 = 3;  
+}
+
+message Stage1Timestamps {
+    string transfer_proposal_request_message_timestamp = 1;
+    string transfer_proposal_receipt_message_timestamp = 2;
+    string transfer_proposal_reject_message_timestamp = 3;
+    string transfer_commence_request_message_timestamp = 4;
+    string transfer_commence_response_message_timestamp = 5;
+}
+
+message Stage2Timestamps {
+    string lock_assertion_request_message_timestamp = 1;
+    string lock_assertion_receipt_message_timestamp = 2;
+}
+
+message Stage3Timestamps {
+    string commit_preparation_request_message_timestamp = 1;
+    string commit_ready_response_message_timestamp = 2;
+    string commit_final_assertion_request_message_timestamp = 3;
+    string commit_final_acknoledgement_receipt_response_message_timestamp = 4;
+    string transfer_complete_request_message_timestamp = 5;
+    string transfer_complete_response_message_timestamp = 6;
 }
 
 message MessageStagesTimestamps {

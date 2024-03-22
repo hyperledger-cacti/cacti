@@ -13,24 +13,11 @@ message TransferProposalRequestMessage {
   bool multiple_cancels_allowed = 6;
 }
 
-message TransferProposalReceiptMessage {
-  cacti.satp.v02.common.CommonSatp common = 1;
-  string hash_transfer_init_claims = 2;
-  string timestamp = 3;
-}
-
-message TransferProposalRejectMessage {
+message TransferProposalReceiptRejectMessage {
   cacti.satp.v02.common.CommonSatp common = 1;
   string hash_transfer_init_claims = 2;
   cacti.satp.v02.common.TransferClaims transfer_counter_claims = 3;
   string timestamp = 4;
-}
-
-message TransferProposalResponseMessage {
-  oneof response {
-    TransferProposalReceiptMessage receipt = 1;
-    TransferProposalRejectMessage reject = 2;
-  }
 }
 
 message TransferCommenceRequestMessage {
@@ -44,6 +31,6 @@ message TransferCommenceResponseMessage {
 }
   
 service SatpStage1Service {
-  rpc TransferProposal(TransferProposalRequestMessage) returns (TransferProposalResponseMessage) {}
+  rpc TransferProposal(TransferProposalRequestMessage) returns (TransferProposalReceiptRejectMessage) {}
   rpc TransferCommence(TransferCommenceRequestMessage) returns (TransferCommenceResponseMessage) {}
 }

@@ -93,14 +93,15 @@ enum MessageType {
     MESSAGE_TYPE_INIT_PROPOSAL = 1;
     MESSAGE_TYPE_INIT_RECEIPT = 2;
     MESSAGE_TYPE_INIT_REJECT = 3;
-    MESSAGE_TYPE_TRANSFER_COMMENCE = 4;
-    MESSAGE_TYPE_LOCK_ASSERT = 5;
-    MESSAGE_TYPE_ASSERTION_RECEIPT = 6;
-    MESSAGE_TYPE_COMMIT_PREPARE = 7;
-    MESSAGE_TYPE_COMMIT_READY = 8;
-    MESSAGE_TYPE_COMMIT_FINAL = 9;
-    MESSAGE_TYPE_ACK_COMMIT_FINAL = 10;
-    MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 11;
+    MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 4;
+    MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 5;
+    MESSAGE_TYPE_LOCK_ASSERT = 6;
+    MESSAGE_TYPE_ASSERTION_RECEIPT = 7;
+    MESSAGE_TYPE_COMMIT_PREPARE = 8;
+    MESSAGE_TYPE_COMMIT_READY = 9;
+    MESSAGE_TYPE_COMMIT_FINAL = 10;
+    MESSAGE_TYPE_ACK_COMMIT_FINAL = 11;
+    MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 12;
   }
 
 message CommonSatp {
@@ -189,5 +190,37 @@ enum Error {
     ERROR_EXPIRED_CLAIM = 9;
     ERROR_INCORRERCT_PARAMETER = 10;
     ERROR_MESSAGE_OUT_OF_SEQUENCE = 11;
+}
+
+message LockAssertionClaim {
+
+}
+
+message LockAssertionFormat {
+
+}
+
+message MintAssertionClaims {
+
+}
+
+message MintAssertionClaimsFormat {
+
+}
+
+message BurnAssertionClaim {
+
+}
+
+message BurnAssertionClaimFormat {
+
+}
+
+message AssignmentAssertionClaim {
+
+}
+
+message AssignmentAssertionClaimFormat {
+
 }
 
