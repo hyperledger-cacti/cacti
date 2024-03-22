@@ -5,162 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { CommonSatp } from "./common/common_messages_pb.js";
-
-/**
- * @generated from message cacti.satp.v02.MintAssertionClaims
- */
-export class MintAssertionClaims extends Message<MintAssertionClaims> {
-  constructor(data?: PartialMessage<MintAssertionClaims>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.MintAssertionClaims";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaims {
-    return new MintAssertionClaims().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MintAssertionClaims {
-    return new MintAssertionClaims().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MintAssertionClaims {
-    return new MintAssertionClaims().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: MintAssertionClaims | PlainMessage<MintAssertionClaims> | undefined, b: MintAssertionClaims | PlainMessage<MintAssertionClaims> | undefined): boolean {
-    return proto3.util.equals(MintAssertionClaims, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.BurnAssertionClaim
- */
-export class BurnAssertionClaim extends Message<BurnAssertionClaim> {
-  constructor(data?: PartialMessage<BurnAssertionClaim>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.BurnAssertionClaim";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BurnAssertionClaim {
-    return new BurnAssertionClaim().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BurnAssertionClaim {
-    return new BurnAssertionClaim().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BurnAssertionClaim {
-    return new BurnAssertionClaim().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: BurnAssertionClaim | PlainMessage<BurnAssertionClaim> | undefined, b: BurnAssertionClaim | PlainMessage<BurnAssertionClaim> | undefined): boolean {
-    return proto3.util.equals(BurnAssertionClaim, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.BurnAssertionClaimFormat
- */
-export class BurnAssertionClaimFormat extends Message<BurnAssertionClaimFormat> {
-  constructor(data?: PartialMessage<BurnAssertionClaimFormat>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.BurnAssertionClaimFormat";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BurnAssertionClaimFormat {
-    return new BurnAssertionClaimFormat().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BurnAssertionClaimFormat {
-    return new BurnAssertionClaimFormat().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BurnAssertionClaimFormat {
-    return new BurnAssertionClaimFormat().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: BurnAssertionClaimFormat | PlainMessage<BurnAssertionClaimFormat> | undefined, b: BurnAssertionClaimFormat | PlainMessage<BurnAssertionClaimFormat> | undefined): boolean {
-    return proto3.util.equals(BurnAssertionClaimFormat, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.AssignmentAssertionClaim
- */
-export class AssignmentAssertionClaim extends Message<AssignmentAssertionClaim> {
-  constructor(data?: PartialMessage<AssignmentAssertionClaim>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.AssignmentAssertionClaim";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssignmentAssertionClaim {
-    return new AssignmentAssertionClaim().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssignmentAssertionClaim {
-    return new AssignmentAssertionClaim().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssignmentAssertionClaim {
-    return new AssignmentAssertionClaim().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined, b: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined): boolean {
-    return proto3.util.equals(AssignmentAssertionClaim, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.AssignmentAssertionClaimFormat
- */
-export class AssignmentAssertionClaimFormat extends Message<AssignmentAssertionClaimFormat> {
-  constructor(data?: PartialMessage<AssignmentAssertionClaimFormat>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.AssignmentAssertionClaimFormat";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssignmentAssertionClaimFormat {
-    return new AssignmentAssertionClaimFormat().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssignmentAssertionClaimFormat {
-    return new AssignmentAssertionClaimFormat().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssignmentAssertionClaimFormat {
-    return new AssignmentAssertionClaimFormat().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: AssignmentAssertionClaimFormat | PlainMessage<AssignmentAssertionClaimFormat> | undefined, b: AssignmentAssertionClaimFormat | PlainMessage<AssignmentAssertionClaimFormat> | undefined): boolean {
-    return proto3.util.equals(AssignmentAssertionClaimFormat, a, b);
-  }
-}
+import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CommonSatp, MintAssertionClaims, MintAssertionClaimsFormat } from "./common/common_messages_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.CommitPreparationRequestMessage
@@ -221,17 +66,22 @@ export class CommitReadyResponseMessage extends Message<CommitReadyResponseMessa
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.MintAssertionClaims mint_assertion_claims = 2;
+   * @generated from field: cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 2;
    */
   mintAssertionClaims?: MintAssertionClaims;
 
   /**
-   * @generated from field: string server_transfer_number = 3;
+   * @generated from field: cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 3;
+   */
+  mintAssertionClaimsFormat?: MintAssertionClaimsFormat;
+
+  /**
+   * @generated from field: string server_transfer_number = 4;
    */
   serverTransferNumber = "";
 
   /**
-   * @generated from field: string server_signature = 4;
+   * @generated from field: string server_signature = 5;
    */
   serverSignature = "";
 
@@ -245,8 +95,9 @@ export class CommitReadyResponseMessage extends Message<CommitReadyResponseMessa
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
     { no: 2, name: "mint_assertion_claims", kind: "message", T: MintAssertionClaims },
-    { no: 3, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "mint_assertion_claims_format", kind: "message", T: MintAssertionClaimsFormat },
+    { no: 4, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CommitReadyResponseMessage {
@@ -276,12 +127,12 @@ export class CommitFinalAssertionRequestMessage extends Message<CommitFinalAsser
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.BurnAssertionClaim burn_assertion_claim = 2;
+   * @generated from field: cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 2;
    */
   burnAssertionClaim?: BurnAssertionClaim;
 
   /**
-   * @generated from field: cacti.satp.v02.BurnAssertionClaimFormat burn_assertion_claim_format = 3;
+   * @generated from field: cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 3;
    */
   burnAssertionClaimFormat?: BurnAssertionClaimFormat;
 
@@ -337,12 +188,12 @@ export class CommitFinalAcknowledgementReceiptResponseMessage extends Message<Co
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.AssignmentAssertionClaim assignment_assertion_claim = 2;
+   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 2;
    */
   assignmentAssertionClaim?: AssignmentAssertionClaim;
 
   /**
-   * @generated from field: cacti.satp.v02.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 3;
+   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 3;
    */
   assignmentAssertionClaimFormat?: AssignmentAssertionClaimFormat;
 

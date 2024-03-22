@@ -5,69 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { CommonSatp } from "./common/common_messages_pb.js";
-
-/**
- * @generated from message cacti.satp.v02.LockAssertionClaim
- */
-export class LockAssertionClaim extends Message<LockAssertionClaim> {
-  constructor(data?: PartialMessage<LockAssertionClaim>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.LockAssertionClaim";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionClaim {
-    return new LockAssertionClaim().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssertionClaim {
-    return new LockAssertionClaim().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssertionClaim {
-    return new LockAssertionClaim().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LockAssertionClaim | PlainMessage<LockAssertionClaim> | undefined, b: LockAssertionClaim | PlainMessage<LockAssertionClaim> | undefined): boolean {
-    return proto3.util.equals(LockAssertionClaim, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.LockAssertionFormat
- */
-export class LockAssertionFormat extends Message<LockAssertionFormat> {
-  constructor(data?: PartialMessage<LockAssertionFormat>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.LockAssertionFormat";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionFormat {
-    return new LockAssertionFormat().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssertionFormat {
-    return new LockAssertionFormat().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssertionFormat {
-    return new LockAssertionFormat().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LockAssertionFormat | PlainMessage<LockAssertionFormat> | undefined, b: LockAssertionFormat | PlainMessage<LockAssertionFormat> | undefined): boolean {
-    return proto3.util.equals(LockAssertionFormat, a, b);
-  }
-}
+import { CommonSatp, LockAssertionClaim, LockAssertionFormat } from "./common/common_messages_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.LockAssertionRequestMessage
@@ -79,12 +17,12 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.LockAssertionClaim lock_assertion_claim = 2;
+   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 2;
    */
   lockAssertionClaim?: LockAssertionClaim;
 
   /**
-   * @generated from field: cacti.satp.v02.LockAssertionFormat lock_assertion_format = 3;
+   * @generated from field: cacti.satp.v02.common.LockAssertionFormat lock_assertion_format = 3;
    */
   lockAssertionFormat?: LockAssertionFormat;
 
