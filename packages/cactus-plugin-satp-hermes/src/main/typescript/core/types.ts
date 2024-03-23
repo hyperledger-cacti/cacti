@@ -1,6 +1,7 @@
-import { Secp256k1Keys, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
 import { BLODispatcher } from "../blo/dispatcher";
+import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
 
 export enum CurrentDrafts {
   Core = "Core",
@@ -43,13 +44,14 @@ export type GatewayIdentity = {
   proofID?: string;
   gatewayServerPort?: number;
   gatewayClientPort?: number;
+  gatewayGrpcPort?: number;
   address?: Address;
 };
 
 export interface SATPGatewayConfig {
   gid?: GatewayIdentity;
   logLevel?: LogLevelDesc;
-  keys?: Secp256k1Keys;
+  keyPair?: ISignerKeyPairs;
   environment?: "development" | "production";
   enableOpenAPI?: boolean;
   validationOptions?: ValidatorOptions;
@@ -67,4 +69,19 @@ export function isOfType<T>(
   type: new (...args: any[]) => T,
 ): obj is T {
   return obj instanceof type;
+}
+
+export interface LocalLog {
+  sessionID: string;
+  type: string;
+  key?: string;
+  operation: string;
+  timestamp?: string;
+  data: string;
+}
+export interface RemoteLog {
+  key: string;
+  hash: string;
+  signature: string;
+  signerPubKey: string;
 }
