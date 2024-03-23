@@ -4,6 +4,8 @@ import {
   Checks,
   LoggerProvider,
   ILoggerOptions,
+  JsObjectSigner,
+  IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
 import { v4 as uuidv4 } from "uuid";
 
@@ -26,15 +28,22 @@ import {
 import { GatewayOrchestrator } from "./gol/gateway-orchestrator";
 export { SATPGatewayConfig };
 import express, { Express } from "express";
-import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import http from "http";
 import { configureRoutes } from "./web-services/router";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_GRPC,
   DEFAULT_PORT_GATEWAY_SERVER,
 } from "./core/constants";
 import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
-
+import { SessionData } from "./generated/proto/cacti/satp/v02/common/session_pb";
+import { expressConnectMiddleware } from "@connectrpc/connect-express";
+import { bufArray2HexStr } from "./gateway-utils";
+import { COREDispatcher } from "./core/dispatcher";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "./repository/interfaces/repository";
 export class SATPGateway {
   // todo more checks; example port from config is between 3000 and 9000
   @IsDefined()
@@ -60,9 +69,20 @@ export class SATPGateway {
   private BLOApplication?: Express;
   private BLOServer?: http.Server;
   private BLODispatcher?: BLODispatcher;
+  private gRPCServer?: http.Server;
+  private gRPCApplication?: Express;
+  private COREDispatcher?: COREDispatcher;
+
+  private objectSigner: JsObjectSigner;
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
-  // private sessions: Map<string, Session> = new Map();
+  private supportedDltIDs: SupportedGatewayImplementations[];
+  private sessions: Map<string, SessionData> = new Map();
+  private _pubKey: string;
+  private _privKey: string;
+
+  public localRepository?: ILocalLogRepository;
+  public remoteRepository?: IRemoteLogRepository;
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.label}#constructor()`;
@@ -76,6 +96,21 @@ export class SATPGateway {
     };
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
+
+    if (this.config.keyPair == undefined) {
+      throw new Error("Key pair is undefined");
+    }
+
+    this._pubKey = bufArray2HexStr(this.config.keyPair.publicKey);
+    this._privKey = bufArray2HexStr(this.config.keyPair.privateKey);
+
+    this.logger.info(`Gateway's public key: ${this._pubKey}`);
+
+    const objectSignerOptions: IJsObjectSignerOptions = {
+      privateKey: this._privKey,
+      logLevel: "debug",
+    };
+    this.objectSigner = new JsObjectSigner(objectSignerOptions);
 
     if (options.enableOpenAPI) {
       this.setupOpenAPI();
@@ -95,11 +130,37 @@ export class SATPGateway {
       instanceId: this.config.gid!.id,
     };
 
+    this.supportedDltIDs = this.config.gid!.supportedChains;
+
     if (!this.config.gid || !dispatcherOps.instanceId) {
       throw new Error("Invalid configuration");
     }
 
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
+  }
+
+  public getSessions(): Map<string, SessionData> {
+    return this.sessions;
+  }
+
+  public getSession(sessionId: string): SessionData | undefined {
+    return this.sessions.get(sessionId);
+  }
+
+  public getSupportedDltIDs(): string[] {
+    return this.supportedDltIDs;
+  }
+
+  public addSession(sessionId: string, sessionData: SessionData): void {
+    this.sessions.set(sessionId, sessionData);
+  }
+
+  public get gatewaySigner(): JsObjectSigner {
+    return this.objectSigner;
+  }
+
+  public get pubKey(): string {
+    return this._pubKey;
   }
 
   // todo load docs for gateway coordinator and expose them in a http gatewayApplication
@@ -124,8 +185,8 @@ export class SATPGateway {
   static ProcessGatewayCoordinatorConfig(
     pluginOptions: SATPGatewayConfig,
   ): SATPGatewayConfig {
-    if (!pluginOptions.keys) {
-      pluginOptions.keys = Secp256k1Keys.generateKeyPairsBuffer();
+    if (!pluginOptions.keyPair) {
+      pluginOptions.keyPair = Secp256k1Keys.generateKeyPairsBuffer();
     }
 
     const id = uuidv4();
@@ -217,13 +278,57 @@ export class SATPGateway {
     this.logger.trace(`Entering ${fnTag}`);
 
     await Promise.all([
-      // TODO! need to add TLS support for Connect and gRPC to work
+      // grpc server does not start correctly
+      // this.startupGRPCServer(),
       this.startupGatewayServer(),
       this.startupBOLServer(),
     ]);
 
     this.logger.info("Both GatewayServer and BLOServer have started");
   }
+
+  async startupGRPCServer(): Promise<void> {
+    const fnTag = `${this.label}#startupGRPCServer()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    this.logger.info("Starting gRPC server");
+    const port = this.options.gid?.gatewayGrpcPort ?? DEFAULT_PORT_GATEWAY_GRPC;
+
+    return new Promise(async (resolve, reject) => {
+      if (this.gRPCApplication || !this.gRPCServer) {
+        if (!this.COREDispatcher) {
+          throw new Error("COREDispatcher is not defined");
+        }
+
+        this.gRPCApplication = express();
+
+        try {
+          const gRPCServices = await this.COREDispatcher.getOrCreateServices();
+          for (const service of gRPCServices) {
+            this.logger.debug(`Registering web service: ${service.getPath()}`);
+            await service.registerExpress(this.COREDispatcher);
+          }
+        } catch (error) {
+          throw new Error(`Failed to register web services: ${error}`);
+        }
+
+        this.gRPCServer = http.createServer(this.gRPCApplication);
+
+        this.gRPCServer.listen(port, () => {
+          this.logger.info(`gRPC server started and listening on port ${port}`);
+          resolve();
+        });
+
+        this.gRPCServer.on("error", (error) => {
+          this.logger.error(`gRPC server failed to start: ${error}`);
+          reject(error);
+        });
+      } else {
+        this.logger.warn("Server already running");
+        resolve();
+      }
+    });
+  }
+
   async startupGatewayServer(): Promise<void> {
     const fnTag = `${this.label}#startupGatewayServer()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -442,6 +547,9 @@ export class SATPGateway {
     const fnTag = `${this.label}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
 
+    this.logger.info("Shutting down Node server - gRPC");
+    await this.shutdownGRPCServer();
+
     this.logger.info("Shutting down Node server - Gateway");
     await this.shutdownGatewayServer();
 
@@ -488,6 +596,24 @@ export class SATPGateway {
       try {
         await this.BLOServer.close();
         this.BLOServer = undefined;
+        this.logger.info("Server shut down");
+      } catch (error) {
+        this.logger.error(
+          `Error shutting down the gatewayApplication: ${error}`,
+        );
+      }
+    } else {
+      this.logger.warn("Server is not running.");
+    }
+  }
+
+  private async shutdownGRPCServer(): Promise<void> {
+    const fnTag = `${this.label}#shutdownGRPCServer()`;
+    this.logger.debug(`Entering ${fnTag}`);
+    if (this.gRPCServer) {
+      try {
+        await this.gRPCServer.close();
+        this.gRPCServer = undefined;
         this.logger.info("Server shut down");
       } catch (error) {
         this.logger.error(
