@@ -1,4 +1,4 @@
-import { ILocalLog } from "../plugin-satp-gateway";
+import { LocalLog } from "../core/types";
 import { ILocalLogRepository } from "./interfaces/repository";
 import knex, { Knex } from "knex";
 
@@ -18,24 +18,24 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
     return this.database("logs");
   }
 
-  readById(logKey: string): Promise<ILocalLog> {
+  readById(logKey: string): Promise<LocalLog> {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
-  readLastestLog(sessionID: string): Promise<ILocalLog> {
+  readLastestLog(sessionID: string): Promise<LocalLog> {
     return this.getLogsTable()
       .orderBy("timestamp", "desc")
       .where({ sessionID: sessionID })
       .first();
   }
 
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<ILocalLog[]> {
+  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]> {
     return this.getLogsTable()
       .where("timestamp", ">", timestamp)
       .whereNot("type", "like", "%proof%");
   }
 
-  create(log: ILocalLog): any {
+  create(log: LocalLog): any {
     return this.getLogsTable().insert(log);
   }
 
@@ -43,7 +43,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
     return this.database().where({ sessionID: sessionID }).del();
   }
 
-  readLogsNotProofs(): Promise<ILocalLog[]> {
+  readLogsNotProofs(): Promise<LocalLog[]> {
     return this.getLogsTable()
       .select(
         this.database.raw(

@@ -1,4 +1,4 @@
-import { IRemoteLog, ILocalLog } from "../../plugin-satp-gateway";
+import { LocalLog, RemoteLog } from "../../core/types";
 
 export interface IRepository<T, K> {
   readById(id: K): Promise<T>;
@@ -7,22 +7,22 @@ export interface IRepository<T, K> {
   reset(): any;
 }
 
-export interface ILocalLogRepository extends IRepository<ILocalLog, string> {
+export interface ILocalLogRepository extends IRepository<LocalLog, string> {
   database: any;
-  readById(id: string): Promise<ILocalLog>;
-  readLogsNotProofs(): Promise<ILocalLog[]>;
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<ILocalLog[]>;
-  readLastestLog(sessionID: string): Promise<ILocalLog>;
-  create(log: ILocalLog): Promise<ILocalLog>;
+  readById(id: string): Promise<LocalLog>;
+  readLogsNotProofs(): Promise<LocalLog[]>;
+  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]>;
+  readLastestLog(sessionID: string): Promise<LocalLog>;
+  create(log: LocalLog): Promise<LocalLog>;
   deleteBySessionId(log: string): any;
   destroy(): any;
   reset(): any;
 }
 
-export interface IRemoteLogRepository extends IRepository<IRemoteLog, string> {
+export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
   database: any;
-  readById(id: string): Promise<IRemoteLog>;
-  create(log: IRemoteLog): any;
+  readById(id: string): Promise<RemoteLog>;
+  create(log: RemoteLog): any;
   destroy(): any;
   reset(): any;
 }

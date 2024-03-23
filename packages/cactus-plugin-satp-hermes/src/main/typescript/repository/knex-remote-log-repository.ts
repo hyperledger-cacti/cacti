@@ -1,5 +1,5 @@
 import { IRemoteLogRepository } from "./interfaces/repository";
-import { IRemoteLog } from "../plugin-satp-gateway";
+import { RemoteLog } from "../core/types";
 import knex, { Knex } from "knex";
 
 export class KnexRemoteLogRepository implements IRemoteLogRepository {
@@ -21,11 +21,11 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
     return this.database("remote-logs");
   }
 
-  readById(logKey: string): Promise<IRemoteLog> {
+  readById(logKey: string): Promise<RemoteLog> {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
-  create(log: IRemoteLog): any {
+  create(log: RemoteLog): any {
     return this.getLogsTable().insert(log);
   }
 
