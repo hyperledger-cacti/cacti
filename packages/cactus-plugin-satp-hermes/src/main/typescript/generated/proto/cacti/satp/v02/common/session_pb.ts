@@ -4,7 +4,684 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { PayloadProfile } from "./common_messages_pb.js";
+
+/**
+ * @generated from message cacti.satp.v02.common.SessionData
+ */
+export class SessionData extends Message<SessionData> {
+  constructor(data?: PartialMessage<SessionData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.SessionData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {
+    return new SessionData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SessionData {
+    return new SessionData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SessionData {
+    return new SessionData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SessionData | PlainMessage<SessionData> | undefined, b: SessionData | PlainMessage<SessionData> | undefined): boolean {
+    return proto3.util.equals(SessionData, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.SessionData.SessionData
+ */
+export class SessionData_SessionData extends Message<SessionData_SessionData> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  /**
+   * @generated from field: string transfer_context_id = 3;
+   */
+  transferContextId = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.MessageStagesHashes hashes = 4;
+   */
+  hashes?: MessageStagesHashes;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.PayloadProfile payload_profile = 5;
+   */
+  payloadProfile?: PayloadProfile;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.MessageStagesSignatures signatures = 6;
+   */
+  signatures?: MessageStagesSignatures;
+
+  /**
+   * @generated from field: string max_retries = 7;
+   */
+  maxRetries = "";
+
+  /**
+   * @generated from field: string max_timeout = 8;
+   */
+  maxTimeout = "";
+
+  /**
+   * @generated from field: string logging_profile = 9;
+   */
+  loggingProfile = "";
+
+  /**
+   * @generated from field: string recipient_base_path = 10;
+   */
+  recipientBasePath = "";
+
+  /**
+   * @generated from field: string source_base_path = 11;
+   */
+  sourceBasePath = "";
+
+  /**
+   * @generated from field: string access_control_profile = 12;
+   */
+  accessControlProfile = "";
+
+  /**
+   * @generated from field: string application_profile = 13;
+   */
+  applicationProfile = "";
+
+  /**
+   * @generated from field: int64 last_sequence_number = 14;
+   */
+  lastSequenceNumber = protoInt64.zero;
+
+  /**
+   * @generated from field: string sender_gateway_network_id = 15;
+   */
+  senderGatewayNetworkId = "";
+
+  /**
+   * @generated from field: string recipient_gateway_network_id = 16;
+   */
+  recipientGatewayNetworkId = "";
+
+  /**
+   * @generated from field: string source_ledger_asset_id = 17;
+   */
+  sourceLedgerAssetId = "";
+
+  /**
+   * @generated from field: string recipient_ledger_asset_id = 18;
+   */
+  recipientLedgerAssetId = "";
+
+  /**
+   * @generated from field: string server_identity_pubkey = 19;
+   */
+  serverIdentityPubkey = "";
+
+  /**
+   * @generated from field: string source_gateway_pubkey = 20;
+   */
+  sourceGatewayPubkey = "";
+
+  /**
+   * @generated from field: string verified_originator_entity_id = 21;
+   */
+  verifiedOriginatorEntityId = "";
+
+  /**
+   * @generated from field: string verified_beneficiary_entity_id = 22;
+   */
+  verifiedBeneficiaryEntityId = "";
+
+  /**
+   * @generated from field: string asset_profile_id = 23;
+   */
+  assetProfileId = "";
+
+  /**
+   * @generated from field: string digital_asset_id = 24;
+   */
+  digitalAssetId = "";
+
+  /**
+   * @generated from field: string originator_pubkey = 25;
+   */
+  originatorPubkey = "";
+
+  /**
+   * @generated from field: string beneficiary_pubkey = 26;
+   */
+  beneficiaryPubkey = "";
+
+  /**
+   * @generated from field: string sender_gateway_owner_id = 27;
+   */
+  senderGatewayOwnerId = "";
+
+  /**
+   * @generated from field: string receiver_gateway_owner_id = 28;
+   */
+  receiverGatewayOwnerId = "";
+
+  /**
+   * @generated from field: string hash_transfer_init_claims = 29;
+   */
+  hashTransferInitClaims = "";
+
+  constructor(data?: PartialMessage<SessionData_SessionData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.SessionData.SessionData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "transfer_context_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "hashes", kind: "message", T: MessageStagesHashes },
+    { no: 5, name: "payload_profile", kind: "message", T: PayloadProfile },
+    { no: 6, name: "signatures", kind: "message", T: MessageStagesSignatures },
+    { no: 7, name: "max_retries", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "max_timeout", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "logging_profile", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "recipient_base_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "source_base_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "access_control_profile", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 13, name: "application_profile", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 14, name: "last_sequence_number", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 15, name: "sender_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "recipient_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "source_ledger_asset_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 18, name: "recipient_ledger_asset_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 19, name: "server_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "source_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 21, name: "verified_originator_entity_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 22, name: "verified_beneficiary_entity_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 23, name: "asset_profile_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 24, name: "digital_asset_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 25, name: "originator_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 26, name: "beneficiary_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 27, name: "sender_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 28, name: "receiver_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 29, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData_SessionData {
+    return new SessionData_SessionData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SessionData_SessionData {
+    return new SessionData_SessionData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SessionData_SessionData {
+    return new SessionData_SessionData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SessionData_SessionData | PlainMessage<SessionData_SessionData> | undefined, b: SessionData_SessionData | PlainMessage<SessionData_SessionData> | undefined): boolean {
+    return proto3.util.equals(SessionData_SessionData, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.MessageStagesHashes
+ */
+export class MessageStagesHashes extends Message<MessageStagesHashes> {
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage1Hashes stage1 = 1;
+   */
+  stage1?: Stage1Hashes;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage2Hashes stage2 = 2;
+   */
+  stage2?: Stage2Hashes;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage3Hashes stage3 = 3;
+   */
+  stage3?: Stage3Hashes;
+
+  constructor(data?: PartialMessage<MessageStagesHashes>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.MessageStagesHashes";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stage1", kind: "message", T: Stage1Hashes },
+    { no: 2, name: "stage2", kind: "message", T: Stage2Hashes },
+    { no: 3, name: "stage3", kind: "message", T: Stage3Hashes },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageStagesHashes {
+    return new MessageStagesHashes().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MessageStagesHashes {
+    return new MessageStagesHashes().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MessageStagesHashes {
+    return new MessageStagesHashes().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MessageStagesHashes | PlainMessage<MessageStagesHashes> | undefined, b: MessageStagesHashes | PlainMessage<MessageStagesHashes> | undefined): boolean {
+    return proto3.util.equals(MessageStagesHashes, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage1Hashes
+ */
+export class Stage1Hashes extends Message<Stage1Hashes> {
+  /**
+   * @generated from field: string transfer_proposal_request_message_hash = 1;
+   */
+  transferProposalRequestMessageHash = "";
+
+  /**
+   * @generated from field: string transfer_proposal_receipt_message_hash = 2;
+   */
+  transferProposalReceiptMessageHash = "";
+
+  /**
+   * @generated from field: string transfer_proposal_reject_message_hash = 3;
+   */
+  transferProposalRejectMessageHash = "";
+
+  /**
+   * @generated from field: string transfer_commence_request_message_hash = 4;
+   */
+  transferCommenceRequestMessageHash = "";
+
+  /**
+   * @generated from field: string transfer_commence_response_message_hash = 5;
+   */
+  transferCommenceResponseMessageHash = "";
+
+  constructor(data?: PartialMessage<Stage1Hashes>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage1Hashes";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "transfer_proposal_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "transfer_proposal_receipt_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "transfer_proposal_reject_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "transfer_commence_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_commence_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage1Hashes {
+    return new Stage1Hashes().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage1Hashes {
+    return new Stage1Hashes().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage1Hashes {
+    return new Stage1Hashes().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage1Hashes | PlainMessage<Stage1Hashes> | undefined, b: Stage1Hashes | PlainMessage<Stage1Hashes> | undefined): boolean {
+    return proto3.util.equals(Stage1Hashes, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage2Hashes
+ */
+export class Stage2Hashes extends Message<Stage2Hashes> {
+  /**
+   * @generated from field: string lock_assertion_request_message_hash = 1;
+   */
+  lockAssertionRequestMessageHash = "";
+
+  /**
+   * @generated from field: string lock_assertion_receipt_message_hash = 2;
+   */
+  lockAssertionReceiptMessageHash = "";
+
+  constructor(data?: PartialMessage<Stage2Hashes>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage2Hashes";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "lock_assertion_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "lock_assertion_receipt_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage2Hashes {
+    return new Stage2Hashes().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage2Hashes {
+    return new Stage2Hashes().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage2Hashes {
+    return new Stage2Hashes().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage2Hashes | PlainMessage<Stage2Hashes> | undefined, b: Stage2Hashes | PlainMessage<Stage2Hashes> | undefined): boolean {
+    return proto3.util.equals(Stage2Hashes, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage3Hashes
+ */
+export class Stage3Hashes extends Message<Stage3Hashes> {
+  /**
+   * @generated from field: string commit_preparation_request_message_hash = 1;
+   */
+  commitPreparationRequestMessageHash = "";
+
+  /**
+   * @generated from field: string commit_ready_response_message_hash = 2;
+   */
+  commitReadyResponseMessageHash = "";
+
+  /**
+   * @generated from field: string commit_final_assertion_request_message_hash = 3;
+   */
+  commitFinalAssertionRequestMessageHash = "";
+
+  /**
+   * @generated from field: string commit_final_acknoledgement_receipt_response_message_hash = 4;
+   */
+  commitFinalAcknoledgementReceiptResponseMessageHash = "";
+
+  /**
+   * @generated from field: string transfer_complete_request_message_hash = 5;
+   */
+  transferCompleteRequestMessageHash = "";
+
+  /**
+   * @generated from field: string transfer_complete_response_message_hash = 6;
+   */
+  transferCompleteResponseMessageHash = "";
+
+  constructor(data?: PartialMessage<Stage3Hashes>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage3Hashes";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "commit_preparation_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "commit_ready_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "commit_final_assertion_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "commit_final_acknoledgement_receipt_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_complete_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "transfer_complete_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage3Hashes {
+    return new Stage3Hashes().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage3Hashes {
+    return new Stage3Hashes().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage3Hashes {
+    return new Stage3Hashes().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage3Hashes | PlainMessage<Stage3Hashes> | undefined, b: Stage3Hashes | PlainMessage<Stage3Hashes> | undefined): boolean {
+    return proto3.util.equals(Stage3Hashes, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.MessageStagesSignatures
+ */
+export class MessageStagesSignatures extends Message<MessageStagesSignatures> {
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage1Signatures stage1 = 1;
+   */
+  stage1?: Stage1Signatures;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage2Signatures stage2 = 2;
+   */
+  stage2?: Stage2Signatures;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage3Signatures stage3 = 3;
+   */
+  stage3?: Stage3Signatures;
+
+  constructor(data?: PartialMessage<MessageStagesSignatures>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.MessageStagesSignatures";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stage1", kind: "message", T: Stage1Signatures },
+    { no: 2, name: "stage2", kind: "message", T: Stage2Signatures },
+    { no: 3, name: "stage3", kind: "message", T: Stage3Signatures },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageStagesSignatures {
+    return new MessageStagesSignatures().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MessageStagesSignatures {
+    return new MessageStagesSignatures().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MessageStagesSignatures {
+    return new MessageStagesSignatures().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MessageStagesSignatures | PlainMessage<MessageStagesSignatures> | undefined, b: MessageStagesSignatures | PlainMessage<MessageStagesSignatures> | undefined): boolean {
+    return proto3.util.equals(MessageStagesSignatures, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage1Signatures
+ */
+export class Stage1Signatures extends Message<Stage1Signatures> {
+  /**
+   * @generated from field: string transfer_proposal_request_message_client_signature = 1;
+   */
+  transferProposalRequestMessageClientSignature = "";
+
+  /**
+   * @generated from field: string transfer_proposal_receipt_message_server_signature = 2;
+   */
+  transferProposalReceiptMessageServerSignature = "";
+
+  /**
+   * @generated from field: string transfer_proposal_reject_message_server_signature = 3;
+   */
+  transferProposalRejectMessageServerSignature = "";
+
+  /**
+   * @generated from field: string transfer_commence_request_message_client_signature = 4;
+   */
+  transferCommenceRequestMessageClientSignature = "";
+
+  /**
+   * @generated from field: string transfer_commence_response_message_server_signature = 5;
+   */
+  transferCommenceResponseMessageServerSignature = "";
+
+  constructor(data?: PartialMessage<Stage1Signatures>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage1Signatures";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "transfer_proposal_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "transfer_proposal_receipt_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "transfer_proposal_reject_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "transfer_commence_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_commence_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage1Signatures {
+    return new Stage1Signatures().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage1Signatures {
+    return new Stage1Signatures().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage1Signatures {
+    return new Stage1Signatures().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage1Signatures | PlainMessage<Stage1Signatures> | undefined, b: Stage1Signatures | PlainMessage<Stage1Signatures> | undefined): boolean {
+    return proto3.util.equals(Stage1Signatures, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage2Signatures
+ */
+export class Stage2Signatures extends Message<Stage2Signatures> {
+  /**
+   * @generated from field: string lock_assertion_request_message_client_signature = 1;
+   */
+  lockAssertionRequestMessageClientSignature = "";
+
+  /**
+   * @generated from field: string lock_assertion_receipt_message_server_signature = 2;
+   */
+  lockAssertionReceiptMessageServerSignature = "";
+
+  constructor(data?: PartialMessage<Stage2Signatures>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage2Signatures";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "lock_assertion_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "lock_assertion_receipt_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage2Signatures {
+    return new Stage2Signatures().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage2Signatures {
+    return new Stage2Signatures().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage2Signatures {
+    return new Stage2Signatures().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage2Signatures | PlainMessage<Stage2Signatures> | undefined, b: Stage2Signatures | PlainMessage<Stage2Signatures> | undefined): boolean {
+    return proto3.util.equals(Stage2Signatures, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage3Signatures
+ */
+export class Stage3Signatures extends Message<Stage3Signatures> {
+  /**
+   * @generated from field: string commit_preparation_request_message_client_signature = 1;
+   */
+  commitPreparationRequestMessageClientSignature = "";
+
+  /**
+   * @generated from field: string commit_ready_response_message_server_signature = 2;
+   */
+  commitReadyResponseMessageServerSignature = "";
+
+  /**
+   * @generated from field: string commit_final_assertion_request_message_client_signature = 3;
+   */
+  commitFinalAssertionRequestMessageClientSignature = "";
+
+  /**
+   * @generated from field: string commit_final_acknoledgement_receipt_response_message_server_signature = 4;
+   */
+  commitFinalAcknoledgementReceiptResponseMessageServerSignature = "";
+
+  /**
+   * @generated from field: string transfer_complete_request_message_client_signature = 5;
+   */
+  transferCompleteRequestMessageClientSignature = "";
+
+  /**
+   * @generated from field: string transfer_complete_response_message_server_signature = 6;
+   */
+  transferCompleteResponseMessageServerSignature = "";
+
+  constructor(data?: PartialMessage<Stage3Signatures>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage3Signatures";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "commit_preparation_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "commit_ready_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "commit_final_assertion_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "commit_final_acknoledgement_receipt_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_complete_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "transfer_complete_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage3Signatures {
+    return new Stage3Signatures().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage3Signatures {
+    return new Stage3Signatures().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage3Signatures {
+    return new Stage3Signatures().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage3Signatures | PlainMessage<Stage3Signatures> | undefined, b: Stage3Signatures | PlainMessage<Stage3Signatures> | undefined): boolean {
+    return proto3.util.equals(Stage3Signatures, a, b);
+  }
+}
 
 /**
  * @generated from message cacti.satp.v02.common.SendStatusRequest
@@ -16,7 +693,7 @@ export class SendStatusRequest extends Message<SendStatusRequest> {
   status = "";
 
   /**
-   * @generated from field: bool hasBackup = 2;
+   * @generated from field: bool has_backup = 2;
    */
   hasBackup = false;
 
@@ -29,7 +706,7 @@ export class SendStatusRequest extends Message<SendStatusRequest> {
   static readonly typeName = "cacti.satp.v02.common.SendStatusRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "hasBackup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "has_backup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SendStatusRequest {
@@ -59,7 +736,7 @@ export class SendStatusResponse extends Message<SendStatusResponse> {
   status = "";
 
   /**
-   * @generated from field: bool hasBackup = 2;
+   * @generated from field: bool has_backup = 2;
    */
   hasBackup = false;
 
@@ -72,7 +749,7 @@ export class SendStatusResponse extends Message<SendStatusResponse> {
   static readonly typeName = "cacti.satp.v02.common.SendStatusResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "hasBackup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "has_backup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SendStatusResponse {
