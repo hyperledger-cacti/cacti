@@ -1,0 +1,2724 @@
+openapi: 3.0.3
+info:
+  contact:
+    name: Hyperledger Cacti
+  description: |-
+    SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.
+
+    This API defines the gateway client facing API (business logic orchestrator, or BLO), which is named API-Type 1 in the SATP-Core specification.
+
+    **Additional Resources**:
+    - [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/)
+    - [SATP Core draft](https://datatracker.ietf.org/doc/draft-ietf-satp-core)
+    - [SATP Crash Recovery draft](https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/)
+    - [SATP Architecture draft](https://datatracker.ietf.org/doc/draft-ietf-satp-architecture/)
+    - [SATP Use-Cases draft](https://datatracker.ietf.org/doc/draft-ramakrishna-sat-use-cases/)
+    - [SATP Data sharing draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-data-sharing)
+    - [SATP View Addresses draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-views-addresses)
+  title: SATP Gateway Client (Business Logic Orchestrator)
+  version: v0.0.1
+  x-logo:
+    altText: Cacti logo
+    backgroundColor: '#fafafa'
+    url: https://github.com/hyperledger/cacti/blob/main/images/HL_Cacti_Logo_Color.png
+externalDocs:
+  description: "For more information about the SATP Gateway Client, refer to the official\
+    \ documentation."
+  url: https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-satp-hermes/README.md
+servers:
+- description: Development server
+  url: "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes"
+  variables:
+    host:
+      default: localhost
+    port:
+      default: "3011"
+tags:
+- description: API endpoints for interacting with blockchains via gateways
+  name: transaction
+- description: API endpoints for fetching information on SATP sessions
+  name: admin
+paths:
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact:
+    post:
+      description: Allows users to queue intents for transactions based on specified
+        parameters.
+      operationId: Transact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transact_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_200_response'
+          description: Transaction successfully queued
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_default_response'
+          description: An error occurred
+      summary: Submit a transaction intent
+      tags:
+      - transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel:
+    post:
+      description: Attempts to cancel a previously submitted transaction intent using
+        its session ID.
+      operationId: Cancel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cancel_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cancel_200_response'
+          description: Transaction cancellation attempted
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_default_response'
+          description: An error occurred or transaction cannot be cancelled
+      summary: Cancel a transaction session
+      tags:
+      - transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/status:
+    get:
+      description: Retrieve the status of a SATP session
+      operationId: GetStatus
+      parameters:
+      - description: Unique identifier for the session.
+        explode: true
+        in: query
+        name: SessionID
+        required: true
+        schema:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+          x-category: satp-core
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_200_response_statusResponse'
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Get SATP current session data
+      tags:
+      - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/status
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
+    get:
+      description: Get a list of possible routes for swapping one asset for another
+        across multiple exchanges
+      operationId: GetRoutes
+      parameters:
+      - description: The sending DLT Network.
+        explode: true
+        in: query
+        name: fromNetworkID
+        required: true
+        schema:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        style: form
+      - description: The amount that should be sent including all decimals.
+        explode: true
+        in: query
+        name: fromAmount
+        required: true
+        schema:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        style: form
+      - description: The token that should be transferred. Can be the address or the
+          symbol.
+        explode: true
+        in: query
+        name: fromToken
+        required: true
+        schema:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        style: form
+      - description: The receiving DLT Network.
+        explode: true
+        in: query
+        name: toDLTNetwork
+        required: true
+        schema:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        style: form
+      - description: The token that should be transferred to. Can be the address or
+          the symbol.
+        explode: true
+        in: query
+        name: toToken
+        required: true
+        schema:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        style: form
+      - description: The sending wallet address.
+        explode: true
+        in: query
+        name: fromAddress
+        required: true
+        schema:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        style: form
+      - description: "The receiving wallet address. If none is provided, the fromAddress\
+          \ will be used."
+        explode: true
+        in: query
+        name: toAddress
+        required: true
+        schema:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRoutes_200_response'
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_default_response'
+          description: An error occurred
+      summary: Get a list of routes for a gateway-to-gateway asset transfer
+      tags:
+      - transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit:
+    get:
+      description: Audits transactions based on provided filters such as start and
+        end dates. Optionally includes proofs generated from each gateway transaction.
+      operationId: GetAudit
+      parameters:
+      - description: The start date for the audit period.
+        explode: true
+        in: query
+        name: auditStartDate
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: The end date for the audit period.
+        explode: true
+        in: query
+        name: auditEndDate
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: Include proofs generated from each gateway transaction.
+        explode: true
+        in: query
+        name: includeProofs
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAudit_200_response'
+          description: Audit results
+      summary: Audit transactions
+      tags:
+      - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit
+components:
+  schemas:
+    AuthzScope:
+      enum:
+      - group:admin
+      - group:user
+      type: string
+      x-enum-descriptions:
+      - Identities with the group:admin scope are administrators of the system.
+      - Identities with the group:user scope are end users of the system who only
+        have authorization to perform a limited set of actions.
+      x-enum-varnames:
+      - GroupAdmin
+      - GroupUser
+    AuthzJwtClaim:
+      description: "Stores global constants related to the authorization of the application.\
+        \ Specifically enumerates the claims to validate for as per RFC 7519, section\
+        \ 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1"
+      enum:
+      - Hyperledger Labs - Carbon Accounting Tool
+      type: string
+      x-enum-descriptions:
+      - The "iss" (issuer) claim identifies the principal that issued the JWT. The
+        processing of this claim is generally application specific. The "iss" value
+        is a case-sensitive string containing a StringOrURI value. Use of this claim
+        is OPTIONAL.
+      x-enum-varnames:
+      - iss
+    CredentialProfile:
+      enum:
+      - SAML
+      - OAUTH
+      - X509
+      type: string
+    getAuditRequest:
+      properties:
+        auditStartDate:
+          description: The start datetime for the audit.
+          format: date-time
+          type: string
+        auditEndDate:
+          description: The end datetime for the audit.
+          format: date-time
+          type: string
+        includeProofs:
+          description: Include proofs generated from each gateway transaction.
+          type: boolean
+      type: object
+      x-category: request
+    getAuditResponse:
+      properties:
+        proofs:
+          description: An array of strings representing proofs.
+          items:
+            type: string
+          type: array
+        auditStartTime:
+          description: The start datetime of the audit period.
+          format: date-time
+          type: string
+        auditEndTime:
+          description: The end datetime of the audit period.
+          format: date-time
+          type: string
+      type: object
+      x-category: response
+    StatusResponse:
+      properties:
+        status:
+          description: Current status of the SATP session.
+          enum:
+          - NOT_FOUND
+          - INVALID
+          - PENDING
+          - DONE
+          - FAILED
+          type: string
+        substatus:
+          description: More detailed status of the SATP session.
+          enum:
+          - WAIT_SOURCE_CONFIRMATIONS
+          - WAIT_DESTINATION_TRANSACTION
+          - BRIDGE_NOT_AVAILABLE
+          - CHAIN_NOT_AVAILABLE
+          - REFUND_IN_PROGRESS
+          - UNKNOWN_ERROR
+          - COMPLETED
+          - PARTIAL
+          - REFUNDED
+          - NOT_PROCESSABLE_REFUND_NEEDED
+          type: string
+        stage:
+          description: Current stage of the SATP session.
+          enum:
+          - STAGE0
+          - STAGE1
+          - STAGE2
+          - STAGE3
+          type: string
+        step:
+          description: Current step within the stage of the SATP session.
+          enum:
+          - transfer-initialization-claims
+          - conveyance-of-network-capabilities-and-parameters
+          - transfer-proposal-message
+          - transfer-proposal-receipt-message
+          - transfer-proposal-reject-and-conditional-reject-message
+          - transfer-commence-message
+          - commence-response-message
+          - lock-assertion-message
+          - lock-assertion-receipt-message
+          - commit-preparation-message
+          - commit-ready-message
+          - commit-final-assertion-message
+          - commit-final-acknowledgement-receipt-message
+          - transfer-complete-message
+          - rollback-transfer-initialization-claims
+          - rollback-conveyance-of-network-capabilities-and-parameters
+          - rollback-transfer-proposal-message
+          - rollback-transfer-proposal-receipt-message
+          - rollback-transfer-proposal-reject-and-conditional-reject-message
+          - rollback-transfer-commence-message
+          - rollback-commence-response-message
+          - rollback-lock-assertion-message
+          - rollback-lock-assertion-receipt-message
+          - rollback-commit-preparation-message
+          - rollback-commit-ready-message
+          - rollback-commit-final-assertion-message
+          - rollback-commit-final-acknowledgement-receipt-message
+          - rollback-transfer-complete-message
+          type: string
+        startTime:
+          description: The start time of the SATP session.
+          format: date-time
+          type: string
+      required:
+      - stage
+      - startTime
+      - status
+      - step
+      - substatus
+      type: object
+      x-category: response
+    StatusRequest:
+      properties:
+        sessionID:
+          description: The ID of the session for which the status is being requested.
+          type: string
+      required:
+      - sessionID
+      type: object
+      x-category: request
+    TransactRequest:
+      example:
+        fromAmount: "1000000000000000000"
+        toAmount: "1000000000000000000"
+        contextID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        toDLTNetworkID: toDLTNetworkID
+        fromDLTNetworkID: fromDLTNetworkID
+        fromToken:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+        toToken:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+      properties:
+        contextID:
+          description: A unique identifier for the transaction context.
+          format: uuid
+          type: string
+        fromDLTNetworkID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        fromAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        fromToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        toDLTNetworkID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        toAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        toToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+      required:
+      - contextID
+      - fromAmount
+      - fromDLTNetworkID
+      - fromToken
+      - toAmount
+      - toDLTNetworkID
+      - toToken
+      type: object
+    TransactResponse:
+      properties:
+        sessionID:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+          x-category: satp-core
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+      required:
+      - sessionID
+      - statusResponse
+      type: object
+    CancelRequest:
+      example:
+        sessionID: 000003e8-e0b8-21ee-ba00-325096b39f47
+      properties:
+        sessionID:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+          x-category: satp-core
+      required:
+      - sessionID
+      type: object
+    CancelResponse:
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+        cancelSuccessful:
+          description: Indicates whether the cancel operation was successful.
+          type: boolean
+      required:
+      - cancelSuccessful
+      - statusResponse
+      type: object
+    APIError:
+      description: An Error
+      properties:
+        type:
+          description: HTTP error type
+          example: bad-request
+          type: string
+        code:
+          description: Numeric error code
+          example: 16384
+          type: integer
+        status:
+          description: HTTP status of the error
+          example: 500
+          type: integer
+        message:
+          description: Long error description
+          example: Oops there's been an internal error handling
+          type: string
+        timestamp:
+          description: Timestamp of the error
+          example: 2021-07-21T17:32:28Z
+          type: string
+      required:
+      - code
+      - message
+      - status
+      - timestamp
+      - type
+      type: object
+      x-category: response
+      x-go-type: ApiError
+      x-go-name: ApiError
+    DLTProtocol:
+      description: Supported DLT protocols.
+      enum:
+      - HyperledgerFabric
+      - HyperledgerBesu
+      type: string
+      x-category: satp-core
+    DLTNetworkID:
+      description: "The network of the DLT being interacted with. TODO: implement\
+        \ network identification draft"
+      type: string
+      x-category: satp-core
+    DLTSubnetworkID:
+      description: "The subnetwork of the DLT being interacted with. TODO: implement\
+        \ network identification draft"
+      type: string
+      x-category: satp-core
+    SessionID:
+      description: Unique identifier (UUID) for the session.
+      example: 000003e8-e0b8-21ee-ba00-325096b39f47
+      type: string
+      x-category: satp-core
+    Address:
+      description: A blockchain address.
+      example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+      type: string
+    AmountString:
+      description: The amount in string format including all decimals.
+      example: "1000000000000000000"
+      pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+      type: string
+    AmountDecimal:
+      description: Amount value with decimal places
+      example: 100.33
+      format: float
+      type: number
+    TokenSymbol:
+      description: The symbol of a token
+      example: ETH
+      type: string
+    LogoURI:
+      description: "The logo of a token, chain, dex etc."
+      format: uri
+      type: string
+    RoutesResponse:
+      description: A collection of available and unavailable routes
+      properties:
+        routes:
+          description: A collection of route objects
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner'
+          type: array
+      required:
+      - routes
+      type: object
+    Route:
+      properties:
+        id:
+          description: A unique identifier of the route.
+          type: string
+        gatewayID:
+          description: A unique identifier for the gateway.
+          format: uuid
+          type: string
+        fromDLTNetworkID:
+          description: The ID of the DLT Network where the transfer will originate.
+          type: string
+        fromAmountUSD:
+          description: "The amount of 'fromToken' to be transferred in USD, specified\
+            \ as a string to maintain precision."
+          format: double
+          type: string
+        fromAmount:
+          description: "The amount that should be sent including all decimals (e.g.,\
+            \ 1000000 for 1 USDC (6 decimals))."
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        fromToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        toDLTNetworkID:
+          description: The ID of the DLT Network where the transfer will end.
+          type: string
+        toAmountUSD:
+          description: The expected amount to be received in USD.
+          type: string
+        toAmount:
+          description: "The expected amount to be received including all decimals\
+            \ (e.g., 1000000 for 1 USDC (6 decimals))."
+          type: string
+        toAmountMin:
+          description: "The minimum expected amount to be received including all decimals\
+            \ (e.g., 1000000 for 1 USDC (6 decimals))."
+          type: string
+        toToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        gasCostUSD:
+          description: The expected gas cost in USD.
+          type: string
+        containsSwitchChain:
+          description: Whether chain switching is enabled or not.
+          type: boolean
+        steps:
+          description: List of steps involved in this route.
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner'
+          type: array
+        insurance:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_insurance'
+        tags:
+          description: List of tags identifiers providing additional context or categorization.
+          example:
+          - satp
+          - hyperledger
+          items:
+            type: string
+          type: array
+      required:
+      - gatewayID
+      - id
+      type: object
+    Token:
+      description: Metadata detailing a supported token
+      properties:
+        chainID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        chainType:
+          description: Supported DLT protocols.
+          enum:
+          - HyperledgerFabric
+          - HyperledgerBesu
+          type: string
+          x-category: satp-core
+        address:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        name:
+          description: The name of the token.
+          type: string
+        symbol:
+          description: The symbol of the token.
+          type: string
+        decimals:
+          description: How many decimals the token supports.
+          minimum: 1
+          type: integer
+        logoURI:
+          description: "The logo of a token, chain, dex etc."
+          format: uri
+          type: string
+        tags:
+          description: List of tags identifiers providing additional context or categorization.
+          example:
+          - satp
+          - hyperledger
+          items:
+            type: string
+          type: array
+        priceUSD:
+          description: The current price of the token in USD.
+          type: string
+        extensions:
+          $ref: '#/components/schemas/Transact_request_fromToken_extensions'
+      required:
+      - address
+      - chainID
+      - chainType
+      - decimals
+      - symbol
+      type: object
+    Tags:
+      description: List of tags identifiers providing additional context or categorization.
+      example:
+      - satp
+      - hyperledger
+      items:
+        type: string
+      type: array
+    BridgeInfo:
+      description: Information about the bridge used for the token transfer.
+      properties:
+        tokenAddress:
+          description: The address of the token being transferred.
+          example: 0x...
+          type: string
+      type: object
+    IncludedStep:
+      description: Details a single step within a route including actions and estimates.
+      properties:
+        id:
+          description: Id of the step
+          type: string
+        type:
+          description: "Type of the step, typically describing the action, e.g., 'swap'."
+          type: string
+        tool:
+          description: "Tool used in the step, e.g., 'stargate'."
+          type: string
+        action:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_action'
+        estimate:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_estimate'
+        toolDetails:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_toolDetails'
+        integrationDetails:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_toolDetails'
+        includedStepIds:
+          description: "IDs of further steps included within this step, allowing for\
+            \ nested actions without direct recursion."
+          items:
+            type: string
+          type: array
+      type: object
+    Insurance:
+      properties:
+        state:
+          description: The state of insurance applicability for the transaction.
+          enum:
+          - NOT_INSURABLE
+          - INSURABLE
+          - INSURED
+          example: NOT_INSURABLE
+          type: string
+        feeAmountUsd:
+          description: "The fee amount for insurance, represented in USD."
+          example: "10.00"
+          pattern: "^(0|[1-9]\\d*)(\\.\\d+)?$"
+          type: string
+      type: object
+    Action:
+      properties:
+        fromToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        fromAmount:
+          description: "The amount of 'fromToken' to be transferred, specified as\
+            \ a string to maintain precision."
+          example: "1000000000000000000"
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        toToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        slippage:
+          description: The maximum acceptable difference between the expected price
+            of the 'toToken' and the price at the time of the transfer.
+          example: 0.005
+          format: float
+          type: number
+        fromAddress:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        toAddress:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+      type: object
+    IntegrationDetails:
+      description: Describes integration or tool details such as bridges or exchanges
+        involved in the transaction.
+      properties:
+        key:
+          description: A unique identifier for the integration or tool.
+          example: 1inch
+          type: string
+        name:
+          description: The name of the integration or tool.
+          example: 1inch Exchange
+          type: string
+        logoURI:
+          description: URL to the logo of the integration or tool.
+          example: https://cdn.example.com/logos/1inch.png
+          format: uri
+          type: string
+      required:
+      - key
+      - logoURI
+      - name
+      type: object
+    Estimate:
+      description: "Provides an estimation for a transaction, including costs, amounts,\
+        \ and execution duration."
+      properties:
+        approvalAddress:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        toAmountMin:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        toAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        fromAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        feeCosts:
+          description: A collection of fee costs associated with the transaction.
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_estimate_feeCosts_inner'
+          type: array
+        gasCosts:
+          description: A collection of estimated gas costs for executing the transaction.
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_estimate_gasCosts_inner'
+          type: array
+        executionDuration:
+          description: The estimated duration for the transaction execution in seconds.
+          example: 30
+          type: integer
+        fromAmountUSD:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        toAmountUSD:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        tool:
+          description: The tool or service used to generate this estimate.
+          example: satp
+          type: string
+      type: object
+    FeeCost:
+      description: Details about a specific fee cost associated with the transaction.
+      properties:
+        name:
+          description: Name of the fee cost.
+          example: Network Fee
+          type: string
+        amount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        amountUSD:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        token:
+          description: The symbol of a token
+          example: ETH
+          type: string
+        included:
+          description: Indicates if the fee is included in the transaction amount.
+          type: boolean
+      type: object
+    GasCost:
+      properties:
+        type:
+          description: The type of the gas cost.
+          example: SEND
+          type: string
+        price:
+          description: "The gas price, specified as a string to maintain precision."
+          example: "19236858243"
+          type: string
+        estimate:
+          description: "The estimated gas required, specified as a string to maintain\
+            \ precision."
+          example: "445393"
+          type: string
+        limit:
+          description: "The gas limit for the transaction, specified as a string to\
+            \ maintain precision."
+          example: "579011"
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        amount:
+          description: The amount of gas required in the gas currency.
+          example: "8567962003424499"
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        amountUSD:
+          description: The amount of gas required in USD.
+          example: "16.05"
+          pattern: "^(0(\\.[0-9]+)?|[1-9][0-9]*(\\.[0-9]+)?)$"
+          type: string
+        token:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+      type: object
+    Transact_request_fromToken_extensions_bridgeInfo_value:
+      description: Information about the bridge used for the token transfer.
+      example:
+        tokenAddress: 0x...
+      properties:
+        tokenAddress:
+          description: The address of the token being transferred.
+          example: 0x...
+          type: string
+      type: object
+    Transact_request_fromToken_extensions:
+      example:
+        bridgeInfo:
+          key:
+            tokenAddress: 0x...
+        verified: true
+      properties:
+        bridgeInfo:
+          additionalProperties:
+            $ref: '#/components/schemas/Transact_request_fromToken_extensions_bridgeInfo_value'
+          type: object
+        verified:
+          description: Indicates whether the token is verified.
+          type: boolean
+      type: object
+    Transact_request_fromToken:
+      description: Metadata detailing a supported token
+      example:
+        symbol: symbol
+        extensions:
+          bridgeInfo:
+            key:
+              tokenAddress: 0x...
+          verified: true
+        address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+        priceUSD: priceUSD
+        chainID: chainID
+        decimals: 1
+        name: name
+        chainType: HyperledgerFabric
+        logoURI: https://openapi-generator.tech
+        tags:
+        - satp
+        - hyperledger
+      properties:
+        chainID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        chainType:
+          description: Supported DLT protocols.
+          enum:
+          - HyperledgerFabric
+          - HyperledgerBesu
+          type: string
+          x-category: satp-core
+        address:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        name:
+          description: The name of the token.
+          type: string
+        symbol:
+          description: The symbol of the token.
+          type: string
+        decimals:
+          description: How many decimals the token supports.
+          minimum: 1
+          type: integer
+        logoURI:
+          description: "The logo of a token, chain, dex etc."
+          format: uri
+          type: string
+        tags:
+          description: List of tags identifiers providing additional context or categorization.
+          example:
+          - satp
+          - hyperledger
+          items:
+            type: string
+          type: array
+        priceUSD:
+          description: The current price of the token in USD.
+          type: string
+        extensions:
+          $ref: '#/components/schemas/Transact_request_fromToken_extensions'
+      required:
+      - address
+      - chainID
+      - chainType
+      - decimals
+      - symbol
+      type: object
+    Transact_request:
+      properties:
+        contextID:
+          description: A unique identifier for the transaction context.
+          format: uuid
+          type: string
+        fromDLTNetworkID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        fromAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        fromToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        toDLTNetworkID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        toAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        toToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+      required:
+      - contextID
+      - fromAmount
+      - fromDLTNetworkID
+      - fromToken
+      - toAmount
+      - toDLTNetworkID
+      - toToken
+      type: object
+    Transact_200_response_statusResponse:
+      example:
+        stage: STAGE0
+        substatus: WAIT_SOURCE_CONFIRMATIONS
+        step: transfer-initialization-claims
+        startTime: 2000-01-23T04:56:07.000+00:00
+        status: NOT_FOUND
+      properties:
+        status:
+          description: Current status of the SATP session.
+          enum:
+          - NOT_FOUND
+          - INVALID
+          - PENDING
+          - DONE
+          - FAILED
+          type: string
+        substatus:
+          description: More detailed status of the SATP session.
+          enum:
+          - WAIT_SOURCE_CONFIRMATIONS
+          - WAIT_DESTINATION_TRANSACTION
+          - BRIDGE_NOT_AVAILABLE
+          - CHAIN_NOT_AVAILABLE
+          - REFUND_IN_PROGRESS
+          - UNKNOWN_ERROR
+          - COMPLETED
+          - PARTIAL
+          - REFUNDED
+          - NOT_PROCESSABLE_REFUND_NEEDED
+          type: string
+        stage:
+          description: Current stage of the SATP session.
+          enum:
+          - STAGE0
+          - STAGE1
+          - STAGE2
+          - STAGE3
+          type: string
+        step:
+          description: Current step within the stage of the SATP session.
+          enum:
+          - transfer-initialization-claims
+          - conveyance-of-network-capabilities-and-parameters
+          - transfer-proposal-message
+          - transfer-proposal-receipt-message
+          - transfer-proposal-reject-and-conditional-reject-message
+          - transfer-commence-message
+          - commence-response-message
+          - lock-assertion-message
+          - lock-assertion-receipt-message
+          - commit-preparation-message
+          - commit-ready-message
+          - commit-final-assertion-message
+          - commit-final-acknowledgement-receipt-message
+          - transfer-complete-message
+          - rollback-transfer-initialization-claims
+          - rollback-conveyance-of-network-capabilities-and-parameters
+          - rollback-transfer-proposal-message
+          - rollback-transfer-proposal-receipt-message
+          - rollback-transfer-proposal-reject-and-conditional-reject-message
+          - rollback-transfer-commence-message
+          - rollback-commence-response-message
+          - rollback-lock-assertion-message
+          - rollback-lock-assertion-receipt-message
+          - rollback-commit-preparation-message
+          - rollback-commit-ready-message
+          - rollback-commit-final-assertion-message
+          - rollback-commit-final-acknowledgement-receipt-message
+          - rollback-transfer-complete-message
+          type: string
+        startTime:
+          description: The start time of the SATP session.
+          format: date-time
+          type: string
+      required:
+      - stage
+      - startTime
+      - status
+      - step
+      - substatus
+      type: object
+      x-category: response
+    Transact_200_response:
+      example:
+        statusResponse:
+          stage: STAGE0
+          substatus: WAIT_SOURCE_CONFIRMATIONS
+          step: transfer-initialization-claims
+          startTime: 2000-01-23T04:56:07.000+00:00
+          status: NOT_FOUND
+        sessionID: 000003e8-e0b8-21ee-ba00-325096b39f47
+      properties:
+        sessionID:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+          x-category: satp-core
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+      required:
+      - sessionID
+      - statusResponse
+      type: object
+    Transact_default_response:
+      description: An Error
+      properties:
+        type:
+          description: HTTP error type
+          example: bad-request
+          type: string
+        code:
+          description: Numeric error code
+          example: 16384
+          type: integer
+        status:
+          description: HTTP status of the error
+          example: 500
+          type: integer
+        message:
+          description: Long error description
+          example: Oops there's been an internal error handling
+          type: string
+        timestamp:
+          description: Timestamp of the error
+          example: 2021-07-21T17:32:28Z
+          type: string
+      required:
+      - code
+      - message
+      - status
+      - timestamp
+      - type
+      type: object
+      x-category: response
+      x-go-type: ApiError
+      x-go-name: ApiError
+    Cancel_request:
+      properties:
+        sessionID:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+          x-category: satp-core
+      required:
+      - sessionID
+      type: object
+    Cancel_200_response:
+      example:
+        statusResponse:
+          stage: STAGE0
+          substatus: WAIT_SOURCE_CONFIRMATIONS
+          step: transfer-initialization-claims
+          startTime: 2000-01-23T04:56:07.000+00:00
+          status: NOT_FOUND
+        cancelSuccessful: true
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+        cancelSuccessful:
+          description: Indicates whether the cancel operation was successful.
+          type: boolean
+      required:
+      - cancelSuccessful
+      - statusResponse
+      type: object
+    GetRoutes_200_response_routes_inner_steps_inner_action:
+      example:
+        fromAmount: "1000000000000000000"
+        fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+        slippage: 0.005
+        toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+        fromToken:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+        toToken:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+      properties:
+        fromToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        fromAmount:
+          description: "The amount of 'fromToken' to be transferred, specified as\
+            \ a string to maintain precision."
+          example: "1000000000000000000"
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        toToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        slippage:
+          description: The maximum acceptable difference between the expected price
+            of the 'toToken' and the price at the time of the transfer.
+          example: 0.005
+          format: float
+          type: number
+        fromAddress:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        toAddress:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+      type: object
+    GetRoutes_200_response_routes_inner_steps_inner_estimate_feeCosts_inner:
+      description: Details about a specific fee cost associated with the transaction.
+      example:
+        amount: "1000000000000000000"
+        amountUSD: "1000000000000000000"
+        name: Network Fee
+        included: true
+        token: ETH
+      properties:
+        name:
+          description: Name of the fee cost.
+          example: Network Fee
+          type: string
+        amount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        amountUSD:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        token:
+          description: The symbol of a token
+          example: ETH
+          type: string
+        included:
+          description: Indicates if the fee is included in the transaction amount.
+          type: boolean
+      type: object
+    GetRoutes_200_response_routes_inner_steps_inner_estimate_gasCosts_inner:
+      example:
+        amount: "8567962003424499"
+        amountUSD: "16.05"
+        price: "19236858243"
+        estimate: "445393"
+        limit: "579011"
+        type: SEND
+        token:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+      properties:
+        type:
+          description: The type of the gas cost.
+          example: SEND
+          type: string
+        price:
+          description: "The gas price, specified as a string to maintain precision."
+          example: "19236858243"
+          type: string
+        estimate:
+          description: "The estimated gas required, specified as a string to maintain\
+            \ precision."
+          example: "445393"
+          type: string
+        limit:
+          description: "The gas limit for the transaction, specified as a string to\
+            \ maintain precision."
+          example: "579011"
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        amount:
+          description: The amount of gas required in the gas currency.
+          example: "8567962003424499"
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        amountUSD:
+          description: The amount of gas required in USD.
+          example: "16.05"
+          pattern: "^(0(\\.[0-9]+)?|[1-9][0-9]*(\\.[0-9]+)?)$"
+          type: string
+        token:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+      type: object
+    GetRoutes_200_response_routes_inner_steps_inner_estimate:
+      description: "Provides an estimation for a transaction, including costs, amounts,\
+        \ and execution duration."
+      example:
+        toAmountMin: "1000000000000000000"
+        fromAmount: "1000000000000000000"
+        toAmount: "1000000000000000000"
+        gasCosts:
+        - amount: "8567962003424499"
+          amountUSD: "16.05"
+          price: "19236858243"
+          estimate: "445393"
+          limit: "579011"
+          type: SEND
+          token:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+        - amount: "8567962003424499"
+          amountUSD: "16.05"
+          price: "19236858243"
+          estimate: "445393"
+          limit: "579011"
+          type: SEND
+          token:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+        fromAmountUSD: "1000000000000000000"
+        approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+        feeCosts:
+        - amount: "1000000000000000000"
+          amountUSD: "1000000000000000000"
+          name: Network Fee
+          included: true
+          token: ETH
+        - amount: "1000000000000000000"
+          amountUSD: "1000000000000000000"
+          name: Network Fee
+          included: true
+          token: ETH
+        executionDuration: 30
+        toAmountUSD: "1000000000000000000"
+        tool: satp
+      properties:
+        approvalAddress:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        toAmountMin:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        toAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        fromAmount:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        feeCosts:
+          description: A collection of fee costs associated with the transaction.
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_estimate_feeCosts_inner'
+          type: array
+        gasCosts:
+          description: A collection of estimated gas costs for executing the transaction.
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_estimate_gasCosts_inner'
+          type: array
+        executionDuration:
+          description: The estimated duration for the transaction execution in seconds.
+          example: 30
+          type: integer
+        fromAmountUSD:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        toAmountUSD:
+          description: The amount in string format including all decimals.
+          example: "1000000000000000000"
+          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          type: string
+        tool:
+          description: The tool or service used to generate this estimate.
+          example: satp
+          type: string
+      type: object
+    GetRoutes_200_response_routes_inner_steps_inner_toolDetails:
+      description: Describes integration or tool details such as bridges or exchanges
+        involved in the transaction.
+      example:
+        name: 1inch Exchange
+        logoURI: https://cdn.example.com/logos/1inch.png
+        key: 1inch
+      properties:
+        key:
+          description: A unique identifier for the integration or tool.
+          example: 1inch
+          type: string
+        name:
+          description: The name of the integration or tool.
+          example: 1inch Exchange
+          type: string
+        logoURI:
+          description: URL to the logo of the integration or tool.
+          example: https://cdn.example.com/logos/1inch.png
+          format: uri
+          type: string
+      required:
+      - key
+      - logoURI
+      - name
+      type: object
+    GetRoutes_200_response_routes_inner_steps_inner:
+      description: Details a single step within a route including actions and estimates.
+      example:
+        estimate:
+          toAmountMin: "1000000000000000000"
+          fromAmount: "1000000000000000000"
+          toAmount: "1000000000000000000"
+          gasCosts:
+          - amount: "8567962003424499"
+            amountUSD: "16.05"
+            price: "19236858243"
+            estimate: "445393"
+            limit: "579011"
+            type: SEND
+            token:
+              symbol: symbol
+              extensions:
+                bridgeInfo:
+                  key:
+                    tokenAddress: 0x...
+                verified: true
+              address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              priceUSD: priceUSD
+              chainID: chainID
+              decimals: 1
+              name: name
+              chainType: HyperledgerFabric
+              logoURI: https://openapi-generator.tech
+              tags:
+              - satp
+              - hyperledger
+          - amount: "8567962003424499"
+            amountUSD: "16.05"
+            price: "19236858243"
+            estimate: "445393"
+            limit: "579011"
+            type: SEND
+            token:
+              symbol: symbol
+              extensions:
+                bridgeInfo:
+                  key:
+                    tokenAddress: 0x...
+                verified: true
+              address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              priceUSD: priceUSD
+              chainID: chainID
+              decimals: 1
+              name: name
+              chainType: HyperledgerFabric
+              logoURI: https://openapi-generator.tech
+              tags:
+              - satp
+              - hyperledger
+          fromAmountUSD: "1000000000000000000"
+          approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          feeCosts:
+          - amount: "1000000000000000000"
+            amountUSD: "1000000000000000000"
+            name: Network Fee
+            included: true
+            token: ETH
+          - amount: "1000000000000000000"
+            amountUSD: "1000000000000000000"
+            name: Network Fee
+            included: true
+            token: ETH
+          executionDuration: 30
+          toAmountUSD: "1000000000000000000"
+          tool: satp
+        action:
+          fromAmount: "1000000000000000000"
+          fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          slippage: 0.005
+          toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          fromToken:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+          toToken:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+        id: id
+        type: type
+        tool: tool
+        integrationDetails:
+          name: 1inch Exchange
+          logoURI: https://cdn.example.com/logos/1inch.png
+          key: 1inch
+        includedStepIds:
+        - includedStepIds
+        - includedStepIds
+        toolDetails:
+          name: 1inch Exchange
+          logoURI: https://cdn.example.com/logos/1inch.png
+          key: 1inch
+      properties:
+        id:
+          description: Id of the step
+          type: string
+        type:
+          description: "Type of the step, typically describing the action, e.g., 'swap'."
+          type: string
+        tool:
+          description: "Tool used in the step, e.g., 'stargate'."
+          type: string
+        action:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_action'
+        estimate:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_estimate'
+        toolDetails:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_toolDetails'
+        integrationDetails:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner_toolDetails'
+        includedStepIds:
+          description: "IDs of further steps included within this step, allowing for\
+            \ nested actions without direct recursion."
+          items:
+            type: string
+          type: array
+      type: object
+    GetRoutes_200_response_routes_inner_insurance:
+      example:
+        feeAmountUsd: "10.00"
+        state: NOT_INSURABLE
+      properties:
+        state:
+          description: The state of insurance applicability for the transaction.
+          enum:
+          - NOT_INSURABLE
+          - INSURABLE
+          - INSURED
+          example: NOT_INSURABLE
+          type: string
+        feeAmountUsd:
+          description: "The fee amount for insurance, represented in USD."
+          example: "10.00"
+          pattern: "^(0|[1-9]\\d*)(\\.\\d+)?$"
+          type: string
+      type: object
+    GetRoutes_200_response_routes_inner:
+      example:
+        insurance:
+          feeAmountUsd: "10.00"
+          state: NOT_INSURABLE
+        fromAmount: fromAmount
+        toAmountMin: toAmountMin
+        toAmount: toAmount
+        toAmountUSD: toAmountUSD
+        steps:
+        - estimate:
+            toAmountMin: "1000000000000000000"
+            fromAmount: "1000000000000000000"
+            toAmount: "1000000000000000000"
+            gasCosts:
+            - amount: "8567962003424499"
+              amountUSD: "16.05"
+              price: "19236858243"
+              estimate: "445393"
+              limit: "579011"
+              type: SEND
+              token:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            - amount: "8567962003424499"
+              amountUSD: "16.05"
+              price: "19236858243"
+              estimate: "445393"
+              limit: "579011"
+              type: SEND
+              token:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            fromAmountUSD: "1000000000000000000"
+            approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            feeCosts:
+            - amount: "1000000000000000000"
+              amountUSD: "1000000000000000000"
+              name: Network Fee
+              included: true
+              token: ETH
+            - amount: "1000000000000000000"
+              amountUSD: "1000000000000000000"
+              name: Network Fee
+              included: true
+              token: ETH
+            executionDuration: 30
+            toAmountUSD: "1000000000000000000"
+            tool: satp
+          action:
+            fromAmount: "1000000000000000000"
+            fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            slippage: 0.005
+            toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            fromToken:
+              symbol: symbol
+              extensions:
+                bridgeInfo:
+                  key:
+                    tokenAddress: 0x...
+                verified: true
+              address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              priceUSD: priceUSD
+              chainID: chainID
+              decimals: 1
+              name: name
+              chainType: HyperledgerFabric
+              logoURI: https://openapi-generator.tech
+              tags:
+              - satp
+              - hyperledger
+            toToken:
+              symbol: symbol
+              extensions:
+                bridgeInfo:
+                  key:
+                    tokenAddress: 0x...
+                verified: true
+              address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              priceUSD: priceUSD
+              chainID: chainID
+              decimals: 1
+              name: name
+              chainType: HyperledgerFabric
+              logoURI: https://openapi-generator.tech
+              tags:
+              - satp
+              - hyperledger
+          id: id
+          type: type
+          tool: tool
+          integrationDetails:
+            name: 1inch Exchange
+            logoURI: https://cdn.example.com/logos/1inch.png
+            key: 1inch
+          includedStepIds:
+          - includedStepIds
+          - includedStepIds
+          toolDetails:
+            name: 1inch Exchange
+            logoURI: https://cdn.example.com/logos/1inch.png
+            key: 1inch
+        - estimate:
+            toAmountMin: "1000000000000000000"
+            fromAmount: "1000000000000000000"
+            toAmount: "1000000000000000000"
+            gasCosts:
+            - amount: "8567962003424499"
+              amountUSD: "16.05"
+              price: "19236858243"
+              estimate: "445393"
+              limit: "579011"
+              type: SEND
+              token:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            - amount: "8567962003424499"
+              amountUSD: "16.05"
+              price: "19236858243"
+              estimate: "445393"
+              limit: "579011"
+              type: SEND
+              token:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            fromAmountUSD: "1000000000000000000"
+            approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            feeCosts:
+            - amount: "1000000000000000000"
+              amountUSD: "1000000000000000000"
+              name: Network Fee
+              included: true
+              token: ETH
+            - amount: "1000000000000000000"
+              amountUSD: "1000000000000000000"
+              name: Network Fee
+              included: true
+              token: ETH
+            executionDuration: 30
+            toAmountUSD: "1000000000000000000"
+            tool: satp
+          action:
+            fromAmount: "1000000000000000000"
+            fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            slippage: 0.005
+            toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            fromToken:
+              symbol: symbol
+              extensions:
+                bridgeInfo:
+                  key:
+                    tokenAddress: 0x...
+                verified: true
+              address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              priceUSD: priceUSD
+              chainID: chainID
+              decimals: 1
+              name: name
+              chainType: HyperledgerFabric
+              logoURI: https://openapi-generator.tech
+              tags:
+              - satp
+              - hyperledger
+            toToken:
+              symbol: symbol
+              extensions:
+                bridgeInfo:
+                  key:
+                    tokenAddress: 0x...
+                verified: true
+              address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              priceUSD: priceUSD
+              chainID: chainID
+              decimals: 1
+              name: name
+              chainType: HyperledgerFabric
+              logoURI: https://openapi-generator.tech
+              tags:
+              - satp
+              - hyperledger
+          id: id
+          type: type
+          tool: tool
+          integrationDetails:
+            name: 1inch Exchange
+            logoURI: https://cdn.example.com/logos/1inch.png
+            key: 1inch
+          includedStepIds:
+          - includedStepIds
+          - includedStepIds
+          toolDetails:
+            name: 1inch Exchange
+            logoURI: https://cdn.example.com/logos/1inch.png
+            key: 1inch
+        toToken:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+        tags:
+        - satp
+        - hyperledger
+        gasCostUSD: gasCostUSD
+        fromAmountUSD: fromAmountUSD
+        toDLTNetworkID: toDLTNetworkID
+        id: id
+        containsSwitchChain: true
+        fromDLTNetworkID: fromDLTNetworkID
+        gatewayID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        fromToken:
+          symbol: symbol
+          extensions:
+            bridgeInfo:
+              key:
+                tokenAddress: 0x...
+            verified: true
+          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          priceUSD: priceUSD
+          chainID: chainID
+          decimals: 1
+          name: name
+          chainType: HyperledgerFabric
+          logoURI: https://openapi-generator.tech
+          tags:
+          - satp
+          - hyperledger
+      properties:
+        id:
+          description: A unique identifier of the route.
+          type: string
+        gatewayID:
+          description: A unique identifier for the gateway.
+          format: uuid
+          type: string
+        fromDLTNetworkID:
+          description: The ID of the DLT Network where the transfer will originate.
+          type: string
+        fromAmountUSD:
+          description: "The amount of 'fromToken' to be transferred in USD, specified\
+            \ as a string to maintain precision."
+          format: double
+          type: string
+        fromAmount:
+          description: "The amount that should be sent including all decimals (e.g.,\
+            \ 1000000 for 1 USDC (6 decimals))."
+          pattern: "^[1-9][0-9]*$"
+          type: string
+        fromToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        toDLTNetworkID:
+          description: The ID of the DLT Network where the transfer will end.
+          type: string
+        toAmountUSD:
+          description: The expected amount to be received in USD.
+          type: string
+        toAmount:
+          description: "The expected amount to be received including all decimals\
+            \ (e.g., 1000000 for 1 USDC (6 decimals))."
+          type: string
+        toAmountMin:
+          description: "The minimum expected amount to be received including all decimals\
+            \ (e.g., 1000000 for 1 USDC (6 decimals))."
+          type: string
+        toToken:
+          $ref: '#/components/schemas/Transact_request_fromToken'
+        gasCostUSD:
+          description: The expected gas cost in USD.
+          type: string
+        containsSwitchChain:
+          description: Whether chain switching is enabled or not.
+          type: boolean
+        steps:
+          description: List of steps involved in this route.
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner'
+          type: array
+        insurance:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_insurance'
+        tags:
+          description: List of tags identifiers providing additional context or categorization.
+          example:
+          - satp
+          - hyperledger
+          items:
+            type: string
+          type: array
+      required:
+      - gatewayID
+      - id
+      type: object
+    GetRoutes_200_response:
+      description: A collection of available and unavailable routes
+      example:
+        routes:
+        - insurance:
+            feeAmountUsd: "10.00"
+            state: NOT_INSURABLE
+          fromAmount: fromAmount
+          toAmountMin: toAmountMin
+          toAmount: toAmount
+          toAmountUSD: toAmountUSD
+          steps:
+          - estimate:
+              toAmountMin: "1000000000000000000"
+              fromAmount: "1000000000000000000"
+              toAmount: "1000000000000000000"
+              gasCosts:
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              fromAmountUSD: "1000000000000000000"
+              approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              feeCosts:
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              executionDuration: 30
+              toAmountUSD: "1000000000000000000"
+              tool: satp
+            action:
+              fromAmount: "1000000000000000000"
+              fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              slippage: 0.005
+              toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              fromToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+              toToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            id: id
+            type: type
+            tool: tool
+            integrationDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+            includedStepIds:
+            - includedStepIds
+            - includedStepIds
+            toolDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+          - estimate:
+              toAmountMin: "1000000000000000000"
+              fromAmount: "1000000000000000000"
+              toAmount: "1000000000000000000"
+              gasCosts:
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              fromAmountUSD: "1000000000000000000"
+              approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              feeCosts:
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              executionDuration: 30
+              toAmountUSD: "1000000000000000000"
+              tool: satp
+            action:
+              fromAmount: "1000000000000000000"
+              fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              slippage: 0.005
+              toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              fromToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+              toToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            id: id
+            type: type
+            tool: tool
+            integrationDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+            includedStepIds:
+            - includedStepIds
+            - includedStepIds
+            toolDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+          toToken:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+          tags:
+          - satp
+          - hyperledger
+          gasCostUSD: gasCostUSD
+          fromAmountUSD: fromAmountUSD
+          toDLTNetworkID: toDLTNetworkID
+          id: id
+          containsSwitchChain: true
+          fromDLTNetworkID: fromDLTNetworkID
+          gatewayID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          fromToken:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+        - insurance:
+            feeAmountUsd: "10.00"
+            state: NOT_INSURABLE
+          fromAmount: fromAmount
+          toAmountMin: toAmountMin
+          toAmount: toAmount
+          toAmountUSD: toAmountUSD
+          steps:
+          - estimate:
+              toAmountMin: "1000000000000000000"
+              fromAmount: "1000000000000000000"
+              toAmount: "1000000000000000000"
+              gasCosts:
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              fromAmountUSD: "1000000000000000000"
+              approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              feeCosts:
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              executionDuration: 30
+              toAmountUSD: "1000000000000000000"
+              tool: satp
+            action:
+              fromAmount: "1000000000000000000"
+              fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              slippage: 0.005
+              toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              fromToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+              toToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            id: id
+            type: type
+            tool: tool
+            integrationDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+            includedStepIds:
+            - includedStepIds
+            - includedStepIds
+            toolDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+          - estimate:
+              toAmountMin: "1000000000000000000"
+              fromAmount: "1000000000000000000"
+              toAmount: "1000000000000000000"
+              gasCosts:
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              - amount: "8567962003424499"
+                amountUSD: "16.05"
+                price: "19236858243"
+                estimate: "445393"
+                limit: "579011"
+                type: SEND
+                token:
+                  symbol: symbol
+                  extensions:
+                    bridgeInfo:
+                      key:
+                        tokenAddress: 0x...
+                    verified: true
+                  address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                  priceUSD: priceUSD
+                  chainID: chainID
+                  decimals: 1
+                  name: name
+                  chainType: HyperledgerFabric
+                  logoURI: https://openapi-generator.tech
+                  tags:
+                  - satp
+                  - hyperledger
+              fromAmountUSD: "1000000000000000000"
+              approvalAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              feeCosts:
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              - amount: "1000000000000000000"
+                amountUSD: "1000000000000000000"
+                name: Network Fee
+                included: true
+                token: ETH
+              executionDuration: 30
+              toAmountUSD: "1000000000000000000"
+              tool: satp
+            action:
+              fromAmount: "1000000000000000000"
+              fromAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              slippage: 0.005
+              toAddress: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+              fromToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+              toToken:
+                symbol: symbol
+                extensions:
+                  bridgeInfo:
+                    key:
+                      tokenAddress: 0x...
+                  verified: true
+                address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+                priceUSD: priceUSD
+                chainID: chainID
+                decimals: 1
+                name: name
+                chainType: HyperledgerFabric
+                logoURI: https://openapi-generator.tech
+                tags:
+                - satp
+                - hyperledger
+            id: id
+            type: type
+            tool: tool
+            integrationDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+            includedStepIds:
+            - includedStepIds
+            - includedStepIds
+            toolDetails:
+              name: 1inch Exchange
+              logoURI: https://cdn.example.com/logos/1inch.png
+              key: 1inch
+          toToken:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+          tags:
+          - satp
+          - hyperledger
+          gasCostUSD: gasCostUSD
+          fromAmountUSD: fromAmountUSD
+          toDLTNetworkID: toDLTNetworkID
+          id: id
+          containsSwitchChain: true
+          fromDLTNetworkID: fromDLTNetworkID
+          gatewayID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          fromToken:
+            symbol: symbol
+            extensions:
+              bridgeInfo:
+                key:
+                  tokenAddress: 0x...
+              verified: true
+            address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+            priceUSD: priceUSD
+            chainID: chainID
+            decimals: 1
+            name: name
+            chainType: HyperledgerFabric
+            logoURI: https://openapi-generator.tech
+            tags:
+            - satp
+            - hyperledger
+      properties:
+        routes:
+          description: A collection of route objects
+          items:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner'
+          type: array
+      required:
+      - routes
+      type: object
+    GetAudit_200_response:
+      example:
+        proofs:
+        - proofs
+        - proofs
+        auditEndTime: 2000-01-23T04:56:07.000+00:00
+        auditStartTime: 2000-01-23T04:56:07.000+00:00
+      properties:
+        proofs:
+          description: An array of strings representing proofs.
+          items:
+            type: string
+          type: array
+        auditStartTime:
+          description: The start datetime of the audit period.
+          format: date-time
+          type: string
+        auditEndTime:
+          description: The end datetime of the audit period.
+          format: date-time
+          type: string
+      type: object
+      x-category: response
