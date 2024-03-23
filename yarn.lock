@@ -7176,48 +7176,48 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperledger/anoncreds-nodejs@npm:0.2.0-dev.4":
-  version: 0.2.0-dev.4
-  resolution: "@hyperledger/anoncreds-nodejs@npm:0.2.0-dev.4"
+"@hyperledger/anoncreds-nodejs@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@hyperledger/anoncreds-nodejs@npm:0.2.0"
   dependencies:
     "@2060.io/ffi-napi": "npm:4.0.8"
     "@2060.io/ref-napi": "npm:3.0.6"
-    "@hyperledger/anoncreds-shared": "npm:0.2.0-dev.4"
+    "@hyperledger/anoncreds-shared": "npm:0.2.0"
     "@mapbox/node-pre-gyp": "npm:^1.0.11"
     ref-array-di: "npm:1.2.2"
     ref-struct-di: "npm:1.1.1"
-  checksum: 10/5c1bbcc0c2f6d2c26ea5013e7e648b761ddb8ab563169f364a8993ab1a7b2b17d915dfe5aebacc8024f54730c7acd4755faa054dbd74fa89911505376b02700e
+  checksum: 10/76e0a44a8ebec4dbb53341f46ddc0eb9656e4aa2994f2d8954f03ab04bdc6062d2845fadb24f2950fe8d547e0a7fae4c715be3439b5a37825193472896cf093e
   languageName: node
   linkType: hard
 
-"@hyperledger/anoncreds-shared@npm:0.2.0-dev.4":
-  version: 0.2.0-dev.4
-  resolution: "@hyperledger/anoncreds-shared@npm:0.2.0-dev.4"
-  checksum: 10/6de55812777e63f7be8cd6d3378860c48d42be5a86c4bd33253d646f6c2e4347d4c8392b90308dc489e3b9180d1a7abd47d7e76db8fff9d4d3f38f8cdf5a3522
+"@hyperledger/anoncreds-shared@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@hyperledger/anoncreds-shared@npm:0.2.0"
+  checksum: 10/629c395c84628557358e3a5fa0d4b4188f20d7a111167ac8095835ab9020096885e9db8168540aedc74ecb5982f71841929b98e0b7c2be24e34ab8da19a8abc3
   languageName: node
   linkType: hard
 
-"@hyperledger/aries-askar-nodejs@npm:0.2.0-dev.1":
-  version: 0.2.0-dev.1
-  resolution: "@hyperledger/aries-askar-nodejs@npm:0.2.0-dev.1"
+"@hyperledger/aries-askar-nodejs@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@hyperledger/aries-askar-nodejs@npm:0.2.0"
   dependencies:
     "@2060.io/ffi-napi": "npm:4.0.8"
     "@2060.io/ref-napi": "npm:3.0.6"
-    "@hyperledger/aries-askar-shared": "npm:0.2.0-dev.1"
+    "@hyperledger/aries-askar-shared": "npm:0.2.0"
     "@mapbox/node-pre-gyp": "npm:^1.0.10"
     node-cache: "npm:^5.1.2"
     ref-array-di: "npm:^1.2.2"
     ref-struct-di: "npm:^1.1.1"
-  checksum: 10/2ca92ad27b1f3230253ff924b8d8fb470b3560fcdb5cbdac42c8b66c412b4505c77dce0b6a8ca1f1b068b3f6efbe6a4bbb75545dfee161b4c85022e52bfab85a
+  checksum: 10/87e42cd4ba8fd7af9de7f28b6b8b580457d75546e111b9c0743ad639ec60b6f73e94636826d710ff59c18384c6a15026f5251612b4f260a83593ce4733955c2d
   languageName: node
   linkType: hard
 
-"@hyperledger/aries-askar-shared@npm:0.2.0-dev.1":
-  version: 0.2.0-dev.1
-  resolution: "@hyperledger/aries-askar-shared@npm:0.2.0-dev.1"
+"@hyperledger/aries-askar-shared@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@hyperledger/aries-askar-shared@npm:0.2.0"
   dependencies:
     buffer: "npm:^6.0.3"
-  checksum: 10/646d07f24e5037dfd3919d87b4f4f135e23a0e8c8caeecd279a8cc4eb19890cd12f650a348eb542760c023b4aaa4380e923c7c149a4c724a0d2297f05885e61c
+  checksum: 10/29ef58ffad58f75c385c360fcad6856b2e927c57b2b2e0c12ab15a05a3a5015af3f10966cdb06e45d80c085d29c89f2ff8acc2679c9d71637a4dd3cfbebba64f
   languageName: node
   linkType: hard
 
@@ -7880,9 +7880,9 @@ __metadata:
     "@aries-framework/indy-sdk": "npm:0.5.0-alpha.71"
     "@aries-framework/indy-vdr": "npm:0.5.0-alpha.71"
     "@aries-framework/node": "npm:0.5.0-alpha.71"
-    "@hyperledger/anoncreds-nodejs": "npm:0.2.0-dev.4"
-    "@hyperledger/aries-askar-nodejs": "npm:0.2.0-dev.1"
-    "@hyperledger/indy-vdr-nodejs": "npm:0.2.0-dev.3"
+    "@hyperledger/anoncreds-nodejs": "npm:0.2.0"
+    "@hyperledger/aries-askar-nodejs": "npm:0.2.0"
+    "@hyperledger/indy-vdr-nodejs": "npm:0.2.0"
     "@types/inquirer": "npm:8.2.6"
     axios: "npm:1.6.0"
     inquirer: "npm:8.2.6"
@@ -8358,13 +8358,13 @@ __metadata:
     "@aries-framework/core": "npm:0.5.0-alpha.71"
     "@aries-framework/indy-vdr": "npm:0.5.0-alpha.71"
     "@aries-framework/node": "npm:0.5.0-alpha.71"
-    "@hyperledger/anoncreds-nodejs": "npm:0.2.0-dev.4"
-    "@hyperledger/aries-askar-nodejs": "npm:0.2.0-dev.1"
+    "@hyperledger/anoncreds-nodejs": "npm:0.2.0"
+    "@hyperledger/aries-askar-nodejs": "npm:0.2.0"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-core": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-core-api": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-alpha.2"
-    "@hyperledger/indy-vdr-nodejs": "npm:0.2.0-dev.3"
+    "@hyperledger/indy-vdr-nodejs": "npm:0.2.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.19"
     "@types/uuid": "npm:9.0.8"
@@ -9165,9 +9165,9 @@ __metadata:
     "@aries-framework/core": "npm:0.5.0-alpha.58"
     "@aries-framework/indy-vdr": "npm:0.5.0-alpha.58"
     "@aries-framework/node": "npm:0.5.0-alpha.58"
-    "@hyperledger/aries-askar-nodejs": "npm:0.2.0-dev.1"
+    "@hyperledger/aries-askar-nodejs": "npm:0.2.0"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
-    "@hyperledger/indy-vdr-nodejs": "npm:0.2.0-dev.3"
+    "@hyperledger/indy-vdr-nodejs": "npm:0.2.0"
     "@types/dockerode": "npm:3.2.7"
     "@types/esm": "npm:3.2.0"
     "@types/fs-extra": "npm:9.0.13"
@@ -9451,24 +9451,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/indy-vdr-nodejs@npm:0.2.0-dev.3":
-  version: 0.2.0-dev.3
-  resolution: "@hyperledger/indy-vdr-nodejs@npm:0.2.0-dev.3"
+"@hyperledger/indy-vdr-nodejs@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@hyperledger/indy-vdr-nodejs@npm:0.2.0"
   dependencies:
     "@2060.io/ffi-napi": "npm:4.0.8"
     "@2060.io/ref-napi": "npm:3.0.6"
-    "@hyperledger/indy-vdr-shared": "npm:0.2.0-dev.3"
+    "@hyperledger/indy-vdr-shared": "npm:0.2.0"
     "@mapbox/node-pre-gyp": "npm:^1.0.10"
     ref-array-di: "npm:^1.2.2"
     ref-struct-di: "npm:^1.1.1"
-  checksum: 10/78ccf764e3f108a288e2261c034f17ad07d621477b0ad853af3e7d8450d0b93fd0cbf5678e72b9db3cbfcbb5a550679f7792d10642143048a8e6f093cb1553cf
+  checksum: 10/19b65fe81673610a49d8c297b1d72c685a9c676fcb2966307f2ae0986577171c71cd934043bdf760feef7da4107cd825125512d3d260f4228de860983c541afe
   languageName: node
   linkType: hard
 
-"@hyperledger/indy-vdr-shared@npm:0.2.0-dev.3":
-  version: 0.2.0-dev.3
-  resolution: "@hyperledger/indy-vdr-shared@npm:0.2.0-dev.3"
-  checksum: 10/9e191fd262ec36a63a14415da78864336d2ceb19bd76f6d36c3349768a90806ca120c77a75af9b9dbafd646624cd275878933bb26c4ffc48c10d3e9f88eba3f5
+"@hyperledger/indy-vdr-shared@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@hyperledger/indy-vdr-shared@npm:0.2.0"
+  checksum: 10/729760438fbc6b7b98686fa654384a517645463106e747560564f6cbe4e702b52cd2996983b5d23551d29eac58c21beaf889f6195313ccdd7ea07c115fd19a25
   languageName: node
   linkType: hard
 

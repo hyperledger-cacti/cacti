@@ -52,8 +52,8 @@
     "build:dev:backend:postbuild": "npm run copy-sql && npm run copy-yarn-lock",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "copy-sql": "cp -raf ./src/main/sql ./dist/lib/main/",
-    "copy-yarn-lock": "cp -af ../../yarn.lock ./dist/yarn.lock",
+    "copy-sql": "mkdir -p ./dist/lib/main/ && cp -Rfp ./src/main/sql ./dist/lib/main/",
+    "copy-yarn-lock": "mkdir -p ./dist/lib/ && cp -rfp ../../yarn.lock ./dist/yarn.lock",
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore"
   },
   "dependencies": {
