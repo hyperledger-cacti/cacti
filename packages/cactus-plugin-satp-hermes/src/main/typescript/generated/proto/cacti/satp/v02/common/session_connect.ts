@@ -5,7 +5,7 @@
 
 import { Empty, MethodKind } from "@bufbuild/protobuf";
 import { SendStatusRequest, SendStatusResponse } from "./session_pb.js";
-import { Ack, MessageCore, RollbackMessageCore } from "./message_pb.js";
+import { Ack, MessageCore, RollbackMessageCore } from "./common_messages_pb.js";
 
 /**
  * @generated from service cacti.satp.v02.common.SessionStatusService
