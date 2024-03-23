@@ -2,11 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
-import {
-  ILocalLog,
-  PluginSATPGateway,
-} from "../../../../main/typescript/plugin-satp-gateway";
-
+import { PluginSATPGateway } from "../../../../main/typescript/plugin-satp-gateway";
+import { LocalLog } from "../../../../main/typescript/core/types";
 import { SessionData } from "../../../../main/typescript/public-api";
 import { SHA256 } from "crypto-js";
 import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
@@ -34,10 +31,10 @@ let type2: string;
 let type3: string;
 let type4: string;
 let operation: string;
-let satpLog: ILocalLog;
-let satpLog2: ILocalLog;
-let satpLog3: ILocalLog;
-let satpLog4: ILocalLog;
+let satpLog: LocalLog;
+let satpLog2: LocalLog;
+let satpLog3: LocalLog;
+let satpLog4: LocalLog;
 let sessionData: SessionData;
 
 beforeEach(async () => {
