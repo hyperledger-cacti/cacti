@@ -52,9 +52,9 @@
     "setup-credentials": "node dist/lib/main/typescript/scripts/setup-credentials.js"
   },
   "dependencies": {
-    "@hyperledger/anoncreds-nodejs": "0.2.0-dev.4",
-    "@hyperledger/aries-askar-nodejs": "0.2.0-dev.1",
-    "@hyperledger/indy-vdr-nodejs": "0.2.0-dev.3",
+    "@hyperledger/anoncreds-nodejs": "0.2.0",
+    "@hyperledger/aries-askar-nodejs": "0.2.0",
+    "@hyperledger/indy-vdr-nodejs": "0.2.0",
     "axios": "1.6.0",
     "inquirer": "8.2.6",
     "loglevel": "1.8.1"
