@@ -1,0 +1,6 @@
+src/main/typescript/generated/openapi-blo/typescript-axios/.gitignore
+src/main/typescript/generated/openapi-blo/typescript-axios/.npmignore
+src/main/typescript/generated/openapi-blo/typescript-axios/.openapi-generator-ignore
+src/main/typescript/generated/openapi-blo/typescript-axios/api.ts
+src/main/typescript/generated/openapi-blo/typescript-axios/git_push.sh
+src/main/typescript/generated/openapi-blo/typescript-axios/.openapi-generator/FILES
