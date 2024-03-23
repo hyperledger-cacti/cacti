@@ -4,8 +4,9 @@ import { SHA256 } from "crypto-js";
 import {
   SatpMessageType,
   PluginSATPGateway,
-  ILocalLog,
 } from "../../../../main/typescript/plugin-satp-gateway";
+
+import { LocalLog } from "../../../../main/typescript/core/types";
 
 import {
   CommitFinalV1Request,
@@ -94,7 +95,7 @@ beforeEach(async () => {
     type: "proof",
     operation: "delete",
     data: COMMIT_FINAL_CLAIM,
-  } as ILocalLog);
+  } as LocalLog);
 });
 
 test("valid commit final request", async () => {
