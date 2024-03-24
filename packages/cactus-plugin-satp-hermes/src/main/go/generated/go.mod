@@ -1,4 +1,4 @@
-module github.com/GIT_USER_ID/GIT_REPO_ID
+module github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated
 
 go 1.18
 
