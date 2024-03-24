@@ -175,7 +175,7 @@ import (
 )
 
 func main() {
-    transactRequest := *openapiclient.NewTransactRequest("ContextID_example", "FromDLTNetworkID_example", "1000000000000000000", *openapiclient.NewTransactRequestFromToken("ChainID_example", "ChainType_example", "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7", "Symbol_example", int32(123)), "ToDLTNetworkID_example", "1000000000000000000", *openapiclient.NewTransactRequestFromToken("ChainID_example", "ChainType_example", "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7", "Symbol_example", int32(123))) // TransactRequest | 
+    transactRequest := *openapiclient.NewTransactRequest("ContextID_example", "Mode_example") // TransactRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FromToken** | Pointer to [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | [optional] 
+**FromToken** | Pointer to [**GetRoutes200ResponseRoutesInnerFromToken**](GetRoutes200ResponseRoutesInnerFromToken.md) |  | [optional] 
 **FromAmount** | Pointer to **string** | The amount of &#39;fromToken&#39; to be transferred, specified as a string to maintain precision. | [optional] 
-**ToToken** | Pointer to [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | [optional] 
+**ToToken** | Pointer to [**GetRoutes200ResponseRoutesInnerFromToken**](GetRoutes200ResponseRoutesInnerFromToken.md) |  | [optional] 
 **Slippage** | Pointer to **float32** | The maximum acceptable difference between the expected price of the &#39;toToken&#39; and the price at the time of the transfer. | [optional] 
 **FromAddress** | Pointer to **string** | A blockchain address. | [optional] 
 **ToAddress** | Pointer to **string** | A blockchain address. | [optional] 
@@ -32,20 +32,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetFromToken
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromToken() TransactRequestFromToken`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromToken() GetRoutes200ResponseRoutesInnerFromToken`
 
 GetFromToken returns the FromToken field if non-nil, zero value otherwise.
 
 ### GetFromTokenOk
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromTokenOk() (*TransactRequestFromToken, bool)`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool)`
 
 GetFromTokenOk returns a tuple with the FromToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetFromToken
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetFromToken(v TransactRequestFromToken)`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetFromToken(v GetRoutes200ResponseRoutesInnerFromToken)`
 
 SetFromToken sets FromToken field to given value.
 
@@ -82,20 +82,20 @@ HasFromAmount returns a boolean if a field has been set.
 
 ### GetToToken
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToToken() TransactRequestFromToken`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToToken() GetRoutes200ResponseRoutesInnerFromToken`
 
 GetToToken returns the ToToken field if non-nil, zero value otherwise.
 
 ### GetToTokenOk
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToTokenOk() (*TransactRequestFromToken, bool)`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool)`
 
 GetToTokenOk returns a tuple with the ToToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetToToken
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetToToken(v TransactRequestFromToken)`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetToToken(v GetRoutes200ResponseRoutesInnerFromToken)`
 
 SetToToken sets ToToken field to given value.
 

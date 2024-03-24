@@ -67,213 +67,46 @@
                     "format": "uuid",
                     "description": "A unique identifier for the transaction context."
                   },
-                  "fromDLTNetworkID": {
-                    "x-category": "satp-core",
+                  "mode": {
                     "type": "string",
-                    "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+                    "enum": [
+                      "data",
+                      "transfer"
+                    ],
+                    "description": "The mode of transaction - 'data' for arbitrary payload or 'transfer' for asset transfer."
+                  },
+                  "payload": {
+                    "type": "string",
+                    "description": "A string containing all transaction details required for processing in 'data' mode. Required if mode is 'data'."
+                  },
+                  "fromDLTNetworkID": {
+                    "type": "string",
+                    "description": "The ID of the DLT Network from which the asset will be transferred. Required if mode is 'transfer'."
+                  },
+                  "toDLTNetworkID": {
+                    "type": "string",
+                    "description": "The ID of the DLT Network to which the asset will be transferred. Required if mode is 'transfer'."
                   },
                   "fromAmount": {
                     "type": "string",
-                    "description": "The amount in string format including all decimals.",
-                    "pattern": "^([1-9][0-9]*|0)(\\.[0-9]+)?$",
-                    "example": "1000000000000000000"
+                    "description": "Required if mode is 'transfer'."
                   },
                   "fromToken": {
-                    "type": "object",
-                    "description": "Metadata detailing a supported token",
-                    "required": [
-                      "chainID",
-                      "chainType",
-                      "address",
-                      "symbol",
-                      "decimals"
-                    ],
-                    "properties": {
-                      "chainID": {
-                        "x-category": "satp-core",
-                        "type": "string",
-                        "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
-                      },
-                      "chainType": {
-                        "x-category": "satp-core",
-                        "type": "string",
-                        "enum": [
-                          "HyperledgerFabric",
-                          "HyperledgerBesu"
-                        ],
-                        "description": "Supported DLT protocols."
-                      },
-                      "address": {
-                        "type": "string",
-                        "description": "A blockchain address.",
-                        "example": "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "The name of the token."
-                      },
-                      "symbol": {
-                        "type": "string",
-                        "description": "The symbol of the token."
-                      },
-                      "decimals": {
-                        "type": "integer",
-                        "description": "How many decimals the token supports.",
-                        "minimum": 1
-                      },
-                      "logoURI": {
-                        "type": "string",
-                        "description": "The logo of a token, chain, dex etc.",
-                        "format": "uri"
-                      },
-                      "tags": {
-                        "type": "array",
-                        "description": "List of tags identifiers providing additional context or categorization.",
-                        "items": {
-                          "type": "string"
-                        },
-                        "example": [
-                          "satp",
-                          "hyperledger"
-                        ]
-                      },
-                      "priceUSD": {
-                        "type": "string",
-                        "description": "The current price of the token in USD."
-                      },
-                      "extensions": {
-                        "type": "object",
-                        "properties": {
-                          "bridgeInfo": {
-                            "type": "object",
-                            "additionalProperties": {
-                              "type": "object",
-                              "description": "Information about the bridge used for the token transfer.",
-                              "properties": {
-                                "tokenAddress": {
-                                  "type": "string",
-                                  "description": "The address of the token being transferred.",
-                                  "example": "0x..."
-                                }
-                              }
-                            }
-                          },
-                          "verified": {
-                            "type": "boolean",
-                            "description": "Indicates whether the token is verified."
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "toDLTNetworkID": {
-                    "x-category": "satp-core",
                     "type": "string",
-                    "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+                    "description": "Required if mode is 'transfer'."
                   },
                   "toAmount": {
                     "type": "string",
-                    "description": "The amount in string format including all decimals.",
-                    "pattern": "^([1-9][0-9]*|0)(\\.[0-9]+)?$",
-                    "example": "1000000000000000000"
+                    "description": "Required if mode is 'transfer'."
                   },
                   "toToken": {
-                    "type": "object",
-                    "description": "Metadata detailing a supported token",
-                    "required": [
-                      "chainID",
-                      "chainType",
-                      "address",
-                      "symbol",
-                      "decimals"
-                    ],
-                    "properties": {
-                      "chainID": {
-                        "x-category": "satp-core",
-                        "type": "string",
-                        "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
-                      },
-                      "chainType": {
-                        "x-category": "satp-core",
-                        "type": "string",
-                        "enum": [
-                          "HyperledgerFabric",
-                          "HyperledgerBesu"
-                        ],
-                        "description": "Supported DLT protocols."
-                      },
-                      "address": {
-                        "type": "string",
-                        "description": "A blockchain address.",
-                        "example": "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "The name of the token."
-                      },
-                      "symbol": {
-                        "type": "string",
-                        "description": "The symbol of the token."
-                      },
-                      "decimals": {
-                        "type": "integer",
-                        "description": "How many decimals the token supports.",
-                        "minimum": 1
-                      },
-                      "logoURI": {
-                        "type": "string",
-                        "description": "The logo of a token, chain, dex etc.",
-                        "format": "uri"
-                      },
-                      "tags": {
-                        "type": "array",
-                        "description": "List of tags identifiers providing additional context or categorization.",
-                        "items": {
-                          "type": "string"
-                        },
-                        "example": [
-                          "satp",
-                          "hyperledger"
-                        ]
-                      },
-                      "priceUSD": {
-                        "type": "string",
-                        "description": "The current price of the token in USD."
-                      },
-                      "extensions": {
-                        "type": "object",
-                        "properties": {
-                          "bridgeInfo": {
-                            "type": "object",
-                            "additionalProperties": {
-                              "type": "object",
-                              "description": "Information about the bridge used for the token transfer.",
-                              "properties": {
-                                "tokenAddress": {
-                                  "type": "string",
-                                  "description": "The address of the token being transferred.",
-                                  "example": "0x..."
-                                }
-                              }
-                            }
-                          },
-                          "verified": {
-                            "type": "boolean",
-                            "description": "Indicates whether the token is verified."
-                          }
-                        }
-                      }
-                    }
+                    "type": "string",
+                    "description": "Required if mode is 'transfer'."
                   }
                 },
                 "required": [
                   "contextID",
-                  "fromDLTNetworkID",
-                  "fromAmount",
-                  "fromToken",
-                  "toDLTNetworkID",
-                  "toAmount",
-                  "toToken"
+                  "mode"
                 ]
               }
             }
@@ -776,6 +609,506 @@
         }
       }
     },
+    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Continue a paused transaction session",
+        "description": "Attempts to continue a previously paused transaction intent, resuming its execution.",
+        "operationId": "Continue",
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "A unique identifier for the transaction session to be continued."
+                  },
+                  "contextId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "A unique identifier for the transaction context."
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "contextId"
+                ],
+                "description": "Schema for a request to continue a paused transaction session."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction continuation attempted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Response schema for a continue request, returning the status of the SATP session.",
+                  "properties": {
+                    "statusResponse": {
+                      "type": "object",
+                      "x-category": "response",
+                      "required": [
+                        "status",
+                        "substatus",
+                        "stage",
+                        "step",
+                        "startTime"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "NOT_FOUND",
+                            "INVALID",
+                            "PENDING",
+                            "DONE",
+                            "FAILED"
+                          ],
+                          "description": "Current status of the SATP session."
+                        },
+                        "substatus": {
+                          "type": "string",
+                          "enum": [
+                            "WAIT_SOURCE_CONFIRMATIONS",
+                            "WAIT_DESTINATION_TRANSACTION",
+                            "BRIDGE_NOT_AVAILABLE",
+                            "CHAIN_NOT_AVAILABLE",
+                            "REFUND_IN_PROGRESS",
+                            "UNKNOWN_ERROR",
+                            "COMPLETED",
+                            "PARTIAL",
+                            "REFUNDED",
+                            "NOT_PROCESSABLE_REFUND_NEEDED"
+                          ],
+                          "description": "More detailed status of the SATP session."
+                        },
+                        "stage": {
+                          "type": "string",
+                          "enum": [
+                            "STAGE0",
+                            "STAGE1",
+                            "STAGE2",
+                            "STAGE3"
+                          ],
+                          "description": "Current stage of the SATP session."
+                        },
+                        "step": {
+                          "type": "string",
+                          "enum": [
+                            "transfer-initialization-claims",
+                            "conveyance-of-network-capabilities-and-parameters",
+                            "transfer-proposal-message",
+                            "transfer-proposal-receipt-message",
+                            "transfer-proposal-reject-and-conditional-reject-message",
+                            "transfer-commence-message",
+                            "commence-response-message",
+                            "lock-assertion-message",
+                            "lock-assertion-receipt-message",
+                            "commit-preparation-message",
+                            "commit-ready-message",
+                            "commit-final-assertion-message",
+                            "commit-final-acknowledgement-receipt-message",
+                            "transfer-complete-message",
+                            "rollback-transfer-initialization-claims",
+                            "rollback-conveyance-of-network-capabilities-and-parameters",
+                            "rollback-transfer-proposal-message",
+                            "rollback-transfer-proposal-receipt-message",
+                            "rollback-transfer-proposal-reject-and-conditional-reject-message",
+                            "rollback-transfer-commence-message",
+                            "rollback-commence-response-message",
+                            "rollback-lock-assertion-message",
+                            "rollback-lock-assertion-receipt-message",
+                            "rollback-commit-preparation-message",
+                            "rollback-commit-ready-message",
+                            "rollback-commit-final-assertion-message",
+                            "rollback-commit-final-acknowledgement-receipt-message",
+                            "rollback-transfer-complete-message"
+                          ],
+                          "description": "Current step within the stage of the SATP session."
+                        },
+                        "startTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "The start time of the SATP session."
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "statusResponse"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred or transaction cannot be continued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "x-category": "response",
+                  "type": "object",
+                  "x-go-type": "ApiError",
+                  "x-go-name": "ApiError",
+                  "description": "An Error",
+                  "required": [
+                    "message",
+                    "type",
+                    "code",
+                    "status",
+                    "timestamp"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "HTTP error type",
+                      "example": "bad-request"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "description": "Numeric error code",
+                      "example": 16384
+                    },
+                    "status": {
+                      "type": "integer",
+                      "description": "HTTP status of the error",
+                      "example": 500
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Long error description",
+                      "example": "Oops there's been an internal error handling"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp of the error",
+                      "example": "2021-07-21T17:32:28Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Pause a transaction session",
+        "description": "Attempts to pause a previously submitted transaction intent, temporarily halting its execution.",
+        "operationId": "Pause",
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "A unique identifier for the transaction session to be paused."
+                  },
+                  "contextId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "A unique identifier for the transaction context."
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "contextId"
+                ],
+                "description": "Schema for a request to pause a transaction session."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction pause attempted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Response schema for a pause request, returning the status of the SATP session.",
+                  "properties": {
+                    "statusResponse": {
+                      "type": "object",
+                      "x-category": "response",
+                      "required": [
+                        "status",
+                        "substatus",
+                        "stage",
+                        "step",
+                        "startTime"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "NOT_FOUND",
+                            "INVALID",
+                            "PENDING",
+                            "DONE",
+                            "FAILED"
+                          ],
+                          "description": "Current status of the SATP session."
+                        },
+                        "substatus": {
+                          "type": "string",
+                          "enum": [
+                            "WAIT_SOURCE_CONFIRMATIONS",
+                            "WAIT_DESTINATION_TRANSACTION",
+                            "BRIDGE_NOT_AVAILABLE",
+                            "CHAIN_NOT_AVAILABLE",
+                            "REFUND_IN_PROGRESS",
+                            "UNKNOWN_ERROR",
+                            "COMPLETED",
+                            "PARTIAL",
+                            "REFUNDED",
+                            "NOT_PROCESSABLE_REFUND_NEEDED"
+                          ],
+                          "description": "More detailed status of the SATP session."
+                        },
+                        "stage": {
+                          "type": "string",
+                          "enum": [
+                            "STAGE0",
+                            "STAGE1",
+                            "STAGE2",
+                            "STAGE3"
+                          ],
+                          "description": "Current stage of the SATP session."
+                        },
+                        "step": {
+                          "type": "string",
+                          "enum": [
+                            "transfer-initialization-claims",
+                            "conveyance-of-network-capabilities-and-parameters",
+                            "transfer-proposal-message",
+                            "transfer-proposal-receipt-message",
+                            "transfer-proposal-reject-and-conditional-reject-message",
+                            "transfer-commence-message",
+                            "commence-response-message",
+                            "lock-assertion-message",
+                            "lock-assertion-receipt-message",
+                            "commit-preparation-message",
+                            "commit-ready-message",
+                            "commit-final-assertion-message",
+                            "commit-final-acknowledgement-receipt-message",
+                            "transfer-complete-message",
+                            "rollback-transfer-initialization-claims",
+                            "rollback-conveyance-of-network-capabilities-and-parameters",
+                            "rollback-transfer-proposal-message",
+                            "rollback-transfer-proposal-receipt-message",
+                            "rollback-transfer-proposal-reject-and-conditional-reject-message",
+                            "rollback-transfer-commence-message",
+                            "rollback-commence-response-message",
+                            "rollback-lock-assertion-message",
+                            "rollback-lock-assertion-receipt-message",
+                            "rollback-commit-preparation-message",
+                            "rollback-commit-ready-message",
+                            "rollback-commit-final-assertion-message",
+                            "rollback-commit-final-acknowledgement-receipt-message",
+                            "rollback-transfer-complete-message"
+                          ],
+                          "description": "Current step within the stage of the SATP session."
+                        },
+                        "startTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "The start time of the SATP session."
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "statusResponse"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred or transaction cannot be paused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "x-category": "response",
+                  "type": "object",
+                  "x-go-type": "ApiError",
+                  "x-go-name": "ApiError",
+                  "description": "An Error",
+                  "required": [
+                    "message",
+                    "type",
+                    "code",
+                    "status",
+                    "timestamp"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "HTTP error type",
+                      "example": "bad-request"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "description": "Numeric error code",
+                      "example": 16384
+                    },
+                    "status": {
+                      "type": "integer",
+                      "description": "HTTP status of the error",
+                      "example": 500
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Long error description",
+                      "example": "Oops there's been an internal error handling"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp of the error",
+                      "example": "2021-07-21T17:32:28Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/chains": {
+      "get": {
+        "tags": [
+          "chains"
+        ],
+        "summary": "Get supported chains",
+        "description": "Retrieves metadata about each supported blockchain network.",
+        "operationId": "GetChains",
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/chains"
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A list of supported blockchain networks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "List of chains and related metadata",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "chainId": {
+                        "type": "string",
+                        "description": "A unique identifier for the blockchain network."
+                      },
+                      "chainName": {
+                        "type": "string",
+                        "description": "The name of the blockchain network."
+                      },
+                      "chainType": {
+                        "type": "string",
+                        "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
+                      },
+                      "networkName": {
+                        "type": "string",
+                        "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
+                      }
+                    },
+                    "required": [
+                      "chainId",
+                      "chainName",
+                      "chainType",
+                      "networkName"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "x-category": "response",
+                  "type": "object",
+                  "x-go-type": "ApiError",
+                  "x-go-name": "ApiError",
+                  "description": "An Error",
+                  "required": [
+                    "message",
+                    "type",
+                    "code",
+                    "status",
+                    "timestamp"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "HTTP error type",
+                      "example": "bad-request"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "description": "Numeric error code",
+                      "example": 16384
+                    },
+                    "status": {
+                      "type": "integer",
+                      "description": "HTTP status of the error",
+                      "example": 500
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Long error description",
+                      "example": "Oops there's been an internal error handling"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Timestamp of the error",
+                      "example": "2021-07-21T17:32:28Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/@hyperledger/cactus-plugin-satp-hermes/routes": {
       "get": {
         "description": "Get a list of possible routes for swapping one asset for another across multiple exchanges",
@@ -887,10 +1220,6 @@
                       "description": "A collection of route objects",
                       "items": {
                         "type": "object",
-                        "required": [
-                          "id",
-                          "gatewayID"
-                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -901,9 +1230,17 @@
                             "format": "uuid",
                             "description": "A unique identifier for the gateway."
                           },
+                          "mode": {
+                            "type": "string",
+                            "enum": [
+                              "data",
+                              "transfer"
+                            ],
+                            "description": "The mode of operation for this route - 'data' for arbitrary payload handling, 'transfer' for asset transfer."
+                          },
                           "fromDLTNetworkID": {
                             "type": "string",
-                            "description": "The ID of the DLT Network where the transfer will originate."
+                            "description": "The ID of the DLT Network where the operation will originate."
                           },
                           "fromAmountUSD": {
                             "type": "string",
@@ -1005,7 +1342,7 @@
                           },
                           "toDLTNetworkID": {
                             "type": "string",
-                            "description": "The ID of the DLT Network where the transfer will end."
+                            "description": "The ID of the DLT Network where the operation will end."
                           },
                           "toAmountUSD": {
                             "type": "string",
@@ -1117,7 +1454,7 @@
                           },
                           "steps": {
                             "type": "array",
-                            "description": "List of steps involved in this route.",
+                            "description": "List of steps involved in this route, adjusted for mode.",
                             "items": {
                               "type": "object",
                               "description": "Details a single step within a route including actions and estimates.",
@@ -1650,7 +1987,12 @@
                               "hyperledger"
                             ]
                           }
-                        }
+                        },
+                        "required": [
+                          "id",
+                          "gatewayID",
+                          "mode"
+                        ]
                       }
                     }
                   }
@@ -1959,6 +2301,124 @@
           }
         }
       },
+      "PauseRequest": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A unique identifier for the transaction session to be paused."
+          },
+          "contextId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A unique identifier for the transaction context."
+          }
+        },
+        "required": [
+          "sessionId",
+          "contextId"
+        ],
+        "description": "Schema for a request to pause a transaction session."
+      },
+      "PauseResponse": {
+        "type": "object",
+        "description": "Response schema for a pause request, returning the status of the SATP session.",
+        "properties": {
+          "statusResponse": {
+            "type": "object",
+            "x-category": "response",
+            "required": [
+              "status",
+              "substatus",
+              "stage",
+              "step",
+              "startTime"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "NOT_FOUND",
+                  "INVALID",
+                  "PENDING",
+                  "DONE",
+                  "FAILED"
+                ],
+                "description": "Current status of the SATP session."
+              },
+              "substatus": {
+                "type": "string",
+                "enum": [
+                  "WAIT_SOURCE_CONFIRMATIONS",
+                  "WAIT_DESTINATION_TRANSACTION",
+                  "BRIDGE_NOT_AVAILABLE",
+                  "CHAIN_NOT_AVAILABLE",
+                  "REFUND_IN_PROGRESS",
+                  "UNKNOWN_ERROR",
+                  "COMPLETED",
+                  "PARTIAL",
+                  "REFUNDED",
+                  "NOT_PROCESSABLE_REFUND_NEEDED"
+                ],
+                "description": "More detailed status of the SATP session."
+              },
+              "stage": {
+                "type": "string",
+                "enum": [
+                  "STAGE0",
+                  "STAGE1",
+                  "STAGE2",
+                  "STAGE3"
+                ],
+                "description": "Current stage of the SATP session."
+              },
+              "step": {
+                "type": "string",
+                "enum": [
+                  "transfer-initialization-claims",
+                  "conveyance-of-network-capabilities-and-parameters",
+                  "transfer-proposal-message",
+                  "transfer-proposal-receipt-message",
+                  "transfer-proposal-reject-and-conditional-reject-message",
+                  "transfer-commence-message",
+                  "commence-response-message",
+                  "lock-assertion-message",
+                  "lock-assertion-receipt-message",
+                  "commit-preparation-message",
+                  "commit-ready-message",
+                  "commit-final-assertion-message",
+                  "commit-final-acknowledgement-receipt-message",
+                  "transfer-complete-message",
+                  "rollback-transfer-initialization-claims",
+                  "rollback-conveyance-of-network-capabilities-and-parameters",
+                  "rollback-transfer-proposal-message",
+                  "rollback-transfer-proposal-receipt-message",
+                  "rollback-transfer-proposal-reject-and-conditional-reject-message",
+                  "rollback-transfer-commence-message",
+                  "rollback-commence-response-message",
+                  "rollback-lock-assertion-message",
+                  "rollback-lock-assertion-receipt-message",
+                  "rollback-commit-preparation-message",
+                  "rollback-commit-ready-message",
+                  "rollback-commit-final-assertion-message",
+                  "rollback-commit-final-acknowledgement-receipt-message",
+                  "rollback-transfer-complete-message"
+                ],
+                "description": "Current step within the stage of the SATP session."
+              },
+              "startTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The start time of the SATP session."
+              }
+            }
+          }
+        },
+        "required": [
+          "statusResponse"
+        ]
+      },
       "StatusRequest": {
         "type": "object",
         "x-category": "request",
@@ -1980,213 +2440,46 @@
             "format": "uuid",
             "description": "A unique identifier for the transaction context."
           },
-          "fromDLTNetworkID": {
-            "x-category": "satp-core",
+          "mode": {
             "type": "string",
-            "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+            "enum": [
+              "data",
+              "transfer"
+            ],
+            "description": "The mode of transaction - 'data' for arbitrary payload or 'transfer' for asset transfer."
+          },
+          "payload": {
+            "type": "string",
+            "description": "A string containing all transaction details required for processing in 'data' mode. Required if mode is 'data'."
+          },
+          "fromDLTNetworkID": {
+            "type": "string",
+            "description": "The ID of the DLT Network from which the asset will be transferred. Required if mode is 'transfer'."
+          },
+          "toDLTNetworkID": {
+            "type": "string",
+            "description": "The ID of the DLT Network to which the asset will be transferred. Required if mode is 'transfer'."
           },
           "fromAmount": {
             "type": "string",
-            "description": "The amount in string format including all decimals.",
-            "pattern": "^([1-9][0-9]*|0)(\\.[0-9]+)?$",
-            "example": "1000000000000000000"
+            "description": "Required if mode is 'transfer'."
           },
           "fromToken": {
-            "type": "object",
-            "description": "Metadata detailing a supported token",
-            "required": [
-              "chainID",
-              "chainType",
-              "address",
-              "symbol",
-              "decimals"
-            ],
-            "properties": {
-              "chainID": {
-                "x-category": "satp-core",
-                "type": "string",
-                "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
-              },
-              "chainType": {
-                "x-category": "satp-core",
-                "type": "string",
-                "enum": [
-                  "HyperledgerFabric",
-                  "HyperledgerBesu"
-                ],
-                "description": "Supported DLT protocols."
-              },
-              "address": {
-                "type": "string",
-                "description": "A blockchain address.",
-                "example": "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
-              },
-              "name": {
-                "type": "string",
-                "description": "The name of the token."
-              },
-              "symbol": {
-                "type": "string",
-                "description": "The symbol of the token."
-              },
-              "decimals": {
-                "type": "integer",
-                "description": "How many decimals the token supports.",
-                "minimum": 1
-              },
-              "logoURI": {
-                "type": "string",
-                "description": "The logo of a token, chain, dex etc.",
-                "format": "uri"
-              },
-              "tags": {
-                "type": "array",
-                "description": "List of tags identifiers providing additional context or categorization.",
-                "items": {
-                  "type": "string"
-                },
-                "example": [
-                  "satp",
-                  "hyperledger"
-                ]
-              },
-              "priceUSD": {
-                "type": "string",
-                "description": "The current price of the token in USD."
-              },
-              "extensions": {
-                "type": "object",
-                "properties": {
-                  "bridgeInfo": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "object",
-                      "description": "Information about the bridge used for the token transfer.",
-                      "properties": {
-                        "tokenAddress": {
-                          "type": "string",
-                          "description": "The address of the token being transferred.",
-                          "example": "0x..."
-                        }
-                      }
-                    }
-                  },
-                  "verified": {
-                    "type": "boolean",
-                    "description": "Indicates whether the token is verified."
-                  }
-                }
-              }
-            }
-          },
-          "toDLTNetworkID": {
-            "x-category": "satp-core",
             "type": "string",
-            "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+            "description": "Required if mode is 'transfer'."
           },
           "toAmount": {
             "type": "string",
-            "description": "The amount in string format including all decimals.",
-            "pattern": "^([1-9][0-9]*|0)(\\.[0-9]+)?$",
-            "example": "1000000000000000000"
+            "description": "Required if mode is 'transfer'."
           },
           "toToken": {
-            "type": "object",
-            "description": "Metadata detailing a supported token",
-            "required": [
-              "chainID",
-              "chainType",
-              "address",
-              "symbol",
-              "decimals"
-            ],
-            "properties": {
-              "chainID": {
-                "x-category": "satp-core",
-                "type": "string",
-                "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
-              },
-              "chainType": {
-                "x-category": "satp-core",
-                "type": "string",
-                "enum": [
-                  "HyperledgerFabric",
-                  "HyperledgerBesu"
-                ],
-                "description": "Supported DLT protocols."
-              },
-              "address": {
-                "type": "string",
-                "description": "A blockchain address.",
-                "example": "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
-              },
-              "name": {
-                "type": "string",
-                "description": "The name of the token."
-              },
-              "symbol": {
-                "type": "string",
-                "description": "The symbol of the token."
-              },
-              "decimals": {
-                "type": "integer",
-                "description": "How many decimals the token supports.",
-                "minimum": 1
-              },
-              "logoURI": {
-                "type": "string",
-                "description": "The logo of a token, chain, dex etc.",
-                "format": "uri"
-              },
-              "tags": {
-                "type": "array",
-                "description": "List of tags identifiers providing additional context or categorization.",
-                "items": {
-                  "type": "string"
-                },
-                "example": [
-                  "satp",
-                  "hyperledger"
-                ]
-              },
-              "priceUSD": {
-                "type": "string",
-                "description": "The current price of the token in USD."
-              },
-              "extensions": {
-                "type": "object",
-                "properties": {
-                  "bridgeInfo": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "object",
-                      "description": "Information about the bridge used for the token transfer.",
-                      "properties": {
-                        "tokenAddress": {
-                          "type": "string",
-                          "description": "The address of the token being transferred.",
-                          "example": "0x..."
-                        }
-                      }
-                    }
-                  },
-                  "verified": {
-                    "type": "boolean",
-                    "description": "Indicates whether the token is verified."
-                  }
-                }
-              }
-            }
+            "type": "string",
+            "description": "Required if mode is 'transfer'."
           }
         },
         "required": [
           "contextID",
-          "fromDLTNetworkID",
-          "fromAmount",
-          "fromToken",
-          "toDLTNetworkID",
-          "toAmount",
-          "toToken"
+          "mode"
         ]
       },
       "TransactResponse": {
@@ -2514,10 +2807,6 @@
             "description": "A collection of route objects",
             "items": {
               "type": "object",
-              "required": [
-                "id",
-                "gatewayID"
-              ],
               "properties": {
                 "id": {
                   "type": "string",
@@ -2528,9 +2817,17 @@
                   "format": "uuid",
                   "description": "A unique identifier for the gateway."
                 },
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "data",
+                    "transfer"
+                  ],
+                  "description": "The mode of operation for this route - 'data' for arbitrary payload handling, 'transfer' for asset transfer."
+                },
                 "fromDLTNetworkID": {
                   "type": "string",
-                  "description": "The ID of the DLT Network where the transfer will originate."
+                  "description": "The ID of the DLT Network where the operation will originate."
                 },
                 "fromAmountUSD": {
                   "type": "string",
@@ -2632,7 +2929,7 @@
                 },
                 "toDLTNetworkID": {
                   "type": "string",
-                  "description": "The ID of the DLT Network where the transfer will end."
+                  "description": "The ID of the DLT Network where the operation will end."
                 },
                 "toAmountUSD": {
                   "type": "string",
@@ -2744,7 +3041,7 @@
                 },
                 "steps": {
                   "type": "array",
-                  "description": "List of steps involved in this route.",
+                  "description": "List of steps involved in this route, adjusted for mode.",
                   "items": {
                     "type": "object",
                     "description": "Details a single step within a route including actions and estimates.",
@@ -3277,17 +3574,18 @@
                     "hyperledger"
                   ]
                 }
-              }
+              },
+              "required": [
+                "id",
+                "gatewayID",
+                "mode"
+              ]
             }
           }
         }
       },
       "Route": {
         "type": "object",
-        "required": [
-          "id",
-          "gatewayID"
-        ],
         "properties": {
           "id": {
             "type": "string",
@@ -3298,9 +3596,17 @@
             "format": "uuid",
             "description": "A unique identifier for the gateway."
           },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "data",
+              "transfer"
+            ],
+            "description": "The mode of operation for this route - 'data' for arbitrary payload handling, 'transfer' for asset transfer."
+          },
           "fromDLTNetworkID": {
             "type": "string",
-            "description": "The ID of the DLT Network where the transfer will originate."
+            "description": "The ID of the DLT Network where the operation will originate."
           },
           "fromAmountUSD": {
             "type": "string",
@@ -3402,7 +3708,7 @@
           },
           "toDLTNetworkID": {
             "type": "string",
-            "description": "The ID of the DLT Network where the transfer will end."
+            "description": "The ID of the DLT Network where the operation will end."
           },
           "toAmountUSD": {
             "type": "string",
@@ -3514,7 +3820,7 @@
           },
           "steps": {
             "type": "array",
-            "description": "List of steps involved in this route.",
+            "description": "List of steps involved in this route, adjusted for mode.",
             "items": {
               "type": "object",
               "description": "Details a single step within a route including actions and estimates.",
@@ -4047,6 +4353,187 @@
               "hyperledger"
             ]
           }
+        },
+        "required": [
+          "id",
+          "gatewayID",
+          "mode"
+        ]
+      },
+      "ContinueRequest": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A unique identifier for the transaction session to be continued."
+          },
+          "contextId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A unique identifier for the transaction context."
+          }
+        },
+        "required": [
+          "sessionId",
+          "contextId"
+        ],
+        "description": "Schema for a request to continue a paused transaction session."
+      },
+      "ContinueResponse": {
+        "type": "object",
+        "description": "Response schema for a continue request, returning the status of the SATP session.",
+        "properties": {
+          "statusResponse": {
+            "type": "object",
+            "x-category": "response",
+            "required": [
+              "status",
+              "substatus",
+              "stage",
+              "step",
+              "startTime"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "NOT_FOUND",
+                  "INVALID",
+                  "PENDING",
+                  "DONE",
+                  "FAILED"
+                ],
+                "description": "Current status of the SATP session."
+              },
+              "substatus": {
+                "type": "string",
+                "enum": [
+                  "WAIT_SOURCE_CONFIRMATIONS",
+                  "WAIT_DESTINATION_TRANSACTION",
+                  "BRIDGE_NOT_AVAILABLE",
+                  "CHAIN_NOT_AVAILABLE",
+                  "REFUND_IN_PROGRESS",
+                  "UNKNOWN_ERROR",
+                  "COMPLETED",
+                  "PARTIAL",
+                  "REFUNDED",
+                  "NOT_PROCESSABLE_REFUND_NEEDED"
+                ],
+                "description": "More detailed status of the SATP session."
+              },
+              "stage": {
+                "type": "string",
+                "enum": [
+                  "STAGE0",
+                  "STAGE1",
+                  "STAGE2",
+                  "STAGE3"
+                ],
+                "description": "Current stage of the SATP session."
+              },
+              "step": {
+                "type": "string",
+                "enum": [
+                  "transfer-initialization-claims",
+                  "conveyance-of-network-capabilities-and-parameters",
+                  "transfer-proposal-message",
+                  "transfer-proposal-receipt-message",
+                  "transfer-proposal-reject-and-conditional-reject-message",
+                  "transfer-commence-message",
+                  "commence-response-message",
+                  "lock-assertion-message",
+                  "lock-assertion-receipt-message",
+                  "commit-preparation-message",
+                  "commit-ready-message",
+                  "commit-final-assertion-message",
+                  "commit-final-acknowledgement-receipt-message",
+                  "transfer-complete-message",
+                  "rollback-transfer-initialization-claims",
+                  "rollback-conveyance-of-network-capabilities-and-parameters",
+                  "rollback-transfer-proposal-message",
+                  "rollback-transfer-proposal-receipt-message",
+                  "rollback-transfer-proposal-reject-and-conditional-reject-message",
+                  "rollback-transfer-commence-message",
+                  "rollback-commence-response-message",
+                  "rollback-lock-assertion-message",
+                  "rollback-lock-assertion-receipt-message",
+                  "rollback-commit-preparation-message",
+                  "rollback-commit-ready-message",
+                  "rollback-commit-final-assertion-message",
+                  "rollback-commit-final-acknowledgement-receipt-message",
+                  "rollback-transfer-complete-message"
+                ],
+                "description": "Current step within the stage of the SATP session."
+              },
+              "startTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The start time of the SATP session."
+              }
+            }
+          }
+        },
+        "required": [
+          "statusResponse"
+        ]
+      },
+      "Chain": {
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "string",
+            "description": "A unique identifier for the blockchain network."
+          },
+          "chainName": {
+            "type": "string",
+            "description": "The name of the blockchain network."
+          },
+          "chainType": {
+            "type": "string",
+            "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
+          },
+          "networkName": {
+            "type": "string",
+            "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
+          }
+        },
+        "required": [
+          "chainId",
+          "chainName",
+          "chainType",
+          "networkName"
+        ]
+      },
+      "Chains": {
+        "type": "array",
+        "description": "List of chains and related metadata",
+        "items": {
+          "type": "object",
+          "properties": {
+            "chainId": {
+              "type": "string",
+              "description": "A unique identifier for the blockchain network."
+            },
+            "chainName": {
+              "type": "string",
+              "description": "The name of the blockchain network."
+            },
+            "chainType": {
+              "type": "string",
+              "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
+            },
+            "networkName": {
+              "type": "string",
+              "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
+            }
+          },
+          "required": [
+            "chainId",
+            "chainName",
+            "chainType",
+            "networkName"
+          ]
         }
       },
       "Token": {

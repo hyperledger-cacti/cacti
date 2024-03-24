@@ -5,18 +5,20 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ContextID** | **string** | A unique identifier for the transaction context. | 
-**FromDLTNetworkID** | **string** | The network of the DLT being interacted with. TODO: implement network identification draft | 
-**FromAmount** | **string** | The amount in string format including all decimals. | 
-**FromToken** | [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | 
-**ToDLTNetworkID** | **string** | The network of the DLT being interacted with. TODO: implement network identification draft | 
-**ToAmount** | **string** | The amount in string format including all decimals. | 
-**ToToken** | [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | 
+**Mode** | **string** | The mode of transaction - &#39;data&#39; for arbitrary payload or &#39;transfer&#39; for asset transfer. | 
+**Payload** | Pointer to **string** | A string containing all transaction details required for processing in &#39;data&#39; mode. Required if mode is &#39;data&#39;. | [optional] 
+**FromDLTNetworkID** | Pointer to **string** | The ID of the DLT Network from which the asset will be transferred. Required if mode is &#39;transfer&#39;. | [optional] 
+**ToDLTNetworkID** | Pointer to **string** | The ID of the DLT Network to which the asset will be transferred. Required if mode is &#39;transfer&#39;. | [optional] 
+**FromAmount** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
+**FromToken** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
+**ToAmount** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
+**ToToken** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
 
 ## Methods
 
 ### NewTransactRequest
 
-`func NewTransactRequest(contextID string, fromDLTNetworkID string, fromAmount string, fromToken TransactRequestFromToken, toDLTNetworkID string, toAmount string, toToken TransactRequestFromToken, ) *TransactRequest`
+`func NewTransactRequest(contextID string, mode string, ) *TransactRequest`
 
 NewTransactRequest instantiates a new TransactRequest object
 This constructor will assign default values to properties that have it defined,
@@ -51,6 +53,51 @@ and a boolean to check if the value has been set.
 SetContextID sets ContextID field to given value.
 
 
+### GetMode
+
+`func (o *TransactRequest) GetMode() string`
+
+GetMode returns the Mode field if non-nil, zero value otherwise.
+
+### GetModeOk
+
+`func (o *TransactRequest) GetModeOk() (*string, bool)`
+
+GetModeOk returns a tuple with the Mode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMode
+
+`func (o *TransactRequest) SetMode(v string)`
+
+SetMode sets Mode field to given value.
+
+
+### GetPayload
+
+`func (o *TransactRequest) GetPayload() string`
+
+GetPayload returns the Payload field if non-nil, zero value otherwise.
+
+### GetPayloadOk
+
+`func (o *TransactRequest) GetPayloadOk() (*string, bool)`
+
+GetPayloadOk returns a tuple with the Payload field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPayload
+
+`func (o *TransactRequest) SetPayload(v string)`
+
+SetPayload sets Payload field to given value.
+
+### HasPayload
+
+`func (o *TransactRequest) HasPayload() bool`
+
+HasPayload returns a boolean if a field has been set.
+
 ### GetFromDLTNetworkID
 
 `func (o *TransactRequest) GetFromDLTNetworkID() string`
@@ -70,46 +117,11 @@ and a boolean to check if the value has been set.
 
 SetFromDLTNetworkID sets FromDLTNetworkID field to given value.
 
+### HasFromDLTNetworkID
 
-### GetFromAmount
+`func (o *TransactRequest) HasFromDLTNetworkID() bool`
 
-`func (o *TransactRequest) GetFromAmount() string`
-
-GetFromAmount returns the FromAmount field if non-nil, zero value otherwise.
-
-### GetFromAmountOk
-
-`func (o *TransactRequest) GetFromAmountOk() (*string, bool)`
-
-GetFromAmountOk returns a tuple with the FromAmount field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetFromAmount
-
-`func (o *TransactRequest) SetFromAmount(v string)`
-
-SetFromAmount sets FromAmount field to given value.
-
-
-### GetFromToken
-
-`func (o *TransactRequest) GetFromToken() TransactRequestFromToken`
-
-GetFromToken returns the FromToken field if non-nil, zero value otherwise.
-
-### GetFromTokenOk
-
-`func (o *TransactRequest) GetFromTokenOk() (*TransactRequestFromToken, bool)`
-
-GetFromTokenOk returns a tuple with the FromToken field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetFromToken
-
-`func (o *TransactRequest) SetFromToken(v TransactRequestFromToken)`
-
-SetFromToken sets FromToken field to given value.
-
+HasFromDLTNetworkID returns a boolean if a field has been set.
 
 ### GetToDLTNetworkID
 
@@ -130,6 +142,61 @@ and a boolean to check if the value has been set.
 
 SetToDLTNetworkID sets ToDLTNetworkID field to given value.
 
+### HasToDLTNetworkID
+
+`func (o *TransactRequest) HasToDLTNetworkID() bool`
+
+HasToDLTNetworkID returns a boolean if a field has been set.
+
+### GetFromAmount
+
+`func (o *TransactRequest) GetFromAmount() string`
+
+GetFromAmount returns the FromAmount field if non-nil, zero value otherwise.
+
+### GetFromAmountOk
+
+`func (o *TransactRequest) GetFromAmountOk() (*string, bool)`
+
+GetFromAmountOk returns a tuple with the FromAmount field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetFromAmount
+
+`func (o *TransactRequest) SetFromAmount(v string)`
+
+SetFromAmount sets FromAmount field to given value.
+
+### HasFromAmount
+
+`func (o *TransactRequest) HasFromAmount() bool`
+
+HasFromAmount returns a boolean if a field has been set.
+
+### GetFromToken
+
+`func (o *TransactRequest) GetFromToken() string`
+
+GetFromToken returns the FromToken field if non-nil, zero value otherwise.
+
+### GetFromTokenOk
+
+`func (o *TransactRequest) GetFromTokenOk() (*string, bool)`
+
+GetFromTokenOk returns a tuple with the FromToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetFromToken
+
+`func (o *TransactRequest) SetFromToken(v string)`
+
+SetFromToken sets FromToken field to given value.
+
+### HasFromToken
+
+`func (o *TransactRequest) HasFromToken() bool`
+
+HasFromToken returns a boolean if a field has been set.
 
 ### GetToAmount
 
@@ -150,26 +217,36 @@ and a boolean to check if the value has been set.
 
 SetToAmount sets ToAmount field to given value.
 
+### HasToAmount
+
+`func (o *TransactRequest) HasToAmount() bool`
+
+HasToAmount returns a boolean if a field has been set.
 
 ### GetToToken
 
-`func (o *TransactRequest) GetToToken() TransactRequestFromToken`
+`func (o *TransactRequest) GetToToken() string`
 
 GetToToken returns the ToToken field if non-nil, zero value otherwise.
 
 ### GetToTokenOk
 
-`func (o *TransactRequest) GetToTokenOk() (*TransactRequestFromToken, bool)`
+`func (o *TransactRequest) GetToTokenOk() (*string, bool)`
 
 GetToTokenOk returns a tuple with the ToToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetToToken
 
-`func (o *TransactRequest) SetToToken(v TransactRequestFromToken)`
+`func (o *TransactRequest) SetToToken(v string)`
 
 SetToToken sets ToToken field to given value.
 
+### HasToToken
+
+`func (o *TransactRequest) HasToToken() bool`
+
+HasToToken returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

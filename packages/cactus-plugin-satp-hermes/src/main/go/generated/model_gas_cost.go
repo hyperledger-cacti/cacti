@@ -31,7 +31,7 @@ type GasCost struct {
 	Amount *string `json:"amount,omitempty"`
 	// The amount of gas required in USD.
 	AmountUSD *string `json:"amountUSD,omitempty"`
-	Token *TransactRequestFromToken `json:"token,omitempty"`
+	Token *GetRoutes200ResponseRoutesInnerFromToken `json:"token,omitempty"`
 }
 
 // NewGasCost instantiates a new GasCost object
@@ -244,9 +244,9 @@ func (o *GasCost) SetAmountUSD(v string) {
 }
 
 // GetToken returns the Token field value if set, zero value otherwise.
-func (o *GasCost) GetToken() TransactRequestFromToken {
+func (o *GasCost) GetToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.Token) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.Token
@@ -254,7 +254,7 @@ func (o *GasCost) GetToken() TransactRequestFromToken {
 
 // GetTokenOk returns a tuple with the Token field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *GasCost) GetTokenOk() (*TransactRequestFromToken, bool) {
+func (o *GasCost) GetTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.Token) {
 		return nil, false
 	}
@@ -270,8 +270,8 @@ func (o *GasCost) HasToken() bool {
 	return false
 }
 
-// SetToken gets a reference to the given TransactRequestFromToken and assigns it to the Token field.
-func (o *GasCost) SetToken(v TransactRequestFromToken) {
+// SetToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the Token field.
+func (o *GasCost) SetToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.Token = &v
 }
 

@@ -14,11 +14,11 @@ import (
 	"encoding/json"
 )
 
-// checks if the Token type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &Token{}
+// checks if the GetRoutes200ResponseRoutesInnerFromToken type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &GetRoutes200ResponseRoutesInnerFromToken{}
 
-// Token Metadata detailing a supported token
-type Token struct {
+// GetRoutes200ResponseRoutesInnerFromToken Metadata detailing a supported token
+type GetRoutes200ResponseRoutesInnerFromToken struct {
 	// The network of the DLT being interacted with. TODO: implement network identification draft
 	ChainID string `json:"chainID"`
 	// Supported DLT protocols.
@@ -40,12 +40,12 @@ type Token struct {
 	Extensions *GetRoutes200ResponseRoutesInnerFromTokenExtensions `json:"extensions,omitempty"`
 }
 
-// NewToken instantiates a new Token object
+// NewGetRoutes200ResponseRoutesInnerFromToken instantiates a new GetRoutes200ResponseRoutesInnerFromToken object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewToken(chainID string, chainType string, address string, symbol string, decimals int32) *Token {
-	this := Token{}
+func NewGetRoutes200ResponseRoutesInnerFromToken(chainID string, chainType string, address string, symbol string, decimals int32) *GetRoutes200ResponseRoutesInnerFromToken {
+	this := GetRoutes200ResponseRoutesInnerFromToken{}
 	this.ChainID = chainID
 	this.ChainType = chainType
 	this.Address = address
@@ -54,16 +54,16 @@ func NewToken(chainID string, chainType string, address string, symbol string, d
 	return &this
 }
 
-// NewTokenWithDefaults instantiates a new Token object
+// NewGetRoutes200ResponseRoutesInnerFromTokenWithDefaults instantiates a new GetRoutes200ResponseRoutesInnerFromToken object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTokenWithDefaults() *Token {
-	this := Token{}
+func NewGetRoutes200ResponseRoutesInnerFromTokenWithDefaults() *GetRoutes200ResponseRoutesInnerFromToken {
+	this := GetRoutes200ResponseRoutesInnerFromToken{}
 	return &this
 }
 
 // GetChainID returns the ChainID field value
-func (o *Token) GetChainID() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetChainID() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -74,7 +74,7 @@ func (o *Token) GetChainID() string {
 
 // GetChainIDOk returns a tuple with the ChainID field value
 // and a boolean to check if the value has been set.
-func (o *Token) GetChainIDOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetChainIDOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -82,12 +82,12 @@ func (o *Token) GetChainIDOk() (*string, bool) {
 }
 
 // SetChainID sets field value
-func (o *Token) SetChainID(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetChainID(v string) {
 	o.ChainID = v
 }
 
 // GetChainType returns the ChainType field value
-func (o *Token) GetChainType() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetChainType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -98,7 +98,7 @@ func (o *Token) GetChainType() string {
 
 // GetChainTypeOk returns a tuple with the ChainType field value
 // and a boolean to check if the value has been set.
-func (o *Token) GetChainTypeOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetChainTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -106,12 +106,12 @@ func (o *Token) GetChainTypeOk() (*string, bool) {
 }
 
 // SetChainType sets field value
-func (o *Token) SetChainType(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetChainType(v string) {
 	o.ChainType = v
 }
 
 // GetAddress returns the Address field value
-func (o *Token) GetAddress() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetAddress() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -122,7 +122,7 @@ func (o *Token) GetAddress() string {
 
 // GetAddressOk returns a tuple with the Address field value
 // and a boolean to check if the value has been set.
-func (o *Token) GetAddressOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetAddressOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -130,12 +130,12 @@ func (o *Token) GetAddressOk() (*string, bool) {
 }
 
 // SetAddress sets field value
-func (o *Token) SetAddress(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetAddress(v string) {
 	o.Address = v
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
-func (o *Token) GetName() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetName() string {
 	if o == nil || IsNil(o.Name) {
 		var ret string
 		return ret
@@ -145,7 +145,7 @@ func (o *Token) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Token) GetNameOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetNameOk() (*string, bool) {
 	if o == nil || IsNil(o.Name) {
 		return nil, false
 	}
@@ -153,7 +153,7 @@ func (o *Token) GetNameOk() (*string, bool) {
 }
 
 // HasName returns a boolean if a field has been set.
-func (o *Token) HasName() bool {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) HasName() bool {
 	if o != nil && !IsNil(o.Name) {
 		return true
 	}
@@ -162,12 +162,12 @@ func (o *Token) HasName() bool {
 }
 
 // SetName gets a reference to the given string and assigns it to the Name field.
-func (o *Token) SetName(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetName(v string) {
 	o.Name = &v
 }
 
 // GetSymbol returns the Symbol field value
-func (o *Token) GetSymbol() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetSymbol() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -178,7 +178,7 @@ func (o *Token) GetSymbol() string {
 
 // GetSymbolOk returns a tuple with the Symbol field value
 // and a boolean to check if the value has been set.
-func (o *Token) GetSymbolOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetSymbolOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -186,12 +186,12 @@ func (o *Token) GetSymbolOk() (*string, bool) {
 }
 
 // SetSymbol sets field value
-func (o *Token) SetSymbol(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetSymbol(v string) {
 	o.Symbol = v
 }
 
 // GetDecimals returns the Decimals field value
-func (o *Token) GetDecimals() int32 {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetDecimals() int32 {
 	if o == nil {
 		var ret int32
 		return ret
@@ -202,7 +202,7 @@ func (o *Token) GetDecimals() int32 {
 
 // GetDecimalsOk returns a tuple with the Decimals field value
 // and a boolean to check if the value has been set.
-func (o *Token) GetDecimalsOk() (*int32, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetDecimalsOk() (*int32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -210,12 +210,12 @@ func (o *Token) GetDecimalsOk() (*int32, bool) {
 }
 
 // SetDecimals sets field value
-func (o *Token) SetDecimals(v int32) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetDecimals(v int32) {
 	o.Decimals = v
 }
 
 // GetLogoURI returns the LogoURI field value if set, zero value otherwise.
-func (o *Token) GetLogoURI() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetLogoURI() string {
 	if o == nil || IsNil(o.LogoURI) {
 		var ret string
 		return ret
@@ -225,7 +225,7 @@ func (o *Token) GetLogoURI() string {
 
 // GetLogoURIOk returns a tuple with the LogoURI field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Token) GetLogoURIOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetLogoURIOk() (*string, bool) {
 	if o == nil || IsNil(o.LogoURI) {
 		return nil, false
 	}
@@ -233,7 +233,7 @@ func (o *Token) GetLogoURIOk() (*string, bool) {
 }
 
 // HasLogoURI returns a boolean if a field has been set.
-func (o *Token) HasLogoURI() bool {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) HasLogoURI() bool {
 	if o != nil && !IsNil(o.LogoURI) {
 		return true
 	}
@@ -242,12 +242,12 @@ func (o *Token) HasLogoURI() bool {
 }
 
 // SetLogoURI gets a reference to the given string and assigns it to the LogoURI field.
-func (o *Token) SetLogoURI(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetLogoURI(v string) {
 	o.LogoURI = &v
 }
 
 // GetTags returns the Tags field value if set, zero value otherwise.
-func (o *Token) GetTags() []string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetTags() []string {
 	if o == nil || IsNil(o.Tags) {
 		var ret []string
 		return ret
@@ -257,7 +257,7 @@ func (o *Token) GetTags() []string {
 
 // GetTagsOk returns a tuple with the Tags field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Token) GetTagsOk() ([]string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetTagsOk() ([]string, bool) {
 	if o == nil || IsNil(o.Tags) {
 		return nil, false
 	}
@@ -265,7 +265,7 @@ func (o *Token) GetTagsOk() ([]string, bool) {
 }
 
 // HasTags returns a boolean if a field has been set.
-func (o *Token) HasTags() bool {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) HasTags() bool {
 	if o != nil && !IsNil(o.Tags) {
 		return true
 	}
@@ -274,12 +274,12 @@ func (o *Token) HasTags() bool {
 }
 
 // SetTags gets a reference to the given []string and assigns it to the Tags field.
-func (o *Token) SetTags(v []string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetTags(v []string) {
 	o.Tags = v
 }
 
 // GetPriceUSD returns the PriceUSD field value if set, zero value otherwise.
-func (o *Token) GetPriceUSD() string {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetPriceUSD() string {
 	if o == nil || IsNil(o.PriceUSD) {
 		var ret string
 		return ret
@@ -289,7 +289,7 @@ func (o *Token) GetPriceUSD() string {
 
 // GetPriceUSDOk returns a tuple with the PriceUSD field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Token) GetPriceUSDOk() (*string, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetPriceUSDOk() (*string, bool) {
 	if o == nil || IsNil(o.PriceUSD) {
 		return nil, false
 	}
@@ -297,7 +297,7 @@ func (o *Token) GetPriceUSDOk() (*string, bool) {
 }
 
 // HasPriceUSD returns a boolean if a field has been set.
-func (o *Token) HasPriceUSD() bool {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) HasPriceUSD() bool {
 	if o != nil && !IsNil(o.PriceUSD) {
 		return true
 	}
@@ -306,12 +306,12 @@ func (o *Token) HasPriceUSD() bool {
 }
 
 // SetPriceUSD gets a reference to the given string and assigns it to the PriceUSD field.
-func (o *Token) SetPriceUSD(v string) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetPriceUSD(v string) {
 	o.PriceUSD = &v
 }
 
 // GetExtensions returns the Extensions field value if set, zero value otherwise.
-func (o *Token) GetExtensions() GetRoutes200ResponseRoutesInnerFromTokenExtensions {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetExtensions() GetRoutes200ResponseRoutesInnerFromTokenExtensions {
 	if o == nil || IsNil(o.Extensions) {
 		var ret GetRoutes200ResponseRoutesInnerFromTokenExtensions
 		return ret
@@ -321,7 +321,7 @@ func (o *Token) GetExtensions() GetRoutes200ResponseRoutesInnerFromTokenExtensio
 
 // GetExtensionsOk returns a tuple with the Extensions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Token) GetExtensionsOk() (*GetRoutes200ResponseRoutesInnerFromTokenExtensions, bool) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) GetExtensionsOk() (*GetRoutes200ResponseRoutesInnerFromTokenExtensions, bool) {
 	if o == nil || IsNil(o.Extensions) {
 		return nil, false
 	}
@@ -329,7 +329,7 @@ func (o *Token) GetExtensionsOk() (*GetRoutes200ResponseRoutesInnerFromTokenExte
 }
 
 // HasExtensions returns a boolean if a field has been set.
-func (o *Token) HasExtensions() bool {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) HasExtensions() bool {
 	if o != nil && !IsNil(o.Extensions) {
 		return true
 	}
@@ -338,11 +338,11 @@ func (o *Token) HasExtensions() bool {
 }
 
 // SetExtensions gets a reference to the given GetRoutes200ResponseRoutesInnerFromTokenExtensions and assigns it to the Extensions field.
-func (o *Token) SetExtensions(v GetRoutes200ResponseRoutesInnerFromTokenExtensions) {
+func (o *GetRoutes200ResponseRoutesInnerFromToken) SetExtensions(v GetRoutes200ResponseRoutesInnerFromTokenExtensions) {
 	o.Extensions = &v
 }
 
-func (o Token) MarshalJSON() ([]byte, error) {
+func (o GetRoutes200ResponseRoutesInnerFromToken) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -350,7 +350,7 @@ func (o Token) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o Token) ToMap() (map[string]interface{}, error) {
+func (o GetRoutes200ResponseRoutesInnerFromToken) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["chainID"] = o.ChainID
 	toSerialize["chainType"] = o.ChainType
@@ -375,38 +375,38 @@ func (o Token) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableToken struct {
-	value *Token
+type NullableGetRoutes200ResponseRoutesInnerFromToken struct {
+	value *GetRoutes200ResponseRoutesInnerFromToken
 	isSet bool
 }
 
-func (v NullableToken) Get() *Token {
+func (v NullableGetRoutes200ResponseRoutesInnerFromToken) Get() *GetRoutes200ResponseRoutesInnerFromToken {
 	return v.value
 }
 
-func (v *NullableToken) Set(val *Token) {
+func (v *NullableGetRoutes200ResponseRoutesInnerFromToken) Set(val *GetRoutes200ResponseRoutesInnerFromToken) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableToken) IsSet() bool {
+func (v NullableGetRoutes200ResponseRoutesInnerFromToken) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableToken) Unset() {
+func (v *NullableGetRoutes200ResponseRoutesInnerFromToken) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableToken(val *Token) *NullableToken {
-	return &NullableToken{value: val, isSet: true}
+func NewNullableGetRoutes200ResponseRoutesInnerFromToken(val *GetRoutes200ResponseRoutesInnerFromToken) *NullableGetRoutes200ResponseRoutesInnerFromToken {
+	return &NullableGetRoutes200ResponseRoutesInnerFromToken{value: val, isSet: true}
 }
 
-func (v NullableToken) MarshalJSON() ([]byte, error) {
+func (v NullableGetRoutes200ResponseRoutesInnerFromToken) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableToken) UnmarshalJSON(src []byte) error {
+func (v *NullableGetRoutes200ResponseRoutesInnerFromToken) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
