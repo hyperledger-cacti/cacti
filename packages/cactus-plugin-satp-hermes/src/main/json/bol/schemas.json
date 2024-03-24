@@ -1,24 +1,26 @@
-{  "AuthzScope": {
-        "type": "string",
-        "enum": ["group:admin", "group:user"],
-        "x-enum-descriptions": [
-          "Identities with the group:admin scope are administrators of the system.",
-          "Identities with the group:user scope are end users of the system who only have authorization to perform a limited set of actions."
-        ],
-        "x-enum-varnames": ["GroupAdmin", "GroupUser"]
-      },
-      "AuthzJwtClaim": {
-        "description": "Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1",
-        "type": "string",
-        "enum": ["Hyperledger Labs - Carbon Accounting Tool"],
-        "x-enum-descriptions": [
-          "The \"iss\" (issuer) claim identifies the principal that issued the JWT. The processing of this claim is generally application specific. The \"iss\" value is a case-sensitive string containing a StringOrURI value. Use of this claim is OPTIONAL."
-        ],
-        "x-enum-varnames": ["iss"]
-      },      "CredentialProfile": {
-        "type": "string",
-        "enum": ["SAML", "OAUTH", "X509"]
-      },
+{
+  "AuthzScope": {
+    "type": "string",
+    "enum": ["group:admin", "group:user"],
+    "x-enum-descriptions": [
+      "Identities with the group:admin scope are administrators of the system.",
+      "Identities with the group:user scope are end users of the system who only have authorization to perform a limited set of actions."
+    ],
+    "x-enum-varnames": ["GroupAdmin", "GroupUser"]
+  },
+  "AuthzJwtClaim": {
+    "description": "Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1",
+    "type": "string",
+    "enum": ["Hyperledger Labs - Carbon Accounting Tool"],
+    "x-enum-descriptions": [
+      "The \"iss\" (issuer) claim identifies the principal that issued the JWT. The processing of this claim is generally application specific. The \"iss\" value is a case-sensitive string containing a StringOrURI value. Use of this claim is OPTIONAL."
+    ],
+    "x-enum-varnames": ["iss"]
+  },
+  "CredentialProfile": {
+    "type": "string",
+    "enum": ["SAML", "OAUTH", "X509"]
+  },
   "getAuditRequest": {
     "type": "object",
     "x-category": "request",
@@ -65,23 +67,11 @@
   "StatusResponse": {
     "type": "object",
     "x-category": "response",
-    "required": [
-      "status",
-      "substatus",
-      "stage",
-      "step",
-      "startTime"
-    ],
+    "required": ["status", "substatus", "stage", "step", "startTime"],
     "properties": {
       "status": {
         "type": "string",
-        "enum": [
-          "NOT_FOUND",
-          "INVALID",
-          "PENDING",
-          "DONE",
-          "FAILED"
-        ],
+        "enum": ["NOT_FOUND", "INVALID", "PENDING", "DONE", "FAILED"],
         "description": "Current status of the SATP session."
       },
       "substatus": {
@@ -102,12 +92,7 @@
       },
       "stage": {
         "type": "string",
-        "enum": [
-          "STAGE0",
-          "STAGE1",
-          "STAGE2",
-          "STAGE3"
-        ],
+        "enum": ["STAGE0", "STAGE1", "STAGE2", "STAGE3"],
         "description": "Current stage of the SATP session."
       },
       "step": {
@@ -151,7 +136,34 @@
       }
     }
   },
-"StatusRequest": {
+  "PauseRequest": {
+    "type": "object",
+    "properties": {
+      "sessionId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "A unique identifier for the transaction session to be paused."
+      },
+      "contextId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "A unique identifier for the transaction context."
+      }
+    },
+    "required": ["sessionId", "contextId"],
+    "description": "Schema for a request to pause a transaction session."
+  },
+  "PauseResponse": {
+    "type": "object",
+    "description": "Response schema for a pause request, returning the status of the SATP session.",
+    "properties": {
+      "statusResponse": {
+        "$ref": "./schemas.json#/StatusResponse"
+      }
+    },
+    "required": ["statusResponse"]
+  },
+  "StatusRequest": {
     "type": "object",
     "x-category": "request",
     "required": ["sessionID"],
@@ -170,26 +182,41 @@
         "format": "uuid",
         "description": "A unique identifier for the transaction context."
       },
+      "mode": {
+        "type": "string",
+        "enum": ["data", "transfer"],
+        "description": "The mode of transaction - 'data' for arbitrary payload or 'transfer' for asset transfer."
+      },
+      "payload": {
+        "type": "string",
+        "description": "A string containing all transaction details required for processing in 'data' mode. Required if mode is 'data'."
+      },
       "fromDLTNetworkID": {
-        "$ref": "./schemas.json#/DLTNetworkID"
-      },
-      "fromAmount": {
-        "$ref": "./schemas.json#/AmountString"
-      },
-      "fromToken": {
-        "$ref": "./schemas.json#/Token"
+        "type": "string",
+        "description": "The ID of the DLT Network from which the asset will be transferred. Required if mode is 'transfer'."
       },
       "toDLTNetworkID": {
-        "$ref": "./schemas.json#/DLTNetworkID"
+        "type": "string",
+        "description": "The ID of the DLT Network to which the asset will be transferred. Required if mode is 'transfer'."
+      },
+      "fromAmount": {
+        "type": "string",
+        "description": "Required if mode is 'transfer'."
+      },
+      "fromToken": {
+        "type": "string",
+        "description": "Required if mode is 'transfer'."
       },
       "toAmount": {
-        "$ref": "./schemas.json#/AmountString"
+        "type": "string",
+        "description": "Required if mode is 'transfer'."
       },
       "toToken": {
-        "$ref": "./schemas.json#/Token"
+        "type": "string",
+        "description": "Required if mode is 'transfer'."
       }
     },
-    "required": ["contextID", "fromDLTNetworkID", "fromAmount", "fromToken", "toDLTNetworkID", "toAmount", "toToken"]
+    "required": ["contextID", "mode"]
   },
   "TransactResponse": {
     "type": "object",
@@ -225,83 +252,73 @@
     },
     "required": ["statusResponse", "cancelSuccessful"]
   },
-    "APIError": {
+  "APIError": {
     "x-category": "response",
-      "type": "object",
-      "x-go-type": "ApiError",
-      "x-go-name": "ApiError",
-      "description": "An Error",
-      "required": [
-        "message",
-        "type",
-        "code",
-        "status",
-        "timestamp"
-      ],
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "HTTP error type",
-          "example": "bad-request"
-        },
-        "code": {
-          "type": "integer",
-          "description": "Numeric error code",
-          "example": 16384
-        },
-        "status": {
-          "type": "integer",
-          "description": "HTTP status of the error",
-          "example": 500
-        },
-        "message": {
-          "type": "string",
-          "description": "Long error description",
-          "example": "Oops there's been an internal error handling"
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Timestamp of the error",
-          "example": "2021-07-21T17:32:28Z"
-        }
+    "type": "object",
+    "x-go-type": "ApiError",
+    "x-go-name": "ApiError",
+    "description": "An Error",
+    "required": ["message", "type", "code", "status", "timestamp"],
+    "properties": {
+      "type": {
+        "type": "string",
+        "description": "HTTP error type",
+        "example": "bad-request"
+      },
+      "code": {
+        "type": "integer",
+        "description": "Numeric error code",
+        "example": 16384
+      },
+      "status": {
+        "type": "integer",
+        "description": "HTTP status of the error",
+        "example": 500
+      },
+      "message": {
+        "type": "string",
+        "description": "Long error description",
+        "example": "Oops there's been an internal error handling"
+      },
+      "timestamp": {
+        "type": "string",
+        "description": "Timestamp of the error",
+        "example": "2021-07-21T17:32:28Z"
       }
-    },
-        "DLTProtocol": {
-            
+    }
+  },
+  "DLTProtocol": {
     "x-category": "satp-core",
-      "type": "string",
-      "enum": [
-        "HyperledgerFabric",
-        "HyperledgerBesu"
-      ],
-      "description": "Supported DLT protocols."
-    },
-    "DLTNetworkID": {
-    "x-category": "satp-core",        
-      "type": "string",
-      "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
-    },
-    "DLTSubnetworkID": {
+    "type": "string",
+    "enum": ["HyperledgerFabric", "HyperledgerBesu"],
+    "description": "Supported DLT protocols."
+  },
+  "DLTNetworkID": {
     "x-category": "satp-core",
-      "type": "string",
-      "description": "The subnetwork of the DLT being interacted with. TODO: implement network identification draft"
-    },
-    "SessionID": {
+    "type": "string",
+    "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+  },
+  "DLTSubnetworkID": {
     "x-category": "satp-core",
-      "type": "string",
-      "description": "Unique identifier (UUID) for the session.",
-      "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
-    },
-    "Address": {
-      "type": "string",
-      "description": "A blockchain address.",
-      "example": "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
-    },
-    "AmountString": {
-      "type": "string",
-      "description": "The amount in string format including all decimals.",
+    "type": "string",
+    "description": "The subnetwork of the DLT being interacted with. TODO: implement network identification draft"
+  },
+  "SessionID": {
+    "x-category": "satp-core",
+    "type": "string",
+    "description": "Unique identifier (UUID) for the session.",
+    "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
+  },
+  "Address": {
+    "type": "string",
+    "description": "A blockchain address.",
+    "example": "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
+  },
+  "AmountString": {
+    "type": "string",
+    "description": "The amount in string format including all decimals.",
     "pattern": "^([1-9][0-9]*|0)(\\.[0-9]+)?$",
-      "example": "1000000000000000000"
+    "example": "1000000000000000000"
   },
   "AmountDecimal": {
     "type": "number",
@@ -318,7 +335,7 @@
     "type": "string",
     "description": "The logo of a token, chain, dex etc.",
     "format": "uri"
-  }, 
+  },
   "RoutesResponse": {
     "type": "object",
     "description": "A collection of available and unavailable routes",
@@ -335,7 +352,6 @@
   },
   "Route": {
     "type": "object",
-    "required": ["id", "gatewayID"],
     "properties": {
       "id": {
         "type": "string",
@@ -346,9 +362,14 @@
         "format": "uuid",
         "description": "A unique identifier for the gateway."
       },
+      "mode": {
+        "type": "string",
+        "enum": ["data", "transfer"],
+        "description": "The mode of operation for this route - 'data' for arbitrary payload handling, 'transfer' for asset transfer."
+      },
       "fromDLTNetworkID": {
         "type": "string",
-        "description": "The ID of the DLT Network where the transfer will originate."
+        "description": "The ID of the DLT Network where the operation will originate."
       },
       "fromAmountUSD": {
         "type": "string",
@@ -365,7 +386,7 @@
       },
       "toDLTNetworkID": {
         "type": "string",
-        "description": "The ID of the DLT Network where the transfer will end."
+        "description": "The ID of the DLT Network where the operation will end."
       },
       "toAmountUSD": {
         "type": "string",
@@ -392,7 +413,7 @@
       },
       "steps": {
         "type": "array",
-        "description": "List of steps involved in this route.",
+        "description": "List of steps involved in this route, adjusted for mode.",
         "items": {
           "$ref": "./schemas.json#/IncludedStep"
         }
@@ -403,6 +424,63 @@
       "tags": {
         "$ref": "./schemas.json#/Tags"
       }
+    },
+    "required": ["id", "gatewayID", "mode"]
+  },
+  "ContinueRequest": {
+    "type": "object",
+    "properties": {
+      "sessionId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "A unique identifier for the transaction session to be continued."
+      },
+      "contextId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "A unique identifier for the transaction context."
+      }
+    },
+    "required": ["sessionId", "contextId"],
+    "description": "Schema for a request to continue a paused transaction session."
+  },"ContinueResponse": {
+  "type": "object",
+  "description": "Response schema for a continue request, returning the status of the SATP session.",
+  "properties": {
+    "statusResponse": {
+      "$ref": "./schemas.json#/StatusResponse"
+    }
+  },
+  "required": ["statusResponse"]
+},
+  "Chain": {
+    "type": "object",
+    "properties": {
+      "chainId": {
+        "type": "string",
+        "description": "A unique identifier for the blockchain network."
+      },
+      "chainName": {
+        "type": "string",
+        "description": "The name of the blockchain network."
+      },
+      "chainType": {
+        "type": "string",
+        "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
+      },
+      "networkName": {
+        "type": "string",
+        "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
+      }
+    },
+    "required": ["chainId", "chainName", "chainType", "networkName"]
+  },
+
+  "Chains": {
+    "type": "array",
+    "description": "List of chains and related metadata",
+    "items": {
+      "$ref": "./schemas.json#/Chain"
     }
   },
   "Token": {
@@ -459,7 +537,7 @@
       }
     }
   },
-   "Tags": {
+  "Tags": {
     "type": "array",
     "description": "List of tags identifiers providing additional context or categorization.",
     "items": {
@@ -478,59 +556,60 @@
       }
     }
   },
-"IncludedStep": {
-  "type": "object",
-  "description": "Details a single step within a route including actions and estimates.",
-  "properties": {
-    "id": {
-      "type": "string",
-      "description": "Id of the step"
-    },
-    "type": {
-      "type": "string",
-      "description": "Type of the step, typically describing the action, e.g., 'swap'."
-    },
-    "tool": {
-      "type": "string",
-      "description": "Tool used in the step, e.g., 'stargate'."
-    },
-    "action": {
-      "$ref": "./schemas.json#/Action"
-    },
-    "estimate": {
-      "$ref": "./schemas.json#/Estimate"
-    },
-    "toolDetails": {
-      "$ref": "./schemas.json#/IntegrationDetails"
-    },
-    "integrationDetails": {
-      "$ref": "./schemas.json#/IntegrationDetails"
-    },
-    "includedStepIds": {
-      "type": "array",
-      "description": "IDs of further steps included within this step, allowing for nested actions without direct recursion.",
-      "items": {
-        "type": "string"
+  "IncludedStep": {
+    "type": "object",
+    "description": "Details a single step within a route including actions and estimates.",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id of the step"
+      },
+      "type": {
+        "type": "string",
+        "description": "Type of the step, typically describing the action, e.g., 'swap'."
+      },
+      "tool": {
+        "type": "string",
+        "description": "Tool used in the step, e.g., 'stargate'."
+      },
+      "action": {
+        "$ref": "./schemas.json#/Action"
+      },
+      "estimate": {
+        "$ref": "./schemas.json#/Estimate"
+      },
+      "toolDetails": {
+        "$ref": "./schemas.json#/IntegrationDetails"
+      },
+      "integrationDetails": {
+        "$ref": "./schemas.json#/IntegrationDetails"
+      },
+      "includedStepIds": {
+        "type": "array",
+        "description": "IDs of further steps included within this step, allowing for nested actions without direct recursion.",
+        "items": {
+          "type": "string"
+        }
       }
     }
-  }
-},"Insurance": {
-  "type": "object",
-  "properties": {
-    "state": {
-      "type": "string",
-      "description": "The state of insurance applicability for the transaction.",
-      "example": "NOT_INSURABLE",
-      "enum": ["NOT_INSURABLE", "INSURABLE", "INSURED"]
-    },
-    "feeAmountUsd": {
-      "type": "string",
-      "description": "The fee amount for insurance, represented in USD.",
-      "example": "10.00",
-      "pattern": "^(0|[1-9]\\d*)(\\.\\d+)?$"
+  },
+  "Insurance": {
+    "type": "object",
+    "properties": {
+      "state": {
+        "type": "string",
+        "description": "The state of insurance applicability for the transaction.",
+        "example": "NOT_INSURABLE",
+        "enum": ["NOT_INSURABLE", "INSURABLE", "INSURED"]
+      },
+      "feeAmountUsd": {
+        "type": "string",
+        "description": "The fee amount for insurance, represented in USD.",
+        "example": "10.00",
+        "pattern": "^(0|[1-9]\\d*)(\\.\\d+)?$"
+      }
     }
-  }
-},
+  },
   "Action": {
     "type": "object",
     "properties": {
@@ -559,139 +638,141 @@
         "$ref": "./schemas.json#/Address"
       }
     }
-  },"IntegrationDetails": {
-  "type": "object",
-  "description": "Describes integration or tool details such as bridges or exchanges involved in the transaction.",
-  "required": ["key", "name", "logoURI"],
-  "properties": {
-    "key": {
-      "type": "string",
-      "description": "A unique identifier for the integration or tool.",
-      "example": "1inch"
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the integration or tool.",
-      "example": "1inch Exchange"
-    },
-    "logoURI": {
-      "type": "string",
-      "format": "uri",
-      "description": "URL to the logo of the integration or tool.",
-      "example": "https://cdn.example.com/logos/1inch.png"
-    }
-  }
-},"Estimate": {
-  "type": "object",
-  "description": "Provides an estimation for a transaction, including costs, amounts, and execution duration.",
-  "properties": {
-    "approvalAddress": {
-      "$ref": "./schemas.json#/Address"
-    },
-    "toAmountMin": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "toAmount": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "fromAmount": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "feeCosts": {
-      "type": "array",
-      "description": "A collection of fee costs associated with the transaction.",
-      "items": {
-        "$ref": "./schemas.json#/FeeCost"
+  },
+  "IntegrationDetails": {
+    "type": "object",
+    "description": "Describes integration or tool details such as bridges or exchanges involved in the transaction.",
+    "required": ["key", "name", "logoURI"],
+    "properties": {
+      "key": {
+        "type": "string",
+        "description": "A unique identifier for the integration or tool.",
+        "example": "1inch"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the integration or tool.",
+        "example": "1inch Exchange"
+      },
+      "logoURI": {
+        "type": "string",
+        "format": "uri",
+        "description": "URL to the logo of the integration or tool.",
+        "example": "https://cdn.example.com/logos/1inch.png"
       }
-    },
-    "gasCosts": {
-      "type": "array",
-      "description": "A collection of estimated gas costs for executing the transaction.",
-      "items": {
-        "$ref": "./schemas.json#/GasCost"
+    }
+  },
+  "Estimate": {
+    "type": "object",
+    "description": "Provides an estimation for a transaction, including costs, amounts, and execution duration.",
+    "properties": {
+      "approvalAddress": {
+        "$ref": "./schemas.json#/Address"
+      },
+      "toAmountMin": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "toAmount": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "fromAmount": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "feeCosts": {
+        "type": "array",
+        "description": "A collection of fee costs associated with the transaction.",
+        "items": {
+          "$ref": "./schemas.json#/FeeCost"
+        }
+      },
+      "gasCosts": {
+        "type": "array",
+        "description": "A collection of estimated gas costs for executing the transaction.",
+        "items": {
+          "$ref": "./schemas.json#/GasCost"
+        }
+      },
+      "executionDuration": {
+        "type": "integer",
+        "description": "The estimated duration for the transaction execution in seconds.",
+        "example": 30
+      },
+      "fromAmountUSD": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "toAmountUSD": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "tool": {
+        "type": "string",
+        "description": "The tool or service used to generate this estimate.",
+        "example": "satp"
       }
-    },
-    "executionDuration": {
-      "type": "integer",
-      "description": "The estimated duration for the transaction execution in seconds.",
-      "example": 30
-    },
-    "fromAmountUSD": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "toAmountUSD": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "tool": {
-      "type": "string",
-      "description": "The tool or service used to generate this estimate.",
-      "example": "satp"
+    }
+  },
+  "FeeCost": {
+    "type": "object",
+    "description": "Details about a specific fee cost associated with the transaction.",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name of the fee cost.",
+        "example": "Network Fee"
+      },
+      "amount": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "amountUSD": {
+        "$ref": "./schemas.json#/AmountString"
+      },
+      "token": {
+        "$ref": "./schemas.json#/TokenSymbol"
+      },
+      "included": {
+        "type": "boolean",
+        "description": "Indicates if the fee is included in the transaction amount."
+      }
+    }
+  },
+  "GasCost": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "description": "The type of the gas cost.",
+        "example": "SEND"
+      },
+      "price": {
+        "type": "string",
+        "description": "The gas price, specified as a string to maintain precision.",
+        "example": "19236858243"
+      },
+      "estimate": {
+        "type": "string",
+        "description": "The estimated gas required, specified as a string to maintain precision.",
+        "example": "445393"
+      },
+      "limit": {
+        "type": "string",
+        "description": "The gas limit for the transaction, specified as a string to maintain precision.",
+        "example": "579011",
+        "pattern": "^[1-9][0-9]*$"
+      },
+      "amount": {
+        "type": "string",
+        "description": "The amount of gas required in the gas currency.",
+        "example": "8567962003424499",
+        "pattern": "^[1-9][0-9]*$"
+      },
+      "amountUSD": {
+        "type": "string",
+        "description": "The amount of gas required in USD.",
+        "example": "16.05",
+        "pattern": "^(0(\\.[0-9]+)?|[1-9][0-9]*(\\.[0-9]+)?)$"
+      },
+      "token": {
+        "$ref": "./schemas.json#/Token"
+      }
     }
   }
-},"FeeCost": {
-  "type": "object",
-  "description": "Details about a specific fee cost associated with the transaction.",
-  "properties": {
-    "name": {
-      "type": "string",
-      "description": "Name of the fee cost.",
-      "example": "Network Fee"
-    },
-    "amount": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "amountUSD": {
-      "$ref": "./schemas.json#/AmountString"
-    },
-    "token": {
-      "$ref": "./schemas.json#/TokenSymbol"
-    },
-    "included": {
-      "type": "boolean",
-      "description": "Indicates if the fee is included in the transaction amount."
-    }
-  }
-},"GasCost": {
-  "type": "object",
-  "properties": {
-    "type": {
-      "type": "string",
-      "description": "The type of the gas cost.",
-      "example": "SEND"
-    },
-    "price": {
-      "type": "string",
-      "description": "The gas price, specified as a string to maintain precision.",
-      "example": "19236858243"
-    },
-    "estimate": {
-      "type": "string",
-      "description": "The estimated gas required, specified as a string to maintain precision.",
-      "example": "445393"
-    },
-    "limit": {
-      "type": "string",
-      "description": "The gas limit for the transaction, specified as a string to maintain precision.",
-      "example": "579011",
-      "pattern": "^[1-9][0-9]*$"
-    },
-    "amount": {
-      "type": "string",
-      "description": "The amount of gas required in the gas currency.",
-      "example": "8567962003424499",
-      "pattern": "^[1-9][0-9]*$"
-    },
-    "amountUSD": {
-      "type": "string",
-      "description": "The amount of gas required in USD.",
-      "example": "16.05",
-      "pattern": "^(0(\\.[0-9]+)?|[1-9][0-9]*(\\.[0-9]+)?)$"
-    },
-    "token": {
-      "$ref": "./schemas.json#/Token"
-    }
-  }
-}
-
-
 }

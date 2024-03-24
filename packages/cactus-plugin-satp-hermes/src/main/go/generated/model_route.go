@@ -23,14 +23,16 @@ type Route struct {
 	Id string `json:"id"`
 	// A unique identifier for the gateway.
 	GatewayID string `json:"gatewayID"`
-	// The ID of the DLT Network where the transfer will originate.
+	// The mode of operation for this route - 'data' for arbitrary payload handling, 'transfer' for asset transfer.
+	Mode string `json:"mode"`
+	// The ID of the DLT Network where the operation will originate.
 	FromDLTNetworkID *string `json:"fromDLTNetworkID,omitempty"`
 	// The amount of 'fromToken' to be transferred in USD, specified as a string to maintain precision.
 	FromAmountUSD *float64 `json:"fromAmountUSD,omitempty"`
 	// The amount that should be sent including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
 	FromAmount *string `json:"fromAmount,omitempty"`
-	FromToken *TransactRequestFromToken `json:"fromToken,omitempty"`
-	// The ID of the DLT Network where the transfer will end.
+	FromToken *GetRoutes200ResponseRoutesInnerFromToken `json:"fromToken,omitempty"`
+	// The ID of the DLT Network where the operation will end.
 	ToDLTNetworkID *string `json:"toDLTNetworkID,omitempty"`
 	// The expected amount to be received in USD.
 	ToAmountUSD *string `json:"toAmountUSD,omitempty"`
@@ -38,12 +40,12 @@ type Route struct {
 	ToAmount *string `json:"toAmount,omitempty"`
 	// The minimum expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
 	ToAmountMin *string `json:"toAmountMin,omitempty"`
-	ToToken *TransactRequestFromToken `json:"toToken,omitempty"`
+	ToToken *GetRoutes200ResponseRoutesInnerFromToken `json:"toToken,omitempty"`
 	// The expected gas cost in USD.
 	GasCostUSD *string `json:"gasCostUSD,omitempty"`
 	// Whether chain switching is enabled or not.
 	ContainsSwitchChain *bool `json:"containsSwitchChain,omitempty"`
-	// List of steps involved in this route.
+	// List of steps involved in this route, adjusted for mode.
 	Steps []GetRoutes200ResponseRoutesInnerStepsInner `json:"steps,omitempty"`
 	Insurance *GetRoutes200ResponseRoutesInnerInsurance `json:"insurance,omitempty"`
 	// List of tags identifiers providing additional context or categorization.
@@ -54,10 +56,11 @@ type Route struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRoute(id string, gatewayID string) *Route {
+func NewRoute(id string, gatewayID string, mode string) *Route {
 	this := Route{}
 	this.Id = id
 	this.GatewayID = gatewayID
+	this.Mode = mode
 	return &this
 }
 
@@ -115,6 +118,30 @@ func (o *Route) GetGatewayIDOk() (*string, bool) {
 // SetGatewayID sets field value
 func (o *Route) SetGatewayID(v string) {
 	o.GatewayID = v
+}
+
+// GetMode returns the Mode field value
+func (o *Route) GetMode() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Mode
+}
+
+// GetModeOk returns a tuple with the Mode field value
+// and a boolean to check if the value has been set.
+func (o *Route) GetModeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Mode, true
+}
+
+// SetMode sets field value
+func (o *Route) SetMode(v string) {
+	o.Mode = v
 }
 
 // GetFromDLTNetworkID returns the FromDLTNetworkID field value if set, zero value otherwise.
@@ -214,9 +241,9 @@ func (o *Route) SetFromAmount(v string) {
 }
 
 // GetFromToken returns the FromToken field value if set, zero value otherwise.
-func (o *Route) GetFromToken() TransactRequestFromToken {
+func (o *Route) GetFromToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.FromToken) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.FromToken
@@ -224,7 +251,7 @@ func (o *Route) GetFromToken() TransactRequestFromToken {
 
 // GetFromTokenOk returns a tuple with the FromToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Route) GetFromTokenOk() (*TransactRequestFromToken, bool) {
+func (o *Route) GetFromTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.FromToken) {
 		return nil, false
 	}
@@ -240,8 +267,8 @@ func (o *Route) HasFromToken() bool {
 	return false
 }
 
-// SetFromToken gets a reference to the given TransactRequestFromToken and assigns it to the FromToken field.
-func (o *Route) SetFromToken(v TransactRequestFromToken) {
+// SetFromToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the FromToken field.
+func (o *Route) SetFromToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.FromToken = &v
 }
 
@@ -374,9 +401,9 @@ func (o *Route) SetToAmountMin(v string) {
 }
 
 // GetToToken returns the ToToken field value if set, zero value otherwise.
-func (o *Route) GetToToken() TransactRequestFromToken {
+func (o *Route) GetToToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.ToToken) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.ToToken
@@ -384,7 +411,7 @@ func (o *Route) GetToToken() TransactRequestFromToken {
 
 // GetToTokenOk returns a tuple with the ToToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Route) GetToTokenOk() (*TransactRequestFromToken, bool) {
+func (o *Route) GetToTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.ToToken) {
 		return nil, false
 	}
@@ -400,8 +427,8 @@ func (o *Route) HasToToken() bool {
 	return false
 }
 
-// SetToToken gets a reference to the given TransactRequestFromToken and assigns it to the ToToken field.
-func (o *Route) SetToToken(v TransactRequestFromToken) {
+// SetToToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the ToToken field.
+func (o *Route) SetToToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.ToToken = &v
 }
 
@@ -577,6 +604,7 @@ func (o Route) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["gatewayID"] = o.GatewayID
+	toSerialize["mode"] = o.Mode
 	if !IsNil(o.FromDLTNetworkID) {
 		toSerialize["fromDLTNetworkID"] = o.FromDLTNetworkID
 	}

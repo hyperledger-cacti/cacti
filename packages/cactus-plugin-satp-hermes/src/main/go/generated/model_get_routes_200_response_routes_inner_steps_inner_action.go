@@ -19,10 +19,10 @@ var _ MappedNullable = &GetRoutes200ResponseRoutesInnerStepsInnerAction{}
 
 // GetRoutes200ResponseRoutesInnerStepsInnerAction struct for GetRoutes200ResponseRoutesInnerStepsInnerAction
 type GetRoutes200ResponseRoutesInnerStepsInnerAction struct {
-	FromToken *TransactRequestFromToken `json:"fromToken,omitempty"`
+	FromToken *GetRoutes200ResponseRoutesInnerFromToken `json:"fromToken,omitempty"`
 	// The amount of 'fromToken' to be transferred, specified as a string to maintain precision.
 	FromAmount *string `json:"fromAmount,omitempty"`
-	ToToken *TransactRequestFromToken `json:"toToken,omitempty"`
+	ToToken *GetRoutes200ResponseRoutesInnerFromToken `json:"toToken,omitempty"`
 	// The maximum acceptable difference between the expected price of the 'toToken' and the price at the time of the transfer.
 	Slippage *float32 `json:"slippage,omitempty"`
 	// A blockchain address.
@@ -49,9 +49,9 @@ func NewGetRoutes200ResponseRoutesInnerStepsInnerActionWithDefaults() *GetRoutes
 }
 
 // GetFromToken returns the FromToken field value if set, zero value otherwise.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromToken() TransactRequestFromToken {
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.FromToken) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.FromToken
@@ -59,7 +59,7 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromToken() Transac
 
 // GetFromTokenOk returns a tuple with the FromToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromTokenOk() (*TransactRequestFromToken, bool) {
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetFromTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.FromToken) {
 		return nil, false
 	}
@@ -75,8 +75,8 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) HasFromToken() bool {
 	return false
 }
 
-// SetFromToken gets a reference to the given TransactRequestFromToken and assigns it to the FromToken field.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetFromToken(v TransactRequestFromToken) {
+// SetFromToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the FromToken field.
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetFromToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.FromToken = &v
 }
 
@@ -113,9 +113,9 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetFromAmount(v string
 }
 
 // GetToToken returns the ToToken field value if set, zero value otherwise.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToToken() TransactRequestFromToken {
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.ToToken) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.ToToken
@@ -123,7 +123,7 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToToken() TransactR
 
 // GetToTokenOk returns a tuple with the ToToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToTokenOk() (*TransactRequestFromToken, bool) {
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) GetToTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.ToToken) {
 		return nil, false
 	}
@@ -139,8 +139,8 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) HasToToken() bool {
 	return false
 }
 
-// SetToToken gets a reference to the given TransactRequestFromToken and assigns it to the ToToken field.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetToToken(v TransactRequestFromToken) {
+// SetToToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the ToToken field.
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerAction) SetToToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.ToToken = &v
 }
 

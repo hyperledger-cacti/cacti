@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **Limit** | Pointer to **string** | The gas limit for the transaction, specified as a string to maintain precision. | [optional] 
 **Amount** | Pointer to **string** | The amount of gas required in the gas currency. | [optional] 
 **AmountUSD** | Pointer to **string** | The amount of gas required in USD. | [optional] 
-**Token** | Pointer to [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | [optional] 
+**Token** | Pointer to [**GetRoutes200ResponseRoutesInnerFromToken**](GetRoutes200ResponseRoutesInnerFromToken.md) |  | [optional] 
 
 ## Methods
 
@@ -183,20 +183,20 @@ HasAmountUSD returns a boolean if a field has been set.
 
 ### GetToken
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetToken() TransactRequestFromToken`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetToken() GetRoutes200ResponseRoutesInnerFromToken`
 
 GetToken returns the Token field if non-nil, zero value otherwise.
 
 ### GetTokenOk
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetTokenOk() (*TransactRequestFromToken, bool)`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool)`
 
 GetTokenOk returns a tuple with the Token field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetToken
 
-`func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) SetToken(v TransactRequestFromToken)`
+`func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) SetToken(v GetRoutes200ResponseRoutesInnerFromToken)`
 
 SetToken sets Token field to given value.
 

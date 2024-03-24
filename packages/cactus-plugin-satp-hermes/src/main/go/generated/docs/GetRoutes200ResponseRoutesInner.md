@@ -6,18 +6,19 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | **string** | A unique identifier of the route. | 
 **GatewayID** | **string** | A unique identifier for the gateway. | 
-**FromDLTNetworkID** | Pointer to **string** | The ID of the DLT Network where the transfer will originate. | [optional] 
+**Mode** | **string** | The mode of operation for this route - &#39;data&#39; for arbitrary payload handling, &#39;transfer&#39; for asset transfer. | 
+**FromDLTNetworkID** | Pointer to **string** | The ID of the DLT Network where the operation will originate. | [optional] 
 **FromAmountUSD** | Pointer to **float64** | The amount of &#39;fromToken&#39; to be transferred in USD, specified as a string to maintain precision. | [optional] 
 **FromAmount** | Pointer to **string** | The amount that should be sent including all decimals (e.g., 1000000 for 1 USDC (6 decimals)). | [optional] 
-**FromToken** | Pointer to [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | [optional] 
-**ToDLTNetworkID** | Pointer to **string** | The ID of the DLT Network where the transfer will end. | [optional] 
+**FromToken** | Pointer to [**GetRoutes200ResponseRoutesInnerFromToken**](GetRoutes200ResponseRoutesInnerFromToken.md) |  | [optional] 
+**ToDLTNetworkID** | Pointer to **string** | The ID of the DLT Network where the operation will end. | [optional] 
 **ToAmountUSD** | Pointer to **string** | The expected amount to be received in USD. | [optional] 
 **ToAmount** | Pointer to **string** | The expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)). | [optional] 
 **ToAmountMin** | Pointer to **string** | The minimum expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)). | [optional] 
-**ToToken** | Pointer to [**TransactRequestFromToken**](TransactRequestFromToken.md) |  | [optional] 
+**ToToken** | Pointer to [**GetRoutes200ResponseRoutesInnerFromToken**](GetRoutes200ResponseRoutesInnerFromToken.md) |  | [optional] 
 **GasCostUSD** | Pointer to **string** | The expected gas cost in USD. | [optional] 
 **ContainsSwitchChain** | Pointer to **bool** | Whether chain switching is enabled or not. | [optional] 
-**Steps** | Pointer to [**[]GetRoutes200ResponseRoutesInnerStepsInner**](GetRoutes200ResponseRoutesInnerStepsInner.md) | List of steps involved in this route. | [optional] 
+**Steps** | Pointer to [**[]GetRoutes200ResponseRoutesInnerStepsInner**](GetRoutes200ResponseRoutesInnerStepsInner.md) | List of steps involved in this route, adjusted for mode. | [optional] 
 **Insurance** | Pointer to [**GetRoutes200ResponseRoutesInnerInsurance**](GetRoutes200ResponseRoutesInnerInsurance.md) |  | [optional] 
 **Tags** | Pointer to **[]string** | List of tags identifiers providing additional context or categorization. | [optional] 
 
@@ -25,7 +26,7 @@ Name | Type | Description | Notes
 
 ### NewGetRoutes200ResponseRoutesInner
 
-`func NewGetRoutes200ResponseRoutesInner(id string, gatewayID string, ) *GetRoutes200ResponseRoutesInner`
+`func NewGetRoutes200ResponseRoutesInner(id string, gatewayID string, mode string, ) *GetRoutes200ResponseRoutesInner`
 
 NewGetRoutes200ResponseRoutesInner instantiates a new GetRoutes200ResponseRoutesInner object
 This constructor will assign default values to properties that have it defined,
@@ -78,6 +79,26 @@ and a boolean to check if the value has been set.
 `func (o *GetRoutes200ResponseRoutesInner) SetGatewayID(v string)`
 
 SetGatewayID sets GatewayID field to given value.
+
+
+### GetMode
+
+`func (o *GetRoutes200ResponseRoutesInner) GetMode() string`
+
+GetMode returns the Mode field if non-nil, zero value otherwise.
+
+### GetModeOk
+
+`func (o *GetRoutes200ResponseRoutesInner) GetModeOk() (*string, bool)`
+
+GetModeOk returns a tuple with the Mode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMode
+
+`func (o *GetRoutes200ResponseRoutesInner) SetMode(v string)`
+
+SetMode sets Mode field to given value.
 
 
 ### GetFromDLTNetworkID
@@ -157,20 +178,20 @@ HasFromAmount returns a boolean if a field has been set.
 
 ### GetFromToken
 
-`func (o *GetRoutes200ResponseRoutesInner) GetFromToken() TransactRequestFromToken`
+`func (o *GetRoutes200ResponseRoutesInner) GetFromToken() GetRoutes200ResponseRoutesInnerFromToken`
 
 GetFromToken returns the FromToken field if non-nil, zero value otherwise.
 
 ### GetFromTokenOk
 
-`func (o *GetRoutes200ResponseRoutesInner) GetFromTokenOk() (*TransactRequestFromToken, bool)`
+`func (o *GetRoutes200ResponseRoutesInner) GetFromTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool)`
 
 GetFromTokenOk returns a tuple with the FromToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetFromToken
 
-`func (o *GetRoutes200ResponseRoutesInner) SetFromToken(v TransactRequestFromToken)`
+`func (o *GetRoutes200ResponseRoutesInner) SetFromToken(v GetRoutes200ResponseRoutesInnerFromToken)`
 
 SetFromToken sets FromToken field to given value.
 
@@ -282,20 +303,20 @@ HasToAmountMin returns a boolean if a field has been set.
 
 ### GetToToken
 
-`func (o *GetRoutes200ResponseRoutesInner) GetToToken() TransactRequestFromToken`
+`func (o *GetRoutes200ResponseRoutesInner) GetToToken() GetRoutes200ResponseRoutesInnerFromToken`
 
 GetToToken returns the ToToken field if non-nil, zero value otherwise.
 
 ### GetToTokenOk
 
-`func (o *GetRoutes200ResponseRoutesInner) GetToTokenOk() (*TransactRequestFromToken, bool)`
+`func (o *GetRoutes200ResponseRoutesInner) GetToTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool)`
 
 GetToTokenOk returns a tuple with the ToToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetToToken
 
-`func (o *GetRoutes200ResponseRoutesInner) SetToToken(v TransactRequestFromToken)`
+`func (o *GetRoutes200ResponseRoutesInner) SetToToken(v GetRoutes200ResponseRoutesInnerFromToken)`
 
 SetToToken sets ToToken field to given value.
 

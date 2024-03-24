@@ -4,9 +4,77 @@ All URIs are relative to *http://localhost:3011/api/v1/@hyperledger/cactus-plugi
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**CallContinue**](AdminApi.md#CallContinue) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue | Continue a paused transaction session
 [**GetAudit**](AdminApi.md#GetAudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 [**GetStatus**](AdminApi.md#GetStatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
+[**Pause**](AdminApi.md#Pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
 
+
+
+## CallContinue
+
+> Continue200Response CallContinue(ctx).ContinueRequest(continueRequest).Execute()
+
+Continue a paused transaction session
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+    continueRequest := *openapiclient.NewContinueRequest("SessionId_example", "ContextId_example") // ContinueRequest | 
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.AdminApi.CallContinue(context.Background()).ContinueRequest(continueRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.CallContinue``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `CallContinue`: Continue200Response
+    fmt.Fprintf(os.Stdout, "Response from `AdminApi.CallContinue`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiCallContinueRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **continueRequest** | [**ContinueRequest**](ContinueRequest.md) |  | 
+
+### Return type
+
+[**Continue200Response**](Continue200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## GetAudit
@@ -139,6 +207,72 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## Pause
+
+> Pause200Response Pause(ctx).PauseRequest(pauseRequest).Execute()
+
+Pause a transaction session
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+    pauseRequest := *openapiclient.NewPauseRequest("SessionId_example", "ContextId_example") // PauseRequest | 
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.AdminApi.Pause(context.Background()).PauseRequest(pauseRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.Pause``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `Pause`: Pause200Response
+    fmt.Fprintf(os.Stdout, "Response from `AdminApi.Pause`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiPauseRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pauseRequest** | [**PauseRequest**](PauseRequest.md) |  | 
+
+### Return type
+
+[**Pause200Response**](Pause200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

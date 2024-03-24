@@ -19,10 +19,10 @@ var _ MappedNullable = &Action{}
 
 // Action struct for Action
 type Action struct {
-	FromToken *TransactRequestFromToken `json:"fromToken,omitempty"`
+	FromToken *GetRoutes200ResponseRoutesInnerFromToken `json:"fromToken,omitempty"`
 	// The amount of 'fromToken' to be transferred, specified as a string to maintain precision.
 	FromAmount *string `json:"fromAmount,omitempty"`
-	ToToken *TransactRequestFromToken `json:"toToken,omitempty"`
+	ToToken *GetRoutes200ResponseRoutesInnerFromToken `json:"toToken,omitempty"`
 	// The maximum acceptable difference between the expected price of the 'toToken' and the price at the time of the transfer.
 	Slippage *float32 `json:"slippage,omitempty"`
 	// A blockchain address.
@@ -49,9 +49,9 @@ func NewActionWithDefaults() *Action {
 }
 
 // GetFromToken returns the FromToken field value if set, zero value otherwise.
-func (o *Action) GetFromToken() TransactRequestFromToken {
+func (o *Action) GetFromToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.FromToken) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.FromToken
@@ -59,7 +59,7 @@ func (o *Action) GetFromToken() TransactRequestFromToken {
 
 // GetFromTokenOk returns a tuple with the FromToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Action) GetFromTokenOk() (*TransactRequestFromToken, bool) {
+func (o *Action) GetFromTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.FromToken) {
 		return nil, false
 	}
@@ -75,8 +75,8 @@ func (o *Action) HasFromToken() bool {
 	return false
 }
 
-// SetFromToken gets a reference to the given TransactRequestFromToken and assigns it to the FromToken field.
-func (o *Action) SetFromToken(v TransactRequestFromToken) {
+// SetFromToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the FromToken field.
+func (o *Action) SetFromToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.FromToken = &v
 }
 
@@ -113,9 +113,9 @@ func (o *Action) SetFromAmount(v string) {
 }
 
 // GetToToken returns the ToToken field value if set, zero value otherwise.
-func (o *Action) GetToToken() TransactRequestFromToken {
+func (o *Action) GetToToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.ToToken) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.ToToken
@@ -123,7 +123,7 @@ func (o *Action) GetToToken() TransactRequestFromToken {
 
 // GetToTokenOk returns a tuple with the ToToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Action) GetToTokenOk() (*TransactRequestFromToken, bool) {
+func (o *Action) GetToTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.ToToken) {
 		return nil, false
 	}
@@ -139,8 +139,8 @@ func (o *Action) HasToToken() bool {
 	return false
 }
 
-// SetToToken gets a reference to the given TransactRequestFromToken and assigns it to the ToToken field.
-func (o *Action) SetToToken(v TransactRequestFromToken) {
+// SetToToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the ToToken field.
+func (o *Action) SetToToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.ToToken = &v
 }
 

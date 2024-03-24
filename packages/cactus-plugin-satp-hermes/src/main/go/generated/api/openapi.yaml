@@ -137,6 +137,95 @@ paths:
         http:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/status
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
+    post:
+      description: "Attempts to continue a previously paused transaction intent, resuming\
+        \ its execution."
+      operationId: Continue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Continue_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Continue_200_response'
+          description: Transaction continuation attempted
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_default_response'
+          description: An error occurred or transaction cannot be continued
+      summary: Continue a paused transaction session
+      tags:
+      - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause:
+    post:
+      description: "Attempts to pause a previously submitted transaction intent, temporarily\
+        \ halting its execution."
+      operationId: Pause
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pause_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pause_200_response'
+          description: Transaction pause attempted
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_default_response'
+          description: An error occurred or transaction cannot be paused
+      summary: Pause a transaction session
+      tags:
+      - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains:
+    get:
+      description: Retrieves metadata about each supported blockchain network.
+      operationId: GetChains
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                description: List of chains and related metadata
+                items:
+                  $ref: '#/components/schemas/GetChains_200_response_inner'
+                type: array
+          description: A list of supported blockchain networks.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transact_default_response'
+          description: An error occurred
+      summary: Get supported chains
+      tags:
+      - chains
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
     get:
       description: Get a list of possible routes for swapping one asset for another
@@ -428,6 +517,33 @@ components:
       - substatus
       type: object
       x-category: response
+    PauseRequest:
+      description: Schema for a request to pause a transaction session.
+      example:
+        contextId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        sessionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        sessionId:
+          description: A unique identifier for the transaction session to be paused.
+          format: uuid
+          type: string
+        contextId:
+          description: A unique identifier for the transaction context.
+          format: uuid
+          type: string
+      required:
+      - contextId
+      - sessionId
+      type: object
+    PauseResponse:
+      description: "Response schema for a pause request, returning the status of the\
+        \ SATP session."
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+      required:
+      - statusResponse
+      type: object
     StatusRequest:
       properties:
         sessionID:
@@ -439,82 +555,54 @@ components:
       x-category: request
     TransactRequest:
       example:
-        fromAmount: "1000000000000000000"
-        toAmount: "1000000000000000000"
+        mode: data
+        payload: payload
+        fromAmount: fromAmount
+        toAmount: toAmount
         contextID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         toDLTNetworkID: toDLTNetworkID
         fromDLTNetworkID: fromDLTNetworkID
-        fromToken:
-          symbol: symbol
-          extensions:
-            bridgeInfo:
-              key:
-                tokenAddress: 0x...
-            verified: true
-          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
-          priceUSD: priceUSD
-          chainID: chainID
-          decimals: 1
-          name: name
-          chainType: HyperledgerFabric
-          logoURI: https://openapi-generator.tech
-          tags:
-          - satp
-          - hyperledger
-        toToken:
-          symbol: symbol
-          extensions:
-            bridgeInfo:
-              key:
-                tokenAddress: 0x...
-            verified: true
-          address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
-          priceUSD: priceUSD
-          chainID: chainID
-          decimals: 1
-          name: name
-          chainType: HyperledgerFabric
-          logoURI: https://openapi-generator.tech
-          tags:
-          - satp
-          - hyperledger
+        fromToken: fromToken
+        toToken: toToken
       properties:
         contextID:
           description: A unique identifier for the transaction context.
           format: uuid
           type: string
-        fromDLTNetworkID:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
+        mode:
+          description: The mode of transaction - 'data' for arbitrary payload or 'transfer'
+            for asset transfer.
+          enum:
+          - data
+          - transfer
           type: string
-          x-category: satp-core
+        payload:
+          description: A string containing all transaction details required for processing
+            in 'data' mode. Required if mode is 'data'.
+          type: string
+        fromDLTNetworkID:
+          description: The ID of the DLT Network from which the asset will be transferred.
+            Required if mode is 'transfer'.
+          type: string
+        toDLTNetworkID:
+          description: The ID of the DLT Network to which the asset will be transferred.
+            Required if mode is 'transfer'.
+          type: string
         fromAmount:
-          description: The amount in string format including all decimals.
-          example: "1000000000000000000"
-          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          description: Required if mode is 'transfer'.
           type: string
         fromToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
-        toDLTNetworkID:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
+          description: Required if mode is 'transfer'.
           type: string
-          x-category: satp-core
         toAmount:
-          description: The amount in string format including all decimals.
-          example: "1000000000000000000"
-          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          description: Required if mode is 'transfer'.
           type: string
         toToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          description: Required if mode is 'transfer'.
+          type: string
       required:
       - contextID
-      - fromAmount
-      - fromDLTNetworkID
-      - fromToken
-      - toAmount
-      - toDLTNetworkID
-      - toToken
+      - mode
       type: object
     TransactResponse:
       properties:
@@ -649,8 +737,15 @@ components:
           description: A unique identifier for the gateway.
           format: uuid
           type: string
+        mode:
+          description: "The mode of operation for this route - 'data' for arbitrary\
+            \ payload handling, 'transfer' for asset transfer."
+          enum:
+          - data
+          - transfer
+          type: string
         fromDLTNetworkID:
-          description: The ID of the DLT Network where the transfer will originate.
+          description: The ID of the DLT Network where the operation will originate.
           type: string
         fromAmountUSD:
           description: "The amount of 'fromToken' to be transferred in USD, specified\
@@ -663,9 +758,9 @@ components:
           pattern: "^[1-9][0-9]*$"
           type: string
         fromToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         toDLTNetworkID:
-          description: The ID of the DLT Network where the transfer will end.
+          description: The ID of the DLT Network where the operation will end.
           type: string
         toAmountUSD:
           description: The expected amount to be received in USD.
@@ -679,7 +774,7 @@ components:
             \ (e.g., 1000000 for 1 USDC (6 decimals))."
           type: string
         toToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         gasCostUSD:
           description: The expected gas cost in USD.
           type: string
@@ -687,7 +782,7 @@ components:
           description: Whether chain switching is enabled or not.
           type: boolean
         steps:
-          description: List of steps involved in this route.
+          description: "List of steps involved in this route, adjusted for mode."
           items:
             $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner'
           type: array
@@ -704,7 +799,61 @@ components:
       required:
       - gatewayID
       - id
+      - mode
       type: object
+    ContinueRequest:
+      description: Schema for a request to continue a paused transaction session.
+      example:
+        contextId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        sessionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        sessionId:
+          description: A unique identifier for the transaction session to be continued.
+          format: uuid
+          type: string
+        contextId:
+          description: A unique identifier for the transaction context.
+          format: uuid
+          type: string
+      required:
+      - contextId
+      - sessionId
+      type: object
+    ContinueResponse:
+      description: "Response schema for a continue request, returning the status of\
+        \ the SATP session."
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+      required:
+      - statusResponse
+      type: object
+    Chain:
+      properties:
+        chainId:
+          description: A unique identifier for the blockchain network.
+          type: string
+        chainName:
+          description: The name of the blockchain network.
+          type: string
+        chainType:
+          description: "The type of blockchain network (e.g., 'evm', 'fabric')."
+          type: string
+        networkName:
+          description: "The specific network name within the blockchain (e.g., 'mainnet',\
+            \ 'testnet')."
+          type: string
+      required:
+      - chainId
+      - chainName
+      - chainType
+      - networkName
+      type: object
+    Chains:
+      description: List of chains and related metadata
+      items:
+        $ref: '#/components/schemas/GetChains_200_response_inner'
+      type: array
     Token:
       description: Metadata detailing a supported token
       properties:
@@ -750,7 +899,7 @@ components:
           description: The current price of the token in USD.
           type: string
         extensions:
-          $ref: '#/components/schemas/Transact_request_fromToken_extensions'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken_extensions'
       required:
       - address
       - chainID
@@ -820,7 +969,7 @@ components:
     Action:
       properties:
         fromToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         fromAmount:
           description: "The amount of 'fromToken' to be transferred, specified as\
             \ a string to maintain precision."
@@ -828,7 +977,7 @@ components:
           pattern: "^[1-9][0-9]*$"
           type: string
         toToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         slippage:
           description: The maximum acceptable difference between the expected price
             of the 'toToken' and the price at the time of the transfer.
@@ -975,102 +1124,7 @@ components:
           pattern: "^(0(\\.[0-9]+)?|[1-9][0-9]*(\\.[0-9]+)?)$"
           type: string
         token:
-          $ref: '#/components/schemas/Transact_request_fromToken'
-      type: object
-    Transact_request_fromToken_extensions_bridgeInfo_value:
-      description: Information about the bridge used for the token transfer.
-      example:
-        tokenAddress: 0x...
-      properties:
-        tokenAddress:
-          description: The address of the token being transferred.
-          example: 0x...
-          type: string
-      type: object
-    Transact_request_fromToken_extensions:
-      example:
-        bridgeInfo:
-          key:
-            tokenAddress: 0x...
-        verified: true
-      properties:
-        bridgeInfo:
-          additionalProperties:
-            $ref: '#/components/schemas/Transact_request_fromToken_extensions_bridgeInfo_value'
-          type: object
-        verified:
-          description: Indicates whether the token is verified.
-          type: boolean
-      type: object
-    Transact_request_fromToken:
-      description: Metadata detailing a supported token
-      example:
-        symbol: symbol
-        extensions:
-          bridgeInfo:
-            key:
-              tokenAddress: 0x...
-          verified: true
-        address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
-        priceUSD: priceUSD
-        chainID: chainID
-        decimals: 1
-        name: name
-        chainType: HyperledgerFabric
-        logoURI: https://openapi-generator.tech
-        tags:
-        - satp
-        - hyperledger
-      properties:
-        chainID:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
-          type: string
-          x-category: satp-core
-        chainType:
-          description: Supported DLT protocols.
-          enum:
-          - HyperledgerFabric
-          - HyperledgerBesu
-          type: string
-          x-category: satp-core
-        address:
-          description: A blockchain address.
-          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
-          type: string
-        name:
-          description: The name of the token.
-          type: string
-        symbol:
-          description: The symbol of the token.
-          type: string
-        decimals:
-          description: How many decimals the token supports.
-          minimum: 1
-          type: integer
-        logoURI:
-          description: "The logo of a token, chain, dex etc."
-          format: uri
-          type: string
-        tags:
-          description: List of tags identifiers providing additional context or categorization.
-          example:
-          - satp
-          - hyperledger
-          items:
-            type: string
-          type: array
-        priceUSD:
-          description: The current price of the token in USD.
-          type: string
-        extensions:
-          $ref: '#/components/schemas/Transact_request_fromToken_extensions'
-      required:
-      - address
-      - chainID
-      - chainType
-      - decimals
-      - symbol
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
       type: object
     Transact_request:
       properties:
@@ -1078,38 +1132,40 @@ components:
           description: A unique identifier for the transaction context.
           format: uuid
           type: string
-        fromDLTNetworkID:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
+        mode:
+          description: The mode of transaction - 'data' for arbitrary payload or 'transfer'
+            for asset transfer.
+          enum:
+          - data
+          - transfer
           type: string
-          x-category: satp-core
+        payload:
+          description: A string containing all transaction details required for processing
+            in 'data' mode. Required if mode is 'data'.
+          type: string
+        fromDLTNetworkID:
+          description: The ID of the DLT Network from which the asset will be transferred.
+            Required if mode is 'transfer'.
+          type: string
+        toDLTNetworkID:
+          description: The ID of the DLT Network to which the asset will be transferred.
+            Required if mode is 'transfer'.
+          type: string
         fromAmount:
-          description: The amount in string format including all decimals.
-          example: "1000000000000000000"
-          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          description: Required if mode is 'transfer'.
           type: string
         fromToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
-        toDLTNetworkID:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
+          description: Required if mode is 'transfer'.
           type: string
-          x-category: satp-core
         toAmount:
-          description: The amount in string format including all decimals.
-          example: "1000000000000000000"
-          pattern: "^([1-9][0-9]*|0)(\\.[0-9]+)?$"
+          description: Required if mode is 'transfer'.
           type: string
         toToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          description: Required if mode is 'transfer'.
+          type: string
       required:
       - contextID
-      - fromAmount
-      - fromDLTNetworkID
-      - fromToken
-      - toAmount
-      - toDLTNetworkID
-      - toToken
+      - mode
       type: object
     Transact_200_response_statusResponse:
       example:
@@ -1277,6 +1333,189 @@ components:
       - cancelSuccessful
       - statusResponse
       type: object
+    Continue_request:
+      description: Schema for a request to continue a paused transaction session.
+      properties:
+        sessionId:
+          description: A unique identifier for the transaction session to be continued.
+          format: uuid
+          type: string
+        contextId:
+          description: A unique identifier for the transaction context.
+          format: uuid
+          type: string
+      required:
+      - contextId
+      - sessionId
+      type: object
+    Continue_200_response:
+      description: "Response schema for a continue request, returning the status of\
+        \ the SATP session."
+      example:
+        statusResponse:
+          stage: STAGE0
+          substatus: WAIT_SOURCE_CONFIRMATIONS
+          step: transfer-initialization-claims
+          startTime: 2000-01-23T04:56:07.000+00:00
+          status: NOT_FOUND
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+      required:
+      - statusResponse
+      type: object
+    Pause_request:
+      description: Schema for a request to pause a transaction session.
+      properties:
+        sessionId:
+          description: A unique identifier for the transaction session to be paused.
+          format: uuid
+          type: string
+        contextId:
+          description: A unique identifier for the transaction context.
+          format: uuid
+          type: string
+      required:
+      - contextId
+      - sessionId
+      type: object
+    Pause_200_response:
+      description: "Response schema for a pause request, returning the status of the\
+        \ SATP session."
+      example:
+        statusResponse:
+          stage: STAGE0
+          substatus: WAIT_SOURCE_CONFIRMATIONS
+          step: transfer-initialization-claims
+          startTime: 2000-01-23T04:56:07.000+00:00
+          status: NOT_FOUND
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse'
+      required:
+      - statusResponse
+      type: object
+    GetChains_200_response_inner:
+      example:
+        chainName: chainName
+        chainId: chainId
+        networkName: networkName
+        chainType: chainType
+      properties:
+        chainId:
+          description: A unique identifier for the blockchain network.
+          type: string
+        chainName:
+          description: The name of the blockchain network.
+          type: string
+        chainType:
+          description: "The type of blockchain network (e.g., 'evm', 'fabric')."
+          type: string
+        networkName:
+          description: "The specific network name within the blockchain (e.g., 'mainnet',\
+            \ 'testnet')."
+          type: string
+      required:
+      - chainId
+      - chainName
+      - chainType
+      - networkName
+      type: object
+    GetRoutes_200_response_routes_inner_fromToken_extensions_bridgeInfo_value:
+      description: Information about the bridge used for the token transfer.
+      example:
+        tokenAddress: 0x...
+      properties:
+        tokenAddress:
+          description: The address of the token being transferred.
+          example: 0x...
+          type: string
+      type: object
+    GetRoutes_200_response_routes_inner_fromToken_extensions:
+      example:
+        bridgeInfo:
+          key:
+            tokenAddress: 0x...
+        verified: true
+      properties:
+        bridgeInfo:
+          additionalProperties:
+            $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken_extensions_bridgeInfo_value'
+          type: object
+        verified:
+          description: Indicates whether the token is verified.
+          type: boolean
+      type: object
+    GetRoutes_200_response_routes_inner_fromToken:
+      description: Metadata detailing a supported token
+      example:
+        symbol: symbol
+        extensions:
+          bridgeInfo:
+            key:
+              tokenAddress: 0x...
+          verified: true
+        address: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+        priceUSD: priceUSD
+        chainID: chainID
+        decimals: 1
+        name: name
+        chainType: HyperledgerFabric
+        logoURI: https://openapi-generator.tech
+        tags:
+        - satp
+        - hyperledger
+      properties:
+        chainID:
+          description: "The network of the DLT being interacted with. TODO: implement\
+            \ network identification draft"
+          type: string
+          x-category: satp-core
+        chainType:
+          description: Supported DLT protocols.
+          enum:
+          - HyperledgerFabric
+          - HyperledgerBesu
+          type: string
+          x-category: satp-core
+        address:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+        name:
+          description: The name of the token.
+          type: string
+        symbol:
+          description: The symbol of the token.
+          type: string
+        decimals:
+          description: How many decimals the token supports.
+          minimum: 1
+          type: integer
+        logoURI:
+          description: "The logo of a token, chain, dex etc."
+          format: uri
+          type: string
+        tags:
+          description: List of tags identifiers providing additional context or categorization.
+          example:
+          - satp
+          - hyperledger
+          items:
+            type: string
+          type: array
+        priceUSD:
+          description: The current price of the token in USD.
+          type: string
+        extensions:
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken_extensions'
+      required:
+      - address
+      - chainID
+      - chainType
+      - decimals
+      - symbol
+      type: object
     GetRoutes_200_response_routes_inner_steps_inner_action:
       example:
         fromAmount: "1000000000000000000"
@@ -1319,7 +1558,7 @@ components:
           - hyperledger
       properties:
         fromToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         fromAmount:
           description: "The amount of 'fromToken' to be transferred, specified as\
             \ a string to maintain precision."
@@ -1327,7 +1566,7 @@ components:
           pattern: "^[1-9][0-9]*$"
           type: string
         toToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         slippage:
           description: The maximum acceptable difference between the expected price
             of the 'toToken' and the price at the time of the transfer.
@@ -1430,7 +1669,7 @@ components:
           pattern: "^(0(\\.[0-9]+)?|[1-9][0-9]*(\\.[0-9]+)?)$"
           type: string
         token:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
       type: object
     GetRoutes_200_response_routes_inner_steps_inner_estimate:
       description: "Provides an estimation for a transaction, including costs, amounts,\
@@ -2014,6 +2253,7 @@ components:
         tags:
         - satp
         - hyperledger
+        mode: data
         gasCostUSD: gasCostUSD
         fromAmountUSD: fromAmountUSD
         toDLTNetworkID: toDLTNetworkID
@@ -2046,8 +2286,15 @@ components:
           description: A unique identifier for the gateway.
           format: uuid
           type: string
+        mode:
+          description: "The mode of operation for this route - 'data' for arbitrary\
+            \ payload handling, 'transfer' for asset transfer."
+          enum:
+          - data
+          - transfer
+          type: string
         fromDLTNetworkID:
-          description: The ID of the DLT Network where the transfer will originate.
+          description: The ID of the DLT Network where the operation will originate.
           type: string
         fromAmountUSD:
           description: "The amount of 'fromToken' to be transferred in USD, specified\
@@ -2060,9 +2307,9 @@ components:
           pattern: "^[1-9][0-9]*$"
           type: string
         fromToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         toDLTNetworkID:
-          description: The ID of the DLT Network where the transfer will end.
+          description: The ID of the DLT Network where the operation will end.
           type: string
         toAmountUSD:
           description: The expected amount to be received in USD.
@@ -2076,7 +2323,7 @@ components:
             \ (e.g., 1000000 for 1 USDC (6 decimals))."
           type: string
         toToken:
-          $ref: '#/components/schemas/Transact_request_fromToken'
+          $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
         gasCostUSD:
           description: The expected gas cost in USD.
           type: string
@@ -2084,7 +2331,7 @@ components:
           description: Whether chain switching is enabled or not.
           type: boolean
         steps:
-          description: List of steps involved in this route.
+          description: "List of steps involved in this route, adjusted for mode."
           items:
             $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_steps_inner'
           type: array
@@ -2101,6 +2348,7 @@ components:
       required:
       - gatewayID
       - id
+      - mode
       type: object
     GetRoutes_200_response:
       description: A collection of available and unavailable routes
@@ -2374,6 +2622,7 @@ components:
           tags:
           - satp
           - hyperledger
+          mode: data
           gasCostUSD: gasCostUSD
           fromAmountUSD: fromAmountUSD
           toDLTNetworkID: toDLTNetworkID
@@ -2666,6 +2915,7 @@ components:
           tags:
           - satp
           - hyperledger
+          mode: data
           gasCostUSD: gasCostUSD
           fromAmountUSD: fromAmountUSD
           toDLTNetworkID: toDLTNetworkID
