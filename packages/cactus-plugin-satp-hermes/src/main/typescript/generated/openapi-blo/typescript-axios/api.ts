@@ -68,10 +68,10 @@ export interface APIError {
 export interface Action {
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof Action
      */
-    'fromToken'?: TransactRequestFromToken;
+    'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The amount of \'fromToken\' to be transferred, specified as a string to maintain precision.
      * @type {string}
@@ -80,10 +80,10 @@ export interface Action {
     'fromAmount'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof Action
      */
-    'toToken'?: TransactRequestFromToken;
+    'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The maximum acceptable difference between the expected price of the \'toToken\' and the price at the time of the transfer.
      * @type {number}
@@ -202,6 +202,82 @@ export interface CancelResponse {
      * @memberof CancelResponse
      */
     'cancelSuccessful': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface Chain
+ */
+export interface Chain {
+    /**
+     * A unique identifier for the blockchain network.
+     * @type {string}
+     * @memberof Chain
+     */
+    'chainId': string;
+    /**
+     * The name of the blockchain network.
+     * @type {string}
+     * @memberof Chain
+     */
+    'chainName': string;
+    /**
+     * The type of blockchain network (e.g., \'evm\', \'fabric\').
+     * @type {string}
+     * @memberof Chain
+     */
+    'chainType': string;
+    /**
+     * The specific network name within the blockchain (e.g., \'mainnet\', \'testnet\').
+     * @type {string}
+     * @memberof Chain
+     */
+    'networkName': string;
+}
+/**
+ * Response schema for a continue request, returning the status of the SATP session.
+ * @export
+ * @interface Continue200Response
+ */
+export interface Continue200Response {
+    /**
+     * 
+     * @type {Transact200ResponseStatusResponse}
+     * @memberof Continue200Response
+     */
+    'statusResponse': Transact200ResponseStatusResponse;
+}
+/**
+ * Schema for a request to continue a paused transaction session.
+ * @export
+ * @interface ContinueRequest
+ */
+export interface ContinueRequest {
+    /**
+     * A unique identifier for the transaction session to be continued.
+     * @type {string}
+     * @memberof ContinueRequest
+     */
+    'sessionId': string;
+    /**
+     * A unique identifier for the transaction context.
+     * @type {string}
+     * @memberof ContinueRequest
+     */
+    'contextId': string;
+}
+/**
+ * Response schema for a continue request, returning the status of the SATP session.
+ * @export
+ * @interface ContinueResponse
+ */
+export interface ContinueResponse {
+    /**
+     * 
+     * @type {Transact200ResponseStatusResponse}
+     * @memberof ContinueResponse
+     */
+    'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * 
@@ -380,10 +456,10 @@ export interface GasCost {
     'amountUSD'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof GasCost
      */
-    'token'?: TransactRequestFromToken;
+    'token'?: GetRoutes200ResponseRoutesInnerFromToken;
 }
 /**
  * 
@@ -461,6 +537,37 @@ export interface GetAuditResponse {
     'auditEndTime'?: string;
 }
 /**
+ * 
+ * @export
+ * @interface GetChains200ResponseInner
+ */
+export interface GetChains200ResponseInner {
+    /**
+     * A unique identifier for the blockchain network.
+     * @type {string}
+     * @memberof GetChains200ResponseInner
+     */
+    'chainId': string;
+    /**
+     * The name of the blockchain network.
+     * @type {string}
+     * @memberof GetChains200ResponseInner
+     */
+    'chainName': string;
+    /**
+     * The type of blockchain network (e.g., \'evm\', \'fabric\').
+     * @type {string}
+     * @memberof GetChains200ResponseInner
+     */
+    'chainType': string;
+    /**
+     * The specific network name within the blockchain (e.g., \'mainnet\', \'testnet\').
+     * @type {string}
+     * @memberof GetChains200ResponseInner
+     */
+    'networkName': string;
+}
+/**
  * A collection of available and unavailable routes
  * @export
  * @interface GetRoutes200Response
@@ -492,7 +599,13 @@ export interface GetRoutes200ResponseRoutesInner {
      */
     'gatewayID': string;
     /**
-     * The ID of the DLT Network where the transfer will originate.
+     * The mode of operation for this route - \'data\' for arbitrary payload handling, \'transfer\' for asset transfer.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInner
+     */
+    'mode': GetRoutes200ResponseRoutesInnerModeEnum;
+    /**
+     * The ID of the DLT Network where the operation will originate.
      * @type {string}
      * @memberof GetRoutes200ResponseRoutesInner
      */
@@ -511,12 +624,12 @@ export interface GetRoutes200ResponseRoutesInner {
     'fromAmount'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof GetRoutes200ResponseRoutesInner
      */
-    'fromToken'?: TransactRequestFromToken;
+    'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
-     * The ID of the DLT Network where the transfer will end.
+     * The ID of the DLT Network where the operation will end.
      * @type {string}
      * @memberof GetRoutes200ResponseRoutesInner
      */
@@ -541,10 +654,10 @@ export interface GetRoutes200ResponseRoutesInner {
     'toAmountMin'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof GetRoutes200ResponseRoutesInner
      */
-    'toToken'?: TransactRequestFromToken;
+    'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The expected gas cost in USD.
      * @type {string}
@@ -558,7 +671,7 @@ export interface GetRoutes200ResponseRoutesInner {
      */
     'containsSwitchChain'?: boolean;
     /**
-     * List of steps involved in this route.
+     * List of steps involved in this route, adjusted for mode.
      * @type {Array<GetRoutes200ResponseRoutesInnerStepsInner>}
      * @memberof GetRoutes200ResponseRoutesInner
      */
@@ -575,6 +688,121 @@ export interface GetRoutes200ResponseRoutesInner {
      * @memberof GetRoutes200ResponseRoutesInner
      */
     'tags'?: Array<string>;
+}
+
+export const GetRoutes200ResponseRoutesInnerModeEnum = {
+    Data: 'data',
+    Transfer: 'transfer'
+} as const;
+
+export type GetRoutes200ResponseRoutesInnerModeEnum = typeof GetRoutes200ResponseRoutesInnerModeEnum[keyof typeof GetRoutes200ResponseRoutesInnerModeEnum];
+
+/**
+ * Metadata detailing a supported token
+ * @export
+ * @interface GetRoutes200ResponseRoutesInnerFromToken
+ */
+export interface GetRoutes200ResponseRoutesInnerFromToken {
+    /**
+     * The network of the DLT being interacted with. TODO: implement network identification draft
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'chainID': string;
+    /**
+     * Supported DLT protocols.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'chainType': GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum;
+    /**
+     * A blockchain address.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'address': string;
+    /**
+     * The name of the token.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'name'?: string;
+    /**
+     * The symbol of the token.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'symbol': string;
+    /**
+     * How many decimals the token supports.
+     * @type {number}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'decimals': number;
+    /**
+     * The logo of a token, chain, dex etc.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'logoURI'?: string;
+    /**
+     * List of tags identifiers providing additional context or categorization.
+     * @type {Array<string>}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'tags'?: Array<string>;
+    /**
+     * The current price of the token in USD.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'priceUSD'?: string;
+    /**
+     * 
+     * @type {GetRoutes200ResponseRoutesInnerFromTokenExtensions}
+     * @memberof GetRoutes200ResponseRoutesInnerFromToken
+     */
+    'extensions'?: GetRoutes200ResponseRoutesInnerFromTokenExtensions;
+}
+
+export const GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum = {
+    HyperledgerFabric: 'HyperledgerFabric',
+    HyperledgerBesu: 'HyperledgerBesu'
+} as const;
+
+export type GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum = typeof GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum[keyof typeof GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface GetRoutes200ResponseRoutesInnerFromTokenExtensions
+ */
+export interface GetRoutes200ResponseRoutesInnerFromTokenExtensions {
+    /**
+     * 
+     * @type {{ [key: string]: GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue; }}
+     * @memberof GetRoutes200ResponseRoutesInnerFromTokenExtensions
+     */
+    'bridgeInfo'?: { [key: string]: GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue; };
+    /**
+     * Indicates whether the token is verified.
+     * @type {boolean}
+     * @memberof GetRoutes200ResponseRoutesInnerFromTokenExtensions
+     */
+    'verified'?: boolean;
+}
+/**
+ * Information about the bridge used for the token transfer.
+ * @export
+ * @interface GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue
+ */
+export interface GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue {
+    /**
+     * The address of the token being transferred.
+     * @type {string}
+     * @memberof GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue
+     */
+    'tokenAddress'?: string;
 }
 /**
  * 
@@ -667,10 +895,10 @@ export interface GetRoutes200ResponseRoutesInnerStepsInner {
 export interface GetRoutes200ResponseRoutesInnerStepsInnerAction {
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
      */
-    'fromToken'?: TransactRequestFromToken;
+    'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The amount of \'fromToken\' to be transferred, specified as a string to maintain precision.
      * @type {string}
@@ -679,10 +907,10 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerAction {
     'fromAmount'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
      */
-    'toToken'?: TransactRequestFromToken;
+    'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The maximum acceptable difference between the expected price of the \'toToken\' and the price at the time of the transfer.
      * @type {number}
@@ -850,10 +1078,10 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner 
     'amountUSD'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
-    'token'?: TransactRequestFromToken;
+    'token'?: GetRoutes200ResponseRoutesInnerFromToken;
 }
 /**
  * Describes integration or tool details such as bridges or exchanges involved in the transaction.
@@ -989,6 +1217,51 @@ export interface IntegrationDetails {
     'logoURI': string;
 }
 /**
+ * Response schema for a pause request, returning the status of the SATP session.
+ * @export
+ * @interface Pause200Response
+ */
+export interface Pause200Response {
+    /**
+     * 
+     * @type {Transact200ResponseStatusResponse}
+     * @memberof Pause200Response
+     */
+    'statusResponse': Transact200ResponseStatusResponse;
+}
+/**
+ * Schema for a request to pause a transaction session.
+ * @export
+ * @interface PauseRequest
+ */
+export interface PauseRequest {
+    /**
+     * A unique identifier for the transaction session to be paused.
+     * @type {string}
+     * @memberof PauseRequest
+     */
+    'sessionId': string;
+    /**
+     * A unique identifier for the transaction context.
+     * @type {string}
+     * @memberof PauseRequest
+     */
+    'contextId': string;
+}
+/**
+ * Response schema for a pause request, returning the status of the SATP session.
+ * @export
+ * @interface PauseResponse
+ */
+export interface PauseResponse {
+    /**
+     * 
+     * @type {Transact200ResponseStatusResponse}
+     * @memberof PauseResponse
+     */
+    'statusResponse': Transact200ResponseStatusResponse;
+}
+/**
  * 
  * @export
  * @interface Route
@@ -1007,7 +1280,13 @@ export interface Route {
      */
     'gatewayID': string;
     /**
-     * The ID of the DLT Network where the transfer will originate.
+     * The mode of operation for this route - \'data\' for arbitrary payload handling, \'transfer\' for asset transfer.
+     * @type {string}
+     * @memberof Route
+     */
+    'mode': RouteModeEnum;
+    /**
+     * The ID of the DLT Network where the operation will originate.
      * @type {string}
      * @memberof Route
      */
@@ -1026,12 +1305,12 @@ export interface Route {
     'fromAmount'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof Route
      */
-    'fromToken'?: TransactRequestFromToken;
+    'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
-     * The ID of the DLT Network where the transfer will end.
+     * The ID of the DLT Network where the operation will end.
      * @type {string}
      * @memberof Route
      */
@@ -1056,10 +1335,10 @@ export interface Route {
     'toAmountMin'?: string;
     /**
      * 
-     * @type {TransactRequestFromToken}
+     * @type {GetRoutes200ResponseRoutesInnerFromToken}
      * @memberof Route
      */
-    'toToken'?: TransactRequestFromToken;
+    'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The expected gas cost in USD.
      * @type {string}
@@ -1073,7 +1352,7 @@ export interface Route {
      */
     'containsSwitchChain'?: boolean;
     /**
-     * List of steps involved in this route.
+     * List of steps involved in this route, adjusted for mode.
      * @type {Array<GetRoutes200ResponseRoutesInnerStepsInner>}
      * @memberof Route
      */
@@ -1091,6 +1370,14 @@ export interface Route {
      */
     'tags'?: Array<string>;
 }
+
+export const RouteModeEnum = {
+    Data: 'data',
+    Transfer: 'transfer'
+} as const;
+
+export type RouteModeEnum = typeof RouteModeEnum[keyof typeof RouteModeEnum];
+
 /**
  * A collection of available and unavailable routes
  * @export
@@ -1281,10 +1568,10 @@ export interface Token {
     'priceUSD'?: string;
     /**
      * 
-     * @type {TransactRequestFromTokenExtensions}
+     * @type {GetRoutes200ResponseRoutesInnerFromTokenExtensions}
      * @memberof Token
      */
-    'extensions'?: TransactRequestFromTokenExtensions;
+    'extensions'?: GetRoutes200ResponseRoutesInnerFromTokenExtensions;
 }
 
 export const TokenChainTypeEnum = {
@@ -1465,149 +1752,62 @@ export interface TransactRequest {
      */
     'contextID': string;
     /**
-     * The network of the DLT being interacted with. TODO: implement network identification draft
+     * The mode of transaction - \'data\' for arbitrary payload or \'transfer\' for asset transfer.
      * @type {string}
      * @memberof TransactRequest
      */
-    'fromDLTNetworkID': string;
+    'mode': TransactRequestModeEnum;
     /**
-     * The amount in string format including all decimals.
+     * A string containing all transaction details required for processing in \'data\' mode. Required if mode is \'data\'.
      * @type {string}
      * @memberof TransactRequest
      */
-    'fromAmount': string;
+    'payload'?: string;
     /**
-     * 
-     * @type {TransactRequestFromToken}
-     * @memberof TransactRequest
-     */
-    'fromToken': TransactRequestFromToken;
-    /**
-     * The network of the DLT being interacted with. TODO: implement network identification draft
+     * The ID of the DLT Network from which the asset will be transferred. Required if mode is \'transfer\'.
      * @type {string}
      * @memberof TransactRequest
      */
-    'toDLTNetworkID': string;
+    'fromDLTNetworkID'?: string;
     /**
-     * The amount in string format including all decimals.
+     * The ID of the DLT Network to which the asset will be transferred. Required if mode is \'transfer\'.
      * @type {string}
      * @memberof TransactRequest
      */
-    'toAmount': string;
+    'toDLTNetworkID'?: string;
     /**
-     * 
-     * @type {TransactRequestFromToken}
+     * Required if mode is \'transfer\'.
+     * @type {string}
      * @memberof TransactRequest
      */
-    'toToken': TransactRequestFromToken;
-}
-/**
- * Metadata detailing a supported token
- * @export
- * @interface TransactRequestFromToken
- */
-export interface TransactRequestFromToken {
+    'fromAmount'?: string;
     /**
-     * The network of the DLT being interacted with. TODO: implement network identification draft
+     * Required if mode is \'transfer\'.
      * @type {string}
-     * @memberof TransactRequestFromToken
+     * @memberof TransactRequest
      */
-    'chainID': string;
+    'fromToken'?: string;
     /**
-     * Supported DLT protocols.
+     * Required if mode is \'transfer\'.
      * @type {string}
-     * @memberof TransactRequestFromToken
+     * @memberof TransactRequest
      */
-    'chainType': TransactRequestFromTokenChainTypeEnum;
+    'toAmount'?: string;
     /**
-     * A blockchain address.
+     * Required if mode is \'transfer\'.
      * @type {string}
-     * @memberof TransactRequestFromToken
+     * @memberof TransactRequest
      */
-    'address': string;
-    /**
-     * The name of the token.
-     * @type {string}
-     * @memberof TransactRequestFromToken
-     */
-    'name'?: string;
-    /**
-     * The symbol of the token.
-     * @type {string}
-     * @memberof TransactRequestFromToken
-     */
-    'symbol': string;
-    /**
-     * How many decimals the token supports.
-     * @type {number}
-     * @memberof TransactRequestFromToken
-     */
-    'decimals': number;
-    /**
-     * The logo of a token, chain, dex etc.
-     * @type {string}
-     * @memberof TransactRequestFromToken
-     */
-    'logoURI'?: string;
-    /**
-     * List of tags identifiers providing additional context or categorization.
-     * @type {Array<string>}
-     * @memberof TransactRequestFromToken
-     */
-    'tags'?: Array<string>;
-    /**
-     * The current price of the token in USD.
-     * @type {string}
-     * @memberof TransactRequestFromToken
-     */
-    'priceUSD'?: string;
-    /**
-     * 
-     * @type {TransactRequestFromTokenExtensions}
-     * @memberof TransactRequestFromToken
-     */
-    'extensions'?: TransactRequestFromTokenExtensions;
+    'toToken'?: string;
 }
 
-export const TransactRequestFromTokenChainTypeEnum = {
-    HyperledgerFabric: 'HyperledgerFabric',
-    HyperledgerBesu: 'HyperledgerBesu'
+export const TransactRequestModeEnum = {
+    Data: 'data',
+    Transfer: 'transfer'
 } as const;
 
-export type TransactRequestFromTokenChainTypeEnum = typeof TransactRequestFromTokenChainTypeEnum[keyof typeof TransactRequestFromTokenChainTypeEnum];
+export type TransactRequestModeEnum = typeof TransactRequestModeEnum[keyof typeof TransactRequestModeEnum];
 
-/**
- * 
- * @export
- * @interface TransactRequestFromTokenExtensions
- */
-export interface TransactRequestFromTokenExtensions {
-    /**
-     * 
-     * @type {{ [key: string]: TransactRequestFromTokenExtensionsBridgeInfoValue; }}
-     * @memberof TransactRequestFromTokenExtensions
-     */
-    'bridgeInfo'?: { [key: string]: TransactRequestFromTokenExtensionsBridgeInfoValue; };
-    /**
-     * Indicates whether the token is verified.
-     * @type {boolean}
-     * @memberof TransactRequestFromTokenExtensions
-     */
-    'verified'?: boolean;
-}
-/**
- * Information about the bridge used for the token transfer.
- * @export
- * @interface TransactRequestFromTokenExtensionsBridgeInfoValue
- */
-export interface TransactRequestFromTokenExtensionsBridgeInfoValue {
-    /**
-     * The address of the token being transferred.
-     * @type {string}
-     * @memberof TransactRequestFromTokenExtensionsBridgeInfoValue
-     */
-    'tokenAddress'?: string;
-}
 /**
  * 
  * @export
@@ -1634,6 +1834,42 @@ export interface TransactResponse {
  */
 export const AdminApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Attempts to continue a previously paused transaction intent, resuming its execution.
+         * @summary Continue a paused transaction session
+         * @param {ContinueRequest} continueRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        _continue: async (continueRequest: ContinueRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'continueRequest' is not null or undefined
+            assertParamExists('_continue', 'continueRequest', continueRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(continueRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
          * @summary Audit transactions
@@ -1720,6 +1956,42 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
+         * @summary Pause a transaction session
+         * @param {PauseRequest} pauseRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pause: async (pauseRequest: PauseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pauseRequest' is not null or undefined
+            assertParamExists('pause', 'pauseRequest', pauseRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(pauseRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1730,6 +2002,17 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
 export const AdminApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AdminApiAxiosParamCreator(configuration)
     return {
+        /**
+         * Attempts to continue a previously paused transaction intent, resuming its execution.
+         * @summary Continue a paused transaction session
+         * @param {ContinueRequest} continueRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async _continue(continueRequest: ContinueRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Continue200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator._continue(continueRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
          * @summary Audit transactions
@@ -1754,6 +2037,17 @@ export const AdminApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatus(sessionID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
+         * @summary Pause a transaction session
+         * @param {PauseRequest} pauseRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async pause(pauseRequest: PauseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pause200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.pause(pauseRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -1764,6 +2058,16 @@ export const AdminApiFp = function(configuration?: Configuration) {
 export const AdminApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AdminApiFp(configuration)
     return {
+        /**
+         * Attempts to continue a previously paused transaction intent, resuming its execution.
+         * @summary Continue a paused transaction session
+         * @param {ContinueRequest} continueRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        _continue(continueRequest: ContinueRequest, options?: any): AxiosPromise<Continue200Response> {
+            return localVarFp._continue(continueRequest, options).then((request) => request(axios, basePath));
+        },
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
          * @summary Audit transactions
@@ -1786,6 +2090,16 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
         getStatus(sessionID: string, options?: any): AxiosPromise<Transact200ResponseStatusResponse> {
             return localVarFp.getStatus(sessionID, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
+         * @summary Pause a transaction session
+         * @param {PauseRequest} pauseRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pause(pauseRequest: PauseRequest, options?: any): AxiosPromise<Pause200Response> {
+            return localVarFp.pause(pauseRequest, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -1796,6 +2110,18 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
  * @extends {BaseAPI}
  */
 export class AdminApi extends BaseAPI {
+    /**
+     * Attempts to continue a previously paused transaction intent, resuming its execution.
+     * @summary Continue a paused transaction session
+     * @param {ContinueRequest} continueRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public _continue(continueRequest: ContinueRequest, options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration)._continue(continueRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
      * @summary Audit transactions
@@ -1820,6 +2146,116 @@ export class AdminApi extends BaseAPI {
      */
     public getStatus(sessionID: string, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).getStatus(sessionID, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
+     * @summary Pause a transaction session
+     * @param {PauseRequest} pauseRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public pause(pauseRequest: PauseRequest, options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).pause(pauseRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * ChainsApi - axios parameter creator
+ * @export
+ */
+export const ChainsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Retrieves metadata about each supported blockchain network.
+         * @summary Get supported chains
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChains: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/chains`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ChainsApi - functional programming interface
+ * @export
+ */
+export const ChainsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ChainsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Retrieves metadata about each supported blockchain network.
+         * @summary Get supported chains
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChains(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<GetChains200ResponseInner>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getChains(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ChainsApi - factory interface
+ * @export
+ */
+export const ChainsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ChainsApiFp(configuration)
+    return {
+        /**
+         * Retrieves metadata about each supported blockchain network.
+         * @summary Get supported chains
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChains(options?: any): AxiosPromise<Array<GetChains200ResponseInner>> {
+            return localVarFp.getChains(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ChainsApi - object-oriented interface
+ * @export
+ * @class ChainsApi
+ * @extends {BaseAPI}
+ */
+export class ChainsApi extends BaseAPI {
+    /**
+     * Retrieves metadata about each supported blockchain network.
+     * @summary Get supported chains
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ChainsApi
+     */
+    public getChains(options?: AxiosRequestConfig) {
+        return ChainsApiFp(this.configuration).getChains(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -31,7 +31,7 @@ type GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner struct {
 	Amount *string `json:"amount,omitempty"`
 	// The amount of gas required in USD.
 	AmountUSD *string `json:"amountUSD,omitempty"`
-	Token *TransactRequestFromToken `json:"token,omitempty"`
+	Token *GetRoutes200ResponseRoutesInnerFromToken `json:"token,omitempty"`
 }
 
 // NewGetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner instantiates a new GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner object
@@ -244,9 +244,9 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) SetAmou
 }
 
 // GetToken returns the Token field value if set, zero value otherwise.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetToken() TransactRequestFromToken {
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetToken() GetRoutes200ResponseRoutesInnerFromToken {
 	if o == nil || IsNil(o.Token) {
-		var ret TransactRequestFromToken
+		var ret GetRoutes200ResponseRoutesInnerFromToken
 		return ret
 	}
 	return *o.Token
@@ -254,7 +254,7 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetToke
 
 // GetTokenOk returns a tuple with the Token field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetTokenOk() (*TransactRequestFromToken, bool) {
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) GetTokenOk() (*GetRoutes200ResponseRoutesInnerFromToken, bool) {
 	if o == nil || IsNil(o.Token) {
 		return nil, false
 	}
@@ -270,8 +270,8 @@ func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) HasToke
 	return false
 }
 
-// SetToken gets a reference to the given TransactRequestFromToken and assigns it to the Token field.
-func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) SetToken(v TransactRequestFromToken) {
+// SetToken gets a reference to the given GetRoutes200ResponseRoutesInnerFromToken and assigns it to the Token field.
+func (o *GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner) SetToken(v GetRoutes200ResponseRoutesInnerFromToken) {
 	o.Token = &v
 }
 

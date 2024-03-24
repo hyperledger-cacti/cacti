@@ -88,8 +88,11 @@ All URIs are relative to *http://localhost:3011/api/v1/@hyperledger/cactus-plugi
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AdminApi* | [**CallContinue**](docs/AdminApi.md#callcontinue) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue | Continue a paused transaction session
 *AdminApi* | [**GetAudit**](docs/AdminApi.md#getaudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 *AdminApi* | [**GetStatus**](docs/AdminApi.md#getstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
+*AdminApi* | [**Pause**](docs/AdminApi.md#pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
+*ChainsApi* | [**GetChains**](docs/ChainsApi.md#getchains) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains | Get supported chains
 *TransactionApi* | [**Cancel**](docs/TransactionApi.md#cancel) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel | Cancel a transaction session
 *TransactionApi* | [**GetRoutes**](docs/TransactionApi.md#getroutes) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes | Get a list of routes for a gateway-to-gateway asset transfer
 *TransactionApi* | [**Transact**](docs/TransactionApi.md#transact) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact | Submit a transaction intent
@@ -105,6 +108,10 @@ Class | Method | HTTP request | Description
  - [Cancel200Response](docs/Cancel200Response.md)
  - [CancelRequest](docs/CancelRequest.md)
  - [CancelResponse](docs/CancelResponse.md)
+ - [Chain](docs/Chain.md)
+ - [Continue200Response](docs/Continue200Response.md)
+ - [ContinueRequest](docs/ContinueRequest.md)
+ - [ContinueResponse](docs/ContinueResponse.md)
  - [CredentialProfile](docs/CredentialProfile.md)
  - [DLTProtocol](docs/DLTProtocol.md)
  - [Estimate](docs/Estimate.md)
@@ -113,8 +120,12 @@ Class | Method | HTTP request | Description
  - [GetAudit200Response](docs/GetAudit200Response.md)
  - [GetAuditRequest](docs/GetAuditRequest.md)
  - [GetAuditResponse](docs/GetAuditResponse.md)
+ - [GetChains200ResponseInner](docs/GetChains200ResponseInner.md)
  - [GetRoutes200Response](docs/GetRoutes200Response.md)
  - [GetRoutes200ResponseRoutesInner](docs/GetRoutes200ResponseRoutesInner.md)
+ - [GetRoutes200ResponseRoutesInnerFromToken](docs/GetRoutes200ResponseRoutesInnerFromToken.md)
+ - [GetRoutes200ResponseRoutesInnerFromTokenExtensions](docs/GetRoutes200ResponseRoutesInnerFromTokenExtensions.md)
+ - [GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue](docs/GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue.md)
  - [GetRoutes200ResponseRoutesInnerInsurance](docs/GetRoutes200ResponseRoutesInnerInsurance.md)
  - [GetRoutes200ResponseRoutesInnerStepsInner](docs/GetRoutes200ResponseRoutesInnerStepsInner.md)
  - [GetRoutes200ResponseRoutesInnerStepsInnerAction](docs/GetRoutes200ResponseRoutesInnerStepsInnerAction.md)
@@ -125,6 +136,9 @@ Class | Method | HTTP request | Description
  - [IncludedStep](docs/IncludedStep.md)
  - [Insurance](docs/Insurance.md)
  - [IntegrationDetails](docs/IntegrationDetails.md)
+ - [Pause200Response](docs/Pause200Response.md)
+ - [PauseRequest](docs/PauseRequest.md)
+ - [PauseResponse](docs/PauseResponse.md)
  - [Route](docs/Route.md)
  - [RoutesResponse](docs/RoutesResponse.md)
  - [StatusRequest](docs/StatusRequest.md)
@@ -134,9 +148,6 @@ Class | Method | HTTP request | Description
  - [Transact200ResponseStatusResponse](docs/Transact200ResponseStatusResponse.md)
  - [TransactDefaultResponse](docs/TransactDefaultResponse.md)
  - [TransactRequest](docs/TransactRequest.md)
- - [TransactRequestFromToken](docs/TransactRequestFromToken.md)
- - [TransactRequestFromTokenExtensions](docs/TransactRequestFromTokenExtensions.md)
- - [TransactRequestFromTokenExtensionsBridgeInfoValue](docs/TransactRequestFromTokenExtensionsBridgeInfoValue.md)
  - [TransactResponse](docs/TransactResponse.md)
 
 

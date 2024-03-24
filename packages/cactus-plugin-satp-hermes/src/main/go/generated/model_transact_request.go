@@ -21,31 +21,32 @@ var _ MappedNullable = &TransactRequest{}
 type TransactRequest struct {
 	// A unique identifier for the transaction context.
 	ContextID string `json:"contextID"`
-	// The network of the DLT being interacted with. TODO: implement network identification draft
-	FromDLTNetworkID string `json:"fromDLTNetworkID"`
-	// The amount in string format including all decimals.
-	FromAmount string `json:"fromAmount"`
-	FromToken TransactRequestFromToken `json:"fromToken"`
-	// The network of the DLT being interacted with. TODO: implement network identification draft
-	ToDLTNetworkID string `json:"toDLTNetworkID"`
-	// The amount in string format including all decimals.
-	ToAmount string `json:"toAmount"`
-	ToToken TransactRequestFromToken `json:"toToken"`
+	// The mode of transaction - 'data' for arbitrary payload or 'transfer' for asset transfer.
+	Mode string `json:"mode"`
+	// A string containing all transaction details required for processing in 'data' mode. Required if mode is 'data'.
+	Payload *string `json:"payload,omitempty"`
+	// The ID of the DLT Network from which the asset will be transferred. Required if mode is 'transfer'.
+	FromDLTNetworkID *string `json:"fromDLTNetworkID,omitempty"`
+	// The ID of the DLT Network to which the asset will be transferred. Required if mode is 'transfer'.
+	ToDLTNetworkID *string `json:"toDLTNetworkID,omitempty"`
+	// Required if mode is 'transfer'.
+	FromAmount *string `json:"fromAmount,omitempty"`
+	// Required if mode is 'transfer'.
+	FromToken *string `json:"fromToken,omitempty"`
+	// Required if mode is 'transfer'.
+	ToAmount *string `json:"toAmount,omitempty"`
+	// Required if mode is 'transfer'.
+	ToToken *string `json:"toToken,omitempty"`
 }
 
 // NewTransactRequest instantiates a new TransactRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransactRequest(contextID string, fromDLTNetworkID string, fromAmount string, fromToken TransactRequestFromToken, toDLTNetworkID string, toAmount string, toToken TransactRequestFromToken) *TransactRequest {
+func NewTransactRequest(contextID string, mode string) *TransactRequest {
 	this := TransactRequest{}
 	this.ContextID = contextID
-	this.FromDLTNetworkID = fromDLTNetworkID
-	this.FromAmount = fromAmount
-	this.FromToken = fromToken
-	this.ToDLTNetworkID = toDLTNetworkID
-	this.ToAmount = toAmount
-	this.ToToken = toToken
+	this.Mode = mode
 	return &this
 }
 
@@ -81,148 +82,252 @@ func (o *TransactRequest) SetContextID(v string) {
 	o.ContextID = v
 }
 
-// GetFromDLTNetworkID returns the FromDLTNetworkID field value
-func (o *TransactRequest) GetFromDLTNetworkID() string {
+// GetMode returns the Mode field value
+func (o *TransactRequest) GetMode() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.FromDLTNetworkID
+	return o.Mode
 }
 
-// GetFromDLTNetworkIDOk returns a tuple with the FromDLTNetworkID field value
+// GetModeOk returns a tuple with the Mode field value
+// and a boolean to check if the value has been set.
+func (o *TransactRequest) GetModeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Mode, true
+}
+
+// SetMode sets field value
+func (o *TransactRequest) SetMode(v string) {
+	o.Mode = v
+}
+
+// GetPayload returns the Payload field value if set, zero value otherwise.
+func (o *TransactRequest) GetPayload() string {
+	if o == nil || IsNil(o.Payload) {
+		var ret string
+		return ret
+	}
+	return *o.Payload
+}
+
+// GetPayloadOk returns a tuple with the Payload field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactRequest) GetPayloadOk() (*string, bool) {
+	if o == nil || IsNil(o.Payload) {
+		return nil, false
+	}
+	return o.Payload, true
+}
+
+// HasPayload returns a boolean if a field has been set.
+func (o *TransactRequest) HasPayload() bool {
+	if o != nil && !IsNil(o.Payload) {
+		return true
+	}
+
+	return false
+}
+
+// SetPayload gets a reference to the given string and assigns it to the Payload field.
+func (o *TransactRequest) SetPayload(v string) {
+	o.Payload = &v
+}
+
+// GetFromDLTNetworkID returns the FromDLTNetworkID field value if set, zero value otherwise.
+func (o *TransactRequest) GetFromDLTNetworkID() string {
+	if o == nil || IsNil(o.FromDLTNetworkID) {
+		var ret string
+		return ret
+	}
+	return *o.FromDLTNetworkID
+}
+
+// GetFromDLTNetworkIDOk returns a tuple with the FromDLTNetworkID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactRequest) GetFromDLTNetworkIDOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.FromDLTNetworkID) {
 		return nil, false
 	}
-	return &o.FromDLTNetworkID, true
+	return o.FromDLTNetworkID, true
 }
 
-// SetFromDLTNetworkID sets field value
+// HasFromDLTNetworkID returns a boolean if a field has been set.
+func (o *TransactRequest) HasFromDLTNetworkID() bool {
+	if o != nil && !IsNil(o.FromDLTNetworkID) {
+		return true
+	}
+
+	return false
+}
+
+// SetFromDLTNetworkID gets a reference to the given string and assigns it to the FromDLTNetworkID field.
 func (o *TransactRequest) SetFromDLTNetworkID(v string) {
-	o.FromDLTNetworkID = v
+	o.FromDLTNetworkID = &v
 }
 
-// GetFromAmount returns the FromAmount field value
-func (o *TransactRequest) GetFromAmount() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.FromAmount
-}
-
-// GetFromAmountOk returns a tuple with the FromAmount field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetFromAmountOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.FromAmount, true
-}
-
-// SetFromAmount sets field value
-func (o *TransactRequest) SetFromAmount(v string) {
-	o.FromAmount = v
-}
-
-// GetFromToken returns the FromToken field value
-func (o *TransactRequest) GetFromToken() TransactRequestFromToken {
-	if o == nil {
-		var ret TransactRequestFromToken
-		return ret
-	}
-
-	return o.FromToken
-}
-
-// GetFromTokenOk returns a tuple with the FromToken field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetFromTokenOk() (*TransactRequestFromToken, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.FromToken, true
-}
-
-// SetFromToken sets field value
-func (o *TransactRequest) SetFromToken(v TransactRequestFromToken) {
-	o.FromToken = v
-}
-
-// GetToDLTNetworkID returns the ToDLTNetworkID field value
+// GetToDLTNetworkID returns the ToDLTNetworkID field value if set, zero value otherwise.
 func (o *TransactRequest) GetToDLTNetworkID() string {
-	if o == nil {
+	if o == nil || IsNil(o.ToDLTNetworkID) {
 		var ret string
 		return ret
 	}
-
-	return o.ToDLTNetworkID
+	return *o.ToDLTNetworkID
 }
 
-// GetToDLTNetworkIDOk returns a tuple with the ToDLTNetworkID field value
+// GetToDLTNetworkIDOk returns a tuple with the ToDLTNetworkID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactRequest) GetToDLTNetworkIDOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.ToDLTNetworkID) {
 		return nil, false
 	}
-	return &o.ToDLTNetworkID, true
+	return o.ToDLTNetworkID, true
 }
 
-// SetToDLTNetworkID sets field value
+// HasToDLTNetworkID returns a boolean if a field has been set.
+func (o *TransactRequest) HasToDLTNetworkID() bool {
+	if o != nil && !IsNil(o.ToDLTNetworkID) {
+		return true
+	}
+
+	return false
+}
+
+// SetToDLTNetworkID gets a reference to the given string and assigns it to the ToDLTNetworkID field.
 func (o *TransactRequest) SetToDLTNetworkID(v string) {
-	o.ToDLTNetworkID = v
+	o.ToDLTNetworkID = &v
 }
 
-// GetToAmount returns the ToAmount field value
-func (o *TransactRequest) GetToAmount() string {
-	if o == nil {
+// GetFromAmount returns the FromAmount field value if set, zero value otherwise.
+func (o *TransactRequest) GetFromAmount() string {
+	if o == nil || IsNil(o.FromAmount) {
 		var ret string
 		return ret
 	}
-
-	return o.ToAmount
+	return *o.FromAmount
 }
 
-// GetToAmountOk returns a tuple with the ToAmount field value
+// GetFromAmountOk returns a tuple with the FromAmount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TransactRequest) GetToAmountOk() (*string, bool) {
-	if o == nil {
+func (o *TransactRequest) GetFromAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.FromAmount) {
 		return nil, false
 	}
-	return &o.ToAmount, true
+	return o.FromAmount, true
 }
 
-// SetToAmount sets field value
-func (o *TransactRequest) SetToAmount(v string) {
-	o.ToAmount = v
+// HasFromAmount returns a boolean if a field has been set.
+func (o *TransactRequest) HasFromAmount() bool {
+	if o != nil && !IsNil(o.FromAmount) {
+		return true
+	}
+
+	return false
 }
 
-// GetToToken returns the ToToken field value
-func (o *TransactRequest) GetToToken() TransactRequestFromToken {
-	if o == nil {
-		var ret TransactRequestFromToken
+// SetFromAmount gets a reference to the given string and assigns it to the FromAmount field.
+func (o *TransactRequest) SetFromAmount(v string) {
+	o.FromAmount = &v
+}
+
+// GetFromToken returns the FromToken field value if set, zero value otherwise.
+func (o *TransactRequest) GetFromToken() string {
+	if o == nil || IsNil(o.FromToken) {
+		var ret string
 		return ret
 	}
-
-	return o.ToToken
+	return *o.FromToken
 }
 
-// GetToTokenOk returns a tuple with the ToToken field value
+// GetFromTokenOk returns a tuple with the FromToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TransactRequest) GetToTokenOk() (*TransactRequestFromToken, bool) {
-	if o == nil {
+func (o *TransactRequest) GetFromTokenOk() (*string, bool) {
+	if o == nil || IsNil(o.FromToken) {
 		return nil, false
 	}
-	return &o.ToToken, true
+	return o.FromToken, true
 }
 
-// SetToToken sets field value
-func (o *TransactRequest) SetToToken(v TransactRequestFromToken) {
-	o.ToToken = v
+// HasFromToken returns a boolean if a field has been set.
+func (o *TransactRequest) HasFromToken() bool {
+	if o != nil && !IsNil(o.FromToken) {
+		return true
+	}
+
+	return false
+}
+
+// SetFromToken gets a reference to the given string and assigns it to the FromToken field.
+func (o *TransactRequest) SetFromToken(v string) {
+	o.FromToken = &v
+}
+
+// GetToAmount returns the ToAmount field value if set, zero value otherwise.
+func (o *TransactRequest) GetToAmount() string {
+	if o == nil || IsNil(o.ToAmount) {
+		var ret string
+		return ret
+	}
+	return *o.ToAmount
+}
+
+// GetToAmountOk returns a tuple with the ToAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactRequest) GetToAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.ToAmount) {
+		return nil, false
+	}
+	return o.ToAmount, true
+}
+
+// HasToAmount returns a boolean if a field has been set.
+func (o *TransactRequest) HasToAmount() bool {
+	if o != nil && !IsNil(o.ToAmount) {
+		return true
+	}
+
+	return false
+}
+
+// SetToAmount gets a reference to the given string and assigns it to the ToAmount field.
+func (o *TransactRequest) SetToAmount(v string) {
+	o.ToAmount = &v
+}
+
+// GetToToken returns the ToToken field value if set, zero value otherwise.
+func (o *TransactRequest) GetToToken() string {
+	if o == nil || IsNil(o.ToToken) {
+		var ret string
+		return ret
+	}
+	return *o.ToToken
+}
+
+// GetToTokenOk returns a tuple with the ToToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactRequest) GetToTokenOk() (*string, bool) {
+	if o == nil || IsNil(o.ToToken) {
+		return nil, false
+	}
+	return o.ToToken, true
+}
+
+// HasToToken returns a boolean if a field has been set.
+func (o *TransactRequest) HasToToken() bool {
+	if o != nil && !IsNil(o.ToToken) {
+		return true
+	}
+
+	return false
+}
+
+// SetToToken gets a reference to the given string and assigns it to the ToToken field.
+func (o *TransactRequest) SetToToken(v string) {
+	o.ToToken = &v
 }
 
 func (o TransactRequest) MarshalJSON() ([]byte, error) {
@@ -236,12 +341,28 @@ func (o TransactRequest) MarshalJSON() ([]byte, error) {
 func (o TransactRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["contextID"] = o.ContextID
-	toSerialize["fromDLTNetworkID"] = o.FromDLTNetworkID
-	toSerialize["fromAmount"] = o.FromAmount
-	toSerialize["fromToken"] = o.FromToken
-	toSerialize["toDLTNetworkID"] = o.ToDLTNetworkID
-	toSerialize["toAmount"] = o.ToAmount
-	toSerialize["toToken"] = o.ToToken
+	toSerialize["mode"] = o.Mode
+	if !IsNil(o.Payload) {
+		toSerialize["payload"] = o.Payload
+	}
+	if !IsNil(o.FromDLTNetworkID) {
+		toSerialize["fromDLTNetworkID"] = o.FromDLTNetworkID
+	}
+	if !IsNil(o.ToDLTNetworkID) {
+		toSerialize["toDLTNetworkID"] = o.ToDLTNetworkID
+	}
+	if !IsNil(o.FromAmount) {
+		toSerialize["fromAmount"] = o.FromAmount
+	}
+	if !IsNil(o.FromToken) {
+		toSerialize["fromToken"] = o.FromToken
+	}
+	if !IsNil(o.ToAmount) {
+		toSerialize["toAmount"] = o.ToAmount
+	}
+	if !IsNil(o.ToToken) {
+		toSerialize["toToken"] = o.ToToken
+	}
 	return toSerialize, nil
 }
 

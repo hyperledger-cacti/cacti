@@ -23,6 +23,20 @@ import (
 type AdminApi interface {
 
 	/*
+	CallContinue Continue a paused transaction session
+
+	Attempts to continue a previously paused transaction intent, resuming its execution.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCallContinueRequest
+	*/
+	CallContinue(ctx context.Context) ApiCallContinueRequest
+
+	// CallContinueExecute executes the request
+	//  @return Continue200Response
+	CallContinueExecute(r ApiCallContinueRequest) (*Continue200Response, *http.Response, error)
+
+	/*
 	GetAudit Audit transactions
 
 	Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
@@ -49,10 +63,142 @@ type AdminApi interface {
 	// GetStatusExecute executes the request
 	//  @return Transact200ResponseStatusResponse
 	GetStatusExecute(r ApiGetStatusRequest) (*Transact200ResponseStatusResponse, *http.Response, error)
+
+	/*
+	Pause Pause a transaction session
+
+	Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiPauseRequest
+	*/
+	Pause(ctx context.Context) ApiPauseRequest
+
+	// PauseExecute executes the request
+	//  @return Pause200Response
+	PauseExecute(r ApiPauseRequest) (*Pause200Response, *http.Response, error)
 }
 
 // AdminApiService AdminApi service
 type AdminApiService service
+
+type ApiCallContinueRequest struct {
+	ctx context.Context
+	ApiService AdminApi
+	continueRequest *ContinueRequest
+}
+
+func (r ApiCallContinueRequest) ContinueRequest(continueRequest ContinueRequest) ApiCallContinueRequest {
+	r.continueRequest = &continueRequest
+	return r
+}
+
+func (r ApiCallContinueRequest) Execute() (*Continue200Response, *http.Response, error) {
+	return r.ApiService.CallContinueExecute(r)
+}
+
+/*
+CallContinue Continue a paused transaction session
+
+Attempts to continue a previously paused transaction intent, resuming its execution.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCallContinueRequest
+*/
+func (a *AdminApiService) CallContinue(ctx context.Context) ApiCallContinueRequest {
+	return ApiCallContinueRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return Continue200Response
+func (a *AdminApiService) CallContinueExecute(r ApiCallContinueRequest) (*Continue200Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Continue200Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.CallContinue")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.continueRequest == nil {
+		return localVarReturnValue, nil, reportError("continueRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.continueRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+			var v TransactDefaultResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
 
 type ApiGetAuditRequest struct {
 	ctx context.Context
@@ -278,6 +424,124 @@ func (a *AdminApiService) GetStatusExecute(r ApiGetStatusRequest) (*Transact200R
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiPauseRequest struct {
+	ctx context.Context
+	ApiService AdminApi
+	pauseRequest *PauseRequest
+}
+
+func (r ApiPauseRequest) PauseRequest(pauseRequest PauseRequest) ApiPauseRequest {
+	r.pauseRequest = &pauseRequest
+	return r
+}
+
+func (r ApiPauseRequest) Execute() (*Pause200Response, *http.Response, error) {
+	return r.ApiService.PauseExecute(r)
+}
+
+/*
+Pause Pause a transaction session
+
+Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiPauseRequest
+*/
+func (a *AdminApiService) Pause(ctx context.Context) ApiPauseRequest {
+	return ApiPauseRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return Pause200Response
+func (a *AdminApiService) PauseExecute(r ApiPauseRequest) (*Pause200Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Pause200Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.Pause")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.pauseRequest == nil {
+		return localVarReturnValue, nil, reportError("pauseRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.pauseRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+			var v TransactDefaultResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
