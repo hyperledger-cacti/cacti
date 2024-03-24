@@ -112,5 +112,4 @@ model_transact_default_response.go
 model_transact_request.go
 model_transact_response.go
 response.go
-test/api_chains_test.go
 utils.go
