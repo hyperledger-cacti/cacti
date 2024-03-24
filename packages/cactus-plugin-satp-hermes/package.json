@@ -46,21 +46,21 @@
     "build": "run-p tsc codegen",
     "build-proto": "buf build --path src/main/proto --verbose",
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/knex && cp -r ./src/knex/* ./dist/lib/knex",
-    "bundle-openapi": "swagger-cli bundle ./src/main/json/bol/openapi-blo.json -o ./src/main/json/bol/openapi-blo-bundled.json -r",
+    "bundle-openapi": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "npm run generate-proto",
     "generate-proto": "cd src/main/proto && buf generate --template buf.gen.yaml --config buf.yaml --verbose",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios-bol": "yarn bundle-openapi && openapi-generator-cli generate -i ./src/main/json/bol/openapi-blo-bundled.json -g typescript-axios -o ./src/main/typescript/generated/openapi-blo/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
-    "generate-sdk:typescript-axios-gateway": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/bol/openapi-blo-bundled.json -g go -o ./src/main/go/generated --additional-properties=packageName=generated,generateInterfaces=true,packageVersion=v0.0.1",
+    "generate-sdk:typescript-axios-bol": "yarn bundle-openapi && openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/openapi-blo/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
+    "generate-sdk:typescript-axios-gateway": "openapi-generator-cli generate -i ./src/main/yml/openapi.yml -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g go -o ./src/main/go/generated --additional-properties=packageName=generated,generateInterfaces=true,packageVersion=v0.0.1",
     "lint": "run-p 'lint:*'",
     "lint:eslint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
-    "lint:oapi": "vacuum lint -d -e ./src/main/json/bol/openapi-blo-bundled.json",
+    "lint:oapi": "vacuum lint -d -e ./src/main/yml/bol/openapi-blo-bundled.yml",
     "lint:protobuf": "buf lint --path src/main/proto --verbose",
     "pretsc": "npm run generate-sdk",
-    "tsc": "tsc --project ./tsconfig.json",
+    "tsc": "tsc --project ./tsconfig.yml",
     "watch": "tsc --build --watch"
   },
   "jest": {
@@ -133,14 +133,14 @@
     "tsc": {
       "patterns": [
         "src/",
-        "src/*/json/**/openapi*"
+        "src/*/yml/**/*"
       ],
       "ignore": [
         "src/**/generated/*"
       ],
       "extensions": [
         "ts",
-        "json"
+        "yml"
       ],
       "quiet": true,
       "verbose": false,
