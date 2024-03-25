@@ -83,7 +83,7 @@
     "typescript-optional": "2.0.1",
     "uuid": "9.0.1",
     "web3-core": "1.5.2",
-    "web3-utils": "1.5.2"
+    "web3-utils": "4.2.1"
   },
   "devDependencies": {
     "@types/crypto-js": "4.1.1",
