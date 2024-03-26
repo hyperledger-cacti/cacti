@@ -110,12 +110,9 @@ message CommonSatp {
     string transfer_context_id = 4;
     uint64 sequence_number = 5;
     string resource_url = 6;
-    string developer_urn = 7;
     ActionResponse action_response = 8;
-    CredentialProfile credential_profile = 9;
     string credential_block = 10;
     PayloadProfile payload_profile = 11;
-    string application_profile = 12;
     Payload payload = 13;
     string payload_hash = 14;
     string signature = 15;

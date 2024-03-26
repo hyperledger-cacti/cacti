@@ -957,19 +957,9 @@ export class CommonSatp extends Message<CommonSatp> {
   resourceUrl = "";
 
   /**
-   * @generated from field: string developer_urn = 7;
-   */
-  developerUrn = "";
-
-  /**
    * @generated from field: cacti.satp.v02.common.ActionResponse action_response = 8;
    */
   actionResponse?: ActionResponse;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.CredentialProfile credential_profile = 9;
-   */
-  credentialProfile = CredentialProfile.UNSPECIFIED;
 
   /**
    * @generated from field: string credential_block = 10;
@@ -980,11 +970,6 @@ export class CommonSatp extends Message<CommonSatp> {
    * @generated from field: cacti.satp.v02.common.PayloadProfile payload_profile = 11;
    */
   payloadProfile?: PayloadProfile;
-
-  /**
-   * @generated from field: string application_profile = 12;
-   */
-  applicationProfile = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.Payload payload = 13;
@@ -1030,12 +1015,9 @@ export class CommonSatp extends Message<CommonSatp> {
     { no: 4, name: "transfer_context_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "sequence_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 6, name: "resource_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "developer_urn", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "action_response", kind: "message", T: ActionResponse },
-    { no: 9, name: "credential_profile", kind: "enum", T: proto3.getEnumType(CredentialProfile) },
     { no: 10, name: "credential_block", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 11, name: "payload_profile", kind: "message", T: PayloadProfile },
-    { no: 12, name: "application_profile", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "payload", kind: "message", T: Payload },
     { no: 14, name: "payload_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 15, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },

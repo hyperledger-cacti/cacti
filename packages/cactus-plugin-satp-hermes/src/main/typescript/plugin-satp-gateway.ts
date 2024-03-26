@@ -23,7 +23,6 @@ import {
 import {
   TransferInitializationV1Response,
   DefaultApi as SatpApi,
-  SessionData,
   ClientV1Request,
   TransferCommenceV1Request,
   TransferCommenceV1Response,
@@ -96,6 +95,7 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
+import { SessionData } from "./generated/proto/cacti/satp/v02/common/session_pb";
 
 export enum SatpMessageType {
   InitializationRequest = "urn:ietf:satp:msgtype:init-transfer-msg",
@@ -457,7 +457,7 @@ export abstract class PluginSATPGateway
       let amIBackup = false;
       if (
         this.pubKey != sessionData.sourceGatewayPubkey &&
-        this.pubKey != sessionData.recipientGatewayPubkey
+        this.pubKey != sessionData.serverIdentityPubkey
       ) {
         // this is a backup gateway -> for now we assume backup gateways only on the client side
         sessionData.sourceGatewayPubkey = this.pubKey;
