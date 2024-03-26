@@ -117,6 +117,38 @@ export interface GetPublicKeyResponse {
      */
     'pubKey'?: string;
 }
+/**
+ * Set of transaction or state proofs and merkle tree root for verification
+ * @export
+ * @interface VerifyMerkleRootRequest
+ */
+export interface VerifyMerkleRootRequest {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof VerifyMerkleRootRequest
+     */
+    'input'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof VerifyMerkleRootRequest
+     */
+    'root'?: string;
+}
+/**
+ * true or false, wether input matched provided root
+ * @export
+ * @interface VerifyMerkleRootResponse
+ */
+export interface VerifyMerkleRootResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof VerifyMerkleRootResponse
+     */
+    'result'?: boolean;
+}
 
 /**
  * DefaultApi - axios parameter creator
@@ -220,6 +252,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Checks validity of merkle tree root given an input
+         * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyMerkleRoot: async (verifyMerkleRootRequest: VerifyMerkleRootRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'verifyMerkleRootRequest' is not null or undefined
+            assertParamExists('verifyMerkleRoot', 'verifyMerkleRootRequest', verifyMerkleRootRequest)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(verifyMerkleRootRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -261,6 +329,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPublicKey(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @summary Checks validity of merkle tree root given an input
+         * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VerifyMerkleRootResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyMerkleRoot(verifyMerkleRootRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -298,6 +377,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getPublicKey(options?: any): AxiosPromise<GetPublicKeyResponse> {
             return localVarFp.getPublicKey(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Checks validity of merkle tree root given an input
+         * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: any): AxiosPromise<VerifyMerkleRootResponse> {
+            return localVarFp.verifyMerkleRoot(verifyMerkleRootRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -341,6 +430,18 @@ export class DefaultApi extends BaseAPI {
      */
     public getPublicKey(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPublicKey(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Checks validity of merkle tree root given an input
+     * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verifyMerkleRoot(verifyMerkleRootRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

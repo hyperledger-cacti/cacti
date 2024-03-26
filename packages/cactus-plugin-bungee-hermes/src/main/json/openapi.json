@@ -110,6 +110,34 @@
                     "type": "string",
                     "example": "strategy-fabric"
                 }
+            },
+            "VerifyMerkleRootRequest":{
+                "type": "object",
+                "description": "Set of transaction or state proofs and merkle tree root for verification",
+                "properties": {
+                    "input":{
+                        "nullable": false,
+                        "type": "array",
+                        "items":{
+                            "type": "string",
+                            "example": "transactionProof stringified"
+                        }
+                    },
+                    "root":{
+                        "nullable": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "VerifyMerkleRootResponse": {
+                "type": "object",
+                "description": "true or false, wether input matched provided root",
+                "properties": {
+                    "result":{
+                        "type": "boolean",
+                        "example": "true"
+                    }
+                }
             }
         }
     },
@@ -209,6 +237,48 @@
                                 "example": ["strategy-fabric"]
                             }
                            
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root"
+                    }
+                },
+                "operationId": "verifyMerkleRoot",
+                "summary": "Checks validity of merkle tree root given an input",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyMerkleRootRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyMerkleRootResponse"
+                                },
+                                "example": {"result": true}
+                            }
                         }
                     },
                     "404": {

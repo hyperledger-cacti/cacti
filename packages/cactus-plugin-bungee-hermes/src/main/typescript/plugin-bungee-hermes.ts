@@ -34,6 +34,8 @@ import {
 import { CreateViewEndpointV1 } from "./web-services/create-view-endpoint";
 import { GetPublicKeyEndpointV1 } from "./web-services/get-public-key-endpoint";
 import { GetAvailableStrategiesEndpointV1 } from "./web-services/get-available-strategies-endpoint";
+import MerkleTree from "merkletreejs";
+import { VerifyMerkleRootEndpointV1 } from "./web-services/verify-merkle-root-endpoint";
 
 export interface IKeyPair {
   publicKey: Uint8Array;
@@ -106,7 +108,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     if (this.strategies.get(strategyId) == undefined) {
       this.strategies.set(strategyId, strategy);
     } else {
-      throw Error("Strategy " + strategyId + " already exists.");
+      throw new Error("Strategy " + strategyId + " already exists.");
     }
   }
   public getStrategy(strategyId: string): ObtainLedgerStrategy | undefined {
@@ -151,11 +153,15 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     const availableStrategiesEndpoint = new GetAvailableStrategiesEndpointV1({
       bungee: this,
     });
+    const verifyMerkleProofEndpoint = new VerifyMerkleRootEndpointV1({
+      bungee: this,
+    });
 
     this.endpoints = [
       viewEndpoint,
       pubKeyEndpoint,
       availableStrategiesEndpoint,
+      verifyMerkleProofEndpoint,
     ];
     return this.endpoints;
   }
@@ -222,7 +228,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
   ): Promise<Snapshot> {
     const strategy = this.getStrategy(strategyId);
     if (strategy == undefined) {
-      throw Error("Strategy " + strategyId + " is undefined/unsupported");
+      throw new Error("Strategy " + strategyId + " is undefined/unsupported");
     }
 
     const ledgerStates = await strategy.generateLedgerStates(
@@ -246,5 +252,13 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     snapshot.update_TI_TF();
 
     return snapshot;
+  }
+
+  public verifyMerkleProof(input: string[], root: string): boolean {
+    const tree = new MerkleTree(input, undefined, {
+      sort: true,
+      hashLeaves: true,
+    });
+    return tree.getRoot().toString("hex") == root;
   }
 }
