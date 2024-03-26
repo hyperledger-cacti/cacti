@@ -7747,16 +7747,19 @@ __metadata:
     "@types/express": "npm:4.17.19"
     "@types/fs-extra": "npm:9.0.13"
     "@types/json-stable-stringify": "npm:1.0.34"
+    "@types/qs": "npm:6.9.14"
     "@types/uuid": "npm:9.0.8"
     async-exit-hook: "npm:2.0.1"
     express-jwt: "npm:8.4.1"
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:10.1.0"
     hardhat: "npm:2.17.2"
+    http-cache-semantics: "npm:4.1.1"
     http-status-codes: "npm:2.1.4"
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.2"
     openapi-types: "npm:12.1.3"
+    qs: "npm:6.7.3"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:9.0.1"
     web3-core: "npm:1.6.1"
@@ -15377,6 +15380,13 @@ __metadata:
   version: 6.9.7
   resolution: "@types/qs@npm:6.9.7"
   checksum: 10/7fd6f9c25053e9b5bb6bc9f9f76c1d89e6c04f7707a7ba0e44cc01f17ef5284adb82f230f542c2d5557d69407c9a40f0f3515e8319afd14e1e16b5543ac6cdba
+  languageName: node
+  linkType: hard
+
+"@types/qs@npm:6.9.14":
+  version: 6.9.14
+  resolution: "@types/qs@npm:6.9.14"
+  checksum: 10/d3b76021d36b86c0063ec4b7373e9fa470754914e486fbfe54b3a8866dad037800a2c2068ecbcaa9399ae3ed15772a26b07e67793ed2519cf2de199104014716
   languageName: node
   linkType: hard
 
@@ -41969,6 +41979,13 @@ __metadata:
   version: 6.7.0
   resolution: "qs@npm:6.7.0"
   checksum: 10/d8f4b216c6777853c17586dc17fa685fb4e14269dbf6e860add6c0c61fd12137dc7aa4bf5066a794ba9a8dbb9c11e9ef20b72db763228701be95546ea807213a
+  languageName: node
+  linkType: hard
+
+"qs@npm:6.7.3":
+  version: 6.7.3
+  resolution: "qs@npm:6.7.3"
+  checksum: 10/b299d27f4ac4e47511dc15ff5650bd7a1c07cfbe514190a479b0b3a0d5b401198ff6910371b473e70fbde8e114f1bcba9c64ea52a147053e3b0b554aeb5a41ad
   languageName: node
   linkType: hard
 
