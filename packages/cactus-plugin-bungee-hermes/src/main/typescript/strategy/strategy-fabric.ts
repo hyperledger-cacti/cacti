@@ -7,6 +7,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { NetworkDetails, ObtainLedgerStrategy } from "./obtain-ledger-strategy";
 import {
+  Checks,
   LogLevelDesc,
   Logger,
   LoggerProvider,
@@ -38,7 +39,9 @@ export class StrategyFabric implements ObtainLedgerStrategy {
     stateIds: string[],
     networkDetails: FabricNetworkDetails,
   ): Promise<Map<string, State>> {
-    this.log.info(`Generating ledger snapshot`);
+    const fnTag = `${StrategyFabric.CLASS_NAME}#generateLedgerStates()`;
+    this.log.debug(`Generating ledger snapshot`);
+    Checks.truthy(networkDetails, `${fnTag} networkDetails`);
 
     const config = new Configuration({
       basePath: networkDetails.connectorApiPath,
@@ -57,6 +60,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
 
       const txs = await this.getAllTxByKey(assetKey, fabricApi, networkDetails);
       //For each tx get receipt
+      let last_receipt;
       for (const tx of txs) {
         const receipt = JSON.parse(
           await this.fabricGetTxReceiptByTxIDV1(
@@ -65,11 +69,15 @@ export class StrategyFabric implements ObtainLedgerStrategy {
             networkDetails,
           ),
         );
-
+        tx.getProof().setCreator(
+          new Proof({
+            creator: receipt.transactionCreator.creatorID,
+            mspid: receipt.transactionCreator.mspid,
+          }),
+        );
         assetValues.push(JSON.parse(receipt.rwsetWriteData).Value.toString());
         tx.setStateId(assetKey);
-        //tx.setPayload(); //FIXME check what to assign here
-        //tx.setTarget();
+        tx.setTarget(receipt.channelID + ": " + receipt.chainCodeName);
 
         for (const endorsement of receipt.transactionEndorsement) {
           const signature64 = Buffer.from(endorsement.signature).toString(
@@ -84,13 +92,13 @@ export class StrategyFabric implements ObtainLedgerStrategy {
           );
         }
         txWithTimeS.push(tx);
+        last_receipt = receipt;
       }
       const block = await this.fabricGetBlockByTxID(
         txs[txs.length - 1].getId(),
         fabricApi,
         networkDetails,
       );
-
       const state = new State(assetKey, assetValues, txWithTimeS);
       ledgerStates.set(assetKey, state);
       const stateProof = new StateProof(
@@ -101,9 +109,14 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       //only adding last block for each state, in the state proof
       stateProof.addBlock({
         blockHash: block.hash,
-        blockCreator: "",
+        blockCreator: JSON.stringify({
+          mspid: last_receipt.blockMetaData.mspid,
+          id: last_receipt.blockMetaData.blockCreatorID,
+        }),
         blockSigners: block.signers,
       });
+
+      state.setStateProof([stateProof]);
     }
     return ledgerStates;
   }
@@ -121,25 +134,38 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       methodName: "GetBlockByTxID",
       params: [networkDetails.channelName, transactionId],
     } as RunTransactionRequest);
-    return JSON.stringify(receiptLockRes?.data);
+
+    if (receiptLockRes.status >= 200 && receiptLockRes.status < 300) {
+      if (receiptLockRes.data) {
+        return JSON.stringify(receiptLockRes.data);
+      } else {
+        throw new Error(
+          `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1: contract qscc method GetBlockByTxID invocation output is falsy`,
+        );
+      }
+    }
+    throw new Error(
+      `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1: FabricAPI error with status 500: ` +
+        receiptLockRes.data,
+    );
   }
 
   async fabricGetBlockByTxID(
     txId: string,
     api: FabricApi,
-    netwokDetails: FabricNetworkDetails,
+    networkDetails: FabricNetworkDetails,
   ): Promise<{ hash: string; signers: string[] }> {
     const gatewayOptions = {
-      identity: netwokDetails.signingCredential.keychainRef,
+      identity: networkDetails.signingCredential.keychainRef,
       wallet: {
         keychain: {
-          keychainId: netwokDetails.signingCredential.keychainId,
-          keychainRef: netwokDetails.signingCredential.keychainRef,
+          keychainId: networkDetails.signingCredential.keychainId,
+          keychainRef: networkDetails.signingCredential.keychainRef,
         },
       },
     };
     const getBlockReq = {
-      channelName: netwokDetails.channelName as string,
+      channelName: networkDetails.channelName as string,
       gatewayOptions,
       query: {
         transactionId: txId,
@@ -149,6 +175,18 @@ export class StrategyFabric implements ObtainLedgerStrategy {
 
     const getBlockResponse = await api.getBlockV1(getBlockReq);
 
+    if (getBlockResponse.status < 200 || getBlockResponse.status >= 300) {
+      throw new Error(
+        `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1: FabricAPI getBlockV1 error with status ${getBlockResponse.status}: ` +
+          getBlockResponse.data,
+      );
+    }
+    if (!getBlockResponse.data) {
+      throw new Error(
+        `${StrategyFabric.CLASS_NAME}#fabricGetBlockByTxID: getBlockV1 API call output data is falsy`,
+      );
+    }
+
     const block = JSON.parse(
       JSON.stringify(getBlockResponse?.data),
     ).decodedBlock;
@@ -156,9 +194,17 @@ export class StrategyFabric implements ObtainLedgerStrategy {
     const blockSig = block.metadata.metadata[0].signatures;
     const sigs = [];
     for (const sig of blockSig) {
-      sigs.push(JSON.stringify(sig));
+      const decoded = {
+        creator: {
+          mspid: sig.signature_header.creator.mspid,
+          id: Buffer.from(sig.signature_header.creator.id_bytes.data).toString(
+            "hex",
+          ),
+        },
+        signature: Buffer.from(sig.signature.data).toString("hex"),
+      };
+      sigs.push(JSON.stringify(decoded));
     }
-
     return {
       hash: Buffer.from(block.header.data_hash.data).toString("hex"),
       signers: sigs,
@@ -167,43 +213,59 @@ export class StrategyFabric implements ObtainLedgerStrategy {
 
   async getAllAssetsKey(
     api: FabricApi,
-    netwokDetails: FabricNetworkDetails,
+    networkDetails: FabricNetworkDetails,
   ): Promise<string> {
     const response = await api.runTransactionV1({
-      signingCredential: netwokDetails.signingCredential,
-      channelName: netwokDetails.channelName,
-      contractName: netwokDetails.contractName,
+      signingCredential: networkDetails.signingCredential,
+      channelName: networkDetails.channelName,
+      contractName: networkDetails.contractName,
       methodName: "GetAllAssetsKey",
       invocationType: FabricContractInvocationType.Call,
       params: [],
     } as RunTransactionRequest);
 
-    if (response != undefined) {
-      return response.data.functionOutput;
+    if (response.status >= 200 && response.status < 300) {
+      if (response.data.functionOutput) {
+        return response.data.functionOutput;
+      } else {
+        throw new Error(
+          `${StrategyFabric.CLASS_NAME}#getAllAssetsKey: contract ${networkDetails.contractName} method GetAllAssetsKey invocation output is falsy`,
+        );
+      }
     }
-
-    return "response undefined";
+    throw new Error(
+      `${StrategyFabric.CLASS_NAME}#getAllAssetsKey: FabricAPI error with status 500: ` +
+        response.data,
+    );
   }
 
   async getAllTxByKey(
     key: string,
     api: FabricApi,
-    netwokDetails: FabricNetworkDetails,
+    networkDetails: FabricNetworkDetails,
   ): Promise<Transaction[]> {
     const response = await api.runTransactionV1({
-      signingCredential: netwokDetails.signingCredential,
-      channelName: netwokDetails.channelName,
-      contractName: netwokDetails.contractName,
+      signingCredential: networkDetails.signingCredential,
+      channelName: networkDetails.channelName,
+      contractName: networkDetails.contractName,
       methodName: "GetAllTxByKey",
       invocationType: FabricContractInvocationType.Call,
       params: [key],
     } as RunTransactionRequest);
 
-    if (response != undefined) {
-      return this.txsStringToTxs(response.data.functionOutput);
+    if (response.status >= 200 && response.status < 300) {
+      if (response.data.functionOutput) {
+        return this.txsStringToTxs(response.data.functionOutput);
+      } else {
+        throw new Error(
+          `${StrategyFabric.CLASS_NAME}#getAllTxByKey: contract ${networkDetails.contractName} method GetAllTxByKey invocation output is falsy`,
+        );
+      }
     }
-
-    return [];
+    throw new Error(
+      `${StrategyFabric.CLASS_NAME}#getAllTxByKey: FabricAPI error with status 500: ` +
+        response.data,
+    );
   }
 
   // Receive transactions in string format and parses to Transaction []
@@ -213,13 +275,13 @@ export class StrategyFabric implements ObtainLedgerStrategy {
     for (const tx of txs) {
       const txId = tx.value.txId;
       const ts = tx.value.timestamp.seconds;
-      transactions.push(
-        new Transaction(
-          txId,
-          ts,
-          new TransactionProof(new Proof({ creator: "" })),
-        ),
+      const transaction = new Transaction(
+        txId,
+        ts,
+        new TransactionProof(new Proof({ creator: "" }), txId), //transaction proof details are set in function 'generateLedgerStates'
       );
+      transaction.setPayload(JSON.stringify(tx.value));
+      transactions.push(transaction);
     }
     return transactions.reverse();
   }

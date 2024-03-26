@@ -6,9 +6,10 @@ export class TransactionProof {
   //set of signed endorsements
   //only existent for some ledgers (example Fabric)
   private endorsements?: Proof[] = [];
-
-  constructor(transactionCreator: Proof) {
+  private hash: string;
+  constructor(transactionCreator: Proof, hash: string) {
     this.transactionCreator = transactionCreator;
+    this.hash = hash;
   }
 
   public addEndorser(endorser: Proof) {
@@ -31,6 +32,9 @@ export class TransactionProof {
 
   public getCreator(): Proof {
     return this.transactionCreator;
+  }
+  public setCreator(transactionCreator: Proof) {
+    this.transactionCreator = transactionCreator;
   }
 
   public getEndorsements(): Proof[] | undefined {

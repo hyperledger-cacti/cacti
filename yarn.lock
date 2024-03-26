@@ -8225,8 +8225,9 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.0.0-alpha.2"
-    "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.0.0-alpha.2"
+    "@hyperledger/cactus-test-geth-ledger": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-alpha.2"
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
@@ -8240,6 +8241,7 @@ __metadata:
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:10.1.0"
     key-encoder: "npm:2.0.3"
+    merkletreejs: "npm:0.3.11"
     socket.io: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:9.0.1"
@@ -19531,6 +19533,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer-reverse@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "buffer-reverse@npm:1.0.1"
+  checksum: 10/e350872a89b17af0a7e1bd7a73239a535164f3f010b0800add44f2e52bd0511548dc5b96c20309effba969868c385023d2d02a0add6155f6a76da7b3073b77bd
+  languageName: node
+  linkType: hard
+
 "buffer-to-arraybuffer@npm:^0.0.5":
   version: 0.0.5
   resolution: "buffer-to-arraybuffer@npm:0.0.5"
@@ -22126,7 +22135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:4.2.0":
+"crypto-js@npm:4.2.0, crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: 10/c7bcc56a6e01c3c397e95aa4a74e4241321f04677f9a618a8f48a63b5781617248afb9adb0629824792e7ec20ca0d4241a49b6b2938ae6f973ec4efc5c53c924
@@ -36295,6 +36304,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"merkletreejs@npm:0.3.11":
+  version: 0.3.11
+  resolution: "merkletreejs@npm:0.3.11"
+  dependencies:
+    bignumber.js: "npm:^9.0.1"
+    buffer-reverse: "npm:^1.0.1"
+    crypto-js: "npm:^4.2.0"
+    treeify: "npm:^1.1.0"
+    web3-utils: "npm:^1.3.4"
+  checksum: 10/a93520ef768648d1e4ebd175182bd3d304270b8eb0700df5be99395fb3ad8805407bdaf3231d13b1649e87de799aa06d71c616db047ad039025764eb23b02244
+  languageName: node
+  linkType: hard
+
 "methods@npm:^1.1.2, methods@npm:~1.1.2":
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
@@ -48076,6 +48098,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"treeify@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "treeify@npm:1.1.0"
+  checksum: 10/5241976a751168fb9894a12d031299f1f6337b7f2cbd3eff22ee86e6777620352a69a1cab0d4709251317ff307eeda0dc45918850974fc44f4c7fc50e623b990
+  languageName: node
+  linkType: hard
+
 "treeverse@npm:^3.0.0":
   version: 3.0.0
   resolution: "treeverse@npm:3.0.0"
@@ -52163,6 +52192,22 @@ __metadata:
     web3-types: "npm:^1.5.0"
     web3-validator: "npm:^2.0.4"
   checksum: 10/1b9ab1d4f5b1cfb820ad9b72d6362ed553b19a94555cf52a25064079c8b00d398c6c311dcba787cde6a6ccf68ff36103eb808190451d7d6fe2d545111bac57bb
+  languageName: node
+  linkType: hard
+
+"web3-utils@npm:^1.3.4":
+  version: 1.10.4
+  resolution: "web3-utils@npm:1.10.4"
+  dependencies:
+    "@ethereumjs/util": "npm:^8.1.0"
+    bn.js: "npm:^5.2.1"
+    ethereum-bloom-filters: "npm:^1.0.6"
+    ethereum-cryptography: "npm:^2.1.2"
+    ethjs-unit: "npm:0.1.6"
+    number-to-bn: "npm:1.7.0"
+    randombytes: "npm:^2.1.0"
+    utf8: "npm:3.0.0"
+  checksum: 10/3e586b638cdae9fa45b7698e8a511ae2cbf60e219a900351ae38d384beaaf67424ac6e1d9c5098c3fb8f2ff3cc65a70d977a20bdce3dad542cb50deb666ea2a3
   languageName: node
   linkType: hard
 

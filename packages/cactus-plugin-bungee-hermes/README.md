@@ -36,13 +36,14 @@ Know how to use the following plugins of the project:
 
   - [cactus-plugin-ledger-connector-fabric](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric)
   - [cactus-plugin-ledger-connector-besu](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu)
+  - [cactus-plugin-ledger-connector-ethereum](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-ethereum)
 
 
 ## Architecture
 
 The plugin interacts with a cactus ledger connector, using strategies with custom logic for each different network.
 
-Note that, so far, only strategies for Fabric and Besu networks were implemented. Smart-contracts in Fabric and Besu must implement the interface provided in the files ITraceableContract.ts and ITraceableContract.sol, in the test directory 
+Note that, so far, only strategies for Fabric, Besu and Ethereum networks were implemented. Smart-contracts for Fabric and EVM based chains must implement the interface provided in the files ITraceableContract.ts and ITraceableContract.sol, in the test directory 
 
 The plugin stands _behind_ a cacti-ledger-connector, which is used to fetch information from the ledger to create the snapshot.
 ```typescript
@@ -70,10 +71,12 @@ Endpoints exposed:
   - CreateViewV1
   - GetPublicKey
   - GetAvailableStrategies
+  - VerifyMerkleRoot
 
 
 ## Running the tests
   - **besu-test-basic.test.ts**: A test using strategy-besu and a besu connector, testing creating views for different timeframes and states.
+  - **ethereum-test-basic.test.ts**: A test using strategy-ethereum and a ethereum connector, testing creating views for different timeframes and states.
   - **fabric-test-basic.test.ts**: A test using strategy-fabric and a fabric connector, testing creating views for different timeframes and states.
   - **besu-test-pruning.test.ts**: A test using strategy-besu and a besu connector, testing creating views for specific timeframes.
   - **fabric-test-pruning.test.ts**: A test using strategy-fabric and a fabric connector, testing creating views for specific timeframes.
@@ -147,6 +150,34 @@ const viewBesu = await bungeeApi.createViewV1({
 
 Note that each strategy can be used to query different ledgers (ledgers of the same type, but on different locations), and BUNGEE also supports adding multiple strategies to each bungee-hermes-plugin instance.
 Each strategy implements the logic to query information from each different ledger (i.e. capture set of asset states), while bungee-hermes plugin handles the snapshot and view creation.
+
+
+'View' object contains a 'viewProof'. viewProof is composed by two merkle trees, one for stateProofs and another for transactionProofs.
+One can check if the content of a view has no inconsistencies, by querying the VerifyMerkleRoot endpoint with the appropriate input:
+
+```typescript
+  //using a previously created View object
+
+  const stateProofs = view?.getSnapshot()
+    .getStateBins()
+    .map((x) => JSON.stringify(x.getStateProof()));
+  const transactionProofs: string[] = [];
+  view?
+    .getAllTransactions()
+            .forEach((t) => transactionProofs.push(JSON.stringify(t.getProof())));
+
+  const verifyStateRoot = await bungeeApi.verifyMerkleRoot({
+    input: stateProofs?.reverse(), //check integrity, order should not matter
+    root: proof?.statesMerkleRoot,
+  });
+  expect(verifyStateRoot.data.result).toBeTrue();
+
+  const verifyTransactionsRoot = await bungeeApi.verifyMerkleRoot({
+    input: transactionProofs?.reverse(), //check integrity, order should not matter
+    root: proof?.transactionsMerkleRoot,
+  });
+  expect(verifyTransactionsRoot.data.result).toBeTrue();
+```
 
 
 

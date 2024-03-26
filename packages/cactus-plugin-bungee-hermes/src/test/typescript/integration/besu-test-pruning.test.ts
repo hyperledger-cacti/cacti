@@ -48,7 +48,6 @@ const logLevel: LogLevelDesc = "INFO";
 
 let besuLedger: BesuTestLedger;
 let contractName: string;
-//let besuServer: Server;
 
 let rpcApiHttpHost: string;
 let rpcApiWsHost: string;
