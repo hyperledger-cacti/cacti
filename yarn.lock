@@ -35443,6 +35443,42 @@ __metadata:
   languageName: node
   linkType: hard
 
+"merge@npm:^1.2.0":
+  version: 1.2.1
+  resolution: "merge@npm:1.2.1"
+  checksum: 10/2298c4fdcf64561f320b92338681f7ffcafafb579a6e294066ae3e7bd10ae25df363903d2f028072733b9f79a1f75d2b999aef98ad5d73de13641da39cda0913
+  languageName: node
+  linkType: hard
+
+"merkle-patricia-tree@npm:^2.1.2, merkle-patricia-tree@npm:^2.3.2":
+  version: 2.3.2
+  resolution: "merkle-patricia-tree@npm:2.3.2"
+  dependencies:
+    async: "npm:^1.4.2"
+    ethereumjs-util: "npm:^5.0.0"
+    level-ws: "npm:0.0.0"
+    levelup: "npm:^1.2.1"
+    memdown: "npm:^1.0.0"
+    readable-stream: "npm:^2.0.0"
+    rlp: "npm:^2.0.0"
+    semaphore: "npm:>=1.0.1"
+  checksum: 10/4188bd5b163719bd9c5da45ba356fac753a0f0ac0b9990923b5f064852e083334abd5e4d838dcd35ee50d884dad5c52adbd103387c89d20be3ec47b51784946a
+  languageName: node
+  linkType: hard
+
+"merkletreejs@npm:0.3.11":
+  version: 0.3.11
+  resolution: "merkletreejs@npm:0.3.11"
+  dependencies:
+    bignumber.js: "npm:^9.0.1"
+    buffer-reverse: "npm:^1.0.1"
+    crypto-js: "npm:^4.2.0"
+    treeify: "npm:^1.1.0"
+    web3-utils: "npm:^1.3.4"
+  checksum: 10/a93520ef768648d1e4ebd175182bd3d304270b8eb0700df5be99395fb3ad8805407bdaf3231d13b1649e87de799aa06d71c616db047ad039025764eb23b02244
+  languageName: node
+  linkType: hard
+
 "methods@npm:^1.1.2, methods@npm:~1.1.2":
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
@@ -50558,19 +50594,6 @@ __metadata:
     randombytes: "npm:^2.1.0"
     utf8: "npm:3.0.0"
   checksum: 10/3e586b638cdae9fa45b7698e8a511ae2cbf60e219a900351ae38d384beaaf67424ac6e1d9c5098c3fb8f2ff3cc65a70d977a20bdce3dad542cb50deb666ea2a3
-  languageName: node
-  linkType: hard
-
-"web3-utils@npm:^4.0.3, web3-utils@npm:^4.2.3":
-  version: 4.2.3
-  resolution: "web3-utils@npm:4.2.3"
-  dependencies:
-    ethereum-cryptography: "npm:^2.0.0"
-    eventemitter3: "npm:^5.0.1"
-    web3-errors: "npm:^1.1.4"
-    web3-types: "npm:^1.6.0"
-    web3-validator: "npm:^2.0.5"
-  checksum: 10/2a1a696ddd8f4318048913fd75af0f11599fa03ff731aeed72d1c7bc6577c99317bdc3529844e7ff1a74b18ec99a5e08f5695537f0d56f44e707477014ea2a11
   languageName: node
   linkType: hard
 
