@@ -40,6 +40,7 @@ import {
   RecoverUpdateAckV1Message,
   RollbackV1Message,
   RollbackAckV1Message,
+  SessionData
 } from "./generated/openapi/typescript-axios";
 import { CommitFinalRequestEndpointV1 } from "./web-services/server-side/commit-final-request-endpoint";
 import { CommitFinalResponseEndpointV1 } from "./web-services/client-side/commit-final-response-endpoint";
@@ -95,7 +96,6 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
-import { SessionData } from "./generated/proto/cacti/satp/v02/common/session_pb";
 
 export enum SatpMessageType {
   InitializationRequest = "urn:ietf:satp:msgtype:init-transfer-msg",
@@ -457,7 +457,7 @@ export abstract class PluginSATPGateway
       let amIBackup = false;
       if (
         this.pubKey != sessionData.sourceGatewayPubkey &&
-        this.pubKey != sessionData.serverIdentityPubkey
+        this.pubKey != sessionData.recipientGatewayPubkey
       ) {
         // this is a backup gateway -> for now we assume backup gateways only on the client side
         sessionData.sourceGatewayPubkey = this.pubKey;

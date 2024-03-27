@@ -102,14 +102,14 @@ export class SessionData extends Message<SessionData> {
   recipientLedgerAssetId = "";
 
   /**
-   * @generated from field: string server_identity_pubkey = 19;
+   * @generated from field: string server_gateway_pubkey = 19;
    */
-  serverIdentityPubkey = "";
+  serverGatewayPubkey = "";
 
   /**
-   * @generated from field: string client_identity_pubkey = 20;
+   * @generated from field: string client_gateway_pubkey = 20;
    */
-  clientIdentityPubkey = "";
+  clientGatewayPubkey = "";
 
   /**
    * @generated from field: string verified_originator_entity_id = 21;
@@ -247,8 +247,8 @@ export class SessionData extends Message<SessionData> {
     { no: 16, name: "recipient_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 17, name: "source_ledger_asset_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 18, name: "recipient_ledger_asset_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 19, name: "server_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 20, name: "client_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 19, name: "server_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "client_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 21, name: "verified_originator_entity_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 22, name: "verified_beneficiary_entity_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 23, name: "asset_profile_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },

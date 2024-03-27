@@ -26,8 +26,8 @@ message SessionData {
     string recipient_gateway_network_id = 16;
     string source_ledger_asset_id = 17; 
     string recipient_ledger_asset_id = 18;
-    string server_identity_pubkey = 19;
-    string client_identity_pubkey = 20;
+    string server_gateway_pubkey = 19;
+    string client_gateway_pubkey = 20;
     string verified_originator_entity_id = 21; 
     string verified_beneficiary_entity_id = 22;
     string asset_profile_id = 23;
