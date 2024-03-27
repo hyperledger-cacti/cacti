@@ -50,10 +50,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.7
 
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v3.11.0
         with:
-          java-version: '8'
+          java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Go
@@ -85,9 +85,7 @@ jobs:
         working-directory: weaver/tests/network-setups/corda
 
       - name: Start Corda Network
-        run: |
-          sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
-          make start &> corda-net.out &
+        run: make start &> corda-net.out &
         working-directory: weaver/tests/network-setups/corda
 
       # FABRIC NETWORK
@@ -244,11 +242,11 @@ jobs:
           # CORDA2-CORDA
 
           NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C 1> tmp.out
-          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-state C 1> tmp.out
-          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           # CORDA - FABRIC1
@@ -340,11 +338,11 @@ jobs:
           cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true &> tmp.out
-          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
 
@@ -409,7 +407,17 @@ jobs:
   data-sharing-docker-local:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true'
-    # if: ${{ false }}
+    env:
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      CONFIGURE_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: true
+      FULL_BUILD_DISABLED: true
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -426,10 +434,10 @@ jobs:
               - './weaver/**'
               - '.github/workflows/test_weaver-data-sharing.yaml'
 
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v3.11.0
         with:
-          java-version: '8'
+          java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Go
@@ -446,8 +454,12 @@ jobs:
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          rm -rf protoc-3.15.6-linux-x86_64.zip
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: CI script for cleanup
+        run: ./tools/ci.sh
 
       # PROTOS
       - name: Build GO Protos
@@ -505,9 +517,7 @@ jobs:
         working-directory: weaver/core/identity-management/iin-agent
 
       - name: Start Corda Network
-        run: |
-          sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
-          make start-local &> corda-net.out &
+        run: make start-local &> corda-net.out &
         working-directory: weaver/tests/network-setups/corda
 
       # FABRIC NETWORK
@@ -669,11 +679,11 @@ jobs:
           # CORDA2-CORDA
 
           NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state --wkey=C localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C 1> tmp.out
-          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-state C 1> tmp.out
-          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           # CORDA - FABRIC1
@@ -765,11 +775,11 @@ jobs:
           cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true &> tmp.out
-          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
 
@@ -851,10 +861,10 @@ jobs:
               - './weaver/**'
               - '.github/workflows/test_weaver-data-sharing.yaml'
 
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v3.11.0
         with:
-          java-version: '8'
+          java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Go
@@ -945,9 +955,7 @@ jobs:
 
       # CORDA NETWORK
       - name: Start Corda Network
-        run: |
-          sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
-          make start-local &> corda-net.out &
+        run: make start-local &> corda-net.out &
         working-directory: weaver/tests/network-setups/corda
 
       # FABRIC NETWORK
@@ -1097,11 +1105,11 @@ jobs:
           # CORDA2-CORDA
 
           NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state --wkey=C localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C 1> tmp.out
-          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-state C 1> tmp.out
-          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           # CORDA - FABRIC1
@@ -1193,11 +1201,11 @@ jobs:
           cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true --debug=true &> tmp.out
-          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=6" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
 

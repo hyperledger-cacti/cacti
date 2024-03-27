@@ -1,3 +1,6 @@
+import static org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+
 buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
@@ -5,8 +8,8 @@ buildscript {
     ext {
         kotlin_version = constants.getProperty("kotlinVersion")
         coroutines_version = constants.getProperty("coroutinesVersion")
-        protobuf_version = constants.getProperty("protobufVersion")
         bcprov_version = constants.getProperty("bcprovVersion")
+        bcprov_name = constants.getProperty("bcprovName")
         grpc_version = constants.getProperty("grpcVersion") // CURRENT_GRPC_VERSION
         grpc_kotlin_version = constants.getProperty("grpcKotlinVersion") // CURRENT_GRPC_KOTLIN_VERSION
         corda_release_group = constants.getProperty("cordaReleaseGroup")
@@ -14,7 +17,6 @@ buildscript {
         corda_version = constants.getProperty("cordaVersion")
         corda_core_version = constants.getProperty("cordaVersion")
         arrow_version = constants.getProperty("arrowVersion")
-        corda_gradle_plugins_version = constants.getProperty("gradlePluginsVersion")
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
         cacti_version = constants.getProperty("cactiVersion")
@@ -66,24 +68,29 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile 'com.google.code.gson:gson:2.8.6'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     // Corda dependencies.
-    compile "$corda_release_group:corda-rpc:$corda_version"
+    implementation "$corda_core_release_group:corda-core:$corda_core_version"
+    implementation "$corda_release_group:corda-node-api:$corda_version"
+    implementation "$corda_release_group:corda:$corda_version"
+    implementation "$corda_release_group:corda-rpc:$corda_version"
 
     implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
     implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "$cacti_version")
     implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "$cacti_version")
 
-    // gRPC and protobuf dependencies
+    // gRPC dependencies
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
     implementation "io.grpc:grpc-netty-shaded:$grpc_version"
     implementation "io.grpc:grpc-stub:$grpc_version"
     implementation "io.grpc:grpc-okhttp:$grpc_version"
-    implementation "org.bouncycastle:bcprov-jdk15on:$bcprov_version"
+    implementation "io.grpc:grpc-protobuf:$grpc_version"
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
+    implementation "org.bouncycastle:$bcprov_name:$bcprov_version"
     implementation group: 'org.json', name: 'json', version: '20190722'
     
     // Logger dependencies
@@ -96,12 +103,22 @@ dependencies {
 
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-    kotlinOptions {
-        languageVersion = "1.3"
-        apiVersion = "1.3"
-        jvmTarget = "1.8"
+    compilerOptions {
+        languageVersion = KOTLIN_1_9
+        apiVersion = KOTLIN_1_9
+        jvmTarget = JVM_17
         javaParameters = true
     }
+}
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
 }
 
 dokka {

@@ -10,7 +10,6 @@ import co.paralleluniverse.fibers.Suspendable
 import com.cordaSimpleApplication.state.BondAssetState
 import com.cordaSimpleApplication.state.BondAssetStateJSON
 import com.cordaSimpleApplication.contract.BondAssetContract
-import javassist.NotFoundException
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
@@ -27,7 +26,6 @@ import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 import net.corda.core.contracts.requireThat
-import sun.security.x509.UniqueIdentity
 import java.util.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -174,7 +172,7 @@ class DeleteBondAssetState(val linearId: String) : FlowLogic<SignedTransaction>(
         val assetStatesWithLinearId = serviceHub.vaultService.queryBy<BondAssetState>(criteria).states
 
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("BondssetState with linearId $linearId not found")
+            throw NoSuchElementException("BondssetState with linearId $linearId not found")
         }
         val inputState = assetStatesWithLinearId.first()
         println("Deleting bond asset state from the ledger: $inputState\n")
@@ -399,7 +397,7 @@ class TransferBondAssetStateInitiator(val linearId: String, val otherParty: Part
             Vault.StateStatus.UNCONSUMED, null)
         val assetStatesWithLinearId = serviceHub.vaultService.queryBy<BondAssetState>(criteria).states
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("BondAssetState with linearId $linearId not found")
+            throw NoSuchElementException("BondAssetState with linearId $linearId not found")
         }
         val inputState = assetStatesWithLinearId.first()
 

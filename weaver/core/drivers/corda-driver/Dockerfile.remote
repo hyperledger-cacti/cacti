@@ -1,5 +1,5 @@
 # Remote build
-FROM gradle:4.10.3-jdk8 AS builder-remote
+FROM gradle:7.6-jdk17-jammy AS builder-remote
 
 USER root
 
@@ -17,7 +17,7 @@ RUN ./gradlew clean installDist
 FROM builder-remote as builder
 
 # Deployment Image 
-FROM openjdk:8-jre
+FROM eclipse-temurin:17-jre-noble
 
 COPY --from=builder /driver/corda/build/install/driver-corda /driver/corda/
 

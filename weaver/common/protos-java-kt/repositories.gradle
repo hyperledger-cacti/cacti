@@ -1,7 +1,6 @@
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url 'https://jitpack.io' }
     maven { url 'https://download.corda.net/maven/corda-dependencies' }
     maven { url 'https://download.corda.net/maven/corda-releases' }

@@ -1,5 +1,5 @@
 # Local build
-FROM gradle:4.10.3-jdk8 AS builder-local
+FROM gradle:7.6-jdk17-jammy AS builder-local
 
 WORKDIR /driver/corda
 ADD build /driver/corda/build
@@ -7,7 +7,7 @@ ADD build /driver/corda/build
 FROM builder-local as builder
 
 # Deployment Image 
-FROM openjdk:8-jre
+FROM eclipse-temurin:17-jre-noble
 
 COPY --from=builder /driver/corda/build/install/driver-corda /driver/corda/
 

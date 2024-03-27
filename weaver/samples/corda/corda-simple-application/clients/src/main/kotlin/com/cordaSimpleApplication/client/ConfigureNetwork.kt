@@ -79,8 +79,12 @@ class ConfigureCreateAllCommand : CliktCommand(name="create-all",
  * Helper function used by ConfigureDataCommand
  */
 fun configDataHelper(config: Map<String, String>) {
-    createStateHelper("H", "1", config)
-    createStateHelper("C", "20", config)
+    var linesIterator = object {}.javaClass.getResourceAsStream("/bootstrap-states.csv")?.bufferedReader()?.lines()!!.iterator()
+    while (linesIterator.hasNext()) {
+        val line = linesIterator.next()
+        val keyValue = line.split(",").map{ it.strip() }.toTypedArray()
+        createStateHelper(keyValue[0], keyValue[1], config)
+    }
 }
 
 /**
