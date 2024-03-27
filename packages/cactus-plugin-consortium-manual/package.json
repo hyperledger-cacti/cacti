@@ -60,7 +60,7 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "axios": "1.6.0",
     "body-parser": "1.20.2",
-    "express": "4.18.2",
+    "express": "4.19.2",
     "jose": "4.15.5",
     "json-stable-stringify": "1.0.1",
     "prom-client": "13.2.0",
