@@ -73,7 +73,7 @@
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
     "cors": "2.8.5",
-    "express": "4.18.2",
+    "express": "4.19.2",
     "express-http-proxy": "1.6.2",
     "express-jwt": "8.4.1",
     "express-openapi-validator": "5.0.4",
