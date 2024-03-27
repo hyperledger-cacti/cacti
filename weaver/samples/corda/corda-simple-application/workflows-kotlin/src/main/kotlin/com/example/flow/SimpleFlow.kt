@@ -9,7 +9,6 @@ package com.cordaSimpleApplication.flow
 import co.paralleluniverse.fibers.Suspendable
 import com.cordaSimpleApplication.contract.SimpleContract
 import com.cordaSimpleApplication.state.SimpleState
-import javassist.NotFoundException
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -256,7 +255,7 @@ class UpdateState(val key: String, val value: String) : FlowLogic<SignedTransact
         val statesWithKey = serviceHub.vaultService.queryBy<SimpleState>().states
                 .filter { it.state.data.key == key }
         if (statesWithKey.isEmpty()) {
-            throw NotFoundException("SimpleState with key $key not found")
+            throw NoSuchElementException("SimpleState with key $key not found")
         }
         val inputState = statesWithKey.first()
         val outputState = inputState.state.data.copy(value = value)
@@ -330,7 +329,7 @@ class DeleteState(val key: String) : FlowLogic<SignedTransaction>() {
         val statesWithKey = serviceHub.vaultService.queryBy<SimpleState>().states
                 .filter { it.state.data.key == key }
         if (statesWithKey.isEmpty()) {
-            throw NotFoundException("SimpleState with key $key not found")
+            throw NoSuchElementException("SimpleState with key $key not found")
         }
         val inputState = statesWithKey.first()
         println("Deleting state from the ledger: $inputState\n")

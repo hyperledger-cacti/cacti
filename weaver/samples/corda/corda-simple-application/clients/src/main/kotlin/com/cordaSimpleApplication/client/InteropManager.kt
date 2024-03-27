@@ -13,7 +13,6 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
-import io.grpc.ManagedChannelBuilder
 import java.lang.Exception
 import kotlinx.coroutines.*
 import net.corda.core.messaging.startFlow

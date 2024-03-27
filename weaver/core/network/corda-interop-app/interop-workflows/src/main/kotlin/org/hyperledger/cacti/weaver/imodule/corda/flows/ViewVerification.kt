@@ -117,6 +117,7 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
     println("Corda view data: $cordaViewData")
     
     var interopPayload = cordaViewData.notarizedPayloadsList[0].payload
+    var signersMut = mutableListOf<String>()
 
     // 2. Map over the list of notarizations and verify the signature, creating a list of Either Error Boolean
     val eitherErrorCordaViewData = cordaViewData.notarizedPayloadsList.map { notarizedPayload ->
@@ -127,6 +128,7 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
                     if (interopPayload != notarizedPayload.payload) {
                         Left(Error("InteropPayload doesn't match across responses from different nodes"))
                     }
+                    signersMut.add(notarizedPayload.id)
                     Right(true)
                 }
             }
@@ -139,7 +141,8 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
             .map { viewData }
 
     // Get the signers from the list of notarizedPayloads
-    val signers = cordaViewData.notarizedPayloadsList.map { it.id }
+    // val signers = cordaViewData.notarizedPayloadsList.map { it.id }
+    val signers = signersMut.toList()
 
     // 4. Check that every party listed in the verification policy is a signatory
     eitherErrorCordaViewData.flatMap { _ ->

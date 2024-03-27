@@ -127,7 +127,8 @@ class HandleExternalRequestTests {
         network.runNetwork()
         val invalidSignatureError = invalidSignatureFuture.getOrThrow()
         assertTrue(invalidSignatureError.isLeft())
-        assertEquals("Verification Error: Error verifying signature: signature length is wrong", invalidSignatureError.fold({ it.message }, { "" }))
+        /* assertEquals("Verification Error: Error verifying signature: signature length is wrong", invalidSignatureError.fold({ it.message }, { "" })) */
+        assertEquals("Signature Verification Error for certificate for O=PartyA, L=London, C=GB", invalidSignatureError.fold({ it.message }, { "" }))
 
         // Unhappy case where query address is incorrect
         val invalidAddressQuery = query.toBuilder().setAddress("invalidAddress").build()

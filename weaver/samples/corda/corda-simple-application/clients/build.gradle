@@ -1,12 +1,4 @@
 buildscript {
-
-    ext.coroutines_version = "1.3.7"
-    ext.protobuf_version = "3.11.1"
-    ext.bcprov_version = "1.53"
-    ext.grpc_version = "1.29.0" // CURRENT_GRPC_VERSION
-    ext.grpc_kotlin_version = "0.1.4" // CURRENT_GRPC_KOTLIN_VERSION
-    ext.arrow_version = "0.10.4"
-
     repositories {
         mavenCentral()
     }
@@ -15,7 +7,6 @@ buildscript {
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "java"
-    id "com.google.protobuf" version "0.8.12"
     id "idea"
     id "application"
 }
@@ -64,20 +55,23 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile 'com.google.code.gson:gson:2.8.6'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     // Corda dependencies.
-    compile "$corda_release_group:corda-rpc:$corda_release_version"
+    implementation "$corda_core_release_group:corda-core:$corda_core_release_version"
+    implementation "$corda_release_group:corda-node-api:$corda_release_version"
+    implementation "$corda_release_group:corda:$corda_release_version"
+    implementation "$corda_release_group:corda-rpc:$corda_release_version"
     
-    compile "io.arrow-kt:arrow-core:$arrow_version"
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-core:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
 
     // CorDapp dependencies.
-    compile project(":contracts-kotlin")
-    compile project(":workflows-kotlin")
+    implementation project(":contracts-kotlin")
+    implementation project(":workflows-kotlin")
     implementation "com.github.ajalt.clikt:clikt:$clikt_version"
     
     implementation(group: 'com.fungiblehousetoken', name: 'contracts', version: "1.0")
@@ -90,17 +84,14 @@ dependencies {
     // gRPC and protobuf dependencies
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
-    implementation "com.google.protobuf:protobuf-java:$protobuf_version"
-    implementation "com.google.protobuf:protobuf-java-util:$protobuf_version"
     implementation "io.grpc:grpc-netty-shaded:$grpc_version"
-    implementation "io.grpc:grpc-protobuf:$grpc_version"
     implementation "io.grpc:grpc-stub:$grpc_version"
     implementation "io.grpc:grpc-okhttp:$grpc_version"
-    implementation "org.bouncycastle:bcprov-jdk15on:$bcprov_version"
+    implementation "io.grpc:grpc-protobuf:$grpc_version"
     implementation group: 'org.json', name: 'json', version: '20190722'
 
     //// Logger dependencies
-    compile "org.slf4j:slf4j-simple:1.6.1"
+    implementation "org.slf4j:slf4j-simple:1.6.1"
 
     // Token SDK dependencies.
     implementation "$tokens_release_group:tokens-contracts:$tokens_release_version"

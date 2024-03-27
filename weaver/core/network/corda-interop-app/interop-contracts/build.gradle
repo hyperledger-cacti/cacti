@@ -1,10 +1,6 @@
-buildscript {
-    ext.protobuf_version = "3.11.1"
-}
-
 plugins {
-    id "maven-publish"
     id "java"
+    id "maven-publish"
     id "idea"
 }
 
@@ -36,19 +32,19 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Corda dependencies.
-    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"
 
-    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "$corda_release_group:corda-node-driver:$corda_release_version"
+    testImplementation "$corda_core_release_group:corda-test-utils:$corda_core_release_version"
+    testImplementation "$corda_core_release_group:corda-core-test-utils:$corda_core_release_version"
     
     // weaver-protos
     implementation "org.hyperledger.cacti.weaver.protos:protos-java-kt:$cacti_version"
-    
-    compile "com.google.protobuf:protobuf-java:$protobuf_version"
-    compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
 }
 
 publishing {
@@ -57,7 +53,7 @@ publishing {
             groupId = project.properties['group']
             artifactId = 'interop-contracts'
             version = project.properties['version']
-            from components.java
+            from components.cordapp
         }
     }
     repositories {
@@ -69,4 +65,8 @@ publishing {
             }
         }
     }
+}
+
+test {
+    jvmArgs = rootProject.ext.testJvmArgs
 }

@@ -10,7 +10,6 @@ import co.paralleluniverse.fibers.Suspendable
 import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.state.AssetStateJSON
 import com.cordaSimpleApplication.contract.AssetContract
-import javassist.NotFoundException
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
@@ -27,7 +26,6 @@ import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 import net.corda.core.contracts.requireThat
-import sun.security.x509.UniqueIdentity
 import java.util.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -174,7 +172,7 @@ class DeleteAssetState(val linearId: String) : FlowLogic<SignedTransaction>() {
         val assetStatesWithLinearId = serviceHub.vaultService.queryBy<AssetState>(criteria).states
 
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("AssetState with linearId $linearId not found")
+            throw NoSuchElementException("AssetState with linearId $linearId not found")
         }
         val inputState = assetStatesWithLinearId.first()
         println("Deleting asset state from the ledger: $inputState\n")
@@ -366,7 +364,7 @@ class MergeAssetStates(val linearId1: String, val linearId2: String) : FlowLogic
             Vault.StateStatus.UNCONSUMED, null)
         var assetStatesWithLinearId = serviceHub.vaultService.queryBy<AssetState>(criteria).states
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("AssetState with linearId $linearId1 not found")
+            throw NoSuchElementException("AssetState with linearId $linearId1 not found")
         }
         val assetState1 = assetStatesWithLinearId.first()
 
@@ -375,7 +373,7 @@ class MergeAssetStates(val linearId1: String, val linearId2: String) : FlowLogic
             Vault.StateStatus.UNCONSUMED, null)
         assetStatesWithLinearId = serviceHub.vaultService.queryBy<AssetState>(criteria).states
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("AssetState with linearId $linearId2 not found")
+            throw NoSuchElementException("AssetState with linearId $linearId2 not found")
         }
         val assetState2 = assetStatesWithLinearId.first()
 
@@ -484,7 +482,7 @@ class SplitAssetState(val linearId: String, val quantity1: Long, val quantity2: 
             Vault.StateStatus.UNCONSUMED, null)
         val assetStatesWithLinearId = serviceHub.vaultService.queryBy<AssetState>(criteria).states
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("AssetState with linearId $linearId not found")
+            throw NoSuchElementException("AssetState with linearId $linearId not found")
         }
         val splitState = assetStatesWithLinearId.first()
 
@@ -568,7 +566,7 @@ class TransferAssetStateInitiator(val linearId: String, val otherParty: Party) :
             Vault.StateStatus.UNCONSUMED, null)
         val assetStatesWithLinearId = serviceHub.vaultService.queryBy<AssetState>(criteria).states
         if (assetStatesWithLinearId.isEmpty()) {
-            throw NotFoundException("AssetState with linearId $linearId not found")
+            throw NoSuchElementException("AssetState with linearId $linearId not found")
         }
         val inputState = assetStatesWithLinearId.first()
 

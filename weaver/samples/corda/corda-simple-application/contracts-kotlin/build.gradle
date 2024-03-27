@@ -14,16 +14,16 @@ cordapp {
 }
 
 dependencies {
-    compile 'com.google.code.gson:gson:2.8.6'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Corda dependencies.
-    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"
 
-    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+    testImplementation "$corda_release_group:corda-node-driver:$corda_release_version"
     
-    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
+    cordaProvided(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
 }
 
 publishing {
@@ -43,7 +43,7 @@ publishing {
             groupId = 'com.cordaSimpleApplication'
             artifactId = 'contracts-kotlin'
             version = '0.4'
-            from components.java
+            from components.cordapp
         }
     }
     repositories {

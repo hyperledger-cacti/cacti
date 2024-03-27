@@ -18,7 +18,6 @@ import net.corda.core.contracts.StaticPointer
 import net.corda.core.transactions.LedgerTransaction
 import java.time.Instant
 import java.util.*
-import co.paralleluniverse.fibers.Suspendable
 
 /**
  * AssetTransferContract defines the rules for managing a [AssetPledgeState].
