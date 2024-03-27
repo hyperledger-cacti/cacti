@@ -484,14 +484,14 @@ export class TransferClaims extends Message<TransferClaims> {
   recipientGatewayNetworkId = "";
 
   /**
-   * @generated from field: string client_identity_pubkey = 9;
+   * @generated from field: string client_gateway_pubkey = 9;
    */
-  clientIdentityPubkey = "";
+  clientGatewayPubkey = "";
 
   /**
-   * @generated from field: string server_identity_pubkey = 10;
+   * @generated from field: string server_gateway_pubkey = 10;
    */
-  serverIdentityPubkey = "";
+  serverGatewayPubkey = "";
 
   /**
    * @generated from field: string sender_gateway_owner_id = 11;
@@ -529,8 +529,8 @@ export class TransferClaims extends Message<TransferClaims> {
     { no: 6, name: "beneficiary_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "sender_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "recipient_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 9, name: "client_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 10, name: "server_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "client_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "server_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 11, name: "sender_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "receiver_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "max_retries", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
@@ -987,14 +987,14 @@ export class CommonSatp extends Message<CommonSatp> {
   signature = "";
 
   /**
-   * @generated from field: string client_identity_pubkey = 16;
+   * @generated from field: string client_gateway_pubkey = 16;
    */
-  clientIdentityPubkey = "";
+  clientGatewayPubkey = "";
 
   /**
-   * @generated from field: string server_identity_pubkey = 17;
+   * @generated from field: string server_gateway_pubkey = 17;
    */
-  serverIdentityPubkey = "";
+  serverGatewayPubkey = "";
 
   /**
    * @generated from field: string hash_previous_message = 18;
@@ -1021,8 +1021,8 @@ export class CommonSatp extends Message<CommonSatp> {
     { no: 13, name: "payload", kind: "message", T: Payload },
     { no: 14, name: "payload_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 15, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "client_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 17, name: "server_identity_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "client_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "server_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 18, name: "hash_previous_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
