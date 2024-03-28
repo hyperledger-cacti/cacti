@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711041785907,
+  "lastUpdate": 1711644778935,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -152,6 +152,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.30%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "15e21324cae132c71e8ee6b41255858660c3a0f9",
+          "message": "build(deps): bump express from 4.17.1 to 4.19.2\n\nBumps [express](https://github.com/expressjs/express) from 4.17.1 to 4.19.2.\n- [Release notes](https://github.com/expressjs/express/releases)\n- [Changelog](https://github.com/expressjs/express/blob/master/History.md)\n- [Commits](https://github.com/expressjs/express/compare/4.17.1...4.19.2)\n\n---\nupdated-dependencies:\n- dependency-name: express\n  dependency-type: direct:production\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2024-03-28T09:36:15-07:00",
+          "tree_id": "555a91189f21260ae3b43161b19af40985e68029",
+          "url": "https://github.com/hyperledger/cacti/commit/15e21324cae132c71e8ee6b41255858660c3a0f9"
+        },
+        "date": 1711644776550,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 592,
+            "range": "±1.69%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 322,
+            "range": "±16.57%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
