@@ -9057,7 +9057,7 @@ __metadata:
     express: "npm:4.19.2"
     uuid: "npm:9.0.1"
     web3-eth-abi: "npm:4.0.3"
-    web3-utils: "npm:4.0.3"
+    web3-utils: "npm:4.2.1"
   languageName: unknown
   linkType: soft
 
