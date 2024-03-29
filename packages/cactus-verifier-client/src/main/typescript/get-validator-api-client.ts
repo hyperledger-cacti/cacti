@@ -26,10 +26,6 @@ import type {
   CordaApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-corda";
 import type {
-  IrohaApiClient,
-  IrohaApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-iroha";
-import type {
   Iroha2ApiClient,
   Iroha2ApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
@@ -72,10 +68,6 @@ export type ClientApiConfig = {
   CORDA_4X: {
     in: CordaApiClientOptions;
     out: CordaApiClient;
-  };
-  IROHA_1X: {
-    in: IrohaApiClientOptions;
-    out: IrohaApiClient;
   };
   IROHA_2X: {
     in: Iroha2ApiClientOptions;
@@ -126,9 +118,6 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
     case "CORDA_4X":
       const cordaPackage = require("@hyperledger/cactus-plugin-ledger-connector-corda");
       return new cordaPackage.CordaApiClient(options as CordaApiClientOptions);
-    case "IROHA_1X":
-      const irohaPackage = require("@hyperledger/cactus-plugin-ledger-connector-iroha");
-      return new irohaPackage.IrohaApiClient(options as IrohaApiClientOptions);
     case "IROHA_2X":
       const iroha2Package = require("@hyperledger/cactus-plugin-ledger-connector-iroha2");
       return new iroha2Package.Iroha2ApiClient(
