@@ -14,11 +14,11 @@ import (
 	"encoding/json"
 )
 
-// checks if the Chain type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &Chain{}
+// checks if the Chains1Inner type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Chains1Inner{}
 
-// Chain struct for Chain
-type Chain struct {
+// Chains1Inner struct for Chains1Inner
+type Chains1Inner struct {
 	// A unique identifier for the blockchain network.
 	ChainId string `json:"chainId"`
 	// The name of the blockchain network.
@@ -29,12 +29,12 @@ type Chain struct {
 	NetworkName string `json:"networkName"`
 }
 
-// NewChain instantiates a new Chain object
+// NewChains1Inner instantiates a new Chains1Inner object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewChain(chainId string, chainName string, chainType string, networkName string) *Chain {
-	this := Chain{}
+func NewChains1Inner(chainId string, chainName string, chainType string, networkName string) *Chains1Inner {
+	this := Chains1Inner{}
 	this.ChainId = chainId
 	this.ChainName = chainName
 	this.ChainType = chainType
@@ -42,16 +42,16 @@ func NewChain(chainId string, chainName string, chainType string, networkName st
 	return &this
 }
 
-// NewChainWithDefaults instantiates a new Chain object
+// NewChains1InnerWithDefaults instantiates a new Chains1Inner object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewChainWithDefaults() *Chain {
-	this := Chain{}
+func NewChains1InnerWithDefaults() *Chains1Inner {
+	this := Chains1Inner{}
 	return &this
 }
 
 // GetChainId returns the ChainId field value
-func (o *Chain) GetChainId() string {
+func (o *Chains1Inner) GetChainId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -62,7 +62,7 @@ func (o *Chain) GetChainId() string {
 
 // GetChainIdOk returns a tuple with the ChainId field value
 // and a boolean to check if the value has been set.
-func (o *Chain) GetChainIdOk() (*string, bool) {
+func (o *Chains1Inner) GetChainIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -70,12 +70,12 @@ func (o *Chain) GetChainIdOk() (*string, bool) {
 }
 
 // SetChainId sets field value
-func (o *Chain) SetChainId(v string) {
+func (o *Chains1Inner) SetChainId(v string) {
 	o.ChainId = v
 }
 
 // GetChainName returns the ChainName field value
-func (o *Chain) GetChainName() string {
+func (o *Chains1Inner) GetChainName() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -86,7 +86,7 @@ func (o *Chain) GetChainName() string {
 
 // GetChainNameOk returns a tuple with the ChainName field value
 // and a boolean to check if the value has been set.
-func (o *Chain) GetChainNameOk() (*string, bool) {
+func (o *Chains1Inner) GetChainNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -94,12 +94,12 @@ func (o *Chain) GetChainNameOk() (*string, bool) {
 }
 
 // SetChainName sets field value
-func (o *Chain) SetChainName(v string) {
+func (o *Chains1Inner) SetChainName(v string) {
 	o.ChainName = v
 }
 
 // GetChainType returns the ChainType field value
-func (o *Chain) GetChainType() string {
+func (o *Chains1Inner) GetChainType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -110,7 +110,7 @@ func (o *Chain) GetChainType() string {
 
 // GetChainTypeOk returns a tuple with the ChainType field value
 // and a boolean to check if the value has been set.
-func (o *Chain) GetChainTypeOk() (*string, bool) {
+func (o *Chains1Inner) GetChainTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -118,12 +118,12 @@ func (o *Chain) GetChainTypeOk() (*string, bool) {
 }
 
 // SetChainType sets field value
-func (o *Chain) SetChainType(v string) {
+func (o *Chains1Inner) SetChainType(v string) {
 	o.ChainType = v
 }
 
 // GetNetworkName returns the NetworkName field value
-func (o *Chain) GetNetworkName() string {
+func (o *Chains1Inner) GetNetworkName() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -134,7 +134,7 @@ func (o *Chain) GetNetworkName() string {
 
 // GetNetworkNameOk returns a tuple with the NetworkName field value
 // and a boolean to check if the value has been set.
-func (o *Chain) GetNetworkNameOk() (*string, bool) {
+func (o *Chains1Inner) GetNetworkNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -142,11 +142,11 @@ func (o *Chain) GetNetworkNameOk() (*string, bool) {
 }
 
 // SetNetworkName sets field value
-func (o *Chain) SetNetworkName(v string) {
+func (o *Chains1Inner) SetNetworkName(v string) {
 	o.NetworkName = v
 }
 
-func (o Chain) MarshalJSON() ([]byte, error) {
+func (o Chains1Inner) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -154,7 +154,7 @@ func (o Chain) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o Chain) ToMap() (map[string]interface{}, error) {
+func (o Chains1Inner) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["chainId"] = o.ChainId
 	toSerialize["chainName"] = o.ChainName
@@ -163,38 +163,38 @@ func (o Chain) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableChain struct {
-	value *Chain
+type NullableChains1Inner struct {
+	value *Chains1Inner
 	isSet bool
 }
 
-func (v NullableChain) Get() *Chain {
+func (v NullableChains1Inner) Get() *Chains1Inner {
 	return v.value
 }
 
-func (v *NullableChain) Set(val *Chain) {
+func (v *NullableChains1Inner) Set(val *Chains1Inner) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableChain) IsSet() bool {
+func (v NullableChains1Inner) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableChain) Unset() {
+func (v *NullableChains1Inner) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableChain(val *Chain) *NullableChain {
-	return &NullableChain{value: val, isSet: true}
+func NewNullableChains1Inner(val *Chains1Inner) *NullableChains1Inner {
+	return &NullableChains1Inner{value: val, isSet: true}
 }
 
-func (v NullableChain) MarshalJSON() ([]byte, error) {
+func (v NullableChains1Inner) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableChain) UnmarshalJSON(src []byte) error {
+func (v *NullableChains1Inner) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

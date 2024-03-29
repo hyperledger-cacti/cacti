@@ -235,7 +235,7 @@ import (
 )
 
 func main() {
-    pauseRequest := *openapiclient.NewPauseRequest("SessionId_example", "ContextId_example") // PauseRequest | 
+    pauseRequest := *openapiclient.NewPauseRequest() // PauseRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

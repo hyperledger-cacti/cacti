@@ -3,7 +3,6 @@
 README.md
 api/openapi.yaml
 api_admin.go
-api_chains.go
 api_transaction.go
 client.go
 configuration.go
@@ -17,7 +16,7 @@ docs/Cancel200Response.md
 docs/CancelRequest.md
 docs/CancelResponse.md
 docs/Chain.md
-docs/ChainsApi.md
+docs/Chains1Inner.md
 docs/Continue200Response.md
 docs/ContinueRequest.md
 docs/ContinueResponse.md
@@ -29,7 +28,6 @@ docs/GasCost.md
 docs/GetAudit200Response.md
 docs/GetAuditRequest.md
 docs/GetAuditResponse.md
-docs/GetChains200ResponseInner.md
 docs/GetRoutes200Response.md
 docs/GetRoutes200ResponseRoutesInner.md
 docs/GetRoutes200ResponseRoutesInnerFromToken.md
@@ -55,6 +53,8 @@ docs/StatusResponse.md
 docs/Token.md
 docs/Transact200Response.md
 docs/Transact200ResponseStatusResponse.md
+docs/Transact200ResponseStatusResponseDestinationChain.md
+docs/Transact200ResponseStatusResponseOriginChain.md
 docs/TransactDefaultResponse.md
 docs/TransactRequest.md
 docs/TransactResponse.md
@@ -71,6 +71,7 @@ model_cancel_200_response.go
 model_cancel_request.go
 model_cancel_response.go
 model_chain.go
+model_chains_1_inner.go
 model_continue_200_response.go
 model_continue_request.go
 model_continue_response.go
@@ -82,7 +83,6 @@ model_gas_cost.go
 model_get_audit_200_response.go
 model_get_audit_request.go
 model_get_audit_response.go
-model_get_chains_200_response_inner.go
 model_get_routes_200_response.go
 model_get_routes_200_response_routes_inner.go
 model_get_routes_200_response_routes_inner_from_token.go
@@ -108,6 +108,8 @@ model_status_response.go
 model_token.go
 model_transact_200_response.go
 model_transact_200_response_status_response.go
+model_transact_200_response_status_response_destination_chain.go
+model_transact_200_response_status_response_origin_chain.go
 model_transact_default_response.go
 model_transact_request.go
 model_transact_response.go
