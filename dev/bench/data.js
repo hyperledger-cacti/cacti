@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711644778935,
+  "lastUpdate": 1711685350080,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -188,6 +188,44 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 322,
             "range": "±16.57%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "rafael.belchior@tecnico.ulisboa.pt",
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "f81b46bce5ca0880e6bf6b51be2233e2616759a5",
+          "message": "fix(indy-vdr-nodejs): update dependency version\n\n    Previously breaking MacOS builds. See https://github.com/hyperledger/indy-vdr/issues/260\n\nSigned-off-by: Rafael Belchior <rafael.belchior@tecnico.ulisboa.pt>",
+          "timestamp": "2024-03-28T20:53:41-07:00",
+          "tree_id": "8fc777e948794ddd46e2a793b5674d93b94dcb38",
+          "url": "https://github.com/hyperledger/cacti/commit/f81b46bce5ca0880e6bf6b51be2233e2616759a5"
+        },
+        "date": 1711685346446,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 597,
+            "range": "±1.77%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 368,
+            "range": "±1.26%",
             "unit": "ops/sec",
             "extra": "180 samples"
           }
