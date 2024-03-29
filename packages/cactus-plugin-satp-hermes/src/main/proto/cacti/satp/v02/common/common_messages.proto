@@ -30,8 +30,8 @@ message TransferClaims {
     string beneficiary_pubkey = 6;
     string sender_gateway_network_id = 7;
     string recipient_gateway_network_id = 8;
-    string client_identity_pubkey = 9;
-    string server_identity_pubkey = 10;
+    string client_gateway_pubkey = 9;
+    string server_gateway_pubkey = 10;
     string sender_gateway_owner_id = 11;
     string receiver_gateway_owner_id = 12;
     uint32 max_retries = 13;
@@ -110,17 +110,14 @@ message CommonSatp {
     string transfer_context_id = 4;
     uint64 sequence_number = 5;
     string resource_url = 6;
-    string developer_urn = 7;
     ActionResponse action_response = 8;
-    CredentialProfile credential_profile = 9;
     string credential_block = 10;
     PayloadProfile payload_profile = 11;
-    string application_profile = 12;
     Payload payload = 13;
     string payload_hash = 14;
     string signature = 15;
-    string client_identity_pubkey = 16;
-    string server_identity_pubkey = 17;
+    string client_gateway_pubkey = 16;
+    string server_gateway_pubkey = 17;
     string hash_previous_message = 18;
 }
 
