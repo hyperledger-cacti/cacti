@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SessionId** | **string** | A unique identifier for the transaction session to be paused. | 
-**ContextId** | **string** | A unique identifier for the transaction context. | 
+**SessionId** | Pointer to **string** |  | [optional] 
+**ContextId** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
 ### NewPauseRequest
 
-`func NewPauseRequest(sessionId string, contextId string, ) *PauseRequest`
+`func NewPauseRequest() *PauseRequest`
 
 NewPauseRequest instantiates a new PauseRequest object
 This constructor will assign default values to properties that have it defined,
@@ -45,6 +45,11 @@ and a boolean to check if the value has been set.
 
 SetSessionId sets SessionId field to given value.
 
+### HasSessionId
+
+`func (o *PauseRequest) HasSessionId() bool`
+
+HasSessionId returns a boolean if a field has been set.
 
 ### GetContextId
 
@@ -65,6 +70,11 @@ and a boolean to check if the value has been set.
 
 SetContextId sets ContextId field to given value.
 
+### HasContextId
+
+`func (o *PauseRequest) HasContextId() bool`
+
+HasContextId returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

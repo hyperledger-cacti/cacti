@@ -4,17 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Status** | **string** | Current status of the SATP session. | 
-**Substatus** | **string** | More detailed status of the SATP session. | 
-**Stage** | **string** | Current stage of the SATP session. | 
-**Step** | **string** | Current step within the stage of the SATP session. | 
-**StartTime** | **time.Time** | The start time of the SATP session. | 
+**Status** | **string** |  | 
+**Substatus** | **string** |  | 
+**Stage** | **string** |  | 
+**Step** | **string** |  | 
+**StartTime** | **time.Time** |  | 
+**OriginChain** | [**Transact200ResponseStatusResponseOriginChain**](Transact200ResponseStatusResponseOriginChain.md) |  | 
+**DestinationChain** | [**Transact200ResponseStatusResponseDestinationChain**](Transact200ResponseStatusResponseDestinationChain.md) |  | 
 
 ## Methods
 
 ### NewTransact200ResponseStatusResponse
 
-`func NewTransact200ResponseStatusResponse(status string, substatus string, stage string, step string, startTime time.Time, ) *Transact200ResponseStatusResponse`
+`func NewTransact200ResponseStatusResponse(status string, substatus string, stage string, step string, startTime time.Time, originChain Transact200ResponseStatusResponseOriginChain, destinationChain Transact200ResponseStatusResponseDestinationChain, ) *Transact200ResponseStatusResponse`
 
 NewTransact200ResponseStatusResponse instantiates a new Transact200ResponseStatusResponse object
 This constructor will assign default values to properties that have it defined,
@@ -127,6 +129,46 @@ and a boolean to check if the value has been set.
 `func (o *Transact200ResponseStatusResponse) SetStartTime(v time.Time)`
 
 SetStartTime sets StartTime field to given value.
+
+
+### GetOriginChain
+
+`func (o *Transact200ResponseStatusResponse) GetOriginChain() Transact200ResponseStatusResponseOriginChain`
+
+GetOriginChain returns the OriginChain field if non-nil, zero value otherwise.
+
+### GetOriginChainOk
+
+`func (o *Transact200ResponseStatusResponse) GetOriginChainOk() (*Transact200ResponseStatusResponseOriginChain, bool)`
+
+GetOriginChainOk returns a tuple with the OriginChain field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOriginChain
+
+`func (o *Transact200ResponseStatusResponse) SetOriginChain(v Transact200ResponseStatusResponseOriginChain)`
+
+SetOriginChain sets OriginChain field to given value.
+
+
+### GetDestinationChain
+
+`func (o *Transact200ResponseStatusResponse) GetDestinationChain() Transact200ResponseStatusResponseDestinationChain`
+
+GetDestinationChain returns the DestinationChain field if non-nil, zero value otherwise.
+
+### GetDestinationChainOk
+
+`func (o *Transact200ResponseStatusResponse) GetDestinationChainOk() (*Transact200ResponseStatusResponseDestinationChain, bool)`
+
+GetDestinationChainOk returns a tuple with the DestinationChain field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDestinationChain
+
+`func (o *Transact200ResponseStatusResponse) SetDestinationChain(v Transact200ResponseStatusResponseDestinationChain)`
+
+SetDestinationChain sets DestinationChain field to given value.
 
 
 

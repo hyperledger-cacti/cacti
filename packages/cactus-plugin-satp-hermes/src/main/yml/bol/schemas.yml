@@ -9,8 +9,9 @@ AuthzScope:
   x-enum-varnames:
     - GroupAdmin
     - GroupUser
+  example: group:admin
 AuthzJwtClaim:
-  description: 'Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1'
+  description: "Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1"
   type: string
   enum:
     - Hyperledger Labs - Carbon Accounting Tool
@@ -18,13 +19,16 @@ AuthzJwtClaim:
     - The "iss" (issuer) claim identifies the principal that issued the JWT. The processing of this claim is generally application specific. The "iss" value is a case-sensitive string containing a StringOrURI value. Use of this claim is OPTIONAL.
   x-enum-varnames:
     - iss
+  example: Hyperledger Labs - Carbon Accounting Tool
 CredentialProfile:
   type: string
   enum:
     - SAML
     - OAUTH
     - X509
+  example: OAUTH
 getAuditRequest:
+  description: "Request schema for initiating an audit. Includes the start and end dates for the audit period and an option to include proofs."
   type: object
   x-category: request
   properties:
@@ -32,14 +36,18 @@ getAuditRequest:
       type: string
       format: date-time
       description: The start datetime for the audit.
+      example: "2023-01-01T00:00:00Z"
     auditEndDate:
       type: string
       format: date-time
       description: The end datetime for the audit.
+      example: "2023-01-31T23:59:59Z"
     includeProofs:
       type: boolean
       description: Include proofs generated from each gateway transaction.
+      example: true
 getAuditResponse:
+  description: "Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes."
   type: object
   x-category: response
   properties:
@@ -48,15 +56,19 @@ getAuditResponse:
       items:
         type: string
       description: An array of strings representing proofs.
+      example: ["proof1", "proof2"]
     auditStartTime:
       type: string
       format: date-time
       description: The start datetime of the audit period.
+      example: "2023-01-01T00:00:00Z"
     auditEndTime:
       type: string
       format: date-time
       description: The end datetime of the audit period.
+      example: "2023-01-31T23:59:59Z"
 StatusResponse:
+  description: "Provides the current status of the SATP session including detailed information on the progress, such as substatus, stage, and step, along with the session start time and chain information."
   type: object
   x-category: response
   required:
@@ -65,6 +77,8 @@ StatusResponse:
     - stage
     - step
     - startTime
+    - originChain
+    - destinationChain
   properties:
     status:
       type: string
@@ -74,7 +88,7 @@ StatusResponse:
         - PENDING
         - DONE
         - FAILED
-      description: Current status of the SATP session.
+      example: DONE
     substatus:
       type: string
       enum:
@@ -88,7 +102,7 @@ StatusResponse:
         - PARTIAL
         - REFUNDED
         - NOT_PROCESSABLE_REFUND_NEEDED
-      description: More detailed status of the SATP session.
+      example: COMPLETED
     stage:
       type: string
       enum:
@@ -96,7 +110,7 @@ StatusResponse:
         - STAGE1
         - STAGE2
         - STAGE3
-      description: Current stage of the SATP session.
+      example: STAGE3
     step:
       type: string
       enum:
@@ -128,35 +142,48 @@ StatusResponse:
         - rollback-commit-final-assertion-message
         - rollback-commit-final-acknowledgement-receipt-message
         - rollback-transfer-complete-message
-      description: Current step within the stage of the SATP session.
+      example: transfer-complete-message
     startTime:
       type: string
       format: date-time
-      description: The start time of the SATP session.
+      example: "2023-01-01T00:00:00Z"
+    originChain:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerFabric
+        dltSubnetworkID:
+          example: subnetwork1
+    destinationChain:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerBesu
+        dltSubnetworkID:
+          example: subnetwork2
 PauseRequest:
+  description: "Request to temporarily pause an ongoing transaction session, identified by the session and context IDs."
   type: object
   properties:
     sessionId:
       type: string
       format: uuid
-      description: A unique identifier for the transaction session to be paused.
+      example: "123e4567-e89b-12d3-a456-426614174000"
     contextId:
       type: string
       format: uuid
-      description: A unique identifier for the transaction context.
-  required:
-    - sessionId
-    - contextId
-  description: Schema for a request to pause a transaction session.
+      example: "123e4567-e89b-12d3-a456-426614174001"
+
 PauseResponse:
+  description: "Response for a pause transaction request. Returns the current status of the SATP session post-pause action."
   type: object
-  description: Response schema for a pause request, returning the status of the SATP session.
   properties:
     statusResponse:
       $ref: ./schemas.yml#/StatusResponse
   required:
     - statusResponse
 StatusRequest:
+  description: "Request for retrieving the current status of a session, identified by the session ID."
   type: object
   x-category: request
   required:
@@ -165,44 +192,48 @@ StatusRequest:
     sessionID:
       type: string
       description: The ID of the session for which the status is being requested.
+  example: "123e4567-e89b-12d3-a456-426614174000"
 TransactRequest:
+  description: "Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks."
   type: object
+  required:
+    - contextID
+    - mode
   properties:
     contextID:
       type: string
       format: uuid
-      description: A unique identifier for the transaction context.
+      example: "123e4567-e89b-12d3-a456-426614174000"
     mode:
       type: string
       enum:
         - data
         - transfer
-      description: The mode of transaction - 'data' for arbitrary payload or 'transfer' for asset transfer.
+      example: transfer
     payload:
       type: string
-      description: A string containing all transaction details required for processing in 'data' mode. Required if mode is 'data'.
+      example: '{"data":"example payload"}'
     fromDLTNetworkID:
       type: string
-      description: The ID of the DLT Network from which the asset will be transferred. Required if mode is 'transfer'.
+      example: "network1"
     toDLTNetworkID:
       type: string
-      description: The ID of the DLT Network to which the asset will be transferred. Required if mode is 'transfer'.
+      example: "network2"
     fromAmount:
       type: string
-      description: Required if mode is 'transfer'.
+      example: "100"
     fromToken:
       type: string
-      description: Required if mode is 'transfer'.
+      example: "TOKEN1"
     toAmount:
       type: string
-      description: Required if mode is 'transfer'.
+      example: "95"
     toToken:
       type: string
-      description: Required if mode is 'transfer'.
-  required:
-    - contextID
-    - mode
+      example: "TOKEN2"
+
 TransactResponse:
+  description: "Response schema for a transaction request. Includes the session ID and the current status of the transaction."
   type: object
   properties:
     sessionID:
@@ -213,6 +244,7 @@ TransactResponse:
     - sessionID
     - statusResponse
 CancelRequest:
+  description: "Request to cancel an ongoing transaction session, identified by the session ID."
   type: object
   properties:
     sessionID:
@@ -220,6 +252,7 @@ CancelRequest:
   required:
     - sessionID
 CancelResponse:
+  description: "Response for a cancel transaction request. Indicates whether the cancel action was successful and includes the current session status."
   type: object
   properties:
     statusResponse:
@@ -227,6 +260,7 @@ CancelResponse:
     cancelSuccessful:
       type: boolean
       description: Indicates whether the cancel operation was successful.
+      example: true
   required:
     - statusResponse
     - cancelSuccessful
@@ -262,7 +296,7 @@ APIError:
     timestamp:
       type: string
       description: Timestamp of the error
-      example: '2021-07-21T17:32:28Z'
+      example: "2021-07-21T17:32:28Z"
 DLTProtocol:
   x-category: satp-core
   type: string
@@ -273,11 +307,11 @@ DLTProtocol:
 DLTNetworkID:
   x-category: satp-core
   type: string
-  description: 'The network of the DLT being interacted with. TODO: implement network identification draft'
+  description: "The network of the DLT being interacted with. TODO: implement network identification draft"
 DLTSubnetworkID:
   x-category: satp-core
   type: string
-  description: 'The subnetwork of the DLT being interacted with. TODO: implement network identification draft'
+  description: "The subnetwork of the DLT being interacted with. TODO: implement network identification draft"
 SessionID:
   x-category: satp-core
   type: string
@@ -286,12 +320,12 @@ SessionID:
 Address:
   type: string
   description: A blockchain address.
-  example: '0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7'
+  example: "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7"
 AmountString:
   type: string
   description: The amount in string format including all decimals.
   pattern: ^([1-9][0-9]*|0)(\.[0-9]+)?$
-  example: '1000000000000000000'
+  example: "1000000000000000000"
 AmountDecimal:
   type: number
   format: float
@@ -422,6 +456,7 @@ Chain:
     - chainType
     - networkName
 Chains:
+  title: Chains
   type: array
   description: List of chains and related metadata
   items:
@@ -470,6 +505,7 @@ Token:
           type: boolean
           description: Indicates whether the token is verified.
 Tags:
+  title: Tags
   type: array
   description: List of tags identifiers providing additional context or categorization.
   items:
@@ -525,7 +561,7 @@ Insurance:
     feeAmountUsd:
       type: string
       description: The fee amount for insurance, represented in USD.
-      example: '10.00'
+      example: "10.00"
       pattern: ^(0|[1-9]\d*)(\.\d+)?$
 Action:
   type: object
@@ -535,7 +571,7 @@ Action:
     fromAmount:
       type: string
       description: The amount of 'fromToken' to be transferred, specified as a string to maintain precision.
-      example: '1000000000000000000'
+      example: "1000000000000000000"
       pattern: ^[1-9][0-9]*$
     toToken:
       $ref: ./schemas.yml#/Token
@@ -630,25 +666,25 @@ GasCost:
     price:
       type: string
       description: The gas price, specified as a string to maintain precision.
-      example: '19236858243'
+      example: "19236858243"
     estimate:
       type: string
       description: The estimated gas required, specified as a string to maintain precision.
-      example: '445393'
+      example: "445393"
     limit:
       type: string
       description: The gas limit for the transaction, specified as a string to maintain precision.
-      example: '579011'
+      example: "579011"
       pattern: ^[1-9][0-9]*$
     amount:
       type: string
       description: The amount of gas required in the gas currency.
-      example: '8567962003424499'
+      example: "8567962003424499"
       pattern: ^[1-9][0-9]*$
     amountUSD:
       type: string
       description: The amount of gas required in USD.
-      example: '16.05'
+      example: "16.05"
       pattern: ^(0(\.[0-9]+)?|[1-9][0-9]*(\.[0-9]+)?)$
     token:
       $ref: ./schemas.yml#/Token

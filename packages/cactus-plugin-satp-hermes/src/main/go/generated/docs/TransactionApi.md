@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost:3011/api/v1/@hyperledger/cactus-plugi
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**Cancel**](TransactionApi.md#Cancel) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel | Cancel a transaction session
+[**GetIntegrations**](TransactionApi.md#GetIntegrations) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations | Get supported integrations
 [**GetRoutes**](TransactionApi.md#GetRoutes) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes | Get a list of routes for a gateway-to-gateway asset transfer
 [**Transact**](TransactionApi.md#Transact) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact | Submit a transaction intent
 
@@ -69,6 +70,67 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetIntegrations
+
+> []Chains1Inner GetIntegrations(ctx).Execute()
+
+Get supported integrations
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated"
+)
+
+func main() {
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.TransactionApi.GetIntegrations(context.Background()).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `TransactionApi.GetIntegrations``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `GetIntegrations`: []Chains1Inner
+    fmt.Fprintf(os.Stdout, "Response from `TransactionApi.GetIntegrations`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+This endpoint does not need any parameter.
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiGetIntegrationsRequest struct via the builder pattern
+
+
+### Return type
+
+[**[]Chains1Inner**](Chains1Inner.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
@@ -175,7 +237,7 @@ import (
 )
 
 func main() {
-    transactRequest := *openapiclient.NewTransactRequest("ContextID_example", "Mode_example") // TransactRequest | 
+    transactRequest := *openapiclient.NewTransactRequest("123e4567-e89b-12d3-a456-426614174000", "transfer") // TransactRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

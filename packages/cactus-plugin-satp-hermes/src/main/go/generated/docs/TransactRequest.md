@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | **string** | A unique identifier for the transaction context. | 
-**Mode** | **string** | The mode of transaction - &#39;data&#39; for arbitrary payload or &#39;transfer&#39; for asset transfer. | 
-**Payload** | Pointer to **string** | A string containing all transaction details required for processing in &#39;data&#39; mode. Required if mode is &#39;data&#39;. | [optional] 
-**FromDLTNetworkID** | Pointer to **string** | The ID of the DLT Network from which the asset will be transferred. Required if mode is &#39;transfer&#39;. | [optional] 
-**ToDLTNetworkID** | Pointer to **string** | The ID of the DLT Network to which the asset will be transferred. Required if mode is &#39;transfer&#39;. | [optional] 
-**FromAmount** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
-**FromToken** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
-**ToAmount** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
-**ToToken** | Pointer to **string** | Required if mode is &#39;transfer&#39;. | [optional] 
+**ContextID** | **string** |  | 
+**Mode** | **string** |  | 
+**Payload** | Pointer to **string** |  | [optional] 
+**FromDLTNetworkID** | Pointer to **string** |  | [optional] 
+**ToDLTNetworkID** | Pointer to **string** |  | [optional] 
+**FromAmount** | Pointer to **string** |  | [optional] 
+**FromToken** | Pointer to **string** |  | [optional] 
+**ToAmount** | Pointer to **string** |  | [optional] 
+**ToToken** | Pointer to **string** |  | [optional] 
 
 ## Methods
 

@@ -46,7 +46,7 @@
     "build": "run-p tsc codegen",
     "build-proto": "buf build --path src/main/proto --verbose",
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/knex && cp -r ./src/knex/* ./dist/lib/knex",
-    "bundle-openapi": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r",
+    "bundle-openapi": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r -t yaml",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "npm run generate-proto",

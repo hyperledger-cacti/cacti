@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: SATP Gateway Client (Business Logic Orchestrator)
-  version: v0.0.1
+  version: 0.0.2
   description: |-
     SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.
 
@@ -45,10 +45,6 @@ paths:
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
-      x-hyperledger-cacti:
-        http:
-          verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
       requestBody:
         content:
           application/json:
@@ -189,20 +185,21 @@ paths:
             application/json:
               schema:
                 $ref: ./schemas.yml#/APIError
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains:
+ 
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
     get:
       tags:
-        - chains
-      summary: Get supported chains
-      description: Retrieves metadata about each supported blockchain network.
-      operationId: GetChains
+        - transaction
+      summary: Get supported integrations
+      description: Retrieves metadata about each supported blockchain networks, chains, and other systems.
+      operationId: GetIntegrations
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations
       responses:
-        '200':
-          description: A list of supported blockchain networks.
+        "200":
+          description: A list of supported systems.
           content:
             application/json:
               schema:

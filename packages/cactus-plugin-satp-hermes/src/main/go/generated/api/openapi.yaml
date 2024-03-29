@@ -16,7 +16,7 @@ info:
     - [SATP Data sharing draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-data-sharing)
     - [SATP View Addresses draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-views-addresses)
   title: SATP Gateway Client (Business Logic Orchestrator)
-  version: v0.0.1
+  version: 0.0.2
   x-logo:
     altText: Cacti logo
     backgroundColor: '#fafafa'
@@ -66,10 +66,6 @@ paths:
       summary: Submit a transaction intent
       tags:
       - transaction
-      x-hyperledger-cacti:
-        http:
-          verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel:
     post:
       description: Attempts to cancel a previously submitted transaction intent using
@@ -199,10 +195,11 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains:
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
     get:
-      description: Retrieves metadata about each supported blockchain network.
-      operationId: GetChains
+      description: "Retrieves metadata about each supported blockchain networks, chains,\
+        \ and other systems."
+      operationId: GetIntegrations
       responses:
         "200":
           content:
@@ -210,22 +207,23 @@ paths:
               schema:
                 description: List of chains and related metadata
                 items:
-                  $ref: '#/components/schemas/GetChains_200_response_inner'
+                  $ref: '#/components/schemas/Chains_1_inner'
+                title: Chains
                 type: array
-          description: A list of supported blockchain networks.
+          description: A list of supported systems.
         default:
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transact_default_response'
           description: An error occurred
-      summary: Get supported chains
+      summary: Get supported integrations
       tags:
-      - chains
+      - transaction
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/chains
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
     get:
       description: Get a list of possible routes for swapping one asset for another
@@ -380,6 +378,7 @@ components:
       enum:
       - group:admin
       - group:user
+      example: group:admin
       type: string
       x-enum-descriptions:
       - Identities with the group:admin scope are administrators of the system.
@@ -394,6 +393,7 @@ components:
         \ 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1"
       enum:
       - Hyperledger Labs - Carbon Accounting Tool
+      example: Hyperledger Labs - Carbon Accounting Tool
       type: string
       x-enum-descriptions:
       - The "iss" (issuer) claim identifies the principal that issued the JWT. The
@@ -407,52 +407,67 @@ components:
       - SAML
       - OAUTH
       - X509
+      example: OAUTH
       type: string
     getAuditRequest:
+      description: Request schema for initiating an audit. Includes the start and
+        end dates for the audit period and an option to include proofs.
       properties:
         auditStartDate:
           description: The start datetime for the audit.
+          example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
         auditEndDate:
           description: The end datetime for the audit.
+          example: 2023-01-31T23:59:59Z
           format: date-time
           type: string
         includeProofs:
           description: Include proofs generated from each gateway transaction.
+          example: true
           type: boolean
       type: object
       x-category: request
     getAuditResponse:
+      description: Response schema for an audit request. Contains the proofs generated
+        during the audit period and the start and end datetimes.
       properties:
         proofs:
           description: An array of strings representing proofs.
+          example:
+          - proof1
+          - proof2
           items:
             type: string
           type: array
         auditStartTime:
           description: The start datetime of the audit period.
+          example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
         auditEndTime:
           description: The end datetime of the audit period.
+          example: 2023-01-31T23:59:59Z
           format: date-time
           type: string
       type: object
       x-category: response
     StatusResponse:
+      description: "Provides the current status of the SATP session including detailed\
+        \ information on the progress, such as substatus, stage, and step, along with\
+        \ the session start time and chain information."
       properties:
         status:
-          description: Current status of the SATP session.
           enum:
           - NOT_FOUND
           - INVALID
           - PENDING
           - DONE
           - FAILED
+          example: DONE
           type: string
         substatus:
-          description: More detailed status of the SATP session.
           enum:
           - WAIT_SOURCE_CONFIRMATIONS
           - WAIT_DESTINATION_TRANSACTION
@@ -464,17 +479,17 @@ components:
           - PARTIAL
           - REFUNDED
           - NOT_PROCESSABLE_REFUND_NEEDED
+          example: COMPLETED
           type: string
         stage:
-          description: Current stage of the SATP session.
           enum:
           - STAGE0
           - STAGE1
           - STAGE2
           - STAGE3
+          example: STAGE3
           type: string
         step:
-          description: Current step within the stage of the SATP session.
           enum:
           - transfer-initialization-claims
           - conveyance-of-network-capabilities-and-parameters
@@ -504,12 +519,19 @@ components:
           - rollback-commit-final-assertion-message
           - rollback-commit-final-acknowledgement-receipt-message
           - rollback-transfer-complete-message
+          example: transfer-complete-message
           type: string
         startTime:
-          description: The start time of the SATP session.
+          example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
+        originChain:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_originChain'
+        destinationChain:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_destinationChain'
       required:
+      - destinationChain
+      - originChain
       - stage
       - startTime
       - status
@@ -518,26 +540,24 @@ components:
       type: object
       x-category: response
     PauseRequest:
-      description: Schema for a request to pause a transaction session.
+      description: "Request to temporarily pause an ongoing transaction session, identified\
+        \ by the session and context IDs."
       example:
-        contextId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        sessionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        contextId: 123e4567-e89b-12d3-a456-426614174001
+        sessionId: 123e4567-e89b-12d3-a456-426614174000
       properties:
         sessionId:
-          description: A unique identifier for the transaction session to be paused.
+          example: 123e4567-e89b-12d3-a456-426614174000
           format: uuid
           type: string
         contextId:
-          description: A unique identifier for the transaction context.
+          example: 123e4567-e89b-12d3-a456-426614174001
           format: uuid
           type: string
-      required:
-      - contextId
-      - sessionId
       type: object
     PauseResponse:
-      description: "Response schema for a pause request, returning the status of the\
-        \ SATP session."
+      description: Response for a pause transaction request. Returns the current status
+        of the SATP session post-pause action.
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
@@ -545,6 +565,9 @@ components:
       - statusResponse
       type: object
     StatusRequest:
+      description: "Request for retrieving the current status of a session, identified\
+        \ by the session ID."
+      example: 123e4567-e89b-12d3-a456-426614174000
       properties:
         sessionID:
           description: The ID of the session for which the status is being requested.
@@ -554,57 +577,58 @@ components:
       type: object
       x-category: request
     TransactRequest:
+      description: "Request schema for initiating a transaction. Includes details\
+        \ such as the transaction context, mode (data or transfer), payload, and information\
+        \ about the source and destination DLT networks."
       example:
-        mode: data
-        payload: payload
-        fromAmount: fromAmount
-        toAmount: toAmount
-        contextID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        toDLTNetworkID: toDLTNetworkID
-        fromDLTNetworkID: fromDLTNetworkID
-        fromToken: fromToken
-        toToken: toToken
+        mode: transfer
+        payload: "{\"data\":\"example payload\"}"
+        fromAmount: "100"
+        toAmount: "95"
+        contextID: 123e4567-e89b-12d3-a456-426614174000
+        toDLTNetworkID: network2
+        fromDLTNetworkID: network1
+        fromToken: TOKEN1
+        toToken: TOKEN2
       properties:
         contextID:
-          description: A unique identifier for the transaction context.
+          example: 123e4567-e89b-12d3-a456-426614174000
           format: uuid
           type: string
         mode:
-          description: The mode of transaction - 'data' for arbitrary payload or 'transfer'
-            for asset transfer.
           enum:
           - data
           - transfer
+          example: transfer
           type: string
         payload:
-          description: A string containing all transaction details required for processing
-            in 'data' mode. Required if mode is 'data'.
+          example: "{\"data\":\"example payload\"}"
           type: string
         fromDLTNetworkID:
-          description: The ID of the DLT Network from which the asset will be transferred.
-            Required if mode is 'transfer'.
+          example: network1
           type: string
         toDLTNetworkID:
-          description: The ID of the DLT Network to which the asset will be transferred.
-            Required if mode is 'transfer'.
+          example: network2
           type: string
         fromAmount:
-          description: Required if mode is 'transfer'.
+          example: "100"
           type: string
         fromToken:
-          description: Required if mode is 'transfer'.
+          example: TOKEN1
           type: string
         toAmount:
-          description: Required if mode is 'transfer'.
+          example: "95"
           type: string
         toToken:
-          description: Required if mode is 'transfer'.
+          example: TOKEN2
           type: string
       required:
       - contextID
       - mode
       type: object
     TransactResponse:
+      description: Response schema for a transaction request. Includes the session
+        ID and the current status of the transaction.
       properties:
         sessionID:
           description: Unique identifier (UUID) for the session.
@@ -618,6 +642,8 @@ components:
       - statusResponse
       type: object
     CancelRequest:
+      description: "Request to cancel an ongoing transaction session, identified by\
+        \ the session ID."
       example:
         sessionID: 000003e8-e0b8-21ee-ba00-325096b39f47
       properties:
@@ -630,11 +656,14 @@ components:
       - sessionID
       type: object
     CancelResponse:
+      description: Response for a cancel transaction request. Indicates whether the
+        cancel action was successful and includes the current session status.
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
         cancelSuccessful:
           description: Indicates whether the cancel operation was successful.
+          example: true
           type: boolean
       required:
       - cancelSuccessful
@@ -795,6 +824,7 @@ components:
           - hyperledger
           items:
             type: string
+          title: Tags
           type: array
       required:
       - gatewayID
@@ -852,7 +882,8 @@ components:
     Chains:
       description: List of chains and related metadata
       items:
-        $ref: '#/components/schemas/GetChains_200_response_inner'
+        $ref: '#/components/schemas/Chains_1_inner'
+      title: Chains
       type: array
     Token:
       description: Metadata detailing a supported token
@@ -894,6 +925,7 @@ components:
           - hyperledger
           items:
             type: string
+          title: Tags
           type: array
         priceUSD:
           description: The current price of the token in USD.
@@ -914,6 +946,7 @@ components:
       - hyperledger
       items:
         type: string
+      title: Tags
       type: array
     BridgeInfo:
       description: Information about the bridge used for the token transfer.
@@ -1127,65 +1160,92 @@ components:
           $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
       type: object
     Transact_request:
+      description: "Request schema for initiating a transaction. Includes details\
+        \ such as the transaction context, mode (data or transfer), payload, and information\
+        \ about the source and destination DLT networks."
       properties:
         contextID:
-          description: A unique identifier for the transaction context.
+          example: 123e4567-e89b-12d3-a456-426614174000
           format: uuid
           type: string
         mode:
-          description: The mode of transaction - 'data' for arbitrary payload or 'transfer'
-            for asset transfer.
           enum:
           - data
           - transfer
+          example: transfer
           type: string
         payload:
-          description: A string containing all transaction details required for processing
-            in 'data' mode. Required if mode is 'data'.
+          example: "{\"data\":\"example payload\"}"
           type: string
         fromDLTNetworkID:
-          description: The ID of the DLT Network from which the asset will be transferred.
-            Required if mode is 'transfer'.
+          example: network1
           type: string
         toDLTNetworkID:
-          description: The ID of the DLT Network to which the asset will be transferred.
-            Required if mode is 'transfer'.
+          example: network2
           type: string
         fromAmount:
-          description: Required if mode is 'transfer'.
+          example: "100"
           type: string
         fromToken:
-          description: Required if mode is 'transfer'.
+          example: TOKEN1
           type: string
         toAmount:
-          description: Required if mode is 'transfer'.
+          example: "95"
           type: string
         toToken:
-          description: Required if mode is 'transfer'.
+          example: TOKEN2
           type: string
       required:
       - contextID
       - mode
       type: object
-    Transact_200_response_statusResponse:
+    Transact_200_response_statusResponse_originChain:
       example:
-        stage: STAGE0
-        substatus: WAIT_SOURCE_CONFIRMATIONS
-        step: transfer-initialization-claims
-        startTime: 2000-01-23T04:56:07.000+00:00
-        status: NOT_FOUND
+        dltSubnetworkID: subnetwork1
+        dltProtocol: HyperledgerFabric
+      properties:
+        dltProtocol:
+          example: HyperledgerFabric
+        dltSubnetworkID:
+          example: subnetwork1
+      type: object
+    Transact_200_response_statusResponse_destinationChain:
+      example:
+        dltSubnetworkID: subnetwork2
+        dltProtocol: HyperledgerBesu
+      properties:
+        dltProtocol:
+          example: HyperledgerBesu
+        dltSubnetworkID:
+          example: subnetwork2
+      type: object
+    Transact_200_response_statusResponse:
+      description: "Provides the current status of the SATP session including detailed\
+        \ information on the progress, such as substatus, stage, and step, along with\
+        \ the session start time and chain information."
+      example:
+        stage: STAGE3
+        substatus: COMPLETED
+        originChain:
+          dltSubnetworkID: subnetwork1
+          dltProtocol: HyperledgerFabric
+        step: transfer-complete-message
+        startTime: 2023-01-01T00:00:00Z
+        destinationChain:
+          dltSubnetworkID: subnetwork2
+          dltProtocol: HyperledgerBesu
+        status: DONE
       properties:
         status:
-          description: Current status of the SATP session.
           enum:
           - NOT_FOUND
           - INVALID
           - PENDING
           - DONE
           - FAILED
+          example: DONE
           type: string
         substatus:
-          description: More detailed status of the SATP session.
           enum:
           - WAIT_SOURCE_CONFIRMATIONS
           - WAIT_DESTINATION_TRANSACTION
@@ -1197,17 +1257,17 @@ components:
           - PARTIAL
           - REFUNDED
           - NOT_PROCESSABLE_REFUND_NEEDED
+          example: COMPLETED
           type: string
         stage:
-          description: Current stage of the SATP session.
           enum:
           - STAGE0
           - STAGE1
           - STAGE2
           - STAGE3
+          example: STAGE3
           type: string
         step:
-          description: Current step within the stage of the SATP session.
           enum:
           - transfer-initialization-claims
           - conveyance-of-network-capabilities-and-parameters
@@ -1237,12 +1297,19 @@ components:
           - rollback-commit-final-assertion-message
           - rollback-commit-final-acknowledgement-receipt-message
           - rollback-transfer-complete-message
+          example: transfer-complete-message
           type: string
         startTime:
-          description: The start time of the SATP session.
+          example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
+        originChain:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_originChain'
+        destinationChain:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_destinationChain'
       required:
+      - destinationChain
+      - originChain
       - stage
       - startTime
       - status
@@ -1251,13 +1318,21 @@ components:
       type: object
       x-category: response
     Transact_200_response:
+      description: Response schema for a transaction request. Includes the session
+        ID and the current status of the transaction.
       example:
         statusResponse:
-          stage: STAGE0
-          substatus: WAIT_SOURCE_CONFIRMATIONS
-          step: transfer-initialization-claims
-          startTime: 2000-01-23T04:56:07.000+00:00
-          status: NOT_FOUND
+          stage: STAGE3
+          substatus: COMPLETED
+          originChain:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          step: transfer-complete-message
+          startTime: 2023-01-01T00:00:00Z
+          destinationChain:
+            dltSubnetworkID: subnetwork2
+            dltProtocol: HyperledgerBesu
+          status: DONE
         sessionID: 000003e8-e0b8-21ee-ba00-325096b39f47
       properties:
         sessionID:
@@ -1305,6 +1380,8 @@ components:
       x-go-type: ApiError
       x-go-name: ApiError
     Cancel_request:
+      description: "Request to cancel an ongoing transaction session, identified by\
+        \ the session ID."
       properties:
         sessionID:
           description: Unique identifier (UUID) for the session.
@@ -1315,19 +1392,28 @@ components:
       - sessionID
       type: object
     Cancel_200_response:
+      description: Response for a cancel transaction request. Indicates whether the
+        cancel action was successful and includes the current session status.
       example:
         statusResponse:
-          stage: STAGE0
-          substatus: WAIT_SOURCE_CONFIRMATIONS
-          step: transfer-initialization-claims
-          startTime: 2000-01-23T04:56:07.000+00:00
-          status: NOT_FOUND
+          stage: STAGE3
+          substatus: COMPLETED
+          originChain:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          step: transfer-complete-message
+          startTime: 2023-01-01T00:00:00Z
+          destinationChain:
+            dltSubnetworkID: subnetwork2
+            dltProtocol: HyperledgerBesu
+          status: DONE
         cancelSuccessful: true
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
         cancelSuccessful:
           description: Indicates whether the cancel operation was successful.
+          example: true
           type: boolean
       required:
       - cancelSuccessful
@@ -1353,11 +1439,17 @@ components:
         \ the SATP session."
       example:
         statusResponse:
-          stage: STAGE0
-          substatus: WAIT_SOURCE_CONFIRMATIONS
-          step: transfer-initialization-claims
-          startTime: 2000-01-23T04:56:07.000+00:00
-          status: NOT_FOUND
+          stage: STAGE3
+          substatus: COMPLETED
+          originChain:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          step: transfer-complete-message
+          startTime: 2023-01-01T00:00:00Z
+          destinationChain:
+            dltSubnetworkID: subnetwork2
+            dltProtocol: HyperledgerBesu
+          status: DONE
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
@@ -1365,37 +1457,41 @@ components:
       - statusResponse
       type: object
     Pause_request:
-      description: Schema for a request to pause a transaction session.
+      description: "Request to temporarily pause an ongoing transaction session, identified\
+        \ by the session and context IDs."
       properties:
         sessionId:
-          description: A unique identifier for the transaction session to be paused.
+          example: 123e4567-e89b-12d3-a456-426614174000
           format: uuid
           type: string
         contextId:
-          description: A unique identifier for the transaction context.
+          example: 123e4567-e89b-12d3-a456-426614174001
           format: uuid
           type: string
-      required:
-      - contextId
-      - sessionId
       type: object
     Pause_200_response:
-      description: "Response schema for a pause request, returning the status of the\
-        \ SATP session."
+      description: Response for a pause transaction request. Returns the current status
+        of the SATP session post-pause action.
       example:
         statusResponse:
-          stage: STAGE0
-          substatus: WAIT_SOURCE_CONFIRMATIONS
-          step: transfer-initialization-claims
-          startTime: 2000-01-23T04:56:07.000+00:00
-          status: NOT_FOUND
+          stage: STAGE3
+          substatus: COMPLETED
+          originChain:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          step: transfer-complete-message
+          startTime: 2023-01-01T00:00:00Z
+          destinationChain:
+            dltSubnetworkID: subnetwork2
+            dltProtocol: HyperledgerBesu
+          status: DONE
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
       required:
       - statusResponse
       type: object
-    GetChains_200_response_inner:
+    Chains_1_inner:
       example:
         chainName: chainName
         chainId: chainId
@@ -1503,6 +1599,7 @@ components:
           - hyperledger
           items:
             type: string
+          title: Tags
           type: array
         priceUSD:
           description: The current price of the token in USD.
@@ -2344,6 +2441,7 @@ components:
           - hyperledger
           items:
             type: string
+          title: Tags
           type: array
       required:
       - gatewayID
@@ -2950,24 +3048,31 @@ components:
       - routes
       type: object
     GetAudit_200_response:
+      description: Response schema for an audit request. Contains the proofs generated
+        during the audit period and the start and end datetimes.
       example:
         proofs:
-        - proofs
-        - proofs
-        auditEndTime: 2000-01-23T04:56:07.000+00:00
-        auditStartTime: 2000-01-23T04:56:07.000+00:00
+        - proof1
+        - proof2
+        auditEndTime: 2023-01-31T23:59:59Z
+        auditStartTime: 2023-01-01T00:00:00Z
       properties:
         proofs:
           description: An array of strings representing proofs.
+          example:
+          - proof1
+          - proof2
           items:
             type: string
           type: array
         auditStartTime:
           description: The start datetime of the audit period.
+          example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
         auditEndTime:
           description: The end datetime of the audit period.
+          example: 2023-01-31T23:59:59Z
           format: date-time
           type: string
       type: object
