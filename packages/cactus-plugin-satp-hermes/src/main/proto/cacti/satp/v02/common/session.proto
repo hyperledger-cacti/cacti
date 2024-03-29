@@ -6,39 +6,52 @@ import "google/protobuf/empty.proto";
 import "cacti/satp/v02/common/common_messages.proto";
 
 
+
 message SessionData {
-    message SessionData {
-        string id = 1;
-        string version = 2;
-        string transfer_context_id = 3;
-        MessageStagesHashes hashes = 4;
-        cacti.satp.v02.common.PayloadProfile payload_profile = 5;
-        MessageStagesSignatures signatures = 6;
-        string max_retries = 7;
-        string max_timeout = 8;
-        string logging_profile = 9;
-        string recipient_base_path = 10;
-        string source_base_path = 11;
-        string access_control_profile = 12;
-        string application_profile = 13;
-        int64 last_sequence_number = 14;
-        string sender_gateway_network_id = 15;
-        string recipient_gateway_network_id = 16;
-        string source_ledger_asset_id = 17; 
-        string recipient_ledger_asset_id = 18;
-        string server_identity_pubkey = 19;
-        string source_gateway_pubkey = 20;
-        string verified_originator_entity_id = 21; 
-        string verified_beneficiary_entity_id = 22;
-        string asset_profile_id = 23;
-        string digital_asset_id = 24;
-        string originator_pubkey = 25;
-        string beneficiary_pubkey = 26;
-        string sender_gateway_owner_id = 27;
-        string receiver_gateway_owner_id = 28;
-        string hash_transfer_init_claims = 29;
-    }
+    string id = 1;
+    string version = 2;
+    string transfer_context_id = 3;
+    MessageStagesHashes hashes = 4;
+    cacti.satp.v02.common.PayloadProfile payload_profile = 5;
+    MessageStagesSignatures signatures = 6;
+    string max_retries = 7;
+    string max_timeout = 8;
+    string logging_profile = 9;
+    string recipient_base_path = 10;
+    string source_base_path = 11;
+    string access_control_profile = 12;
+    string application_profile = 13;
+    int64 last_sequence_number = 14;
+    string sender_gateway_network_id = 15;
+    string recipient_gateway_network_id = 16;
+    string source_ledger_asset_id = 17; 
+    string recipient_ledger_asset_id = 18;
+    string server_gateway_pubkey = 19;
+    string client_gateway_pubkey = 20;
+    string verified_originator_entity_id = 21; 
+    string verified_beneficiary_entity_id = 22;
+    string asset_profile_id = 23;
+    string digital_asset_id = 24;
+    string originator_pubkey = 25;
+    string beneficiary_pubkey = 26;
+    string sender_gateway_owner_id = 27;
+    string receiver_gateway_owner_id = 28;
+    string hash_transfer_init_claims = 29;
+    cacti.satp.v02.common.SignatureAlgorithm signature_algorithm = 30;
+    cacti.satp.v02.common.LockType lock_type = 31;
+    uint64 lock_expiration_time = 32;
+    cacti.satp.v02.common.Permissions permitions = 33;
+    string developer_urn = 34;
+    cacti.satp.v02.common.CredentialProfile credential_profile = 35;
+    string subsequent_calls = 36;
+    string history = 37;
+    bool multiple_claims_allowed = 38;
+    bool multiple_cancels_allowed = 39;
+    string last_message_received_timestamp = 40;
+    MessageStagesTimestamps processed_timestamps = 41;
+    MessageStagesTimestamps received_timestamps = 42;
 }
+
 
 message MessageStagesHashes {
     Stage1Hashes stage1 = 1;
@@ -94,6 +107,34 @@ message Stage3Signatures {
     string commit_final_acknoledgement_receipt_response_message_server_signature = 4;
     string transfer_complete_request_message_client_signature = 5;
     string transfer_complete_response_message_server_signature = 6;
+}
+
+message MessageStagesTimestamps {
+    Stage1Timestamps stage1 = 1;
+    Stage2Timestamps stage2 = 2;
+    Stage3Timestamps stage3 = 3;  
+}
+
+message Stage1Timestamps {
+    string transfer_proposal_request_message_timestamp = 1;
+    string transfer_proposal_receipt_message_timestamp = 2;
+    string transfer_proposal_reject_message_timestamp = 3;
+    string transfer_commence_request_message_timestamp = 4;
+    string transfer_commence_response_message_timestamp = 5;
+}
+
+message Stage2Timestamps {
+    string lock_assertion_request_message_timestamp = 1;
+    string lock_assertion_receipt_message_timestamp = 2;
+}
+
+message Stage3Timestamps {
+    string commit_preparation_request_message_timestamp = 1;
+    string commit_ready_response_message_timestamp = 2;
+    string commit_final_assertion_request_message_timestamp = 3;
+    string commit_final_acknoledgement_receipt_response_message_timestamp = 4;
+    string transfer_complete_request_message_timestamp = 5;
+    string transfer_complete_response_message_timestamp = 6;
 }
 
 
