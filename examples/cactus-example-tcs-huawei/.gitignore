@@ -1,7 +1,0 @@
-MeterInfo.json
-
-# BLP artifacts
-etc/
-
-# don't commit package-lock
-package-lock.json
