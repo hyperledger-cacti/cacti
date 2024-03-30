@@ -133,6 +133,22 @@ paths:
         http:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/status
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck:
+    get:
+      description: Responds if SATP Hermes is on
+      operationId: GetHealthCheck
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHealthCheck_200_response'
+          description: OK
+        "500":
+          description: Internal server error
+      summary: Health check endpoint
+      tags:
+      - admin
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
     post:
       description: "Attempts to continue a previously paused transaction intent, resuming\
@@ -948,6 +964,12 @@ components:
         type: string
       title: Tags
       type: array
+    HealthCheckResponse:
+      properties:
+        status:
+          example: OK
+          type: string
+      type: object
     BridgeInfo:
       description: Information about the bridge used for the token transfer.
       properties:
@@ -1418,6 +1440,14 @@ components:
       required:
       - cancelSuccessful
       - statusResponse
+      type: object
+    GetHealthCheck_200_response:
+      example:
+        status: OK
+      properties:
+        status:
+          example: OK
+          type: string
       type: object
     Continue_request:
       description: Schema for a request to continue a paused transaction session.

@@ -534,6 +534,26 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck:
+    get:
+      summary: Health check endpoint
+      description: Responds if SATP Hermes is on
+      operationId: GetHealthCheck
+      tags:
+        - admin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+        '500':
+          description: Internal server error
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
     post:
       tags:
@@ -3786,6 +3806,12 @@ components:
       example:
         - satp
         - hyperledger
+    HealthCheckResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
     BridgeInfo:
       type: object
       description: Information about the bridge used for the token transfer.
