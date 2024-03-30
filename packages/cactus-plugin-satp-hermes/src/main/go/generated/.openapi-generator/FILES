@@ -28,6 +28,7 @@ docs/GasCost.md
 docs/GetAudit200Response.md
 docs/GetAuditRequest.md
 docs/GetAuditResponse.md
+docs/GetHealthCheck200Response.md
 docs/GetRoutes200Response.md
 docs/GetRoutes200ResponseRoutesInner.md
 docs/GetRoutes200ResponseRoutesInnerFromToken.md
@@ -40,6 +41,7 @@ docs/GetRoutes200ResponseRoutesInnerStepsInnerEstimate.md
 docs/GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner.md
 docs/GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner.md
 docs/GetRoutes200ResponseRoutesInnerStepsInnerToolDetails.md
+docs/HealthCheckResponse.md
 docs/IncludedStep.md
 docs/Insurance.md
 docs/IntegrationDetails.md
@@ -83,6 +85,7 @@ model_gas_cost.go
 model_get_audit_200_response.go
 model_get_audit_request.go
 model_get_audit_response.go
+model_get_health_check_200_response.go
 model_get_routes_200_response.go
 model_get_routes_200_response_routes_inner.go
 model_get_routes_200_response_routes_inner_from_token.go
@@ -95,6 +98,7 @@ model_get_routes_200_response_routes_inner_steps_inner_estimate.go
 model_get_routes_200_response_routes_inner_steps_inner_estimate_fee_costs_inner.go
 model_get_routes_200_response_routes_inner_steps_inner_estimate_gas_costs_inner.go
 model_get_routes_200_response_routes_inner_steps_inner_tool_details.go
+model_health_check_response.go
 model_included_step.go
 model_insurance.go
 model_integration_details.go

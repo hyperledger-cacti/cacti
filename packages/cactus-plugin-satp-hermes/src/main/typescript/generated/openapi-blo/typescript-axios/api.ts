@@ -568,6 +568,19 @@ export interface GetAuditResponse {
     'auditEndTime'?: string;
 }
 /**
+ * 
+ * @export
+ * @interface GetHealthCheck200Response
+ */
+export interface GetHealthCheck200Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetHealthCheck200Response
+     */
+    'status'?: string;
+}
+/**
  * A collection of available and unavailable routes
  * @export
  * @interface GetRoutes200Response
@@ -1107,6 +1120,19 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails {
      * @memberof GetRoutes200ResponseRoutesInnerStepsInnerToolDetails
      */
     'logoURI': string;
+}
+/**
+ * 
+ * @export
+ * @interface HealthCheckResponse
+ */
+export interface HealthCheckResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof HealthCheckResponse
+     */
+    'status'?: string;
 }
 /**
  * Details a single step within a route including actions and estimates.
@@ -1982,6 +2008,36 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Responds if SATP Hermes is on
+         * @summary Health check endpoint
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getHealthCheck: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieve the status of a SATP session
          * @summary Get SATP current session data
          * @param {string} sessionID Unique identifier for the session.
@@ -2089,6 +2145,16 @@ export const AdminApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Responds if SATP Hermes is on
+         * @summary Health check endpoint
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getHealthCheck(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetHealthCheck200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getHealthCheck(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Retrieve the status of a SATP session
          * @summary Get SATP current session data
          * @param {string} sessionID Unique identifier for the session.
@@ -2141,6 +2207,15 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          */
         getAudit(auditStartDate?: string, auditEndDate?: string, includeProofs?: boolean, options?: any): AxiosPromise<GetAudit200Response> {
             return localVarFp.getAudit(auditStartDate, auditEndDate, includeProofs, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Responds if SATP Hermes is on
+         * @summary Health check endpoint
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getHealthCheck(options?: any): AxiosPromise<GetHealthCheck200Response> {
+            return localVarFp.getHealthCheck(options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieve the status of a SATP session
@@ -2196,6 +2271,17 @@ export class AdminApi extends BaseAPI {
      */
     public getAudit(auditStartDate?: string, auditEndDate?: string, includeProofs?: boolean, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).getAudit(auditStartDate, auditEndDate, includeProofs, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Responds if SATP Hermes is on
+     * @summary Health check endpoint
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public getHealthCheck(options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).getHealthCheck(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

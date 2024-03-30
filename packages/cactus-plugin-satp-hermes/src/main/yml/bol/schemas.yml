@@ -513,6 +513,12 @@ Tags:
   example:
     - satp
     - hyperledger
+HealthCheckResponse:
+  type: object
+  properties:
+    status:
+      type: string
+      example: 'OK'
 BridgeInfo:
   type: object
   description: Information about the bridge used for the token transfer.
