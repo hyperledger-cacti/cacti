@@ -3,6 +3,7 @@ export * from "./generated/openapi/typescript-axios";
 export {
   PluginLedgerConnectorEthereum,
   IPluginLedgerConnectorEthereumOptions,
+  RunTransactionV1Exchange,
 } from "./plugin-ledger-connector-ethereum";
 
 export * from "./sign-utils";
