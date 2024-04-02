@@ -1,6 +1,0 @@
-src/main/typescript/generated/gateway-client/typescript-axios/.gitignore
-src/main/typescript/generated/gateway-client/typescript-axios/.npmignore
-src/main/typescript/generated/gateway-client/typescript-axios/.openapi-generator-ignore
-src/main/typescript/generated/gateway-client/typescript-axios/api.ts
-src/main/typescript/generated/gateway-client/typescript-axios/git_push.sh
-src/main/typescript/generated/gateway-client/typescript-axios/.openapi-generator/FILES

@@ -1,9 +1,0 @@
-syntax = "proto3";
-package cacti.satp.v02.common;
-import "cacti/satp/v02/common/message.proto";
-
-message HealthCheckRequest {}
-
-service HealthService {
-    rpc CheckHealth(HealthCheckRequest) returns (Ack);
-}

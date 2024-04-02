@@ -134,7 +134,7 @@
       "path": "./packages/cactus-test-verifier-client/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-cc-tx-visualization/tsconfig.json"
+      "path": "./packages/cactus-plugin-ccmodel-hephaestus/tsconfig.json"
     },
     {
       "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"
@@ -168,9 +168,6 @@
     },
     {
       "path": "./examples/cactus-example-discounted-asset-trade-client/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-cbdc-bridging-frontend/tsconfig.json"
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
