@@ -2,6 +2,7 @@ export {
   E_KEYCHAIN_NOT_FOUND,
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
+  RunTransactionV1Exchange,
 } from "./plugin-ledger-connector-besu";
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 

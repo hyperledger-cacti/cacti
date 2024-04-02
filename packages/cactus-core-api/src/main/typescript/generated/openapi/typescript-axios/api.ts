@@ -524,6 +524,7 @@ export const LedgerType = {
     Besu2X: 'BESU_2X',
     Burrow0X: 'BURROW_0X',
     Corda4X: 'CORDA_4X',
+    Ethereum: 'ETHEREUM',
     Fabric14X: 'FABRIC_14X',
     Fabric2: 'FABRIC_2',
     Quorum2X: 'QUORUM_2X',
