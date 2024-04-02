@@ -1,0 +1,97 @@
+{
+  "name": "@hyperledger/cactus-plugin-ccmodel-hephaestus",
+  "version": "1.0.0",
+  "description": "A web service plugin that provides management capabilities on cross-chain transactions visualization.",
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Iulia Mihaiu"
+    },
+    {
+      "name": "Sabrina Scuri"
+    },
+    {
+      "name": "Rafael Belchior"
+    },
+    {
+      "name": "Bruno Mateus"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-plugin-ccmodel-hephaestus.web.umd.js",
+  "types": "dist/types/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "npm run tsc",
+    "tsc": "tsc --project ./tsconfig.json",
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev webpack:prod",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
+    "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
+    "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
+    "run-time-error-cjs": "1.4.0",
+    "typescript-optional": "2.0.1"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-geth-ledger": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "@types/express": "4.17.8",
+    "@types/uuid": "8.3.0",
+    "body-parser": "1.19.0",
+    "express": "4.17.1",
+    "fabric-network": "2.2.20",
+    "socket.io": "4.5.4",
+    "uuid": "8.3.2",
+    "web3": "1.6.1",
+    "web3-core": "1.6.1"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-plugin-ccmodel-hephaestus.web.umd.min.js",
+  "mainMinified": "dist/cactus-plugin-ccmodel-hephaestus.node.umd.min.js"
+}
