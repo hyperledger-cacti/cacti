@@ -414,18 +414,6 @@
               "nullable": false
             }
           },
-          "cost":{
-            "type": "number",
-            "nullable": false
-        	},
-        	"carbonFootprint":{
-            "type": "string",
-            "nullable": false
-        	},
-        	"caseID":{
-            "type": "string",
-            "nullable": false
-        	},
           "transientData": {
             "type": "object",
             "nullable": true
