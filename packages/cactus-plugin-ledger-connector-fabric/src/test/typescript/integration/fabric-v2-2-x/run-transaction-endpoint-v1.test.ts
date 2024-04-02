@@ -35,6 +35,8 @@ import {
   FabricSigningCredential,
 } from "../../../../main/typescript/public-api";
 
+import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics";
+
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
 import { Configuration } from "@hyperledger/cactus-core-api";
@@ -227,6 +229,25 @@ describe(testCase, () => {
       expect(asset277).toBeTruthy();
       expect(asset277.Owner).toBeTruthy();
       expect(asset277.Owner).toEqual(assetOwner);
+    }
+
+    {
+      const res = await apiClient.getPrometheusMetricsV1();
+      const promMetricsOutput =
+        "# HELP " +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        " Total transactions executed\n" +
+        "# TYPE " +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        " gauge\n" +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        '{type="' +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        '"} 3';
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+      expect(res.data.includes(promMetricsOutput)).toBeTrue();
     }
 
     {
