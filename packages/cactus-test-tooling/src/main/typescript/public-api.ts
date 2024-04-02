@@ -230,5 +230,3 @@ export {
   IBuildImageBesuAllInOneLatestResponse,
   buildImageBesuAllInOneLatest,
 } from "./corda/build-image-besu-all-in-one-latest";
-
-export { RabbitMQTestServer } from "./rabbitmq-test-server/rabbit-mq-test-server";

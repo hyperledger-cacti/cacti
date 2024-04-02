@@ -1,7 +1,0 @@
-caseID;receiptID;timestamp;blockchainID;invocationType;methodName;parameters;identity;cost;carbonFootprint;latency;revenue
-1;515ca87f-fbac-49f0-a4cf-d3bf5eb62860;2022-08-03T14:04:52.844Z;TEST;send;initialize asset;"[""1,100""]";A;0;0;7621;
-1;2a5ca7a6-344c-4dfd-a005-98811fc889ce;2022-08-03T14:04:52.846Z;TEST;send;lock asset;"[""1,100""]";A;0;0;7620;
-1;4b3a5b7f-9bb2-413e-b2f4-74822db34c07;2022-08-03T14:04:52.847Z;TEST;send;mint asset;"[""1,100""]";A;0;0;7619;
-1;ee00b057-2f8e-4d57-89b0-ec9390a53e9b;2022-08-03T14:04:52.848Z;TEST;send;transfer asset;"[""A""]";A;0;0;7618;
-1;d31efa25-097b-4496-9c75-bc8daca1cf51;2022-08-03T14:04:52.849Z;TEST;send;transfer asset;"[""""]";A;0;0;7617;
-1;020c5f54-006f-4f49-b675-7cf85fb3cd80;2022-08-03T14:04:52.850Z;TEST;send;burn asset;"[""""]";A;0;0;7617;
