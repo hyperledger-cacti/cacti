@@ -88,6 +88,7 @@ export class InvokeRawWeb3EthMethodEndpoint implements IWebServiceEndpoint {
     try {
       const methodResponse =
         await this.options.connector.invokeRawWeb3EthMethod(req.body);
+
       const response: InvokeRawWeb3EthMethodV1Response = {
         status: 200,
         data: methodResponse,

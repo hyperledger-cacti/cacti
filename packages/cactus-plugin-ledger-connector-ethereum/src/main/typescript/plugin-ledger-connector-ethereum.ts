@@ -304,6 +304,9 @@ export class PluginLedgerConnectorEthereum
     app: Express,
     wsApi: SocketIoServer,
   ): Promise<IWebServiceEndpoint[]> {
+    // Add custom replacer to handle bigint responses correctly
+    app.set("json replacer", this.stringifyBigIntReplacer);
+
     const { logLevel } = this.options;
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
@@ -1182,5 +1185,15 @@ export class PluginLedgerConnectorEthereum
     return methodRef(...contractMethodArgs)[args.invocationType](
       args.invocationParams,
     );
+  }
+
+  stringifyBigIntReplacer(
+    _key: string,
+    value: bigint | unknown,
+  ): string | unknown {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
   }
 }
