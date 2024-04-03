@@ -64,7 +64,7 @@
     "postcss": "8.4.31",
     "supabase": "1.28.4",
     "typescript-plugin-css-modules": "5.0.2",
-    "vite": "4.5.2",
+    "vite": "4.5.3",
     "vite-plugin-solid": "2.8.2"
   },
   "engines": {
