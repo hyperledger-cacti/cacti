@@ -5,7 +5,7 @@ import { Optional } from "typescript-optional";
 import type { Express } from "express";
 import { v4 as uuidV4 } from "uuid";
 import { Knex } from "knex";
-import OAS from "../json/openapi.json";
+import OAS from "../json/openapi-gateway-bundled.json";
 import {
   Secp256k1Keys,
   Logger,
@@ -40,7 +40,7 @@ import {
   RecoverUpdateAckV1Message,
   RollbackV1Message,
   RollbackAckV1Message,
-  SessionData
+  SessionData,
 } from "./generated/openapi/typescript-axios";
 import { CommitFinalRequestEndpointV1 } from "./web-services/server-side/commit-final-request-endpoint";
 import { CommitFinalResponseEndpointV1 } from "./web-services/client-side/commit-final-response-endpoint";

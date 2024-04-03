@@ -2,6 +2,7 @@ import { GetStatusError } from "../../core/errors";
 import {
   StatusRequest,
   StatusResponse,
+  Transact200ResponseStatusResponseOriginChain,
 } from "../../generated/openapi-blo/typescript-axios";
 import { Logger } from "@hyperledger/cactus-common";
 
@@ -33,12 +34,24 @@ export async function GetStatusService(
   req: StatusRequest,
 ): Promise<StatusResponse> {
   // Implement the logic for getting status here; call core
+  const originChain: Transact200ResponseStatusResponseOriginChain = {
+    dltProtocol: "besu",
+    dltSubnetworkID: "v24.4.0-RC1",
+  };
+
+  const destinationChain: Transact200ResponseStatusResponseOriginChain = {
+    dltProtocol: "fabric",
+    dltSubnetworkID: "v2.0.0",
+  };
+
   const mock: StatusResponse = {
     status: "DONE",
     substatus: "COMPLETED",
     stage: "STAGE3",
     step: "transfer-complete-message",
     startTime: "2023-03-14T16:50:06.662Z",
+    originChain: originChain,
+    destinationChain: destinationChain,
   };
 
   logger.info(req);
