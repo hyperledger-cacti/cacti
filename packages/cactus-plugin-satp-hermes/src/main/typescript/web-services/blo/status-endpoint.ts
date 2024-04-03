@@ -14,7 +14,7 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import OAS from "../../../json/bol/openapi-blo-bundled.json";
+import OAS from "../../../json/openapi-blo-bundled.json";
 import { IRequestOptions } from "../../core/types";
 import { StatusRequest } from "../../generated/openapi-blo/typescript-axios";
 
