@@ -25,7 +25,6 @@ import {
   IAccount,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const testCase = "Quorum Ledger Connector Plugin";
 import express from "express";
@@ -33,6 +32,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Server as SocketIoServer } from "socket.io";
 
 const logLevel: LogLevelDesc = "INFO";
@@ -44,8 +44,7 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
-  const containerImageVersion = "2021-01-08-7a055c3"; // Quorum v2.3.0, Tessera v0.10.0
-
+  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
   const ledgerOptions = { containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
   test.onFinish(async () => {
@@ -73,8 +72,6 @@ test(testCase, async (t: Test) => {
   const web3 = new Web3(rpcApiHttpHost);
   const testEthAccount = web3.eth.accounts.create(uuidV4());
 
-  // Instantiate connector with the keychain plugin that already has the
-  // private key we want to use for one of our tests
   const connector: PluginLedgerConnectorQuorum =
     new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
@@ -129,7 +126,7 @@ test(testCase, async (t: Test) => {
   let contractAddress: string;
 
   test("deploys contract via .json file", async (t2: Test) => {
-    const deployOut = await connector.deployContractJsonObject({
+    const deployOut = await connector.deployContractNoKeychain({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -164,7 +161,6 @@ test(testCase, async (t: Test) => {
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      gas: 1000000,
       contractJSON: HelloWorldContractJson,
     });
     t2.ok(helloMsg, "sayHello() output is truthy");
@@ -283,6 +279,7 @@ test(testCase, async (t: Test) => {
 
   test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
     const newName = `DrCactus${uuidV4()}`;
+    const txCount = await web3.eth.getTransactionCount(testEthAccount.address);
     const setNameOut = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
@@ -293,7 +290,7 @@ test(testCase, async (t: Test) => {
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
-      nonce: 1,
+      nonce: txCount,
       contractJSON: HelloWorldContractJson,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");

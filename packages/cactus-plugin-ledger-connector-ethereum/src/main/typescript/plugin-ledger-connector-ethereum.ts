@@ -39,6 +39,7 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { DeployContractEndpoint } from "./web-services/deploy-contract-v1-endpoint";
+import { DeployContractNoKeychainEndpoint } from "./web-services/deploy-contract-no-keychain-v1-endpoint";
 
 import {
   DeployContractV1Request,
@@ -60,6 +61,7 @@ import {
   ContractKeychainDefinition,
   GasTransactionConfig,
   ContractJSON,
+  DeployContractNoKeychainV1Request,
 } from "./generated/openapi/typescript-axios";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-v1-endpoint";
@@ -73,7 +75,6 @@ import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3et
 import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3eth-contract-v1-endpoint";
 
 import {
-  isContractJsonDefinition,
   isContractKeychainDefinition,
   isDeployedContractJsonDefinition,
   isGasTransactionConfigEIP1559,
@@ -364,6 +365,13 @@ export class PluginLedgerConnectorEthereum
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const endpoint = new DeployContractEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new DeployContractNoKeychainEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -946,24 +954,25 @@ export class PluginLedgerConnectorEthereum
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
       throw new Error(`Cannot deploy contract with pre-signed TX`);
     }
+    return this.deployContractFromKeychain(req, req.contract);
+  }
 
-    if (isContractJsonDefinition(req.contract)) {
-      return this.runContractDeployment({
-        web3SigningCredential: req.web3SigningCredential,
-        gasConfig: req.gasConfig,
-        constructorArgs: req.constructorArgs,
-        value: req.value,
-        contractJSON: req.contract.contractJSON,
-      });
-    } else if (isContractKeychainDefinition(req.contract)) {
-      return this.deployContractFromKeychain(req, req.contract);
-    } else {
-      // Exhaustive check
-      const unknownContract: never = req.contract;
-      throw new Error(
-        `Unknown contract definition provided: ${unknownContract}`,
-      );
+  public async deployContractNoKeychain(
+    req: DeployContractNoKeychainV1Request,
+  ): Promise<RunTransactionResponse> {
+    Checks.truthy(req, "deployContractNoKeychain() request arg");
+
+    if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
+      throw new Error(`Cannot deploy contract with pre-signed TX`);
     }
+
+    return this.runContractDeployment({
+      web3SigningCredential: req.web3SigningCredential,
+      gasConfig: req.gasConfig,
+      constructorArgs: req.constructorArgs,
+      value: req.value,
+      contractJSON: req.contract.contractJSON,
+    });
   }
 
   /**

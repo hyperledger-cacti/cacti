@@ -42,8 +42,8 @@ import {
   Web3SigningCredentialType,
   DefaultApi as EthereumApi,
   ContractJsonDefinition,
-  DeployContractV1Request,
   InvokeContractV1Request,
+  DeployContractNoKeychainV1Request,
 } from "../../../main/typescript/public-api";
 
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
@@ -168,7 +168,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   //////////////////////////////////
 
   test("deploys contract using json object", async () => {
-    const deployOut = await apiClient.deployContract({
+    const deployOut = await apiClient.deployContractNoKeychain({
       contract: {
         contractJSON: HelloWorldContractJson,
       },
@@ -209,7 +209,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("deploys contract using json object with constructorArgs", async () => {
-    const deployOut = await apiClient.deployContract({
+    const deployOut = await apiClient.deployContractNoKeychain({
       contract: {
         contractJSON: HelloWorldWithArgContractJson,
       },
@@ -228,7 +228,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
 
   test("deployContract without contractJSON should fail", async () => {
     try {
-      await apiClient.deployContract({
+      await apiClient.deployContractNoKeychain({
         contract: {} as ContractJsonDefinition,
         web3SigningCredential: {
           ethAccount: WHALE_ACCOUNT_ADDRESS,
@@ -244,7 +244,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
 
   test("deployContract with additional parameters should fail", async () => {
     try {
-      await apiClient.deployContract({
+      await apiClient.deployContractNoKeychain({
         contract: {
           contractJSON: HelloWorldContractJson,
         },
@@ -255,7 +255,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         },
         gas: 1000000,
         fake: 4,
-      } as DeployContractV1Request);
+      } as DeployContractNoKeychainV1Request);
       fail("Expected deployContract call to fail but it succeeded.");
     } catch (error) {
       console.log("deployContract failed as expected");

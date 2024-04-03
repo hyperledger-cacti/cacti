@@ -1,39 +1,44 @@
 import { Express, Request, Response } from "express";
 
 import {
+  IWebServiceEndpoint,
+  IExpressRequestHandler,
+  IEndpointAuthzOptions,
+} from "@hyperledger/cactus-core-api";
+
+import {
   Logger,
   Checks,
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
-import {
-  IEndpointAuthzOptions,
-  IExpressRequestHandler,
-  IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
-
+import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
+import { DeployContractNoKeychainV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
-export interface IInvokeContractEndpointJsonObjectOptions {
+export interface IDeployContractSolidityBytecodeNoKeychainOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginLedgerConnectorQuorum;
+  connector: PluginLedgerConnectorXdai;
 }
 
-export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractJsonObjectEndpoint";
+export class DeployContractSolidityBytecodeNoKeychainEndpoint
+  implements IWebServiceEndpoint
+{
+  public static readonly CLASS_NAME =
+    "DeployContractSolidityBytecodeNoKeychainEndpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return InvokeContractJsonObjectEndpoint.CLASS_NAME;
+    return DeployContractSolidityBytecodeNoKeychainEndpoint.CLASS_NAME;
   }
 
   constructor(
-    public readonly options: IInvokeContractEndpointJsonObjectOptions,
+    public readonly options: IDeployContractSolidityBytecodeNoKeychainOptions,
   ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -44,24 +49,22 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath() {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-no-keychain"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-no-keychain"
     ];
   }
 
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cacti"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -88,9 +91,10 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody = req.body;
+    const reqBody: DeployContractNoKeychainV1Request = req.body;
     try {
-      const resBody = await this.options.connector.getContractInfo(reqBody);
+      const resBody =
+        await this.options.connector.deployContractNoKeychain(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

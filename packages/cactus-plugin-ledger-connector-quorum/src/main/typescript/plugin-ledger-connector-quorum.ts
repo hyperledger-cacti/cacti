@@ -49,16 +49,15 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
-import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint-json-object";
+import { DeployContractSolidityBytecodeNoKeychainEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint-no-keychain";
 
 import {
   DeployContractSolidityBytecodeV1Request,
-  DeployContractSolidityBytecodeJsonObjectV1Request,
   DeployContractSolidityBytecodeV1Response,
   EthContractInvocationType,
   EthContractInvocationWeb3Method,
   InvokeContractV1Request,
-  InvokeContractJsonObjectV1Request,
+  InvokeContractNoKeychainV1Request,
   InvokeContractV1Response,
   RunTransactionRequest,
   RunTransactionResponse,
@@ -70,11 +69,12 @@ import {
   WatchBlocksV1Options,
   InvokeRawWeb3EthMethodV1Request,
   InvokeRawWeb3EthContractV1Request,
+  DeployContractSolidityBytecodeNoKeychainV1Request,
 } from "./generated/openapi/typescript-axios/";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
-import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-endpoint-json-object";
+import { InvokeContractNoKeychainEndpoint } from "./web-services/invoke-contract-endpoint-no-keychain";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
 import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3eth-method-v1-endpoint";
@@ -240,7 +240,7 @@ export class PluginLedgerConnectorQuorum
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new DeployContractSolidityBytecodeJsonObjectEndpoint({
+      const endpoint = new DeployContractSolidityBytecodeNoKeychainEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -261,7 +261,7 @@ export class PluginLedgerConnectorQuorum
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new InvokeContractJsonObjectEndpoint({
+      const endpoint = new InvokeContractNoKeychainEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -415,7 +415,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async getContractInfo(
-    req: InvokeContractJsonObjectV1Request,
+    req: InvokeContractNoKeychainV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContractNoKeychain()`;
     const { contractJSON, contractAddress } = req;
@@ -429,7 +429,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async invokeContract(
-    req: InvokeContractJsonObjectV1Request,
+    req: InvokeContractNoKeychainV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
 
@@ -831,8 +831,8 @@ export class PluginLedgerConnectorQuorum
     return receipt;
   }
 
-  public async deployContractJsonObject(
-    req: DeployContractSolidityBytecodeJsonObjectV1Request,
+  public async deployContractNoKeychain(
+    req: DeployContractSolidityBytecodeNoKeychainV1Request,
   ): Promise<DeployContractSolidityBytecodeV1Response> {
     const fnTag = `${this.className}#deployContractNoKeychain()`;
     if (

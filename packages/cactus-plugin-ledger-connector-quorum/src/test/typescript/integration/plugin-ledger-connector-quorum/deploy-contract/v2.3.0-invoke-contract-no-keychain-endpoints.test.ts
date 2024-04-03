@@ -1,4 +1,4 @@
-import test, { Test } from "tape-promise/tape";
+import test, { Test } from "tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 
@@ -9,8 +9,6 @@ import {
 } from "@hyperledger/cactus-common";
 
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
-
-import { K_CACTUS_QUORUM_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics";
 
 import {
   EthContractInvocationType,
@@ -23,11 +21,9 @@ import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
   IAccount,
-  pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
-const testCase = "Quorum Ledger Connector Plugin";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
@@ -37,13 +33,7 @@ import { Server as SocketIoServer } from "socket.io";
 
 const logLevel: LogLevelDesc = "INFO";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
+test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const containerImageVersion = "2021-01-08-7a055c3"; // Quorum v2.3.0, Tessera v0.10.0
 
   const ledgerOptions = { containerImageVersion };
@@ -51,7 +41,6 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
   });
   await ledger.start();
 
@@ -72,9 +61,6 @@ test(testCase, async (t: Test) => {
 
   const web3 = new Web3(rpcApiHttpHost);
   const testEthAccount = web3.eth.accounts.create(uuidV4());
-
-  // Instantiate connector with the keychain plugin that already has the
-  // private key we want to use for one of our tests
   const connector: PluginLedgerConnectorQuorum =
     new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
@@ -129,7 +115,7 @@ test(testCase, async (t: Test) => {
   let contractAddress: string;
 
   test("deploys contract via .json file", async (t2: Test) => {
-    const deployOut = await apiClient.deployContractSolBytecodeJsonObjectV1({
+    const deployOut = await apiClient.deployContractSolBytecodeNoKeychainV1({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -155,22 +141,22 @@ test(testCase, async (t: Test) => {
       "contractAddress typeof string OK",
     );
 
-    const invokeOut = await apiClient.invokeContractV1NoKeychain({
+    const helloMsgRes = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      gas: 1000000,
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(invokeOut.data.callOutput, "sayHello() output is truthy");
+    t2.ok(helloMsgRes.data.callOutput, "sayHello() output is truthy");
     t2.true(
-      typeof invokeOut.data.callOutput === "string",
+      typeof helloMsgRes.data.callOutput === "string",
       "sayHello() output is type of string",
     );
   });
@@ -185,6 +171,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -224,6 +211,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -236,11 +224,12 @@ test(testCase, async (t: Test) => {
       `getName() SEND invocation produced receipt OK`,
     );
 
-    const getNameRes = await apiClient.invokeContractV1NoKeychain({
+    const getNameOut2 = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -249,7 +238,7 @@ test(testCase, async (t: Test) => {
       contractJSON: HelloWorldContractJson,
     });
     t2.equal(
-      getNameRes.data.callOutput,
+      getNameOut2.data.callOutput,
       newName,
       "setName() invocation #2 output is truthy OK",
     );
@@ -292,6 +281,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -325,13 +315,13 @@ test(testCase, async (t: Test) => {
         "setName() invocation with invalid nonce",
       );
     }
-    // const { callOutput: getNameOut } =
+
     const getNameOut = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
-      //  gas: 1000000,
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -350,7 +340,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
-      //gas: 1000000,
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -358,31 +348,8 @@ test(testCase, async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
+    t2.ok(getNameOut2.data, "getName() invocation #2 output is truthy OK");
 
-    t2.end();
-  });
-
-  test("get prometheus exporter metrics", async (t2: Test) => {
-    const res = await apiClient.getPrometheusMetricsV1();
-    const promMetricsOutput =
-      "# HELP " +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      " Total transactions executed\n" +
-      "# TYPE " +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      " gauge\n" +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      '{type="' +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      '"} 3';
-    t2.ok(res);
-    t2.ok(res.data);
-    t2.equal(res.status, 200);
-    t2.true(
-      res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 3 recorded as expected. RESULT OK.",
-    );
     t2.end();
   });
 

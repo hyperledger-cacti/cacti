@@ -461,7 +461,7 @@
           }
         }
       },
-      "DeployContractJsonObjectV1Request": {
+      "DeployContractNoKeychainV1Request": {
         "type": "object",
         "required": ["web3SigningCredential", "contractJSON"],
         "additionalProperties": false,
@@ -594,7 +594,7 @@
           }
         }
       },
-      "InvokeContractJsonObjectV1Request": {
+      "InvokeContractNoKeychainV1Request": {
         "type": "object",
         "required": [
           "web3SigningCredential",
@@ -868,22 +868,22 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-no-keychain": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-no-keychain"
           }
         },
-        "operationId": "deployContractJsonObjectV1",
+        "operationId": "deployContractNoKeychainV1",
         "summary": "Deploys the bytecode of a Solidity contract.",
         "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DeployContractJsonObjectV1Request"
+                "$ref": "#/components/schemas/DeployContractNoKeychainV1Request"
               }
             }
           }
@@ -970,22 +970,22 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-no-keychain": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-no-keychain"
           }
         },
-        "operationId": "invokeContractJsonObject",
+        "operationId": "invokeContractNoKeychain",
         "summary": "Invokes a contract on a besu ledger",
         "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InvokeContractJsonObjectV1Request"
+                "$ref": "#/components/schemas/InvokeContractNoKeychainV1Request"
               }
             }
           }

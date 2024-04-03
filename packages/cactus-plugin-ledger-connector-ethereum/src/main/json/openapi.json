@@ -447,17 +447,40 @@
             "nullable": false
           },
           "contract": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ContractJsonDefinition",
-                "description": "Send contract ABI directly in the request."
-              },
-              {
-                "$ref": "#/components/schemas/ContractKeychainDefinition",
-                "description": "Read contract definition from the keychain plugin."
-              }
-            ],
+              "$ref": "#/components/schemas/ContractKeychainDefinition",
+              "description": "Send contract ABI directly in the request.",
+              "nullable": false
+          },
+          "constructorArgs": {
+            "description": "The list of arguments to pass in to the constructor of the contract being deployed.",
+            "type": "array",
+            "default": [],
+            "items": {}
+          },
+          "gasConfig": {
+            "$ref": "#/components/schemas/GasTransactionConfig",
             "nullable": false
+          },
+          "value": {
+            "type": "string",
+            "description": "Ether balance to send on deployment.",
+            "nullable": false
+          }
+        }
+      },
+      "DeployContractNoKeychainV1Request": {
+        "type": "object",
+        "required": ["web3SigningCredential", "contract"],
+        "additionalProperties": false,
+        "properties": {
+          "web3SigningCredential": {
+            "$ref": "#/components/schemas/Web3SigningCredential",
+            "nullable": false
+          },
+          "contract": {
+              "$ref": "#/components/schemas/ContractJsonDefinition",
+              "description": "Send contract ABI directly in the request.",
+              "nullable": false
           },
           "constructorArgs": {
             "description": "The list of arguments to pass in to the constructor of the contract being deployed.",
@@ -943,6 +966,50 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeployContractV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunTransactionResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract-no-keychain": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract-no-keychain"
+          }
+        },
+        "operationId": "deployContractNoKeychain",
+        "summary": "Deploys the contract to ethereum ledger without keychain.",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployContractNoKeychainV1Request"
               }
             }
           }

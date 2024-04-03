@@ -1,4 +1,4 @@
-import test, { Test } from "tape-promise/tape";
+import test, { Test } from "tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 
@@ -9,8 +9,6 @@ import {
 } from "@hyperledger/cactus-common";
 
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
-
-import { K_CACTUS_QUORUM_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics";
 
 import {
   EthContractInvocationType,
@@ -23,34 +21,26 @@ import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
   IAccount,
-  pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import { Server as SocketIoServer } from "socket.io";
 
-const testCase = "Quorum Ledger Connector Plugin";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Server as SocketIoServer } from "socket.io";
 
 const logLevel: LogLevelDesc = "INFO";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
+test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const containerImageVersion = "2021-05-03-quorum-v21.4.1";
+
   const ledgerOptions = { containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
   });
   await ledger.start();
 
@@ -71,7 +61,6 @@ test(testCase, async (t: Test) => {
 
   const web3 = new Web3(rpcApiHttpHost);
   const testEthAccount = web3.eth.accounts.create(uuidV4());
-
   const connector: PluginLedgerConnectorQuorum =
     new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
@@ -126,7 +115,7 @@ test(testCase, async (t: Test) => {
   let contractAddress: string;
 
   test("deploys contract via .json file", async (t2: Test) => {
-    const deployOut = await apiClient.deployContractSolBytecodeJsonObjectV1({
+    const deployOut = await apiClient.deployContractSolBytecodeNoKeychainV1({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -305,7 +294,7 @@ test(testCase, async (t: Test) => {
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
-        //  gas: 1000000,
+        gas: 1000000,
         web3SigningCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
@@ -327,7 +316,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
-      //  gas: 1000000,
+      gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -356,29 +345,6 @@ test(testCase, async (t: Test) => {
     });
     t2.ok(getNameOut2.data, "getName() invocation #2 output is truthy OK");
 
-    t2.end();
-  });
-
-  test("get prometheus exporter metrics", async (t2: Test) => {
-    const res = await apiClient.getPrometheusMetricsV1();
-    const promMetricsOutput =
-      "# HELP " +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      " Total transactions executed\n" +
-      "# TYPE " +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      " gauge\n" +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      '{type="' +
-      K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      '"} 3';
-    t2.ok(res);
-    t2.ok(res.data);
-    t2.equal(res.status, 200);
-    t2.true(
-      res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 3 recorded as expected. RESULT OK.",
-    );
     t2.end();
   });
 

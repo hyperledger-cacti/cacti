@@ -14,8 +14,8 @@ import {
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
   DefaultApi as QuorumApi,
-  DeployContractSolidityBytecodeJsonObjectV1Request,
-  InvokeContractJsonObjectV1Request,
+  DeployContractSolidityBytecodeNoKeychainV1Request,
+  InvokeContractNoKeychainV1Request,
 } from "../../../../../../main/typescript/public-api";
 
 import {
@@ -114,7 +114,7 @@ test(testCase, async (t: Test) => {
   const fDeploy = "deployContractSolBytecodeJsonObjectV1";
   const fInvoke = "invokeContractV1NoKeychain";
   const cOk = "without bad request error";
-  const cWithoutParams = "not sending all required parameters";
+  const cNoParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
 
   let contractAddress: string;
@@ -131,8 +131,8 @@ test(testCase, async (t: Test) => {
       gas: 1000000,
       contractJSON: HelloWorldContractJson,
     };
-    const res = await apiClient.deployContractSolBytecodeJsonObjectV1(
-      parameters as DeployContractSolidityBytecodeJsonObjectV1Request,
+    const res = await apiClient.deployContractSolBytecodeNoKeychainV1(
+      parameters as DeployContractSolidityBytecodeNoKeychainV1Request,
     );
     t2.ok(res, "Contract deployed successfully");
     t2.ok(res.data);
@@ -162,7 +162,7 @@ test(testCase, async (t: Test) => {
       contractJSON: HelloWorldContractJson,
     };
     const res = await apiClient.invokeContractV1NoKeychain(
-      parameters as InvokeContractJsonObjectV1Request,
+      parameters as InvokeContractNoKeychainV1Request,
     );
     t2.ok(res, "Contract invoked successfully");
     t2.ok(res.data);
@@ -175,7 +175,7 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test(`${testCase} - ${fDeploy} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fDeploy} - ${cNoParams}`, async (t2: Test) => {
     try {
       const parameters = {
         contractAddress,
@@ -187,8 +187,8 @@ test(testCase, async (t: Test) => {
         bytecode: HelloWorldContractJson.bytecode,
         gas: 1000000,
       };
-      await apiClient.deployContractSolBytecodeJsonObjectV1(
-        parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
+      await apiClient.deployContractSolBytecodeNoKeychainV1(
+        parameters as any as DeployContractSolidityBytecodeNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -223,8 +223,8 @@ test(testCase, async (t: Test) => {
         contractJSON: HelloWorldContractJson,
         fake: 4,
       };
-      await apiClient.deployContractSolBytecodeJsonObjectV1(
-        parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
+      await apiClient.deployContractSolBytecodeNoKeychainV1(
+        parameters as any as DeployContractSolidityBytecodeNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -244,7 +244,7 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test(`${testCase} - ${fInvoke} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fInvoke} - ${cNoParams}`, async (t2: Test) => {
     try {
       const parameters = {
         contractAddress,
@@ -260,7 +260,7 @@ test(testCase, async (t: Test) => {
         nonce: 2,
       };
       await apiClient.invokeContractV1NoKeychain(
-        parameters as any as InvokeContractJsonObjectV1Request,
+        parameters as any as InvokeContractNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -299,7 +299,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.invokeContractV1NoKeychain(
-        parameters as any as InvokeContractJsonObjectV1Request,
+        parameters as any as InvokeContractNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(

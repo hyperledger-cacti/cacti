@@ -126,7 +126,7 @@ test(testCase, async (t: Test) => {
   let contractAddress: string;
 
   test("deploys contract via .json file", async (t2: Test) => {
-    const deployOut = await connector.deployContractJsonObject({
+    const deployOut = await apiClient.deployContractSolBytecodeNoKeychainV1({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -137,21 +137,22 @@ test(testCase, async (t: Test) => {
     });
     t2.ok(deployOut, "deployContract() output is truthy OK");
     t2.ok(
-      deployOut.transactionReceipt,
+      deployOut.data.transactionReceipt,
       "deployContract() output.transactionReceipt is truthy OK",
     );
     t2.ok(
-      deployOut.transactionReceipt.contractAddress,
+      deployOut.data.transactionReceipt.contractAddress,
       "deployContract() output.transactionReceipt.contractAddress is truthy OK",
     );
 
-    contractAddress = deployOut.transactionReceipt.contractAddress as string;
+    contractAddress = deployOut.data.transactionReceipt
+      .contractAddress as string;
     t2.ok(
       typeof contractAddress === "string",
       "contractAddress typeof string OK",
     );
 
-    const { callOutput: helloMsg } = await connector.getContractInfo({
+    const helloMsg = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
@@ -163,9 +164,9 @@ test(testCase, async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(helloMsg, "sayHello() output is truthy");
+    t2.ok(helloMsg.data.callOutput, "sayHello() output is truthy");
     t2.true(
-      typeof helloMsg === "string",
+      typeof helloMsg.data.callOutput === "string",
       "sayHello() output is type of string",
     );
   });
@@ -175,7 +176,7 @@ test(testCase, async (t: Test) => {
     const txCount = await web3.eth.getTransactionCount(
       firstHighNetWorthAccount,
     );
-    const setNameOut = await connector.getContractInfo({
+    const setNameOut = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
@@ -188,10 +189,10 @@ test(testCase, async (t: Test) => {
       nonce: txCount,
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    t2.ok(setNameOut.data, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await connector.getContractInfo({
+      const setNameOutInvalid = await apiClient.invokeContractV1NoKeychain({
         contractAddress,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
@@ -205,7 +206,7 @@ test(testCase, async (t: Test) => {
         nonce: 2,
         contractJSON: HelloWorldContractJson,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
+      t2.ifError(setNameOutInvalid.data.transactionReceipt);
     } catch (error) {
       t2.notStrictEqual(
         error,
@@ -214,7 +215,7 @@ test(testCase, async (t: Test) => {
       );
     }
 
-    const getNameOut = await connector.getContractInfo({
+    const getNameOut = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
@@ -226,9 +227,12 @@ test(testCase, async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(getNameOut.success, `getName() SEND invocation produced receipt OK`);
+    t2.ok(
+      getNameOut.data.success,
+      `getName() SEND invocation produced receipt OK`,
+    );
 
-    const { callOutput: getNameOut2 } = await connector.getContractInfo({
+    const getNameOut2 = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
@@ -241,7 +245,7 @@ test(testCase, async (t: Test) => {
       contractJSON: HelloWorldContractJson,
     });
     t2.equal(
-      getNameOut2,
+      getNameOut2.data.callOutput,
       newName,
       "setName() invocation #2 output is truthy OK",
     );
@@ -280,7 +284,7 @@ test(testCase, async (t: Test) => {
   test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
     const newName = `DrCactus${uuidV4()}`;
     const txCount = await web3.eth.getTransactionCount(testEthAccount.address);
-    const setNameOut = await connector.getContractInfo({
+    const setNameOut = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
@@ -293,15 +297,15 @@ test(testCase, async (t: Test) => {
       nonce: txCount,
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    t2.ok(setNameOut.data, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await connector.getContractInfo({
+      const setNameOutInvalid = await apiClient.invokeContractV1NoKeychain({
         contractAddress,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
-        gas: 1000000,
+        //  gas: 1000000,
         web3SigningCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
@@ -310,7 +314,7 @@ test(testCase, async (t: Test) => {
         nonce: 1,
         contractJSON: HelloWorldContractJson,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
+      t2.ifError(setNameOutInvalid.data.transactionReceipt);
     } catch (error) {
       t2.notStrictEqual(
         error,
@@ -318,12 +322,12 @@ test(testCase, async (t: Test) => {
         "setName() invocation with invalid nonce",
       );
     }
-    const { callOutput: getNameOut } = await connector.getContractInfo({
+    const getNameOut = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
-      gas: 1000000,
+      //  gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -331,9 +335,13 @@ test(testCase, async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
+    t2.equal(
+      getNameOut.data.callOutput,
+      newName,
+      `getName() output reflects the update OK`,
+    );
 
-    const getNameOut2 = await connector.getContractInfo({
+    const getNameOut2 = await apiClient.invokeContractV1NoKeychain({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
@@ -346,7 +354,7 @@ test(testCase, async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
+    t2.ok(getNameOut2.data, "getName() invocation #2 output is truthy OK");
 
     t2.end();
   });

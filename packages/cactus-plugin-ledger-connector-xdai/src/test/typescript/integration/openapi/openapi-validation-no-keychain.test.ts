@@ -5,8 +5,8 @@ import {
   Web3SigningCredentialType,
   PluginLedgerConnectorXdai,
   DefaultApi as XdaiApi,
-  DeployContractJsonObjectV1Request,
-  InvokeContractJsonObjectV1Request,
+  DeployContractNoKeychainV1Request,
+  InvokeContractNoKeychainV1Request,
 } from "../../../../main/typescript/public-api";
 import {
   Containers,
@@ -92,10 +92,10 @@ test(testCase, async (t: Test) => {
   await connector.getOrCreateWebServices();
   await connector.registerWebServices(expressApp);
 
-  const fDeploy = "deployContractJsonObjectV1";
+  const fDeploy = "deployContractNoKeychainV1";
   const fInvoke = "invokeContractV1";
   const cOk = "without bad request error";
-  const cWithoutParams = "not sending all required parameters";
+  const cNoParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
 
   let contractAddress: string;
@@ -111,8 +111,8 @@ test(testCase, async (t: Test) => {
       gas: 1000000,
       contractJSON: HelloWorldContractJson,
     };
-    const res = await apiClient.deployContractJsonObjectV1(
-      parameters as DeployContractJsonObjectV1Request,
+    const res = await apiClient.deployContractNoKeychainV1(
+      parameters as DeployContractNoKeychainV1Request,
     );
     t2.ok(res, "Contract deployed successfully");
     t2.ok(res.data);
@@ -127,7 +127,7 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test(`${testCase} - ${fDeploy} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fDeploy} - ${cNoParams}`, async (t2: Test) => {
     try {
       const parameters = {
         constructorArgs: [],
@@ -138,8 +138,8 @@ test(testCase, async (t: Test) => {
         },
         gas: 1000000,
       };
-      await apiClient.deployContractJsonObjectV1(
-        parameters as any as DeployContractJsonObjectV1Request,
+      await apiClient.deployContractNoKeychainV1(
+        parameters as any as DeployContractNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -172,8 +172,8 @@ test(testCase, async (t: Test) => {
         contractJSON: HelloWorldContractJson,
         fake: 4,
       };
-      await apiClient.deployContractJsonObjectV1(
-        parameters as any as DeployContractJsonObjectV1Request,
+      await apiClient.deployContractNoKeychainV1(
+        parameters as any as DeployContractNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -207,7 +207,7 @@ test(testCase, async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     };
-    const res = await apiClient.invokeContractJsonObject(parameters);
+    const res = await apiClient.invokeContractNoKeychain(parameters);
     t2.ok(res, "Contract invoked successfully");
     t2.ok(res.data);
     t2.equal(
@@ -219,7 +219,7 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test(`${testCase} - ${fInvoke} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fInvoke} - ${cNoParams}`, async (t2: Test) => {
     try {
       const parameters = {
         contractAddress,
@@ -233,8 +233,8 @@ test(testCase, async (t: Test) => {
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
       };
-      await apiClient.invokeContractJsonObject(
-        parameters as any as InvokeContractJsonObjectV1Request,
+      await apiClient.invokeContractNoKeychain(
+        parameters as any as InvokeContractNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -270,8 +270,8 @@ test(testCase, async (t: Test) => {
         contractJSON: HelloWorldContractJson,
         fake: 4,
       };
-      await apiClient.invokeContractJsonObject(
-        parameters as any as InvokeContractJsonObjectV1Request,
+      await apiClient.invokeContractNoKeychain(
+        parameters as any as InvokeContractNoKeychainV1Request,
       );
     } catch (e) {
       t2.equal(

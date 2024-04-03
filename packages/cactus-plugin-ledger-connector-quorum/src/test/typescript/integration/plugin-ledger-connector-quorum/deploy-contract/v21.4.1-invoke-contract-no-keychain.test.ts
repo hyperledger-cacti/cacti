@@ -2,11 +2,7 @@ import test, { Test } from "tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 
-import {
-  LogLevelDesc,
-  IListenOptions,
-  Servers,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 
@@ -14,7 +10,6 @@ import {
   EthContractInvocationType,
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
-  DefaultApi as QuorumApi,
 } from "../../../../../main/typescript/public-api";
 
 import {
@@ -23,13 +18,6 @@ import {
   IAccount,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { Server as SocketIoServer } from "socket.io";
-
-import express from "express";
-import bodyParser from "body-parser";
-import http from "http";
-import { AddressInfo } from "net";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -69,32 +57,6 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       pluginRegistry: new PluginRegistry(),
     });
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-  t.comment(
-    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/get-prometheus-exporter-metrics`,
-  );
-
-  const apiConfig = new Configuration({ basePath: apiHost });
-  const apiClient = new QuorumApi(apiConfig);
-
-  const wsApi = new SocketIoServer(server, {
-    path: Constants.SocketIoConnectionPathV1,
-  });
-
-  await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp, wsApi);
-
   await connector.transact({
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,
@@ -115,7 +77,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   let contractAddress: string;
 
   test("deploys contract via .json file", async (t2: Test) => {
-    const deployOut = await apiClient.deployContractSolBytecodeJsonObjectV1({
+    const deployOut = await connector.deployContractNoKeychain({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -126,22 +88,21 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     });
     t2.ok(deployOut, "deployContract() output is truthy OK");
     t2.ok(
-      deployOut.data.transactionReceipt,
+      deployOut.transactionReceipt,
       "deployContract() output.transactionReceipt is truthy OK",
     );
     t2.ok(
-      deployOut.data.transactionReceipt.contractAddress,
+      deployOut.transactionReceipt.contractAddress,
       "deployContract() output.transactionReceipt.contractAddress is truthy OK",
     );
 
-    contractAddress = deployOut.data.transactionReceipt
-      .contractAddress as string;
+    contractAddress = deployOut.transactionReceipt.contractAddress as string;
     t2.ok(
       typeof contractAddress === "string",
       "contractAddress typeof string OK",
     );
 
-    const helloMsg = await apiClient.invokeContractV1NoKeychain({
+    const { callOutput: helloMsg } = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
@@ -153,9 +114,9 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(helloMsg.data.callOutput, "sayHello() output is truthy");
+    t2.ok(helloMsg, "sayHello() output is truthy");
     t2.true(
-      typeof helloMsg.data.callOutput === "string",
+      typeof helloMsg === "string",
       "sayHello() output is type of string",
     );
   });
@@ -165,7 +126,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     const txCount = await web3.eth.getTransactionCount(
       firstHighNetWorthAccount,
     );
-    const setNameOut = await apiClient.invokeContractV1NoKeychain({
+    const setNameOut = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
@@ -178,10 +139,10 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       nonce: txCount,
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(setNameOut.data, "setName() invocation #1 output is truthy OK");
+    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await apiClient.invokeContractV1NoKeychain({
+      const setNameOutInvalid = await connector.getContractInfo({
         contractAddress,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
@@ -195,7 +156,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         nonce: 2,
         contractJSON: HelloWorldContractJson,
       });
-      t2.ifError(setNameOutInvalid.data.transactionReceipt);
+      t2.ifError(setNameOutInvalid.transactionReceipt);
     } catch (error) {
       t2.notStrictEqual(
         error,
@@ -204,7 +165,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       );
     }
 
-    const getNameOut = await apiClient.invokeContractV1NoKeychain({
+    const getNameOut = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
@@ -216,12 +177,9 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(
-      getNameOut.data.success,
-      `getName() SEND invocation produced receipt OK`,
-    );
+    t2.ok(getNameOut.success, `getName() SEND invocation produced receipt OK`);
 
-    const getNameOut2 = await apiClient.invokeContractV1NoKeychain({
+    const { callOutput: getNameOut2 } = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
@@ -234,7 +192,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       contractJSON: HelloWorldContractJson,
     });
     t2.equal(
-      getNameOut2.data.callOutput,
+      getNameOut2,
       newName,
       "setName() invocation #2 output is truthy OK",
     );
@@ -273,7 +231,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
     const newName = `DrCactus${uuidV4()}`;
     const txCount = await web3.eth.getTransactionCount(testEthAccount.address);
-    const setNameOut = await apiClient.invokeContractV1NoKeychain({
+    const setNameOut = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
@@ -286,10 +244,10 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       nonce: txCount,
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(setNameOut.data, "setName() invocation #1 output is truthy OK");
+    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await apiClient.invokeContractV1NoKeychain({
+      const setNameOutInvalid = await connector.getContractInfo({
         contractAddress,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
@@ -303,7 +261,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         nonce: 1,
         contractJSON: HelloWorldContractJson,
       });
-      t2.ifError(setNameOutInvalid.data.transactionReceipt);
+      t2.ifError(setNameOutInvalid.transactionReceipt);
     } catch (error) {
       t2.notStrictEqual(
         error,
@@ -311,7 +269,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         "setName() invocation with invalid nonce",
       );
     }
-    const getNameOut = await apiClient.invokeContractV1NoKeychain({
+    const { callOutput: getNameOut } = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
@@ -324,13 +282,9 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.equal(
-      getNameOut.data.callOutput,
-      newName,
-      `getName() output reflects the update OK`,
-    );
+    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
-    const getNameOut2 = await apiClient.invokeContractV1NoKeychain({
+    const getNameOut2 = await connector.getContractInfo({
       contractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
@@ -343,7 +297,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       },
       contractJSON: HelloWorldContractJson,
     });
-    t2.ok(getNameOut2.data, "getName() invocation #2 output is truthy OK");
+    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
     t2.end();
   });

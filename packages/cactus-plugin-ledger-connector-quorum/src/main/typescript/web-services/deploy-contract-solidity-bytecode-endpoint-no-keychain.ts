@@ -16,29 +16,29 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
-import { DeployContractJsonObjectV1Request } from "../generated/openapi/typescript-axios";
+import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
+import { DeployContractSolidityBytecodeNoKeychainV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
-export interface IDeployContractSolidityBytecodeJsonObjectOptions {
+export interface IDeployContractSolidityBytecodeOptionsNoKeychain {
   logLevel?: LogLevelDesc;
-  connector: PluginLedgerConnectorXdai;
+  connector: PluginLedgerConnectorQuorum;
 }
 
-export class DeployContractSolidityBytecodeJsonObjectEndpoint
+export class DeployContractSolidityBytecodeNoKeychainEndpoint
   implements IWebServiceEndpoint
 {
   public static readonly CLASS_NAME =
-    "DeployContractSolidityBytecodeJsonObjectEndpoint";
+    "DeployContractSolidityBytecodeEndpointNoKeychain";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return DeployContractSolidityBytecodeJsonObjectEndpoint.CLASS_NAME;
+    return DeployContractSolidityBytecodeNoKeychainEndpoint.CLASS_NAME;
   }
 
   constructor(
-    public readonly options: IDeployContractSolidityBytecodeJsonObjectOptions,
+    public readonly options: IDeployContractSolidityBytecodeOptionsNoKeychain,
   ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -49,22 +49,24 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object"] {
+  public getOasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-no-keychain"
     ];
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cacti"].http.path;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.oasPath.post.operationId;
+    return this.getOasPath().post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -91,10 +93,10 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody: DeployContractJsonObjectV1Request = req.body;
+    const reqBody: DeployContractSolidityBytecodeNoKeychainV1Request = req.body;
     try {
       const resBody =
-        await this.options.connector.deployContractJsonObject(reqBody);
+        await this.options.connector.deployContractNoKeychain(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

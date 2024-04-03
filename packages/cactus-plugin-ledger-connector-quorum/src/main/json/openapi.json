@@ -566,7 +566,7 @@
           }
         }
       },
-      "DeployContractSolidityBytecodeJsonObjectV1Request": {
+      "DeployContractSolidityBytecodeNoKeychainV1Request": {
         "type": "object",
         "required": ["web3SigningCredential", "contractJSON"],
         "additionalProperties": false,
@@ -690,7 +690,7 @@
           }
         }
       },
-      "InvokeContractJsonObjectV1Request": {
+      "InvokeContractNoKeychainV1Request": {
         "type": "object",
         "required": [
           "web3SigningCredential",
@@ -1201,22 +1201,22 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-no-keychain": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-no-keychain"
           }
         },
-        "operationId": "deployContractSolBytecodeJsonObjectV1",
+        "operationId": "deployContractSolBytecodeNoKeychainV1",
         "summary": "Deploys the bytecode of a Solidity contract.",
         "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DeployContractSolidityBytecodeJsonObjectV1Request"
+                "$ref": "#/components/schemas/DeployContractSolidityBytecodeNoKeychainV1Request"
               }
             }
           }
@@ -1303,12 +1303,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-no-keychain": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-no-keychain"
           }
         },
         "operationId": "invokeContractV1NoKeychain",
@@ -1318,7 +1318,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InvokeContractJsonObjectV1Request"
+                "$ref": "#/components/schemas/InvokeContractNoKeychainV1Request"
               }
             }
           }

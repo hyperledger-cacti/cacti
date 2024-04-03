@@ -17,24 +17,24 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
 
 import OAS from "../../json/openapi.json";
-import { InvokeContractJsonObjectV1Request } from "../generated/openapi/typescript-axios";
+import { InvokeContractNoKeychainV1Request } from "../generated/openapi/typescript-axios";
 
-export interface IInvokeContractJsonObjectEndpointOptions {
+export interface IInvokeContractNoKeychainEndpointOptions {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorXdai;
 }
 
-export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractJsonObjectEndpoint";
+export class InvokeContractNoKeychainEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "InvokeContractNoKeychainEndpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return InvokeContractJsonObjectEndpoint.CLASS_NAME;
+    return InvokeContractNoKeychainEndpoint.CLASS_NAME;
   }
 
   constructor(
-    public readonly options: IInvokeContractJsonObjectEndpointOptions,
+    public readonly options: IInvokeContractNoKeychainEndpointOptions,
   ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -45,9 +45,9 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-no-keychain"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-no-keychain"
     ];
   }
 
@@ -87,10 +87,10 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody: InvokeContractJsonObjectV1Request = req.body;
+    const reqBody: InvokeContractNoKeychainV1Request = req.body;
     try {
       const resBody =
-        await this.options.connector.invokeContractJsonObject(reqBody);
+        await this.options.connector.invokeContractNoKeychain(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

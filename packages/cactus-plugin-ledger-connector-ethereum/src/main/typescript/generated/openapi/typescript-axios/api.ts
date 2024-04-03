@@ -145,6 +145,43 @@ export interface ContractKeychainDefinition {
 /**
  * 
  * @export
+ * @interface DeployContractNoKeychainV1Request
+ */
+export interface DeployContractNoKeychainV1Request {
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof DeployContractNoKeychainV1Request
+     */
+    'web3SigningCredential': Web3SigningCredential;
+    /**
+     * 
+     * @type {ContractJsonDefinition}
+     * @memberof DeployContractNoKeychainV1Request
+     */
+    'contract': ContractJsonDefinition;
+    /**
+     * The list of arguments to pass in to the constructor of the contract being deployed.
+     * @type {Array<any>}
+     * @memberof DeployContractNoKeychainV1Request
+     */
+    'constructorArgs'?: Array<any>;
+    /**
+     * 
+     * @type {GasTransactionConfig}
+     * @memberof DeployContractNoKeychainV1Request
+     */
+    'gasConfig'?: GasTransactionConfig;
+    /**
+     * Ether balance to send on deployment.
+     * @type {string}
+     * @memberof DeployContractNoKeychainV1Request
+     */
+    'value'?: string;
+}
+/**
+ * 
+ * @export
  * @interface DeployContractV1Request
  */
 export interface DeployContractV1Request {
@@ -156,10 +193,10 @@ export interface DeployContractV1Request {
     'web3SigningCredential': Web3SigningCredential;
     /**
      * 
-     * @type {DeployContractV1RequestContract}
+     * @type {ContractKeychainDefinition}
      * @memberof DeployContractV1Request
      */
-    'contract': DeployContractV1RequestContract;
+    'contract': ContractKeychainDefinition;
     /**
      * The list of arguments to pass in to the constructor of the contract being deployed.
      * @type {Array<any>}
@@ -179,12 +216,6 @@ export interface DeployContractV1Request {
      */
     'value'?: string;
 }
-/**
- * @type DeployContractV1RequestContract
- * @export
- */
-export type DeployContractV1RequestContract = ContractJsonDefinition | ContractKeychainDefinition;
-
 /**
  * 
  * @export
@@ -1271,6 +1302,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Deploys the contract to ethereum ledger without keychain.
+         * @param {DeployContractNoKeychainV1Request} [deployContractNoKeychainV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractNoKeychain: async (deployContractNoKeychainV1Request?: DeployContractNoKeychainV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract-no-keychain`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractNoKeychainV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1458,6 +1523,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Deploys the contract to ethereum ledger without keychain.
+         * @param {DeployContractNoKeychainV1Request} [deployContractNoKeychainV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployContractNoKeychain(deployContractNoKeychainV1Request?: DeployContractNoKeychainV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractNoKeychain(deployContractNoKeychainV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1532,6 +1608,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Deploys the contract to ethereum ledger without keychain.
+         * @param {DeployContractNoKeychainV1Request} [deployContractNoKeychainV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractNoKeychain(deployContractNoKeychainV1Request?: DeployContractNoKeychainV1Request, options?: any): AxiosPromise<RunTransactionResponse> {
+            return localVarFp.deployContractNoKeychain(deployContractNoKeychainV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1599,6 +1685,18 @@ export class DefaultApi extends BaseAPI {
      */
     public deployContract(deployContractV1Request?: DeployContractV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deployContract(deployContractV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Deploys the contract to ethereum ledger without keychain.
+     * @param {DeployContractNoKeychainV1Request} [deployContractNoKeychainV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deployContractNoKeychain(deployContractNoKeychainV1Request?: DeployContractNoKeychainV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deployContractNoKeychain(deployContractNoKeychainV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

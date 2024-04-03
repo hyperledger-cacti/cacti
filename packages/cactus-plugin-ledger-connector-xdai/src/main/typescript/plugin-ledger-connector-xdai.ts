@@ -32,12 +32,12 @@ import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-co
 
 import {
   ConsistencyStrategy,
-  DeployContractJsonObjectV1Request,
+  DeployContractNoKeychainV1Request,
   DeployContractV1Request,
   DeployContractV1Response,
   DeployRequestBaseV1,
   EthContractInvocationType,
-  InvokeContractJsonObjectV1Request,
+  InvokeContractNoKeychainV1Request,
   InvokeContractV1Request,
   InvokeContractV1Response,
   InvokeRequestBaseV1,
@@ -57,8 +57,8 @@ import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
-import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-json-object-endpoint";
-import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-json-object-endpoint";
+import { DeployContractSolidityBytecodeNoKeychainEndpoint } from "./web-services/deploy-contract-solidity-bytecode-no-keychain-endpoint";
+import { InvokeContractNoKeychainEndpoint } from "./web-services/invoke-contract-no-keychain-endpoint";
 import { RuntimeError } from "run-time-error-cjs";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.xdai.keychain_not_found";
@@ -180,7 +180,7 @@ export class PluginLedgerConnectorXdai
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new DeployContractSolidityBytecodeJsonObjectEndpoint({
+      const endpoint = new DeployContractSolidityBytecodeNoKeychainEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -201,7 +201,7 @@ export class PluginLedgerConnectorXdai
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new InvokeContractJsonObjectEndpoint({
+      const endpoint = new InvokeContractNoKeychainEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -403,10 +403,10 @@ export class PluginLedgerConnectorXdai
     return this.runInvoke(invokeBaseReq);
   }
 
-  public async invokeContractJsonObject(
-    req: InvokeContractJsonObjectV1Request,
+  public async invokeContractNoKeychain(
+    req: InvokeContractNoKeychainV1Request,
   ): Promise<InvokeContractV1Response> {
-    const fnTag = `${this.className}#invokeContractJsonObject()`;
+    const fnTag = `${this.className}#invokeContractNoKeychain()`;
     const { contractJSON, contractAddress } = req;
     if (!contractJSON) {
       throw new Error(`${fnTag} The contractJson param is needed`);
@@ -706,10 +706,10 @@ export class PluginLedgerConnectorXdai
     return receipt;
   }
 
-  public async deployContractJsonObject(
-    req: DeployContractJsonObjectV1Request,
+  public async deployContractNoKeychain(
+    req: DeployContractNoKeychainV1Request,
   ): Promise<DeployContractV1Response> {
-    const fnTag = `${this.className}#deployContractJsonObject()`;
+    const fnTag = `${this.className}#deployContractNoKeychain()`;
     if (
       !req.contractJSON ||
       !req.contractJSON.bytecode ||
