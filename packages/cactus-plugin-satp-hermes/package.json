@@ -49,7 +49,6 @@
     "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r -t yaml",
     "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/json/openapi-blo-bundled.json -r -t json",
     "bundle-openapi-gateway-json": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/json/openapi-gateway-bundled.json -r -t json",
-    "bundle-openapi-gateway-refactor-json": "swagger-cli bundle ./src/main/yml/openapi-refactor.yml -o ./src/main/json/openapi-gateway-refactor-bundled.json -r -t json",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "npm run generate-proto",
