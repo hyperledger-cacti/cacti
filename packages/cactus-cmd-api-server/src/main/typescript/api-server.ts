@@ -34,6 +34,7 @@ import {
   PluginImport,
   Constants,
   PluginImportAction,
+  isIPluginGrpcService,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -105,6 +106,7 @@ export class ApiServer {
   private readonly enableShutdownHook: boolean;
 
   public prometheusExporter: PrometheusExporter;
+  public boundGrpcHostPort: string;
 
   public get className(): string {
     return ApiServer.CLASS_NAME;
@@ -117,6 +119,8 @@ export class ApiServer {
     if (!options.config) {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
+
+    this.boundGrpcHostPort = "127.0.0.1:-1";
 
     this.enableShutdownHook = Bools.isBooleanStrict(
       options.config.enableShutdownHook,
@@ -462,8 +466,12 @@ export class ApiServer {
     }
 
     if (this.grpcServer) {
-      this.log.info(`Closing Cacti gRPC server ...`);
       await new Promise<void>((resolve, reject) => {
+        this.log.info(`Draining Cacti gRPC server ...`);
+        this.grpcServer.drain(this.boundGrpcHostPort, 5000);
+        this.log.info(`Drained Cacti gRPC server OK`);
+
+        this.log.info(`Trying to shut down Cacti gRPC server ...`);
         this.grpcServer.tryShutdown((ex?: Error) => {
           if (ex) {
             const eMsg =
@@ -471,11 +479,11 @@ export class ApiServer {
             this.log.debug(eMsg, ex);
             reject(newRex(eMsg, ex));
           } else {
+            this.log.info(`Shut down Cacti gRPC server OK`);
             resolve();
           }
         });
       });
-      this.log.info(`Close gRPC server OK`);
     }
   }
 
@@ -648,6 +656,11 @@ export class ApiServer {
   }
 
   async startGrpcServer(): Promise<AddressInfo> {
+    const fnTag = `${this.className}#startGrpcServer()`;
+    const { log } = this;
+    const { logLevel } = this.options.config;
+    const pluginRegistry = await this.getOrInitPluginRegistry();
+
     return new Promise((resolve, reject) => {
       // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
       const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
@@ -672,15 +685,46 @@ export class ApiServer {
         new GrpcServerApiServer(),
       );
 
+      log.debug("Installing gRPC services of IPluginGrpcService instances...");
+      pluginRegistry.getPlugins().forEach(async (x: ICactusPlugin) => {
+        if (!isIPluginGrpcService(x)) {
+          this.log.debug("%s skipping %s instance", fnTag, x.getPackageName());
+          return;
+        }
+        const opts = { logLevel };
+        log.info("%s Creating gRPC service of: %s", fnTag, x.getPackageName());
+
+        const svcPairs = await x.createGrpcSvcDefAndImplPairs(opts);
+        log.debug("%s Obtained %o gRPC svc pairs OK", fnTag, svcPairs.length);
+
+        svcPairs.forEach(({ definition, implementation }) => {
+          const svcNames = Object.values(definition).map((x) => x.originalName);
+          const svcPaths = Object.values(definition).map((x) => x.path);
+          log.debug("%s Adding gRPC svc names %o ...", fnTag, svcNames);
+          log.debug("%s Adding gRPC svc paths %o ...", fnTag, svcPaths);
+          this.grpcServer.addService(definition, implementation);
+          log.debug("%s Added gRPC svc OK ...", fnTag);
+        });
+
+        log.info("%s Added gRPC service of: %s OK", fnTag, x.getPackageName());
+      });
+      log.debug("%s Installed all IPluginGrpcService instances OK", fnTag);
+
       this.grpcServer.bindAsync(
         grpcHostAndPort,
         grpcTlsCredentials,
         (error: Error | null, port: number) => {
           if (error) {
-            this.log.error("Binding gRPC failed: ", error);
-            return reject(new RuntimeError("Binding gRPC failed: ", error));
+            this.log.error("%s Binding gRPC failed: ", fnTag, error);
+            return reject(new RuntimeError(fnTag + " gRPC bindAsync:", error));
+          } else {
+            this.log.info("%s gRPC server bound to port %o OK", fnTag, port);
           }
-          this.grpcServer.start();
+
+          const portStr = port.toString(10);
+          this.boundGrpcHostPort = grpcHost.concat(":").concat(portStr);
+          log.info("%s boundGrpcHostPort=%s", fnTag, this.boundGrpcHostPort);
+
           const family = determineAddressFamily(grpcHost);
           resolve({ address: grpcHost, port, family });
         },
