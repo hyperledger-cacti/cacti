@@ -6,6 +6,8 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   ICactusPluginOptions,
+  ICrpcSvcRegistration,
+  IPluginCrpcService,
   IPluginKeychain,
   IPluginWebService,
   IWebServiceEndpoint,
@@ -21,6 +23,9 @@ import { SetKeychainEntryV1Endpoint } from "./web-services/set-keychain-entry-en
 import { GetKeychainEntryV1Endpoint } from "./web-services/get-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryV1Endpoint } from "./web-services/delete-keychain-entry-endpoint-v1";
 import { HasKeychainEntryV1Endpoint } from "./web-services/has-keychain-entry-endpoint-v1";
+import { DefaultService } from "./generated/crpc/services/default_service_connect";
+import { KeychainMemoryCrpcSvcOpenApi } from "./crpc-services/keychain-memory-crpc-svc-openapi";
+import { ServiceType } from "@bufbuild/protobuf";
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -30,7 +35,7 @@ export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
 }
 
 export class PluginKeychainMemory
-  implements IPluginKeychain, IPluginWebService
+  implements IPluginCrpcService, IPluginKeychain, IPluginWebService
 {
   public static readonly CLASS_NAME = "PluginKeychainMemory";
 
@@ -87,6 +92,25 @@ export class PluginKeychainMemory
     const res: string = await this.prometheusExporter.getPrometheusMetrics();
     this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
     return res;
+  }
+
+  public async createCrpcSvcRegistrations(): Promise<
+    ICrpcSvcRegistration<ServiceType>[]
+  > {
+    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+
+    const implementation = new KeychainMemoryCrpcSvcOpenApi({
+      keychain: this,
+      logLevel: this.opts.logLevel,
+    });
+
+    const crpcSvcRegistration: ICrpcSvcRegistration<ServiceType> = {
+      definition: DefaultService,
+      serviceName: DefaultService.typeName,
+      implementation,
+    };
+    out.push(crpcSvcRegistration);
+    return out;
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {

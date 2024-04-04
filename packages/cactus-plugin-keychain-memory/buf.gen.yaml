@@ -1,0 +1,18 @@
+# buf.gen.yaml defines a local generation template.
+# For details, see https://buf.build/docs/configuration/v1/buf-gen-yaml
+version: v1
+plugins:
+  # This will invoke protoc-gen-es and write output to src/gen
+  - plugin: es
+  # packages/cactus-plugin-keychain-memory/src/main/typescript/generated/protoc-gen-es
+    out: ../../crpc
+    opt:
+      # Add more plugin options here
+      - target=ts
+  # This will invoke protoc-gen-connect-es
+  - plugin: connect-es
+  # packages/cactus-plugin-keychain-memory/src/main/typescript/generated/protoc-gen-connect-es
+    out: ../../crpc
+    opt:
+      # Add more plugin options here
+      - target=ts
