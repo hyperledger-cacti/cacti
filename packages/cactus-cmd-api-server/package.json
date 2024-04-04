@@ -59,6 +59,10 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@connectrpc/connect": "1.4.0",
+    "@connectrpc/connect-express": "1.4.0",
+    "@connectrpc/connect-fastify": "1.4.0",
+    "@connectrpc/connect-node": "1.4.0",
     "@grpc/grpc-js": "1.10.3",
     "@grpc/proto-loader": "0.7.8",
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
@@ -78,6 +82,7 @@
     "express-jwt": "8.4.1",
     "express-openapi-validator": "5.0.4",
     "express-rate-limit": "6.7.0",
+    "fastify": "4.26.2",
     "fs-extra": "10.1.0",
     "google-protobuf": "3.18.0-rc.2",
     "jose": "4.15.5",
@@ -95,6 +100,10 @@
     "uuid": "9.0.1"
   },
   "devDependencies": {
+    "@bufbuild/buf": "1.30.0",
+    "@bufbuild/protobuf": "1.8.0",
+    "@bufbuild/protoc-gen-es": "1.8.0",
+    "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@hyperledger/cactus-plugin-keychain-vault": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openapitools/openapi-generator-cli": "2.7.0",

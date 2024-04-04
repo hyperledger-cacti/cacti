@@ -27,6 +27,8 @@ convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
 
 export interface ICactusApiServerOptions {
+  crpcPort: number;
+  crpcHost: string;
   pluginManagerOptionsJson: string;
   authorizationProtocol: AuthorizationProtocol;
   authorizationConfigJson: IAuthorizationConfig;
@@ -90,6 +92,20 @@ export class ConfigService {
 
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
+      crpcHost: {
+        doc: "The host to bind the CRPC fastify instance to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
+        format: "ipaddress",
+        env: "CRPC_HOST",
+        arg: "crpc-host",
+        default: "127.0.0.1",
+      },
+      crpcPort: {
+        doc: "The HTTP port to bind the CRPC fastify server endpoints to.",
+        format: "port",
+        env: "CRPC_PORT",
+        arg: "crpc-port",
+        default: 6000,
+      },
       pluginManagerOptionsJson: {
         doc: "Can be used to override npm registry and authentication details for example. See https://www.npmjs.com/package/live-plugin-manager#pluginmanagerconstructoroptions-partialpluginmanageroptions for further details.",
         format: "*",
@@ -554,6 +570,8 @@ export class ConfigService {
     };
 
     return {
+      crpcHost: (schema.crpcHost as SchemaObj).default,
+      crpcPort: (schema.crpcPort as SchemaObj).default,
       pluginManagerOptionsJson: "{}",
       authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
       authorizationConfigJson,

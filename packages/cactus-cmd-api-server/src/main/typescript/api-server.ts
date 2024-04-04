@@ -1,4 +1,6 @@
 import type { AddressInfo } from "net";
+import { Http2Server, Http2ServerRequest } from "node:http2";
+import { Http2ServerResponse } from "node:http2";
 import type { Server as SecureServer } from "https";
 import type { Request, Response, RequestHandler } from "express";
 import type { ServerOptions as SocketIoServerOptions } from "socket.io";
@@ -16,6 +18,15 @@ import fs from "fs-extra";
 import expressHttpProxy from "express-http-proxy";
 import { Server as GrpcServer } from "@grpc/grpc-js";
 import { ServerCredentials as GrpcServerCredentials } from "@grpc/grpc-js";
+import { expressConnectMiddleware } from "@connectrpc/connect-express";
+import { ConnectRouter } from "@connectrpc/connect";
+import {
+  fastify,
+  FastifyBaseLogger,
+  FastifyInstance,
+  FastifyTypeProviderDefault,
+} from "fastify";
+import { fastifyConnectPlugin } from "@connectrpc/connect-fastify";
 import express from "express";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import compression from "compression";
@@ -24,6 +35,7 @@ import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
 import { Server as SocketIoServer } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
+import { ServiceType } from "@bufbuild/protobuf";
 
 import {
   ICactusPlugin,
@@ -35,6 +47,8 @@ import {
   Constants,
   PluginImportAction,
   isIPluginGrpcService,
+  isIPluginCrpcService,
+  ICrpcSvcRegistration,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -74,6 +88,13 @@ export interface IApiServerConstructorOptions {
   readonly httpServerApi?: Server | SecureServer;
   readonly wsServerApi?: SocketIoServer;
   readonly grpcServer?: GrpcServer;
+  readonly crpcServer?: FastifyInstance<
+    Http2Server,
+    Http2ServerRequest,
+    Http2ServerResponse,
+    FastifyBaseLogger,
+    FastifyTypeProviderDefault
+  >;
   readonly wsOptions?: SocketIoServerOptions;
   readonly httpServerCockpit?: Server | SecureServer;
   readonly config: ICactusApiServerOptions;
@@ -100,6 +121,13 @@ export class ApiServer {
   private readonly httpServerCockpit?: Server | SecureServer;
   private readonly wsApi: SocketIoServer;
   private readonly grpcServer: GrpcServer;
+  private readonly crpcServer: FastifyInstance<
+    Http2Server,
+    Http2ServerRequest,
+    Http2ServerResponse,
+    FastifyBaseLogger,
+    FastifyTypeProviderDefault
+  >;
   private readonly expressApi: express.Express;
   private readonly expressCockpit: express.Express;
   private readonly pluginsPath: string;
@@ -158,6 +186,10 @@ export class ApiServer {
       }
     }
 
+    this.crpcServer =
+      this.options.crpcServer ||
+      fastify({ http2: true, forceCloseConnections: true });
+
     this.grpcServer = this.options.grpcServer || new GrpcServer({});
     this.wsApi = new SocketIoServer();
     this.expressApi = express();
@@ -212,9 +244,10 @@ export class ApiServer {
   }
 
   async start(): Promise<{
-    addressInfoCockpit?: AddressInfo;
-    addressInfoApi: AddressInfo;
-    addressInfoGrpc: AddressInfo;
+    readonly addressInfoCockpit?: AddressInfo;
+    readonly addressInfoApi: AddressInfo;
+    readonly addressInfoGrpc: AddressInfo;
+    readonly addressInfoCrpc: AddressInfo;
   }> {
     this.checkNodeVersion();
     const tlsMaxVersion = this.options.config.tlsDefaultMaxVersion;
@@ -229,6 +262,8 @@ export class ApiServer {
       }
       const addressInfoApi = await this.startApiServer();
       const addressInfoGrpc = await this.startGrpcServer();
+      const { addressInfoCrpc, crpcUrl } = await this.startCrpcServer();
+      this.log.debug("Cacti CRPC reachable %s", crpcUrl);
 
       {
         const { port, address } = addressInfoGrpc;
@@ -252,7 +287,12 @@ export class ApiServer {
         this.log.info(`Cactus Cockpit reachable ${httpUrl}`);
       }
 
-      return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
+      return {
+        addressInfoCockpit,
+        addressInfoApi,
+        addressInfoGrpc,
+        addressInfoCrpc,
+      };
     } catch (ex1: unknown) {
       const context = "Failed to start ApiServer";
       this.log.error(context, ex1);
@@ -465,6 +505,14 @@ export class ApiServer {
       this.log.info(`Close HTTP server of the cockpit OK`);
     }
 
+    if (this.crpcServer) {
+      const fastifyPlugins = this.crpcServer.printPlugins();
+      this.log.info("Fastify plugin list: %o", fastifyPlugins);
+      this.log.info(`Closing Cacti CRPC HTTP server ...`);
+      await this.crpcServer.close();
+      this.log.info(`Closed Cacti CRPC HTTP server OK`);
+    }
+
     if (this.grpcServer) {
       await new Promise<void>((resolve, reject) => {
         this.log.info(`Draining Cacti gRPC server ...`);
@@ -655,6 +703,78 @@ export class ApiServer {
     app[httpVerbPrometheus](httpPathPrometheus, prometheusExporterHandler);
   }
 
+  async createCrpcExpressMiddlewareHandler(): Promise<{
+    readonly svcCount: number;
+    readonly crpcMiddlewareHandler: express.RequestHandler;
+  }> {
+    const { crpcRoutesHandler, svcCount } =
+      await this.createCrpcRoutesHandler();
+
+    const crpcMiddlewareHandler = expressConnectMiddleware({
+      routes: crpcRoutesHandler,
+    });
+
+    return { svcCount, crpcMiddlewareHandler };
+  }
+
+  async createCrpcRoutesHandler(): Promise<{
+    readonly svcCount: number;
+    readonly crpcRoutesHandler: (router: ConnectRouter) => void;
+  }> {
+    const fnTag = `${this.className}#registerCrpcServices()}`;
+    const { log } = this;
+
+    const crpcSvcRegistrations = await this.createCrpcServicesOfPlugins();
+    const crpcSvcRegCount = crpcSvcRegistrations.length;
+
+    log.debug("%s Obtained %o Crpc registrations.", fnTag, crpcSvcRegCount);
+
+    const crpcRoutesHandler = (router: ConnectRouter) => {
+      log.debug("%s expressConnectMiddleware() routes handler", fnTag);
+
+      crpcSvcRegistrations.forEach((it) => {
+        log.debug("%s Registering %s", fnTag, it.serviceName);
+        router.service(it.definition, it.implementation, it.options);
+      });
+    };
+
+    return { svcCount: crpcSvcRegCount, crpcRoutesHandler };
+  }
+
+  async startCrpcServer(): Promise<{
+    readonly addressInfoCrpc: AddressInfo;
+    readonly crpcUrl: string;
+  }> {
+    const fn = `${this.className}#startCrpcServer()`;
+    const { log, options } = this;
+
+    const { config } = options;
+    const { crpcHost, crpcPort } = config;
+
+    const { crpcRoutesHandler, svcCount } =
+      await this.createCrpcRoutesHandler();
+
+    log.debug("%s Registering %o CRPC routes handler(s).", fn, svcCount);
+
+    const registration = await this.crpcServer.register(fastifyConnectPlugin, {
+      routes: crpcRoutesHandler,
+      shutdownTimeoutMs: 5000,
+      grpc: true,
+      grpcWeb: true,
+    });
+    log.debug("%s Fastify registration OK=%o", fn, registration);
+
+    const crpcUrl = await this.crpcServer.listen({
+      host: crpcHost,
+      port: crpcPort,
+    });
+    log.debug("%s Fastify listen() crpcUrl: %s", fn, crpcUrl);
+
+    const [addressInfoCrpc, ...addresses] = this.crpcServer.addresses();
+    log.debug("%s server is listening at", fn, addressInfoCrpc, addresses);
+    return { crpcUrl, addressInfoCrpc };
+  }
+
   async startGrpcServer(): Promise<AddressInfo> {
     const fnTag = `${this.className}#startGrpcServer()`;
     const { log } = this;
@@ -732,6 +852,39 @@ export class ApiServer {
     });
   }
 
+  async createCrpcServicesOfPlugins(): Promise<
+    ICrpcSvcRegistration<ServiceType>[]
+  > {
+    const fnTag = `${this.className}#startCrpcServer()`;
+    const { log } = this;
+    const { logLevel } = this.options.config;
+    const pluginRegistry = await this.getOrInitPluginRegistry();
+
+    log.debug("Installing crpc services of IPluginCrpcService instances...");
+
+    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+
+    const plugins = pluginRegistry.getPlugins();
+
+    const tasksDone = plugins.map(async (x: ICactusPlugin) => {
+      if (!isIPluginCrpcService(x)) {
+        this.log.debug("%s skipping %s instance", fnTag, x.getPackageName());
+        return;
+      }
+      const opts = { logLevel };
+      log.info("%s Creating crpc service of: %s", fnTag, x.getPackageName());
+
+      const svcRegistrations = await x.createCrpcSvcRegistrations(opts);
+      log.debug("%s Got %o Crpc svc defs:", fnTag, svcRegistrations.length);
+
+      svcRegistrations.forEach((it) => out.push(it));
+    });
+
+    await Promise.all(tasksDone);
+
+    return out;
+  }
+
   async startApiServer(): Promise<AddressInfo> {
     const { options, expressApi: app, wsApi } = this;
     const { config } = options;
@@ -743,6 +896,13 @@ export class ApiServer {
     const apiServerOptions = config;
 
     const pluginRegistry = await this.getOrInitPluginRegistry();
+
+    const { svcCount, crpcMiddlewareHandler } =
+      await this.createCrpcExpressMiddlewareHandler();
+
+    this.log.info("Registered %o Crpc services OK", svcCount);
+
+    app.use(crpcMiddlewareHandler);
 
     app.use(compression() as RequestHandler);
 
