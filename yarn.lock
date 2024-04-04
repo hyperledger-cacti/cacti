@@ -4341,6 +4341,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bufbuild/protobuf@npm:1.8.0":
+  version: 1.8.0
+  resolution: "@bufbuild/protobuf@npm:1.8.0"
+  checksum: 10/f91d60ff1609c023466500e99312d2e92ac09c163d615c315fa25d9e50f1e9b76a3a9cac776786a3dd5c5065bb7061bf29388587e2a1d27306f68ed98e57a892
+  languageName: node
+  linkType: hard
+
 "@chainsafe/as-sha256@npm:^0.3.1":
   version: 0.3.1
   resolution: "@chainsafe/as-sha256@npm:0.3.1"
@@ -4604,6 +4611,15 @@ __metadata:
   dependencies:
     chalk: "npm:^4.1.0"
   checksum: 10/03c52429052d161710896d198000196bd2e60be0fd71459b22133dd83dee43e8d05ea8ee703c8369823bc40f77a54881b80d8aa4368ac52aea7f30fb234b73d2
+  languageName: node
+  linkType: hard
+
+"@connectrpc/connect@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@connectrpc/connect@npm:1.4.0"
+  peerDependencies:
+    "@bufbuild/protobuf": ^1.4.2
+  checksum: 10/5e84fbba544f7e52533bdd0058caaa6d5c89903f522fbd9551c6bad0cd2fea2d3f14c7396696609d1787a5e2018054dd53db40b2d08c55975ff81334074eeeae
   languageName: node
   linkType: hard
 
@@ -7672,6 +7688,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-core-api@workspace:packages/cactus-core-api"
   dependencies:
+    "@bufbuild/protobuf": "npm:1.8.0"
+    "@connectrpc/connect": "npm:1.4.0"
     "@grpc/grpc-js": "npm:1.10.3"
     "@grpc/proto-loader": "npm:0.7.8"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
