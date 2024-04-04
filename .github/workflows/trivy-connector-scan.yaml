@@ -1,0 +1,33 @@
+name: trivy-container-image-scan
+
+on:
+  push:
+  pull_request:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+
+jobs:
+
+  build:
+    name: Scan cactus-plugin-ledger-connector-quorum table image
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build an image from Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-plugin-ledger-connector-quorum/Dockerfile -t cactus-plugin-ledger-connector-quorum
+      - name: Run Trivy vulnerability scan for cactus-plugin-ledger-connector-quorum
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-plugin-ledger-connector-quorum'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
