@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package org.hyperledger.cacti.plugin.ledger.connector.besu.services.besuservice;
+
+import "models/watch_blocks_v1_progress_pb.proto";
+import "models/watch_blocks_v1_request_pb.proto";
+
+service BesuGrpcSvcStreams {
+    rpc WatchBlocksV1(stream WatchBlocksV1RequestPB) returns (stream WatchBlocksV1ProgressPB) {};
+}
