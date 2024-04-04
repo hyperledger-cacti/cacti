@@ -36,6 +36,9 @@ coverage/
 !.vscode/template.launch.json
 !.vscode/extensions.json
 
+# IntelliJ files
+.idea/
+
 # Introperability App specifics
 examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
