@@ -2,7 +2,7 @@
 syntax = "proto3";
 package cacti.satp.v02;
 
-import "cacti/satp/v02/common/common_messages.proto";
+import "cacti/satp/v02/common/message.proto";
 
 message PreTransferVerificationAndContextEstablishmentRequest {
   cacti.satp.v02.common.CommonSatp context = 1;

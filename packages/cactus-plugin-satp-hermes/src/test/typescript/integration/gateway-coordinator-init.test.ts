@@ -44,7 +44,7 @@ describe("SATPGateway initialization", () => {
 
     expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.getIdentity();
+    const identity = gateway.Identity;
     expect(identity).toBeDefined();
     expect(identity.id).toBeDefined();
     expect(identity.name).toBeDefined();
@@ -60,7 +60,7 @@ describe("SATPGateway initialization", () => {
       SupportedGatewayImplementations.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID1");
-    expect(identity.port).toBe(3000);
+    expect(identity.gatewayClientPort).toBe(3011);
     expect(identity.address).toBe("http://localhost");
   });
 
@@ -82,7 +82,7 @@ describe("SATPGateway initialization", () => {
           SupportedGatewayImplementations.BESU,
         ],
         proofID: "mockProofID10",
-        port: 3001,
+        gatewayClientPort: 3001,
         address: "https://localhost",
       },
     };
@@ -90,7 +90,7 @@ describe("SATPGateway initialization", () => {
 
     expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.getIdentity();
+    const identity = gateway.Identity;
     expect(identity).toBeDefined();
     expect(identity.id).toBeDefined();
     expect(identity.name).toBeDefined();
@@ -106,7 +106,7 @@ describe("SATPGateway initialization", () => {
       SupportedGatewayImplementations.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID10");
-    expect(identity.port).toBe(3001);
+    expect(identity.gatewayClientPort).toBe(3001);
     expect(identity.address).toBe("https://localhost");
   });
 
@@ -128,17 +128,17 @@ describe("SATPGateway initialization", () => {
           SupportedGatewayImplementations.BESU,
         ],
         proofID: "mockProofID10",
-        port: 3010,
+        gatewayClientPort: 3010,
         address: "https://localhost",
       },
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.getIdentity();
-    expect(identity.port).toBe(3010);
+    const identity = gateway.Identity;
+    expect(identity.gatewayClientPort).toBe(3010);
     expect(identity.address).toBe("https://localhost");
-    await gateway.startupServer();
+    await gateway.startupBOLServer();
     await gateway.shutdown();
   });
 });

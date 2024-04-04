@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CommonSatp, MintAssertionClaims, MintAssertionClaimsFormat } from "./common/common_messages_pb.js";
+import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CommonSatp, MintAssertionClaims, MintAssertionClaimsFormat } from "./common/message_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.CommitPreparationRequestMessage
@@ -291,37 +291,6 @@ export class TransferCompleteRequestMessage extends Message<TransferCompleteRequ
 
   static equals(a: TransferCompleteRequestMessage | PlainMessage<TransferCompleteRequestMessage> | undefined, b: TransferCompleteRequestMessage | PlainMessage<TransferCompleteRequestMessage> | undefined): boolean {
     return proto3.util.equals(TransferCompleteRequestMessage, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.TransferCompleteResponseMessage
- */
-export class TransferCompleteResponseMessage extends Message<TransferCompleteResponseMessage> {
-  constructor(data?: PartialMessage<TransferCompleteResponseMessage>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.TransferCompleteResponseMessage";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferCompleteResponseMessage {
-    return new TransferCompleteResponseMessage().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TransferCompleteResponseMessage {
-    return new TransferCompleteResponseMessage().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TransferCompleteResponseMessage {
-    return new TransferCompleteResponseMessage().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: TransferCompleteResponseMessage | PlainMessage<TransferCompleteResponseMessage> | undefined, b: TransferCompleteResponseMessage | PlainMessage<TransferCompleteResponseMessage> | undefined): boolean {
-    return proto3.util.equals(TransferCompleteResponseMessage, a, b);
   }
 }
 

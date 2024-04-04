@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { CommonSatp, LockAssertionClaim, LockAssertionFormat } from "./common/common_messages_pb.js";
+import { CommonSatp, LockAssertionClaim, LockAssertionFormat } from "./common/message_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.LockAssertionRequestMessage

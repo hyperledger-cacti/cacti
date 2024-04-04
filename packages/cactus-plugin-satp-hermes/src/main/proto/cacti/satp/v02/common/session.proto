@@ -3,7 +3,7 @@ package cacti.satp.v02.common;
 
 import "google/protobuf/empty.proto";
 
-import "cacti/satp/v02/common/common_messages.proto";
+import "cacti/satp/v02/common/message.proto";
 
 
 

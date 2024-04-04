@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
-import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, LockAssertionClaim, LockAssertionFormat, LockType, MintAssertionClaims, MintAssertionClaimsFormat, PayloadProfile, Permissions, SignatureAlgorithm } from "./common_messages_pb.js";
+import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, LockAssertionClaim, LockAssertionFormat, LockType, MintAssertionClaims, MintAssertionClaimsFormat, PayloadProfile, Permissions, SignatureAlgorithm } from "./message_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.common.SessionData
