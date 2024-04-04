@@ -1,6 +1,0 @@
-.accounts-wrapper{
-    width:100%;
-    display:grid;
-    grid-template-columns: repeat(auto-fit, 35rem);
-    gap: 1rem;
-}

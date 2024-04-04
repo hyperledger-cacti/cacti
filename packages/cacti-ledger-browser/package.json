@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cacti-ledger-browser",
   "version": "2.0.0-alpha.2",
-  "description": "Cacti GUI for visualizing ledger data.",
+  "description": "Cacti GUI for visualizing ledger data build on react.",
   "keywords": [
     "Hyperledger",
     "Cacti",
@@ -30,6 +30,11 @@
       "url": "https://example.com"
     },
     {
+      "name": "Tomasz Awramski",
+      "email": "tomasz.awramski@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    },
+    {
       "name": "Eryk Baranowski",
       "email": "eryk.baranowski@fujitsu.com",
       "url": "https://www.fujitsu.com/global/"
@@ -48,31 +53,28 @@
     "start": "vite"
   },
   "dependencies": {
-    "@solidjs/router": "0.8.4",
+    "@emotion/react": "11.11.3",
+    "@emotion/styled": "11.11.0",
+    "@mui/icons-material": "5.15.10",
+    "@mui/material": "5.15.10",
     "@supabase/supabase-js": "1.35.6",
-    "apexcharts": "3.36.0",
-    "chart.js": "3.9.1",
-    "moment": "2.29.4",
-    "solid-apexcharts": "0.1.6",
-    "solid-icons": "1.0.4",
-    "solid-js": "1.8.11",
-    "solid-slider": "1.3.9",
-    "solid-toast": "0.5.0"
+    "apexcharts": "3.45.2",
+    "localforage": "1.10.0",
+    "match-sorter": "6.3.3",
+    "moment": "2.30.1",
+    "react": "18.2.0",
+    "react-apexcharts": "1.4.1",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.21.3",
+    "sort-by": "1.2.0",
+    "web3": "4.1.1"
   },
   "devDependencies": {
-    "autoprefixer": "10.4.8",
-    "postcss": "8.4.31",
-    "supabase": "1.28.4",
-    "typescript-plugin-css-modules": "5.0.2",
-    "vite": "4.5.2",
-    "vite-plugin-solid": "2.8.2"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "watch": {}
+    "@types/react": "18.2.43",
+    "@types/react-dom": "18.2.17",
+    "@types/sort-by": "1",
+    "@vitejs/plugin-react": "4.2.1",
+    "typescript": "5.2.2",
+    "vite": "5.0.13"
+  }
 }

@@ -1,19 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": [
-    "./src"
-  ],
   "compilerOptions": {
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "plugins": [
-        {
-            "name": "typescript-plugin-css-modules"
-        }
-    ],
-    "outDir": "./dist/out-tsc",
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cacti-ledger-browser.tsbuildinfo"
+    "skipLibCheck": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
+    "lib": ["ES2015", "dom"]
   },
-
+  "include": ["./src"]
 }
