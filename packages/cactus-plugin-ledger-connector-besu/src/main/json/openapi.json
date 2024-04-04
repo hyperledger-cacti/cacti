@@ -240,6 +240,15 @@
           "Complete"
         ]
       },
+      "WatchBlocksV1Request": {
+        "type": "object",
+        "required": ["event"],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/WatchBlocksV1"
+          }
+        }
+      },
       "Web3BlockHeader": {
         "type": "object",
         "required": [

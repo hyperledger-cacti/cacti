@@ -1026,6 +1026,21 @@ export interface WatchBlocksV1Progress {
 /**
  * 
  * @export
+ * @interface WatchBlocksV1Request
+ */
+export interface WatchBlocksV1Request {
+    /**
+     * 
+     * @type {WatchBlocksV1}
+     * @memberof WatchBlocksV1Request
+     */
+    'event': WatchBlocksV1;
+}
+
+
+/**
+ * 
+ * @export
  * @interface Web3BlockHeader
  */
 export interface Web3BlockHeader {
