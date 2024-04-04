@@ -42,10 +42,6 @@ message TransferCompleteRequestMessage {
   string client_transfer_number = 3;
   string client_signature = 4;
 }
-
-message TransferCompleteResponseMessage {
-
-}
   
 service SatpStage3Service {
   rpc CommitPreparation(CommitPreparationRequestMessage) returns (CommitReadyResponseMessage) {}

@@ -221,72 +221,6 @@ export class SessionData extends Message<SessionData> {
    */
   receivedTimestamps?: MessageStagesTimestamps;
 
-  constructor(data?: PartialMessage<SessionData>) {
-  /**
-   * @generated from field: cacti.satp.v02.common.SignatureAlgorithm signature_algorithm = 30;
-   */
-  signatureAlgorithm = SignatureAlgorithm.UNSPECIFIED;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.LockType lock_type = 31;
-   */
-  lockType = LockType.UNSPECIFIED;
-
-  /**
-   * @generated from field: uint64 lock_expiration_time = 32;
-   */
-  lockExpirationTime = protoInt64.zero;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.Permissions permitions = 33;
-   */
-  permitions?: Permissions;
-
-  /**
-   * @generated from field: string developer_urn = 34;
-   */
-  developerUrn = "";
-
-  /**
-   * @generated from field: cacti.satp.v02.common.CredentialProfile credential_profile = 35;
-   */
-  credentialProfile = CredentialProfile.UNSPECIFIED;
-
-  /**
-   * @generated from field: string subsequent_calls = 36;
-   */
-  subsequentCalls = "";
-
-  /**
-   * @generated from field: string history = 37;
-   */
-  history = "";
-
-  /**
-   * @generated from field: bool multiple_claims_allowed = 38;
-   */
-  multipleClaimsAllowed = false;
-
-  /**
-   * @generated from field: bool multiple_cancels_allowed = 39;
-   */
-  multipleCancelsAllowed = false;
-
-  /**
-   * @generated from field: string last_message_received_timestamp = 40;
-   */
-  lastMessageReceivedTimestamp = "";
-
-  /**
-   * @generated from field: cacti.satp.v02.common.MessageStagesTimestamps processed_timestamps = 41;
-   */
-  processedTimestamps?: MessageStagesTimestamps;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.MessageStagesTimestamps received_timestamps = 42;
-   */
-  receivedTimestamps?: MessageStagesTimestamps;
-
   /**
    * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 43;
    */
@@ -334,7 +268,6 @@ export class SessionData extends Message<SessionData> {
 
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.SessionData";
-  static readonly typeName = "cacti.satp.v02.common.SessionData";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -378,23 +311,6 @@ export class SessionData extends Message<SessionData> {
     { no: 40, name: "last_message_received_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 41, name: "processed_timestamps", kind: "message", T: MessageStagesTimestamps },
     { no: 42, name: "received_timestamps", kind: "message", T: MessageStagesTimestamps },
-    { no: 30, name: "signature_algorithm", kind: "enum", T: proto3.getEnumType(SignatureAlgorithm) },
-    { no: 31, name: "lock_type", kind: "enum", T: proto3.getEnumType(LockType) },
-    { no: 32, name: "lock_expiration_time", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 33, name: "permitions", kind: "message", T: Permissions },
-    { no: 34, name: "developer_urn", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 35, name: "credential_profile", kind: "enum", T: proto3.getEnumType(CredentialProfile) },
-    { no: 36, name: "subsequent_calls", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 37, name: "history", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 38, name: "multiple_claims_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 39, name: "multiple_cancels_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 40, name: "last_message_received_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 41, name: "processed_timestamps", kind: "message", T: MessageStagesTimestamps },
-    { no: 42, name: "received_timestamps", kind: "message", T: MessageStagesTimestamps },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {
-    return new SessionData().fromBinary(bytes, options);
     { no: 43, name: "lock_assertion_claim", kind: "message", T: LockAssertionClaim },
     { no: 44, name: "lock_assertion_format", kind: "message", T: LockAssertionFormat },
     { no: 45, name: "mint_assertion_claims", kind: "message", T: MintAssertionClaims },
@@ -411,18 +327,12 @@ export class SessionData extends Message<SessionData> {
 
   static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SessionData {
     return new SessionData().fromJson(jsonValue, options);
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SessionData {
-    return new SessionData().fromJson(jsonValue, options);
   }
 
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SessionData {
     return new SessionData().fromJsonString(jsonString, options);
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SessionData {
-    return new SessionData().fromJsonString(jsonString, options);
   }
 
-  static equals(a: SessionData | PlainMessage<SessionData> | undefined, b: SessionData | PlainMessage<SessionData> | undefined): boolean {
-    return proto3.util.equals(SessionData, a, b);
   static equals(a: SessionData | PlainMessage<SessionData> | undefined, b: SessionData | PlainMessage<SessionData> | undefined): boolean {
     return proto3.util.equals(SessionData, a, b);
   }
@@ -865,226 +775,6 @@ export class Stage3Signatures extends Message<Stage3Signatures> {
 
   static equals(a: Stage3Signatures | PlainMessage<Stage3Signatures> | undefined, b: Stage3Signatures | PlainMessage<Stage3Signatures> | undefined): boolean {
     return proto3.util.equals(Stage3Signatures, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.MessageStagesTimestamps
- */
-export class MessageStagesTimestamps extends Message<MessageStagesTimestamps> {
-  /**
-   * @generated from field: cacti.satp.v02.common.Stage1Timestamps stage1 = 1;
-   */
-  stage1?: Stage1Timestamps;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.Stage2Timestamps stage2 = 2;
-   */
-  stage2?: Stage2Timestamps;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.Stage3Timestamps stage3 = 3;
-   */
-  stage3?: Stage3Timestamps;
-
-  constructor(data?: PartialMessage<MessageStagesTimestamps>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.MessageStagesTimestamps";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "stage1", kind: "message", T: Stage1Timestamps },
-    { no: 2, name: "stage2", kind: "message", T: Stage2Timestamps },
-    { no: 3, name: "stage3", kind: "message", T: Stage3Timestamps },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageStagesTimestamps {
-    return new MessageStagesTimestamps().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MessageStagesTimestamps {
-    return new MessageStagesTimestamps().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MessageStagesTimestamps {
-    return new MessageStagesTimestamps().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: MessageStagesTimestamps | PlainMessage<MessageStagesTimestamps> | undefined, b: MessageStagesTimestamps | PlainMessage<MessageStagesTimestamps> | undefined): boolean {
-    return proto3.util.equals(MessageStagesTimestamps, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.Stage1Timestamps
- */
-export class Stage1Timestamps extends Message<Stage1Timestamps> {
-  /**
-   * @generated from field: string transfer_proposal_request_message_timestamp = 1;
-   */
-  transferProposalRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_proposal_receipt_message_timestamp = 2;
-   */
-  transferProposalReceiptMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_proposal_reject_message_timestamp = 3;
-   */
-  transferProposalRejectMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_commence_request_message_timestamp = 4;
-   */
-  transferCommenceRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_commence_response_message_timestamp = 5;
-   */
-  transferCommenceResponseMessageTimestamp = "";
-
-  constructor(data?: PartialMessage<Stage1Timestamps>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.Stage1Timestamps";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "transfer_proposal_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "transfer_proposal_receipt_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "transfer_proposal_reject_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "transfer_commence_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "transfer_commence_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage1Timestamps {
-    return new Stage1Timestamps().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage1Timestamps {
-    return new Stage1Timestamps().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage1Timestamps {
-    return new Stage1Timestamps().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Stage1Timestamps | PlainMessage<Stage1Timestamps> | undefined, b: Stage1Timestamps | PlainMessage<Stage1Timestamps> | undefined): boolean {
-    return proto3.util.equals(Stage1Timestamps, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.Stage2Timestamps
- */
-export class Stage2Timestamps extends Message<Stage2Timestamps> {
-  /**
-   * @generated from field: string lock_assertion_request_message_timestamp = 1;
-   */
-  lockAssertionRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string lock_assertion_receipt_message_timestamp = 2;
-   */
-  lockAssertionReceiptMessageTimestamp = "";
-
-  constructor(data?: PartialMessage<Stage2Timestamps>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.Stage2Timestamps";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "lock_assertion_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "lock_assertion_receipt_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage2Timestamps {
-    return new Stage2Timestamps().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage2Timestamps {
-    return new Stage2Timestamps().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage2Timestamps {
-    return new Stage2Timestamps().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Stage2Timestamps | PlainMessage<Stage2Timestamps> | undefined, b: Stage2Timestamps | PlainMessage<Stage2Timestamps> | undefined): boolean {
-    return proto3.util.equals(Stage2Timestamps, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.Stage3Timestamps
- */
-export class Stage3Timestamps extends Message<Stage3Timestamps> {
-  /**
-   * @generated from field: string commit_preparation_request_message_timestamp = 1;
-   */
-  commitPreparationRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string commit_ready_response_message_timestamp = 2;
-   */
-  commitReadyResponseMessageTimestamp = "";
-
-  /**
-   * @generated from field: string commit_final_assertion_request_message_timestamp = 3;
-   */
-  commitFinalAssertionRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string commit_final_acknoledgement_receipt_response_message_timestamp = 4;
-   */
-  commitFinalAcknoledgementReceiptResponseMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_complete_request_message_timestamp = 5;
-   */
-  transferCompleteRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_complete_response_message_timestamp = 6;
-   */
-  transferCompleteResponseMessageTimestamp = "";
-
-  constructor(data?: PartialMessage<Stage3Timestamps>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.Stage3Timestamps";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "commit_preparation_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "commit_ready_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "commit_final_assertion_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "commit_final_acknoledgement_receipt_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "transfer_complete_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "transfer_complete_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage3Timestamps {
-    return new Stage3Timestamps().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage3Timestamps {
-    return new Stage3Timestamps().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage3Timestamps {
-    return new Stage3Timestamps().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Stage3Timestamps | PlainMessage<Stage3Timestamps> | undefined, b: Stage3Timestamps | PlainMessage<Stage3Timestamps> | undefined): boolean {
-    return proto3.util.equals(Stage3Timestamps, a, b);
   }
 }
 
