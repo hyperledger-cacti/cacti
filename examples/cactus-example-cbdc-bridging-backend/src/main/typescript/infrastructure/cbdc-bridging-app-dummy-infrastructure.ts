@@ -9,9 +9,11 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   BesuTestLedger,
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -86,46 +88,20 @@ export class CbdcBridgingAppDummyInfrastructure {
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-      imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([
-        ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
+        ["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION],
       ]),
       logLevel: level || "DEBUG",
     });
   }
 
   public get org1Env(): NodeJS.ProcessEnv & DeploymentTargetOrgFabric2x {
-    return {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org1MSP",
-
-      ORDERER_CA: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      CORE_PEER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt`,
-      CORE_PEER_MSPCONFIGPATH: `${this.orgCfgDir}peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp`,
-      CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
-      ORDERER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
+    return FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1;
   }
 
   public get org2Env(): NodeJS.ProcessEnv & DeploymentTargetOrgFabric2x {
-    return {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org2MSP",
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      ORDERER_CA: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
-      CORE_PEER_MSPCONFIGPATH: `${this.orgCfgDir}peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp`,
-      CORE_PEER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt`,
-      ORDERER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
+    return FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2;
   }
 
   public async start(): Promise<void> {
@@ -411,7 +387,7 @@ export class CbdcBridgingAppDummyInfrastructure {
             sourceFiles,
             ccName: contractName,
             targetOrganizations: [this.org1Env, this.org2Env],
-            caFile: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
+            caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "asset-reference-contract",
             ccLang: ChainCodeProgrammingLanguage.Typescript,
             ccSequence: 1,
@@ -538,7 +514,7 @@ export class CbdcBridgingAppDummyInfrastructure {
             sourceFiles,
             ccName: contractName,
             targetOrganizations: [this.org1Env, this.org2Env],
-            caFile: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
+            caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "cbdc",
             ccLang: ChainCodeProgrammingLanguage.Javascript,
             ccSequence: 1,

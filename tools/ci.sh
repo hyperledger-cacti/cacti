@@ -115,7 +115,7 @@ function mainTask()
   fi
 
   docker --version
-  docker-compose --version
+  docker compose version
   node --version
   npm --version
   java -version

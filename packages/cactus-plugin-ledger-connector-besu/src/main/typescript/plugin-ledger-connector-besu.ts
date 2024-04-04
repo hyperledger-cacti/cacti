@@ -1,5 +1,6 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
+import { setTimeout } from "timers/promises";
 
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
@@ -788,8 +789,14 @@ export class PluginLedgerConnectorBesu
     const startedAt = new Date();
 
     do {
+      const now = Date.now();
+      const elapsedTime = now - startedAt.getTime();
+      timedOut = now >= startedAt.getTime() + timeoutMs;
+      this.log.debug("%s tries=%n elapsedMs=%n", fnTag, tries, elapsedTime);
+      if (tries > 0) {
+        await setTimeout(1000);
+      }
       tries++;
-      timedOut = Date.now() >= startedAt.getTime() + timeoutMs;
       if (timedOut) {
         break;
       }

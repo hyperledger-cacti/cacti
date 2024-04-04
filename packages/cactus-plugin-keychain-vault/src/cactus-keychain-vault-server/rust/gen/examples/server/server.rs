@@ -85,7 +85,6 @@ impl<C> Api<C> for Server<C> where C: Has<XSpanIdString> + Send + Sync
         get_keychain_entry_request: models::GetKeychainEntryRequest,
         context: &C) -> Result<GetKeychainEntryResponse, ApiError>
     {
-        let context = context.clone();
         info!("get_keychain_entry({:?}) - X-Span-ID: {:?}", get_keychain_entry_request, context.get().0.clone());
 
         // FIXME implement connection pooling
@@ -112,7 +111,6 @@ impl<C> Api<C> for Server<C> where C: Has<XSpanIdString> + Send + Sync
         set_keychain_entry_request: models::SetKeychainEntryRequest,
         context: &C) -> Result<SetKeychainEntryResponse, ApiError>
     {
-        let context = context.clone();
         info!("set_keychain_entry({:?}) - X-Span-ID: {:?}", set_keychain_entry_request, context.get().0.clone());
 
         // FIXME implement connection pooling

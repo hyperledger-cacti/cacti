@@ -6,7 +6,7 @@
   "dependencies": {
     "body-parser": "1.20.2",
     "cors": "2.8.5",
-    "express": "4.18.2",
+    "express": "4.19.2",
     "moment": "2.29.4",
     "ts-node": "10.9.1",
     "typescript": "5.3.3",

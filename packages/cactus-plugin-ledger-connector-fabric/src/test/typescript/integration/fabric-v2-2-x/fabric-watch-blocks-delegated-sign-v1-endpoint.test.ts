@@ -11,9 +11,6 @@
 //////////////////////////////////
 
 // Ledger settings
-const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
-const imageVersion = "2021-09-02--fix-876-supervisord-retries";
-const fabricEnvVersion = "2.2.0";
 const fabricEnvCAVersion = "1.4.9";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
@@ -32,6 +29,9 @@ import { Server as SocketIoServer } from "socket.io";
 import { DiscoveryOptions, X509Identity } from "fabric-network";
 
 import {
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -89,15 +89,20 @@ describe("watchBlocksDelegatedSignV1 of fabric connector tests", () => {
 
     // Start Ledger
     log.info("Start FabricTestLedgerV1...");
-    log.debug("Version:", fabricEnvVersion, "CA Version:", fabricEnvCAVersion);
+    log.debug(
+      "Version:",
+      FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      "CA Version:",
+      fabricEnvCAVersion,
+    );
     ledger = new FabricTestLedgerV1({
       emitContainerLogs: false,
       publishAllPorts: true,
       logLevel: testLogLevel,
-      imageName,
-      imageVersion,
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([
-        ["FABRIC_VERSION", fabricEnvVersion],
+        ["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION],
         ["CA_VERSION", fabricEnvCAVersion],
       ]),
     });

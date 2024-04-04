@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@fidm/x509": "1.2.1",
-        "@grpc/grpc-js": "1.9.5",
+        "@grpc/grpc-js": "1.10.3",
         "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
         "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
         "dotenv": "8.6.0",
@@ -31,7 +31,7 @@
         "winston": "3.10.0"
     },
     "devDependencies": {
-        "@types/node": "16.18.41",
+        "@types/node": "18.11.9",
         "nodemon": "2.0.22",
         "patch-package": "6.5.1",
         "typedoc": "0.25.6",

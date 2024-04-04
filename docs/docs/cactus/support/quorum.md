@@ -161,8 +161,8 @@ Quorum 2.3.0 and Tessera 0.10.0
 
 ✅ [test](https://github.com/hyperledger/cactus/blob/v0.4.1/packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-from-json.test.ts)
 
-  
 
-[Previous](iroha.md "Iroha Support") [Next](xdai.md "xDai Support")
+
+[Previous](fabric.md "Fabric Support") [Next](xdai.md "xDai Support")
 
 * * *
