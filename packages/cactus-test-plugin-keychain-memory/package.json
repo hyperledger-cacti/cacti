@@ -1,0 +1,71 @@
+{
+  "name": "@hyperledger/cactus-test-plugin-keychain-memory",
+  "version": "2.0.0-alpha.2",
+  "private": true,
+  "description": "Tests with API server integration for the dummy keychain implementation. Private package not meant to be released.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-test-plugin-keychain-memory.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch"
+  },
+  "devDependencies": {
+    "@connectrpc/connect": "1.4.0",
+    "@connectrpc/connect-node": "1.4.0",
+    "@connectrpc/connect-web": "1.4.0",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "express": "4.18.2",
+    "uuid": "9.0.1"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-test-plugin-keychain-memory.web.umd.min.js",
+  "mainMinified": "dist/cactus-test-plugin-keychain-memory.node.umd.min.js",
+  "watch": {}
+}

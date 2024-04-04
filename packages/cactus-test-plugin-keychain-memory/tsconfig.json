@@ -1,18 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": true,
     "composite": true,
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-keychain-memory.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cactus-test-plugin-keychain-memory.tsbuildinfo"
   },
   "include": [
     "./src",
-    "**/openapi.json"
   ],
   "references": [
+    {
+      "path": "../cactus-cmd-api-server/tsconfig.json"
+    },
     {
       "path": "../cactus-common/tsconfig.json"
     },
@@ -21,6 +22,9 @@
     },
     {
       "path": "../cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-keychain-memory/tsconfig.json"
     }
   ]
 }
