@@ -8206,7 +8206,7 @@ __metadata:
     "@types/uuid": "npm:9.0.6"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
-    express: "npm:4.18.2"
+    express: "npm:4.19.2"
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:10.1.0"
     key-encoder: "npm:2.0.3"
