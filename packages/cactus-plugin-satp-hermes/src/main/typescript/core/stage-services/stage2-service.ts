@@ -5,10 +5,16 @@ import {
   LockAssertionRequestMessage,
 } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 
-export const sendLockAssertionRequest: any = (router: ConnectRouter) =>
+export default (router: ConnectRouter) =>
   router.service(SatpStage2Service, {
-    async lockAssertion(req: LockAssertionRequestMessage, context: HandlerContext) {
+    async lockAssertion(
+      req: LockAssertionRequestMessage,
+      context: HandlerContext,
+    ) {
       console.log("Received request", req, context);
+
+      //todo
+
       return new LockAssertionReceiptMessage({});
     },
   });

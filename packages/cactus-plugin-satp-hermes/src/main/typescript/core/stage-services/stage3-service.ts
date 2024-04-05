@@ -9,35 +9,36 @@ import {
 } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
 import { Empty } from "@bufbuild/protobuf";
 
-export const sendCommitPreparationRequest: any = (router: ConnectRouter) =>
+export default (router: ConnectRouter) =>
   router.service(SatpStage3Service, {
     async commitPreparation(
       req: CommitPreparationRequestMessage,
       context: HandlerContext,
     ) {
       console.log("Received request", req, context);
+
+      //todo
+
       return new CommitReadyResponseMessage({});
     },
-  });
-
-export const sendCommitFinalAssertionRequest: any = (router: ConnectRouter) =>
-  router.service(SatpStage3Service, {
     async commitFinalAssertion(
       req: CommitFinalAssertionRequestMessage,
       context: HandlerContext,
     ) {
       console.log("Received request", req, context);
+
+      //todo
+
       return new CommitFinalAcknowledgementReceiptResponseMessage({});
     },
-  });
-
-export const sendTransferCompleteRequest: any = (router: ConnectRouter) =>
-  router.service(SatpStage3Service, {
     async transferComplete(
       req: TransferCompleteRequestMessage,
       context: HandlerContext,
     ) {
       console.log("Received request", req, context);
+
+      //todo
+
       return new Empty({});
     },
   });

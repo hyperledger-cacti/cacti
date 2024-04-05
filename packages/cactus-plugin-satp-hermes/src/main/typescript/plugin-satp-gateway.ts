@@ -34,7 +34,6 @@ import {
   CommitFinalV1Response,
   TransferCompleteV1Request,
   TransferInitializationV1Request,
-  LocalLog,
   RecoverV1Message,
   RecoverUpdateV1Message,
   RecoverUpdateAckV1Message,
@@ -92,10 +91,7 @@ import { RollbackAckMessageEndpointV1 } from "./web-services/recovery/rollback-a
 import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository";
 import { IPFSRemoteLogRepository } from "./repository/ipfs-remote-log-repository";
 import { KnexRemoteLogRepository } from "./repository/knex-remote-log-repository";
-import {
-  ILocalLogRepository,
-  IRemoteLogRepository,
-} from "./repository/interfaces/repository";
+import { IRemoteLogRepository } from "./repository/interfaces/repository";
 
 export enum SatpMessageType {
   InitializationRequest = "urn:ietf:satp:msgtype:init-transfer-msg",
@@ -111,6 +107,7 @@ export enum SatpMessageType {
   TransferCompleteRequest = "urn:ietf:satp:msgtype:commit-transfer-complete-msg",
 }
 
+import { LocalLog, RemoteLog } from "./core/types";
 export interface IPluginSatpGatewayConstructorOptions {
   name: string;
   dltIDs: string[];
@@ -130,23 +127,6 @@ export interface IKeyPair {
   publicKey: Uint8Array;
   privateKey: Uint8Array;
 }
-
-export interface IRemoteLog {
-  key: string;
-  hash: string;
-  signature: string;
-  signerPubKey: string;
-}
-
-export interface ILocalLog {
-  key?: string;
-  sessionID: string;
-  data?: string;
-  type: string;
-  operation: string;
-  timestamp?: string;
-}
-
 // todo implement factory
 export abstract class PluginSATPGateway
   implements ICactusPlugin, IPluginWebService
@@ -159,7 +139,7 @@ export abstract class PluginSATPGateway
   private _pubKey: string;
   private _privKey: string;
 
-  public localRepository?: ILocalLogRepository;
+  public localRepository?: LocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -469,7 +449,7 @@ export abstract class PluginSATPGateway
     }
   }
 
-  async storeInDatabase(LocalLog: ILocalLog) {
+  async storeInDatabase(LocalLog: LocalLog) {
     const fnTag = `${this.className}#storeInDatabase()`;
     this.log.info(`${fnTag}, Storing locally log: ${JSON.stringify(LocalLog)}`);
 
@@ -479,7 +459,7 @@ export abstract class PluginSATPGateway
   async storeRemoteLog(key: string, hash: string) {
     const fnTag = `${this.className}#storeRemoteLog()`;
 
-    const remoteLog: IRemoteLog = {
+    const remoteLog: RemoteLog = {
       key: key,
       hash: hash,
       signature: "",
@@ -527,7 +507,7 @@ export abstract class PluginSATPGateway
     await this.storeRemoteLog(localLog.key, hash);
   }
 
-  async storeProof(localLog: ILocalLog): Promise<void> {
+  async storeProof(localLog: LocalLog): Promise<void> {
     if (localLog.data == undefined) return;
 
     localLog.key = PluginSATPGateway.getSatpLogKey(
@@ -544,7 +524,7 @@ export abstract class PluginSATPGateway
     await this.storeRemoteLog(localLog.key, hash);
   }
 
-  async getLogFromDatabase(logKey: string): Promise<ILocalLog | undefined> {
+  async getLogFromDatabase(logKey: string): Promise<LocalLog | undefined> {
     const fnTag = `${this.className}#getLogFromDatabase()`;
     this.log.info(`${fnTag}, retrieving log with key ${logKey}`);
 
@@ -566,13 +546,11 @@ export abstract class PluginSATPGateway
     });
   }
 
-  async getLogsMoreRecentThanTimestamp(
-    timestamp: string,
-  ): Promise<ILocalLog[]> {
+  async getLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]> {
     const fnTag = `${this.className}#getLogsMoreRecentThanTimestamp()`;
     this.log.info(`${fnTag}, retrieving logs more recent than ${timestamp}`);
 
-    const logs: ILocalLog[] | undefined =
+    const logs: LocalLog[] | undefined =
       await this.localRepository?.readLogsMoreRecentThanTimestamp(timestamp);
 
     if (logs == undefined) {
@@ -584,7 +562,7 @@ export abstract class PluginSATPGateway
     return logs;
   }
 
-  async getLogFromRemote(logKey: string): Promise<IRemoteLog> {
+  async getLogFromRemote(logKey: string): Promise<RemoteLog> {
     const fnTag = `${this.className}#getSatpLogFromIPFS()`;
     this.log.info(`Retrieving log with key: <${logKey}>`);
 
