@@ -14,7 +14,8 @@ RUN apt-get -y install --no-install-recommends -y \
     ca-certificates \
     tzdata \
     git \
-    jq
+    jq \
+    moreutils
 
 ARG APP=/usr/src/app/
 
@@ -47,19 +48,19 @@ RUN source ~/.bashrc && \
     yarn config set nodeLinker node-modules && \
     yarn add @hyperledger/cactus-example-supply-chain-backend@${NPM_PKG_VERSION} --exact && \
     yarn add ethers@6.8.1 --exact && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-test-tooling": "\($NPM_PKG_VERSION)" }' | tee /usr/src/app/package.json && \ 
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-api-client": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-cmd-api-server": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-common": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core-api": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-business-logic-plugin": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-frontend": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-consortium-manual": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-keychain-memory": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-besu": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-fabric": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-quorum": "\($NPM_PKG_VERSION)" } ' | tee /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-test-tooling": "\($NPM_PKG_VERSION)" }' | sponge /usr/src/app/package.json && \ 
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-api-client": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-cmd-api-server": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-common": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core-api": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-business-logic-plugin": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-frontend": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-consortium-manual": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-keychain-memory": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-besu": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-fabric": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-quorum": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     yarn install
 
 SHELL ["/bin/bash", "--login", "-c"]
