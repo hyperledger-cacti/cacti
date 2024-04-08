@@ -14,7 +14,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
@@ -28,10 +31,16 @@ export interface IRunTransactionEndpointV1Options {
 export class GetTransactionReceiptByTxIDEndpointV1
   implements IWebServiceEndpoint
 {
+  public static readonly CLASS_NAME = "GetTransactionReceiptByTxIDEndpointV1";
+
   private readonly log: Logger;
 
+  public get className(): string {
+    return GetTransactionReceiptByTxIDEndpointV1.CLASS_NAME;
+  }
+
   constructor(public readonly opts: IRunTransactionEndpointV1Options) {
-    const fnTag = "GetTransactionReceiptByTxIDEndpointV1#constructor()";
+    const fnTag = `${this.className}#constructor()`;
 
     Checks.truthy(opts, `${fnTag} options`);
     Checks.truthy(opts.connector, `${fnTag} options.connector`);
@@ -84,8 +93,10 @@ export class GetTransactionReceiptByTxIDEndpointV1
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "GetTransactionReceiptByTxIDEndpointV1#handleRequest()";
-    this.log.debug(`POST ${this.getPath()}`);
+    const fnTag = `${this.className}#handleRequest()`;
+    const verbUpper = this.getVerbLowerCase().toUpperCase();
+    const reqTag = `${verbUpper} ${this.getPath()}`;
+    this.log.debug(reqTag);
 
     try {
       const reqBody = req.body as RunTransactionRequest;
@@ -94,10 +105,13 @@ export class GetTransactionReceiptByTxIDEndpointV1
       res.status(200);
       res.json(resBody);
     } catch (ex) {
-      this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
+      await handleRestEndpointException({
+        errorMsg,
+        log: this.log,
+        error: ex,
+        res,
+      });
     }
   }
 }
