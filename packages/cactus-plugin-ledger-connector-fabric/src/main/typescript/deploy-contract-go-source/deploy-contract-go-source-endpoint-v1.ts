@@ -16,7 +16,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import { DeployContractGoSourceV1Request } from "../generated/openapi/typescript-axios/index";
@@ -106,8 +109,8 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
   async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = `${this.className}#handleRequest()`;
     const verbUpper = this.getVerbLowerCase().toUpperCase();
-    this.log.debug(`${verbUpper} ${this.getPath()}`);
-
+    const reqTag = `${verbUpper} ${this.getPath()}`;
+    this.log.debug(reqTag);
     try {
       const { connector } = this.opts;
       const reqBody = req.body as DeployContractGoSourceV1Request;
@@ -116,10 +119,13 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
       res.status(HttpStatus.OK);
       res.json(resBody);
     } catch (ex) {
-      this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
+      await handleRestEndpointException({
+        errorMsg,
+        log: this.log,
+        error: ex,
+        res,
+      });
     }
   }
 }
