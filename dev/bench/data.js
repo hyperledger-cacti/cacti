@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712244530447,
+  "lastUpdate": 1712623167508,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -76,6 +76,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.51%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "c569460b099469184a7953ffc0f806ddf3facb38",
+          "message": "feat(cmd-api-server): add ConnectRPC auto-registration for plugins\n\n1. This is enabling plugins to expose their operations via ConnectRPC\nservices which is very similar to gRPC but it comes with a few extra\nbells and whistles that can come in very handy.\n2. There is an upcoming pull request that makes it so that the keychain\nmemory plugin implements and registers its services via this newly added\nhook of the API server. The importance of this is that test coverage for\nthe code in this commit resides on another branch, meaning that even though\nthere are no new test cases on this branch, the feature has been extensively\ntested and there is test-automation in place to continue verifying it\nas well.\n3. The main difference between the hook methods are that for CRPC the\nAPI server expects an array of service definition+implementation pairs\ninstead of just a single one. This was a design decision forced by the\nissues with implementing separate services in a single class: The compiler\nwas hard to appease in a way that kept the code clean. gRPC did not suffer\nfrom this and therefore the registration methods defined for that only\nreturn a single gRPC service defintion+implementation pair which can combine\nany number of .proto services.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-04-08T17:19:14-07:00",
+          "tree_id": "66d28fc1c3da87e53764470516168ae6040fa106",
+          "url": "https://github.com/hyperledger/cacti/commit/c569460b099469184a7953ffc0f806ddf3facb38"
+        },
+        "date": 1712623164928,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 579,
+            "range": "±1.69%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 359,
+            "range": "±1.44%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
