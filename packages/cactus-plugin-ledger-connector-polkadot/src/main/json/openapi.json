@@ -533,7 +533,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
@@ -568,7 +568,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
@@ -612,7 +612,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction"
@@ -656,7 +656,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction"
@@ -700,7 +700,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction"
@@ -744,7 +744,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink"
@@ -788,7 +788,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract"
