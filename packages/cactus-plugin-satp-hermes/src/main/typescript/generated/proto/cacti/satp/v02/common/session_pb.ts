@@ -8,6 +8,32 @@ import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, LockAssertionClaim, LockAssertionFormat, LockType, MintAssertionClaims, MintAssertionClaimsFormat, PayloadProfile, Permissions, SignatureAlgorithm } from "./message_pb.js";
 
 /**
+ * @generated from enum cacti.satp.v02.common.ACCEPTANCE
+ */
+export enum ACCEPTANCE {
+  /**
+   * @generated from enum value: ACCEPTANCE_REJECTED = 0;
+   */
+  ACCEPTANCE_REJECTED = 0,
+
+  /**
+   * @generated from enum value: ACCEPTANCE_ACCEPTED = 1;
+   */
+  ACCEPTANCE_ACCEPTED = 1,
+
+  /**
+   * @generated from enum value: ACCEPTANCE_CONDITIONAL = 2;
+   */
+  ACCEPTANCE_CONDITIONAL = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ACCEPTANCE)
+proto3.util.setEnumType(ACCEPTANCE, "cacti.satp.v02.common.ACCEPTANCE", [
+  { no: 0, name: "ACCEPTANCE_REJECTED" },
+  { no: 1, name: "ACCEPTANCE_ACCEPTED" },
+  { no: 2, name: "ACCEPTANCE_CONDITIONAL" },
+]);
+
+/**
  * @generated from message cacti.satp.v02.common.SessionData
  */
 export class SessionData extends Message<SessionData> {
@@ -261,6 +287,21 @@ export class SessionData extends Message<SessionData> {
    */
   assignmentAssertionClaimFormat?: AssignmentAssertionClaimFormat;
 
+  /**
+   * @generated from field: bool completed = 51;
+   */
+  completed = false;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.ACCEPTANCE acceptance = 52;
+   */
+  acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
+
+  /**
+   * @generated from field: string last_message_hash = 53;
+   */
+  lastMessageHash = "";
+
   constructor(data?: PartialMessage<SessionData>) {
     super();
     proto3.util.initPartial(data, this);
@@ -319,6 +360,9 @@ export class SessionData extends Message<SessionData> {
     { no: 48, name: "burn_assertion_claim_format", kind: "message", T: BurnAssertionClaimFormat },
     { no: 49, name: "assignment_assertion_claim", kind: "message", T: AssignmentAssertionClaim },
     { no: 50, name: "assignment_assertion_claim_format", kind: "message", T: AssignmentAssertionClaimFormat },
+    { no: 51, name: "completed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 52, name: "acceptance", kind: "enum", T: proto3.getEnumType(ACCEPTANCE) },
+    { no: 53, name: "last_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {
@@ -516,14 +560,9 @@ export class Stage3Hashes extends Message<Stage3Hashes> {
   commitFinalAcknowledgementReceiptResponseMessageHash = "";
 
   /**
-   * @generated from field: string transfer_complete_request_message_hash = 5;
+   * @generated from field: string transfer_complete_message_hash = 5;
    */
-  transferCompleteRequestMessageHash = "";
-
-  /**
-   * @generated from field: string transfer_complete_response_message_hash = 6;
-   */
-  transferCompleteResponseMessageHash = "";
+  transferCompleteMessageHash = "";
 
   constructor(data?: PartialMessage<Stage3Hashes>) {
     super();
@@ -537,8 +576,7 @@ export class Stage3Hashes extends Message<Stage3Hashes> {
     { no: 2, name: "commit_ready_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "commit_final_assertion_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "commit_final_acknowledgement_receipt_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "transfer_complete_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "transfer_complete_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_complete_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage3Hashes {
@@ -612,29 +650,29 @@ export class MessageStagesSignatures extends Message<MessageStagesSignatures> {
  */
 export class Stage1Signatures extends Message<Stage1Signatures> {
   /**
-   * @generated from field: string transfer_proposal_request_message_client_signature = 1;
+   * @generated from field: string transfer_proposal_request_message_signature = 1;
    */
-  transferProposalRequestMessageClientSignature = "";
+  transferProposalRequestMessageSignature = "";
 
   /**
-   * @generated from field: string transfer_proposal_receipt_message_server_signature = 2;
+   * @generated from field: string transfer_proposal_receipt_message_signature = 2;
    */
-  transferProposalReceiptMessageServerSignature = "";
+  transferProposalReceiptMessageSignature = "";
 
   /**
-   * @generated from field: string transfer_proposal_reject_message_server_signature = 3;
+   * @generated from field: string transfer_proposal_reject_message_signature = 3;
    */
-  transferProposalRejectMessageServerSignature = "";
+  transferProposalRejectMessageSignature = "";
 
   /**
-   * @generated from field: string transfer_commence_request_message_client_signature = 4;
+   * @generated from field: string transfer_commence_request_message_signature = 4;
    */
-  transferCommenceRequestMessageClientSignature = "";
+  transferCommenceRequestMessageSignature = "";
 
   /**
-   * @generated from field: string transfer_commence_response_message_server_signature = 5;
+   * @generated from field: string transfer_commence_response_message_signature = 5;
    */
-  transferCommenceResponseMessageServerSignature = "";
+  transferCommenceResponseMessageSignature = "";
 
   constructor(data?: PartialMessage<Stage1Signatures>) {
     super();
@@ -644,11 +682,11 @@ export class Stage1Signatures extends Message<Stage1Signatures> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.Stage1Signatures";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "transfer_proposal_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "transfer_proposal_receipt_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "transfer_proposal_reject_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "transfer_commence_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "transfer_commence_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "transfer_proposal_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "transfer_proposal_receipt_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "transfer_proposal_reject_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "transfer_commence_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_commence_response_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage1Signatures {
@@ -673,14 +711,14 @@ export class Stage1Signatures extends Message<Stage1Signatures> {
  */
 export class Stage2Signatures extends Message<Stage2Signatures> {
   /**
-   * @generated from field: string lock_assertion_request_message_client_signature = 1;
+   * @generated from field: string lock_assertion_request_message_signature = 1;
    */
-  lockAssertionRequestMessageClientSignature = "";
+  lockAssertionRequestMessageSignature = "";
 
   /**
-   * @generated from field: string lock_assertion_receipt_message_server_signature = 2;
+   * @generated from field: string lock_assertion_receipt_message_signature = 2;
    */
-  lockAssertionReceiptMessageServerSignature = "";
+  lockAssertionReceiptMessageSignature = "";
 
   constructor(data?: PartialMessage<Stage2Signatures>) {
     super();
@@ -690,8 +728,8 @@ export class Stage2Signatures extends Message<Stage2Signatures> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.Stage2Signatures";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "lock_assertion_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "lock_assertion_receipt_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "lock_assertion_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "lock_assertion_receipt_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage2Signatures {
@@ -716,34 +754,29 @@ export class Stage2Signatures extends Message<Stage2Signatures> {
  */
 export class Stage3Signatures extends Message<Stage3Signatures> {
   /**
-   * @generated from field: string commit_preparation_request_message_client_signature = 1;
+   * @generated from field: string commit_preparation_request_message_signature = 1;
    */
-  commitPreparationRequestMessageClientSignature = "";
+  commitPreparationRequestMessageSignature = "";
 
   /**
-   * @generated from field: string commit_ready_response_message_server_signature = 2;
+   * @generated from field: string commit_ready_response_message_signature = 2;
    */
-  commitReadyResponseMessageServerSignature = "";
+  commitReadyResponseMessageSignature = "";
 
   /**
-   * @generated from field: string commit_final_assertion_request_message_client_signature = 3;
+   * @generated from field: string commit_final_assertion_request_message_signature = 3;
    */
-  commitFinalAssertionRequestMessageClientSignature = "";
+  commitFinalAssertionRequestMessageSignature = "";
 
   /**
-   * @generated from field: string commit_final_acknowledgement_receipt_response_message_server_signature = 4;
+   * @generated from field: string commit_final_acknowledgement_receipt_response_message_signature = 4;
    */
-  commitFinalAcknowledgementReceiptResponseMessageServerSignature = "";
+  commitFinalAcknowledgementReceiptResponseMessageSignature = "";
 
   /**
-   * @generated from field: string transfer_complete_request_message_client_signature = 5;
+   * @generated from field: string transfer_complete_message_signature = 5;
    */
-  transferCompleteRequestMessageClientSignature = "";
-
-  /**
-   * @generated from field: string transfer_complete_response_message_server_signature = 6;
-   */
-  transferCompleteResponseMessageServerSignature = "";
+  transferCompleteMessageSignature = "";
 
   constructor(data?: PartialMessage<Stage3Signatures>) {
     super();
@@ -753,12 +786,11 @@ export class Stage3Signatures extends Message<Stage3Signatures> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.Stage3Signatures";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "commit_preparation_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "commit_ready_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "commit_final_assertion_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "commit_final_acknowledgement_receipt_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "transfer_complete_request_message_client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "transfer_complete_response_message_server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "commit_preparation_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "commit_ready_response_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "commit_final_assertion_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "commit_final_acknowledgement_receipt_response_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_complete_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage3Signatures {
@@ -951,19 +983,14 @@ export class Stage3Timestamps extends Message<Stage3Timestamps> {
   commitFinalAssertionRequestMessageTimestamp = "";
 
   /**
-   * @generated from field: string commit_final_acknoledgement_receipt_response_message_timestamp = 4;
+   * @generated from field: string commit_final_acknowledgement_receipt_response_message_timestamp = 4;
    */
-  commitFinalAcknoledgementReceiptResponseMessageTimestamp = "";
+  commitFinalAcknowledgementReceiptResponseMessageTimestamp = "";
 
   /**
-   * @generated from field: string transfer_complete_request_message_timestamp = 5;
+   * @generated from field: string transfer_complete_message_timestamp = 5;
    */
-  transferCompleteRequestMessageTimestamp = "";
-
-  /**
-   * @generated from field: string transfer_complete_response_message_timestamp = 6;
-   */
-  transferCompleteResponseMessageTimestamp = "";
+  transferCompleteMessageTimestamp = "";
 
   constructor(data?: PartialMessage<Stage3Timestamps>) {
     super();
@@ -976,9 +1003,8 @@ export class Stage3Timestamps extends Message<Stage3Timestamps> {
     { no: 1, name: "commit_preparation_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "commit_ready_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "commit_final_assertion_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "commit_final_acknoledgement_receipt_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "transfer_complete_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "transfer_complete_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "commit_final_acknowledgement_receipt_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "transfer_complete_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage3Timestamps {
