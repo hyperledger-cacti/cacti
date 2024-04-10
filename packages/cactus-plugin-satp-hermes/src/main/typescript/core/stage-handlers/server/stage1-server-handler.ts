@@ -1,5 +1,4 @@
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { SHA256 } from "crypto-js";
 
 import { SATPGateway } from "../../../gateway-refactor";
 import {
@@ -13,34 +12,39 @@ import {
   CommonSatp,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  MessageStagesHashes,
-  MessageStagesSignatures,
-  MessageStagesTimestamps,
+  ACCEPTANCE,
   SessionData,
-  Stage1Hashes,
-  Stage1Signatures,
-  Stage1Timestamps,
 } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import { SATP_VERSION } from "../../constants";
 import {
   bufArray2HexStr,
+  getHash,
   sign,
   storeLog,
   verifySignature,
 } from "../../../gateway-utils";
+import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  TimestampType,
+  createSessionData,
+  getMessageHash,
+  getMessageTimestamp,
+  saveHash,
+  saveSignature,
+} from "../../session-utils";
 
-export class Stage1Handler {
+export class Stage1ServerHandler {
   public static readonly CLASS_NAME = "Stage1Handler-Server";
   private _log: Logger;
 
   constructor() {
     const level = "INFO";
-    const label = Stage1Handler.CLASS_NAME;
+    const label = Stage1ServerHandler.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public get className(): string {
-    return Stage1Handler.CLASS_NAME;
+    return Stage1ServerHandler.CLASS_NAME;
   }
 
   public get log(): Logger {
@@ -49,11 +53,10 @@ export class Stage1Handler {
 
   async transferProposalResponse(
     request: TransferProposalRequestMessage,
+    reject: boolean,
     gateway: SATPGateway,
   ): Promise<void | TransferProposalReceiptRejectMessage> {
     const fnTag = `${this.className}#transferProposalResponse()`;
-
-    const recvTimestamp: string = Date.now().toString();
 
     if (
       request.common == undefined ||
@@ -65,93 +68,66 @@ export class Stage1Handler {
       );
     }
 
-    const sessionData = new SessionData();
-    sessionData.id = request.common.sessionId;
-    sessionData.version = request.common.version;
-    sessionData.digitalAssetId = request.transferInitClaims.digitalAssetId;
-    //sessionData.assetProfile = request.common.payloadProfile.assetProfile;
-    // sessionData.applicationProfile = request.networkCapabilities.applicationProfile;
-    sessionData.originatorPubkey = request.common.clientGatewayPubkey;
-    sessionData.beneficiaryPubkey = request.common.serverGatewayPubkey;
-    sessionData.senderGatewayNetworkId =
-      request.transferInitClaims.senderGatewayNetworkId;
-    sessionData.recipientGatewayNetworkId =
-      request.transferInitClaims.recipientGatewayNetworkId;
-    sessionData.clientGatewayPubkey = request.common.clientGatewayPubkey;
-    sessionData.serverGatewayPubkey = request.common.serverGatewayPubkey;
-    sessionData.receiverGatewayOwnerId =
-      request.transferInitClaims.receiverGatewayOwnerId;
-    sessionData.senderGatewayOwnerId =
-      request.transferInitClaims.senderGatewayOwnerId;
-    sessionData.signatureAlgorithm =
-      request.networkCapabilities.signatureAlgorithm;
-    sessionData.lockType = request.networkCapabilities.lockType;
-    sessionData.lockExpirationTime =
-      request.networkCapabilities.lockExpirationTime;
-    sessionData.credentialProfile =
-      request.networkCapabilities.credentialProfile;
-    sessionData.loggingProfile = request.networkCapabilities.loggingProfile;
-    sessionData.accessControlProfile =
-      request.networkCapabilities.accessControlProfile;
+    const sessionData = gateway.getSession(request.common.sessionId);
 
-    // sessionData.maxRetries = request.transferInitClaims.maxRetries;
-    // sessionData.maxTimeout = request.transferInitClaims.maxTimeout;
+    if (sessionData == undefined) {
+      throw new Error(
+        `${fnTag}, session data not found for session id ${request.common.sessionId}`,
+      );
+    }
 
-    sessionData.signatures = new MessageStagesSignatures();
-    sessionData.signatures.stage1 = new Stage1Signatures();
-    sessionData.signatures.stage1.transferCommenceRequestMessageClientSignature =
-      request.common.signature;
-
-    sessionData.lastMessageReceivedTimestamp = recvTimestamp;
+    saveSignature(
+      sessionData,
+      MessageType.INIT_PROPOSAL,
+      request.common.signature,
+    );
 
     sessionData.sourceLedgerAssetId =
       request.transferInitClaims.verifiedOriginatorEntityId;
     sessionData.recipientLedgerAssetId =
       request.transferInitClaims.verifiedBeneficiaryEntityId; // todo shouldn't be the server to create this id?
 
-    sessionData.hashTransferInitClaims = SHA256(
-      JSON.stringify(request.transferInitClaims),
-    ).toString();
+    sessionData.hashTransferInitClaims = getHash(request.transferInitClaims);
 
-    sessionData.hashes = new MessageStagesHashes();
-    sessionData.hashes.stage1 = new Stage1Hashes();
-
-    sessionData.hashes.stage1.transferCommenceRequestMessageHash = SHA256(
-      JSON.stringify(request),
-    ).toString();
+    saveHash(sessionData, MessageType.INIT_PROPOSAL, getHash(request));
 
     sessionData.lastSequenceNumber = request.common.sequenceNumber + BigInt(1);
 
-    sessionData.processedTimestamps = new MessageStagesTimestamps();
-    sessionData.processedTimestamps.stage1 = new Stage1Timestamps();
-
-    sessionData.receivedTimestamps = new MessageStagesTimestamps();
-    sessionData.receivedTimestamps.stage1 = new Stage1Timestamps();
-
-    sessionData.receivedTimestamps.stage1.transferCommenceRequestMessageTimestamp =
-      recvTimestamp;
-
-    gateway.addSession(request.common.sessionId, sessionData);
-
     const commonBody = new CommonSatp();
     commonBody.version = sessionData.version;
-    commonBody.messageType = MessageType.INIT_RECEIPT;
+
     commonBody.sessionId = sessionData.id;
     commonBody.sequenceNumber = request.common.sequenceNumber + BigInt(1);
     commonBody.resourceUrl = request.common.resourceUrl;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.hashPreviousMessage = sessionData.hashTransferInitClaims;
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.INIT_PROPOSAL,
+    );
+
+    if (reject) {
+      commonBody.messageType = MessageType.INIT_REJECT;
+      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
+      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_CONDITIONAL;
+
+      //todo check if there are transferClaims possible if not just not send
+    } else {
+      commonBody.messageType = MessageType.INIT_RECEIPT;
+      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
+    }
 
     //todo if rejection
     const transferProposalReceiptMessage =
       new TransferProposalReceiptRejectMessage();
     transferProposalReceiptMessage.common = commonBody;
-
-    sessionData.processedTimestamps.stage1.transferCommenceRequestMessageTimestamp =
-      Date.now().toString();
-    transferProposalReceiptMessage.timestamp =
-      sessionData.processedTimestamps.stage1.transferCommenceRequestMessageTimestamp;
+    transferProposalReceiptMessage.hashTransferInitClaims =
+      sessionData.hashTransferInitClaims;
+    transferProposalReceiptMessage.timestamp = getMessageTimestamp(
+      sessionData,
+      MessageType.INIT_PROPOSAL,
+      TimestampType.RECEIVED,
+    );
 
     const messageSignature = bufArray2HexStr(
       sign(
@@ -162,11 +138,13 @@ export class Stage1Handler {
 
     transferProposalReceiptMessage.common.signature = messageSignature;
 
-    sessionData.signatures.stage1.transferProposalReceiptMessageServerSignature =
-      messageSignature;
-    sessionData.hashes.stage1.transferProposalReceiptMessageHash = SHA256(
-      JSON.stringify(transferProposalReceiptMessage),
-    ).toString();
+    saveSignature(sessionData, commonBody.messageType, messageSignature);
+
+    saveHash(
+      sessionData,
+      commonBody.messageType,
+      getHash(transferProposalReceiptMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -186,8 +164,6 @@ export class Stage1Handler {
   ): Promise<void | TransferCommenceResponseMessage> {
     const fnTag = `${this.className}#transferCommenceResponse()`;
 
-    const recvTimestamp: string = Date.now().toString();
-
     if (request.common == undefined) {
       throw new Error(
         `${fnTag}, message satp common body is missing or is missing required fields`,
@@ -196,29 +172,26 @@ export class Stage1Handler {
 
     const sessionData = gateway.getSession(request.common.sessionId);
 
-    if (
-      sessionData == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined
-    ) {
+    if (sessionData == undefined) {
       throw new Error(
         `${fnTag}, session data not loaded correctly ${request.common.sessionId}`,
       );
     }
 
-    sessionData.hashes.stage1.transferCommenceRequestMessageHash = SHA256(
-      JSON.stringify(request),
-    ).toString();
-
-    sessionData.lastMessageReceivedTimestamp = recvTimestamp;
-    this.log.info(`TransferCommenceRequest passed all checks.`);
+    saveHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_REQUEST,
+      getHash(request),
+    );
 
     const commonBody = new CommonSatp();
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.TRANSFER_COMMENCE_RESPONSE;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage1.transferCommenceRequestMessageHash; //todo
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_REQUEST,
+    );
 
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -229,13 +202,28 @@ export class Stage1Handler {
     transferCommenceResponseMessage.common = commonBody;
 
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
-    //sessionData.processedTimestamps.stage1.transferCommenceRequestMessageTimestamp = Date.now().toString();
 
-    sessionData.hashes.stage1.transferCommenceResponseMessageHash = SHA256(
-      JSON.stringify(transferCommenceResponseMessage),
-    ).toString();
+    const messageSignature = bufArray2HexStr(
+      sign(
+        gateway.gatewaySigner,
+        JSON.stringify(transferCommenceResponseMessage),
+      ),
+    );
 
-    //todo sign
+    transferCommenceResponseMessage.common.signature = messageSignature;
+
+    saveSignature(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_RESPONSE,
+      messageSignature,
+    );
+
+    saveHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_RESPONSE,
+      getHash(transferCommenceResponseMessage),
+    );
+
     await storeLog(gateway, {
       sessionID: sessionData.id,
       type: "transferCommenceResponse",
@@ -248,10 +236,10 @@ export class Stage1Handler {
     return transferCommenceResponseMessage;
   }
 
-  checkTransferProposalRequestMessage(
+  async checkTransferProposalRequestMessage(
     request: TransferProposalRequestMessage,
     gateway: SATPGateway,
-  ): void {
+  ): Promise<[SessionData, boolean]> {
     const fnTag = `${this.className}#checkTransferProposalRequestMessage()`;
 
     if (
@@ -277,8 +265,6 @@ export class Stage1Handler {
     if (request.common.version != SATP_VERSION) {
       throw new Error(`${fnTag}, unsupported SATP version`);
     }
-
-    //todo there is not a session data already here?
 
     if (
       !verifySignature(
@@ -321,15 +307,39 @@ export class Stage1Handler {
     }
 
     this.log.info(`TransferProposalRequest passed all checks.`);
+
+    const sessionData = createSessionData(
+      request.common.sessionId,
+      request.common.version,
+      request.transferInitClaims.digitalAssetId,
+      request.transferInitClaims.senderGatewayNetworkId,
+      request.transferInitClaims.recipientGatewayNetworkId,
+      request.transferInitClaims.originatorPubkey,
+      request.transferInitClaims.beneficiaryPubkey,
+      request.transferInitClaims.senderGatewayOwnerId,
+      request.transferInitClaims.receiverGatewayOwnerId,
+      request.transferInitClaims.clientGatewayPubkey,
+      request.transferInitClaims.serverGatewayPubkey,
+      request.networkCapabilities.signatureAlgorithm,
+      request.networkCapabilities.lockType,
+      request.networkCapabilities.lockExpirationTime,
+      request.networkCapabilities.credentialProfile,
+      request.networkCapabilities.loggingProfile,
+      request.networkCapabilities.accessControlProfile,
+    );
+
+    this.log.info(`Session data created for session id ${sessionData.id}`);
+
+    gateway.addSession(request.common.sessionId, sessionData);
+
+    return [sessionData, this.checkTransferClaims(request.transferInitClaims)];
   }
 
   async checkTransferCommenceRequestMessage(
     request: TransferCommenceRequestMessage,
     gateway: SATPGateway,
-  ): Promise<void> {
+  ): Promise<SessionData> {
     const fnTag = `${this.className}#transferCommenceResponse()`;
-
-    //const recvTimestamp: string = Date.now().toString();
 
     if (
       request.common == undefined ||
@@ -367,7 +377,7 @@ export class Stage1Handler {
       sessionData.serverGatewayPubkey == undefined ||
       sessionData.hashes == undefined ||
       sessionData.hashes.stage1 == undefined ||
-      sessionData.hashes.stage1.transferProposalRequestMessageHash ==
+      sessionData.hashes.stage1.transferProposalReceiptMessageHash ==
         undefined ||
       sessionData.lastSequenceNumber == undefined
     ) {
@@ -415,7 +425,7 @@ export class Stage1Handler {
 
     if (
       request.common.hashPreviousMessage !=
-      sessionData.hashes.stage1.transferProposalReceiptMessageHash //todo
+      sessionData.hashes.stage1.transferProposalReceiptMessageHash
     ) {
       throw new Error(
         `${fnTag}, TransferCommenceRequest previous message hash does not match the one that was sent`,
@@ -444,5 +454,12 @@ export class Stage1Handler {
     }
 
     this.log.info(`TransferCommenceRequest passed all checks.`);
+    return sessionData;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  checkTransferClaims(transferClaims: TransferClaims): boolean {
+    //todo
+    return true;
   }
 }
