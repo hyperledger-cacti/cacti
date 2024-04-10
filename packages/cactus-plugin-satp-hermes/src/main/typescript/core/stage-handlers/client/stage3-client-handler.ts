@@ -13,18 +13,14 @@ import {
   CommitReadyResponseMessage,
   TransferCompleteRequestMessage,
 } from "../../../generated/proto/cacti/satp/v02/stage_3_pb";
-import { SHA256 } from "crypto-js";
-import {
-  SessionData,
-  Stage3Hashes,
-  Stage3Signatures,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import {
   bufArray2HexStr,
+  getHash,
   sign,
   storeLog,
   verifySignature,
 } from "../../../gateway-utils";
+import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 
 export class Stage3ClientHandler {
   public static readonly CLASS_NAME = "Stage3Handler-Client";
@@ -62,28 +58,16 @@ export class Stage3ClientHandler {
       );
     }
 
-    if (
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage2 == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
-    ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
-      );
-    }
-
-    sessionData.hashes.stage2.lockAssertionReceiptMessageHash = SHA256(
-      JSON.stringify(response),
-    ).toString();
+    saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.COMMIT_PREPARE;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage2.lockAssertionReceiptMessageHash;
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.ASSERTION_RECEIPT,
+    );
     commonBody.sessionId = response.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -103,14 +87,13 @@ export class Stage3ClientHandler {
 
     commitPreparationRequestMessage.common.signature = messageSignature;
 
-    sessionData.signatures.stage3 = new Stage3Signatures();
-    sessionData.signatures.stage3.commitPreparationRequestMessageClientSignature =
-      messageSignature;
+    saveSignature(sessionData, MessageType.COMMIT_PREPARE, messageSignature);
 
-    sessionData.hashes.stage3 = new Stage3Hashes();
-    sessionData.hashes.stage3.commitPreparationRequestMessageHash = SHA256(
-      JSON.stringify(commitPreparationRequestMessage),
-    ).toString();
+    saveHash(
+      sessionData,
+      MessageType.COMMIT_PREPARE,
+      getHash(commitPreparationRequestMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -134,8 +117,7 @@ export class Stage3ClientHandler {
       throw new Error(`${fnTag}, message common body is missing`);
     }
 
-    //const sessionData = gateway.sessions.get(response.common.sessionId);
-    const sessionData = new SessionData(); //todo change
+    const sessionData = gateway.getSession(response.common.sessionId);
 
     if (sessionData == undefined) {
       throw new Error(
@@ -143,30 +125,18 @@ export class Stage3ClientHandler {
       );
     }
 
-    if (
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage3 == undefined ||
-      sessionData.signatures == undefined ||
-      sessionData.signatures.stage3 == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
-    ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
-      );
-    }
-
-    sessionData.hashes.stage3.commitReadyResponseMessageHash = SHA256(
-      JSON.stringify(response),
-    ).toString();
+    saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.COMMIT_FINAL;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage3.commitReadyResponseMessageHash;
+
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.COMMIT_READY,
+    );
+
     commonBody.sessionId = response.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -191,12 +161,13 @@ export class Stage3ClientHandler {
 
     commitFinalAssertionRequestMessage.common.signature = messageSignature;
 
-    sessionData.signatures.stage3.commitFinalAssertionRequestMessageClientSignature =
-      messageSignature;
+    saveSignature(sessionData, MessageType.COMMIT_FINAL, messageSignature);
 
-    sessionData.hashes.stage3.commitFinalAssertionRequestMessageHash = SHA256(
-      JSON.stringify(commitFinalAssertionRequestMessage),
-    ).toString();
+    saveHash(
+      sessionData,
+      MessageType.COMMIT_FINAL,
+      getHash(commitFinalAssertionRequestMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -220,8 +191,7 @@ export class Stage3ClientHandler {
       throw new Error(`${fnTag}, message common body is missing`);
     }
 
-    //const sessionData = gateway.sessions.get(response.common.sessionId);
-    const sessionData = new SessionData(); //todo change
+    const sessionData = gateway.getSession(response.common.sessionId);
 
     if (sessionData == undefined) {
       throw new Error(
@@ -229,30 +199,18 @@ export class Stage3ClientHandler {
       );
     }
 
-    if (
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined ||
-      sessionData.hashes.stage3 == undefined ||
-      sessionData.signatures == undefined ||
-      sessionData.signatures.stage3 == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
-    ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
-      );
-    }
-
-    sessionData.hashes.stage3.commitFinalAcknowledgementReceiptResponseMessageHash =
-      SHA256(JSON.stringify(response)).toString();
+    saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.COMMIT_TRANSFER_COMPLETE;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage3.commitFinalAcknowledgementReceiptResponseMessageHash;
+
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.ACK_COMMIT_FINAL,
+    );
+
     commonBody.sessionId = response.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -261,8 +219,11 @@ export class Stage3ClientHandler {
 
     const transferCompleteRequestMessage = new TransferCompleteRequestMessage();
     transferCompleteRequestMessage.common = commonBody;
-    transferCompleteRequestMessage.hashTransferCommence =
-      sessionData.hashes.stage1.transferCommenceRequestMessageHash;
+
+    transferCompleteRequestMessage.hashTransferCommence = getMessageHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_REQUEST,
+    );
 
     const messageSignature = bufArray2HexStr(
       sign(
@@ -273,12 +234,17 @@ export class Stage3ClientHandler {
 
     transferCompleteRequestMessage.common.signature = messageSignature;
 
-    sessionData.signatures.stage3.transferCompleteRequestMessageClientSignature =
-      messageSignature;
+    saveSignature(
+      sessionData,
+      MessageType.COMMIT_TRANSFER_COMPLETE,
+      messageSignature,
+    );
 
-    sessionData.hashes.stage3.transferCompleteRequestMessageHash = SHA256(
-      JSON.stringify(transferCompleteRequestMessage),
-    ).toString();
+    saveHash(
+      sessionData,
+      MessageType.COMMIT_TRANSFER_COMPLETE,
+      getHash(transferCompleteRequestMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -319,12 +285,8 @@ export class Stage3ClientHandler {
     }
 
     if (
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage2 == undefined ||
-      sessionData.hashes.stage2.lockAssertionRequestMessageHash == undefined ||
       sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
+      sessionData.version == undefined
     ) {
       throw new Error(
         `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
@@ -339,8 +301,8 @@ export class Stage3ClientHandler {
     }
 
     if (
-      sessionData.hashes.stage2.lockAssertionRequestMessageHash !=
-      response.common.hashPreviousMessage
+      response.common.hashPreviousMessage !=
+      getMessageHash(sessionData, MessageType.LOCK_ASSERT)
     ) {
       throw new Error(`${fnTag}, hashPreviousMessage does not match`);
     }
@@ -397,13 +359,8 @@ export class Stage3ClientHandler {
     }
 
     if (
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage3 == undefined ||
-      sessionData.hashes.stage3.commitPreparationRequestMessageHash ==
-        undefined ||
       sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
+      sessionData.version == undefined
     ) {
       throw new Error(
         `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
@@ -418,8 +375,8 @@ export class Stage3ClientHandler {
     }
 
     if (
-      sessionData.hashes.stage3.commitPreparationRequestMessageHash !=
-      response.common.hashPreviousMessage
+      response.common.hashPreviousMessage !=
+      getMessageHash(sessionData, MessageType.COMMIT_PREPARE)
     ) {
       throw new Error(`${fnTag}, hashPreviousMessage does not match`);
     }
@@ -481,13 +438,8 @@ export class Stage3ClientHandler {
     }
 
     if (
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage3 == undefined ||
-      sessionData.hashes.stage3.commitFinalAssertionRequestMessageHash ==
-        undefined ||
       sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
+      sessionData.version == undefined
     ) {
       throw new Error(
         `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
@@ -502,8 +454,8 @@ export class Stage3ClientHandler {
     }
 
     if (
-      sessionData.hashes.stage3.commitFinalAssertionRequestMessageHash !=
-      response.common.hashPreviousMessage
+      response.common.hashPreviousMessage !=
+      getMessageHash(sessionData, MessageType.COMMIT_FINAL)
     ) {
       throw new Error(`${fnTag}, hashPreviousMessage does not match`);
     }
