@@ -9,18 +9,15 @@ import {
   CommonSatp,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import {
-  Stage2Hashes,
-  Stage2Signatures,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
-import { SHA256 } from "crypto-js";
+import { SessionData } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import {
   bufArray2HexStr,
+  getHash,
   sign,
   storeLog,
   verifySignature,
 } from "../../../gateway-utils";
-
+import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 export class Stage2ServerHandler {
   public static readonly CLASS_NAME = "Stage2Handler-Server";
   private _log: Logger;
@@ -56,29 +53,17 @@ export class Stage2ServerHandler {
         `${fnTag}, session data not found for session id ${request.common.sessionId}`,
       );
     }
-    if (
-      sessionData == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
-    ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${request.common.sessionId}`,
-      );
-    }
 
-    sessionData.hashes.stage2 = new Stage2Hashes();
-    sessionData.hashes.stage2.lockAssertionRequestMessageHash = SHA256(
-      JSON.stringify(request),
-    ).toString();
+    saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.ASSERTION_RECEIPT;
     commonBody.sequenceNumber = request.common.sequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage2.lockAssertionRequestMessageHash;
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.LOCK_ASSERT,
+    );
     commonBody.sessionId = request.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -94,14 +79,13 @@ export class Stage2ServerHandler {
 
     lockAssertionReceiptMessage.common.signature = messageSignature;
 
-    sessionData.signatures.stage2 = new Stage2Signatures();
-    sessionData.signatures.stage2.lockAssertionRequestMessageClientSignature =
-      messageSignature;
+    saveSignature(sessionData, MessageType.ASSERTION_RECEIPT, messageSignature);
 
-    sessionData.hashes.stage2 = new Stage2Hashes();
-    sessionData.hashes.stage2.lockAssertionRequestMessageHash = SHA256(
-      JSON.stringify(lockAssertionReceiptMessage),
-    ).toString();
+    saveHash(
+      sessionData,
+      MessageType.ASSERTION_RECEIPT,
+      getHash(lockAssertionReceiptMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -115,10 +99,10 @@ export class Stage2ServerHandler {
     return lockAssertionReceiptMessage;
   }
 
-  checkLockAssertionRequestMessage(
+  async checkLockAssertionRequestMessage(
     request: LockAssertionRequestMessage,
     gateway: SATPGateway,
-  ): void {
+  ): Promise<SessionData> {
     const fnTag = `${this.className}#checkLockAssertionRequestMessage()`;
 
     if (
@@ -155,10 +139,6 @@ export class Stage2ServerHandler {
 
     if (
       sessionData.serverGatewayPubkey == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined ||
-      sessionData.hashes.stage1.transferCommenceResponseMessageHash ==
-        undefined ||
       sessionData.lastSequenceNumber == undefined
     ) {
       throw new Error(`${fnTag}, session data was not load correctly`);
@@ -203,7 +183,7 @@ export class Stage2ServerHandler {
 
     if (
       request.common.hashPreviousMessage !=
-      sessionData.hashes.stage1.transferCommenceResponseMessageHash
+      getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
     ) {
       throw new Error(
         `${fnTag}, LockAssertionRequest previous message hash does not match the one that was sent`,
@@ -220,5 +200,6 @@ export class Stage2ServerHandler {
     }
 
     this.log.info(`LockAssertionRequest passed all checks.`);
+    return sessionData;
   }
 }
