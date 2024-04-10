@@ -102,3 +102,7 @@ export function getSatpLogKey(
 ): string {
   return `${sessionID}-${type}-${operation}`;
 }
+
+export function getHash(object: unknown) {
+  return SHA256(JSON.stringify(object)).toString();
+}
