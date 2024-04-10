@@ -1,6 +1,4 @@
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { SHA256 } from "crypto-js";
-
 import { SATPGateway } from "../../../gateway-refactor";
 import {
   TransferCommenceRequestMessage,
@@ -13,20 +11,15 @@ import {
   TransferClaims,
   NetworkCapabilities,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import {
-  MessageStagesHashes,
-  MessageStagesSignatures,
-  SessionData,
-  Stage1Hashes,
-  Stage1Signatures,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import { SATP_VERSION } from "../../constants";
 import {
   bufArray2HexStr,
+  getHash,
   sign,
   storeLog,
   verifySignature,
 } from "../../../gateway-utils";
+import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 
 export class Stage1ClientHandler {
   public static readonly CLASS_NAME = "Stage1Handler-Client";
@@ -55,6 +48,7 @@ export class Stage1ClientHandler {
     const sessionData = gateway.getSession(sessionID);
 
     if (
+      //todo maybe remove this?
       sessionData == undefined ||
       sessionData.version == undefined ||
       sessionData.id == undefined ||
@@ -140,6 +134,8 @@ export class Stage1ClientHandler {
     transferInitClaims.receiverGatewayOwnerId =
       sessionData.receiverGatewayOwnerId;
 
+    sessionData.hashTransferInitClaims = getHash(transferInitClaims);
+
     const networkCapabilities = new NetworkCapabilities();
     networkCapabilities.senderGatewayNetworkId =
       sessionData.senderGatewayNetworkId;
@@ -172,17 +168,13 @@ export class Stage1ClientHandler {
 
     transferProposalRequestMessage.common.signature = messageSignature;
 
-    sessionData.signatures = new MessageStagesSignatures();
-    sessionData.signatures.stage1 = new Stage1Signatures();
-    sessionData.signatures.stage1.transferCommenceRequestMessageClientSignature =
-      messageSignature;
+    saveSignature(sessionData, MessageType.INIT_PROPOSAL, messageSignature);
 
-    sessionData.hashes = new MessageStagesHashes();
-    sessionData.hashes.stage1 = new Stage1Hashes();
-
-    sessionData.hashes.stage1.transferCommenceRequestMessageHash = SHA256(
-      JSON.stringify(transferProposalRequestMessage),
-    ).toString();
+    saveHash(
+      sessionData,
+      MessageType.INIT_PROPOSAL,
+      getHash(transferProposalRequestMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionID,
@@ -206,14 +198,9 @@ export class Stage1ClientHandler {
       throw new Error("Response or response.common is undefined");
     }
 
-    //const sessionData = gateway.sessions.get(response.common.sessionId);
-    const sessionData = new SessionData(); //todo change
+    const sessionData = gateway.getSession(response.common.sessionId);
 
-    if (
-      sessionData == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined
-    ) {
+    if (sessionData == undefined) {
       throw new Error("Session data not loaded successfully");
     }
 
@@ -221,17 +208,24 @@ export class Stage1ClientHandler {
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.TRANSFER_COMMENCE_REQUEST;
     commonBody.sequenceNumber = response.common.sequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage1.transferProposalReceiptMessageHash; //todo
+
+    //todo check when reject
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.INIT_RECEIPT,
+    );
 
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
     commonBody.sessionId = sessionData.id;
 
+    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+
     const transferCommenceRequestMessage = new TransferCommenceRequestMessage();
     transferCommenceRequestMessage.common = commonBody;
     transferCommenceRequestMessage.hashTransferInitClaims =
       sessionData.hashTransferInitClaims;
+
     // transferCommenceRequestMessage.clientTransferNumber = sessionData.clientTransferNumber;
 
     const messageSignature = bufArray2HexStr(
@@ -243,7 +237,17 @@ export class Stage1ClientHandler {
 
     transferCommenceRequestMessage.common.signature = messageSignature;
 
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+    saveSignature(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_REQUEST,
+      messageSignature,
+    );
+
+    saveHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_REQUEST,
+      getHash(transferCommenceRequestMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -257,10 +261,11 @@ export class Stage1ClientHandler {
     return transferCommenceRequestMessage;
   }
 
+  //If is a reject message and there is no transferCounterClaims, then the there is no following up messages
   async checkTransferProposalReceiptRejectMessage(
     response: TransferProposalReceiptRejectMessage,
     gateway: SATPGateway,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const fnTag = `${this.className}#checkTransferProposalReceiptRejectMessage()`;
 
     if (response.common == undefined) {
@@ -288,13 +293,7 @@ export class Stage1ClientHandler {
 
     if (
       sessionData.serverGatewayPubkey == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined ||
-      sessionData.hashes.stage1.transferProposalRequestMessageHash ==
-        undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined
+      sessionData.lastSequenceNumber == undefined
     ) {
       throw new Error(`${fnTag}, session data was not loaded correctly`);
     }
@@ -324,16 +323,7 @@ export class Stage1ClientHandler {
     if (
       response.common.hashPreviousMessage == undefined ||
       response.common.hashPreviousMessage !=
-        sessionData.hashes.stage1.transferProposalRequestMessageHash
-    ) {
-      throw new Error(
-        `${fnTag}, TransferProposalReceipt Message previous message hash is wrong`,
-      );
-    }
-
-    if (
-      response.common.hashPreviousMessage !=
-      sessionData.hashes.stage1.transferProposalRequestMessageHash
+        getMessageHash(sessionData, MessageType.INIT_PROPOSAL)
     ) {
       throw new Error(
         `${fnTag}, TransferProposalReceipt previous message hash does not match the one that was sent`,
@@ -369,5 +359,13 @@ export class Stage1ClientHandler {
     }
 
     this.log.info(`TransferProposalReceipt passed all checks.`);
+
+    if (
+      response.common.messageType == MessageType.INIT_REJECT &&
+      response.transferCounterClaims == undefined
+    ) {
+      return false;
+    }
+    return true;
   }
 }
