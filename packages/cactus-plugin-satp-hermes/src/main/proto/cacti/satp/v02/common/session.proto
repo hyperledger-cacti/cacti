@@ -58,6 +58,9 @@ message SessionData {
     cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 48;
     cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 49;
     cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 50;
+    bool completed = 51;
+    ACCEPTANCE acceptance = 52;
+    string last_message_hash = 53;
 }
 
 
@@ -86,8 +89,7 @@ message Stage3Hashes {
     string commit_ready_response_message_hash = 2;
     string commit_final_assertion_request_message_hash = 3;
     string commit_final_acknowledgement_receipt_response_message_hash = 4;
-    string transfer_complete_request_message_hash = 5;
-    string transfer_complete_response_message_hash = 6;
+    string transfer_complete_message_hash = 5;
 }
 
 message MessageStagesSignatures {
@@ -97,25 +99,24 @@ message MessageStagesSignatures {
 }
 
 message Stage1Signatures {
-    string transfer_proposal_request_message_client_signature = 1;
-    string transfer_proposal_receipt_message_server_signature = 2;
-    string transfer_proposal_reject_message_server_signature = 3;
-    string transfer_commence_request_message_client_signature = 4;
-    string transfer_commence_response_message_server_signature = 5;
+    string transfer_proposal_request_message_signature = 1;
+    string transfer_proposal_receipt_message_signature = 2;
+    string transfer_proposal_reject_message_signature = 3;
+    string transfer_commence_request_message_signature = 4;
+    string transfer_commence_response_message_signature = 5;
 }
 
 message Stage2Signatures {
-    string lock_assertion_request_message_client_signature = 1;
-    string lock_assertion_receipt_message_server_signature = 2;
+    string lock_assertion_request_message_signature = 1;
+    string lock_assertion_receipt_message_signature = 2;
 }
 
 message Stage3Signatures {
-    string commit_preparation_request_message_client_signature = 1;
-    string commit_ready_response_message_server_signature = 2;
-    string commit_final_assertion_request_message_client_signature = 3;
-    string commit_final_acknowledgement_receipt_response_message_server_signature = 4;
-    string transfer_complete_request_message_client_signature = 5;
-    string transfer_complete_response_message_server_signature = 6;
+    string commit_preparation_request_message_signature = 1;
+    string commit_ready_response_message_signature = 2;
+    string commit_final_assertion_request_message_signature = 3;
+    string commit_final_acknowledgement_receipt_response_message_signature = 4;
+    string transfer_complete_message_signature = 5;
 }
 
 message MessageStagesTimestamps {
@@ -141,9 +142,14 @@ message Stage3Timestamps {
     string commit_preparation_request_message_timestamp = 1;
     string commit_ready_response_message_timestamp = 2;
     string commit_final_assertion_request_message_timestamp = 3;
-    string commit_final_acknoledgement_receipt_response_message_timestamp = 4;
-    string transfer_complete_request_message_timestamp = 5;
-    string transfer_complete_response_message_timestamp = 6;
+    string commit_final_acknowledgement_receipt_response_message_timestamp = 4;
+    string transfer_complete_message_timestamp = 5;
+}
+
+enum ACCEPTANCE {
+    ACCEPTANCE_REJECTED = 0;
+    ACCEPTANCE_ACCEPTED = 1;
+    ACCEPTANCE_CONDITIONAL = 2;
 }
 
 message SendStatusRequest {

@@ -7,17 +7,14 @@ import {
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LockAssertionRequestMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
-import { SHA256 } from "crypto-js";
-import {
-  Stage2Hashes,
-  Stage2Signatures,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import {
   bufArray2HexStr,
+  getHash,
   sign,
   storeLog,
   verifySignature,
 } from "../../../gateway-utils";
+import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 
 export class Stage2ClientHandler {
   public static readonly CLASS_NAME = "Stage2Handler-Client";
@@ -53,31 +50,19 @@ export class Stage2ClientHandler {
         `${fnTag}, session data not found for session id ${response.common.sessionId}`,
       );
     }
-    if (
-      sessionData == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined ||
-      sessionData.hashes.stage1.transferCommenceRequestMessageHash ==
-        undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.version == undefined ||
-      sessionData.signatures == undefined
-    ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
-      );
-    }
 
-    sessionData.hashes.stage1.transferCommenceResponseMessageHash = SHA256(
-      JSON.stringify(response),
-    ).toString();
+    saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
 
     const commonBody = new CommonSatp();
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.LOCK_ASSERT;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage =
-      sessionData.hashes.stage1.transferCommenceResponseMessageHash;
+
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_RESPONSE,
+    );
+
     commonBody.sessionId = response.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -98,14 +83,13 @@ export class Stage2ClientHandler {
 
     lockAssertionRequestMessage.common.signature = messageSignature;
 
-    sessionData.signatures.stage2 = new Stage2Signatures();
-    sessionData.signatures.stage2.lockAssertionRequestMessageClientSignature =
-      messageSignature;
+    saveSignature(sessionData, MessageType.LOCK_ASSERT, messageSignature);
 
-    sessionData.hashes.stage2 = new Stage2Hashes();
-    sessionData.hashes.stage2.lockAssertionRequestMessageHash = SHA256(
-      JSON.stringify(lockAssertionRequestMessage),
-    ).toString();
+    saveHash(
+      sessionData,
+      MessageType.LOCK_ASSERT,
+      getHash(lockAssertionRequestMessage),
+    );
 
     await storeLog(gateway, {
       sessionID: sessionData.id,
@@ -159,10 +143,6 @@ export class Stage2ClientHandler {
 
     if (
       sessionData.serverGatewayPubkey == undefined ||
-      sessionData.hashes == undefined ||
-      sessionData.hashes.stage1 == undefined ||
-      sessionData.hashes.stage1.transferProposalRequestMessageHash ==
-        undefined ||
       sessionData.lastSequenceNumber == undefined
     ) {
       throw new Error(`${fnTag}, session data was not load correctly`);
@@ -213,7 +193,7 @@ export class Stage2ClientHandler {
 
     if (
       response.common.hashPreviousMessage !=
-      sessionData.hashes.stage1.transferCommenceResponseMessageHash //todo
+      getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
     ) {
       throw new Error(
         `${fnTag}, TransferCommenceResponse previous message hash does not match the one that was sent`,
