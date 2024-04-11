@@ -50,7 +50,7 @@
   "devDependencies": {
     "@types/elliptic": "6.4.14",
     "@types/escape-html": "1.0.1",
-    "@types/express": "4.17.19",
+    "@types/express": "4.17.21",
     "@types/jsonwebtoken": "9.0.2",
     "@types/jsrsasign": "10.5.8",
     "@types/uuid": "9.0.8"
