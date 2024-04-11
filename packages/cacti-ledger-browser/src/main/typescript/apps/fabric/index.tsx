@@ -4,86 +4,46 @@ import BlocksFabric from "./pages/BlocksFabric/BlocksFabric";
 import FabricTransaction from "./pages/FabricTransaction/FabricTransaction";
 import FabricBlock from "./pages/FabricBlock/FabricBlock";
 import { Outlet } from "react-router-dom";
-
-interface AppConfig {
-  name: string;
-  url: string;
-  pluginName: string;
-  menuEntries: {
-    title: string;
-    url: string;
-  }[];
-  routes: any;
-}
+import { AppConfig } from "../../common/types/app";
 
 const fabricConfig: AppConfig = {
   name: "Fabric",
-  url: "fabric",
-  pluginName: "PluginPersistenceFabric",
+  path: "/fabric",
   menuEntries: [
     {
       title: "Dashboard",
-      url: "/dashboard",
+      url: "/",
     },
   ],
   routes: [
     {
-      path: "dashboard",
-      element: (
-        <div>
-          <DashFabric></DashFabric>
-        </div>
-      ),
+      element: <DashFabric />,
     },
     {
       path: "transactions",
-      element: (
-        <div>
-          <TransactionsFabric></TransactionsFabric>
-        </div>
-      ),
+      element: <TransactionsFabric />,
     },
     {
       path: "blocks",
-      element: (
-        <div>
-          <BlocksFabric></BlocksFabric>
-        </div>
-      ),
+      element: <BlocksFabric />,
     },
     {
       path: "txn-details",
-      element: (
-        <div>
-          <Outlet></Outlet>
-        </div>
-      ),
+      element: <Outlet />,
       children: [
         {
           path: ":id",
-          element: (
-            <div>
-              <FabricTransaction></FabricTransaction>
-            </div>
-          ),
+          element: <FabricTransaction />,
         },
       ],
     },
     {
       path: "block-details",
-      element: (
-        <div>
-          <Outlet></Outlet>
-        </div>
-      ),
+      element: <Outlet />,
       children: [
         {
           path: ":id",
-          element: (
-            <div>
-              <FabricBlock></FabricBlock>
-            </div>
-          ),
+          element: <FabricBlock />,
         },
       ],
     },

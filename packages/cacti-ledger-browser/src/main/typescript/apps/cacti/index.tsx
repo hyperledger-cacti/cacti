@@ -1,8 +1,9 @@
+import { AppConfig } from "../../common/types/app";
 import StatusPage from "./pages/status-page";
 
-const appConfig = {
-  name: "Cacti",
-  url: "cacti",
+const appConfig: AppConfig = {
+  name: "Status",
+  path: "/cacti",
   menuEntries: [
     {
       title: "Plugin Status",
@@ -11,8 +12,7 @@ const appConfig = {
   ],
   routes: [
     {
-      path: "/",
-      component: StatusPage,
+      element: <StatusPage />,
     },
   ],
 };
