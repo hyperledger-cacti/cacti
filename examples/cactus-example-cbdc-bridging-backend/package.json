@@ -88,7 +88,7 @@
   "devDependencies": {
     "@types/crypto-js": "4.1.1",
     "@types/cucumber": "4.0.4",
-    "@types/express": "4.17.19",
+    "@types/express": "4.17.21",
     "@types/express-jwt": "6.0.2",
     "@types/fs-extra": "9.0.13",
     "@types/node": "18.11.9",
