@@ -44,6 +44,8 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
+import { IPluginLedgerConnector } from "@hyperledger/cactus-core-api";
+import { SATPLedgerConnector } from "./types/blockchain-interaction";
 export class SATPGateway {
   // todo more checks; example port from config is between 3000 and 9000
   @IsDefined()
@@ -75,8 +77,11 @@ export class SATPGateway {
 
   private objectSigner: JsObjectSigner;
 
-  // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
+  // Instantiate connectors based on supported implementations
   private supportedDltIDs: SupportedGatewayImplementations[];
+  private connectors: SATPLedgerConnector[] = [];
+
+  // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   private sessions: Map<string, SessionData> = new Map();
   private _pubKey: string;
   private _privKey: string;
