@@ -10,7 +10,7 @@ import { SATP_VERSION } from "../../constants";
 import {
   CommonSatp,
   MessageType,
-} from "../../../generated/proto/cacti/satp/v02/common/common_messages_pb";
+} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   Stage3Hashes,
   Stage3Signatures,
