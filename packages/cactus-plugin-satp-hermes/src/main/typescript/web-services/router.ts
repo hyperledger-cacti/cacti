@@ -10,6 +10,7 @@ import { TestImplementation2 } from "./test/test2";
 
 */
 export const configureRoutes = (router: ConnectRouter): void => {
+  console.log(router);
   // TODO: add all services and respective implementations
   //router.service(TestService, TestImplementation);
 };
