@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712640619205,
+  "lastUpdate": 1712906972434,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -150,6 +150,44 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 364,
             "range": "±1.26%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "68a46c2be48760e576b0c44cba13dcb731b8e828",
+          "message": "build(deps): bump h2\n\nBumps [h2](https://github.com/hyperium/h2) from 0.3.24 to 0.3.26.\n- [Release notes](https://github.com/hyperium/h2/releases)\n- [Changelog](https://github.com/hyperium/h2/blob/v0.3.26/CHANGELOG.md)\n- [Commits](https://github.com/hyperium/h2/compare/v0.3.24...v0.3.26)\n\n---\nupdated-dependencies:\n- dependency-name: h2\n  dependency-type: indirect\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2024-04-12T00:16:19-07:00",
+          "tree_id": "7fc713a2170cd7b26ef42fcb241a3cb64907dd03",
+          "url": "https://github.com/hyperledger/cacti/commit/68a46c2be48760e576b0c44cba13dcb731b8e828"
+        },
+        "date": 1712906969686,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 571,
+            "range": "±1.84%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 353,
+            "range": "±1.33%",
             "unit": "ops/sec",
             "extra": "180 samples"
           }
