@@ -5,13 +5,13 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 
-import routesStage1 from "./stage-services/stage1-service";
-import routesStage2 from "./stage-services/stage2-service";
-import routesStage3 from "./stage-services/stage3-service";
-import { Stage1ServerHandler } from "./stage-handlers/server/stage1-server-handler";
+import routesStage1 from "./stage-handlers/stage1-handler";
+import routesStage2 from "./stage-handlers/stage2-handler";
+import routesStage3 from "./stage-handlers/stage3-handler";
+import { Stage1ServerService } from "./stage-services/server/stage1-server-service";
 import { SATPGateway } from "../gateway-refactor";
-import { Stage2ServerHandler } from "./stage-handlers/server/stage2-server-handler";
-import { Stage3ServerHandler } from "./stage-handlers/server/stage3-server-handler";
+import { Stage2ServerService } from "./stage-services/server/stage2-server-service";
+import { Stage3ServerService } from "./stage-services/server/stage3-server-service";
 
 export interface COREDispatcherOptions {
   logger: Logger;
@@ -26,16 +26,13 @@ export class COREDispatcher {
   private endpoints: any[] | undefined;
 
   private readonly gateway: SATPGateway;
-  private readonly stage1Handler: Stage1ServerHandler;
-  private readonly stage2Handler: Stage2ServerHandler;
-  private readonly stage3Handler: Stage3ServerHandler;
+  private readonly stage1Service: Stage1ServerService;
+  private readonly stage2Service: Stage2ServerService;
+  private readonly stage3Service: Stage3ServerService;
 
   constructor(
     public readonly options: COREDispatcherOptions,
     gateway: SATPGateway,
-    stage1Handler: Stage1ServerHandler,
-    stage2Handler: Stage2ServerHandler,
-    stage3Handler: Stage3ServerHandler,
   ) {
     const fnTag = `${COREDispatcher.CLASS_NAME}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -46,10 +43,11 @@ export class COREDispatcher {
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
 
+    this.stage1Service = new Stage1ServerService();
+    this.stage2Service = new Stage2ServerService();
+    this.stage3Service = new Stage3ServerService();
+
     this.gateway = gateway;
-    this.stage1Handler = stage1Handler;
-    this.stage2Handler = stage2Handler;
-    this.stage3Handler = stage3Handler;
   }
 
   public get className(): string {
@@ -66,9 +64,9 @@ export class COREDispatcher {
     }
 
     this.endpoints = [
-      routesStage1(this.gateway, this.stage1Handler),
-      routesStage2(this.gateway, this.stage2Handler),
-      routesStage3(this.gateway, this.stage3Handler),
+      routesStage1(this.gateway, this.stage1Service),
+      routesStage2(this.gateway, this.stage2Service),
+      routesStage3(this.gateway, this.stage3Service),
     ];
 
     return this.endpoints;

@@ -19,20 +19,25 @@ import {
   storeLog,
   verifySignature,
 } from "../../../gateway-utils";
-import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
+import {
+  getMessageHash,
+  saveHash,
+  saveSignature,
+  checkSessionData,
+} from "../../session-utils";
 
-export class Stage1ClientHandler {
-  public static readonly CLASS_NAME = "Stage1Handler-Client";
+export class Stage1ClientService {
+  public static readonly CLASS_NAME = "Stage1Service-Client";
   private _log: Logger;
 
   constructor() {
     const level = "INFO";
-    const label = Stage1ClientHandler.CLASS_NAME;
+    const label = Stage1ClientService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public get className(): string {
-    return Stage1ClientHandler.CLASS_NAME;
+    return Stage1ClientService.CLASS_NAME;
   }
 
   public get log(): Logger {
@@ -47,40 +52,7 @@ export class Stage1ClientHandler {
 
     const sessionData = gateway.getSession(sessionID);
 
-    if (
-      //todo maybe remove this?
-      sessionData == undefined ||
-      sessionData.version == undefined ||
-      sessionData.id == undefined ||
-      //sessionData.transferContextId == undefined ||
-      sessionData.digitalAssetId == undefined ||
-      //sessionData.assetProfileId == undefined ||
-      sessionData.originatorPubkey == undefined ||
-      sessionData.beneficiaryPubkey == undefined ||
-      sessionData.senderGatewayNetworkId == undefined ||
-      sessionData.recipientGatewayNetworkId == undefined ||
-      sessionData.clientGatewayPubkey == undefined ||
-      sessionData.serverGatewayPubkey == undefined ||
-      sessionData.senderGatewayOwnerId == undefined ||
-      sessionData.receiverGatewayOwnerId == undefined ||
-      // sessionData.maxRetries == undefined ||
-      // sessionData.maxTimeout == undefined ||
-      sessionData.senderGatewayNetworkId == undefined ||
-      sessionData.signatureAlgorithm == undefined ||
-      sessionData.lockType == undefined ||
-      sessionData.lockExpirationTime == undefined ||
-      //sessionData.permitions == undefined ||
-      //sessionData.developerUrn == undefined ||
-      sessionData.credentialProfile == undefined ||
-      //sessionData.applicationProfile == undefined ||
-      sessionData.loggingProfile == undefined ||
-      sessionData.accessControlProfile == undefined ||
-      sessionData.lastSequenceNumber == undefined //||
-      //sessionData.subsequentCalls == undefined ||
-      //sessionData.history == undefined ||
-      //sessionData.multipleClaimsAllowed == undefined ||
-      //sessionData.multipleCancelsAllowed == undefined
-    ) {
+    if (sessionData == undefined || !checkSessionData(sessionData)) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
@@ -100,16 +72,12 @@ export class Stage1ClientHandler {
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.INIT_PROPOSAL;
     commonBody.sessionId = sessionData.id;
-    // commonBody.transferContextId = sessionData.transferContextId;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
     commonBody.resourceUrl = "";
 
-    //commonBody.actionResponse = new ActionResponse();
-    // commonBody.credentialBlock = sessionData.credentialBlock;
-    // commonBody.payloadProfile = sessionData.payloadProfile;
-    // commonBody.applicationProfile = sessionData.applicationProfile;
-    // commonBody.payload = new Payload();
-    // commonBody.payloadHash = "";
+    if (sessionData.transferContextId != undefined) {
+      commonBody.transferContextId = sessionData.transferContextId;
+    }
 
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -142,22 +110,63 @@ export class Stage1ClientHandler {
     networkCapabilities.signatureAlgorithm = sessionData.signatureAlgorithm;
     networkCapabilities.lockType = sessionData.lockType;
     networkCapabilities.lockExpirationTime = sessionData.lockExpirationTime;
-    //networkCapabilities.permitions = sessionData.permitions;
-    //networkCapabilities.developerUrn = sessionData.developerUrn;
     networkCapabilities.credentialProfile = sessionData.credentialProfile;
-    //networkCapabilities.applicationProfile = sessionData.applicationProfile;
     networkCapabilities.loggingProfile = sessionData.loggingProfile;
     networkCapabilities.accessControlProfile = sessionData.accessControlProfile;
-    //networkCapabilities.subsequentCalls = sessionData.subsequentCalls;
-    //networkCapabilities.history = sessionData.history;
+
+    if (sessionData.permissions != undefined) {
+      this.log.info(`${fnTag}, Optional variable loaded: permissions...`);
+      networkCapabilities.permissions = sessionData.permissions;
+    }
+
+    if (sessionData.developerUrn != undefined) {
+      this.log.info(`${fnTag}, Optional variable loaded: developerUrn...`);
+      networkCapabilities.developerUrn = sessionData.developerUrn;
+    }
+
+    if (sessionData.applicationProfile != undefined) {
+      this.log.info(
+        `${fnTag}, Optional variable loaded: applicationProfile...`,
+      );
+      networkCapabilities.applicationProfile = sessionData.applicationProfile;
+    }
+
+    if (sessionData.subsequentCalls != undefined) {
+      this.log.info(`${fnTag}, Optional variable loaded: subsequentCalls...`);
+      networkCapabilities.subsequentCalls = sessionData.subsequentCalls;
+    }
+
+    if (sessionData.history != undefined) {
+      this.log.info(`${fnTag}, Optional variable loaded: history...`);
+      networkCapabilities.history = sessionData.history;
+    }
 
     const transferProposalRequestMessage = new TransferProposalRequestMessage();
     transferProposalRequestMessage.common = commonBody;
     transferProposalRequestMessage.transferInitClaims = transferInitClaims;
-    // transferProposalRequestMessage.transferInitClaimsFormat = sessionData.transferInitClaimsFormat;
     transferProposalRequestMessage.networkCapabilities = networkCapabilities;
-    // transferProposalRequestMessage.multipleClaimsAllowed = sessionData.multipleClaimsAllowed;
-    // transferProposalRequestMessage.multipleCancelsAllowed = sessionData.multipleCancelsAllowed;
+
+    if (sessionData.transferClaimsFormat != undefined) {
+      this.log.info(
+        `${fnTag}, Optional variable loaded: transferInitClaimsFormat...`,
+      );
+      transferProposalRequestMessage.transferInitClaimsFormat =
+        sessionData.transferClaimsFormat;
+    }
+    if (sessionData.multipleCancelsAllowed != undefined) {
+      this.log.info(
+        `${fnTag}, Optional variable loaded: multipleCancelsAllowed...`,
+      );
+      transferProposalRequestMessage.multipleCancelsAllowed =
+        sessionData.multipleCancelsAllowed;
+    }
+    if (sessionData.multipleClaimsAllowed != undefined) {
+      this.log.info(
+        `${fnTag}, Optional variable loaded: multipleClaimsAllowed...`,
+      );
+      transferProposalRequestMessage.multipleClaimsAllowed =
+        sessionData.multipleClaimsAllowed;
+    }
 
     const messageSignature = bufArray2HexStr(
       sign(
@@ -261,7 +270,6 @@ export class Stage1ClientHandler {
     return transferCommenceRequestMessage;
   }
 
-  //If is a reject message and there is no transferCounterClaims, then the there is no following up messages
   async checkTransferProposalReceiptRejectMessage(
     response: TransferProposalReceiptRejectMessage,
     gateway: SATPGateway,
@@ -358,14 +366,39 @@ export class Stage1ClientHandler {
       );
     }
 
-    this.log.info(`TransferProposalReceipt passed all checks.`);
-
     if (
       response.common.messageType == MessageType.INIT_REJECT &&
       response.transferCounterClaims == undefined
     ) {
+      sessionData.completed = true;
       return false;
+    } else if (
+      response.common.messageType == MessageType.INIT_REJECT &&
+      response.transferCounterClaims != undefined
+    ) {
+      if (this.checkProposedTransferClaims(response.transferCounterClaims)) {
+        sessionData.proposedTransferInitClaims = getHash(
+          response.transferCounterClaims,
+        );
+        return true;
+      } else {
+        this.log.info(
+          `TransferProposalReceipt proposedTransferClaims were rejected`,
+        );
+        sessionData.completed = true;
+        return false;
+      }
     }
+    this.log.info(`TransferProposalReceipt passed all checks.`);
+    return true;
+  }
+
+  private checkProposedTransferClaims(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    counterTransfer: TransferClaims,
+  ): boolean {
+    //const fnTag = `${this.className}#checkCounterTransferClaims()`;
+    //todo
     return true;
   }
 }
