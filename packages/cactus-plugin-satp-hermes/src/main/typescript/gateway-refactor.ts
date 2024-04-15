@@ -39,12 +39,11 @@ import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
 import { SessionData } from "./generated/proto/cacti/satp/v02/common/session_pb";
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import { bufArray2HexStr } from "./gateway-utils";
-import { COREDispatcher } from "./core/dispatcher";
+import { COREDispatcher, COREDispatcherOptions } from "./core/dispatcher";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
-import { IPluginLedgerConnector } from "@hyperledger/cactus-core-api";
 import { SATPLedgerConnector } from "./types/blockchain-interaction";
 export class SATPGateway {
   // todo more checks; example port from config is between 3000 and 9000
@@ -135,6 +134,12 @@ export class SATPGateway {
       instanceId: this.config.gid!.id,
     };
 
+    const coreDispatcherOps: COREDispatcherOptions = {
+      logger: this.logger,
+      logLevel: this.config.logLevel,
+      instanceId: this.config.gid!.id,
+    };
+
     this.supportedDltIDs = this.config.gid!.supportedChains;
 
     if (!this.config.gid || !dispatcherOps.instanceId) {
@@ -142,6 +147,7 @@ export class SATPGateway {
     }
 
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
+    this.COREDispatcher = new COREDispatcher(coreDispatcherOps, this);
   }
 
   public getSessions(): Map<string, SessionData> {
