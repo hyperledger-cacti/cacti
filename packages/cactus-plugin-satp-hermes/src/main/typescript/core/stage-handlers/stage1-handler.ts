@@ -6,11 +6,11 @@ import {
   TransferProposalRequestMessage,
 } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
 import { SATPGateway } from "../../gateway-refactor";
-import { Stage1ServerHandler } from "../stage-handlers/server/stage1-server-handler";
+import { Stage1ServerService } from "../stage-services/server/stage1-server-service";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
-export default (gateway: SATPGateway, handler: Stage1ServerHandler) =>
+export default (gateway: SATPGateway, service: Stage1ServerService) =>
   (router: ConnectRouter) =>
     router.service(SatpStage1Service, {
       async transferProposal(
@@ -21,7 +21,7 @@ export default (gateway: SATPGateway, handler: Stage1ServerHandler) =>
         const recvTimestamp: string = Date.now().toString();
 
         const [sessionData, reject] =
-          await handler.checkTransferProposalRequestMessage(req, gateway);
+          await service.checkTransferProposalRequestMessage(req, gateway);
 
         saveTimestamp(
           sessionData,
@@ -30,7 +30,7 @@ export default (gateway: SATPGateway, handler: Stage1ServerHandler) =>
           recvTimestamp,
         );
 
-        const message = await handler.transferProposalResponse(
+        const message = await service.transferProposalResponse(
           req,
           reject,
           gateway,
@@ -65,7 +65,7 @@ export default (gateway: SATPGateway, handler: Stage1ServerHandler) =>
         console.log("Received TransferCommenceRequest", req, context);
         const recvTimestamp: string = Date.now().toString();
 
-        const sessionData = await handler.checkTransferCommenceRequestMessage(
+        const sessionData = await service.checkTransferCommenceRequestMessage(
           req,
           gateway,
         );
@@ -77,7 +77,7 @@ export default (gateway: SATPGateway, handler: Stage1ServerHandler) =>
           recvTimestamp,
         );
 
-        const message = await handler.transferCommenceResponse(req, gateway);
+        const message = await service.transferCommenceResponse(req, gateway);
 
         if (!message) {
           throw new Error("No message returned from transferProposalResponse");
