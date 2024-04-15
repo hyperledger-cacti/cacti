@@ -394,3 +394,34 @@ export function getMessageTimestamp(
       throw new Error("Message hash not found");
   }
 }
+
+export function checkSessionData(sessionData: SessionData): boolean {
+  if (
+    sessionData.version == undefined ||
+    sessionData.id == undefined ||
+    sessionData.digitalAssetId == undefined ||
+    sessionData.originatorPubkey == undefined ||
+    sessionData.beneficiaryPubkey == undefined ||
+    sessionData.senderGatewayNetworkId == undefined ||
+    sessionData.recipientGatewayNetworkId == undefined ||
+    sessionData.clientGatewayPubkey == undefined ||
+    sessionData.serverGatewayPubkey == undefined ||
+    sessionData.senderGatewayOwnerId == undefined ||
+    sessionData.receiverGatewayOwnerId == undefined ||
+    // sessionData.maxRetries == undefined ||
+    // sessionData.maxTimeout == undefined ||
+    sessionData.senderGatewayNetworkId == undefined ||
+    sessionData.signatureAlgorithm == undefined ||
+    sessionData.lockType == undefined ||
+    sessionData.lockExpirationTime == undefined ||
+    sessionData.credentialProfile == undefined ||
+    sessionData.loggingProfile == undefined ||
+    sessionData.accessControlProfile == undefined ||
+    sessionData.lastSequenceNumber == undefined ||
+    sessionData.multipleClaimsAllowed == undefined ||
+    sessionData.multipleCancelsAllowed == undefined
+  ) {
+    return false;
+  }
+  return true;
+}
