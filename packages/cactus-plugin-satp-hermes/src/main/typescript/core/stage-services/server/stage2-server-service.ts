@@ -18,18 +18,18 @@ import {
   verifySignature,
 } from "../../../gateway-utils";
 import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
-export class Stage2ServerHandler {
-  public static readonly CLASS_NAME = "Stage2Handler-Server";
+export class Stage2ServerService {
+  public static readonly CLASS_NAME = "Stage2Service-Server";
   private _log: Logger;
 
   constructor() {
     const level = "INFO";
-    const label = Stage2ServerHandler.CLASS_NAME;
+    const label = Stage2ServerService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public get className(): string {
-    return Stage2ServerHandler.CLASS_NAME;
+    return Stage2ServerService.CLASS_NAME;
   }
 
   public get log(): Logger {

@@ -16,18 +16,18 @@ import {
 } from "../../../gateway-utils";
 import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 
-export class Stage2ClientHandler {
-  public static readonly CLASS_NAME = "Stage2Handler-Client";
+export class Stage2ClientService {
+  public static readonly CLASS_NAME = "Stage2Service-Client";
   private _log: Logger;
 
   constructor() {
     const level = "INFO";
-    const label = Stage2ClientHandler.CLASS_NAME;
+    const label = Stage2ClientService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public get className(): string {
-    return Stage2ClientHandler.CLASS_NAME;
+    return Stage2ClientService.CLASS_NAME;
   }
 
   public get log(): Logger {
@@ -75,7 +75,7 @@ export class Stage2ClientHandler {
     lockAssertionRequestMessage.lockAssertionClaim =
       sessionData.lockAssertionClaim;
     lockAssertionRequestMessage.lockAssertionFormat =
-      sessionData.lockAssertionFormat; //todo change this
+      sessionData.lockAssertionFormat;
 
     const messageSignature = bufArray2HexStr(
       sign(gateway.gatewaySigner, JSON.stringify(lockAssertionRequestMessage)),
