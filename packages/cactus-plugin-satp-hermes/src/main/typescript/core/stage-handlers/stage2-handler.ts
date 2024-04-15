@@ -2,11 +2,11 @@ import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
 import { LockAssertionRequestMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { SATPGateway } from "../../gateway-refactor";
-import { Stage2ServerHandler } from "../stage-handlers/server/stage2-server-handler";
+import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
-export default (gateway: SATPGateway, handler: Stage2ServerHandler) =>
+export default (gateway: SATPGateway, service: Stage2ServerService) =>
   (router: ConnectRouter) =>
     router.service(SatpStage2Service, {
       async lockAssertion(
@@ -16,7 +16,7 @@ export default (gateway: SATPGateway, handler: Stage2ServerHandler) =>
         console.log("Received LockAssertionRequest", req, context);
         const recvTimestamp: string = Date.now().toString();
 
-        const sessionData = await handler.checkLockAssertionRequestMessage(
+        const sessionData = await service.checkLockAssertionRequestMessage(
           req,
           gateway,
         );
@@ -28,7 +28,7 @@ export default (gateway: SATPGateway, handler: Stage2ServerHandler) =>
           recvTimestamp,
         );
 
-        const message = await handler.lockAssertionResponse(req, gateway);
+        const message = await service.lockAssertionResponse(req, gateway);
 
         if (!message) {
           throw new Error("No message returned from lockAssertionResponse");
