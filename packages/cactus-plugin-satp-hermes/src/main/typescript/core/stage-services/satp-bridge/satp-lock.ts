@@ -1,1 +1,0 @@
-// TODO Implement lock interface for all SATP supported chains

@@ -33,18 +33,18 @@ import {
   saveSignature,
 } from "../../session-utils";
 
-export class Stage1ServerHandler {
-  public static readonly CLASS_NAME = "Stage1Handler-Server";
+export class Stage1ServerService {
+  public static readonly CLASS_NAME = "Stage1Service-Server";
   private _log: Logger;
 
   constructor() {
     const level = "INFO";
-    const label = Stage1ServerHandler.CLASS_NAME;
+    const label = Stage1ServerService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public get className(): string {
-    return Stage1ServerHandler.CLASS_NAME;
+    return Stage1ServerService.CLASS_NAME;
   }
 
   public get log(): Logger {
@@ -106,18 +106,6 @@ export class Stage1ServerHandler {
       MessageType.INIT_PROPOSAL,
     );
 
-    if (reject) {
-      commonBody.messageType = MessageType.INIT_REJECT;
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_CONDITIONAL;
-
-      //todo check if there are transferClaims possible if not just not send
-    } else {
-      commonBody.messageType = MessageType.INIT_RECEIPT;
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
-    }
-
-    //todo if rejection
     const transferProposalReceiptMessage =
       new TransferProposalReceiptRejectMessage();
     transferProposalReceiptMessage.common = commonBody;
@@ -128,6 +116,25 @@ export class Stage1ServerHandler {
       MessageType.INIT_PROPOSAL,
       TimestampType.RECEIVED,
     );
+
+    if (reject) {
+      commonBody.messageType = MessageType.INIT_REJECT;
+      const counterProposalTransferClaims = this.counterProposalTransferClaims(
+        request.transferInitClaims,
+      );
+
+      if (!counterProposalTransferClaims) {
+        this.log.info(`${fnTag}, ProposalTransferClaims were rejected...`);
+        sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
+      } else {
+        sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_CONDITIONAL;
+        transferProposalReceiptMessage.transferCounterClaims =
+          counterProposalTransferClaims;
+      }
+    } else {
+      commonBody.messageType = MessageType.INIT_RECEIPT;
+      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
+    }
 
     const messageSignature = bufArray2HexStr(
       sign(
@@ -301,7 +308,7 @@ export class Stage1ServerHandler {
         .getSupportedDltIDs()
         .includes(request.transferInitClaims.senderGatewayNetworkId)
     ) {
-      throw new Error(
+      throw new Error( //todo change this to the transferClaims check
         `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
       );
     }
@@ -458,8 +465,16 @@ export class Stage1ServerHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  checkTransferClaims(transferClaims: TransferClaims): boolean {
+  private checkTransferClaims(transferClaims: TransferClaims): boolean {
     //todo
     return true;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private counterProposalTransferClaims(
+    oldClaims: TransferClaims,
+  ): TransferClaims {
+    //todo
+    return oldClaims;
   }
 }
