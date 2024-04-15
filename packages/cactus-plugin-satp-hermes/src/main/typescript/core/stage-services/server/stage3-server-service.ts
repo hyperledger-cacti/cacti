@@ -21,18 +21,18 @@ import {
 } from "../../../gateway-utils";
 import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 
-export class Stage3ServerHandler {
-  public static readonly CLASS_NAME = "Stage3Handler-Server";
+export class Stage3ServerService {
+  public static readonly CLASS_NAME = "Stage3Service-Server";
   private _log: Logger;
 
   constructor() {
     const level = "INFO";
-    const label = Stage3ServerHandler.CLASS_NAME;
+    const label = Stage3ServerService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public get className(): string {
-    return Stage3ServerHandler.CLASS_NAME;
+    return Stage3ServerService.CLASS_NAME;
   }
 
   public get log(): Logger {
