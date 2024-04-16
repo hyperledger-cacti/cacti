@@ -11,11 +11,11 @@ import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
 import { GetStatusEndpointV1 } from "../web-services/blo/status-endpoint";
 
-//import { GetAuditRequest, GetAuditResponse } from "../generated/openapi-blo/typescript-axios";
+//import { GetAuditRequest, GetAuditResponse } from "../generated/gateway-client/typescript-axios";
 import {
   StatusRequest,
   StatusResponse,
-} from "../generated/openapi-blo/typescript-axios";
+} from "../generated/gateway-client/typescript-axios";
 import { GetStatusHandler } from "./admin/get-status-handler-service";
 
 export interface BLODispatcherOptions {
