@@ -3,7 +3,7 @@ import {
   Configuration,
   AdminApi,
   TransactionApi,
-} from "../../main/typescript/generated/openapi-blo/typescript-axios";
+} from "../../main/typescript/generated/gateway-client/typescript-axios";
 //import { Api } from "@bufbuild/protobuf";
 
 export function createClient(
