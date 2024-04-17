@@ -1,3 +1,14 @@
+# Below are the full description for the shorten job names:
+#
+# ce - cactus-example
+# cp - cactus-plugin
+# cpk - cactus-plugin-keychain
+# cpl - cactus-plugin-ledger
+# cplc - cactus-plugin-ledger-connector
+# plc - plugin-ledger-connector
+# cpp - cactus-plugin-persistence
+# ct - cactus-test
+# ctp - cactus-test-plugin
 ---
 env:
   NODEJS_VERSION: v18.18.2
@@ -532,7 +543,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-example-carbon-accounting-backend:
+  ce-carbon-accounting-backend:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -558,7 +569,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-example-carbon-accounting-business-logic-plugin:
+  ce-carbon-accounting-business-logic-plugin:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -583,7 +594,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-example-carbon-accounting-frontend:
+  ce-carbon-accounting-frontend:
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -609,7 +620,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-example-supply-chain-backend:
+  ce-supply-chain-backend:
     continue-on-error: false
     env:
       DUMP_DISK_USAGE_INFO_DISABLED: false
@@ -637,7 +648,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-example-supply-chain-business-logic-plugin:
+  ce-supply-chain-business-logic-plugin:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -662,7 +673,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-example-supply-chain-frontend:
+  ce-supply-chain-frontend:
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -688,7 +699,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-consortium-manual:
+  cp-consortium-manual:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -713,7 +724,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-htlc-coordinator-besu:
+  cp-htlc-coordinator-besu:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -740,7 +751,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-htlc-eth-besu:
+  cp-htlc-eth-besu:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -765,7 +776,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-htlc-eth-besu-erc20:
+  cp-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -790,7 +801,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-keychain-aws-sm:
+  cp-keychain-aws-sm:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -816,7 +827,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-keychain-azure-kv:
+  cp-keychain-azure-kv:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -842,7 +853,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-keychain-google-sm:
+  cpk-google-sm:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -868,7 +879,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-keychain-memory:
+  cpk-memory:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -893,7 +904,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-keychain-memory-wasm:
+  cpk-memory-wasm:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -919,7 +930,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-keychain-vault:
+  cpk-vault:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -945,7 +956,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-aries:
+  cpl-connector-aries:
     continue-on-error: false
     needs:
       - build-dev
@@ -972,7 +983,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-besu:
+  cpl-connector-besu:
     permissions: write-all
     continue-on-error: false
     needs:
@@ -1035,7 +1046,7 @@ jobs:
           fail-on-alert: true
           alert-comment-cc-users: '@petermetz'
 
-  cactus-plugin-ledger-connector-polkadot:
+  cpl-connector-polkadot:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1063,7 +1074,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-corda:
+  cpl-connector-corda:
     continue-on-error: false
     needs:
       - build-dev
@@ -1094,7 +1105,7 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
 
-  plugin-ledger-connector-fabric-0:
+  plc-fabric-0:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1127,7 +1138,7 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
 
-  plugin-ledger-connector-fabric-1:
+  plc-fabric-1:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1160,7 +1171,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts
 
-  plugin-ledger-connector-fabric-2:
+  plc-fabric-2:
     continue-on-error: false
     needs:
       - build-dev
@@ -1193,7 +1204,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts
 
-  plugin-ledger-connector-fabric-3:
+  plc-fabric-3:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1226,7 +1237,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts
 
-  plugin-ledger-connector-fabric-4:
+  plc-fabric-4:
     continue-on-error: false
     needs:
       - build-dev
@@ -1259,7 +1270,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts
 
-  plugin-ledger-connector-fabric-5:
+  plc-fabric-5:
     continue-on-error: false
     needs:
       - build-dev
@@ -1292,7 +1303,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts
 
-  plugin-ledger-connector-fabric-6:
+  plc-fabric-6:
     continue-on-error: false
     needs:
       - build-dev
@@ -1325,7 +1336,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts
 
-  plugin-ledger-connector-fabric-7:
+  plc-fabric-7:
     continue-on-error: false
     needs:
       - build-dev
@@ -1358,7 +1369,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts
 
-  plugin-ledger-connector-fabric-8:
+  plc-fabric-8:
     continue-on-error: false
     needs:
       - build-dev
@@ -1391,7 +1402,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts
 
-  plugin-ledger-connector-fabric-9:
+  plc-fabric-9:
     continue-on-error: false
     needs:
       - build-dev
@@ -1424,7 +1435,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts
 
-  plugin-ledger-connector-fabric-10:
+  plc-fabric-10:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1457,7 +1468,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts
 
-  plugin-ledger-connector-fabric-11:
+  plc-fabric-11:
     continue-on-error: false
     needs:
       - build-dev
@@ -1490,7 +1501,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts
 
-  plugin-ledger-connector-fabric-12:
+  plc-fabric-12:
     continue-on-error: false
     needs:
       - build-dev
@@ -1523,7 +1534,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts
 
-  cactus-plugin-ledger-connector-go-ethereum-socketio:
+  cplc-go-ethereum-socketio:
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -1549,7 +1560,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-iroha2:
+  cplc-iroha2:
     continue-on-error: false
     needs:
       - build-dev
@@ -1577,7 +1588,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-ethereum:
+  cplc-ethereum:
     continue-on-error: false
     needs:
       - build-dev
@@ -1604,7 +1615,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-quorum:
+  cplc-quorum:
     continue-on-error: false
     needs:
       - build-dev
@@ -1634,7 +1645,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-sawtooth:
+  cplc-sawtooth:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1658,7 +1669,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-xdai:
+  cplc-xdai:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1685,7 +1696,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-persistence-ethereum:
+  cpp-ethereum:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1710,7 +1721,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-object-store-ipfs:
+  cp-object-store-ipfs:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1763,7 +1774,7 @@ jobs:
   #         restore-keys: |
   #           ${{ runner.os }}-yarn-
   #     - run: ./tools/ci.sh
-  cactus-plugin-bungee-hermes:
+  cp-bungee-hermes:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1788,7 +1799,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-api-client:
+  ct-api-client:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1813,7 +1824,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-cmd-api-server:
+  ct-cmd-api-server:
     continue-on-error: false
     needs:
       - build-dev
@@ -1842,7 +1853,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-geth-ledger:
+  ct-geth-ledger:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1867,7 +1878,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-plugin-consortium-manual:
+  ctp-consortium-manual:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1893,7 +1904,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-plugin-htlc-eth-besu:
+  ctp-htlc-eth-besu:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1926,7 +1937,7 @@ jobs:
       - name: Run solidity tests
         run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
 
-  cactus-test-plugin-htlc-eth-besu-erc20:
+  ctp-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1953,7 +1964,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-plugin-ledger-connector-besu:
+  ctp-ledger-connector-besu:
     continue-on-error: false
     needs:
       - build-dev
@@ -1983,7 +1994,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-plugin-ledger-connector-quorum:
+  ctp-ledger-connector-quorum:
     continue-on-error: false
     needs:
       - build-dev
@@ -2011,7 +2022,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-test-plugin-ledger-connector-ethereum:
+  ctp-ledger-connector-ethereum:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
