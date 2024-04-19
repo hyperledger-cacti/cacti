@@ -1,7 +1,10 @@
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { JsObjectSigner, LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
 import { BLODispatcher } from "../blo/dispatcher";
 import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
+import { createConnectTransport } from "@connectrpc/connect-node";
+import { SATPManager } from "../gol/protocol-manager/satp-manager";
+import { SATPSession } from "./satp-session";
 
 export enum CurrentDrafts {
   Core = "Core",
@@ -28,7 +31,10 @@ export enum SupportedGatewayImplementations {
 }
 
 export type GatewayChannel = {
-  id: string;
+  fromGatewayID: string;
+  toGatewayID: string;
+  manager: SATPManager;
+  sessions: Map<string, SATPSession>;   
 };
 
 export type Address =
@@ -50,6 +56,7 @@ export type GatewayIdentity = {
 
 export interface SATPGatewayConfig {
   gid?: GatewayIdentity;
+  counterPartyGateways?: GatewayIdentity[];
   logLevel?: LogLevelDesc;
   keyPair?: ISignerKeyPairs;
   environment?: "development" | "production";
