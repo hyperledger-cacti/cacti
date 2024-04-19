@@ -25,7 +25,7 @@ import {
   ShutdownHook,
   SupportedGatewayImplementations,
 } from "./core/types";
-import { GatewayOrchestrator } from "./gol/gateway-orchestrator";
+import { GatewayOrchestrator, IGatewayOrchestratorOptions } from "./gol/gateway-orchestrator";
 export { SATPGatewayConfig };
 import express, { Express } from "express";
 import http from "http";
@@ -35,16 +35,19 @@ import {
   DEFAULT_PORT_GATEWAY_GRPC,
   DEFAULT_PORT_GATEWAY_SERVER,
 } from "./core/constants";
-import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
 import { SessionData } from "./generated/proto/cacti/satp/v02/common/session_pb";
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import { bufArray2HexStr } from "./gateway-utils";
-import { COREDispatcher, COREDispatcherOptions } from "./core/dispatcher";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
 import { SATPLedgerConnector } from "./types/blockchain-interaction";
+import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
+import fs from 'fs';
+import swaggerUi from 'swagger-ui-express';
+import { SATPSession } from "./core/satp-session";
+
 export class SATPGateway {
   // todo more checks; example port from config is between 3000 and 9000
   @IsDefined()
@@ -70,9 +73,7 @@ export class SATPGateway {
   private BLOApplication?: Express;
   private BLOServer?: http.Server;
   private BLODispatcher?: BLODispatcher;
-  private gRPCServer?: http.Server;
-  private gRPCApplication?: Express;
-  private COREDispatcher?: COREDispatcher;
+
 
   private objectSigner: JsObjectSigner;
 
@@ -81,9 +82,8 @@ export class SATPGateway {
   private connectors: SATPLedgerConnector[] = [];
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
-  private sessions: Map<string, SessionData> = new Map();
+  private sessions: Map<string, SATPSession> = new Map();
   private _pubKey: string;
-  private _privKey: string;
 
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
@@ -106,27 +106,28 @@ export class SATPGateway {
     }
 
     this._pubKey = bufArray2HexStr(this.config.keyPair.publicKey);
-    this._privKey = bufArray2HexStr(this.config.keyPair.privateKey);
 
     this.logger.info(`Gateway's public key: ${this._pubKey}`);
 
     const objectSignerOptions: IJsObjectSignerOptions = {
-      privateKey: this._privKey,
+      privateKey: bufArray2HexStr(this.config.keyPair.privateKey),
       logLevel: "debug",
     };
     this.objectSigner = new JsObjectSigner(objectSignerOptions);
 
-    if (options.enableOpenAPI) {
-      this.setupOpenAPI();
+    const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
+      logLevel: this.config.logLevel,
+      ourGateway: this.config.gid!,
+      counterPartyGateways: this.config.counterPartyGateways,
+      signer: this.objectSigner!,
+    };
+
+    if (this.config.gid) { 
+      this.logger.info("Initializing gateway connection manager with seed gateways");
+      this.gatewayConnectionManager = new GatewayOrchestrator(gatewayOrchestratorOptions);
+    } else {
+      throw new Error("GatewayIdentity is not defined");
     }
-    this.logger.info("Gateway Coordinator initialized");
-    const seedGateways = this.getGatewaySeeds();
-    this.logger.info(
-      `Initializing gateway connection manager with ${seedGateways} seed gateways`,
-    );
-    this.gatewayConnectionManager = new GatewayOrchestrator(seedGateways, {
-      logger: this.logger,
-    });
 
     const dispatcherOps: BLODispatcherOptions = {
       logger: this.logger,
@@ -134,11 +135,6 @@ export class SATPGateway {
       instanceId: this.config.gid!.id,
     };
 
-    const coreDispatcherOps: COREDispatcherOptions = {
-      logger: this.logger,
-      logLevel: this.config.logLevel,
-      instanceId: this.config.gid!.id,
-    };
 
     this.supportedDltIDs = this.config.gid!.supportedChains;
 
@@ -147,24 +143,19 @@ export class SATPGateway {
     }
 
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
-    this.COREDispatcher = new COREDispatcher(coreDispatcherOps, this);
+    if (options.enableOpenAPI) {
+      this.setupOpenAPI();
+    }
   }
 
-  public getSessions(): Map<string, SessionData> {
-    return this.sessions;
+  public get Signer(): JsObjectSigner {
+    return this.objectSigner;
   }
-
-  public getSession(sessionId: string): SessionData | undefined {
-    return this.sessions.get(sessionId);
-  }
-
+  
   public getSupportedDltIDs(): string[] {
     return this.supportedDltIDs;
   }
 
-  public addSession(sessionId: string, sessionData: SessionData): void {
-    this.sessions.set(sessionId, sessionData);
-  }
 
   public get gatewaySigner(): JsObjectSigner {
     return this.objectSigner;
@@ -175,24 +166,24 @@ export class SATPGateway {
   }
 
   // todo load docs for gateway coordinator and expose them in a http gatewayApplication
+  
   setupOpenAPI(): void {
-    const fnTag = `${this.label}#setupOpenAPI()`;
-    this.logger.trace(`Entering ${fnTag}`);
+    if (!this.BLOApplication) {
+      throw new Error("BLOApplication is not defined");
+    }
 
-    this.logger.error("OpenAPI setup not implemented");
-    return;
-    const specPath = path.join(__dirname, "../../", "/json", "openapi.json");
-    this.logger.debug(`Loading OpenAPI specification from ${specPath}`);
+    const specPath = path.join(__dirname, "../json/openapi-blo-bundled.json");
+    const OpenAPISpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 
-    /*const OpenAPISpec = JSON.parse(fs.readFileSync(specPath).toString());
-    this.logger.info(
-      `OpenAPI docs and documentation set up at 📖: \n ${this.config.gid?.address}:${this.config.gid?.gatewayServerPort}/api-docs`,
+    // Type assertion here
+    this.BLOApplication.use(
+      "/api-docs",
+      swaggerUi.serve as express.RequestHandler[],
+      swaggerUi.setup(OpenAPISpec) as express.RequestHandler
     );
-    */
-    // todo bind to grpc gateway
-    //      this._app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(OpenAPISpec));
   }
 
+  // use builder pattern?
   static ProcessGatewayCoordinatorConfig(
     pluginOptions: SATPGatewayConfig,
   ): SATPGatewayConfig {
@@ -289,92 +280,15 @@ export class SATPGateway {
     this.logger.trace(`Entering ${fnTag}`);
 
     await Promise.all([
-      // grpc server does not start correctly
-      // this.startupGRPCServer(),
       this.startupGatewayServer(),
-      this.startupBOLServer(),
     ]);
 
     this.logger.info("Both GatewayServer and BLOServer have started");
   }
 
-  async startupGRPCServer(): Promise<void> {
-    const fnTag = `${this.label}#startupGRPCServer()`;
-    this.logger.trace(`Entering ${fnTag}`);
-    this.logger.info("Starting gRPC server");
-    const port = this.options.gid?.gatewayGrpcPort ?? DEFAULT_PORT_GATEWAY_GRPC;
-
-    return new Promise(async (resolve, reject) => {
-      if (this.gRPCApplication || !this.gRPCServer) {
-        if (!this.COREDispatcher) {
-          throw new Error("COREDispatcher is not defined");
-        }
-
-        this.gRPCApplication = express();
-
-        try {
-          const gRPCServices = await this.COREDispatcher.getOrCreateServices();
-          for (const service of gRPCServices) {
-            this.logger.debug(`Registering web service: ${service.getPath()}`);
-            await service.registerExpress(this.COREDispatcher);
-          }
-        } catch (error) {
-          throw new Error(`Failed to register web services: ${error}`);
-        }
-
-        this.gRPCServer = http.createServer(this.gRPCApplication);
-
-        this.gRPCServer.listen(port, () => {
-          this.logger.info(`gRPC server started and listening on port ${port}`);
-          resolve();
-        });
-
-        this.gRPCServer.on("error", (error) => {
-          this.logger.error(`gRPC server failed to start: ${error}`);
-          reject(error);
-        });
-      } else {
-        this.logger.warn("Server already running");
-        resolve();
-      }
-    });
-  }
-
   async startupGatewayServer(): Promise<void> {
-    const fnTag = `${this.label}#startupGatewayServer()`;
-    this.logger.trace(`Entering ${fnTag}`);
-    this.logger.info("Starting gateway server");
-    const port =
-      this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
-
-    return new Promise((resolve, reject) => {
-      if (!this.gatewayApplication || !this.gatewayServer) {
-        this.gatewayApplication = express();
-        this.gatewayApplication.use(
-          expressConnectMiddleware({ routes: configureRoutes }),
-        );
-        this.gatewayServer = http.createServer(this.gatewayApplication);
-
-        this.gatewayServer.listen(port, () => {
-          this.logger.info(
-            `Gateway server started and listening on port ${port}`,
-          );
-          resolve();
-        });
-
-        this.gatewayServer.on("error", (error) => {
-          this.logger.error(`Gateway server failed to start: ${error}`);
-          reject(error);
-        });
-      } else {
-        this.logger.warn("Server already running");
-        resolve();
-      }
-    });
-  }
-
-  async startupBOLServer(): Promise<void> {
-    const fnTag = `${this.label}#startupBOLServer()`;
+    // starts BOL
+     const fnTag = `${this.label}#startupGatewayServer()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting BOL server");
     const port =
@@ -422,115 +336,25 @@ export class SATPGateway {
    * These operations are fundamental for setting up and managing gateway connections within the system.
    */
 
-  // TODO: addGateways as an admin endpoint
-  public async addGateways(IDs: string[]): Promise<void> {
-    const fnTag = `${this.label}#addGateways()`;
+  // TODO: addGateways as an admin endpoint, simply calls orchestrator
+  public async resolveAndAddGateways(IDs: string[]): Promise<void> {
+    const fnTag = `${this.label}#resolveAndAddGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
-    const gatewaysToAdd: GatewayIdentity[] = [];
-    const thisID = this.config.gid!.id;
-    const otherIDs = IDs.filter((id) => id !== thisID);
-
-    for (const id of otherIDs) {
-      gatewaysToAdd.push(this.resolveGatewayID(id));
-    }
-
-    this.gatewayConnectionManager.addGateways(gatewaysToAdd);
+    this.gatewayConnectionManager.resolveAndAddGateways(IDs);
 
     // todo connect to gateway
   }
 
-  // gets an ID, queries a repository, returns an address, port, and proof of identity
-  private resolveGatewayID(ID: string): GatewayIdentity {
-    const fnTag = `${this.label}#resolveGatewayID()`;
+  public async addGateways(gateways: GatewayIdentity[]): Promise<void> {
+    const fnTag = `${this.label}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
-    this.logger.info(`Resolving gateway with ID: ${ID}`);
+    this.logger.info("Connecting to gateway");
+    this.gatewayConnectionManager.addGateways(gateways);
 
-    const mockGatewayIdentity: GatewayIdentity[] = [
-      {
-        id: "1",
-        name: "Gateway1",
-        version: [
-          {
-            Core: "1.0",
-            Architecture: "1.0",
-            Crash: "1.0",
-          },
-        ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
-        proofID: "mockProofID1",
-        gatewayServerPort: 3011,
-        address: "http://localhost",
-      },
-      {
-        id: "2",
-        name: "Gateway2",
-        version: [
-          {
-            Core: "1.0",
-            Architecture: "1.0",
-            Crash: "1.0",
-          },
-        ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
-        proofID: "mockProofID1",
-        gatewayServerPort: 3012,
-        address: "http://localhost",
-      },
-    ];
-    return mockGatewayIdentity.filter((gateway) => gateway.id === ID)[0];
+    // todo connect to gateway
   }
 
-  private getGatewaySeeds(): GatewayIdentity[] {
-    const fnTag = `${this.label}#getGatewaySeeds()`;
-    this.logger.trace(`Entering ${fnTag}`);
-
-    const mockGatewayIdentity: GatewayIdentity[] = [
-      {
-        id: "1",
-        name: "Gateway1",
-        version: [
-          {
-            Core: "1.0",
-            Architecture: "1.0",
-            Crash: "1.0",
-          },
-        ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
-        proofID: "mockProofID1",
-        gatewayServerPort: 3011,
-        address: "http://localhost",
-      },
-      {
-        id: "2",
-        name: "Gateway2",
-        version: [
-          {
-            Core: "1.0",
-            Architecture: "1.0",
-            Crash: "1.0",
-          },
-        ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
-        proofID: "mockProofID1",
-        gatewayServerPort: 3014,
-        address: "http://localhost",
-      },
-    ];
-    return mockGatewayIdentity;
-  }
 
   // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
   public get Identity(): GatewayIdentity {
@@ -557,9 +381,6 @@ export class SATPGateway {
   public async shutdown(): Promise<number> {
     const fnTag = `${this.label}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
-
-    this.logger.info("Shutting down Node server - gRPC");
-    await this.shutdownGRPCServer();
 
     this.logger.info("Shutting down Node server - Gateway");
     await this.shutdownGatewayServer();
@@ -618,21 +439,4 @@ export class SATPGateway {
     }
   }
 
-  private async shutdownGRPCServer(): Promise<void> {
-    const fnTag = `${this.label}#shutdownGRPCServer()`;
-    this.logger.debug(`Entering ${fnTag}`);
-    if (this.gRPCServer) {
-      try {
-        await this.gRPCServer.close();
-        this.gRPCServer = undefined;
-        this.logger.info("Server shut down");
-      } catch (error) {
-        this.logger.error(
-          `Error shutting down the gatewayApplication: ${error}`,
-        );
-      }
-    } else {
-      this.logger.warn("Server is not running.");
-    }
-  }
 }
