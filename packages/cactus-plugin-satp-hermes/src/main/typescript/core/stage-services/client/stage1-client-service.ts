@@ -1,9 +1,9 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { JsObjectSigner, Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPGateway } from "../../../gateway-refactor";
 import {
   TransferCommenceRequestMessage,
   TransferProposalRequestMessage,
-  TransferProposalReceiptRejectMessage,
+  TransferProposalReceiptMessage,
 } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
 import {
   MessageType,
@@ -25,15 +25,20 @@ import {
   saveSignature,
   checkSessionData,
 } from "../../session-utils";
+import { SupportedGatewayImplementations } from "../../types";
+import { SATPSession } from "../../../core/satp-session";
+import { SATPService, ISATPClientServiceOptions } from "../../../types/satp-protocol";
 
-export class Stage1ClientService {
+export class Stage1ClientService implements SATPService {
   public static readonly CLASS_NAME = "Stage1Service-Client";
   private _log: Logger;
-
-  constructor() {
+  private signer: JsObjectSigner;
+  
+  constructor(ops: ISATPClientServiceOptions) {
     const level = "INFO";
     const label = Stage1ClientService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
+    this.signer = ops.signer;
   }
 
   public get className(): string {
@@ -46,20 +51,21 @@ export class Stage1ClientService {
 
   async transferProposalRequest(
     sessionID: string,
-    gateway: SATPGateway,
+    session: SATPSession,
+    supportedDLTs: SupportedGatewayImplementations[],
   ): Promise<void | TransferProposalRequestMessage> {
     const fnTag = `${this.className}#transferProposalRequest()`;
 
-    const sessionData = gateway.getSession(sessionID);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined || !checkSessionData(sessionData)) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
     if (
-      !gateway.getSupportedDltIDs().includes(sessionData.senderGatewayNetworkId)
+      !supportedDLTs.includes(sessionData.senderGatewayNetworkId as SupportedGatewayImplementations)
     ) {
-      throw new Error(
+      throw new Error( //todo change this to the transferClaims check
         `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
       );
     }
@@ -170,7 +176,7 @@ export class Stage1ClientService {
 
     const messageSignature = bufArray2HexStr(
       sign(
-        gateway.gatewaySigner,
+        this.signer,
         JSON.stringify(transferProposalRequestMessage),
       ),
     );
@@ -185,21 +191,22 @@ export class Stage1ClientService {
       getHash(transferProposalRequestMessage),
     );
 
+    /*
     await storeLog(gateway, {
       sessionID: sessionID,
       type: "transferProposalRequest",
       operation: "validate",
       data: JSON.stringify(sessionData),
     });
-
+    */
     this.log.info(`${fnTag}, sending TransferProposalRequest...`);
 
     return transferProposalRequestMessage;
   }
 
   async transferCommenceRequest(
-    response: TransferProposalReceiptRejectMessage,
-    gateway: SATPGateway,
+    response: TransferProposalReceiptMessage,
+    session: SATPSession,
   ): Promise<void | TransferCommenceRequestMessage> {
     const fnTag = `${this.className}#transferCommenceRequest()`;
 
@@ -207,7 +214,7 @@ export class Stage1ClientService {
       throw new Error("Response or response.common is undefined");
     }
 
-    const sessionData = gateway.getSession(response.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error("Session data not loaded successfully");
@@ -239,7 +246,7 @@ export class Stage1ClientService {
 
     const messageSignature = bufArray2HexStr(
       sign(
-        gateway.gatewaySigner,
+        this.signer,
         JSON.stringify(transferCommenceRequestMessage),
       ),
     );
@@ -258,23 +265,24 @@ export class Stage1ClientService {
       getHash(transferCommenceRequestMessage),
     );
 
+    /*
     await storeLog(gateway, {
       sessionID: sessionData.id,
       type: "transferCommenceRequest",
       operation: "validate",
       data: JSON.stringify(sessionData),
     });
-
+    */
     this.log.info(`${fnTag}, sending TransferCommenceRequest...`);
 
     return transferCommenceRequestMessage;
   }
 
-  async checkTransferProposalReceiptRejectMessage(
-    response: TransferProposalReceiptRejectMessage,
-    gateway: SATPGateway,
+  async checkTransferProposalReceiptMessage(
+    response: TransferProposalReceiptMessage,
+    session: SATPSession,
   ): Promise<boolean> {
-    const fnTag = `${this.className}#checkTransferProposalReceiptRejectMessage()`;
+    const fnTag = `${this.className}#checkTransferProposalReceiptMessage()`;
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message has no satp common body`);
@@ -291,7 +299,7 @@ export class Stage1ClientService {
 
     const sessionId = response.common.sessionId;
 
-    const sessionData = gateway.getSession(sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -356,7 +364,7 @@ export class Stage1ClientService {
 
     if (
       !verifySignature(
-        gateway.gatewaySigner,
+        this.signer,
         response,
         sessionData.serverGatewayPubkey,
       )
