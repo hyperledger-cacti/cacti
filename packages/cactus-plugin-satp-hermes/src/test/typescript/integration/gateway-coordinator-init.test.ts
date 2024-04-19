@@ -138,7 +138,7 @@ describe("SATPGateway initialization", () => {
     const identity = gateway.Identity;
     expect(identity.gatewayClientPort).toBe(3010);
     expect(identity.address).toBe("https://localhost");
-    await gateway.startupBOLServer();
+    await gateway.startupGatewayServer();
     await gateway.shutdown();
   });
 });
