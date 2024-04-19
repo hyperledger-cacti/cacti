@@ -1,9 +1,7 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { SATPGateway } from "../../../gateway-refactor";
 import {
   TransferCommenceRequestMessage,
   TransferProposalRequestMessage,
-  TransferProposalReceiptRejectMessage,
+  TransferProposalReceiptMessage,
 } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
 import {
   MessageType,
@@ -16,7 +14,6 @@ import {
   bufArray2HexStr,
   getHash,
   sign,
-  storeLog,
   verifySignature,
 } from "../../../gateway-utils";
 import {
@@ -25,41 +22,52 @@ import {
   saveSignature,
   checkSessionData,
 } from "../../session-utils";
+import { SupportedChain } from "../../types";
+import { SATPSession } from "../../../core/satp-session";
+import {
+  SATPService,
+  SATPServiceType,
+  ISATPClientServiceOptions,
+  ISATPServiceOptions,
+} from "../satp-service";
 
-export class Stage1ClientService {
-  public static readonly CLASS_NAME = "Stage1Service-Client";
-  private _log: Logger;
+export class Stage1ClientService extends SATPService {
+  public static readonly SATP_STAGE = "1";
+  public static readonly SERVICE_TYPE = SATPServiceType.Client;
 
-  constructor() {
-    const level = "INFO";
-    const label = Stage1ClientService.CLASS_NAME;
-    this._log = LoggerProvider.getOrCreate({ level, label });
-  }
+  constructor(ops: ISATPClientServiceOptions) {
+    // for now stage1serverservice does not have any different options than the SATPService class
 
-  public get className(): string {
-    return Stage1ClientService.CLASS_NAME;
-  }
-
-  public get log(): Logger {
-    return this._log;
+    const commonOptions: ISATPServiceOptions = {
+      stage: Stage1ClientService.SATP_STAGE,
+      loggerOptions: ops.loggerOptions,
+      serviceName: ops.serviceName,
+      signer: ops.signer,
+      serviceType: Stage1ClientService.SERVICE_TYPE,
+    };
+    super(commonOptions);
   }
 
   async transferProposalRequest(
     sessionID: string,
-    gateway: SATPGateway,
+    session: SATPSession,
+    supportedDLTs: SupportedChain[],
   ): Promise<void | TransferProposalRequestMessage> {
-    const fnTag = `${this.className}#transferProposalRequest()`;
+    const stepTag = `transferProposalRequest()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
-    const sessionData = gateway.getSession(sessionID);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined || !checkSessionData(sessionData)) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
     if (
-      !gateway.getSupportedDltIDs().includes(sessionData.senderGatewayNetworkId)
+      !supportedDLTs.includes(
+        sessionData.senderGatewayNetworkId as SupportedChain,
+      )
     ) {
-      throw new Error(
+      throw new Error( //todo change this to the transferClaims check
         `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
       );
     }
@@ -115,29 +123,29 @@ export class Stage1ClientService {
     networkCapabilities.accessControlProfile = sessionData.accessControlProfile;
 
     if (sessionData.permissions != undefined) {
-      this.log.info(`${fnTag}, Optional variable loaded: permissions...`);
+      this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);
       networkCapabilities.permissions = sessionData.permissions;
     }
 
     if (sessionData.developerUrn != undefined) {
-      this.log.info(`${fnTag}, Optional variable loaded: developerUrn...`);
+      this.Log.info(`${fnTag}, Optional variable loaded: developerUrn...`);
       networkCapabilities.developerUrn = sessionData.developerUrn;
     }
 
     if (sessionData.applicationProfile != undefined) {
-      this.log.info(
+      this.Log.info(
         `${fnTag}, Optional variable loaded: applicationProfile...`,
       );
       networkCapabilities.applicationProfile = sessionData.applicationProfile;
     }
 
     if (sessionData.subsequentCalls != undefined) {
-      this.log.info(`${fnTag}, Optional variable loaded: subsequentCalls...`);
+      this.Log.info(`${fnTag}, Optional variable loaded: subsequentCalls...`);
       networkCapabilities.subsequentCalls = sessionData.subsequentCalls;
     }
 
     if (sessionData.history != undefined) {
-      this.log.info(`${fnTag}, Optional variable loaded: history...`);
+      this.Log.info(`${fnTag}, Optional variable loaded: history...`);
       networkCapabilities.history = sessionData.history;
     }
 
@@ -147,21 +155,21 @@ export class Stage1ClientService {
     transferProposalRequestMessage.networkCapabilities = networkCapabilities;
 
     if (sessionData.transferClaimsFormat != undefined) {
-      this.log.info(
+      this.Log.info(
         `${fnTag}, Optional variable loaded: transferInitClaimsFormat...`,
       );
       transferProposalRequestMessage.transferInitClaimsFormat =
         sessionData.transferClaimsFormat;
     }
     if (sessionData.multipleCancelsAllowed != undefined) {
-      this.log.info(
+      this.Log.info(
         `${fnTag}, Optional variable loaded: multipleCancelsAllowed...`,
       );
       transferProposalRequestMessage.multipleCancelsAllowed =
         sessionData.multipleCancelsAllowed;
     }
     if (sessionData.multipleClaimsAllowed != undefined) {
-      this.log.info(
+      this.Log.info(
         `${fnTag}, Optional variable loaded: multipleClaimsAllowed...`,
       );
       transferProposalRequestMessage.multipleClaimsAllowed =
@@ -169,10 +177,7 @@ export class Stage1ClientService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(
-        gateway.gatewaySigner,
-        JSON.stringify(transferProposalRequestMessage),
-      ),
+      sign(this.Signer, JSON.stringify(transferProposalRequestMessage)),
     );
 
     transferProposalRequestMessage.common.signature = messageSignature;
@@ -185,29 +190,31 @@ export class Stage1ClientService {
       getHash(transferProposalRequestMessage),
     );
 
+    /*
     await storeLog(gateway, {
       sessionID: sessionID,
       type: "transferProposalRequest",
       operation: "validate",
       data: JSON.stringify(sessionData),
     });
-
-    this.log.info(`${fnTag}, sending TransferProposalRequest...`);
+    */
+    this.Log.info(`${fnTag}, sending TransferProposalRequest...`);
 
     return transferProposalRequestMessage;
   }
 
   async transferCommenceRequest(
-    response: TransferProposalReceiptRejectMessage,
-    gateway: SATPGateway,
+    response: TransferProposalReceiptMessage,
+    session: SATPSession,
   ): Promise<void | TransferCommenceRequestMessage> {
-    const fnTag = `${this.className}#transferCommenceRequest()`;
+    const stepTag = `transferCommenceRequest()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
     if (!response || !response.common) {
       throw new Error("Response or response.common is undefined");
     }
 
-    const sessionData = gateway.getSession(response.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error("Session data not loaded successfully");
@@ -238,10 +245,7 @@ export class Stage1ClientService {
     // transferCommenceRequestMessage.clientTransferNumber = sessionData.clientTransferNumber;
 
     const messageSignature = bufArray2HexStr(
-      sign(
-        gateway.gatewaySigner,
-        JSON.stringify(transferCommenceRequestMessage),
-      ),
+      sign(this.Signer, JSON.stringify(transferCommenceRequestMessage)),
     );
 
     transferCommenceRequestMessage.common.signature = messageSignature;
@@ -258,24 +262,25 @@ export class Stage1ClientService {
       getHash(transferCommenceRequestMessage),
     );
 
+    /*
     await storeLog(gateway, {
       sessionID: sessionData.id,
       type: "transferCommenceRequest",
       operation: "validate",
       data: JSON.stringify(sessionData),
     });
-
-    this.log.info(`${fnTag}, sending TransferCommenceRequest...`);
+    */
+    this.Log.info(`${fnTag}, sending TransferCommenceRequest...`);
 
     return transferCommenceRequestMessage;
   }
 
-  async checkTransferProposalReceiptRejectMessage(
-    response: TransferProposalReceiptRejectMessage,
-    gateway: SATPGateway,
+  async checkTransferProposalReceiptMessage(
+    response: TransferProposalReceiptMessage,
+    session: SATPSession,
   ): Promise<boolean> {
-    const fnTag = `${this.className}#checkTransferProposalReceiptRejectMessage()`;
-
+    const stepTag = `checkTransferProposalReceiptMessage()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message has no satp common body`);
     }
@@ -289,9 +294,9 @@ export class Stage1ClientService {
       throw new Error(`${fnTag}, satp common body is missing required fields`);
     }
 
-    const sessionId = response.common.sessionId;
+    // const sessionId = response.common.sessionId;
 
-    const sessionData = gateway.getSession(sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -355,11 +360,7 @@ export class Stage1ClientService {
     }
 
     if (
-      !verifySignature(
-        gateway.gatewaySigner,
-        response,
-        sessionData.serverGatewayPubkey,
-      )
+      !verifySignature(this.Signer, response, sessionData.serverGatewayPubkey)
     ) {
       throw new Error(
         `${fnTag}, TransferProposalReceipt message signature verification failed`,
@@ -376,27 +377,29 @@ export class Stage1ClientService {
       response.common.messageType == MessageType.INIT_REJECT &&
       response.transferCounterClaims != undefined
     ) {
-      if (this.checkProposedTransferClaims(response.transferCounterClaims)) {
+      if (
+        await this.checkProposedTransferClaims(response.transferCounterClaims)
+      ) {
         sessionData.proposedTransferInitClaims = getHash(
           response.transferCounterClaims,
         );
         return true;
       } else {
-        this.log.info(
+        this.Log.info(
           `TransferProposalReceipt proposedTransferClaims were rejected`,
         );
         sessionData.completed = true;
         return false;
       }
     }
-    this.log.info(`TransferProposalReceipt passed all checks.`);
+    this.Log.info(`TransferProposalReceipt passed all checks.`);
     return true;
   }
 
-  private checkProposedTransferClaims(
+  async checkProposedTransferClaims(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     counterTransfer: TransferClaims,
-  ): boolean {
+  ): Promise<boolean> {
     //const fnTag = `${this.className}#checkCounterTransferClaims()`;
     //todo
     return true;

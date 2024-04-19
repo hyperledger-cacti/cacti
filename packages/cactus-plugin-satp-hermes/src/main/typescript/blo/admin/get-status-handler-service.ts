@@ -6,7 +6,7 @@ import {
 } from "../../generated/gateway-client/typescript-axios";
 import { Logger } from "@hyperledger/cactus-common";
 
-export async function GetStatusHandler(
+export async function ExecuteGetStatus(
   logger: Logger,
   req: StatusRequest,
 ): Promise<StatusResponse> {
