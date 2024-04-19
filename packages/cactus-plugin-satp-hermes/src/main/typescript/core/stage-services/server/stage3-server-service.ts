@@ -106,9 +106,19 @@
 //     commitReadyMessage.mintAssertionClaimsFormat =
 //       sessionData.mintAssertionClaimsFormat;
 
-//     const messageSignature = bufArray2HexStr(
-//       sign(this.signer, JSON.stringify(commitReadyMessage)),
-//     );
+// if (sessionData.transferContextId != undefined) {
+//   commitReadyMessage.common.transferContextId =
+//     sessionData.transferContextId;
+// }
+
+// if (sessionData.serverTransferNumber != undefined) {
+//   commitReadyMessage.serverTransferNumber =
+//     sessionData.serverTransferNumber;
+// }
+
+// const messageSignature = bufArray2HexStr(
+//   sign(this.signer, JSON.stringify(commitReadyMessage)),
+// );
 
 //     saveSignature(sessionData, MessageType.COMMIT_READY, messageSignature);
 
@@ -169,10 +179,23 @@
 //       new CommitFinalAcknowledgementReceiptResponseMessage();
 //     commitFinalAcknowledgementReceiptResponseMessage.common = commonBody;
 
-//     commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaim =
-//       sessionData.assignmentAssertionClaim;
-//     commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaimFormat =
-//       sessionData.assignmentAssertionClaimFormat;
+// commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaim =
+//   sessionData.assignmentAssertionClaim;
+
+// if (sessionData.assignmentAssertionClaimFormat != undefined) {
+//   commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaimFormat =
+//     sessionData.assignmentAssertionClaimFormat;
+// }
+
+// if (sessionData.transferContextId != undefined) {
+//   commitFinalAcknowledgementReceiptResponseMessage.common.transferContextId =
+//     sessionData.transferContextId;
+// }
+
+// if (sessionData.serverTransferNumber != undefined) {
+//   commitFinalAcknowledgementReceiptResponseMessage.serverTransferNumber =
+//     sessionData.serverTransferNumber;
+// }
 
 //     const messageSignature = bufArray2HexStr(
 //       sign(
@@ -258,15 +281,32 @@
 //       throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
 //     }
 
-//     if (
-//       !verifySignature(
-//         this.signer,
-//         request.common,
-//         request.common.clientGatewayPubkey,
-//       )
-//     ) {
-//       throw new Error(`${fnTag}, message signature verification failed`);
-//     }
+// if (
+//   !verifySignature(
+//     this.signer,
+//     request.common,
+//     request.common.clientGatewayPubkey,
+//   )
+// ) {
+//   throw new Error(`${fnTag}, message signature verification failed`);
+// }
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   request.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+
+// if (
+//   sessionData.clientTransferNumber != undefined &&
+//   request.clientTransferNumber != sessionData.clientTransferNumber
+// ) {
+//   // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+//   this.log.info(
+//     `${fnTag}, LockAssertionRequest clientTransferNumber does not match the one that was sent`,
+//   );
+// }
 
 //     this.log.info(`CommitPreparationRequestMessage passed all checks.`);
 
@@ -341,22 +381,46 @@
 //       throw new Error(`${fnTag}, message signature verification failed`);
 //     }
 
-//     if (request.burnAssertionClaim == undefined) {
-//       throw new Error(`${fnTag}, mintAssertionClaims is missing`);
-//     }
+// if (
+//   sessionData.transferContextId != undefined &&
+//   request.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+// //todo check burn
+// if (request.burnAssertionClaim == undefined) {
+//   throw new Error(`${fnTag}, mintAssertionClaims is missing`);
+// }
 
-//     //todo check burn
+// sessionData.burnAssertionClaim = request.burnAssertionClaim;
+
+// if (request.burnAssertionClaimFormat != undefined) {
+//   this.log.info(
+//     `${fnTag}, optional variable loaded: burnAssertionClaimFormat`,
+//   );
+//   sessionData.burnAssertionClaimFormat = request.burnAssertionClaimFormat;
+// }
+
+// if (
+//   sessionData.clientTransferNumber != undefined &&
+//   request.clientTransferNumber != sessionData.clientTransferNumber
+// ) {
+//   // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+//   this.log.info(
+//     `${fnTag}, CommitFinalAssertionRequest clientTransferNumber does not match the one that was sent`,
+//   );
+// }
 
 //     this.log.info(`CommitFinalAssertionRequestMessage passed all checks.`);
 
 //     return sessionData;
 //   }
 
-//   async checkTransferCompleteRequestMessage(
-//     request: CommitFinalAssertionRequestMessage,
-//     session: SATPSession,
-//   ): Promise<SessionData> {
-//     const fnTag = `${this.className}#checkTransferCompleteRequestMessage()`;
+// async checkTransferCompleteRequestMessage(
+//   request: TransferCompleteRequestMessage,
+//   session: SATPSession,
+// ): Promise<SessionData> {
+//   const fnTag = `${this.className}#checkTransferCompleteRequestMessage()`;
 
 //     if (request.common == undefined) {
 //       throw new Error(`${fnTag}, message common body is missing`);
@@ -399,12 +463,19 @@
 //       throw new Error(`${fnTag}, sequenceNumber does not match`);
 //     }
 
-//     if (
-//       getMessageHash(sessionData, MessageType.COMMIT_FINAL) !=
-//       request.common.hashPreviousMessage
-//     ) {
-//       throw new Error(`${fnTag}, hashPreviousMessage does not match`);
-//     }
+// if (
+//   getMessageHash(sessionData, MessageType.COMMIT_FINAL) !=
+//   request.common.hashPreviousMessage
+// ) {
+//   throw new Error(`${fnTag}, hashPreviousMessage does not match`);
+// }
+
+// if (
+//   getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_REQUEST) !=
+//   request.hashTransferCommence
+// ) {
+//   throw new Error(`${fnTag}, hashTransferCommence does not match`);
+// }
 
 //     if (sessionData.clientGatewayPubkey != request.common.clientGatewayPubkey) {
 //       throw new Error(`${fnTag}, clientGatewayPubkey does not match`);
@@ -424,9 +495,26 @@
 //       throw new Error(`${fnTag}, message signature verification failed`);
 //     }
 
-//     this.log.info(
-//       `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
-//     );
+// this.log.info(
+//   `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
+// );
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   request.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+
+// if (
+//   sessionData.clientTransferNumber != undefined &&
+//   request.clientTransferNumber != sessionData.clientTransferNumber
+// ) {
+//   // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+//   this.log.info(
+//     `${fnTag}, TransferCompleteRequest clientTransferNumber does not match the one that was sent`,
+//   );
+// }
 
 //     return sessionData;
 //   }

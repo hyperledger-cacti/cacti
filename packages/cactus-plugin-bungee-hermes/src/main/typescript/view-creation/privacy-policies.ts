@@ -18,10 +18,23 @@ export class PrivacyPolicies {
     return view;
   }
 
+  public singleTransaction(
+    view: View,
+    stateId: string,
+    transactionId: string,
+  ): View {
+    const snapshot = view.getSnapshot();
+    snapshot.filterTransaction(stateId, transactionId);
+    return view;
+  }
+
   public getPrivacyPolicy(opts: PrivacyPolicyOpts): IPrivacyPolicy | undefined {
     switch (opts) {
       case PrivacyPolicyOpts.PruneState:
         return this.pruneState;
+        break;
+      case PrivacyPolicyOpts.SingleTransaction:
+        return this.singleTransaction;
         break;
       default:
         return undefined;

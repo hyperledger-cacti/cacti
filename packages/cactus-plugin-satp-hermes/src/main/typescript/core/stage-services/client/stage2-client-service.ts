@@ -104,9 +104,18 @@
 //     lockAssertionRequestMessage.lockAssertionFormat =
 //       sessionData.lockAssertionFormat;
 
-//     const messageSignature = bufArray2HexStr(
-//       sign(this.signer, JSON.stringify(lockAssertionRequestMessage)),
-//     );
+// if (sessionData.transferContextId != undefined) {
+//   lockAssertionRequestMessage.common.transferContextId =
+//     sessionData.transferContextId;
+// }
+// if (sessionData.clientTransferNumber != undefined) {
+//   lockAssertionRequestMessage.clientTransferNumber =
+//     sessionData.clientTransferNumber;
+// }
+
+// const messageSignature = bufArray2HexStr(
+//   sign(this.signer, JSON.stringify(lockAssertionRequestMessage)),
+// );
 
 //     lockAssertionRequestMessage.common.signature = messageSignature;
 
@@ -137,25 +146,22 @@
 //   ): void {
 //     const fnTag = `${this.className}#lockAssertionRequestMessage()`;
 
-//     if (
-//       response.common == undefined ||
-//       response.common.version == undefined ||
-//       response.common.messageType == undefined ||
-//       response.common.sessionId == undefined ||
-//       // request.common.transferContextId == undefined ||
-//       response.common.sequenceNumber == undefined ||
-//       response.common.resourceUrl == undefined ||
-//       // request.common.actionResponse == undefined ||
-//       // request.common.payloadProfile == undefined ||
-//       // request.common.applicationProfile == undefined ||
-//       response.common.signature == undefined ||
-//       response.common.clientGatewayPubkey == undefined ||
-//       response.common.serverGatewayPubkey == undefined
-//     ) {
-//       throw new Error(
-//         `${fnTag}, message satp common body is missing or is missing required fields`,
-//       );
-//     }
+// if (
+//   response.common == undefined ||
+//   response.common.version == undefined ||
+//   response.common.messageType == undefined ||
+//   response.common.sessionId == undefined ||
+//   response.common.sequenceNumber == undefined ||
+//   response.common.resourceUrl == undefined ||
+//   response.common.signature == undefined ||
+//   response.common.clientGatewayPubkey == undefined ||
+//   response.common.serverGatewayPubkey == undefined ||
+//   response.common.hashPreviousMessage == undefined
+// ) {
+//   throw new Error(
+//     `${fnTag}, message satp common body is missing or is missing required fields`,
+//   );
+// }
 
 //     if (response.common.version != SATP_VERSION) {
 //       throw new Error(`${fnTag}, unsupported SATP version`);
@@ -219,14 +225,30 @@
 //       );
 //     }
 
-//     if (
-//       response.common.hashPreviousMessage !=
-//       getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
-//     ) {
-//       throw new Error(
-//         `${fnTag}, TransferCommenceResponse previous message hash does not match the one that was sent`,
-//       );
-//     }
+// if (
+//   response.common.hashPreviousMessage !=
+//   getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
+// ) {
+//   throw new Error(
+//     `${fnTag}, TransferCommenceResponse previous message hash does not match the one that was sent`,
+//   );
+// }
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   response.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(
+//     `${fnTag}, transferContextId does not match the one that was sent`,
+//   );
+// }
+
+// if (response.serverTransferNumber != undefined) {
+//   this.log.info(
+//     `${fnTag}, Optional variable loaded: serverTransferNumber...`,
+//   );
+//   sessionData.serverTransferNumber = response.serverTransferNumber;
+// }
 
 //     this.log.info(`TransferCommenceResponse passed all checks.`);
 //   }

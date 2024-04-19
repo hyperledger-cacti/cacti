@@ -101,9 +101,19 @@
 
 //     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
-//     const commitPreparationRequestMessage =
-//       new CommitPreparationRequestMessage();
-//     commitPreparationRequestMessage.common = commonBody;
+// const commitPreparationRequestMessage =
+//   new CommitPreparationRequestMessage();
+// commitPreparationRequestMessage.common = commonBody;
+
+// if (sessionData.transferContextId != undefined) {
+//   commitPreparationRequestMessage.common.transferContextId =
+//     sessionData.transferContextId;
+// }
+
+// if (sessionData.clientTransferNumber != undefined) {
+//   commitPreparationRequestMessage.clientTransferNumber =
+//     sessionData.clientTransferNumber;
+// }
 
 //     const messageSignature = bufArray2HexStr(
 //       sign(this.signer, JSON.stringify(commitPreparationRequestMessage)),
@@ -173,10 +183,23 @@
 //       new CommitFinalAssertionRequestMessage();
 //     commitFinalAssertionRequestMessage.common = commonBody;
 
-//     commitFinalAssertionRequestMessage.burnAssertionClaim =
-//       sessionData.burnAssertionClaim;
-//     commitFinalAssertionRequestMessage.burnAssertionClaimFormat =
-//       sessionData.burnAssertionClaimFormat;
+// commitFinalAssertionRequestMessage.burnAssertionClaim =
+//   sessionData.burnAssertionClaim;
+
+// if (sessionData.burnAssertionClaimFormat != undefined) {
+//   commitFinalAssertionRequestMessage.burnAssertionClaimFormat =
+//     sessionData.burnAssertionClaimFormat;
+// }
+
+// if (sessionData.transferContextId != undefined) {
+//   commitFinalAssertionRequestMessage.common.transferContextId =
+//     sessionData.transferContextId;
+// }
+
+// if (sessionData.clientTransferNumber != undefined) {
+//   commitFinalAssertionRequestMessage.clientTransferNumber =
+//     sessionData.clientTransferNumber;
+// }
 
 //     const messageSignature = bufArray2HexStr(
 //       sign(this.signer, JSON.stringify(commitFinalAssertionRequestMessage)),
@@ -241,8 +264,18 @@
 
 //     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
-//     const transferCompleteRequestMessage = new TransferCompleteRequestMessage();
-//     transferCompleteRequestMessage.common = commonBody;
+// const transferCompleteRequestMessage = new TransferCompleteRequestMessage();
+// transferCompleteRequestMessage.common = commonBody;
+
+// if (sessionData.transferContextId != undefined) {
+//   transferCompleteRequestMessage.common.transferContextId =
+//     sessionData.transferContextId;
+// }
+
+// if (sessionData.clientTransferNumber != undefined) {
+//   transferCompleteRequestMessage.clientTransferNumber =
+//     sessionData.clientTransferNumber;
+// }
 
 //     transferCompleteRequestMessage.hashTransferCommence = getMessageHash(
 //       sessionData,
@@ -342,15 +375,49 @@
 //       throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
 //     }
 
-//     if (
-//       !verifySignature(
-//         this.signer,
-//         response.common,
-//         response.common.serverGatewayPubkey,
-//       )
-//     ) {
-//       throw new Error(`${fnTag}, message signature verification failed`);
-//     }
+// if (
+//   !verifySignature(
+//     this.signer,
+//     response.common,
+//     response.common.serverGatewayPubkey,
+//   )
+// ) {
+//   throw new Error(`${fnTag}, message signature verification failed`);
+// }
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   response.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+
+// if (
+//   sessionData.serverTransferNumber != undefined &&
+//   response.serverTransferNumber != sessionData.serverTransferNumber
+// ) {
+//   // This does not throw an error because the serverTransferNumber is only meaningful to the server.
+//   this.log.info(
+//     `${fnTag}, serverTransferNumber does not match the one that was sent`,
+//   );
+// }
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   response.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+
+// if (
+//   sessionData.serverTransferNumber != undefined &&
+//   response.serverTransferNumber != sessionData.serverTransferNumber
+// ) {
+//   // This does not throw an error because the serverTransferNumber is only meaningful to the server.
+//   this.log.info(
+//     `${fnTag}, serverTransferNumber does not match the one that was sent`,
+//   );
+// }
 
 //     this.log.info(`LockAssertionReceiptMessage passed all checks.`);
 //   }
@@ -416,20 +483,48 @@
 //       throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
 //     }
 
-//     if (
-//       !verifySignature(
-//         this.signer,
-//         response.common,
-//         response.common.serverGatewayPubkey,
-//       )
-//     ) {
-//       throw new Error(`${fnTag}, message signature verification failed`);
-//     }
+// if (
+//   !verifySignature(
+//     this.signer,
+//     response.common,
+//     response.common.serverGatewayPubkey,
+//   )
+// ) {
+//   throw new Error(`${fnTag}, message signature verification failed`);
+// }
 
-//     if (response.mintAssertionClaims == undefined) {
-//       //todo
-//       throw new Error(`${fnTag}, mintAssertionClaims is missing`);
-//     }
+// if (response.mintAssertionClaimsFormat != undefined) {
+//   //todo
+//   this.log.info(
+//     `${fnTag},  Optional variable loaded: mintAssertionClaimsFormat `,
+//   );
+//   sessionData.mintAssertionClaimsFormat =
+//     response.mintAssertionClaimsFormat;
+// }
+
+// if (response.mintAssertionClaims == undefined) {
+//   //todo
+//   throw new Error(`${fnTag}, mintAssertionClaims is missing`);
+// }
+
+// sessionData.mintAssertionClaims = response.mintAssertionClaims;
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   response.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+
+// if (
+//   sessionData.serverTransferNumber != undefined &&
+//   response.serverTransferNumber != sessionData.serverTransferNumber
+// ) {
+//   // This does not throw an error because the serverTransferNumber is only meaningful to the server.
+//   this.log.info(
+//     `${fnTag}, serverTransferNumber does not match the one that was sent`,
+//   );
+// }
 
 //     this.log.info(`CommitReadyResponseMessage passed all checks.`);
 //   }
@@ -495,19 +590,55 @@
 //       throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
 //     }
 
-//     if (
-//       !verifySignature(
-//         this.signer,
-//         response.common,
-//         response.common.serverGatewayPubkey,
-//       )
-//     ) {
-//       throw new Error(`${fnTag}, message signature verification failed`);
-//     }
+// if (
+//   !verifySignature(
+//     this.signer,
+//     response.common,
+//     response.common.serverGatewayPubkey,
+//   )
+// ) {
+//   throw new Error(`${fnTag}, message signature verification failed`);
+// }
 
-//     if (response.assignmentAssertionClaim == undefined) {
-//       throw new Error(`${fnTag}, assignmentAssertionClaim is missing`);
-//     }
+// if (response.mintAssertionClaimsFormat != undefined) {
+//   //todo
+//   this.log.info(
+//     `${fnTag},  Optional variable loaded: mintAssertionClaimsFormat `,
+//   );
+//   sessionData.mintAssertionClaimsFormat =
+//     response.mintAssertionClaimsFormat;
+// }
+
+// if (
+//   sessionData.transferContextId != undefined &&
+//   response.common.transferContextId != sessionData.transferContextId
+// ) {
+//   throw new Error(`${fnTag}, transferContextId does not match`);
+// }
+
+// if (response.assignmentAssertionClaim == undefined) {
+//   throw new Error(`${fnTag}, assignmentAssertionClaim is missing`);
+// }
+
+// sessionData.assignmentAssertionClaim = response.assignmentAssertionClaim;
+
+// if (response.assignmentAssertionClaimFormat != undefined) {
+//   this.log.info(
+//     `${fnTag},  Optional variable loaded: assignmentAssertionClaimFormat `,
+//   );
+//   sessionData.assignmentAssertionClaimFormat =
+//     response.assignmentAssertionClaimFormat;
+// }
+
+// if (
+//   sessionData.serverTransferNumber != undefined &&
+//   response.serverTransferNumber != sessionData.serverTransferNumber
+// ) {
+//   // This does not throw an error because the serverTransferNumber is only meaningful to the server.
+//   this.log.info(
+//     `${fnTag}, serverTransferNumber does not match the one that was sent`,
+//   );
+// }
 
 //     this.log.info(
 //       `CommitFinalAcknowledgementReceiptResponseMessage passed all checks.`,

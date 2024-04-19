@@ -51,18 +51,22 @@ message SessionData {
     string last_message_received_timestamp = 41;
     MessageStagesTimestamps processed_timestamps = 42;
     MessageStagesTimestamps received_timestamps = 43;
-    cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 44;
+    string lock_assertion_claim = 44;
     cacti.satp.v02.common.LockAssertionFormat lock_assertion_format = 45;
-    cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 46;
+    string mint_assertion_claims = 46;
     cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 47;
-    cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 48;
+    string burn_assertion_claim = 48;
     cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 49;
-    cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 50;
+    string assignment_assertion_claim = 50;
     cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 51;
     bool completed = 52;
     ACCEPTANCE acceptance = 53;
     string last_message_hash = 54;
     cacti.satp.v02.common.TransferClaimsFormat transfer_claims_format = 55;
+    string client_transfer_number = 56;
+    string server_transfer_number = 57;
+    string lock_assertion_expiration = 58;
+    cacti.satp.v02.common.AssetProfile asset_profile = 59;
 }
 
 

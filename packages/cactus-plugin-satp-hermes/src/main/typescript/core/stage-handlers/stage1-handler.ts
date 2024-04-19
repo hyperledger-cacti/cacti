@@ -1,4 +1,4 @@
-import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
+import { ConnectRouter } from "@connectrpc/connect";
 import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_connect";
 import {
   TransferCommenceRequestMessage,
@@ -75,7 +75,7 @@ export class Stage1SATPHandler implements SATPHandler {
       );
       console.log("Returning response", message);
       console.log("Returning response", sessionData);
-      const response = new TransferProposalReceiptMessage();
+      const response = new TransferCommenceResponseMessage();
       return response;
     } catch (error) {
       console.error("Error handling TransferCommenceRequest:", error);

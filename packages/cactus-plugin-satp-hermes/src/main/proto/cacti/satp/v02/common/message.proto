@@ -192,15 +192,8 @@ enum Error {
     ERROR_MESSAGE_OUT_OF_SEQUENCE = 11;
 }
 
-message LockAssertionClaim {
-
-}
 
 message LockAssertionFormat {
-
-}
-
-message MintAssertionClaims {
 
 }
 
@@ -208,15 +201,7 @@ message MintAssertionClaimsFormat {
 
 }
 
-message BurnAssertionClaim {
-
-}
-
 message BurnAssertionClaimFormat {
-
-}
-
-message AssignmentAssertionClaim {
 
 }
 

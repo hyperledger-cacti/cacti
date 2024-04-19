@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
-import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, History, LockAssertionClaim, LockAssertionFormat, LockType, MintAssertionClaims, MintAssertionClaimsFormat, PayloadProfile, Permissions, SignatureAlgorithm, SubsequentCalls, TransferClaimsFormat } from "./message_pb.js";
+import { AssetProfile, AssignmentAssertionClaimFormat, BurnAssertionClaimFormat, CredentialProfile, History, LockAssertionFormat, LockType, MintAssertionClaimsFormat, PayloadProfile, Permissions, SignatureAlgorithm, SubsequentCalls, TransferClaimsFormat } from "./message_pb.js";
 
 /**
  * @generated from enum cacti.satp.v02.common.ACCEPTANCE
@@ -253,9 +253,9 @@ export class SessionData extends Message<SessionData> {
   receivedTimestamps?: MessageStagesTimestamps;
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 44;
+   * @generated from field: string lock_assertion_claim = 44;
    */
-  lockAssertionClaim?: LockAssertionClaim;
+  lockAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.LockAssertionFormat lock_assertion_format = 45;
@@ -263,9 +263,9 @@ export class SessionData extends Message<SessionData> {
   lockAssertionFormat?: LockAssertionFormat;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 46;
+   * @generated from field: string mint_assertion_claims = 46;
    */
-  mintAssertionClaims?: MintAssertionClaims;
+  mintAssertionClaims = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 47;
@@ -273,9 +273,9 @@ export class SessionData extends Message<SessionData> {
   mintAssertionClaimsFormat?: MintAssertionClaimsFormat;
 
   /**
-   * @generated from field: cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 48;
+   * @generated from field: string burn_assertion_claim = 48;
    */
-  burnAssertionClaim?: BurnAssertionClaim;
+  burnAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 49;
@@ -283,9 +283,9 @@ export class SessionData extends Message<SessionData> {
   burnAssertionClaimFormat?: BurnAssertionClaimFormat;
 
   /**
-   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 50;
+   * @generated from field: string assignment_assertion_claim = 50;
    */
-  assignmentAssertionClaim?: AssignmentAssertionClaim;
+  assignmentAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 51;
@@ -311,6 +311,26 @@ export class SessionData extends Message<SessionData> {
    * @generated from field: cacti.satp.v02.common.TransferClaimsFormat transfer_claims_format = 55;
    */
   transferClaimsFormat?: TransferClaimsFormat;
+
+  /**
+   * @generated from field: string client_transfer_number = 56;
+   */
+  clientTransferNumber = "";
+
+  /**
+   * @generated from field: string server_transfer_number = 57;
+   */
+  serverTransferNumber = "";
+
+  /**
+   * @generated from field: string lock_assertion_expiration = 58;
+   */
+  lockAssertionExpiration = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.AssetProfile asset_profile = 59;
+   */
+  assetProfile?: AssetProfile;
 
   constructor(data?: PartialMessage<SessionData>) {
     super();
@@ -363,18 +383,22 @@ export class SessionData extends Message<SessionData> {
     { no: 41, name: "last_message_received_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 42, name: "processed_timestamps", kind: "message", T: MessageStagesTimestamps },
     { no: 43, name: "received_timestamps", kind: "message", T: MessageStagesTimestamps },
-    { no: 44, name: "lock_assertion_claim", kind: "message", T: LockAssertionClaim },
+    { no: 44, name: "lock_assertion_claim", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 45, name: "lock_assertion_format", kind: "message", T: LockAssertionFormat },
-    { no: 46, name: "mint_assertion_claims", kind: "message", T: MintAssertionClaims },
+    { no: 46, name: "mint_assertion_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 47, name: "mint_assertion_claims_format", kind: "message", T: MintAssertionClaimsFormat },
-    { no: 48, name: "burn_assertion_claim", kind: "message", T: BurnAssertionClaim },
+    { no: 48, name: "burn_assertion_claim", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 49, name: "burn_assertion_claim_format", kind: "message", T: BurnAssertionClaimFormat },
-    { no: 50, name: "assignment_assertion_claim", kind: "message", T: AssignmentAssertionClaim },
+    { no: 50, name: "assignment_assertion_claim", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 51, name: "assignment_assertion_claim_format", kind: "message", T: AssignmentAssertionClaimFormat },
     { no: 52, name: "completed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 53, name: "acceptance", kind: "enum", T: proto3.getEnumType(ACCEPTANCE) },
     { no: 54, name: "last_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 55, name: "transfer_claims_format", kind: "message", T: TransferClaimsFormat },
+    { no: 56, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 57, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 58, name: "lock_assertion_expiration", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 59, name: "asset_profile", kind: "message", T: AssetProfile },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {

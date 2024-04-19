@@ -140,6 +140,11 @@ export class Stage1ServerService extends SATPService {
     }
     */
 
+    if (sessionData.transferContextId != undefined) {
+      transferProposalReceiptMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, JSON.stringify(transferProposalReceiptMessage)),
     );
@@ -215,6 +220,16 @@ export class Stage1ServerService extends SATPService {
       new TransferCommenceResponseMessage();
     transferCommenceResponseMessage.common = commonBody;
 
+    if (sessionData.transferContextId != undefined) {
+      transferCommenceResponseMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
+    if (sessionData.serverTransferNumber != undefined) {
+      transferCommenceResponseMessage.serverTransferNumber =
+        sessionData.serverTransferNumber;
+    }
+
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
     const messageSignature = bufArray2HexStr(
@@ -262,12 +277,8 @@ export class Stage1ServerService extends SATPService {
       request.common.version == undefined ||
       request.common.messageType == undefined ||
       request.common.sessionId == undefined ||
-      // request.common.transferContextId == undefined ||
       request.common.sequenceNumber == undefined ||
       request.common.resourceUrl == undefined ||
-      // request.common.actionResponse == undefined ||
-      // request.common.payloadProfile == undefined ||
-      // request.common.applicationProfile == undefined ||
       request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
       request.common.serverGatewayPubkey == undefined
@@ -341,6 +352,55 @@ export class Stage1ServerService extends SATPService {
       request.networkCapabilities.accessControlProfile,
     );
 
+    if (request.networkCapabilities.permissions != undefined) {
+      this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);
+      sessionData.permissions = request.networkCapabilities.permissions;
+    }
+
+    if (request.networkCapabilities.developerUrn != undefined) {
+      this.Log.info(`${fnTag}, Optional variable loaded: developerUrn...`);
+      sessionData.developerUrn = request.networkCapabilities.developerUrn;
+    }
+
+    if (request.networkCapabilities.applicationProfile != undefined) {
+      this.Log.info(
+        `${fnTag}, Optional variable loaded: applicationProfile...`,
+      );
+      sessionData.applicationProfile =
+        request.networkCapabilities.applicationProfile;
+    }
+
+    if (request.networkCapabilities.subsequentCalls != undefined) {
+      this.Log.info(`${fnTag}, Optional variable loaded: subsequentCalls...`);
+      sessionData.subsequentCalls = request.networkCapabilities.subsequentCalls;
+    }
+
+    if (request.networkCapabilities.history != undefined) {
+      this.Log.info(`${fnTag}, Optional variable loaded: history...`);
+      sessionData.history = request.networkCapabilities.history;
+    }
+
+    if (request.transferInitClaimsFormat != undefined) {
+      this.Log.info(
+        `${fnTag}, Optional variable loaded: transferInitClaimsFormat...`,
+      );
+      sessionData.transferClaimsFormat = request.transferInitClaimsFormat;
+    }
+
+    if (request.multipleCancelsAllowed != undefined) {
+      this.Log.info(
+        `${fnTag}, Optional variable loaded: multipleCancelsAllowed...`,
+      );
+      sessionData.multipleCancelsAllowed = request.multipleCancelsAllowed;
+    }
+
+    if (request.multipleClaimsAllowed != undefined) {
+      this.Log.info(
+        `${fnTag}, Optional variable loaded: multipleClaimsAllowed...`,
+      );
+      sessionData.multipleClaimsAllowed = request.multipleClaimsAllowed;
+    }
+
     this.Log.info(`Session data created for session id ${sessionData.id}`);
     if (!this.checkTransferClaims(request.transferInitClaims)) {
       throw new Error();
@@ -360,15 +420,13 @@ export class Stage1ServerService extends SATPService {
       request.common.version == undefined ||
       request.common.messageType == undefined ||
       request.common.sessionId == undefined ||
-      // request.common.transferContextId == undefined ||
       request.common.sequenceNumber == undefined ||
       request.common.resourceUrl == undefined ||
-      // request.common.actionResponse == undefined ||
-      // request.common.payloadProfile == undefined ||
-      // request.common.applicationProfile == undefined ||
       request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
-      request.common.serverGatewayPubkey == undefined
+      request.common.serverGatewayPubkey == undefined ||
+      request.common.hashPreviousMessage == undefined ||
+      request.common.signature == undefined
     ) {
       throw new Error(
         `${fnTag}, message satp common body is missing or is missing required fields`,
@@ -464,6 +522,22 @@ export class Stage1ServerService extends SATPService {
       throw new Error(
         `${fnTag}, TransferCommenceRequest message signature verification failed`,
       );
+    }
+
+    if (
+      sessionData.transferContextId != undefined &&
+      request.common.transferContextId != sessionData.transferContextId
+    ) {
+      throw new Error(
+        `${fnTag}, TransferCommenceRequest message transfer context id does not match the one that was sent`,
+      );
+    }
+
+    if (request.clientTransferNumber != undefined) {
+      this.Log.info(
+        `${fnTag}, Optional variable loaded: clientTransferNumber...`,
+      );
+      sessionData.clientTransferNumber = request.clientTransferNumber;
     }
 
     this.Log.info(`TransferCommenceRequest passed all checks.`);
