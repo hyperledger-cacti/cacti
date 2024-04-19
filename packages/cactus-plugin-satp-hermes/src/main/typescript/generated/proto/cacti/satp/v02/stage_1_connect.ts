@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { TransferCommenceRequestMessage, TransferCommenceResponseMessage, TransferProposalReceiptRejectMessage, TransferProposalRequestMessage } from "./stage_1_pb.js";
+import { TransferCommenceRequestMessage, TransferCommenceResponseMessage, TransferProposalReceiptMessage, TransferProposalRequestMessage } from "./stage_1_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -18,7 +18,7 @@ export const SatpStage1Service = {
     transferProposal: {
       name: "TransferProposal",
       I: TransferProposalRequestMessage,
-      O: TransferProposalReceiptRejectMessage,
+      O: TransferProposalReceiptMessage,
       kind: MethodKind.Unary,
     },
     /**
