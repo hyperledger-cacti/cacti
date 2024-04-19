@@ -1,6 +1,6 @@
 import { JsObjectSigner } from "@hyperledger/cactus-common";
 import { LocalLog, RemoteLog } from "./core/types";
-import { SATPGateway } from "./gateway-refactor";
+import { SATPGateway } from "./plugin-satp-hermes-gateway";
 import { SHA256 } from "crypto-js";
 
 export function bufArray2HexStr(array: Uint8Array): string {
@@ -73,7 +73,7 @@ export async function storeRemoteLog(
   key: string,
   hash: string,
 ) {
-  const fnTag = `${gateway.label}#storeInDatabase()`;
+  const fnTag = `${gateway.className}#storeInDatabase()`;
 
   const remoteLog: RemoteLog = {
     key: key,
@@ -83,7 +83,7 @@ export async function storeRemoteLog(
   };
 
   remoteLog.signature = bufArray2HexStr(
-    sign(gateway.gatewaySigner, JSON.stringify(remoteLog)),
+    sign(gateway.Signer, JSON.stringify(remoteLog)),
   );
 
   const response = await gateway.remoteRepository?.create(remoteLog);
