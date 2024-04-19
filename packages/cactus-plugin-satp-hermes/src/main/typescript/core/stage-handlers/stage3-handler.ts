@@ -5,13 +5,15 @@ import {
   CommitPreparationRequestMessage,
   TransferCompleteRequestMessage,
 } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
-import { Empty } from "@bufbuild/protobuf";
+import { Empty, ServiceType } from "@bufbuild/protobuf";
 import { Stage3ServerService } from "../stage-services/server/stage3-server-service";
 import { SATPGateway } from "../../gateway-refactor";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPSession } from "../satp-session";
+import { SupportedGatewayImplementations } from "../types";
 
-export default (gateway: SATPGateway, service: Stage3ServerService) =>
+export const Stage3Handler = (session: SATPSession, service: Stage3ServerService, connectClients: ServiceType[], supportedDLTs: SupportedGatewayImplementations[]) =>
   (router: ConnectRouter) =>
     router.service(SatpStage3Service, {
       async commitPreparation(
@@ -23,7 +25,7 @@ export default (gateway: SATPGateway, service: Stage3ServerService) =>
 
         const sessionData = await service.checkCommitPreparationRequestMessage(
           req,
-          gateway,
+          session,
         );
 
         saveTimestamp(
@@ -33,7 +35,7 @@ export default (gateway: SATPGateway, service: Stage3ServerService) =>
           recvTimestamp,
         );
 
-        const message = await service.commitReady(req, gateway);
+        const message = await service.commitReady(req, session);
 
         if (!message) {
           throw new Error("No message returned from commitPreparation");
@@ -57,7 +59,7 @@ export default (gateway: SATPGateway, service: Stage3ServerService) =>
         const recvTimestamp: string = Date.now().toString();
 
         const sessionData =
-          await service.checkCommitFinalAssertionRequestMessage(req, gateway);
+          await service.checkCommitFinalAssertionRequestMessage(req, session);
 
         saveTimestamp(
           sessionData,
@@ -68,7 +70,7 @@ export default (gateway: SATPGateway, service: Stage3ServerService) =>
 
         const message = await service.commitFinalAcknowledgementReceiptResponse(
           req,
-          gateway,
+          session,
         );
 
         if (!message) {
@@ -92,7 +94,7 @@ export default (gateway: SATPGateway, service: Stage3ServerService) =>
 
         const sessionData = await service.checkTransferCompleteRequestMessage(
           req,
-          gateway,
+          session,
         );
 
         saveTimestamp(
