@@ -54,6 +54,16 @@ export class State {
     return this.transactions;
   }
 
+  public selectTransactions(txs: string[]): void {
+    const transactions: Transaction[] = [];
+    for (const tx of this.transactions) {
+      if (txs.includes(tx.getId())) {
+        transactions.push(tx);
+      }
+    }
+    this.transactions = transactions;
+  }
+
   public getInitialTime(): string {
     if (this.transactions.length >= 1) {
       return this.transactions[0].getTimeStamp();

@@ -17,9 +17,9 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 2;
+   * @generated from field: string lock_assertion_claim = 2;
    */
-  lockAssertionClaim?: LockAssertionClaim;
+  lockAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 3;
