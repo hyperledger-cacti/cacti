@@ -13,7 +13,7 @@ message TransferProposalRequestMessage {
   bool multiple_cancels_allowed = 6;
 }
 
-message TransferProposalReceiptRejectMessage {
+message TransferProposalReceiptMessage {
   cacti.satp.v02.common.CommonSatp common = 1;
   string hash_transfer_init_claims = 2;
   cacti.satp.v02.common.TransferClaims transfer_counter_claims = 3;
@@ -31,6 +31,6 @@ message TransferCommenceResponseMessage {
 }
   
 service SatpStage1Service {
-  rpc TransferProposal(TransferProposalRequestMessage) returns (TransferProposalReceiptRejectMessage) {}
+  rpc TransferProposal(TransferProposalRequestMessage) returns (TransferProposalReceiptMessage) {}
   rpc TransferCommence(TransferCommenceRequestMessage) returns (TransferCommenceResponseMessage) {}
 }
