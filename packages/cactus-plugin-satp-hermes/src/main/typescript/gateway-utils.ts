@@ -83,7 +83,7 @@ export async function storeRemoteLog(
   };
 
   remoteLog.signature = bufArray2HexStr(
-    sign(gateway.gatewaySigner, JSON.stringify(remoteLog)),
+    sign(gateway.Signer, JSON.stringify(remoteLog)),
   );
 
   const response = await gateway.remoteRepository?.create(remoteLog);
