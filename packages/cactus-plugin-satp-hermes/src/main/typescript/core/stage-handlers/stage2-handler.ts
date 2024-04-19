@@ -1,12 +1,22 @@
+/*
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
 import { LockAssertionRequestMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
-import { SATPGateway } from "../../gateway-refactor";
+import { SATPGateway } from "../../plugin-satp-hermes-gateway";
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPSession } from "../satp-session";
+import { ServiceType } from "@bufbuild/protobuf";
+import { SupportedChain } from "../types";
 
-export default (gateway: SATPGateway, service: Stage2ServerService) =>
+export const Stage2Handler =
+  (
+    session: SATPSession,
+    service: Stage2ServerService,
+    connectClients: ServiceType[],
+    supportedDLTs: SupportedChain[],
+  ) =>
   (router: ConnectRouter) =>
     router.service(SatpStage2Service, {
       async lockAssertion(
@@ -18,7 +28,7 @@ export default (gateway: SATPGateway, service: Stage2ServerService) =>
 
         const sessionData = await service.checkLockAssertionRequestMessage(
           req,
-          gateway,
+          session,
         );
 
         saveTimestamp(
@@ -28,7 +38,7 @@ export default (gateway: SATPGateway, service: Stage2ServerService) =>
           recvTimestamp,
         );
 
-        const message = await service.lockAssertionResponse(req, gateway);
+        const message = await service.lockAssertionResponse(req, session);
 
         if (!message) {
           throw new Error("No message returned from lockAssertionResponse");
@@ -45,3 +55,4 @@ export default (gateway: SATPGateway, service: Stage2ServerService) =>
         return message;
       },
     });
+*/
