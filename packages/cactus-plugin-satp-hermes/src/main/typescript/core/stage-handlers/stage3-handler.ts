@@ -11,7 +11,7 @@ import { SATPGateway } from "../../gateway-refactor";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
-export default (gateway: SATPGateway, service: Stage3ServerService) =>
+export const Stage3Handler = (gateway: SATPGateway, service: Stage3ServerService) =>
   (router: ConnectRouter) =>
     router.service(SatpStage3Service, {
       async commitPreparation(

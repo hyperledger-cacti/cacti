@@ -1,4 +1,4 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { JsObjectSigner, Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPGateway } from "../../../gateway-refactor";
 import {
   CommitFinalAcknowledgementReceiptResponseMessage,
@@ -20,15 +20,19 @@ import {
   verifySignature,
 } from "../../../gateway-utils";
 import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
+import { ISATPServerServiceOptions, SATPService } from "../../types";
+import { SATPSession } from "../../../types/satp-session";
 
-export class Stage3ServerService {
-  public static readonly CLASS_NAME = "Stage3Service-Server";
+export class Stage3ServerService implements SATPService {
+  public static readonly CLASS_NAME = "Stage3ServerService";
   private _log: Logger;
+  private signer: JsObjectSigner;
 
-  constructor() {
+  constructor(ops: ISATPServerServiceOptions) {
     const level = "INFO";
     const label = Stage3ServerService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
+    this.signer = ops.signer;
   }
 
   public get className(): string {
@@ -41,7 +45,7 @@ export class Stage3ServerService {
 
   async commitReady(
     request: CommitPreparationRequestMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): Promise<void | CommitReadyResponseMessage> {
     const fnTag = `${this.className}#commitReady()`;
 
@@ -49,7 +53,7 @@ export class Stage3ServerService {
       throw new Error(`${fnTag}, message common body is missing`);
     }
 
-    const sessionData = gateway.getSession(request.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -81,7 +85,7 @@ export class Stage3ServerService {
       sessionData.mintAssertionClaimsFormat;
 
     const messageSignature = bufArray2HexStr(
-      sign(gateway.gatewaySigner, JSON.stringify(commitReadyMessage)),
+      sign(this.signer, JSON.stringify(commitReadyMessage)),
     );
 
     saveSignature(sessionData, MessageType.COMMIT_READY, messageSignature);
@@ -92,13 +96,14 @@ export class Stage3ServerService {
       getHash(commitReadyMessage),
     );
 
+    /*
     await storeLog(gateway, {
       sessionID: sessionData.id,
       type: "commitReady",
       operation: "lock",
       data: JSON.stringify(sessionData),
     });
-
+    */
     this.log.info(`${fnTag}, sending commitReadyMessage...`);
 
     return commitReadyMessage;
@@ -106,7 +111,7 @@ export class Stage3ServerService {
 
   async commitFinalAcknowledgementReceiptResponse(
     request: CommitFinalAssertionRequestMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): Promise<void | CommitFinalAcknowledgementReceiptResponseMessage> {
     const fnTag = `${this.className}#commitFinalAcknowledgementReceiptResponse()`;
 
@@ -114,7 +119,7 @@ export class Stage3ServerService {
       throw new Error(`${fnTag}, message common body is missing`);
     }
 
-    const sessionData = gateway.getSession(request.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -149,7 +154,7 @@ export class Stage3ServerService {
 
     const messageSignature = bufArray2HexStr(
       sign(
-        gateway.gatewaySigner,
+        this.signer,
         JSON.stringify(commitFinalAcknowledgementReceiptResponseMessage),
       ),
     );
@@ -158,13 +163,14 @@ export class Stage3ServerService {
 
     saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(request));
 
+    /*
     await storeLog(gateway, {
       sessionID: sessionData.id,
       type: "commitFinalAcknowledgementReceiptResponse",
       operation: "lock",
       data: JSON.stringify(sessionData),
     });
-
+    */
     this.log.info(
       `${fnTag}, sending commitFinalAcknowledgementReceiptResponseMessage...`,
     );
@@ -174,7 +180,7 @@ export class Stage3ServerService {
 
   async checkCommitPreparationRequestMessage(
     request: CommitPreparationRequestMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): Promise<SessionData> {
     const fnTag = `${this.className}#checkCommitPreparationRequestMessage()`;
 
@@ -190,7 +196,7 @@ export class Stage3ServerService {
       throw new Error(`${fnTag}, message type is not COMMIT_PREPARE`);
     }
 
-    const sessionData = gateway.getSession(request.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -232,7 +238,7 @@ export class Stage3ServerService {
 
     if (
       !verifySignature(
-        gateway.gatewaySigner,
+        this.signer,
         request.common,
         request.common.clientGatewayPubkey,
       )
@@ -247,7 +253,7 @@ export class Stage3ServerService {
 
   async checkCommitFinalAssertionRequestMessage(
     request: CommitFinalAssertionRequestMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): Promise<SessionData> {
     const fnTag = `${this.className}#checkCommitFinalAssertionRequestMessage()`;
 
@@ -263,7 +269,7 @@ export class Stage3ServerService {
       throw new Error(`${fnTag}, message type is not COMMIT_FINAL`);
     }
 
-    const sessionData = gateway.getSession(request.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -305,7 +311,7 @@ export class Stage3ServerService {
 
     if (
       !verifySignature(
-        gateway.gatewaySigner,
+        this.signer,
         request.common,
         request.common.clientGatewayPubkey,
       )
@@ -326,7 +332,7 @@ export class Stage3ServerService {
 
   async checkTransferCompleteRequestMessage(
     request: CommitFinalAssertionRequestMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): Promise<SessionData> {
     const fnTag = `${this.className}#checkTransferCompleteRequestMessage()`;
 
@@ -346,7 +352,7 @@ export class Stage3ServerService {
       `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
     );
 
-    const sessionData = gateway.getSession(request.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -388,7 +394,7 @@ export class Stage3ServerService {
 
     if (
       !verifySignature(
-        gateway.gatewaySigner,
+        this.signer,
         request.common,
         request.common.clientGatewayPubkey,
       )

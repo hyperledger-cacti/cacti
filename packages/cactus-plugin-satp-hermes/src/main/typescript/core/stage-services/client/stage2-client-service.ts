@@ -1,4 +1,4 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { JsObjectSigner, Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { TransferCommenceResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
 import { SATPGateway } from "../../../gateway-refactor";
 import { SATP_VERSION } from "../../constants";
@@ -15,15 +15,20 @@ import {
   verifySignature,
 } from "../../../gateway-utils";
 import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
+import { SATPSession } from "../../../core/satp-session";
+import { SATPService, ISATPClientServiceOptions } from "../../../types/satp-protocol";
 
-export class Stage2ClientService {
+export class Stage2ClientService implements SATPService {
   public static readonly CLASS_NAME = "Stage2Service-Client";
   private _log: Logger;
-
-  constructor() {
+  private signer: JsObjectSigner;
+  
+  constructor(ops: ISATPClientServiceOptions) {
     const level = "INFO";
     const label = Stage2ClientService.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level, label });
+    this.signer = ops.signer;
+
   }
 
   public get className(): string {
@@ -36,14 +41,14 @@ export class Stage2ClientService {
 
   async lockAssertionRequest(
     response: TransferCommenceResponseMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): Promise<void | LockAssertionRequestMessage> {
     const fnTag = `${this.className}#lockAssertionRequest()`;
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
     }
 
-    const sessionData = gateway.getSession(response.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -78,7 +83,7 @@ export class Stage2ClientService {
       sessionData.lockAssertionFormat;
 
     const messageSignature = bufArray2HexStr(
-      sign(gateway.gatewaySigner, JSON.stringify(lockAssertionRequestMessage)),
+      sign(this.signer, JSON.stringify(lockAssertionRequestMessage)),
     );
 
     lockAssertionRequestMessage.common.signature = messageSignature;
@@ -105,7 +110,7 @@ export class Stage2ClientService {
 
   checkTransferCommenceResponseMessage(
     response: TransferCommenceResponseMessage,
-    gateway: SATPGateway,
+    session: SATPSession,
   ): void {
     const fnTag = `${this.className}#lockAssertionRequestMessage()`;
 
@@ -133,7 +138,7 @@ export class Stage2ClientService {
       throw new Error(`${fnTag}, unsupported SATP version`);
     }
 
-    const sessionData = gateway.getSession(response.common.sessionId);
+    const sessionData = session.getSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -166,7 +171,7 @@ export class Stage2ClientService {
 
     if (
       !verifySignature(
-        gateway.gatewaySigner,
+        this.signer,
         response.common,
         response.common.serverGatewayPubkey,
       )

@@ -6,7 +6,7 @@ import { Stage2ServerService } from "../stage-services/server/stage2-server-serv
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
-export default (gateway: SATPGateway, service: Stage2ServerService) =>
+export const Stage2Handler = (gateway: SATPGateway, service: Stage2ServerService) =>
   (router: ConnectRouter) =>
     router.service(SatpStage2Service, {
       async lockAssertion(
