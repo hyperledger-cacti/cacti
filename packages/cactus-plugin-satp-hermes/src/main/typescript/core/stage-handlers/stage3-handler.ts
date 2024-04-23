@@ -7,7 +7,7 @@ import {
 } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
 import { Empty, ServiceType } from "@bufbuild/protobuf";
 import { Stage3ServerService } from "../stage-services/server/stage3-server-service";
-import { SATPGateway } from "../../gateway-refactor";
+import { SATPGateway } from "../../plugin-satp-hermes-gateway";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATPSession } from "../satp-session";
