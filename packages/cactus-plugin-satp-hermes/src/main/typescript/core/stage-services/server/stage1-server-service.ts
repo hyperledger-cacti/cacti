@@ -1,6 +1,6 @@
 import { IJsObjectSignerOptions, JsObjectSigner, Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
-import { SATPGateway } from "../../../gateway-refactor";
+import { SATPGateway } from "../../../plugin-satp-hermes-gateway";
 import {
   TransferCommenceResponseMessage,
   TransferCommenceRequestMessage,
