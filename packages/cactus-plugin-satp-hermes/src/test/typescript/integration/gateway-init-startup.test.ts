@@ -8,7 +8,7 @@ import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   SATPGateway,
   SATPGatewayConfig,
-} from "../../../main/typescript/gateway-refactor";
+} from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   IPluginFactoryOptions,
@@ -202,6 +202,113 @@ describe("SATPGateway initialization", () => {
 
     // for now, technically not needed. However if we use more tests with loggerSpy, conflicts could arise. This is a reminder to restore the spy after each test
     loggerSpy.mockRestore();
+  });
+});
+
+
+describe("SATPGateway startup", () => {
+  it("initiates with default config", async () => {
+    const options: SATPGatewayConfig = {};
+    const gateway = await factory.create(options);
+
+    expect(gateway).toBeInstanceOf(SATPGateway);
+
+    const identity = gateway.Identity;
+    expect(identity).toBeDefined();
+    expect(identity.id).toBeDefined();
+    expect(identity.name).toBeDefined();
+    expect(identity.version).toEqual([
+      {
+        Core: "v02",
+        Architecture: "v02",
+        Crash: "v02",
+      },
+    ]);
+    expect(identity.supportedChains).toEqual([
+      SupportedGatewayImplementations.FABRIC,
+      SupportedGatewayImplementations.BESU,
+    ]);
+    expect(identity.proofID).toBe("mockProofID1");
+    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.address).toBe("http://localhost");
+  });
+
+  test("initiates custom config Gateway Coordinator", async () => {
+    const options: SATPGatewayConfig = {
+      logLevel: "INFO",
+      gid: {
+        id: "mockID",
+        name: "CustomGateway",
+        version: [
+          {
+            Core: "v1",
+            Architecture: "v1",
+            Crash: "v1",
+          },
+        ],
+        supportedChains: [
+          SupportedGatewayImplementations.FABRIC,
+          SupportedGatewayImplementations.BESU,
+        ],
+        proofID: "mockProofID10",
+        gatewayClientPort: 3001,
+        address: "https://localhost",
+      },
+    };
+    const gateway = await factory.create(options);
+
+    expect(gateway).toBeInstanceOf(SATPGateway);
+
+    const identity = gateway.Identity;
+    expect(identity).toBeDefined();
+    expect(identity.id).toBeDefined();
+    expect(identity.name).toBeDefined();
+    expect(identity.version).toEqual([
+      {
+        Core: "v1",
+        Architecture: "v1",
+        Crash: "v1",
+      },
+    ]);
+    expect(identity.supportedChains).toEqual([
+      SupportedGatewayImplementations.FABRIC,
+      SupportedGatewayImplementations.BESU,
+    ]);
+    expect(identity.proofID).toBe("mockProofID10");
+    expect(identity.gatewayClientPort).toBe(3001);
+    expect(identity.address).toBe("https://localhost");
+  });
+
+  test("Gateway Server launches", async () => {
+    const options: SATPGatewayConfig = {
+      logLevel: "INFO",
+      gid: {
+        id: "mockID",
+        name: "CustomGateway",
+        version: [
+          {
+            Core: "v02",
+            Architecture: "v02",
+            Crash: "v02",
+          },
+        ],
+        supportedChains: [
+          SupportedGatewayImplementations.FABRIC,
+          SupportedGatewayImplementations.BESU,
+        ],
+        proofID: "mockProofID10",
+        gatewayClientPort: 3010,
+        address: "https://localhost",
+      },
+    };
+    const gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+
+    const identity = gateway.Identity;
+    expect(identity.gatewayClientPort).toBe(3010);
+    expect(identity.address).toBe("https://localhost");
+    await gateway.startupGatewayServer();
+    await gateway.shutdown();
   });
 });
 
