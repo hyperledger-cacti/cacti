@@ -1,6 +1,6 @@
 import { JsObjectSigner, Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { TransferCommenceResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
-import { SATPGateway } from "../../../gateway-refactor";
+import { SATPGateway } from "../../../plugin-satp-hermes-gateway";
 import { SATP_VERSION } from "../../constants";
 import {
   CommonSatp,
