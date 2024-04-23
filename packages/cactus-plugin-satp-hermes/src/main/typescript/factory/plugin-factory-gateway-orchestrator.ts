@@ -2,7 +2,7 @@ import {
   IPluginFactoryOptions,
   PluginFactory,
 } from "@hyperledger/cactus-core-api";
-import { SATPGateway, SATPGatewayConfig } from "../gateway-refactor";
+import { SATPGateway, SATPGatewayConfig } from "../plugin-satp-hermes-gateway";
 import { validateOrReject } from "class-validator";
 
 export class PluginFactorySATPGateway extends PluginFactory<
