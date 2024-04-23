@@ -73,7 +73,7 @@ export class SATPGateway {
   private BLOApplication?: Express;
   private BLOServer?: http.Server;
   private BLODispatcher?: BLODispatcher;
-
+  public OAPIServerEnabled: boolean = false;
 
   private objectSigner: JsObjectSigner;
 
@@ -143,9 +143,7 @@ export class SATPGateway {
     }
 
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
-    if (options.enableOpenAPI) {
-      this.setupOpenAPI();
-    }
+    this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
   }
 
   public get Signer(): JsObjectSigner {
@@ -168,10 +166,16 @@ export class SATPGateway {
   // todo load docs for gateway coordinator and expose them in a http gatewayApplication
   
   setupOpenAPI(): void {
-    if (!this.BLOApplication) {
-      throw new Error("BLOApplication is not defined");
+    if (!this.OAPIServerEnabled) {
+      this.logger.debug("OpenAPI server is disabled");
+      return;
     }
 
+    if (!this.BLOApplication) {
+      this.logger.debug("BLOApplication is not defined. Not initializing OpenAPI server");
+      return;
+    }
+    
     const specPath = path.join(__dirname, "../json/openapi-blo-bundled.json");
     const OpenAPISpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 
@@ -281,6 +285,7 @@ export class SATPGateway {
 
     await Promise.all([
       this.startupGatewayServer(),
+      this.setupOpenAPI(),
     ]);
 
     this.logger.info("Both GatewayServer and BLOServer have started");
