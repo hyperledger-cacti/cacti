@@ -10,7 +10,7 @@ import { Stage1Handler } from "../../core/stage-handlers/stage1-handler";
 import { Stage2Handler } from "../../core/stage-handlers/stage2-handler";
 import { Stage3Handler } from "../../core/stage-handlers/stage3-handler";
 import { Stage1ServerService } from "../../core/stage-services/server/stage1-server-service";
-import { SATPGateway } from "../../gateway-refactor";
+import { SATPGateway } from "../../plugin-satp-hermes-gateway";
 import { Stage2ServerService } from "../../core/stage-services/server/stage2-server-service";
 import { Stage3ServerService } from "../../core/stage-services/server/stage3-server-service";
 import { ISATPSessionOptions, SATPSession } from "../../core/satp-session";

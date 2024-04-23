@@ -1,6 +1,6 @@
 import { JsObjectSigner } from "@hyperledger/cactus-common";
 import { LocalLog, RemoteLog } from "./core/types";
-import { SATPGateway } from "./gateway-refactor";
+import { SATPGateway } from "./plugin-satp-hermes-gateway";
 import { SHA256 } from "crypto-js";
 
 export function bufArray2HexStr(array: Uint8Array): string {
