@@ -1,7 +1,7 @@
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
 import { LockAssertionRequestMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
-import { SATPGateway } from "../../gateway-refactor";
+import { SATPGateway } from "../../plugin-satp-hermes-gateway";
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
