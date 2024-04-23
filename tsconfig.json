@@ -158,9 +158,6 @@
       "path": "./examples/cactus-example-discounted-asset-trade-client/tsconfig.json"
     },
     {
-      "path": "./examples/cactus-example-cbdc-bridging-backend/tsconfig.json"
-    },
-    {
       "path": "./examples/cactus-example-cbdc-bridging-frontend/tsconfig.json"
     },
     {
