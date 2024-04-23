@@ -19,7 +19,7 @@
     "@mdx-js/react": "1.6.22",
     "clsx": "1.2.1",
     "elliptic": "6.5.4",
-    "gh-pages": "2.2.0",
+    "gh-pages": "5.0.0",
     "immer": "9.0.21",
     "is-svg": "4.4.0",
     "react": "16.14.0",
