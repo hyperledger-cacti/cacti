@@ -65,6 +65,9 @@
       "path": "./packages/cactus-plugin-ledger-connector-corda/tsconfig.json"
     },
     {
+      "path": "./packages/cacti-plugin-ledger-connector-stellar/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-plugin-ledger-connector-ethereum/tsconfig.json"
     },
     {
