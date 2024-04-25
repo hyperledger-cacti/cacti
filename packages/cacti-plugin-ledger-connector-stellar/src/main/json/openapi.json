@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cacti Plugin - Connector Stellar",
+    "description": "Can perform basic tasks on a Stellar ledger",
+    "version": "v2.0.0-alpha.2",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "WatchBlocksV1": {
+        "type": "string",
+        "enum": [
+          "org.hyperledger.cacti.api.async.stellar.WatchBlocksV1.Subscribe",
+          "org.hyperledger.cacti.api.async.stellar.WatchBlocksV1.Next",
+          "org.hyperledger.cacti.api.async.stellar.WatchBlocksV1.Unsubscribe",
+          "org.hyperledger.cacti.api.async.stellar.WatchBlocksV1.Error",
+          "org.hyperledger.cacti.api.async.stellar.WatchBlocksV1.Complete"
+        ],
+        "x-enum-varnames": [
+          "Subscribe",
+          "Next",
+          "Unsubscribe",
+          "Error",
+          "Complete"
+        ]
+      },
+      "WatchBlocksV1Progress": {
+        "type": "object",
+        "required": ["blockHeader"],
+        "properties": {
+          "blockHeader": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "RunTransactionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          
+        }
+      },
+      "RunTransactionResponse": {
+        "type": "object",
+        "properties": {
+        }
+      },
+      "DeployContractV1Request": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+        }
+      },
+      "DeployContractV1Response": {
+        "type": "object",
+        "properties": {
+        }
+      },
+      "PrometheusExporterMetricsResponse": {
+        "type": "string",
+        "nullable": false
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-open-api-spec": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-open-api-spec"
+          }
+        },
+        "operationId": "getOpenApiSpecV1",
+        "summary": "Retrieves the .json file that contains the OpenAPI specification for the plugin.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/deploy-contract": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/deploy-contract"
+          }
+        },
+        "operationId": "deployContractV1",
+        "summary": "Deploys a smart contract to the Stellar ledger associated with the connector.",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployContractV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployContractV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-transaction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-transaction"
+          }
+        },
+        "operationId": "runTransactionV1",
+        "summary": "Executes a transaction on a stellar ledger",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunTransactionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"
+          }
+        },
+        "operationId": "getPrometheusMetricsV1",
+        "summary": "Get the Prometheus Metrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
