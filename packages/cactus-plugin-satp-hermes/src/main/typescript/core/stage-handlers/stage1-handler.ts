@@ -1,102 +1,50 @@
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
-
 import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_connect";
-import {
-  TransferCommenceRequestMessage,
-  TransferProposalRequestMessage,
-} from "../../generated/proto/cacti/satp/v02/stage_1_pb";
-import { SATPGateway } from "../../plugin-satp-hermes-gateway";
-import { Stage1ServerService } from "../stage-services/server/stage1-server-service";
-import { TimestampType, saveTimestamp } from "../session-utils";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { TransferCommenceRequestMessage, TransferProposalRequestMessage } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
 import { SATPSession } from "../satp-session";
+import { Stage1ServerService } from "../stage-services/server/stage1-server-service";
 import { Stage1ClientService } from "../stage-services/client/stage1-client-service";
-import { ServiceType } from "@bufbuild/protobuf";
 import { SupportedGatewayImplementations } from "../types";
+import { SATPHandler } from './SATPHandler'; // Assuming the interface is exported from this path
 
-export const Stage1Handler = (session: SATPSession | undefined, serverService: Stage1ServerService, clientService: Stage1ClientService, connectClients: ServiceType[], supportedDLTs: SupportedGatewayImplementations[]) =>
-  (router: ConnectRouter) =>
+export class Stage1SATPHandler implements SATPHandler {
+  constructor(
+    private session: SATPSession | undefined,
+    private serverService: Stage1ServerService,
+    private clientService: Stage1ClientService,
+    private supportedDLTs: SupportedGatewayImplementations[]
+  ) {}
+
+  setupRouter(router: ConnectRouter): void {
     router.service(SatpStage1Service, {
-      async transferProposal(
-        req: TransferProposalRequestMessage,
-        context: HandlerContext,
-      ) {
-        console.log("Received TransferProposalRequest", req, context);
-        const recvTimestamp: string = Date.now().toString();
-
-        const sessionData =
-          await serverService.checkTransferProposalRequestMessage(req, session, supportedDLTs);
-
-        saveTimestamp(
-          sessionData,
-          MessageType.INIT_PROPOSAL,
-          TimestampType.RECEIVED,
-          recvTimestamp,
-        );
-
-        const message = await serverService.transferProposalResponse(
-          req,
-          session,
-        );
-
-        if (!message) {
-          throw new Error("No message returned from transferProposalResponse");
+      transferProposal: async (req: TransferProposalRequestMessage, context: HandlerContext) => {
+        try {
+          console.log("Received TransferProposalRequest", req, context);
+          const sessionData = await this.serverService.checkTransferProposalRequestMessage(req, this.session, this.supportedDLTs);
+          const message = await this.serverService.transferProposalResponse(req, this.session);
+          console.log("Returning response", message);
+          return message;
+        } catch (error) {
+          console.error("Error handling TransferProposalRequest:", error);
+          throw new Error("Failed to process TransferProposalRequest");
         }
-
-        /*
-        if (reject) {
-          saveTimestamp(
-            sessionData,
-            MessageType.INIT_REJECT,
-            TimestampType.PROCESSED,
-          );
-        } else {
-          saveTimestamp(
-            sessionData,
-            MessageType.INIT_RECEIPT,
-            TimestampType.PROCESSED,
-          );
-        }
-        */
-        console.log("Returning response", message);
-
-        return message;
       },
-
-      // TODO phase, step
-      async transferCommence(
-        req: TransferCommenceRequestMessage,
-        context: HandlerContext,
-      ) {
-        console.log("Received TransferCommenceRequest", req, context);
-        const recvTimestamp: string = Date.now().toString();
-
-        const sessionData = await serverService.checkTransferCommenceRequestMessage(
-          req,
-          session,
-        );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_REQUEST,
-          TimestampType.RECEIVED,
-          recvTimestamp,
-        );
-
-        const message = await serverService.transferCommenceResponse(req, session);
-
-        if (!message) {
-          throw new Error("No message returned from transferProposalResponse");
+      transferCommence: async (req: TransferCommenceRequestMessage, context: HandlerContext) => {
+        try {
+          console.log("Received TransferCommenceRequest", req, context);
+          const sessionData = await this.serverService.checkTransferCommenceRequestMessage(req, this.session);
+          const message = await this.serverService.transferCommenceResponse(req, this.session);
+          console.log("Returning response", message);
+          return message;
+        } catch (error) {
+          console.error("Error handling TransferCommenceRequest:", error);
+          throw new Error("Failed to process TransferCommenceRequest");
         }
-
-        saveTimestamp(
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_RESPONSE,
-          TimestampType.PROCESSED,
-        );
-
-        console.log("Returning response", message);
-
-        return message;
-      },
+      }
     });
+  }
+
+  getHandlerIdentifier(): string {
+    return "Stage1SATPHandler";
+  }
+}
