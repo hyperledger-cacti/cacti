@@ -16,27 +16,41 @@ import {
 } from "../../../gateway-utils";
 import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
 import { SATPSession } from "../../../core/satp-session";
-import { SATPService, ISATPClientServiceOptions } from "../../../types/satp-protocol";
+import { SATPService, ISATPClientServiceOptions, SATPServiceType } from "../../../types/satp-protocol";
 
 export class Stage2ClientService implements SATPService {
-  public static readonly CLASS_NAME = "Stage2Service-Client";
+  public static readonly CLASS_NAME = "client-service";
+  public static readonly SATP_STAGE = "stage-2";
+  public static readonly SATP_SERVICE_TYPE = SATPServiceType.Client;
+
   private _log: Logger;
   private signer: JsObjectSigner;
   
   constructor(ops: ISATPClientServiceOptions) {
-    const level = "INFO";
-    const label = Stage2ClientService.CLASS_NAME;
+    const level = ops.logLevel || "INFO";
+    const label = this.getServiceIdentifier();
     this._log = LoggerProvider.getOrCreate({ level, label });
     this.signer = ops.signer;
-
   }
 
   public get className(): string {
     return Stage2ClientService.CLASS_NAME;
   }
 
+  public get stage(): string {
+    return Stage2ClientService.SATP_STAGE;
+  }
+
   public get log(): Logger {
     return this._log;
+  }
+
+  public get serviceType(): SATPServiceType {
+    return SATPServiceType.Client;
+  }
+  
+  public getServiceIdentifier(): string {
+    return `${this.className}#${this.serviceType}`;
   }
 
   async lockAssertionRequest(
