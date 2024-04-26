@@ -6,7 +6,7 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 
-import { Stage1Handler } from "../../core/stage-handlers/stage1-handler";
+import { Stage1SATPHandler } from "../../core/stage-handlers/stage1-handler";
 import { Stage2Handler } from "../../core/stage-handlers/stage2-handler";
 import { Stage3Handler } from "../../core/stage-handlers/stage3-handler";
 import { Stage1ServerService } from "../../core/stage-services/server/stage1-server-service";
@@ -21,17 +21,18 @@ import { Stage1ClientService } from "../../core/stage-services/client/stage1-cli
 import { Stage2ClientService } from "../../core/stage-services/client/stage2-client-service";
 import { Stage3ClientService } from "../../core/stage-services/client/stage3-client-service";
 import { createConnectTransport } from "@connectrpc/connect-node";
-import { SATPService, ISATPServerServiceOptions } from "../../types/satp-protocol";
+import { SATPService, ISATPServerServiceOptions, ISATPServiceOptions, SATPHandler, SATPServiceType } from "../../types/satp-protocol";
 import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_connect";
 import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_connect";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
 import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_connect";
 import { PromiseClient as PromiseConnectClient, Transport as ConnectTransport, PromiseClient } from "@connectrpc/connect";
+import { Session } from "inspector";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
   instanceId: string;
-  sessions?: Map<string, SATPSession[]>;
+  sessions?: Map<string, SATPSession>;
   signer: JsObjectSigner;
   supportedDLTs: SupportedGatewayImplementations[];
   connectClients: PromiseConnectClient<SATPServiceClient>[];
@@ -49,68 +50,59 @@ export class SATPManager {
   private signer: JsObjectSigner;
   private connectClients: PromiseConnectClient<SATPServiceClient>[];
   public supportedDLTs: SupportedGatewayImplementations[] = [];
-  protected sessions?: Map<string, SATPSession[]>;
+  private sessions: Map<string, SATPSession>;
 
-  private readonly stage1ServerService: SATPService;
-  private readonly stage2ServerService: SATPService;
-  private readonly stage3ServerService: SATPService;
-  private readonly stage1ClientService: SATPService;
-  private readonly stage2ClientService: SATPService;
-  private readonly stage3ClientService: SATPService;
+  private readonly satpServices: SATPService[] = [];
+  private readonly satpHandlers: SATPHandler[] = [];
 
-  constructor(
-    public readonly options: ISATPManagerOptions,
-  ) {
-    const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
-    Checks.truthy(options, `${fnTag} arg options`);
+    constructor(
+      public readonly options: ISATPManagerOptions,
+    ) {
+      const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
+      Checks.truthy(options, `${fnTag} arg options`);
 
-    const level = this.options.logLevel || "DEBUG";
-    const label = this.className;
-    this.logger = LoggerProvider.getOrCreate({ level, label });
-    this.instanceId = options.instanceId;
-    this.logger.info(`Instantiated ${this.className} OK`);
-    this.supportedDLTs = options.supportedDLTs;
-    this.signer = options.signer;
+      const level = this.options.logLevel || "DEBUG";
+      const label = this.className;
+      this.logger = LoggerProvider.getOrCreate({ level, label });
+      this.instanceId = options.instanceId;
+      this.logger.info(`Instantiated ${this.className} OK`);
+      this.supportedDLTs = options.supportedDLTs;
+      this.signer = options.signer;
 
-    this.sessions = options.sessions;
+      this.sessions = options.sessions || new Map<string, SATPSession>();
 
-    const satpServiceOptions: ISATPServerServiceOptions = {
-      signer: this.signer,
-    };
-      // create clients
+      this.connectClients = options.connectClients;
+      if (this.connectClients == undefined || this.connectClients.length == 0) {
+        this.logger.warn("Connect clients not provided");
+      }
 
-    const satpServiceOptionsClient: ISATPServerServiceOptions = {
-      signer: this.signer,
-
-    };
-    this.connectClients = options.connectClients;
-    if (this.connectClients == undefined || this.connectClients.length == 0) {
-      this.logger.warn("Connect clients not provided");
+      const serviceClasses = [Stage1ServerService, Stage2ServerService, Stage3ServerService, Stage1ClientService, Stage2ClientService, Stage3ClientService];
+      const satpServiceOptions: ISATPServiceOptions = { signer: this.signer, logLevel: level };
+      this.satpServices = serviceClasses.map(ServiceClass => new ServiceClass(satpServiceOptions));
+      
+      let mockSession = this.getOrCreateSession()
+      const stage1Handler = new Stage1SATPHandler(mockSession, this.getServiceByStage(SATPServiceType.Server, "stage-1"), this.getServiceByStage(SATPServiceType.Client, "stage-1"), this.supportedDLTs);
+      stage1Handler.setupRouter(router);        
+      
+      
     }
 
-    this.stage1ServerService = new Stage1ServerService(satpServiceOptions);
-    this.stage2ServerService = new Stage2ServerService(satpServiceOptions);
-    this.stage3ServerService = new Stage3ServerService(satpServiceOptions);
-    this.stage1ClientService = new Stage1ClientService(satpServiceOptionsClient);
-    this.stage2ClientService = new Stage2ClientService(satpServiceOptionsClient);
-    this.stage3ClientService = new Stage3ClientService(satpServiceOptionsClient);
-
-    /*
-     Stage1Handler(this.sessions, this.stage1ServerService, this.stage1ClientService, this.connectClients),
-      Stage2Handler(this.gateway, this.stage2Service),
-      Stage3Handler(this.gateway, this.stage3Service),
-    */	
+  public getServiceByStage(serviceType: SATPServiceType, stageId: string): any {
+    return this.satpServices.find(service => 
+      service.serviceType === serviceType && 
+      service.stage === stageId
+    );
   }
 
   public get className(): string {
     return SATPManager.CLASS_NAME;
   }
 
-  public getSessions(): Map<string, SATPSession[]> | undefined {
+  public getSessions(): Map<string, SATPSession> | undefined {
     return this.sessions;
   }
 
-  public getSession(sessionId: string): SATPSession[] | undefined {
+  public getSession(sessionId: string): SATPSession | undefined {
     if (this.sessions == undefined) {
       return undefined;
     }
@@ -121,23 +113,22 @@ export class SATPManager {
     return this.supportedDLTs;
   }
   
-  public addSession(sessionId: string, contextID: string): void {
-    if (this.sessions == undefined) {
-      this.sessions = new Map<string, SATPSession[]>();
-    } else {
-    const existingSessions = this.sessions.get(sessionId);
-      const sessionOps: ISATPSessionOptions = {
-          contextID: contextID,
-        }; 
-      if (existingSessions) {
-
-        existingSessions.push(new SATPSession(sessionOps));
-        this.sessions.set(sessionId, existingSessions);
-      } else {
-        this.sessions.set(sessionId, [new SATPSession(sessionOps)]);
-      }
+  public getOrCreateSession(sessionId?: string, contextID?: string): SATPSession {
+    let session: SATPSession;
+    if (!sessionId) {
+      return this.createNewSession(contextID || "MOCK_CONTEXT_ID");
+      return session;
+    } else  {
+      let existingSession = this.sessions.get(sessionId);
+      return existingSession || this.createNewSession("MOCK_CONTEXT_ID");
     }
-  }
+   }
+  
+   private createNewSession(contextID: string): SATPSession  {
+      let session = new SATPSession({ contextID: contextID });
+      this.sessions?.set(session.getSessionData().id, session);
+      return session
+   }
 
   getOrCreateServices() {
     const fnTag = `${SATPManager.CLASS_NAME}#getOrCreateServices()`;
@@ -148,17 +139,11 @@ export class SATPManager {
       return this.endpoints;
     }
 
-    this.endpoints = [
-
-    ];
-
+    this.endpoints = this.satpHandlers;
     return this.endpoints;
   }
 
     get StageHandlers() {
       throw new Error("Not implemented yet");
   }
-
-  // methods to dynamically add/remove connect clients
-
 }
