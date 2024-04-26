@@ -13,18 +13,12 @@ export class SATPSession {
   constructor(ops: ISATPSessionOptions) {
     this.sessionData = new SessionData();
     this.sessionData.transferContextId = ops.contextID;
-
-    // TODO algorithm to create session ID from context ID
-    this.sessionData.id = ops.contextID + "-" + uuidv4();
+    this.sessionData.id = this.generateSessionID();
 
   }
 
-  private initializeSessionID(): void {
-    if (this.sessionData.id === undefined) {
-      this.sessionData.id = uuidv4() + "-" + this.sessionData.transferContextId;
-    } else {
-      throw new Error("Session ID already initialized");
-    }
+  private generateSessionID(): string {
+    return this.sessionData.id = uuidv4() + "-" + this.sessionData.transferContextId;
   }
 
   public getSessionData(): SessionData {
