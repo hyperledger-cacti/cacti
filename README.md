@@ -62,4 +62,4 @@ We welcome contributions to Hyperledger Cacti in many forms, and there’s alway
 Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 
 ## License
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](/LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE](/LICENSE) file. 
