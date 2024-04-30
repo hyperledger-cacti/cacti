@@ -13,7 +13,7 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway";
 import OAS from "../../../json/openapi.json";
@@ -49,7 +49,7 @@ export class LockEvidenceResponseEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse"
+      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.path;
   }
@@ -57,7 +57,7 @@ export class LockEvidenceResponseEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse"
+      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
@@ -90,6 +90,7 @@ export class LockEvidenceResponseEndpointV1 implements IWebServiceEndpoint {
   }
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
+    const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
@@ -97,10 +98,9 @@ export class LockEvidenceResponseEndpointV1 implements IWebServiceEndpoint {
       res.status(200).json("OK");
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
+
     }
   }
 }
