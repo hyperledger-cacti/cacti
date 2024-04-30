@@ -7,13 +7,20 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployC
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.FlowStatusV1Responses
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetFlowCidV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetFlowCidV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListCpiV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListCpiV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeInfo
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartFlowV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartFlowV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Request
@@ -51,6 +58,17 @@ interface ApiPluginLedgerConnectorCordaService {
     fun diagnoseNodeV1(diagnoseNodeV1Request: DiagnoseNodeV1Request?): DiagnoseNodeV1Response
 
     /**
+     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/getFlowCid : This method gets the current status of the specified flow instance.
+     *
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance. (required)
+     * @return OK (status code 200)
+     *         or Unauthorized (status code 401)
+     *         or Forbidden (status code 403)
+     * @see ApiPluginLedgerConnectorCorda#getFlowV1
+     */
+    fun getFlowV1(getFlowCidV1Request: GetFlowCidV1Request): GetFlowCidV1Response
+
+    /**
      * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions : Get transactions for monitored state classes.
      *
      * @param getMonitorTransactionsV1Request  (optional)
@@ -77,6 +95,26 @@ interface ApiPluginLedgerConnectorCordaService {
     fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request?): InvokeContractV1Response
 
     /**
+     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/listCPI : List all CPIs uploaded to the cluster
+     *
+     * @param listCpiV1Request  (required)
+     * @return OK (status code 200)
+     * @see ApiPluginLedgerConnectorCorda#listCpiV1
+     */
+    fun listCpiV1(listCpiV1Request: ListCpiV1Request): ListCpiV1Response
+
+    /**
+     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/listFlows : This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     *
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance. (required)
+     * @return OK (status code 200)
+     *         or Unauthorized (status code 401)
+     *         or Forbidden (status code 403)
+     * @see ApiPluginLedgerConnectorCorda#listFlowV1
+     */
+    fun listFlowV1(getFlowCidV1Request: GetFlowCidV1Request): FlowStatusV1Responses
+
+    /**
      * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows
      * Responds with a list of the flows on the Corda node.
      *
@@ -95,6 +133,15 @@ interface ApiPluginLedgerConnectorCordaService {
      * @see ApiPluginLedgerConnectorCorda#networkMapV1
      */
     fun networkMapV1(body: kotlin.Any?): List<NodeInfo>
+
+    /**
+     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/startFlow : This method starts a new instance for the specified flow for the specified holding identity.
+     *
+     * @param startFlowV1Request Request body for starting a flow (required)
+     * @return OK (status code 200)
+     * @see ApiPluginLedgerConnectorCorda#startFlowV1
+     */
+    fun startFlowV1(startFlowV1Request: StartFlowV1Request): StartFlowV1Response
 
     /**
      * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor : Start monitoring corda changes (transactions) of given state class

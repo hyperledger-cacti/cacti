@@ -2,8 +2,14 @@ import { Server } from "http";
 import { Server as SecureServer } from "https";
 import { Config as SshConfig } from "node-ssh";
 import { Express } from "express";
-
 import OAS from "../json/openapi.json";
+import {
+  ListCpiV1Response,
+  StartFlowV1Request,
+  GetFlowCidV1Response,
+  GetFlowCidV1Request,
+  ListCpiV1Request,
+} from "./generated/openapi/typescript-axios";
 
 import {
   IPluginLedgerConnector,
@@ -32,6 +38,19 @@ import {
   IInvokeContractEndpointV1Options,
   InvokeContractEndpointV1,
 } from "./web-services/invoke-contract-endpoint-v1";
+
+import {
+  IListCPIEndpointV1Options,
+  ListCPIEndpointV1,
+} from "./web-services/list-cpi-endpoint-v1";
+import {
+  IFlowStatusEndpointV1Options,
+  FlowStatusEndpointV1,
+} from "./web-services/list-flow-endpoint-v1";
+import {
+  IFlowStatusResponseEndpointV1Options,
+  FlowStatusResponseEndpointV1,
+} from "./web-services/get-flow-endpoint-v1";
 import {
   IListFlowsEndpointV1Options,
   ListFlowsEndpointV1,
@@ -44,9 +63,20 @@ import {
   IDiagnoseNodeEndpointV1Options,
   DiagnoseNodeEndpointV1,
 } from "./web-services/diagnose-node-endpoint-v1";
-
+import {
+  IStartFlowEndpointV1Options,
+  StartFlowEndpointV1,
+} from "./web-services/start-flow-endpoint-v1";
 import fs from "fs";
-
+import fetch from "node-fetch";
+import https from "https";
+export enum CordaVersion {
+  CORDA_V4X = "CORDA_V4X",
+  CORDA_V5 = "CORDA_V5X",
+}
+import dotenv from "dotenv";
+import * as path from "path";
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -56,6 +86,9 @@ export interface IPluginLedgerConnectorCordaOptions
   cordaStartCmd?: string;
   cordaStopCmd?: string;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  holdingIDShortHash?: any;
+  clientRequestID?: any;
   /**
    * Path to the file where the private key for the ssh configuration is located
    * This property is optional. Its use is not recommended for most cases, it will override the privateKey property of the sshConfigAdminShell.
@@ -66,14 +99,20 @@ export interface IPluginLedgerConnectorCordaOptions
 }
 
 export class PluginLedgerConnectorCorda
-  implements IPluginLedgerConnector<any, any, any, any>, IPluginWebService
+  implements
+    IPluginLedgerConnector<
+      GetFlowCidV1Response,
+      StartFlowV1Request,
+      ListCpiV1Response,
+      any
+    >,
+    IPluginWebService
 {
   public static readonly CLASS_NAME = "DeployContractJarsEndpoint";
 
   private readonly instanceId: string;
   private readonly log: Logger;
   public prometheusExporter: PrometheusExporter;
-
   private endpoints: IWebServiceEndpoint[] | undefined;
 
   public get className(): string {
@@ -204,7 +243,6 @@ export class PluginLedgerConnectorCorda
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoints.push(endpoint);
     }
-
     {
       const opts: IListFlowsEndpointV1Options = {
         apiUrl: this.options.apiUrl,
@@ -232,6 +270,47 @@ export class PluginLedgerConnectorCorda
       endpoints.push(endpoint);
     }
 
+    {
+      const opts: IListCPIEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        connector: this,
+      };
+      const endpoint = new ListCPIEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IFlowStatusEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        holdingIDShortHash: this.options.holdingIDShortHash,
+        connector: this,
+      };
+      const endpoint = new FlowStatusEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IFlowStatusResponseEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        holdingIDShortHash: this.options.holdingIDShortHash,
+        clientRequestID: this.options.clientRequestID,
+        connector: this,
+      };
+      const endpoint = new FlowStatusResponseEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+    {
+      const opts: IStartFlowEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        connector: this,
+      };
+      const endpoint = new StartFlowEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
   }
@@ -242,5 +321,170 @@ export class PluginLedgerConnectorCorda
 
   public async getFlowList(): Promise<string[]> {
     return ["getFlowList()_NOT_IMPLEMENTED"];
+  }
+
+  private async setupRequest(
+    username: string,
+    password: string,
+  ): Promise<{ headers: any; agent: any }> {
+    const authString = Buffer.from(`${username}:${password}`).toString(
+      "base64",
+    );
+    const headers = { Authorization: `Basic ${authString}` };
+    const rejectUnauthorized = process.env.REJECT_UNAUTHORIZED !== "false";
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized,
+    });
+    return { headers, agent: httpsAgent };
+  }
+
+  public async startFlow(req: StartFlowV1Request): Promise<any> {
+    try {
+      const { headers, agent } = await this.setupRequest(
+        req.username,
+        req.password,
+      );
+      const holdingIDShortHash = req.holdingIDShortHash;
+      const cordaReq = {
+        clientRequestId: req.clientRequestId,
+        flowClassName: req.flowClassName,
+        requestBody: req.requestBody,
+      };
+      const cordaReqBuff = Buffer.from(JSON.stringify(cordaReq));
+      const response = await fetch(`${req.baseUrl}flow/${holdingIDShortHash}`, {
+        method: `POST`,
+        headers,
+        body: cordaReqBuff,
+        agent,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData = await this.pollEndpointUntilCompleted(
+        req.holdingIDShortHash!,
+        req.clientRequestId,
+      );
+      return responseData;
+    } catch (error) {
+      console.error("Error starting flow:", error);
+      throw error;
+    }
+  }
+
+  public async listCPI(req: ListCpiV1Request): Promise<any> {
+    try {
+      const { headers, agent } = await this.setupRequest(
+        req.username,
+        req.password,
+      );
+      const response = await fetch(`${req.baseUrl}cpi`, {
+        method: `GET`,
+        headers: headers,
+        agent,
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  public async getFlow(req: GetFlowCidV1Request): Promise<any> {
+    try {
+      const { headers, agent } = await this.setupRequest(
+        req.username,
+        req.password,
+      );
+      const holdingIDShortHash = req.holdingIDShortHash;
+      const clientRequestId = req.clientRequestId;
+      const response = await fetch(
+        `${req.baseUrl}flow/${holdingIDShortHash}/${clientRequestId}`,
+        {
+          method: `GET`,
+          headers: headers,
+          agent,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  public async listFlows(req: GetFlowCidV1Request): Promise<any> {
+    try {
+      const { headers, agent } = await this.setupRequest(
+        req.username,
+        req.password,
+      );
+      const holdingIDShortHash = req.holdingIDShortHash;
+      const response = await fetch(`${req.baseUrl}flow/${holdingIDShortHash}`, {
+        method: `GET`,
+        headers: headers,
+        agent,
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  public async pollEndpointUntilCompleted(
+    shortHash: string,
+    clientRequestId: string,
+    interval = 5000,
+    maxAttempts = 10,
+  ): Promise<GetFlowCidV1Response> {
+    return new Promise<GetFlowCidV1Response>(async (resolve, reject) => {
+      let attempts = 0;
+
+      const poll = async () => {
+        attempts++;
+        const queryVar: GetFlowCidV1Request = {
+          username: "admin",
+          password: "admin",
+          baseUrl: "https://127.0.0.1:8888/api/v1/",
+          holdingIDShortHash: shortHash,
+          clientRequestId,
+        };
+        try {
+          const response = await this.getFlow(queryVar);
+          if (response.flowStatus === "COMPLETED") {
+            resolve(response);
+          } else {
+            if (attempts < maxAttempts) {
+              setTimeout(poll, interval);
+            } else {
+              reject(
+                new Error(
+                  `Max attempts (${maxAttempts}) reached. Flow status not completed.`,
+                ),
+              );
+            }
+          }
+        } catch (error) {
+          if (attempts < maxAttempts) {
+            setTimeout(poll, interval);
+          } else {
+            reject(
+              new Error(
+                `Max attempts (${maxAttempts}) reached. Unable to get flow status.`,
+              ),
+            );
+          }
+        }
+      };
+
+      poll();
+    });
   }
 }

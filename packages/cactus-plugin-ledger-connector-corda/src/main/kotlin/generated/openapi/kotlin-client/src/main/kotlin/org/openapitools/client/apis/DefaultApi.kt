@@ -26,13 +26,20 @@ import org.openapitools.client.models.DeployContractJarsSuccessV1Response
 import org.openapitools.client.models.DeployContractJarsV1Request
 import org.openapitools.client.models.DiagnoseNodeV1Request
 import org.openapitools.client.models.DiagnoseNodeV1Response
+import org.openapitools.client.models.FlowStatusV1Responses
+import org.openapitools.client.models.GetFlowCidV1Request
+import org.openapitools.client.models.GetFlowCidV1Response
 import org.openapitools.client.models.GetMonitorTransactionsV1Request
 import org.openapitools.client.models.GetMonitorTransactionsV1Response
 import org.openapitools.client.models.InvokeContractV1Request
 import org.openapitools.client.models.InvokeContractV1Response
+import org.openapitools.client.models.ListCpiV1Request
+import org.openapitools.client.models.ListCpiV1Response
 import org.openapitools.client.models.ListFlowsV1Request
 import org.openapitools.client.models.ListFlowsV1Response
 import org.openapitools.client.models.NodeInfo
+import org.openapitools.client.models.StartFlowV1Request
+import org.openapitools.client.models.StartFlowV1Response
 import org.openapitools.client.models.StartMonitorV1Request
 import org.openapitools.client.models.StartMonitorV1Response
 import org.openapitools.client.models.StopMonitorV1Request
@@ -279,6 +286,77 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * This method gets the current status of the specified flow instance.
+     * 
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @return GetFlowCidV1Response
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun getFlowV1(getFlowCidV1Request: GetFlowCidV1Request) : GetFlowCidV1Response {
+        val localVarResponse = getFlowV1WithHttpInfo(getFlowCidV1Request = getFlowCidV1Request)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as GetFlowCidV1Response
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * This method gets the current status of the specified flow instance.
+     * 
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @return ApiResponse<GetFlowCidV1Response?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun getFlowV1WithHttpInfo(getFlowCidV1Request: GetFlowCidV1Request) : ApiResponse<GetFlowCidV1Response?> {
+        val localVariableConfig = getFlowV1RequestConfig(getFlowCidV1Request = getFlowCidV1Request)
+
+        return request<GetFlowCidV1Request, GetFlowCidV1Response>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation getFlowV1
+     *
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @return RequestConfig
+     */
+    fun getFlowV1RequestConfig(getFlowCidV1Request: GetFlowCidV1Request) : RequestConfig<GetFlowCidV1Request> {
+        val localVariableBody = getFlowCidV1Request
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/getFlowCid",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
      * Get transactions for monitored state classes.
      * 
      * @param getMonitorTransactionsV1Request  (optional)
@@ -490,6 +568,149 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * List all CPIs uploaded to the cluster
+     * 
+     * @param listCpiV1Request 
+     * @return ListCpiV1Response
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun listCpiV1(listCpiV1Request: ListCpiV1Request) : ListCpiV1Response {
+        val localVarResponse = listCpiV1WithHttpInfo(listCpiV1Request = listCpiV1Request)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as ListCpiV1Response
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * List all CPIs uploaded to the cluster
+     * 
+     * @param listCpiV1Request 
+     * @return ApiResponse<ListCpiV1Response?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun listCpiV1WithHttpInfo(listCpiV1Request: ListCpiV1Request) : ApiResponse<ListCpiV1Response?> {
+        val localVariableConfig = listCpiV1RequestConfig(listCpiV1Request = listCpiV1Request)
+
+        return request<ListCpiV1Request, ListCpiV1Response>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation listCpiV1
+     *
+     * @param listCpiV1Request 
+     * @return RequestConfig
+     */
+    fun listCpiV1RequestConfig(listCpiV1Request: ListCpiV1Request) : RequestConfig<ListCpiV1Request> {
+        val localVariableBody = listCpiV1Request
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json"
+
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/listCPI",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * 
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @return FlowStatusV1Responses
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun listFlowV1(getFlowCidV1Request: GetFlowCidV1Request) : FlowStatusV1Responses {
+        val localVarResponse = listFlowV1WithHttpInfo(getFlowCidV1Request = getFlowCidV1Request)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV1Responses
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * 
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @return ApiResponse<FlowStatusV1Responses?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun listFlowV1WithHttpInfo(getFlowCidV1Request: GetFlowCidV1Request) : ApiResponse<FlowStatusV1Responses?> {
+        val localVariableConfig = listFlowV1RequestConfig(getFlowCidV1Request = getFlowCidV1Request)
+
+        return request<GetFlowCidV1Request, FlowStatusV1Responses>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation listFlowV1
+     *
+     * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @return RequestConfig
+     */
+    fun listFlowV1RequestConfig(getFlowCidV1Request: GetFlowCidV1Request) : RequestConfig<GetFlowCidV1Request> {
+        val localVariableBody = getFlowCidV1Request
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/listFlows",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
      * 
      * Responds with a list of the flows on the Corda node.
      * @param listFlowsV1Request  (optional)
@@ -626,6 +847,78 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * This method starts a new instance for the specified flow for the specified holding identity.
+     * 
+     * @param startFlowV1Request Request body for starting a flow
+     * @return StartFlowV1Response
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun startFlowV1(startFlowV1Request: StartFlowV1Request) : StartFlowV1Response {
+        val localVarResponse = startFlowV1WithHttpInfo(startFlowV1Request = startFlowV1Request)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as StartFlowV1Response
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * This method starts a new instance for the specified flow for the specified holding identity.
+     * 
+     * @param startFlowV1Request Request body for starting a flow
+     * @return ApiResponse<StartFlowV1Response?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun startFlowV1WithHttpInfo(startFlowV1Request: StartFlowV1Request) : ApiResponse<StartFlowV1Response?> {
+        val localVariableConfig = startFlowV1RequestConfig(startFlowV1Request = startFlowV1Request)
+
+        return request<StartFlowV1Request, StartFlowV1Response>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation startFlowV1
+     *
+     * @param startFlowV1Request Request body for starting a flow
+     * @return RequestConfig
+     */
+    fun startFlowV1RequestConfig(startFlowV1Request: StartFlowV1Request) : RequestConfig<StartFlowV1Request> {
+        val localVariableBody = startFlowV1Request
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json"
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/startFlow",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
