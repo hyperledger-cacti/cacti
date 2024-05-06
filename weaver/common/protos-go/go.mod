@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/hyperledger/fabric-protos-go v0.3.0
 	google.golang.org/grpc v1.56.3
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
