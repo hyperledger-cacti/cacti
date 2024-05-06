@@ -87,7 +87,7 @@
     "uuid": "9.0.1",
     "web3": "1.6.1",
     "web3-core": "1.6.1",
-    "web3-utils": "1.6.1"
+    "web3-utils": "1.7.0"
   },
   "devDependencies": {
     "@aries-framework/askar": "0.5.0-alpha.58",
