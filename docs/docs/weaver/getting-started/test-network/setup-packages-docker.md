@@ -240,7 +240,7 @@ If you are using a Linux system, make sure that lib64 is installed.
 
 You can install `fabric-cli` as follows (for both the Node.js and Golang versions):
 
-- Navigate to the `weaver/samples/fabric/fabric-cli` folder (for the Node.js version) or the `weaver/samples/fabric/go-cli` folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` folder (for the Node.js version) or the `weaver/samples/fabric/go-cli` folder (for the Golang version).
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
   ```bash

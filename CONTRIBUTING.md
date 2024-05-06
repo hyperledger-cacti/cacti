@@ -22,19 +22,19 @@
   - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
   - [On Reproducible Builds](#on-reproducible-builds)
 
-Thank you for your interest to contribute to Hyperledger Cactus! :tada:
+Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
 
-There are many ways to contribute to Hyperledger Cactus, both as a user and as a developer.
+There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
 
 As a user, this can include:
-* [Making Feature/Enhancement Proposals](https://github.com/hyperledger/cactus/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
-* [Reporting bugs](https://github.com/hyperledger/cactus/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
+* [Making Feature/Enhancement Proposals](https://github.com/hyperledger/cacti/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
+* [Reporting bugs](https://github.com/hyperledger/cacti/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
 
 As a developer:
-* if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger/cactus/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger/cactus/labels/good%20first%20issue) task
-* If you can commit to full-time development, then please contact us on our [Rocketchat channel](https://chat.hyperledger.org/channel/cactus) to work through logistics!
+* if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger/cacti/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger/cacti/labels/good%20first%20issue) task
+* If you can commit to full-time development, then please contact us on our [Discord channel](https://discord.com/channels/905194001349627914/908379338716631050) to work through logistics!
 
 ## Git Know How / Reading List
 
@@ -52,7 +52,7 @@ A handy tool to avoid destroying other's work accidentally is the new(ish) git f
 Using `git push --force-with-lease` instead of vanilla `--force` is highly recommended: https://softwareengineering.stackexchange.com/a/312710
 
 The rustlang documentation has an excellent write-up and additional links on pretty much everything you need to know.
-The only difference between their PR requirements and Cactus' is that we do encourage people referencing github issues in commit messages.
+The only difference between their PR requirements and Cacti' is that we do encourage people referencing github issues in commit messages.
 Quoting the most relevant parts below (and thanks to the Rust maintainers for this).
 
 > Pull requests are the primary mechanism we use to change Rust. GitHub itself has some great documentation on using the Pull Request feature. We use the "fork and pull" model described here, where contributors push changes to their personal fork and create pull requests to bring those changes into the source repository.
@@ -73,7 +73,7 @@ Further reading:
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
-1. Fork [hyperledger/cactus](https://github.com/hyperledger/cactus) via Github UI
+1. Fork [hyperledger/cacti](https://github.com/hyperledger/cacti) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
      which you can do in PowerShell by executing the command below.
      To clarify, this may also apply if you are using any Git GUI application on Windows such as `Github Desktop` or others.
@@ -98,7 +98,7 @@ Further reading:
 7. Commit your changes
     1. Make sure your commit message follows the formatting requirements (details above) and here: [Conventional Commits syntax](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification); this aids in release notes generation which we intend to automate
     2. Be aware that we are using git commit hooks for the automation of certain mundane tasks such as applying the required code style and formatting so your code will be wrapped at 80 characters each line automatically. If you wish to see how your changes will be altered by the formatter you can run the `npm run prettier` command from a terminal or install an IDE extension for the `Prettier` tool that can do the same (VSCode has one that is known to work).
-8. Ensure your branch is rebased onto the `upstream` main branch where `upstream` is fancy git talk for the main Cactus repo on Github (the one you created your fork from).
+8. Ensure your branch is rebased onto the `upstream` main branch where `upstream` is fancy git talk for the main Cacti repo on Github (the one you created your fork from).
    1. **Do not** duplicate your pull request after it has been reviewed. Duplication here means closing the existing PR and then opening a brand new one which does not contain the review history anymore. If you encounter issues with version control that you do not know how to solve the maintainers will be happy to assist to ensure that you do not need to open a new pull request from scratch.
       1. The only exception from the rule above is if you mistakenly named your branch to contain special characters and somehow ended up in a state where it has become impossible to push changes to the remote due to this (which has happened before with branch names like `refactor(core-api): x` that had to  be renamed to `refactor-core-api-x` and then a new PR had to be created in that case because GitHub does not let you rename the remote branch that your pull request is tied to)
    2. If you are having trouble, there are many great resources out there (so we will not write another here).
@@ -115,7 +115,7 @@ Further reading:
 11. Await CI, DCO & linting quality checks, as well as any feedback from reviewers
 12. If you need to update your pull request either because you discovered an issue or because you were asked to do so we ask that you:
    9.  try to add the change in a way that does not produce additional commits on the PR but instead do an `git commit --amend --signoff` on your local branch and then a force push to the remote branch of yours (the PR essentially). Again, if the change you are doing does not fit within any one of the existing commits of your PR, then it is justified to add a new commit and this is up to your discretion (maintainers may respectfully ask you to squash if they see otherwise)
-   10. The rule of thumb for any and all things in git/Cactus is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of `Who? / What? / When / Why?`. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message 'merge xyz', then you know exactly what it is we are trying to avoid here. :-)
+   10. The rule of thumb for any and all things in git/Cacti is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of `Who? / What? / When / Why?`. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message 'merge xyz', then you know exactly what it is we are trying to avoid here. :-)
 
 ## PR Checklist - Maintainer/Reviewer
 
@@ -131,7 +131,7 @@ Ensure all the following conditions are met (on top of you agreeing with the cha
    2. To avoid the hassle/potential issues with the above, it is recommended that you always use 'rebase' when accepting a pull request even if there are multiple commits that you'd otherwise like to see squashed.
    3. If you are adamant that you do not want to merge a PR with multiple commits, that is completely understandable and fair game. The recommended approach there is to ask the contributor to break the pull request up to multiple pull requests by doing an interactive rebase on their branch and cherry picking/re-ordering things accordingly. This is a fairly advanced git use case so you might want to help them out with it (or ask Peter who is the one constantly nagging everyone about these git rules...)
 
-To protect the Hyperledger Cactus source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.
+To protect the Hyperledger Cacti source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.
 
 ## Create local branch
 
@@ -141,7 +141,7 @@ To protect the Hyperledger Cactus source code, GitHub pull requests are accepted
 2. Setup your local fork to keep up-to-date (optional)
    ```
    # Add 'upstream' repo to list of remotes
-   git remote add upstream https://github.com/hyperledger/cactus.git
+   git remote add upstream https://github.com/hyperledger/cacti.git
 
    # Verify the new remote named 'upstream'
    git remote -v
@@ -176,18 +176,19 @@ To protect the Hyperledger Cactus source code, GitHub pull requests are accepted
 6. Once you've committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.
 7. Repeat step 3 to 6 when you need to prepare posting new pull request.
 
-NOTE: Once you submitted pull request to Cactus repository, step 6 is not necessary when you made further changes with `git commit --amend` since your amends will be sent automatically.
+NOTE: Once you submitted pull request to Cacti repository, step 6 is not necessary when you made further changes with `git commit --amend` since your amends will be sent automatically.
 
 NOTE: You can refer original tutorial ['GitHub Standard Fork & Pull Request Workflow'](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
 
 ### Directory structure
 
-Whenever you begin to use your codes on Hyperledger Cactus, you should follow the directory strecture on Hyperledger Cactus.
+Whenever you begin to use your codes on Hyperledger Cacti, you should follow the directory strecture on Hyperledger Cacti.
 The current directory structure is described as the following:
 
-> - contrib/ : Contributions from each participants, which are not directly dependent on Cactus code.
+> - contrib/ : Contributions from each participants, which are not directly dependent on Cacti code.
 >   - Fujitsu-ConnectionChain/
 >   - Accenture-BIF/
+>   - IBM-Weaver/
 > - docs/
 >   - API/
 >     - business-logic-plugin.md
@@ -336,7 +337,7 @@ below applies to all tests regardless of their nature.
 There are additional details about this in the [BUILD.md](./BUILD.md) file in
 the project root as well.
 
-We use Lerna for managing the [monorepo](https://blog.npmjs.org/post/186494959890/monorepos-and-npm) that is Cactus.
+We use Lerna for managing the [monorepo](https://blog.npmjs.org/post/186494959890/monorepos-and-npm) that is Cacti.
 
 > We heavily rely on Docker for testing the ledger plugins.
 
@@ -438,7 +439,7 @@ The specific classes that utilize the `all-in-one` images can be found in the
 Ledger plugin tests are written the same way as any other test (which is difficult to achieve, but we thrive to get it done).
 
 The only difference between a ledger connector plugin test case and any unit test is that the ledger connector plugin's
-test case will pull up a docker container from one of the `all-in-one` images that we maintain as part of Cactus and then
+test case will pull up a docker container from one of the `all-in-one` images that we maintain as part of Cacti and then
 use that `all-in-one-*` container to verify things such as the ability of the ledger connector plugin to deploy a
 contract to said ledger.
 
@@ -496,7 +497,7 @@ npx tap --ts --jobs=1 --timeout=600 \"./\"
 ```
 
 > Be aware that glob patterns need quoting in some operating system's shell environments and not necessarily on others.
-> In the npm scripts Cactus uses we quote all of them to ensure a wider shell compatibility.
+> In the npm scripts Cacti uses we quote all of them to ensure a wider shell compatibility.
 
 ### Building the API Client(S)
 
@@ -519,7 +520,7 @@ to maintain two (or more) separate API client codebases for the various platform
 Example:
 
 ```sh
-# Adds "got" as a dependency to the cactus common package
+# Adds "got" as a dependency to the `cactus-common` package
 # Note that you must specify the fully qualified package name as present in
 # the package.json file
 yarn workspace @hyperledger/cactus-common add got --save-exact

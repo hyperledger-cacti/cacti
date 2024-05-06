@@ -50,6 +50,7 @@ Before starting, make sure you have the following software installed on your hos
     go install google.golang.org/protobuf/cmd/protoc-gen-go
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
+
     | Notes |
     |:------|
     | The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps. |
