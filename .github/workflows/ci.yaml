@@ -973,6 +973,7 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-besu:
+    permissions: write-all
     continue-on-error: false
     needs:
       - build-dev
@@ -1002,6 +1003,38 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+      
+      - name: Ensure .tmp Directory Exists
+        run: mkdir -p .tmp/benchmark-results/plugin-ledger-connector-besu/
+
+     # Download previous benchmark result from cache (if exists)
+      - name: Download previous benchmark data
+        uses: actions/cache@v3.3.1
+        with:
+          path: .tmp/benchmark-results/plugin-ledger-connector-besu/
+          key: ${{ runner.os }}-benchmark
+
+      - name: Run Benchmarks
+        working-directory: ./packages/cactus-plugin-ledger-connector-besu/
+        run: yarn run benchmark
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1.19.2
+        with:
+          tool: 'benchmarkjs'
+          output-file-path: .tmp/benchmark-results/plugin-ledger-connector-besu/run-plugin-ledger-connector-besu-benchmark.ts.log
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Only push the benchmark results to gh-pages website if we are running on the main branch
+          # We do not want to clutter the benchmark results with intermediate results from PRs that could be drafts
+          auto-push: ${{ github.ref == 'refs/heads/main' }}
+
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '5%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@petermetz'
+
   cactus-plugin-ledger-connector-polkadot:
     continue-on-error: false
     env:
