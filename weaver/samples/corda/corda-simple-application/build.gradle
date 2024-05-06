@@ -16,6 +16,7 @@ buildscript {
         cacti_version = constants.getProperty("cactiVersion")  
         tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
         tokens_release_version = constants.getProperty('cordaTokenSDKVersion')      
+        clikt_version = constants.getProperty("cliktVersion")
     }
 
     repositories {

@@ -46,7 +46,7 @@ jobs:
               - 'weaver/common/protos/**'
               - 'weaver/common/protos-js/**'
               - 'weaver/sdks/fabric/interoperation-node-sdk/**'
-              - 'weaver/core/identity-management/**'
+              - 'weaver/core/identity-management/iin-agent/**'
 
             docs_changed:
               - '.github/workflows/test_weaver-node-pkgs.yaml'

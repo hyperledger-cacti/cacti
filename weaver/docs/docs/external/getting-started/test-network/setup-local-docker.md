@@ -48,6 +48,7 @@ Before starting, make sure you have the following software installed on your hos
     go install google.golang.org/protobuf/cmd/protoc-gen-go
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
+
     | Notes |
     |:------|
     | The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps. |
@@ -423,7 +424,7 @@ Navigate to the `weaver/core/relay` folder. Refer [here](#building-relay-image) 
   ```
 * The `.env.corda` and `.env.corda.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `Corda_Network` relay at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS), and update the following value:
   ```
-  DOCKER_IMAGE_NAME=weaver-relay-server
+  DOCKER_IMAGE_NAME=cacti-weaver-relay-server
   ```
 * Repeat the above step for `.env.corda2` or `.env.corda2.tls` in `docker/testnet-envs` directory, which contain environment variables for the `Corda_Network2` relay.
 * To deploy the relay server for `Corda_Network` without TLS, run:

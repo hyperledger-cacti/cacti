@@ -41,7 +41,7 @@ jobs:
               - './weaver/common/protos/**'
               - './weaver/common/protos-js/**'
               - './weaver/sdks/fabric/interoperation-node-sdk/**'
-              - './weaver/weaver/core/drivers/fabric-driver/**'
+              - './weaver/core/drivers/fabric-driver/**'
               - '.github/workflows/test_weaver-docker-build.yaml'
 
             corda_driver_changed:

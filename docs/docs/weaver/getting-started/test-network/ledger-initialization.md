@@ -123,7 +123,14 @@ Bootstrap the Corda networks and application states as follows (_the following i
       ```bash
       make initialise-vault-docker
       ```
-(Add a note about ignoring errors if only one of the two networks was launched, as the init command tries to initialize both networks.)
+    Even upon successful execution (as indicated by the console output), you may see errors of the following form:
+    ```
+    [ERROR] 07:51:17.206 [epollEventLoopGroup-19-1] client.exceptionCaught - AMQ214015: Failed to execute connection life cycle listener
+    java.util.concurrent.RejectedExecutionException: Task org.apache.activemq.artemis.utils.actors.ProcessorBase$$Lambda$34/681158875@666df796 rejected from java.util.concurrent.ThreadPoolExecutor@236f653f[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 6]
+           at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2063) ~[?:1.8.0_402]
+    ..........
+    ```
+    You can ignore these as they are transient errors that don't impact the operations.
 
 ### Next Steps
 
@@ -354,6 +361,14 @@ Bootstrap the Corda networks and application states as follows (_the following i
       ```bash
       make initialise-vault-asset-transfer-docker
       ```
+    Even upon successful execution (as indicated by the console output), you may see errors of the following form:
+    ```
+    [ERROR] 07:51:17.206 [epollEventLoopGroup-19-1] client.exceptionCaught - AMQ214015: Failed to execute connection life cycle listener
+    java.util.concurrent.RejectedExecutionException: Task org.apache.activemq.artemis.utils.actors.ProcessorBase$$Lambda$34/681158875@666df796 rejected from java.util.concurrent.ThreadPoolExecutor@236f653f[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 6]
+           at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2063) ~[?:1.8.0_402]
+    ..........
+    ```
+    You can ignore these as they are transient errors that don't impact the operations.
 
 ### Next Steps
 
