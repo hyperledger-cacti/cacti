@@ -89,9 +89,13 @@ export class Servers {
         const server = await Servers.startOnPort(preferredPort, host);
         return server;
       } catch (ex) {
-        // if something else went wrong we still want to just give up
-        if (!ex.message.includes("EADDRINUSE")) {
-          throw ex;
+        if (ex instanceof Error) {
+          if (!ex.message.includes("EADDRINUSE")) {
+            throw ex;
+          }
+        } else {
+          console.error("Unknown error occurred:", ex);
+          throw new Error("Unknown error occurred");
         }
       }
       return Servers.startOnPort(0);

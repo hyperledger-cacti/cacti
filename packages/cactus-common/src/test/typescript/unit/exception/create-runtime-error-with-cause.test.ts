@@ -14,7 +14,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw anError;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -43,7 +43,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw anError;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -69,7 +69,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw anError;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -97,7 +97,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw fakeErrorWithStack;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -129,7 +129,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw fakeErrorWithStack;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -152,7 +152,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw undefined;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -172,7 +172,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw null;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -192,7 +192,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw NaN;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -212,7 +212,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw 0;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -232,7 +232,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw {};
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -252,7 +252,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw [];
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -275,7 +275,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw [id1, id2, id3];
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -300,7 +300,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
     try {
       const symbolToThrow = Symbol(id1);
       throw symbolToThrow;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -326,7 +326,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
 
     try {
       throw maxSafeIntSquared;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -347,7 +347,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
     const eMsg = uuidV4();
     try {
       throw throwable;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
@@ -366,7 +366,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
     const eMsg = uuidV4();
     try {
       throw eMsg;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const rex = createRuntimeErrorWithCause(eMsg, ex);
       const { cause, message, name, stack } = rex;
       expect(cause).toBeInstanceOf(Error);
