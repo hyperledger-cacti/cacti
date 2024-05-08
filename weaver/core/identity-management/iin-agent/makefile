@@ -12,7 +12,7 @@ build: .npmrc
 	
 protos-js:
 	mkdir -p protos-js && \
-		cp -r ../../../common/protos-js/common ./protos-js/ && \
+		(cp -r ../../../common/protos-js/common ./protos-js/ && \
 		cp -r ../../../common/protos-js/corda ./protos-js/ && \
 		cp -r ../../../common/protos-js/driver ./protos-js/ && \
 		cp -r ../../../common/protos-js/identity ./protos-js/ && \
@@ -21,13 +21,15 @@ protos-js:
 		cp -r ../../../common/protos-js/networks ./protos-js/ && \
 		cp -r ../../../common/protos-js/peer ./protos-js/ && \
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
-		cp -r ../../../common/protos-js/package.json ./protos-js/
+		cp -r ../../../common/protos-js/package.json ./protos-js/) || \
+		(rm -rf protos-js && echo "Error: Please build weaver/common/protos-js locally" && exit 1)
 
 cacti-weaver-sdk-fabric:
 	mkdir -p cacti-weaver-sdk-fabric && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./cacti-weaver-sdk-fabric/ && \
+		(cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./cacti-weaver-sdk-fabric/ && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/index.js ./cacti-weaver-sdk-fabric/ && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/package.json ./cacti-weaver-sdk-fabric/package.json
+		cp -r ../../../sdks/fabric/interoperation-node-sdk/package.json ./cacti-weaver-sdk-fabric/package.json) || \
+		(rm -rf cacti-weaver-sdk-fabric && echo "Error: Please build weaver/sdks/fabric/interoperation-node-sdk locally" && exit 1)
 
 build-local: protos-js cacti-weaver-sdk-fabric
 	(cp package.json package-remote.json && \

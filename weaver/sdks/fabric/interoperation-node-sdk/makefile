@@ -6,7 +6,7 @@ build: .npmrc
 .PHONY: build-local
 build-local:
 	mkdir -p protos-js && \
-		cp -r ../../../common/protos-js/common ./protos-js/ && \
+		(cp -r ../../../common/protos-js/common ./protos-js/ && \
 		cp -r ../../../common/protos-js/corda ./protos-js/ && \
 		cp -r ../../../common/protos-js/driver ./protos-js/ && \
 		cp -r ../../../common/protos-js/fabric ./protos-js/ && \
@@ -15,7 +15,8 @@ build-local:
 		cp -r ../../../common/protos-js/peer ./protos-js/ && \
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
 		cp -r ../../../common/protos-js/identity ./protos-js/ && \
-		cp -r ../../../common/protos-js/package.json ./protos-js/
+		cp -r ../../../common/protos-js/package.json ./protos-js/) || \
+		(rm -rf protos-js && echo "Error: Please build weaver/common/protos-js locally" && exit 1)
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
 		npm install --workspaces=false && \
