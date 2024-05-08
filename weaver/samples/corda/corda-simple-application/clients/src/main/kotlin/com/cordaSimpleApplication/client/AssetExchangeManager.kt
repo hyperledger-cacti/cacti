@@ -30,6 +30,7 @@ import org.hyperledger.cacti.weaver.sdk.corda.AssetManager
 import org.hyperledger.cacti.weaver.sdk.corda.HashFunctions
 import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
+import com.cordaSimpleApplication.contract.BondAssetContract
 
 
 /**
@@ -94,8 +95,8 @@ class LockAssetCommand : CliktCommand(
                         hash, 
                         nTimeout,  
                         1,              // nTimeout represents Duration
-                        "com.cordaSimpleApplication.flow.RetrieveStateAndRef", 
-                        AssetContract.Commands.Delete(),
+                        "com.cordaSimpleApplication.flow.RetrieveBondAssetStateAndRef", 
+                        BondAssetContract.Commands.Delete(),
                         issuer
                     )
                 }
@@ -117,6 +118,7 @@ class ClaimAssetCommand : CliktCommand(help = "Claim a locked asset. Only Recipi
     val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for HTLC State")
     val hash_fn: String? by option("-hfn", "--hash-fn", help="Hash Function to be used. Default: SHA256")
     val secret: String? by option("-s", "--secret", help="Hash Pre-Image for the HTLC Claim")
+    val fungible: Boolean by option("-f", "--fungible", help="Fungible Asset Lock: True/False").flag(default = false)
     override fun run() = runBlocking {
         var hash: HashFunctions.Hash = HashFunctions.SHA256()
         if(hash_fn == "SHA256") {
@@ -135,14 +137,26 @@ class ClaimAssetCommand : CliktCommand(help = "Claim a locked asset. Only Recipi
             try {
                 val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 hash.setPreimage(secret!!)
-                val res = AssetManager.claimAssetInHTLC(
-                    rpc.proxy, 
-                    contractId!!, 
-                    hash,
-                    AssetContract.Commands.Issue(),
-                    "com.cordaSimpleApplication.flow.UpdateAssetOwnerFromPointer",
-                    issuer
-                )
+                var res: Any
+                if (fungible) {
+                  res = AssetManager.claimAssetInHTLC(
+                      rpc.proxy, 
+                      contractId!!, 
+                      hash,
+                      AssetContract.Commands.Issue(),
+                      "com.cordaSimpleApplication.flow.UpdateAssetOwnerFromPointer",
+                      issuer
+                  )
+                } else {
+                  res = AssetManager.claimAssetInHTLC(
+                      rpc.proxy, 
+                      contractId!!, 
+                      hash,
+                      BondAssetContract.Commands.Issue(),
+                      "com.cordaSimpleApplication.flow.UpdateBondAssetOwnerFromPointer",
+                      issuer
+                  )
+                }
                 println("Asset Claim Response: ${res}")
             } catch (e: Exception) {
               println("Error: ${e.toString()}")
@@ -159,6 +173,7 @@ class ClaimAssetCommand : CliktCommand(help = "Claim a locked asset. Only Recipi
 class UnlockAssetCommand : CliktCommand(help = "Unlocks a locked asset after timeout. Only lockers's call will work.") {
     val config by requireObject<Map<String, String>>()
     val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for HTLC State")
+      val fungible: Boolean by option("-f", "--fungible", help="Fungible Asset Lock: True/False").flag(default = false)
     override fun run() = runBlocking {
         if (contractId == null) {
             println("Arguments required: --contract-id.")
@@ -170,12 +185,22 @@ class UnlockAssetCommand : CliktCommand(help = "Unlocks a locked asset after tim
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
                 val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
-                val res = AssetManager.reclaimAssetInHTLC(
-                    rpc.proxy, 
-                    contractId!!,
-                    AssetContract.Commands.Issue(),
-                    issuer
-                )
+                var res: Any
+                if (fungible) {
+                  res = AssetManager.reclaimAssetInHTLC(
+                      rpc.proxy, 
+                      contractId!!,
+                      AssetContract.Commands.Issue(),
+                      issuer
+                  )
+                } else {
+                    res = AssetManager.reclaimAssetInHTLC(
+                        rpc.proxy, 
+                        contractId!!,
+                        BondAssetContract.Commands.Issue(),
+                        issuer
+                    )
+                }
                 println("Asset Unlock Response: ${res}")
             } catch (e: Exception) {
               println("Error: ${e.toString()}")
