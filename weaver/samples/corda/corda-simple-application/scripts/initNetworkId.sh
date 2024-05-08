@@ -35,7 +35,7 @@ then
 	then
 		MEMBERS+="O=PartyB, L=London, C=GB;"
 	fi
-	if [[ $(docker ps | grep corda_network2_partyb_1 | wc -l) == 1 ]]
+	if [[ $(docker ps | grep corda_network2_partyc_1 | wc -l) == 1 ]]
 	then
 		MEMBERS+="O=PartyC, L=London, C=GB;"
 	fi

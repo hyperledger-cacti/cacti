@@ -105,7 +105,7 @@ jobs:
           cat tmp.out
 
           # Claim asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset -cid $CID -s secrettext 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset -f -cid $CID -s secrettext 1> tmp.out
           cat tmp.out | grep "Asset Claim Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -121,7 +121,7 @@ jobs:
           cat tmp.out
 
           ## Unlock asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -f -cid $CID 1> tmp.out
           cat tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -201,7 +201,7 @@ jobs:
           cat tmp.out
 
           # Claim asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset -cid $CID -s secrettext 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset -f -cid $CID -s secrettext 1> tmp.out
           cat tmp.out | grep "Asset Claim Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -217,7 +217,7 @@ jobs:
           cat tmp.out
 
           ## Unlock asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -f -cid $CID 1> tmp.out
           cat tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
