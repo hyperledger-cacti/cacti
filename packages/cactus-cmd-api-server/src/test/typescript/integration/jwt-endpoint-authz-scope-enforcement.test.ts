@@ -139,7 +139,7 @@ describe(testCase, () => {
           Authorization: `Bearer ${token}`,
         },
       });
-    } catch (out: unknown) {
+    } catch (out) {
       if (axios.isAxiosError(out)) {
         expect(out).toBeTruthy();
         expect(out.response).toBeTruthy();

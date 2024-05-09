@@ -293,14 +293,14 @@ export class ApiServer {
         addressInfoGrpc,
         addressInfoCrpc,
       };
-    } catch (ex1: unknown) {
+    } catch (ex1) {
       const context = "Failed to start ApiServer";
       this.log.error(context, ex1);
       this.log.error(`Attempting shutdown...`);
       try {
         await this.shutdown();
         this.log.info(`Server shut down after crash OK`);
-      } catch (ex2: unknown) {
+      } catch (ex2) {
         this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex2);
       }
       throw newRex(context, ex1);
@@ -349,7 +349,7 @@ export class ApiServer {
         await this.getPluginImportsCount(),
       );
       return this.pluginRegistry;
-    } catch (ex: unknown) {
+    } catch (ex) {
       this.pluginRegistry = new PluginRegistry({ plugins: [] });
       const context = "Failed to init PluginRegistry";
       this.log.debug(context, ex);
@@ -413,7 +413,7 @@ export class ApiServer {
       await plugin.onPluginInit();
 
       return plugin;
-    } catch (ex: unknown) {
+    } catch (ex) {
       const context = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
       this.log.debug(context, ex);
       throw newRex(context, ex);
@@ -437,7 +437,7 @@ export class ApiServer {
     try {
       await fs.mkdirp(pluginPackageDir);
       this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
-    } catch (ex: unknown) {
+    } catch (ex) {
       const context =
         "Could not create plugin installation directory, check the file-system permissions.";
       throw newRex(context, ex);
@@ -464,7 +464,7 @@ export class ApiServer {
         throw newRex(eMsg, out);
       }
       this.log.info(`Installed ${pkgName} OK`);
-    } catch (ex: unknown) {
+    } catch (ex) {
       const context = `${fnTag} failed installing plugin '${pkgName}`;
       this.log.debug(ex, context);
       throw newRex(context, ex);
@@ -788,15 +788,15 @@ export class ApiServer {
 
       const grpcTlsCredentials = this.options.config.grpcMtlsEnabled
         ? GrpcServerCredentials.createSsl(
-            Buffer.from(this.options.config.apiTlsCertPem),
-            [
-              {
-                cert_chain: Buffer.from(this.options.config.apiTlsCertPem),
-                private_key: Buffer.from(this.options.config.apiTlsKeyPem),
-              },
-            ],
-            true,
-          )
+          Buffer.from(this.options.config.apiTlsCertPem),
+          [
+            {
+              cert_chain: Buffer.from(this.options.config.apiTlsCertPem),
+              private_key: Buffer.from(this.options.config.apiTlsKeyPem),
+            },
+          ],
+          true,
+        )
         : GrpcServerCredentials.createInsecure();
 
       this.grpcServer.addService(

@@ -245,7 +245,7 @@ const main = async (opts: { readonly argv: Readonly<Array<string>> }) => {
   console.log("%s Shut down API server OK", LOG_TAG);
 };
 
-main({ argv: process.argv }).catch((ex: unknown) => {
+main({ argv: process.argv }).catch((ex) => {
   console.error("%s process crashed with:", LOG_TAG, ex);
   process.exit(1);
 });
