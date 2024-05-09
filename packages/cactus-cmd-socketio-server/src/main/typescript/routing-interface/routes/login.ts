@@ -45,8 +45,12 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 
     res.status(201);
     res.send(respData);
-  } catch (err: any) {
-    logger.error(`##err name: ${err.constructor.name}`);
+  } catch (err) {
+
+    if (typeof err === 'object' && err !== null) { logger.error(`##err name: ${err.constructor.name}`); }
+
+
+
 
     if (err instanceof RIFError) {
       logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
