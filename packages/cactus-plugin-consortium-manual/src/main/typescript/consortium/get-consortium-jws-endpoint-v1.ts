@@ -19,6 +19,7 @@ import {
 import {
   registerWebServiceEndpoint,
   ConsortiumRepository,
+  handleRestEndpointException,
 } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
@@ -99,6 +100,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
 
   async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetConsortiumJwsEndpointV1#handleRequest()";
+    const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(`POST ${this.getPath()}`);
 
     try {
@@ -109,9 +111,10 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
       res.json(body);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+
+
     }
   }
 }
