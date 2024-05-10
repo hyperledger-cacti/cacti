@@ -96,7 +96,7 @@ export class GetAvailableStrategiesEndpointV1 implements IWebServiceEndpoint {
     try {
       const strategies = this.options.bungee.getAvailableStrategies();
       res.status(200).json(strategies);
-    } catch (ex: unknown) {
+    } catch (ex) {
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }

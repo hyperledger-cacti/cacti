@@ -96,7 +96,7 @@ export class GetPublicKeyEndpointV1 implements IWebServiceEndpoint {
     try {
       const pubKey = this.options.bungee.getPublicKey();
       res.status(200).json(pubKey);
-    } catch (ex: unknown) {
+    } catch (ex) {
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
