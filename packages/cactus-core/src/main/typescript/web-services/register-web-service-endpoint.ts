@@ -42,7 +42,7 @@ export async function registerWebServiceEndpoint(
     } else {
       registrationMethod(httpPath, requestHandler);
     }
-  } catch (ex: unknown) {
+  } catch (ex) {
     const errorMessage = `${fnTag} Express verb method ${httpVerb} threw while registering endpoint on path ${httpPath}`;
     throw createRuntimeErrorWithCause(errorMessage, ex);
   }

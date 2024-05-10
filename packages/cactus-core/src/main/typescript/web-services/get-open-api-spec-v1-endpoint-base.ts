@@ -179,7 +179,7 @@ export class GetOpenApiSpecV1EndpointBase<S, P> implements IWebServiceEndpoint {
       const { oas } = this.opts;
       res.status(200);
       res.json(oas);
-    } catch (ex: unknown) {
+    } catch (ex) {
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqMeta}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
