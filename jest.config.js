@@ -3,6 +3,9 @@ module.exports = {
   preset: "ts-jest",
   logHeapUsage: true,
   testEnvironment: "node",
+  moduleNameMapper: {
+    "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
+  },
   maxWorkers: 1,
   maxConcurrency: 1,
   setupFilesAfterEnv: ["jest-extended/all", "./jest.setup.console.logs.js"],
