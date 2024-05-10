@@ -18,8 +18,7 @@ export interface IDefaultConsortiumProviderOptions {
 }
 
 export class DefaultConsortiumProvider
-  implements IAsyncProvider<ConsortiumDatabase>
-{
+  implements IAsyncProvider<ConsortiumDatabase> {
   public static readonly CLASS_NAME = "DefaultConsortiumProvider";
 
   private readonly log: Logger;
@@ -64,9 +63,15 @@ export class DefaultConsortiumProvider
       const res = await this.options.apiClient.getConsortiumJwsV1();
       return this.parseConsortiumJws(res.data);
     } catch (ex) {
-      const innerException = (ex.toJSON && ex.toJSON()) || ex;
-      this.log.error(`Request for Consortium JWS failed: `, innerException);
-      throw ex;
+      if (ex instanceof Date && ex !== null) {
+        const innerException = (ex.toJSON && ex.toJSON())
+        this.log.error(`Request for Consortium JWS failed: `, innerException);
+        throw ex;
+      } else {
+        this.log.error(`Request for Consortium JWS failed: `, ex);
+        throw ex;
+      }
+
     }
   }
 }

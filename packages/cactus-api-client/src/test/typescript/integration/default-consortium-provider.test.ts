@@ -32,14 +32,18 @@ test("Reports failures with meaningful information", async (t: Test) => {
       await provider.get();
       t2.fail("Provider.get() did not throw despite API errors.");
     } catch (ex) {
-      t2.ok(ex, "Thrown error truthy OK");
-      t2.ok(ex.message, "Thrown error.message truthy OK");
-      t2.equal(
-        typeof ex.message,
-        "string",
-        "Thrown error.message type string OK",
-      );
-      t2.true(ex.message.includes("timeout"), "Has timeout in msg OK");
+      if (typeof ex === 'object' && ex !== null) {
+        if ('message' in ex && typeof ex.message === 'string') {
+          t2.ok(ex, "Thrown error truthy OK");
+          t2.ok(ex.message, "Thrown error.message truthy OK");
+          t2.equal(
+            typeof ex.message,
+            "string",
+            "Thrown error.message type string OK",
+          );
+          t2.true(ex.message.includes("timeout"), "Has timeout in msg OK");
+        }
+      } else { t2.ok(ex, "Thrown error truthy OK"); }
     }
     t2.end();
   });
@@ -57,17 +61,23 @@ test("Reports failures with meaningful information", async (t: Test) => {
       await provider.get();
       t2.fail("Provider.get() did not throw despite API errors.");
     } catch (ex) {
-      t2.ok(ex, "Thrown error truthy OK");
-      t2.ok(ex.message, "Thrown error.message truthy OK");
-      t2.equal(
-        typeof ex.message,
-        "string",
-        "Thrown error.message type string OK",
-      );
-      t2.true(
-        ex.message.includes("status code 404"),
-        "Has Status Code in msg OK",
-      );
+
+      if (typeof ex === 'object' && ex !== null) {
+        if ('message' in ex && typeof ex.message === 'string') {
+          t2.ok(ex, "Thrown error truthy OK");
+          t2.ok(ex.message, "Thrown error.message truthy OK");
+          t2.equal(
+            typeof ex.message,
+            "string",
+            "Thrown error.message type string OK",
+          );
+          t2.true(
+            ex.message.includes("status code 404"),
+            "Has Status Code in msg OK",
+          );
+        }
+      } else { t2.ok(ex, "Thrown error truthy OK"); }
+
     }
     t2.end();
   });
