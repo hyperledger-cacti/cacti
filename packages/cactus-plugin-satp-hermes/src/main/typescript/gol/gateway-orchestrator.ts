@@ -1,8 +1,21 @@
 // a helper class to manage connections to counterparty gateways
-import { ILoggerOptions, JsObjectSigner, LogLevelDesc, Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { GatewayIdentity, GatewayChannel, SupportedGatewayImplementations } from "../core/types";
-import { NonExistantGatewayIdentity } from "../core/errors";
-import { PromiseClient as PromiseConnectClient, Transport as ConnectTransport, PromiseClient } from "@connectrpc/connect";
+import {
+  ILoggerOptions,
+  JsObjectSigner,
+  LogLevelDesc,
+  Logger,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
+import {
+  GatewayIdentity,
+  GatewayChannel,
+  SupportedChain,
+  SATPServiceClient,
+} from "../core/types";
+import {
+  PromiseClient as PromiseConnectClient,
+  Transport as ConnectTransport,
+} from "@connectrpc/connect";
 
 import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
 import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
@@ -11,44 +24,31 @@ import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_con
 
 export interface IGatewayOrchestratorOptions {
   logLevel?: LogLevelDesc;
-  ourGateway: GatewayIdentity;
+  localGateway: GatewayIdentity;
   counterPartyGateways: GatewayIdentity[] | undefined;
   signer: JsObjectSigner;
 }
 
-import {
-  DEFAULT_PORT_GATEWAY_CLIENT,
-  DEFAULT_PORT_GATEWAY_GRPC,
-  DEFAULT_PORT_GATEWAY_SERVER,
-} from "../core/constants";
-
-import { BLODispatcher, BLODispatcherOptions } from "../blo/dispatcher";
 //import { COREDispatcher, COREDispatcherOptions } from "../core/dispatcher";
-import express, { Express } from "express";
-import http from "http";
-import { SATPSession } from "../core/satp-session";
-import { SessionData } from "../generated/proto/cacti/satp/v02/common/session_pb";
-import { Transport, createPromiseClient } from "@connectrpc/connect";
+import { createPromiseClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
-import { ISATPManagerOptions, SATPManager, SATPServiceClient } from "./protocol-manager/satp-manager";
-import { log } from "console";
-import { getGatewaySeeds, resolveGatewayID } from "../network-identification/resolve-gateway";
-import { timingSafeEqual } from "crypto";
-import { ServiceType } from "@bufbuild/protobuf";
+import {
+  getGatewaySeeds,
+  resolveGatewayID,
+} from "../network-identification/resolve-gateway";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
-  private ourGateway: GatewayIdentity;
+  protected localGateway: GatewayIdentity;
   private counterPartyGateways: Map<string, GatewayIdentity> = new Map();
+
+  // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   private channels: Map<string, GatewayChannel> = new Map();
   private readonly logger: Logger;
-  private signer: JsObjectSigner;
 
-  constructor(
-    options: IGatewayOrchestratorOptions,
-  ) {
+  constructor(options: IGatewayOrchestratorOptions) {
     // add checks
-    this.ourGateway = options.ourGateway;
+    this.localGateway = options.localGateway;
     const level = options.logLevel || "INFO";
     const logOptions: ILoggerOptions = {
       level: level,
@@ -62,8 +62,9 @@ export class GatewayOrchestrator {
     this.logger.info(
       `Initializing gateway connection manager with ${seedGateways} seed gateways`,
     );
-    this.signer = options.signer;
-    const allCounterPartyGateways = seedGateways.concat(options.counterPartyGateways ?? []);
+    const allCounterPartyGateways = seedGateways.concat(
+      options.counterPartyGateways ?? [],
+    );
     // populate counterPartyGateways
     this.counterPartyGateways = new Map(
       allCounterPartyGateways.map((gateway) => [gateway.id, gateway]),
@@ -72,7 +73,6 @@ export class GatewayOrchestrator {
     this.logger.info(
       `Gateway Connection Manager bootstrapped with ${allCounterPartyGateways.length} gateways`,
     );
-
 
     this.addGateways(allCounterPartyGateways);
     const numberGatewayChannels = this.connectToCounterPartyGateways();
@@ -84,6 +84,9 @@ export class GatewayOrchestrator {
     }
   }
 
+  public get ourGateway(): GatewayIdentity {
+    return this.localGateway;
+  }
   async startupGatewayOrchestrator(): Promise<void> {
     if (this.counterPartyGateways.values.length === 0) {
       this.logger.info("No gateways to connect to");
@@ -93,8 +96,11 @@ export class GatewayOrchestrator {
     }
   }
 
+  public getChannels(): Map<string, GatewayChannel> {
+    return this.channels;
+  }
   isSelfId(id: string): boolean {
-    return id === this.ourGateway.id;
+    return id === this.localGateway.id;
   }
 
   isInCounterPartyGateways(id: string): boolean {
@@ -107,17 +113,19 @@ export class GatewayOrchestrator {
 
   // Find IDs in counterPartyGateways that do not have a corresponding channel
   findUnchanneledGateways(): string[] {
-    return Array.from(this.counterPartyGateways.keys()).filter(id => {
+    return Array.from(this.counterPartyGateways.keys()).filter((id) => {
       return !this.isInChannels(id) && !this.isSelfId(id);
     });
   }
 
   // Filter IDs that are not present in counterPartyGateways or channels and not the self ID
   filterNewIds(ids: string[]): string[] {
-    return ids.filter(id => {
-      return !this.isInCounterPartyGateways(id) && 
-             !this.isInChannels(id) && 
-             !this.isSelfId(id);
+    return ids.filter((id) => {
+      return (
+        !this.isInCounterPartyGateways(id) &&
+        !this.isInChannels(id) &&
+        !this.isSelfId(id)
+      );
     });
   }
 
@@ -128,21 +136,25 @@ export class GatewayOrchestrator {
       return 0;
     }
 
-    const idsToAdd = this.filterNewIds(Array.from(this.counterPartyGateways.keys()));
+    const idsToAdd = this.filterNewIds(
+      Array.from(this.counterPartyGateways.keys()),
+    );
     if (idsToAdd.length === 0) {
       this.logger.info(`${fnTag}, No new gateways to connect to`);
       return 0;
     }
-    
+
     // get gateway identtiies from counterPartyGateways
-    const gatewaysToAdd = idsToAdd.map(id => this.counterPartyGateways.get(id)!);
+    const gatewaysToAdd = idsToAdd.map(
+      (id) => this.counterPartyGateways.get(id)!,
+    );
 
     let connected = 0;
     try {
       for (const gateway of gatewaysToAdd) {
-          const channel = this.createChannel(gateway);
-          this.channels.set(gateway.id, channel);
-          connected++;
+        const channel = this.createChannel(gateway);
+        this.channels.set(gateway.id, channel);
+        connected++;
       }
     } catch (ex) {
       this.logger.error(`${fnTag}, Failed to connect to gateway`);
@@ -151,40 +163,40 @@ export class GatewayOrchestrator {
     return connected;
   }
 
-  get supportedDLTs(): SupportedGatewayImplementations[] {
-     return this.ourGateway.supportedChains;
+  get supportedDLTs(): SupportedChain[] {
+    return this.localGateway.supportedDLTs;
   }
 
   createChannel(identity: GatewayIdentity): GatewayChannel {
     const clients = this.createConnectClients(identity);
 
-    const SATPManagerOpts: ISATPManagerOptions = {
-        logLevel: "DEBUG",
-        instanceId: this.ourGateway!.id,
-        signer: this.signer,
-        supportedDLTs: this.supportedDLTs,
-        connectClients: clients,
-      };
-
-    const manager = new SATPManager(SATPManagerOpts);
-
     const channel: GatewayChannel = {
-      fromGatewayID: this.ourGateway.id,
-      toGatewayID: identity.id, 
-      manager: manager,
+      fromGatewayID: this.localGateway.id,
+      toGatewayID: identity.id,
       sessions: new Map(),
+      clients: clients,
+      supportedDLTs: identity.supportedDLTs,
     };
 
-    
     return channel;
   }
 
-  private createConnectClients(identity: GatewayIdentity): PromiseConnectClient<SATPServiceClient>[] {
-    let createdClients: ServiceType[] = [];
+  protected getTargetChannel(id: string): GatewayChannel {
+    const channel = this.channels.get(id);
+    if (!channel) {
+      throw new Error(`Channel with gateway id ${id} does not exist`);
+    } else {
+      return channel;
+    }
+  }
+
+  private createConnectClients(
+    identity: GatewayIdentity,
+  ): PromiseConnectClient<SATPServiceClient>[] {
     // one function for each client type; aggregate in array
     const transport = createConnectTransport({
       baseUrl: identity.address + ":" + identity.gatewayGrpcPort,
-      httpVersion: "1.1"
+      httpVersion: "1.1",
     });
 
     const stage0Client = this.createStage0ServiceClient(transport);
@@ -192,39 +204,60 @@ export class GatewayOrchestrator {
     const stage2Client = this.createStage2ServiceClient(transport);
     const stage3Client = this.createStage3ServiceClient(transport);
 
+    // todo perform healthcheck on startup; should be in stage 0
     return [stage0Client, stage1Client, stage2Client, stage3Client];
   }
 
-  private createStage0ServiceClient(transport: ConnectTransport): PromiseConnectClient<typeof SatpStage0Service> {
-    this.logger.debug("Creating stage 0 service client, with transport: ", transport);
+  private createStage0ServiceClient(
+    transport: ConnectTransport,
+  ): PromiseConnectClient<typeof SatpStage0Service> {
+    this.logger.debug(
+      "Creating stage 0 service client, with transport: ",
+      transport,
+    );
     const client = createPromiseClient(SatpStage0Service, transport);
     return client;
   }
 
-  private createStage1ServiceClient(transport: ConnectTransport): PromiseConnectClient<typeof SatpStage1Service> {
-    this.logger.debug("Creating stage 1 service client, with transport: ", transport);
+  private createStage1ServiceClient(
+    transport: ConnectTransport,
+  ): PromiseConnectClient<typeof SatpStage1Service> {
+    this.logger.debug(
+      "Creating stage 1 service client, with transport: ",
+      transport,
+    );
     const client = createPromiseClient(SatpStage1Service, transport);
     return client;
   }
 
-  private createStage2ServiceClient(transport: ConnectTransport): PromiseConnectClient<typeof SatpStage2Service> {
-    this.logger.debug("Creating stage 2 service client, with transport: ", transport);
+  private createStage2ServiceClient(
+    transport: ConnectTransport,
+  ): PromiseConnectClient<typeof SatpStage2Service> {
+    this.logger.debug(
+      "Creating stage 2 service client, with transport: ",
+      transport,
+    );
     const client = createPromiseClient(SatpStage2Service, transport);
     return client;
   }
 
-  private createStage3ServiceClient(transport: ConnectTransport): PromiseConnectClient<typeof SatpStage3Service> {
-    this.logger.debug("Creating stage 3 service client, with transport: ", transport);
+  private createStage3ServiceClient(
+    transport: ConnectTransport,
+  ): PromiseConnectClient<typeof SatpStage3Service> {
+    this.logger.debug(
+      "Creating stage 3 service client, with transport: ",
+      transport,
+    );
     const client = createPromiseClient(SatpStage3Service, transport);
     return client;
   }
 
-   public async resolveAndAddGateways(IDs: string[]): Promise<number> {
+  public async resolveAndAddGateways(IDs: string[]): Promise<number> {
     const fnTag = `${this.label}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
     const gatewaysToAdd: GatewayIdentity[] = [];
-    const thisID = this.ourGateway!.id;
+    const thisID = this.localGateway!.id;
     const otherIDs = IDs.filter((id) => id !== thisID);
 
     for (const id of otherIDs) {
@@ -235,16 +268,20 @@ export class GatewayOrchestrator {
     return gatewaysToAdd.length;
   }
 
-   public addGateways(gateways: GatewayIdentity[]): string[] {
+  public addGateways(gateways: GatewayIdentity[]): string[] {
     const fnTag = `${this.label}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
-    let addedIDs: string[] = [];
+    const addedIDs: string[] = [];
     // gateways tha are not self
-    const otherGateways = gateways.filter((gateway) => gateway.id !== this.ourGateway.id);
+    const otherGateways = gateways.filter(
+      (gateway) => gateway.id !== this.localGateway.id,
+    );
 
     // gateways that are not already connected
-    const uniqueGateways = otherGateways.filter((gateway) => !this.counterPartyGateways.has(gateway.id));  
+    const uniqueGateways = otherGateways.filter(
+      (gateway) => !this.counterPartyGateways.has(gateway.id),
+    );
 
     for (const gateway of uniqueGateways) {
       this.counterPartyGateways.set(gateway.id, gateway);
@@ -275,18 +312,17 @@ export class GatewayOrchestrator {
   /*
   BOL TO GOL translation
   */
-    async handleTransferRequest(): Promise<void> {
+  async handleTransferRequest(): Promise<void> {
     // add checks
     this.logger.info("Handling transfer request");
     // ! todo implement transfer request
     this.logger.error("Not implemented");
   }
 
-    async handleGetRoutes(): Promise<void> {
+  async handleGetRoutes(): Promise<void> {
     // add checks
     this.logger.info("Handling transfer request");
     // ! todo implement transfer request
     this.logger.error("Not implemented");
   }
-
 }
