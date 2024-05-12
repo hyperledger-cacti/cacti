@@ -1,3 +1,4 @@
+/*
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
 import { LockAssertionRequestMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
@@ -7,9 +8,15 @@ import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATPSession } from "../satp-session";
 import { ServiceType } from "@bufbuild/protobuf";
-import { SupportedGatewayImplementations } from "../types";
+import { SupportedChain } from "../types";
 
-export const Stage2Handler = (session: SATPSession, service: Stage2ServerService, connectClients: ServiceType[], supportedDLTs: SupportedGatewayImplementations[]) =>
+export const Stage2Handler =
+  (
+    session: SATPSession,
+    service: Stage2ServerService,
+    connectClients: ServiceType[],
+    supportedDLTs: SupportedChain[],
+  ) =>
   (router: ConnectRouter) =>
     router.service(SatpStage2Service, {
       async lockAssertion(
@@ -48,3 +55,4 @@ export const Stage2Handler = (session: SATPSession, service: Stage2ServerService
         return message;
       },
     });
+*/
