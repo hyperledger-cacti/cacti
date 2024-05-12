@@ -1,7 +1,8 @@
 // Gateway Client API
 export * from "./generated/gateway-client/typescript-axios";
 
-// Gateway Backend, not exported for now
+// TODO: Should we export the gateway backend
+// Gateway Backend
 /*
 // Exporting from the common directory
 export * from './generated/proto/cacti/satp/v02/common/health_connect';
