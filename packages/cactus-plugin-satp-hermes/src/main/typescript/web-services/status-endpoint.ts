@@ -14,9 +14,9 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import OAS from "../../../json/openapi-blo-bundled.json";
-import { IRequestOptions } from "../../core/types";
-import { StatusRequest } from "../../generated/gateway-client/typescript-axios";
+import OAS from "../../json/openapi-blo-bundled.json";
+import { IRequestOptions } from "../core/types";
+import { StatusRequest } from "../generated/gateway-client/typescript-axios";
 
 export class GetStatusEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetStatusEndpointV1";
@@ -75,6 +75,8 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
+  // TODO discover way to inherit OAS schema and have request types here
+  // parameter checks should be enforced by the type system
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
