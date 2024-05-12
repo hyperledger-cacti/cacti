@@ -1,3 +1,4 @@
+/*
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_connect";
 import {
@@ -11,9 +12,15 @@ import { SATPGateway } from "../../plugin-satp-hermes-gateway";
 import { TimestampType, saveTimestamp } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATPSession } from "../satp-session";
-import { SupportedGatewayImplementations } from "../types";
+import { SupportedChain } from "../types";
 
-export const Stage3Handler = (session: SATPSession, service: Stage3ServerService, connectClients: ServiceType[], supportedDLTs: SupportedGatewayImplementations[]) =>
+export const Stage3Handler =
+  (
+    session: SATPSession,
+    service: Stage3ServerService,
+    connectClients: ServiceType[],
+    supportedDLTs: SupportedChain[],
+  ) =>
   (router: ConnectRouter) =>
     router.service(SatpStage3Service, {
       async commitPreparation(
@@ -108,3 +115,4 @@ export const Stage3Handler = (session: SATPSession, service: Stage3ServerService
         return new Empty({});
       },
     });
+*/
