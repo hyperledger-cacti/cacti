@@ -73,7 +73,7 @@ export async function storeRemoteLog(
   key: string,
   hash: string,
 ) {
-  const fnTag = `${gateway.label}#storeInDatabase()`;
+  const fnTag = `${gateway.className}#storeInDatabase()`;
 
   const remoteLog: RemoteLog = {
     key: key,
