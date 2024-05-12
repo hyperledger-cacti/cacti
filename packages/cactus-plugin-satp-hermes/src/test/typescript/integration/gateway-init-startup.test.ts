@@ -16,7 +16,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import {
   ShutdownHook,
-  SupportedGatewayImplementations,
+  SupportedChain,
 } from "./../../../main/typescript/core/types";
 
 const logLevel: LogLevelDesc = "INFO";
@@ -58,9 +58,9 @@ describe("SATPGateway initialization", () => {
         Crash: "v02",
       },
     ]);
-    expect(identity.supportedChains).toEqual([
-      SupportedGatewayImplementations.FABRIC,
-      SupportedGatewayImplementations.BESU,
+    expect(identity.supportedDLTs).toEqual([
+      SupportedChain.FABRIC,
+      SupportedChain.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID1");
     expect(identity.gatewayServerPort).toBe(3010);
@@ -80,10 +80,7 @@ describe("SATPGateway initialization", () => {
             Crash: "v1",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         gatewayServerPort: 3010,
         address: "https://localhost",
@@ -104,9 +101,9 @@ describe("SATPGateway initialization", () => {
         Crash: "v1",
       },
     ]);
-    expect(identity.supportedChains).toEqual([
-      SupportedGatewayImplementations.FABRIC,
-      SupportedGatewayImplementations.BESU,
+    expect(identity.supportedDLTs).toEqual([
+      SupportedChain.FABRIC,
+      SupportedChain.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID10");
     expect(identity.gatewayServerPort).toBe(3010);
@@ -126,10 +123,7 @@ describe("SATPGateway initialization", () => {
             Crash: "v02",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         address: "https://localhost",
       },
@@ -158,10 +152,7 @@ describe("SATPGateway initialization", () => {
             Crash: "v02",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         gatewayServerPort: 3014,
         gatewayClientPort: 3015,
@@ -205,7 +196,6 @@ describe("SATPGateway initialization", () => {
   });
 });
 
-
 describe("SATPGateway startup", () => {
   it("initiates with default config", async () => {
     const options: SATPGatewayConfig = {};
@@ -224,9 +214,9 @@ describe("SATPGateway startup", () => {
         Crash: "v02",
       },
     ]);
-    expect(identity.supportedChains).toEqual([
-      SupportedGatewayImplementations.FABRIC,
-      SupportedGatewayImplementations.BESU,
+    expect(identity.supportedDLTs).toEqual([
+      SupportedChain.FABRIC,
+      SupportedChain.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID1");
     expect(identity.gatewayClientPort).toBe(3011);
@@ -246,10 +236,7 @@ describe("SATPGateway startup", () => {
             Crash: "v1",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         gatewayClientPort: 3001,
         address: "https://localhost",
@@ -270,9 +257,9 @@ describe("SATPGateway startup", () => {
         Crash: "v1",
       },
     ]);
-    expect(identity.supportedChains).toEqual([
-      SupportedGatewayImplementations.FABRIC,
-      SupportedGatewayImplementations.BESU,
+    expect(identity.supportedDLTs).toEqual([
+      SupportedChain.FABRIC,
+      SupportedChain.BESU,
     ]);
     expect(identity.proofID).toBe("mockProofID10");
     expect(identity.gatewayClientPort).toBe(3001);
@@ -292,10 +279,7 @@ describe("SATPGateway startup", () => {
             Crash: "v02",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         gatewayClientPort: 3010,
         address: "https://localhost",
@@ -307,7 +291,7 @@ describe("SATPGateway startup", () => {
     const identity = gateway.Identity;
     expect(identity.gatewayClientPort).toBe(3010);
     expect(identity.address).toBe("https://localhost");
-    await gateway.startupGatewayServer();
+    await gateway.startup();
     await gateway.shutdown();
   });
 });
