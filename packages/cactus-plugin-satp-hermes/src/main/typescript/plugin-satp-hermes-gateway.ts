@@ -23,20 +23,19 @@ import {
   SATPGatewayConfig,
   GatewayIdentity,
   ShutdownHook,
-  SupportedGatewayImplementations,
+  SupportedChain,
 } from "./core/types";
-import { GatewayOrchestrator, IGatewayOrchestratorOptions } from "./gol/gateway-orchestrator";
+import {
+  GatewayOrchestrator,
+  IGatewayOrchestratorOptions,
+} from "./gol/gateway-orchestrator";
 export { SATPGatewayConfig };
 import express, { Express } from "express";
 import http from "http";
-import { configureRoutes } from "./web-services/router";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
-  DEFAULT_PORT_GATEWAY_GRPC,
   DEFAULT_PORT_GATEWAY_SERVER,
 } from "./core/constants";
-import { SessionData } from "./generated/proto/cacti/satp/v02/common/session_pb";
-import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import { bufArray2HexStr } from "./gateway-utils";
 import {
   ILocalLogRepository,
@@ -44,11 +43,16 @@ import {
 } from "./repository/interfaces/repository";
 import { SATPLedgerConnector } from "./types/blockchain-interaction";
 import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
-import fs from 'fs';
-import swaggerUi from 'swagger-ui-express';
+import fs from "fs";
+import swaggerUi, { JsonObject } from "swagger-ui-express";
 import { SATPSession } from "./core/satp-session";
+import {
+  IPluginWebService,
+  ICactusPlugin,
+  IWebServiceEndpoint,
+} from "@hyperledger/cactus-core-api";
 
-export class SATPGateway {
+export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
   @IsDefined()
   @IsNotEmptyObject()
@@ -58,45 +62,39 @@ export class SATPGateway {
   @IsDefined()
   @IsNotEmptyObject()
   @IsObject()
-  // todo add decorators that check all fields are defined
   private readonly config: SATPGatewayConfig;
 
   @IsString()
   @Contains("Gateway")
-  public readonly label = "SATPGateway";
+  public readonly className = "SATPGateway";
 
-  private readonly shutdownHooks: ShutdownHook[];
-  private gatewayConnectionManager: GatewayOrchestrator;
+  @IsString()
+  public readonly instanceId: string;
+  private supportedDltIDs: SupportedChain[];
+  private gatewayOrchestrator: GatewayOrchestrator;
 
-  private gatewayApplication?: Express;
-  private gatewayServer?: http.Server;
   private BLOApplication?: Express;
   private BLOServer?: http.Server;
   private BLODispatcher?: BLODispatcher;
+  private readonly OAS: JsonObject;
   public OAPIServerEnabled: boolean = false;
 
-  private objectSigner: JsObjectSigner;
-
-  // Instantiate connectors based on supported implementations
-  private supportedDltIDs: SupportedGatewayImplementations[];
-  private connectors: SATPLedgerConnector[] = [];
-
-  // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
-  private sessions: Map<string, SATPSession> = new Map();
+  private signer: JsObjectSigner;
   private _pubKey: string;
 
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
+  private readonly shutdownHooks: ShutdownHook[];
 
   constructor(public readonly options: SATPGatewayConfig) {
-    const fnTag = `${this.label}#constructor()`;
+    const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     this.config = SATPGateway.ProcessGatewayCoordinatorConfig(options);
     this.shutdownHooks = [];
     const level = options.logLevel || "INFO";
     const logOptions: ILoggerOptions = {
       level: level,
-      label: this.label,
+      label: this.className,
     };
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
@@ -109,34 +107,40 @@ export class SATPGateway {
 
     this.logger.info(`Gateway's public key: ${this._pubKey}`);
 
-    const objectSignerOptions: IJsObjectSignerOptions = {
+    const signerOptions: IJsObjectSignerOptions = {
       privateKey: bufArray2HexStr(this.config.keyPair.privateKey),
       logLevel: "debug",
     };
-    this.objectSigner = new JsObjectSigner(objectSignerOptions);
+    this.signer = new JsObjectSigner(signerOptions);
 
     const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
       logLevel: this.config.logLevel,
-      ourGateway: this.config.gid!,
+      localGateway: this.config.gid!,
       counterPartyGateways: this.config.counterPartyGateways,
-      signer: this.objectSigner!,
+      signer: this.signer!,
     };
 
-    if (this.config.gid) { 
-      this.logger.info("Initializing gateway connection manager with seed gateways");
-      this.gatewayConnectionManager = new GatewayOrchestrator(gatewayOrchestratorOptions);
+    if (this.config.gid) {
+      this.logger.info(
+        "Initializing gateway connection manager with seed gateways",
+      );
+      this.gatewayOrchestrator = new GatewayOrchestrator(
+        gatewayOrchestratorOptions,
+      );
     } else {
       throw new Error("GatewayIdentity is not defined");
     }
 
+    this.instanceId = uuidv4();
     const dispatcherOps: BLODispatcherOptions = {
       logger: this.logger,
       logLevel: this.config.logLevel,
       instanceId: this.config.gid!.id,
+      orchestrator: this.gatewayOrchestrator,
+      signer: this.signer,
     };
 
-
-    this.supportedDltIDs = this.config.gid!.supportedChains;
+    this.supportedDltIDs = this.config.gid!.supportedDLTs;
 
     if (!this.config.gid || !dispatcherOps.instanceId) {
       throw new Error("Invalid configuration");
@@ -144,50 +148,83 @@ export class SATPGateway {
 
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
     this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
+
+    const specPath = path.join(__dirname, "../json/openapi-blo-bundled.json");
+    this.OAS = JSON.parse(fs.readFileSync(specPath, "utf8"));
+    if (!this.OAS) {
+      this.logger.warn("Error loading OAS");
+    }
   }
 
-  public get Signer(): JsObjectSigner {
-    return this.objectSigner;
+  /* ICactus Plugin methods */
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
-  
+
+  public getPackageName(): string {
+    return `@hyperledger/cactus-plugin-satp-hermes`;
+  }
+
+  public async onPluginInit(): Promise<unknown> {
+    const fnTag = `${this.className}#onPluginInit()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    // resolve gateways on init
+    throw new Error("Not implemented");
+  }
+
+  /* IPluginWebService methods */
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => {
+      this.logger.debug(`Registering service ${ws.getPath()}`);
+      ws.registerExpress(app);
+    });
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    const fnTag = `${this.className}#getOrCreateWebServices()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    if (!this.BLODispatcher) {
+      throw new Error(`Cannot ${fnTag} because BLODispatcher is erroneous`);
+    }
+    return this.BLODispatcher?.getOrCreateWebServices();
+  }
+
+  /* Getters */
+
+  public get Signer(): JsObjectSigner {
+    return this.signer;
+  }
+
   public getSupportedDltIDs(): string[] {
     return this.supportedDltIDs;
   }
 
-
   public get gatewaySigner(): JsObjectSigner {
-    return this.objectSigner;
+    return this.signer;
   }
 
   public get pubKey(): string {
     return this._pubKey;
   }
 
-  // todo load docs for gateway coordinator and expose them in a http gatewayApplication
-  
-  setupOpenAPI(): void {
-    if (!this.OAPIServerEnabled) {
-      this.logger.debug("OpenAPI server is disabled");
-      return;
-    }
-
-    if (!this.BLOApplication) {
-      this.logger.debug("BLOApplication is not defined. Not initializing OpenAPI server");
-      return;
-    }
-    
-    const specPath = path.join(__dirname, "../json/openapi-blo-bundled.json");
-    const OpenAPISpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
-
-    // Type assertion here
-    this.BLOApplication.use(
-      "/api-docs",
-      swaggerUi.serve as express.RequestHandler[],
-      swaggerUi.setup(OpenAPISpec) as express.RequestHandler
-    );
+  public getOpenApiSpec(): unknown {
+    return this.OAS;
   }
 
-  // use builder pattern?
+  // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
+  public get Identity(): GatewayIdentity {
+    const fnTag = `${this.className}#getIdentity()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    if (!this.config.gid) {
+      throw new Error("GatewayIdentity is not defined");
+    }
+    return this.config.gid!;
+  }
+
+  /* Gateway configuration helpers */
   static ProcessGatewayCoordinatorConfig(
     pluginOptions: SATPGatewayConfig,
   ): SATPGatewayConfig {
@@ -207,10 +244,7 @@ export class SATPGateway {
             Crash: "v02",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID1",
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
@@ -235,10 +269,10 @@ export class SATPGateway {
         ];
       }
 
-      if (!pluginOptions.gid.supportedChains) {
-        pluginOptions.gid.supportedChains = [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
+      if (!pluginOptions.gid.supportedDLTs) {
+        pluginOptions.gid.supportedDLTs = [
+          SupportedChain.FABRIC,
+          SupportedChain.BESU,
         ];
       }
 
@@ -276,24 +310,19 @@ export class SATPGateway {
   /**
    * Startup Methods
    * ----------------
-   * This section includes methods responsible for starting up the server and its associated services.
+   * This section includes methods responsible for starting up the server and its associated services independently of the existance of a Hyperledger Cacti Node.
    * It ensures that both the GatewayServer and BLOServer are initiated concurrently for efficient launch.
    */
-  async startup(): Promise<void> {
-    const fnTag = `${this.label}#startup()`;
+  public async startup(): Promise<void> {
+    const fnTag = `${this.className}#startup()`;
     this.logger.trace(`Entering ${fnTag}`);
 
-    await Promise.all([
-      this.startupGatewayServer(),
-      this.setupOpenAPI(),
-    ]);
-
-    this.logger.info("Both GatewayServer and BLOServer have started");
+    await Promise.all([this.startupBLOServer(), this.setupOpenAPIServer()]);
   }
 
-  async startupGatewayServer(): Promise<void> {
+  protected async startupBLOServer(): Promise<void> {
     // starts BOL
-     const fnTag = `${this.label}#startupGatewayServer()`;
+    const fnTag = `${this.className}#startupBLOServer()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting BOL server");
     const port =
@@ -333,6 +362,29 @@ export class SATPGateway {
     });
   }
 
+  public setupOpenAPIServer(): void {
+    if (!this.OAPIServerEnabled) {
+      this.logger.debug("OpenAPI server is disabled");
+      return;
+    }
+
+    if (!this.BLOApplication) {
+      this.logger.debug(
+        "BLOApplication is not defined. Not initializing OpenAPI server",
+      );
+      return;
+    }
+
+    if (!this.OAS) {
+      throw new Error("OpenAPI spec is not set");
+    }
+    // Type assertion here
+    this.BLOApplication.use(
+      "/api-docs",
+      swaggerUi.serve as express.RequestHandler[],
+      swaggerUi.setup(this.OAS) as express.RequestHandler,
+    );
+  }
   /**
    * Gateway Connection Methods
    * --------------------------
@@ -343,32 +395,21 @@ export class SATPGateway {
 
   // TODO: addGateways as an admin endpoint, simply calls orchestrator
   public async resolveAndAddGateways(IDs: string[]): Promise<void> {
-    const fnTag = `${this.label}#resolveAndAddGateways()`;
+    const fnTag = `${this.className}#resolveAndAddGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
-    this.gatewayConnectionManager.resolveAndAddGateways(IDs);
+    this.gatewayOrchestrator.resolveAndAddGateways(IDs);
 
     // todo connect to gateway
   }
 
   public async addGateways(gateways: GatewayIdentity[]): Promise<void> {
-    const fnTag = `${this.label}#addGateways()`;
+    const fnTag = `${this.className}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
-    this.gatewayConnectionManager.addGateways(gateways);
+    this.gatewayOrchestrator.addGateways(gateways);
 
     // todo connect to gateway
-  }
-
-
-  // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
-  public get Identity(): GatewayIdentity {
-    const fnTag = `${this.label}#getIdentity()`;
-    this.logger.trace(`Entering ${fnTag}`);
-    if (!this.config.gid) {
-      throw new Error("GatewayIdentity is not defined");
-    }
-    return this.config.gid!;
   }
 
   /**
@@ -377,18 +418,15 @@ export class SATPGateway {
    * This section includes methods responsible for cleanly shutting down the server and its associated services.
    */
   public onShutdown(hook: ShutdownHook): void {
-    const fnTag = `${this.label}#onShutdown()`;
+    const fnTag = `${this.className}#onShutdown()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.debug(`Adding shutdown hook: ${hook.name}`);
     this.shutdownHooks.push(hook);
   }
 
-  public async shutdown(): Promise<number> {
-    const fnTag = `${this.label}#getGatewaySeeds()`;
+  public async shutdown(): Promise<void> {
+    const fnTag = `${this.className}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
-
-    this.logger.info("Shutting down Node server - Gateway");
-    await this.shutdownGatewayServer();
 
     this.logger.info("Shutting down Node server - BOL");
     await this.shutdownBLOServer();
@@ -400,34 +438,15 @@ export class SATPGateway {
     }
 
     this.logger.info("Shutting down Gateway Connection Manager");
-    const connectionsClosed =
-      await this.gatewayConnectionManager.disconnectAll();
+    const connectionsClosed = await this.gatewayOrchestrator.disconnectAll();
 
     this.logger.info(`Closed ${connectionsClosed} connections`);
     this.logger.info("Gateway Coordinator shut down");
-    return connectionsClosed;
-  }
-
-  private async shutdownGatewayServer(): Promise<void> {
-    const fnTag = `${this.label}#shutdownServer()`;
-    this.logger.debug(`Entering ${fnTag}`);
-    if (this.gatewayServer) {
-      try {
-        await this.gatewayServer.close();
-        this.gatewayServer = undefined;
-        this.logger.info("Server shut down");
-      } catch (error) {
-        this.logger.error(
-          `Error shutting down the gatewayApplication: ${error}`,
-        );
-      }
-    } else {
-      this.logger.warn("Server is not running.");
-    }
+    return;
   }
 
   private async shutdownBLOServer(): Promise<void> {
-    const fnTag = `${this.label}#shutdownBLOServer()`;
+    const fnTag = `${this.className}#shutdownBLOServer()`;
     this.logger.debug(`Entering ${fnTag}`);
     if (this.BLOServer) {
       try {
@@ -443,5 +462,4 @@ export class SATPGateway {
       this.logger.warn("Server is not running.");
     }
   }
-
 }

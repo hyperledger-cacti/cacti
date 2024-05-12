@@ -12,7 +12,7 @@ import {
 
 import {
   SATPGatewayConfig,
-  SupportedGatewayImplementations,
+  SupportedChain,
 } from "../../../main/typescript/core/types";
 import { createClient } from "../test-utils";
 
@@ -52,10 +52,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
             Crash: "v1",
           },
         ],
-        supportedChains: [
-          SupportedGatewayImplementations.FABRIC,
-          SupportedGatewayImplementations.BESU,
-        ],
+        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         gatewayServerPort: 3010,
         gatewayClientPort: 3011,

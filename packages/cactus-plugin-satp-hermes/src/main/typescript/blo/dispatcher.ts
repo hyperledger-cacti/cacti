@@ -3,25 +3,30 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  JsObjectSigner,
 } from "@hyperledger/cactus-common";
 
 import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 
 //import { GatewayIdentity, GatewayChannel } from "../core/types";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
-import { GetStatusEndpointV1 } from "../web-services/blo/status-endpoint";
+import { GetStatusEndpointV1 } from "../web-services/status-endpoint";
 
 //import { GetAuditRequest, GetAuditResponse } from "../generated/gateway-client/typescript-axios";
 import {
   StatusRequest,
   StatusResponse,
 } from "../generated/gateway-client/typescript-axios";
-import { GetStatusHandler } from "./admin/get-status-handler-service";
+import { ExecuteGetStatus } from "./admin/get-status-handler-service";
+import { ISATPManagerOptions, SATPManager } from "../gol/satp-manager";
+import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
 
 export interface BLODispatcherOptions {
   logger: Logger;
   logLevel?: LogLevelDesc;
   instanceId: string;
+  orchestrator: GatewayOrchestrator;
+  signer: JsObjectSigner;
 }
 
 export class BLODispatcher {
@@ -29,6 +34,8 @@ export class BLODispatcher {
   private readonly logger: Logger;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private readonly instanceId: string;
+  private manager: SATPManager;
+  private orchestrator: GatewayOrchestrator;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -39,6 +46,18 @@ export class BLODispatcher {
     this.logger = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
+    this.orchestrator = options.orchestrator;
+    const signer = options.signer;
+    const ourGateway = this.orchestrator.ourGateway;
+
+    const SATPManagerOpts: ISATPManagerOptions = {
+      logLevel: "DEBUG",
+      instanceId: ourGateway!.id,
+      signer: signer,
+      supportedDLTs: this.orchestrator.supportedDLTs,
+    };
+
+    this.manager = new SATPManager(SATPManagerOpts);
   }
 
   public get className(): string {
@@ -64,9 +83,31 @@ export class BLODispatcher {
     return theEndpoints;
   }
 
-  public async GetStatus(req: StatusRequest): Promise<StatusResponse> {
-    return GetStatusHandler(this.logger, req);
+  private getTargetGatewayClient(id: string) {
+    const channels = Array.from(this.orchestrator.getChannels());
+    channels.filter((ch) => {
+      id == ch[0] && ch[1].toGatewayID == id;
+    });
+
+    if (channels.length == 0) {
+      throw new Error(`No channels with specified target gateway id ${id}`);
+    } else if (channels.length > 1) {
+      throw new Error(
+        `Duplicated channels with specified target gateway id ${id}`,
+      );
+    } else {
+      return channels[0];
+    }
   }
 
+  public async GetStatus(req: StatusRequest): Promise<StatusResponse> {
+    return ExecuteGetStatus(this.logger, req);
+  }
+
+  public async Transact(req: StatusRequest): Promise<StatusResponse> {
+    return ExecuteGetStatus(this.logger, req);
+  }
+  // get channel by caller; give needed client from orchestrator to handler to call
+  // for all channels, find session id on request
   // TODO implement handlers GetAudit, Transact, Cancel, Routes
 }

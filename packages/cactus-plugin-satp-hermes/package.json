@@ -61,7 +61,7 @@
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g go -o ./src/main/go/generated/gateway-client --additional-properties=packageName=generated,generateInterfaces=true,packageVersion=v0.0.1,moduleName=github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated --git-user-id hyperledger  --git-repo-id cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated",
     "generate-sdk:typescript-axios-bol": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/gateway-client/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
     "lint": "run-p 'lint:*'",
-    "lint:eslint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
+    "lint:eslint": "eslint './src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "lint:oapi": "vacuum lint -d -e ./src/main/yml/bol/openapi-blo-bundled.yml",
     "lint:protobuf": "buf lint --path src/main/proto --verbose",
     "pretsc": "npm run generate-sdk",
