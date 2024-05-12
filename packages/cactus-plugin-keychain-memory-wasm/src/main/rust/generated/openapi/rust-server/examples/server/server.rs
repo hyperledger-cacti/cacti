@@ -7,8 +7,6 @@ use futures::{future, Stream, StreamExt, TryFutureExt, TryStreamExt};
 use hyper::server::conn::Http;
 use hyper::service::Service;
 use log::info;
-#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "ios")))]
-use openssl::ssl::SslAcceptorBuilder;
 use std::future::Future;
 use std::marker::PhantomData;
 use std::net::SocketAddr;
@@ -20,7 +18,7 @@ use swagger::EmptyContext;
 use tokio::net::TcpListener;
 
 #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "ios")))]
-use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+use openssl::ssl::{Ssl, SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
 
 use openapi_client::models;
 
@@ -34,6 +32,7 @@ pub async fn create(addr: &str, https: bool) {
 
     let service = MakeAllowAllAuthenticator::new(service, "cosmo");
 
+    #[allow(unused_mut)]
     let mut service =
         openapi_client::server::context::MakeAddContext::<_, EmptyContext>::new(
             service
@@ -51,29 +50,28 @@ pub async fn create(addr: &str, https: bool) {
 
             // Server authentication
             ssl.set_private_key_file("examples/server-key.pem", SslFiletype::PEM).expect("Failed to set private key");
-            ssl.set_certificate_chain_file("examples/server-chain.pem").expect("Failed to set cerificate chain");
+            ssl.set_certificate_chain_file("examples/server-chain.pem").expect("Failed to set certificate chain");
             ssl.check_private_key().expect("Failed to check private key");
 
-            let tls_acceptor = Arc::new(ssl.build());
-            let mut tcp_listener = TcpListener::bind(&addr).await.unwrap();
-            let mut incoming = tcp_listener.incoming();
+            let tls_acceptor = ssl.build();
+            let tcp_listener = TcpListener::bind(&addr).await.unwrap();
 
-            while let (Some(tcp), rest) = incoming.into_future().await {
-                if let Ok(tcp) = tcp {
+            loop {
+                if let Ok((tcp, _)) = tcp_listener.accept().await {
+                    let ssl = Ssl::new(tls_acceptor.context()).unwrap();
                     let addr = tcp.peer_addr().expect("Unable to get remote address");
                     let service = service.call(addr);
-                    let tls_acceptor = Arc::clone(&tls_acceptor);
 
                     tokio::spawn(async move {
-                        let tls = tokio_openssl::accept(&*tls_acceptor, tcp).await.map_err(|_| ())?;
-
+                        let tls = tokio_openssl::SslStream::new(ssl, tcp).map_err(|_| ())?;
                         let service = service.await.map_err(|_| ())?;
 
-                        Http::new().serve_connection(tls, service).await.map_err(|_| ())
+                        Http::new()
+                            .serve_connection(tls, service)
+                            .await
+                            .map_err(|_| ())
                     });
                 }
-
-                incoming = rest;
             }
         }
     } else {
@@ -109,58 +107,53 @@ use swagger::ApiError;
 #[async_trait]
 impl<C> Api<C> for Server<C> where C: Has<XSpanIdString> + Send + Sync
 {
-    /// Deletes an entry from the keychain stored under the provided key.
+    /// Deletes an entry under a key on the keychain backend.
     async fn delete_keychain_entry_v1(
         &self,
         delete_keychain_entry_request_v1: Option<models::DeleteKeychainEntryRequestV1>,
         context: &C) -> Result<DeleteKeychainEntryV1Response, ApiError>
     {
-        let context = context.clone();
         info!("delete_keychain_entry_v1({:?}) - X-Span-ID: {:?}", delete_keychain_entry_request_v1, context.get().0.clone());
-        Err("Generic failuare".into())
+        Err(ApiError("Generic failure".into()))
     }
 
     /// Retrieves the contents of a keychain entry from the backend.
     async fn get_keychain_entry_v1(
         &self,
-        get_keychain_entry_request: models::GetKeychainEntryRequest,
+        get_keychain_entry_request_v1: models::GetKeychainEntryRequestV1,
         context: &C) -> Result<GetKeychainEntryV1Response, ApiError>
     {
-        let context = context.clone();
-        info!("get_keychain_entry_v1({:?}) - X-Span-ID: {:?}", get_keychain_entry_request, context.get().0.clone());
-        Err("Generic failuare".into())
+        info!("get_keychain_entry_v1({:?}) - X-Span-ID: {:?}", get_keychain_entry_request_v1, context.get().0.clone());
+        Err(ApiError("Generic failure".into()))
     }
 
     /// Get the Prometheus Metrics
     async fn get_prometheus_metrics_v1(
         &self,
         context: &C) -> Result<GetPrometheusMetricsV1Response, ApiError>
-    {
-        let context = context.clone();
-        info!("get_prometheus_metrics_v1() - X-Span-ID: {:?}", context.get().0.clone());
-        Err("Generic failuare".into())
-    }
+        {
+            info!("get_proemtheus_metrics_v1() - X-Span-ID: {:?}", context.get().0.clone());
+            Err(ApiError("Generic failure".into()))
+        }
 
-    /// Retrieves the information regarding a key being present on the keychain or not.
+    /// Checks that an entry exists under a key on the keychain backend
     async fn has_keychain_entry_v1(
         &self,
         has_keychain_entry_request_v1: Option<models::HasKeychainEntryRequestV1>,
         context: &C) -> Result<HasKeychainEntryV1Response, ApiError>
     {
-        let context = context.clone();
         info!("has_keychain_entry_v1({:?}) - X-Span-ID: {:?}", has_keychain_entry_request_v1, context.get().0.clone());
-        Err("Generic failuare".into())
+        Err(ApiError("Generic failure".into()))
     }
 
     /// Sets a value under a key on the keychain backend.
     async fn set_keychain_entry_v1(
         &self,
-        set_keychain_entry_request: models::SetKeychainEntryRequest,
+        set_keychain_entry_request_v1: models::SetKeychainEntryRequestV1,
         context: &C) -> Result<SetKeychainEntryV1Response, ApiError>
     {
-        let context = context.clone();
-        info!("set_keychain_entry_v1({:?}) - X-Span-ID: {:?}", set_keychain_entry_request, context.get().0.clone());
-        Err("Generic failuare".into())
+        info!("set_keychain_entry_v1({:?}) - X-Span-ID: {:?}", set_keychain_entry_request_v1, context.get().0.clone());
+        Err(ApiError("Generic failure".into()))
     }
 
 }

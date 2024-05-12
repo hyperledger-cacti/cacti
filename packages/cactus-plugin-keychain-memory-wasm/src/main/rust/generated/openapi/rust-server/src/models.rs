@@ -7,16 +7,17 @@ use crate::header;
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
 pub struct DeleteKeychainEntryRequestV1 {
-    /// The key of the entry to delete from the keychain.
+    /// The key for the entry to check the presence of on the keychain.
     #[serde(rename = "key")]
     pub key: String,
 
 }
 
 impl DeleteKeychainEntryRequestV1 {
+    #[allow(clippy::new_without_default)]
     pub fn new(key: String, ) -> DeleteKeychainEntryRequestV1 {
         DeleteKeychainEntryRequestV1 {
-            key: key,
+            key,
         }
     }
 }
@@ -26,12 +27,14 @@ impl DeleteKeychainEntryRequestV1 {
 /// Should be implemented in a serde serializer
 impl std::string::ToString for DeleteKeychainEntryRequestV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
@@ -42,8 +45,9 @@ impl std::str::FromStr for DeleteKeychainEntryRequestV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
         }
@@ -51,7 +55,7 @@ impl std::str::FromStr for DeleteKeychainEntryRequestV1 {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
@@ -61,8 +65,10 @@ impl std::str::FromStr for DeleteKeychainEntryRequestV1 {
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
                     _ => return std::result::Result::Err("Unexpected key while parsing DeleteKeychainEntryRequestV1".to_string())
                 }
             }
@@ -73,7 +79,7 @@ impl std::str::FromStr for DeleteKeychainEntryRequestV1 {
 
         // Use the intermediate representation to return the struct
         std::result::Result::Ok(DeleteKeychainEntryRequestV1 {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in DeleteKeychainEntryRequestV1".to_string())?,
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in DeleteKeychainEntryRequestV1".to_string())?,
         })
     }
 }
@@ -120,16 +126,17 @@ impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderVal
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
 pub struct DeleteKeychainEntryResponseV1 {
-    /// The key of the entry that was deleted from the keychain.
+    /// The key that was deleted from the keychain.
     #[serde(rename = "key")]
     pub key: String,
 
 }
 
 impl DeleteKeychainEntryResponseV1 {
+    #[allow(clippy::new_without_default)]
     pub fn new(key: String, ) -> DeleteKeychainEntryResponseV1 {
         DeleteKeychainEntryResponseV1 {
-            key: key,
+            key,
         }
     }
 }
@@ -139,12 +146,14 @@ impl DeleteKeychainEntryResponseV1 {
 /// Should be implemented in a serde serializer
 impl std::string::ToString for DeleteKeychainEntryResponseV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
@@ -155,8 +164,9 @@ impl std::str::FromStr for DeleteKeychainEntryResponseV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
         }
@@ -164,7 +174,7 @@ impl std::str::FromStr for DeleteKeychainEntryResponseV1 {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
@@ -174,8 +184,10 @@ impl std::str::FromStr for DeleteKeychainEntryResponseV1 {
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
                     _ => return std::result::Result::Err("Unexpected key while parsing DeleteKeychainEntryResponseV1".to_string())
                 }
             }
@@ -186,7 +198,7 @@ impl std::str::FromStr for DeleteKeychainEntryResponseV1 {
 
         // Use the intermediate representation to return the struct
         std::result::Result::Ok(DeleteKeychainEntryResponseV1 {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in DeleteKeychainEntryResponseV1".to_string())?,
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in DeleteKeychainEntryResponseV1".to_string())?,
         })
     }
 }
@@ -232,44 +244,48 @@ impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderVal
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
-pub struct GetKeychainEntryRequest {
+pub struct GetKeychainEntryRequestV1 {
     /// The key for the entry to get from the keychain.
     #[serde(rename = "key")]
     pub key: String,
 
 }
 
-impl GetKeychainEntryRequest {
-    pub fn new(key: String, ) -> GetKeychainEntryRequest {
-        GetKeychainEntryRequest {
-            key: key,
+impl GetKeychainEntryRequestV1 {
+    #[allow(clippy::new_without_default)]
+    pub fn new(key: String, ) -> GetKeychainEntryRequestV1 {
+        GetKeychainEntryRequestV1 {
+            key,
         }
     }
 }
 
-/// Converts the GetKeychainEntryRequest value to the Query Parameters representation (style=form, explode=false)
+/// Converts the GetKeychainEntryRequestV1 value to the Query Parameters representation (style=form, explode=false)
 /// specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde serializer
-impl std::string::ToString for GetKeychainEntryRequest {
+impl std::string::ToString for GetKeychainEntryRequestV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
-/// Converts Query Parameters representation (style=form, explode=false) to a GetKeychainEntryRequest value
+/// Converts Query Parameters representation (style=form, explode=false) to a GetKeychainEntryRequestV1 value
 /// as specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde deserializer
-impl std::str::FromStr for GetKeychainEntryRequest {
+impl std::str::FromStr for GetKeychainEntryRequestV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
         }
@@ -277,19 +293,21 @@ impl std::str::FromStr for GetKeychainEntryRequest {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
             let val = match string_iter.next() {
                 Some(x) => x,
-                None => return std::result::Result::Err("Missing value while parsing GetKeychainEntryRequest".to_string())
+                None => return std::result::Result::Err("Missing value while parsing GetKeychainEntryRequestV1".to_string())
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    _ => return std::result::Result::Err("Unexpected key while parsing GetKeychainEntryRequest".to_string())
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    _ => return std::result::Result::Err("Unexpected key while parsing GetKeychainEntryRequestV1".to_string())
                 }
             }
 
@@ -298,40 +316,40 @@ impl std::str::FromStr for GetKeychainEntryRequest {
         }
 
         // Use the intermediate representation to return the struct
-        std::result::Result::Ok(GetKeychainEntryRequest {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in GetKeychainEntryRequest".to_string())?,
+        std::result::Result::Ok(GetKeychainEntryRequestV1 {
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in GetKeychainEntryRequestV1".to_string())?,
         })
     }
 }
 
-// Methods for converting between header::IntoHeaderValue<GetKeychainEntryRequest> and hyper::header::HeaderValue
+// Methods for converting between header::IntoHeaderValue<GetKeychainEntryRequestV1> and hyper::header::HeaderValue
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<header::IntoHeaderValue<GetKeychainEntryRequest>> for hyper::header::HeaderValue {
+impl std::convert::TryFrom<header::IntoHeaderValue<GetKeychainEntryRequestV1>> for hyper::header::HeaderValue {
     type Error = String;
 
-    fn try_from(hdr_value: header::IntoHeaderValue<GetKeychainEntryRequest>) -> std::result::Result<Self, Self::Error> {
+    fn try_from(hdr_value: header::IntoHeaderValue<GetKeychainEntryRequestV1>) -> std::result::Result<Self, Self::Error> {
         let hdr_value = hdr_value.to_string();
         match hyper::header::HeaderValue::from_str(&hdr_value) {
              std::result::Result::Ok(value) => std::result::Result::Ok(value),
              std::result::Result::Err(e) => std::result::Result::Err(
-                 format!("Invalid header value for GetKeychainEntryRequest - value: {} is invalid {}",
+                 format!("Invalid header value for GetKeychainEntryRequestV1 - value: {} is invalid {}",
                      hdr_value, e))
         }
     }
 }
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<GetKeychainEntryRequest> {
+impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<GetKeychainEntryRequestV1> {
     type Error = String;
 
     fn try_from(hdr_value: hyper::header::HeaderValue) -> std::result::Result<Self, Self::Error> {
         match hdr_value.to_str() {
              std::result::Result::Ok(value) => {
-                    match <GetKeychainEntryRequest as std::str::FromStr>::from_str(value) {
+                    match <GetKeychainEntryRequestV1 as std::str::FromStr>::from_str(value) {
                         std::result::Result::Ok(value) => std::result::Result::Ok(header::IntoHeaderValue(value)),
                         std::result::Result::Err(err) => std::result::Result::Err(
-                            format!("Unable to convert header value '{}' into GetKeychainEntryRequest - {}",
+                            format!("Unable to convert header value '{}' into GetKeychainEntryRequestV1 - {}",
                                 value, err))
                     }
              },
@@ -345,7 +363,7 @@ impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderVal
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
-pub struct GetKeychainEntryResponse {
+pub struct GetKeychainEntryResponseV1 {
     /// The key that was used to retrieve the value from the keychain.
     #[serde(rename = "key")]
     pub key: String,
@@ -356,42 +374,46 @@ pub struct GetKeychainEntryResponse {
 
 }
 
-impl GetKeychainEntryResponse {
-    pub fn new(key: String, value: String, ) -> GetKeychainEntryResponse {
-        GetKeychainEntryResponse {
-            key: key,
-            value: value,
+impl GetKeychainEntryResponseV1 {
+    #[allow(clippy::new_without_default)]
+    pub fn new(key: String, value: String, ) -> GetKeychainEntryResponseV1 {
+        GetKeychainEntryResponseV1 {
+            key,
+            value,
         }
     }
 }
 
-/// Converts the GetKeychainEntryResponse value to the Query Parameters representation (style=form, explode=false)
+/// Converts the GetKeychainEntryResponseV1 value to the Query Parameters representation (style=form, explode=false)
 /// specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde serializer
-impl std::string::ToString for GetKeychainEntryResponse {
+impl std::string::ToString for GetKeychainEntryResponseV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
 
-        params.push("value".to_string());
-        params.push(self.value.to_string());
+            Some("value".to_string()),
+            Some(self.value.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
-/// Converts Query Parameters representation (style=form, explode=false) to a GetKeychainEntryResponse value
+/// Converts Query Parameters representation (style=form, explode=false) to a GetKeychainEntryResponseV1 value
 /// as specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde deserializer
-impl std::str::FromStr for GetKeychainEntryResponse {
+impl std::str::FromStr for GetKeychainEntryResponseV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
             pub value: Vec<String>,
@@ -400,20 +422,23 @@ impl std::str::FromStr for GetKeychainEntryResponse {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
             let val = match string_iter.next() {
                 Some(x) => x,
-                None => return std::result::Result::Err("Missing value while parsing GetKeychainEntryResponse".to_string())
+                None => return std::result::Result::Err("Missing value while parsing GetKeychainEntryResponseV1".to_string())
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    "value" => intermediate_rep.value.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    _ => return std::result::Result::Err("Unexpected key while parsing GetKeychainEntryResponse".to_string())
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    #[allow(clippy::redundant_clone)]
+                    "value" => intermediate_rep.value.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    _ => return std::result::Result::Err("Unexpected key while parsing GetKeychainEntryResponseV1".to_string())
                 }
             }
 
@@ -422,41 +447,41 @@ impl std::str::FromStr for GetKeychainEntryResponse {
         }
 
         // Use the intermediate representation to return the struct
-        std::result::Result::Ok(GetKeychainEntryResponse {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in GetKeychainEntryResponse".to_string())?,
-            value: intermediate_rep.value.into_iter().next().ok_or("value missing in GetKeychainEntryResponse".to_string())?,
+        std::result::Result::Ok(GetKeychainEntryResponseV1 {
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in GetKeychainEntryResponseV1".to_string())?,
+            value: intermediate_rep.value.into_iter().next().ok_or_else(|| "value missing in GetKeychainEntryResponseV1".to_string())?,
         })
     }
 }
 
-// Methods for converting between header::IntoHeaderValue<GetKeychainEntryResponse> and hyper::header::HeaderValue
+// Methods for converting between header::IntoHeaderValue<GetKeychainEntryResponseV1> and hyper::header::HeaderValue
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<header::IntoHeaderValue<GetKeychainEntryResponse>> for hyper::header::HeaderValue {
+impl std::convert::TryFrom<header::IntoHeaderValue<GetKeychainEntryResponseV1>> for hyper::header::HeaderValue {
     type Error = String;
 
-    fn try_from(hdr_value: header::IntoHeaderValue<GetKeychainEntryResponse>) -> std::result::Result<Self, Self::Error> {
+    fn try_from(hdr_value: header::IntoHeaderValue<GetKeychainEntryResponseV1>) -> std::result::Result<Self, Self::Error> {
         let hdr_value = hdr_value.to_string();
         match hyper::header::HeaderValue::from_str(&hdr_value) {
              std::result::Result::Ok(value) => std::result::Result::Ok(value),
              std::result::Result::Err(e) => std::result::Result::Err(
-                 format!("Invalid header value for GetKeychainEntryResponse - value: {} is invalid {}",
+                 format!("Invalid header value for GetKeychainEntryResponseV1 - value: {} is invalid {}",
                      hdr_value, e))
         }
     }
 }
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<GetKeychainEntryResponse> {
+impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<GetKeychainEntryResponseV1> {
     type Error = String;
 
     fn try_from(hdr_value: hyper::header::HeaderValue) -> std::result::Result<Self, Self::Error> {
         match hdr_value.to_str() {
              std::result::Result::Ok(value) => {
-                    match <GetKeychainEntryResponse as std::str::FromStr>::from_str(value) {
+                    match <GetKeychainEntryResponseV1 as std::str::FromStr>::from_str(value) {
                         std::result::Result::Ok(value) => std::result::Result::Ok(header::IntoHeaderValue(value)),
                         std::result::Result::Err(err) => std::result::Result::Err(
-                            format!("Unable to convert header value '{}' into GetKeychainEntryResponse - {}",
+                            format!("Unable to convert header value '{}' into GetKeychainEntryResponseV1 - {}",
                                 value, err))
                     }
              },
@@ -478,9 +503,10 @@ pub struct HasKeychainEntryRequestV1 {
 }
 
 impl HasKeychainEntryRequestV1 {
+    #[allow(clippy::new_without_default)]
     pub fn new(key: String, ) -> HasKeychainEntryRequestV1 {
         HasKeychainEntryRequestV1 {
-            key: key,
+            key,
         }
     }
 }
@@ -490,12 +516,14 @@ impl HasKeychainEntryRequestV1 {
 /// Should be implemented in a serde serializer
 impl std::string::ToString for HasKeychainEntryRequestV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
@@ -506,8 +534,9 @@ impl std::str::FromStr for HasKeychainEntryRequestV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
         }
@@ -515,7 +544,7 @@ impl std::str::FromStr for HasKeychainEntryRequestV1 {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
@@ -525,8 +554,10 @@ impl std::str::FromStr for HasKeychainEntryRequestV1 {
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
                     _ => return std::result::Result::Err("Unexpected key while parsing HasKeychainEntryRequestV1".to_string())
                 }
             }
@@ -537,7 +568,7 @@ impl std::str::FromStr for HasKeychainEntryRequestV1 {
 
         // Use the intermediate representation to return the struct
         std::result::Result::Ok(HasKeychainEntryRequestV1 {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in HasKeychainEntryRequestV1".to_string())?,
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in HasKeychainEntryRequestV1".to_string())?,
         })
     }
 }
@@ -584,7 +615,7 @@ impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderVal
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
 pub struct HasKeychainEntryResponseV1 {
-    /// The key that was used to check the presence of the value in the keychain.
+    /// The key that was used to check the presence of the value in the entry store.
     #[serde(rename = "key")]
     pub key: String,
 
@@ -599,11 +630,12 @@ pub struct HasKeychainEntryResponseV1 {
 }
 
 impl HasKeychainEntryResponseV1 {
+    #[allow(clippy::new_without_default)]
     pub fn new(key: String, checked_at: String, is_present: bool, ) -> HasKeychainEntryResponseV1 {
         HasKeychainEntryResponseV1 {
-            key: key,
-            checked_at: checked_at,
-            is_present: is_present,
+            key,
+            checked_at,
+            is_present,
         }
     }
 }
@@ -613,20 +645,22 @@ impl HasKeychainEntryResponseV1 {
 /// Should be implemented in a serde serializer
 impl std::string::ToString for HasKeychainEntryResponseV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
-
-
-        params.push("checkedAt".to_string());
-        params.push(self.checked_at.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
 
-        params.push("isPresent".to_string());
-        params.push(self.is_present.to_string());
+            Some("checkedAt".to_string()),
+            Some(self.checked_at.to_string()),
 
-        params.join(",").to_string()
+
+            Some("isPresent".to_string()),
+            Some(self.is_present.to_string()),
+
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
@@ -637,8 +671,9 @@ impl std::str::FromStr for HasKeychainEntryResponseV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
             pub checked_at: Vec<String>,
@@ -648,7 +683,7 @@ impl std::str::FromStr for HasKeychainEntryResponseV1 {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
@@ -658,10 +693,14 @@ impl std::str::FromStr for HasKeychainEntryResponseV1 {
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    "checkedAt" => intermediate_rep.checked_at.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    "isPresent" => intermediate_rep.is_present.push(<bool as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    #[allow(clippy::redundant_clone)]
+                    "checkedAt" => intermediate_rep.checked_at.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    #[allow(clippy::redundant_clone)]
+                    "isPresent" => intermediate_rep.is_present.push(<bool as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
                     _ => return std::result::Result::Err("Unexpected key while parsing HasKeychainEntryResponseV1".to_string())
                 }
             }
@@ -672,9 +711,9 @@ impl std::str::FromStr for HasKeychainEntryResponseV1 {
 
         // Use the intermediate representation to return the struct
         std::result::Result::Ok(HasKeychainEntryResponseV1 {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in HasKeychainEntryResponseV1".to_string())?,
-            checked_at: intermediate_rep.checked_at.into_iter().next().ok_or("checkedAt missing in HasKeychainEntryResponseV1".to_string())?,
-            is_present: intermediate_rep.is_present.into_iter().next().ok_or("isPresent missing in HasKeychainEntryResponseV1".to_string())?,
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in HasKeychainEntryResponseV1".to_string())?,
+            checked_at: intermediate_rep.checked_at.into_iter().next().ok_or_else(|| "checkedAt missing in HasKeychainEntryResponseV1".to_string())?,
+            is_present: intermediate_rep.is_present.into_iter().next().ok_or_else(|| "isPresent missing in HasKeychainEntryResponseV1".to_string())?,
         })
     }
 }
@@ -763,7 +802,7 @@ impl std::ops::DerefMut for PrometheusExporterMetricsResponse {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
-pub struct SetKeychainEntryRequest {
+pub struct SetKeychainEntryRequestV1 {
     /// The key for the entry to set on the keychain.
     #[serde(rename = "key")]
     pub key: String,
@@ -774,42 +813,46 @@ pub struct SetKeychainEntryRequest {
 
 }
 
-impl SetKeychainEntryRequest {
-    pub fn new(key: String, value: String, ) -> SetKeychainEntryRequest {
-        SetKeychainEntryRequest {
-            key: key,
-            value: value,
+impl SetKeychainEntryRequestV1 {
+    #[allow(clippy::new_without_default)]
+    pub fn new(key: String, value: String, ) -> SetKeychainEntryRequestV1 {
+        SetKeychainEntryRequestV1 {
+            key,
+            value,
         }
     }
 }
 
-/// Converts the SetKeychainEntryRequest value to the Query Parameters representation (style=form, explode=false)
+/// Converts the SetKeychainEntryRequestV1 value to the Query Parameters representation (style=form, explode=false)
 /// specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde serializer
-impl std::string::ToString for SetKeychainEntryRequest {
+impl std::string::ToString for SetKeychainEntryRequestV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
 
-        params.push("value".to_string());
-        params.push(self.value.to_string());
+            Some("value".to_string()),
+            Some(self.value.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
-/// Converts Query Parameters representation (style=form, explode=false) to a SetKeychainEntryRequest value
+/// Converts Query Parameters representation (style=form, explode=false) to a SetKeychainEntryRequestV1 value
 /// as specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde deserializer
-impl std::str::FromStr for SetKeychainEntryRequest {
+impl std::str::FromStr for SetKeychainEntryRequestV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
             pub value: Vec<String>,
@@ -818,20 +861,23 @@ impl std::str::FromStr for SetKeychainEntryRequest {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
             let val = match string_iter.next() {
                 Some(x) => x,
-                None => return std::result::Result::Err("Missing value while parsing SetKeychainEntryRequest".to_string())
+                None => return std::result::Result::Err("Missing value while parsing SetKeychainEntryRequestV1".to_string())
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    "value" => intermediate_rep.value.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    _ => return std::result::Result::Err("Unexpected key while parsing SetKeychainEntryRequest".to_string())
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    #[allow(clippy::redundant_clone)]
+                    "value" => intermediate_rep.value.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    _ => return std::result::Result::Err("Unexpected key while parsing SetKeychainEntryRequestV1".to_string())
                 }
             }
 
@@ -840,41 +886,41 @@ impl std::str::FromStr for SetKeychainEntryRequest {
         }
 
         // Use the intermediate representation to return the struct
-        std::result::Result::Ok(SetKeychainEntryRequest {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in SetKeychainEntryRequest".to_string())?,
-            value: intermediate_rep.value.into_iter().next().ok_or("value missing in SetKeychainEntryRequest".to_string())?,
+        std::result::Result::Ok(SetKeychainEntryRequestV1 {
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in SetKeychainEntryRequestV1".to_string())?,
+            value: intermediate_rep.value.into_iter().next().ok_or_else(|| "value missing in SetKeychainEntryRequestV1".to_string())?,
         })
     }
 }
 
-// Methods for converting between header::IntoHeaderValue<SetKeychainEntryRequest> and hyper::header::HeaderValue
+// Methods for converting between header::IntoHeaderValue<SetKeychainEntryRequestV1> and hyper::header::HeaderValue
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<header::IntoHeaderValue<SetKeychainEntryRequest>> for hyper::header::HeaderValue {
+impl std::convert::TryFrom<header::IntoHeaderValue<SetKeychainEntryRequestV1>> for hyper::header::HeaderValue {
     type Error = String;
 
-    fn try_from(hdr_value: header::IntoHeaderValue<SetKeychainEntryRequest>) -> std::result::Result<Self, Self::Error> {
+    fn try_from(hdr_value: header::IntoHeaderValue<SetKeychainEntryRequestV1>) -> std::result::Result<Self, Self::Error> {
         let hdr_value = hdr_value.to_string();
         match hyper::header::HeaderValue::from_str(&hdr_value) {
              std::result::Result::Ok(value) => std::result::Result::Ok(value),
              std::result::Result::Err(e) => std::result::Result::Err(
-                 format!("Invalid header value for SetKeychainEntryRequest - value: {} is invalid {}",
+                 format!("Invalid header value for SetKeychainEntryRequestV1 - value: {} is invalid {}",
                      hdr_value, e))
         }
     }
 }
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<SetKeychainEntryRequest> {
+impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<SetKeychainEntryRequestV1> {
     type Error = String;
 
     fn try_from(hdr_value: hyper::header::HeaderValue) -> std::result::Result<Self, Self::Error> {
         match hdr_value.to_str() {
              std::result::Result::Ok(value) => {
-                    match <SetKeychainEntryRequest as std::str::FromStr>::from_str(value) {
+                    match <SetKeychainEntryRequestV1 as std::str::FromStr>::from_str(value) {
                         std::result::Result::Ok(value) => std::result::Result::Ok(header::IntoHeaderValue(value)),
                         std::result::Result::Err(err) => std::result::Result::Err(
-                            format!("Unable to convert header value '{}' into SetKeychainEntryRequest - {}",
+                            format!("Unable to convert header value '{}' into SetKeychainEntryRequestV1 - {}",
                                 value, err))
                     }
              },
@@ -888,44 +934,48 @@ impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderVal
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "conversion", derive(frunk::LabelledGeneric))]
-pub struct SetKeychainEntryResponse {
+pub struct SetKeychainEntryResponseV1 {
     /// The key that was used to set the value on the keychain.
     #[serde(rename = "key")]
     pub key: String,
 
 }
 
-impl SetKeychainEntryResponse {
-    pub fn new(key: String, ) -> SetKeychainEntryResponse {
-        SetKeychainEntryResponse {
-            key: key,
+impl SetKeychainEntryResponseV1 {
+    #[allow(clippy::new_without_default)]
+    pub fn new(key: String, ) -> SetKeychainEntryResponseV1 {
+        SetKeychainEntryResponseV1 {
+            key,
         }
     }
 }
 
-/// Converts the SetKeychainEntryResponse value to the Query Parameters representation (style=form, explode=false)
+/// Converts the SetKeychainEntryResponseV1 value to the Query Parameters representation (style=form, explode=false)
 /// specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde serializer
-impl std::string::ToString for SetKeychainEntryResponse {
+impl std::string::ToString for SetKeychainEntryResponseV1 {
     fn to_string(&self) -> String {
-        let mut params: Vec<String> = vec![];
+        let params: Vec<Option<String>> = vec![
 
-        params.push("key".to_string());
-        params.push(self.key.to_string());
+            Some("key".to_string()),
+            Some(self.key.to_string()),
 
-        params.join(",").to_string()
+        ];
+
+        params.into_iter().flatten().collect::<Vec<_>>().join(",")
     }
 }
 
-/// Converts Query Parameters representation (style=form, explode=false) to a SetKeychainEntryResponse value
+/// Converts Query Parameters representation (style=form, explode=false) to a SetKeychainEntryResponseV1 value
 /// as specified in https://swagger.io/docs/specification/serialization/
 /// Should be implemented in a serde deserializer
-impl std::str::FromStr for SetKeychainEntryResponse {
+impl std::str::FromStr for SetKeychainEntryResponseV1 {
     type Err = String;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        /// An intermediate representation of the struct to use for parsing.
         #[derive(Default)]
-        // An intermediate representation of the struct to use for parsing.
+        #[allow(dead_code)]
         struct IntermediateRep {
             pub key: Vec<String>,
         }
@@ -933,19 +983,21 @@ impl std::str::FromStr for SetKeychainEntryResponse {
         let mut intermediate_rep = IntermediateRep::default();
 
         // Parse into intermediate representation
-        let mut string_iter = s.split(',').into_iter();
+        let mut string_iter = s.split(',');
         let mut key_result = string_iter.next();
 
         while key_result.is_some() {
             let val = match string_iter.next() {
                 Some(x) => x,
-                None => return std::result::Result::Err("Missing value while parsing SetKeychainEntryResponse".to_string())
+                None => return std::result::Result::Err("Missing value while parsing SetKeychainEntryResponseV1".to_string())
             };
 
             if let Some(key) = key_result {
+                #[allow(clippy::match_single_binding)]
                 match key {
-                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| format!("{}", x))?),
-                    _ => return std::result::Result::Err("Unexpected key while parsing SetKeychainEntryResponse".to_string())
+                    #[allow(clippy::redundant_clone)]
+                    "key" => intermediate_rep.key.push(<String as std::str::FromStr>::from_str(val).map_err(|x| x.to_string())?),
+                    _ => return std::result::Result::Err("Unexpected key while parsing SetKeychainEntryResponseV1".to_string())
                 }
             }
 
@@ -954,40 +1006,40 @@ impl std::str::FromStr for SetKeychainEntryResponse {
         }
 
         // Use the intermediate representation to return the struct
-        std::result::Result::Ok(SetKeychainEntryResponse {
-            key: intermediate_rep.key.into_iter().next().ok_or("key missing in SetKeychainEntryResponse".to_string())?,
+        std::result::Result::Ok(SetKeychainEntryResponseV1 {
+            key: intermediate_rep.key.into_iter().next().ok_or_else(|| "key missing in SetKeychainEntryResponseV1".to_string())?,
         })
     }
 }
 
-// Methods for converting between header::IntoHeaderValue<SetKeychainEntryResponse> and hyper::header::HeaderValue
+// Methods for converting between header::IntoHeaderValue<SetKeychainEntryResponseV1> and hyper::header::HeaderValue
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<header::IntoHeaderValue<SetKeychainEntryResponse>> for hyper::header::HeaderValue {
+impl std::convert::TryFrom<header::IntoHeaderValue<SetKeychainEntryResponseV1>> for hyper::header::HeaderValue {
     type Error = String;
 
-    fn try_from(hdr_value: header::IntoHeaderValue<SetKeychainEntryResponse>) -> std::result::Result<Self, Self::Error> {
+    fn try_from(hdr_value: header::IntoHeaderValue<SetKeychainEntryResponseV1>) -> std::result::Result<Self, Self::Error> {
         let hdr_value = hdr_value.to_string();
         match hyper::header::HeaderValue::from_str(&hdr_value) {
              std::result::Result::Ok(value) => std::result::Result::Ok(value),
              std::result::Result::Err(e) => std::result::Result::Err(
-                 format!("Invalid header value for SetKeychainEntryResponse - value: {} is invalid {}",
+                 format!("Invalid header value for SetKeychainEntryResponseV1 - value: {} is invalid {}",
                      hdr_value, e))
         }
     }
 }
 
 #[cfg(any(feature = "client", feature = "server"))]
-impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<SetKeychainEntryResponse> {
+impl std::convert::TryFrom<hyper::header::HeaderValue> for header::IntoHeaderValue<SetKeychainEntryResponseV1> {
     type Error = String;
 
     fn try_from(hdr_value: hyper::header::HeaderValue) -> std::result::Result<Self, Self::Error> {
         match hdr_value.to_str() {
              std::result::Result::Ok(value) => {
-                    match <SetKeychainEntryResponse as std::str::FromStr>::from_str(value) {
+                    match <SetKeychainEntryResponseV1 as std::str::FromStr>::from_str(value) {
                         std::result::Result::Ok(value) => std::result::Result::Ok(header::IntoHeaderValue(value)),
                         std::result::Result::Err(err) => std::result::Result::Err(
-                            format!("Unable to convert header value '{}' into SetKeychainEntryResponse - {}",
+                            format!("Unable to convert header value '{}' into SetKeychainEntryResponseV1 - {}",
                                 value, err))
                     }
              },

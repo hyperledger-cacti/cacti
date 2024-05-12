@@ -1,6 +1,6 @@
 # Rust API for openapi_client
 
-Contains/describes the Keychain API types/paths for Hyperledger Cactus.
+Contains/describes the Hyperledger Cactus Keychain Memory WASM plugin which is designed to help with testing and development and is implemented in Rust instead of Typescript.
 
 ## Overview
 
@@ -13,8 +13,8 @@ To see how to make this your own, look here:
 
 [README]((https://openapi-generator.tech))
 
-- API version: 0.3.0
-- Build date: 2021-10-04T20:30:49.096004-07:00[America/Los_Angeles]
+- API version: v2.0.0-alpha.2
+- Build date: 2024-05-14T10:49:59.180Z[GMT]
 
 
 
@@ -61,9 +61,6 @@ cargo run --example server
 To run a client, follow one of the following simple steps:
 
 ```
-cargo run --example client DeleteKeychainEntryV1
-cargo run --example client GetPrometheusMetricsV1
-cargo run --example client HasKeychainEntryV1
 ```
 
 ### HTTPS
@@ -97,28 +94,26 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**deleteKeychainEntryV1**](docs/default_api.md#deleteKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry | Deletes an entry from the keychain stored under the provided key.
-[**getKeychainEntryV1**](docs/default_api.md#getKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
-[**getPrometheusMetricsV1**](docs/default_api.md#getPrometheusMetricsV1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-[**hasKeychainEntryV1**](docs/default_api.md#hasKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/has-keychain-entry | Retrieves the information regarding a key being present on the keychain or not.
-[**setKeychainEntryV1**](docs/default_api.md#setKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry | Sets a value under a key on the keychain backend.
+[**deleteKeychainEntryV1**](docs/default_api.md#deleteKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
+[**getKeychainEntryV1**](docs/default_api.md#getKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
+[**hasKeychainEntryV1**](docs/default_api.md#hasKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/has-keychain-entry | Checks that an entry exists under a key on the keychain backend
+[**setKeychainEntryV1**](docs/default_api.md#setKeychainEntryV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/set-keychain-entry | Sets a value under a key on the keychain backend.
 
 
 ## Documentation For Models
 
  - [DeleteKeychainEntryRequestV1](docs/DeleteKeychainEntryRequestV1.md)
  - [DeleteKeychainEntryResponseV1](docs/DeleteKeychainEntryResponseV1.md)
- - [GetKeychainEntryRequest](docs/GetKeychainEntryRequest.md)
- - [GetKeychainEntryResponse](docs/GetKeychainEntryResponse.md)
+ - [GetKeychainEntryRequestV1](docs/GetKeychainEntryRequestV1.md)
+ - [GetKeychainEntryResponseV1](docs/GetKeychainEntryResponseV1.md)
  - [HasKeychainEntryRequestV1](docs/HasKeychainEntryRequestV1.md)
  - [HasKeychainEntryResponseV1](docs/HasKeychainEntryResponseV1.md)
- - [PrometheusExporterMetricsResponse](docs/PrometheusExporterMetricsResponse.md)
- - [SetKeychainEntryRequest](docs/SetKeychainEntryRequest.md)
- - [SetKeychainEntryResponse](docs/SetKeychainEntryResponse.md)
+ - [SetKeychainEntryRequestV1](docs/SetKeychainEntryRequestV1.md)
+ - [SetKeychainEntryResponseV1](docs/SetKeychainEntryResponseV1.md)
 
 
 ## Documentation For Authorization
- Endpoints do not require authorization.
+Endpoints do not require authorization.
 
 
 ## Author

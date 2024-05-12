@@ -57,7 +57,7 @@ fn into_base_path(input: impl TryInto<Uri, Error=hyper::http::uri::InvalidUri>, 
         }
     }
 
-    let host = uri.host().ok_or_else(|| ClientInitError::MissingHost)?;
+    let host = uri.host().ok_or(ClientInitError::MissingHost)?;
     let port = uri.port_u16().map(|x| format!(":{}", x)).unwrap_or_default();
     Ok(format!("{}://{}{}{}", scheme, host, port, uri.path().trim_end_matches('/')))
 }
@@ -196,7 +196,7 @@ impl<C> Client<DropContextService<HyperClient, C>, C> where
             "https" => {
                 let connector = connector.https()
                    .build()
-                   .map_err(|e| ClientInitError::SslError(e))?;
+                   .map_err(ClientInitError::SslError)?;
                 HyperClient::Https(hyper::client::Client::builder().build(connector))
             },
             _ => {
@@ -248,7 +248,7 @@ impl<C> Client<DropContextService<hyper::client::Client<HttpsConnector, Body>, C
         let https_connector = Connector::builder()
             .https()
             .build()
-            .map_err(|e| ClientInitError::SslError(e))?;
+            .map_err(ClientInitError::SslError)?;
         Self::try_new_with_connector(base_path, Some("https"), https_connector)
     }
 
@@ -269,7 +269,7 @@ impl<C> Client<DropContextService<hyper::client::Client<HttpsConnector, Body>, C
             .https()
             .pin_server_certificate(ca_certificate)
             .build()
-            .map_err(|e| ClientInitError::SslError(e))?;
+            .map_err(ClientInitError::SslError)?;
         Self::try_new_with_connector(base_path, Some("https"), https_connector)
     }
 
@@ -297,7 +297,7 @@ impl<C> Client<DropContextService<hyper::client::Client<HttpsConnector, Body>, C
             .pin_server_certificate(ca_certificate)
             .client_authentication(client_key, client_certificate)
             .build()
-            .map_err(|e| ClientInitError::SslError(e))?;
+            .map_err(ClientInitError::SslError)?;
         Self::try_new_with_connector(base_path, Some("https"), https_connector)
     }
 }
@@ -419,45 +419,58 @@ impl<S, C> Api<C> for Client<S, C> where
         };
 
         // Body parameter
-        let body = param_delete_keychain_entry_request_v1.map(|ref body| {
-            serde_json::to_string(body).expect("impossible to fail to serialize")
-        });
-        if let Some(body) = body {
+        let body = serde_json::to_string(&param_delete_keychain_entry_request_v1).expect("impossible to fail to serialize");
                 *request.body_mut() = Body::from(body);
-        }
 
         let header = "application/json";
         request.headers_mut().insert(CONTENT_TYPE, match HeaderValue::from_str(header) {
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create header: {} - {}", header, e)))
         });
-        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.clone().to_string().as_str());
+        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.as_str());
         request.headers_mut().insert(HeaderName::from_static("x-span-id"), match header {
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create X-Span ID header value: {}", e)))
         });
 
-        let mut response = client_service.call((request, context.clone()))
+        let response = client_service.call((request, context.clone()))
             .map_err(|e| ApiError(format!("No response received: {}", e))).await?;
 
         match response.status().as_u16() {
             200 => {
                 let body = response.into_body();
                 let body = body
-                        .to_raw()
+                        .into_raw()
                         .map_err(|e| ApiError(format!("Failed to read response: {}", e))).await?;
                 let body = str::from_utf8(&body)
                     .map_err(|e| ApiError(format!("Response was not valid UTF8: {}", e)))?;
-                let body = serde_json::from_str::<models::DeleteKeychainEntryResponseV1>(body)?;
+                let body = serde_json::from_str::<models::DeleteKeychainEntryResponseV1>(body).map_err(|e| {
+                    ApiError(format!("Response body did not match the schema: {}", e))
+                })?;
                 Ok(DeleteKeychainEntryV1Response::OK
                     (body)
+                )
+            }
+            400 => {
+                Ok(
+                    DeleteKeychainEntryV1Response::BadRequest
+                )
+            }
+            401 => {
+                Ok(
+                    DeleteKeychainEntryV1Response::AuthorizationInformationIsMissingOrInvalid
+                )
+            }
+            500 => {
+                Ok(
+                    DeleteKeychainEntryV1Response::UnexpectedError
                 )
             }
             code => {
                 let headers = response.headers().clone();
                 let body = response.into_body()
                        .take(100)
-                       .to_raw().await;
+                       .into_raw().await;
                 Err(ApiError(format!("Unexpected response code {}:\n{:?}\n\n{}",
                     code,
                     headers,
@@ -475,7 +488,7 @@ impl<S, C> Api<C> for Client<S, C> where
 
     async fn get_keychain_entry_v1(
         &self,
-        param_get_keychain_entry_request: models::GetKeychainEntryRequest,
+        param_get_keychain_entry_request_v1: models::GetKeychainEntryRequestV1,
         context: &C) -> Result<GetKeychainEntryV1Response, ApiError>
     {
         let mut client_service = self.client_service.clone();
@@ -507,7 +520,7 @@ impl<S, C> Api<C> for Client<S, C> where
                 Err(e) => return Err(ApiError(format!("Unable to create request: {}", e)))
         };
 
-        let body = serde_json::to_string(&param_get_keychain_entry_request).expect("impossible to fail to serialize");
+        let body = serde_json::to_string(&param_get_keychain_entry_request_v1).expect("impossible to fail to serialize");
                 *request.body_mut() = Body::from(body);
 
         let header = "application/json";
@@ -515,48 +528,46 @@ impl<S, C> Api<C> for Client<S, C> where
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create header: {} - {}", header, e)))
         });
-        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.clone().to_string().as_str());
+        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.as_str());
         request.headers_mut().insert(HeaderName::from_static("x-span-id"), match header {
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create X-Span ID header value: {}", e)))
         });
 
-        let mut response = client_service.call((request, context.clone()))
+        let response = client_service.call((request, context.clone()))
             .map_err(|e| ApiError(format!("No response received: {}", e))).await?;
 
         match response.status().as_u16() {
             200 => {
                 let body = response.into_body();
                 let body = body
-                        .to_raw()
+                        .into_raw()
                         .map_err(|e| ApiError(format!("Failed to read response: {}", e))).await?;
                 let body = str::from_utf8(&body)
                     .map_err(|e| ApiError(format!("Response was not valid UTF8: {}", e)))?;
-                let body = serde_json::from_str::<models::GetKeychainEntryResponse>(body)?;
+                let body = serde_json::from_str::<models::GetKeychainEntryResponseV1>(body).map_err(|e| {
+                    ApiError(format!("Response body did not match the schema: {}", e))
+                })?;
                 Ok(GetKeychainEntryV1Response::OK
                     (body)
                 )
             }
             400 => {
-                let body = response.into_body();
                 Ok(
                     GetKeychainEntryV1Response::BadRequest
                 )
             }
             401 => {
-                let body = response.into_body();
                 Ok(
                     GetKeychainEntryV1Response::AuthorizationInformationIsMissingOrInvalid
                 )
             }
             404 => {
-                let body = response.into_body();
                 Ok(
                     GetKeychainEntryV1Response::AKeychainItemWithTheSpecifiedKeyWasNotFound
                 )
             }
             500 => {
-                let body = response.into_body();
                 Ok(
                     GetKeychainEntryV1Response::UnexpectedError
                 )
@@ -565,8 +576,8 @@ impl<S, C> Api<C> for Client<S, C> where
                 let headers = response.headers().clone();
                 let body = response.into_body()
                        .take(100)
-                       .to_raw().await;
-                Err(ApiError(format!("Unexpected response code {}:\n{:?}\n\n{}",
+                       .into_raw().await;
+                    Err(ApiError(format!("Unexpected response code {}:\n{:?}\n\n{}",
                     code,
                     headers,
                     match body {
@@ -627,7 +638,7 @@ impl<S, C> Api<C> for Client<S, C> where
             200 => {
                 let body = response.into_body();
                 let body = body
-                        .to_raw()
+                        .into_raw()
                         .map_err(|e| ApiError(format!("Failed to read response: {}", e))).await?;
                 let body = str::from_utf8(&body)
                     .map_err(|e| ApiError(format!("Response was not valid UTF8: {}", e)))?;
@@ -640,7 +651,7 @@ impl<S, C> Api<C> for Client<S, C> where
                 let headers = response.headers().clone();
                 let body = response.into_body()
                        .take(100)
-                       .to_raw().await;
+                       .into_raw().await;
                 Err(ApiError(format!("Unexpected response code {}:\n{:?}\n\n{}",
                     code,
                     headers,
@@ -690,45 +701,58 @@ impl<S, C> Api<C> for Client<S, C> where
                 Err(e) => return Err(ApiError(format!("Unable to create request: {}", e)))
         };
 
-        let body = param_has_keychain_entry_request_v1.map(|ref body| {
-            serde_json::to_string(body).expect("impossible to fail to serialize")
-        });
-        if let Some(body) = body {
+        let body = serde_json::to_string(&param_has_keychain_entry_request_v1).expect("impossible to fail to serialize");
                 *request.body_mut() = Body::from(body);
-        }
 
         let header = "application/json";
         request.headers_mut().insert(CONTENT_TYPE, match HeaderValue::from_str(header) {
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create header: {} - {}", header, e)))
         });
-        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.clone().to_string().as_str());
+        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.as_str());
         request.headers_mut().insert(HeaderName::from_static("x-span-id"), match header {
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create X-Span ID header value: {}", e)))
         });
 
-        let mut response = client_service.call((request, context.clone()))
+        let response = client_service.call((request, context.clone()))
             .map_err(|e| ApiError(format!("No response received: {}", e))).await?;
 
         match response.status().as_u16() {
             200 => {
                 let body = response.into_body();
                 let body = body
-                        .to_raw()
+                        .into_raw()
                         .map_err(|e| ApiError(format!("Failed to read response: {}", e))).await?;
                 let body = str::from_utf8(&body)
                     .map_err(|e| ApiError(format!("Response was not valid UTF8: {}", e)))?;
-                let body = serde_json::from_str::<models::HasKeychainEntryResponseV1>(body)?;
+                let body = serde_json::from_str::<models::HasKeychainEntryResponseV1>(body).map_err(|e| {
+                    ApiError(format!("Response body did not match the schema: {}", e))
+                })?;
                 Ok(HasKeychainEntryV1Response::OK
                     (body)
+                )
+            }
+            400 => {
+                Ok(
+                    HasKeychainEntryV1Response::BadRequest
+                )
+            }
+            401 => {
+                Ok(
+                    HasKeychainEntryV1Response::AuthorizationInformationIsMissingOrInvalid
+                )
+            }
+            500 => {
+                Ok(
+                    HasKeychainEntryV1Response::UnexpectedError
                 )
             }
             code => {
                 let headers = response.headers().clone();
                 let body = response.into_body()
                        .take(100)
-                       .to_raw().await;
+                       .into_raw().await;
                 Err(ApiError(format!("Unexpected response code {}:\n{:?}\n\n{}",
                     code,
                     headers,
@@ -746,7 +770,7 @@ impl<S, C> Api<C> for Client<S, C> where
 
     async fn set_keychain_entry_v1(
         &self,
-        param_set_keychain_entry_request: models::SetKeychainEntryRequest,
+        param_set_keychain_entry_request_v1: models::SetKeychainEntryRequestV1,
         context: &C) -> Result<SetKeychainEntryV1Response, ApiError>
     {
         let mut client_service = self.client_service.clone();
@@ -778,7 +802,7 @@ impl<S, C> Api<C> for Client<S, C> where
                 Err(e) => return Err(ApiError(format!("Unable to create request: {}", e)))
         };
 
-        let body = serde_json::to_string(&param_set_keychain_entry_request).expect("impossible to fail to serialize");
+        let body = serde_json::to_string(&param_set_keychain_entry_request_v1).expect("impossible to fail to serialize");
 
                 *request.body_mut() = Body::from(body);
 
@@ -788,42 +812,41 @@ impl<S, C> Api<C> for Client<S, C> where
             Err(e) => return Err(ApiError(format!("Unable to create header: {} - {}", header, e)))
         });
 
-        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.clone().to_string().as_str());
+        let header = HeaderValue::from_str(Has::<XSpanIdString>::get(context).0.as_str());
         request.headers_mut().insert(HeaderName::from_static("x-span-id"), match header {
             Ok(h) => h,
             Err(e) => return Err(ApiError(format!("Unable to create X-Span ID header value: {}", e)))
         });
 
-        let mut response = client_service.call((request, context.clone()))
+        let response = client_service.call((request, context.clone()))
             .map_err(|e| ApiError(format!("No response received: {}", e))).await?;
 
         match response.status().as_u16() {
             200 => {
                 let body = response.into_body();
                 let body = body
-                        .to_raw()
+                        .into_raw()
                         .map_err(|e| ApiError(format!("Failed to read response: {}", e))).await?;
                 let body = str::from_utf8(&body)
                     .map_err(|e| ApiError(format!("Response was not valid UTF8: {}", e)))?;
-                let body = serde_json::from_str::<models::SetKeychainEntryResponse>(body)?;
+                let body = serde_json::from_str::<models::SetKeychainEntryResponseV1>(body).map_err(|e| {
+                    ApiError(format!("Response body did not match the schema: {}", e))
+                })?;
                 Ok(SetKeychainEntryV1Response::OK
                     (body)
                 )
             }
             400 => {
-                let body = response.into_body();
                 Ok(
                     SetKeychainEntryV1Response::BadRequest
                 )
             }
             401 => {
-                let body = response.into_body();
                 Ok(
                     SetKeychainEntryV1Response::AuthorizationInformationIsMissingOrInvalid
                 )
             }
             500 => {
-                let body = response.into_body();
                 Ok(
                     SetKeychainEntryV1Response::UnexpectedError
                 )
@@ -832,7 +855,7 @@ impl<S, C> Api<C> for Client<S, C> where
                 let headers = response.headers().clone();
                 let body = response.into_body()
                        .take(100)
-                       .to_raw().await;
+                       .into_raw().await;
                 Err(ApiError(format!("Unexpected response code {}:\n{:?}\n\n{}",
                     code,
                     headers,
