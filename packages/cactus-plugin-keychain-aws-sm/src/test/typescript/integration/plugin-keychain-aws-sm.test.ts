@@ -205,7 +205,7 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
       t.fail(
         "Failing because getKeychainEntryV1 did not throw when called with non-existent key.",
       );
-    } catch (ex) {
+    } catch (ex: any) {
       t.ok(ex, "res7 -> ex truthy");
       const res7 = ex.response;
       t.equal(res7.status, 404, "res7.status === 404 OK");

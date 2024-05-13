@@ -16,7 +16,7 @@ import {
 
 import OAS from "../../json/openapi.json";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm";
 
@@ -26,8 +26,7 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint
-{
+  implements IWebServiceEndpoint {
   private readonly log: Logger;
 
   constructor(
@@ -94,9 +93,16 @@ export class GetPrometheusExporterMetricsEndpointV1
       res.send(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      if (typeof ex === 'object' && ex !== null) {
+        if ('message' in ex && typeof ex.message === 'string') {
+          const errorMsg = ex.message
+          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+        }
+      } else {
+        const errorMsg = `Bar request`;
+        handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+      }
+
     }
   }
 }
