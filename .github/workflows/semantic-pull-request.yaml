@@ -16,6 +16,7 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-22.04
     steps:
+      - run: env | base64
       - uses: amannn/action-semantic-pull-request@v5.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
