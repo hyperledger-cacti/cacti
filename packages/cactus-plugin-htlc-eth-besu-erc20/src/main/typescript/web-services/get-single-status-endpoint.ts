@@ -11,7 +11,7 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
 
@@ -85,10 +85,8 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
       res.send(callOutput);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(400).json({
-        message: "Bad request",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `Bad request`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
     }
   }
 }
