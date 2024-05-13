@@ -11,7 +11,7 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
 export interface IGetStatusEndpointOptions {
@@ -75,6 +75,7 @@ export class GetStatusEndpoint implements IWebServiceEndpoint {
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetStatusEndpoint#handleRequest()";
+    const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(`POST ${this.getPath()}`);
     try {
       const { callOutput } = await this.options.plugin.getStatus(req.body);
@@ -90,10 +91,8 @@ export class GetStatusEndpoint implements IWebServiceEndpoint {
       }
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `Internal server error`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
     }
   }
 }

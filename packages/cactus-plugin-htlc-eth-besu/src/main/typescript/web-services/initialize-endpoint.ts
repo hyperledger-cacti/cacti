@@ -11,7 +11,7 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 
 import { InitializeRequest } from "../generated/openapi/typescript-axios";
@@ -79,6 +79,7 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "InitializeEndpoint#handleRequest()";
+    const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(`POST ${this.getPath()}`);
     try {
       const request: InitializeRequest = req.body as InitializeRequest;
@@ -94,10 +95,8 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
       }
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `Internal server Error`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
     }
   }
 }
