@@ -114,7 +114,7 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
   t.equal(res6.data.key, key, "res6.data.key === key OK");
   try {
     await apiClient.getKeychainEntryV1({ key });
-  } catch (out) {
+  } catch (out: any) {
     t.ok(out, "error thrown for not found endpoint truthy OK");
     t.ok(out.response, "deploy contract response truthy OK");
     t.ok(out.response.data, "out.response.data truthy OK");

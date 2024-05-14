@@ -112,7 +112,7 @@ test(testCase, async (t: Test) => {
       await apiClient.setKeychainEntryV1({
         value,
       } as any as SetKeychainEntryRequestV1);
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -131,7 +131,7 @@ test(testCase, async (t: Test) => {
       await apiClient.getKeychainEntryV1(
         {} as any as GetKeychainEntryRequestV1,
       );
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -150,7 +150,7 @@ test(testCase, async (t: Test) => {
       await apiClient.hasKeychainEntryV1(
         {} as any as HasKeychainEntryRequestV1,
       );
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -169,7 +169,7 @@ test(testCase, async (t: Test) => {
       await apiClient.deleteKeychainEntryV1(
         {} as any as DeleteKeychainEntryRequestV1,
       );
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -190,7 +190,7 @@ test(testCase, async (t: Test) => {
         value,
         fake: 4,
       } as any as SetKeychainEntryRequestV1);
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -213,7 +213,7 @@ test(testCase, async (t: Test) => {
         key,
         fake: 4,
       } as any as GetKeychainEntryRequestV1);
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -236,7 +236,7 @@ test(testCase, async (t: Test) => {
         key,
         fake: 4,
       } as any as HasKeychainEntryRequestV1);
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
@@ -259,7 +259,7 @@ test(testCase, async (t: Test) => {
         key,
         fake: 4,
       } as any as DeleteKeychainEntryRequestV1);
-    } catch (e) {
+    } catch (e: any) {
       t2.equal(
         e.response.status,
         400,
