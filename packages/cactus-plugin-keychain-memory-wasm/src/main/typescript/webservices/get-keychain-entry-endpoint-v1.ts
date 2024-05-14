@@ -13,7 +13,7 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginKeychainMemoryWasm } from "../plugin-keychain-memory-wasm";
@@ -91,17 +91,16 @@ export class GetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
       const value = await this.options.plugin.get(key);
       res.json({ key, value });
     } catch (ex) {
-      if (ex?.message?.includes(`${key} secret not found`)) {
-        res.status(404).json({
-          key,
-          error: ex?.stack || ex?.message,
-        });
+      if (typeof ex === 'object' && ex !== null) {
+        if ('message' in ex && ex['message'] && typeof ex.message === 'string') {
+          const errorMsg = ex.message
+          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+        }
+
       } else {
         this.log.error(`Crash while serving ${reqTag}`, ex);
-        res.status(500).json({
-          message: "Internal Server Error",
-          error: ex?.stack || ex?.message,
-        });
+        const errorMsg = `Internal server Error`;
+        handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
       }
     }
   }
