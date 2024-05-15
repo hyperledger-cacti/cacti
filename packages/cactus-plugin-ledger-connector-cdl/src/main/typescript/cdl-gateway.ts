@@ -117,10 +117,9 @@ export class CDLGateway {
 
       return requestResponse.data;
     } catch (error) {
-      if ("toJSON" in error) {
+      if (error instanceof Date) {
         this.log.error("CDL API request failed:", error.toJSON());
       }
-
       throw error;
     }
   }
