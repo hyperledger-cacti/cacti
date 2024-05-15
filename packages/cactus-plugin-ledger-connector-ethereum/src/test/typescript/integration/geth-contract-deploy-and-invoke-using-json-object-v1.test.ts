@@ -52,9 +52,9 @@ const containerImageVersion = "2023-07-27-2a8c48ed6";
 describe("Ethereum contract deploy and invoke using keychain tests", () => {
   const keychainEntryKey = uuidV4();
   let testEthAccount: {
-      address: HexString;
-      privateKey: HexString;
-    },
+    address: HexString;
+    privateKey: HexString;
+  },
     web3: InstanceType<typeof Web3>,
     addressInfo,
     address: string,
