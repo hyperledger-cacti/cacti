@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../../images/HL_Cacti_Logo_Colorreverse.svg">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.22">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.732c4fb1.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -4152,9 +4152,7 @@
 <li>Node.js and NPM: <a href="https://nodejs.org/en/download/package-manager/">sample instructions</a> (Version 16 Supported)</li>
 <li>Yarn: <a href="https://classic.yarnpkg.com/en/docs/install/">sample instructions</a></li>
 <li>Rust: <a href="https://www.rust-lang.org/tools/install">sample instructions</a></li>
-<li>
-<p>Protoc (Protobuf compiler): <em>Golang should already be installed and configured.</em></p>
-<ul>
+<li>Protoc (Protobuf compiler): <em>Golang should already be installed and configured.</em><ul>
 <li>Default method: Run the following with <code>sudo</code> if necessary. This will install both the protobuf compiler and the Go code generator plugins.
   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>apt-get install protobuf-compiler
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go install google.golang.org/protobuf/cmd/protoc-gen-go
@@ -4168,6 +4166,14 @@
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>export PATH=&quot;$PATH:&lt;some-folder-path&gt;/bin&quot;
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>go install google.golang.org/protobuf/cmd/protoc-gen-go
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+</code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>SQLite3 Library:</p>
+<ul>
+<li>Sample instruction for Ubuntu:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>apt-get install sqlite3 libsqlite3-dev
 </code></pre></div></li>
 </ul>
 <table>
@@ -4194,35 +4200,35 @@
 <ul>
 <li>Navigate to the <code>weaver/common/protos-js</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>build
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>build
 </code></pre></div></li>
 </ul>
 <p>To compile the protobufs for Golang, do the following:</p>
 <ul>
 <li>Navigate to the <code>weaver/common/protos-go</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>build
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>make<span class="w"> </span>build
 </code></pre></div></li>
 </ul>
 <p>To compile the protobufs for Java and Kotlin, do the following:</p>
 <ul>
 <li>Navigate to the <code>weaver/common/protos-java-kt</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>make<span class="w"> </span>build
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>make<span class="w"> </span>build
 </code></pre></div></li>
 </ul>
 <p>To compile the protobufs for Solidity, do the following:</p>
 <ul>
 <li>Navigate to the <code>weaver/common/protos-sol</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>make<span class="w"> </span>build
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span>build
 </code></pre></div></li>
 </ul>
 <p>To compile the protobufs for Rust, do the following:</p>
 <ul>
 <li>Navigate to the <code>weaver/common/protos-rs</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span>build
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make<span class="w"> </span>build
 </code></pre></div></li>
 </ul>
 <h2 id="securing-components">Securing Components<a class="headerlink" href="#securing-components" title="Permanent link">&para;</a></h2>
@@ -4246,7 +4252,7 @@
 <ul>
 <li>Navigate to the <code>weaver/sdks/fabric/interoperation-node-sdk</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 </ul>
 <h3 id="fabric-network">Fabric Network<a class="headerlink" href="#fabric-network" title="Permanent link">&para;</a></h3>
@@ -4280,13 +4286,13 @@
 <ul>
 <li>Navigate to the <code>weaver/tests/network-setups/fabric/dev</code> folder.</li>
 <li>To spin up both network1 and network2 with the interoperation chaincode and the default <code>simplestate</code> chaincode installed, run:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>make<span class="w"> </span>start-interop-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>make<span class="w"> </span>start-interop-local
 </code></pre></div></li>
 <li><em>To launch the networks with a different application chaincode from the above list, run</em>:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>make<span class="w"> </span>start-interop-local<span class="w"> </span><span class="nv">CHAINCODE_NAME</span><span class="o">=</span>&lt;chaincode-name&gt;
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make<span class="w"> </span>start-interop-local<span class="w"> </span><span class="nv">CHAINCODE_NAME</span><span class="o">=</span>&lt;chaincode-name&gt;
 </code></pre></div></li>
 <li><em>To launch the networks with 2 organizations, each with a peer (this will enable more variation and experimentation, which you can attempt after testing interoperation protocols across basic network configurations), run</em>:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make<span class="w"> </span>start-interop-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;2-nodes&quot;</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make<span class="w"> </span>start-interop-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;2-nodes&quot;</span>
 </code></pre></div></li>
 </ul>
 <table>
@@ -4332,7 +4338,7 @@
 <ul>
 <li>Navigate to the <code>weaver/samples/fabric/fabric-cli</code> folder (for the Node.js version) or the <code>weaver/samples/fabric/go-cli</code> (for the Golang version) folder.</li>
 <li>Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 <li>Use the <code>fabric-cli</code> executable in the <code>bin</code> folder for <a href="../ledger-initialization/">subsequent actions</a>.</li>
 </ul>
@@ -4345,11 +4351,11 @@ The code for this lies in the <code>weaver/core/relay</code> folder.</p>
 <ul>
 <li>Navigate to the <code>weaver/core/relay</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>make
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>make
 </code></pre></div></li>
 <li>If you observe errors during the above compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions and recompile as follows:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>make<span class="w"> </span>update-pkgs
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>make
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>make<span class="w"> </span>update-pkgs
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>make
 </code></pre></div></li>
 </ul>
 <h4 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">&para;</a></h4>
@@ -4358,84 +4364,84 @@ The code for this lies in the <code>weaver/core/relay</code> folder.</p>
 <ul>
 <li>Navigate to the <code>weaver/core/relay</code> folder.</li>
 <li>To launch the server without TLS, leave the configuration file <code>config/Fabric_Relay.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">.</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="p">.</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">.</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">.</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="k">[relays]</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="k">[relays.Corda_Relay]</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9081&quot;</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="k">[relays.Corda_Relay2]</span>
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9082&quot;</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="k">[relays.Fabric_Relay2]</span>
-<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9083&quot;</span>
-<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="p">.</span>
-<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="p">.</span>
-<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="k">[drivers]</span>
-<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="k">[drivers.Fabric]</span>
-<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9090&quot;</span>
-<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="p">.</span>
-<a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="p">.</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">.</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p">.</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">.</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">.</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="k">[relays.Corda_Relay]</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9081&quot;</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="k">[relays.Corda_Relay2]</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9082&quot;</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="k">[relays.Fabric_Relay2]</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9083&quot;</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="p">.</span>
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a><span class="p">.</span>
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a><span class="k">[drivers.Fabric]</span>
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9090&quot;</span>
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a><span class="p">.</span>
+<a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a><span class="p">.</span>
 </code></pre></div></li>
 <li>To launch the server, simply run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Fabric_Relay.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Fabric_Relay.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
 </code></pre></div></li>
 </ul>
 <p>Run a relay for <code>network2</code> as follows (<em>do this only if you have launched both Fabric networks <code>network1</code> and <code>network2</code> and wish to test interoperation between them</em>)</p>
 <ul>
 <li>Navigate to the <code>weaver/core/relay</code> folder.</li>
 <li>To launch the server without TLS, leave the configuration file <code>config/Fabric_Relay2.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">.</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="p">.</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="p">.</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="p">.</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="k">[relays]</span>
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="k">[relays.Corda_Relay]</span>
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9081&quot;</span>
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="k">[relays.Corda_Relay2]</span>
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9082&quot;</span>
-<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="k">[relays.Fabric_Relay]</span>
-<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9080&quot;</span>
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="p">.</span>
-<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="p">.</span>
-<a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a><span class="k">[drivers]</span>
-<a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a><span class="k">[drivers.Fabric]</span>
-<a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9095&quot;</span>
-<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a><span class="p">.</span>
-<a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a><span class="p">.</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">.</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="p">.</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">.</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">.</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="k">[relays.Corda_Relay]</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9081&quot;</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="k">[relays.Corda_Relay2]</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9082&quot;</span>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="k">[relays.Fabric_Relay]</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9080&quot;</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a><span class="p">.</span>
+<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a><span class="p">.</span>
+<a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a><span class="k">[drivers.Fabric]</span>
+<a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9095&quot;</span>
+<a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-17-32" name="__codelineno-17-32" href="#__codelineno-17-32"></a><span class="p">.</span>
+<a id="__codelineno-17-33" name="__codelineno-17-33" href="#__codelineno-17-33"></a><span class="p">.</span>
 </code></pre></div></li>
 <li>To launch the server, simply run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Fabric_Relay2.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Fabric_Relay2.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
 </code></pre></div></li>
 </ul>
 <p>For more information, see the <a href="https://github.com/hyperledger/cacti/tree/main/weaver/core/relay">relay README</a>.</p>
@@ -4454,18 +4460,18 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 </ul>
 </li>
 <li>If you wish to start the driver without TLS, set the following parameter values:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>RELAY_TLS=false
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>RELAY_TLSCA_CERT_PATH=
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>DRIVER_TLS=false
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>DRIVER_TLS_CERT_PATH=
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>DRIVER_TLS_KEY_PATH=
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>RELAY_TLS=false
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>RELAY_TLSCA_CERT_PATH=
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>DRIVER_TLS=false
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>DRIVER_TLS_CERT_PATH=
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>DRIVER_TLS_KEY_PATH=
 </code></pre></div>
   Otherwise, if you wish to start the driver with TLS enabled, set the following parameter values (replace <code>&lt;PATH-TO-WEAVER&gt;</code> with the absolute path of the <code>weaver</code> folder within your Cacti repository clone):
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>RELAY_TLS=true
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>RELAY_TLSCA_CERT_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_ca_cert.pem
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>DRIVER_TLS=true
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>DRIVER_TLS_CERT_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_cert.pem
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>DRIVER_TLS_KEY_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_key
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>RELAY_TLS=true
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>RELAY_TLSCA_CERT_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_ca_cert.pem
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>DRIVER_TLS=true
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>DRIVER_TLS_CERT_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_cert.pem
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>DRIVER_TLS_KEY_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_key
 </code></pre></div></li>
 <li>Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified in the template.</li>
 </ul>
@@ -4476,7 +4482,7 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <ul>
 <li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 </ul>
 <h4 id="running">Running<a class="headerlink" href="#running" title="Permanent link">&para;</a></h4>
@@ -4484,14 +4490,14 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <ul>
 <li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div></li>
 </ul>
 <p>Run a Fabric driver for <code>network2</code> as follows (<em>do this only if you wish to test interoperation between the two Fabric networks <code>network1</code> and <code>network2</code></em>)</p>
 <ul>
 <li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
 <li>Run the following (replace <code>&lt;PATH-TO-WEAVER&gt;</code> with the absolute path of the <code>weaver</code> folder within your Cacti repository clone):
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">CONNECTION_PROFILE</span><span class="o">=</span>&lt;PATH-TO-WEAVER&gt;/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json<span class="w"> </span><span class="nv">NETWORK_NAME</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">RELAY_ENDPOINT</span><span class="o">=</span>localhost:9083<span class="w"> </span><span class="nv">DRIVER_ENDPOINT</span><span class="o">=</span>localhost:9095<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">CONNECTION_PROFILE</span><span class="o">=</span>&lt;PATH-TO-WEAVER&gt;/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json<span class="w"> </span><span class="nv">NETWORK_NAME</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">RELAY_ENDPOINT</span><span class="o">=</span>localhost:9083<span class="w"> </span><span class="nv">DRIVER_ENDPOINT</span><span class="o">=</span>localhost:9095<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div></li>
 </ul>
 <table>
@@ -4510,7 +4516,7 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <p>IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the <code>weaver/core/identity-management/iin-agent</code> folder. Navigate to the <code>weaver/core/identity-management/iin-agent</code> folder.</p>
 <h4 id="building_2">Building<a class="headerlink" href="#building_2" title="Permanent link">&para;</a></h4>
 <p>To build the IIN Agent, run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>make<span class="w"> </span>build-local
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></p>
 <h4 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h4>
 <p>Ledger config file specifies ledger specific IIN Agent details such as identity and which network and organization to connect to.</p>
@@ -4533,102 +4539,102 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <ul>
 <li>
 <p>If Fabric networks are started with 1 org, and IIN Agent are to be started without TLS, use following values:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
-<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-24-16" name="__codelineno-24-16" href="#__codelineno-24-16"></a><span class="p">}</span>
-</code></pre></div></p>
-</li>
-<li>
-<p>If Fabric networks are started with 1 org, and IIN Agent are to be started with TLS, use following values:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span><span class="p">},</span>
 <a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="p">}</span>
 </code></pre></div></p>
 </li>
 <li>
-<p>If Fabric networks are started with 2 orgs, and IIN Agent are to be started without TLS, use following values:
+<p>If Fabric networks are started with 1 org, and IIN Agent are to be started with TLS, use following values:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">        </span><span class="p">},</span>
-<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9510&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a><span class="w">        </span><span class="p">},</span>
-<a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9511&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-22" name="__codelineno-26-22" href="#__codelineno-26-22"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-26-23" name="__codelineno-26-23" href="#__codelineno-26-23"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-26-24" name="__codelineno-26-24" href="#__codelineno-26-24"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-26-25" name="__codelineno-26-25" href="#__codelineno-26-25"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-26-26" name="__codelineno-26-26" href="#__codelineno-26-26"></a><span class="p">}</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="p">}</span>
 </code></pre></div></p>
 </li>
 <li>
-<p>If Fabric networks are started with 2 orgs, and IIN Agent are to be started with TLS, use following values:
+<p>If Fabric networks are started with 2 orgs, and IIN Agent are to be started without TLS, use following values:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9510&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="w">    </span><span class="p">},</span>
 <a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9511&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a><span class="p">}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>If Fabric networks are started with 2 orgs, and IIN Agent are to be started with TLS, use following values:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9510&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9511&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-28-25" name="__codelineno-28-25" href="#__codelineno-28-25"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a><span class="p">}</span>
 </code></pre></div></p>
 </li>
 </ul>
@@ -4636,36 +4642,36 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <p>To configure environment variables for <code>Org1MSP</code>'s Fabric IIN Agent of <code>network1</code>, follow the steps:</p>
 <ol>
 <li>Create a copy of <code>.env.template</code> as <code>.env</code>, and update following values based on previous configuration file paths:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>IIN_AGENT_ENDPOINT=localhost:9500
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>MEMBER_ID=Org1MSP
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>SECURITY_DOMAIN=network1
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>DLT_TYPE=fabric
-<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>CONFIG_PATH=./src/fabric-ledger/config-n1-org1.json
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>DNS_CONFIG_PATH=./dnsconfig.json
-<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json
-<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>WEAVER_CONTRACT_ID=interop
-<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>AUTO_SYNC=true
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>IIN_AGENT_ENDPOINT=localhost:9500
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>MEMBER_ID=Org1MSP
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>SECURITY_DOMAIN=network1
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>DLT_TYPE=fabric
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>CONFIG_PATH=./src/fabric-ledger/config-n1-org1.json
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>DNS_CONFIG_PATH=./dnsconfig.json
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>WEAVER_CONTRACT_ID=interop
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>AUTO_SYNC=true
 </code></pre></div></li>
 <li>If IIN Agent has to be started with TLS enabled, also update following values:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>IIN_AGENT_TLS=true
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>IIN_AGENT_TLS_CERT_PATH=../../relay/credentials/fabric_cert.pem
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>IIN_AGENT_TLS_KEY_PATH=../../relay/credentials/fabric_key
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>IIN_AGENT_TLS=true
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>IIN_AGENT_TLS_CERT_PATH=../../relay/credentials/fabric_cert.pem
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>IIN_AGENT_TLS_KEY_PATH=../../relay/credentials/fabric_key
 </code></pre></div></li>
 </ol>
 <h4 id="deployment_1">Deployment<a class="headerlink" href="#deployment_1" title="Permanent link">&para;</a></h4>
 <p>Use the following steps to run Fabric IIN Agents in host machine:</p>
 <ul>
 <li>To start IIN Agent for <code>Org1MSP</code> of <code>network1</code>, run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div></li>
 <li>To start IIN Agent for <code>Org2MSP</code> of <code>network1</code> (<em>only required if Fabric network was started with 2 orgs</em>), run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9510<span class="w"> </span><span class="nv">MEMBER_ID</span><span class="o">=</span>Org2MSP<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n1-org2.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9510<span class="w"> </span><span class="nv">MEMBER_ID</span><span class="o">=</span>Org2MSP<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n1-org2.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div></li>
 <li>To start IIN Agent for <code>Org1MSP</code> of <code>network2</code>, run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9501<span class="w"> </span><span class="nv">SECURITY_DOMAIN</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n2-org1.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9501<span class="w"> </span><span class="nv">SECURITY_DOMAIN</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n2-org1.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div></li>
 <li>To start IIN Agent for <code>Org2MSP</code> of <code>network2</code> (<em>only required if Fabric network was started with 2 orgs</em>), run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9511<span class="w"> </span><span class="nv">MEMBER_ID</span><span class="o">=</span>Org2MSP<span class="w"> </span><span class="nv">SECURITY_DOMAIN</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n2-org2.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9511<span class="w"> </span><span class="nv">MEMBER_ID</span><span class="o">=</span>Org2MSP<span class="w"> </span><span class="nv">SECURITY_DOMAIN</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n2-org2.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div></li>
 </ul>
 <table>
@@ -4688,7 +4694,7 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <ul>
 <li>Navigate to the <code>weaver/core/network/corda-interop-app</code> folder.</li>
 <li>Run the following to create the JAR files on which other Corda network components will depend on:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 </ul>
 <h3 id="corda-interoperation-sdk">Corda Interoperation SDK<a class="headerlink" href="#corda-interoperation-sdk" title="Permanent link">&para;</a></h3>
@@ -4697,7 +4703,7 @@ The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> fol
 <ul>
 <li>Navigate to the <code>weaver/sdks/corda</code> folder.</li>
 <li>Run the following command (<em>make sure there is no github.properties file present in the directory</em>):
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>make<span class="w"> </span>build
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>make<span class="w"> </span>build
 </code></pre></div></li>
 </ul>
 <h3 id="corda-simple-application-and-client-application">Corda Simple Application and Client (Application)<a class="headerlink" href="#corda-simple-application-and-client-application" title="Permanent link">&para;</a></h3>
@@ -4707,7 +4713,7 @@ The code for this lies in the <code>weaver/samples/corda/corda-simple-applicatio
 <ul>
 <li>Navigate to the <code>weaver/samples/corda/corda-simple-application</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 </ul>
 <h3 id="corda-network">Corda Network<a class="headerlink" href="#corda-network" title="Permanent link">&para;</a></h3>
@@ -4717,13 +4723,13 @@ The code for this lies in the <code>weaver/samples/corda/corda-simple-applicatio
 <li>Navigate to the <code>weaver/tests/network-setups/corda</code> folder.</li>
 <li>To spin up the Corda networks with the Interoperation CorDapps:<ul>
 <li>Each consisting of 1 node and a notary (for data-transfer), run:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>make<span class="w"> </span>start-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>make<span class="w"> </span>start-local
 </code></pre></div></li>
 <li>Each consisting of 2 nodes and a notary (for asset-exchange/transfer), run:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>make<span class="w"> </span>start-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;2-nodes&quot;</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>make<span class="w"> </span>start-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;2-nodes&quot;</span>
 </code></pre></div></li>
 <li>Each consisting of 3 nodes and a notary (for asset-exchange/transfer), run:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>make<span class="w"> </span>start-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;3-nodes&quot;</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>make<span class="w"> </span>start-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;3-nodes&quot;</span>
 </code></pre></div></li>
 </ul>
 </li>
@@ -4741,13 +4747,13 @@ The code for this lies in the <code>weaver/samples/corda/corda-simple-applicatio
 </tbody>
 </table>
 <p>You should see the following message in the terminal:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>Waiting for network node services to start
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>Waiting for network node services to start
 </code></pre></div>
 The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following for each network, though the number of node entries will depend on the profile you used to start the network with (replace <code>&lt;network-name&gt;</code> with <code>Corda_Network</code> or <code>Corda_Network2</code>):
-<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>PartyA<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
-<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>PartyB<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
-<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>PartyC<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
-<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>Notary<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>PartyA<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>PartyB<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>PartyC<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>Notary<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
 </code></pre></div></p>
 <h3 id="corda-relay">Corda Relay<a class="headerlink" href="#corda-relay" title="Permanent link">&para;</a></h3>
 <p>The relay was built earlier, so you just need to use a different configuration file to start a relay for the Corda network.</p>
@@ -4756,93 +4762,93 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <li>Navigate to the <code>weaver/core/relay</code> folder.</li>
 <li>(Make sure you've already built the relay by running <code>make</code>.)</li>
 <li>To launch the server without TLS, leave the configuration file <code>config/Corda_Relay.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="p">.</span>
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="p">.</span>
-<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
-<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
-<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="p">.</span>
-<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a><span class="p">.</span>
-<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="k">[relays]</span>
-<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a><span class="k">[relays.Fabric_Relay]</span>
-<a id="__codelineno-42-10" name="__codelineno-42-10" href="#__codelineno-42-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-42-11" name="__codelineno-42-11" href="#__codelineno-42-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9080&quot;</span>
-<a id="__codelineno-42-12" name="__codelineno-42-12" href="#__codelineno-42-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-42-13" name="__codelineno-42-13" href="#__codelineno-42-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-42-14" name="__codelineno-42-14" href="#__codelineno-42-14"></a><span class="k">[relays.Fabric_Relay2]</span>
-<a id="__codelineno-42-15" name="__codelineno-42-15" href="#__codelineno-42-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-42-16" name="__codelineno-42-16" href="#__codelineno-42-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9083&quot;</span>
-<a id="__codelineno-42-17" name="__codelineno-42-17" href="#__codelineno-42-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-42-18" name="__codelineno-42-18" href="#__codelineno-42-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-42-19" name="__codelineno-42-19" href="#__codelineno-42-19"></a><span class="k">[relays.Corda_Relay2]</span>
-<a id="__codelineno-42-20" name="__codelineno-42-20" href="#__codelineno-42-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-42-21" name="__codelineno-42-21" href="#__codelineno-42-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9082&quot;</span>
-<a id="__codelineno-42-22" name="__codelineno-42-22" href="#__codelineno-42-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-42-23" name="__codelineno-42-23" href="#__codelineno-42-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-42-24" name="__codelineno-42-24" href="#__codelineno-42-24"></a><span class="p">.</span>
-<a id="__codelineno-42-25" name="__codelineno-42-25" href="#__codelineno-42-25"></a><span class="p">.</span>
-<a id="__codelineno-42-26" name="__codelineno-42-26" href="#__codelineno-42-26"></a><span class="k">[drivers]</span>
-<a id="__codelineno-42-27" name="__codelineno-42-27" href="#__codelineno-42-27"></a><span class="k">[drivers.Corda]</span>
-<a id="__codelineno-42-28" name="__codelineno-42-28" href="#__codelineno-42-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-42-29" name="__codelineno-42-29" href="#__codelineno-42-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9099&quot;</span>
-<a id="__codelineno-42-30" name="__codelineno-42-30" href="#__codelineno-42-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-42-31" name="__codelineno-42-31" href="#__codelineno-42-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-42-32" name="__codelineno-42-32" href="#__codelineno-42-32"></a><span class="p">.</span>
-<a id="__codelineno-42-33" name="__codelineno-42-33" href="#__codelineno-42-33"></a><span class="p">.</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="p">.</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="p">.</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="p">.</span>
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="p">.</span>
+<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a><span class="k">[relays.Fabric_Relay]</span>
+<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9080&quot;</span>
+<a id="__codelineno-43-12" name="__codelineno-43-12" href="#__codelineno-43-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-43-13" name="__codelineno-43-13" href="#__codelineno-43-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-43-14" name="__codelineno-43-14" href="#__codelineno-43-14"></a><span class="k">[relays.Fabric_Relay2]</span>
+<a id="__codelineno-43-15" name="__codelineno-43-15" href="#__codelineno-43-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-43-16" name="__codelineno-43-16" href="#__codelineno-43-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9083&quot;</span>
+<a id="__codelineno-43-17" name="__codelineno-43-17" href="#__codelineno-43-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-43-18" name="__codelineno-43-18" href="#__codelineno-43-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-43-19" name="__codelineno-43-19" href="#__codelineno-43-19"></a><span class="k">[relays.Corda_Relay2]</span>
+<a id="__codelineno-43-20" name="__codelineno-43-20" href="#__codelineno-43-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-43-21" name="__codelineno-43-21" href="#__codelineno-43-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9082&quot;</span>
+<a id="__codelineno-43-22" name="__codelineno-43-22" href="#__codelineno-43-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-43-23" name="__codelineno-43-23" href="#__codelineno-43-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-43-24" name="__codelineno-43-24" href="#__codelineno-43-24"></a><span class="p">.</span>
+<a id="__codelineno-43-25" name="__codelineno-43-25" href="#__codelineno-43-25"></a><span class="p">.</span>
+<a id="__codelineno-43-26" name="__codelineno-43-26" href="#__codelineno-43-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-43-27" name="__codelineno-43-27" href="#__codelineno-43-27"></a><span class="k">[drivers.Corda]</span>
+<a id="__codelineno-43-28" name="__codelineno-43-28" href="#__codelineno-43-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-43-29" name="__codelineno-43-29" href="#__codelineno-43-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9099&quot;</span>
+<a id="__codelineno-43-30" name="__codelineno-43-30" href="#__codelineno-43-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-43-31" name="__codelineno-43-31" href="#__codelineno-43-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-43-32" name="__codelineno-43-32" href="#__codelineno-43-32"></a><span class="p">.</span>
+<a id="__codelineno-43-33" name="__codelineno-43-33" href="#__codelineno-43-33"></a><span class="p">.</span>
 </code></pre></div></li>
 <li>To launch the server, simply run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Corda_Relay.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Corda_Relay.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
 </code></pre></div></li>
 </ul>
 <p>If the relay starts up successfully, the following will be logged on your terminal:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Relay Name: &quot;Corda_Relay&quot;
-<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>RelayServer listening on [::1]:9081
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>Relay Name: &quot;Corda_Relay&quot;
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>RelayServer listening on [::1]:9081
 </code></pre></div>
 <p>Run a relay for <code>Corda_Network2</code> as follows (<em>do this only if you have launched both Corda networks <code>Corda_Network</code> and <code>Corda_Network2</code> and wish to test interoperation between them</em>)</p>
 <ul>
 <li>Navigate to the <code>weaver/core/relay</code> folder.</li>
 <li>To launch the server without TLS, leave the configuration file <code>config/Corda_Relay2.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="p">.</span>
-<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="p">.</span>
-<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
-<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
-<a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a><span class="p">.</span>
-<a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a><span class="p">.</span>
-<a id="__codelineno-45-8" name="__codelineno-45-8" href="#__codelineno-45-8"></a><span class="k">[relays]</span>
-<a id="__codelineno-45-9" name="__codelineno-45-9" href="#__codelineno-45-9"></a><span class="k">[relays.Fabric_Relay]</span>
-<a id="__codelineno-45-10" name="__codelineno-45-10" href="#__codelineno-45-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-45-11" name="__codelineno-45-11" href="#__codelineno-45-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9080&quot;</span>
-<a id="__codelineno-45-12" name="__codelineno-45-12" href="#__codelineno-45-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-45-13" name="__codelineno-45-13" href="#__codelineno-45-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-45-14" name="__codelineno-45-14" href="#__codelineno-45-14"></a><span class="k">[relays.Fabric_Relay2]</span>
-<a id="__codelineno-45-15" name="__codelineno-45-15" href="#__codelineno-45-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-45-16" name="__codelineno-45-16" href="#__codelineno-45-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9083&quot;</span>
-<a id="__codelineno-45-17" name="__codelineno-45-17" href="#__codelineno-45-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-45-18" name="__codelineno-45-18" href="#__codelineno-45-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-45-19" name="__codelineno-45-19" href="#__codelineno-45-19"></a><span class="k">[relays.Corda_Relay]</span>
-<a id="__codelineno-45-20" name="__codelineno-45-20" href="#__codelineno-45-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-45-21" name="__codelineno-45-21" href="#__codelineno-45-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9081&quot;</span>
-<a id="__codelineno-45-22" name="__codelineno-45-22" href="#__codelineno-45-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-45-23" name="__codelineno-45-23" href="#__codelineno-45-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-45-24" name="__codelineno-45-24" href="#__codelineno-45-24"></a><span class="p">.</span>
-<a id="__codelineno-45-25" name="__codelineno-45-25" href="#__codelineno-45-25"></a><span class="p">.</span>
-<a id="__codelineno-45-26" name="__codelineno-45-26" href="#__codelineno-45-26"></a><span class="k">[drivers]</span>
-<a id="__codelineno-45-27" name="__codelineno-45-27" href="#__codelineno-45-27"></a><span class="k">[drivers.Corda]</span>
-<a id="__codelineno-45-28" name="__codelineno-45-28" href="#__codelineno-45-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<a id="__codelineno-45-29" name="__codelineno-45-29" href="#__codelineno-45-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9098&quot;</span>
-<a id="__codelineno-45-30" name="__codelineno-45-30" href="#__codelineno-45-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
-<a id="__codelineno-45-31" name="__codelineno-45-31" href="#__codelineno-45-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
-<a id="__codelineno-45-32" name="__codelineno-45-32" href="#__codelineno-45-32"></a><span class="p">.</span>
-<a id="__codelineno-45-33" name="__codelineno-45-33" href="#__codelineno-45-33"></a><span class="p">.</span>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="p">.</span>
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="p">.</span>
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a><span class="p">.</span>
+<a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a><span class="p">.</span>
+<a id="__codelineno-46-8" name="__codelineno-46-8" href="#__codelineno-46-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-46-9" name="__codelineno-46-9" href="#__codelineno-46-9"></a><span class="k">[relays.Fabric_Relay]</span>
+<a id="__codelineno-46-10" name="__codelineno-46-10" href="#__codelineno-46-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-46-11" name="__codelineno-46-11" href="#__codelineno-46-11"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9080&quot;</span>
+<a id="__codelineno-46-12" name="__codelineno-46-12" href="#__codelineno-46-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-46-13" name="__codelineno-46-13" href="#__codelineno-46-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-46-14" name="__codelineno-46-14" href="#__codelineno-46-14"></a><span class="k">[relays.Fabric_Relay2]</span>
+<a id="__codelineno-46-15" name="__codelineno-46-15" href="#__codelineno-46-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-46-16" name="__codelineno-46-16" href="#__codelineno-46-16"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9083&quot;</span>
+<a id="__codelineno-46-17" name="__codelineno-46-17" href="#__codelineno-46-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-46-18" name="__codelineno-46-18" href="#__codelineno-46-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-46-19" name="__codelineno-46-19" href="#__codelineno-46-19"></a><span class="k">[relays.Corda_Relay]</span>
+<a id="__codelineno-46-20" name="__codelineno-46-20" href="#__codelineno-46-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-46-21" name="__codelineno-46-21" href="#__codelineno-46-21"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9081&quot;</span>
+<a id="__codelineno-46-22" name="__codelineno-46-22" href="#__codelineno-46-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-46-23" name="__codelineno-46-23" href="#__codelineno-46-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-46-24" name="__codelineno-46-24" href="#__codelineno-46-24"></a><span class="p">.</span>
+<a id="__codelineno-46-25" name="__codelineno-46-25" href="#__codelineno-46-25"></a><span class="p">.</span>
+<a id="__codelineno-46-26" name="__codelineno-46-26" href="#__codelineno-46-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-46-27" name="__codelineno-46-27" href="#__codelineno-46-27"></a><span class="k">[drivers.Corda]</span>
+<a id="__codelineno-46-28" name="__codelineno-46-28" href="#__codelineno-46-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-46-29" name="__codelineno-46-29" href="#__codelineno-46-29"></a><span class="n">port</span><span class="o">=</span><span class="s2">&quot;9098&quot;</span>
+<a id="__codelineno-46-30" name="__codelineno-46-30" href="#__codelineno-46-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-46-31" name="__codelineno-46-31" href="#__codelineno-46-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s2">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-46-32" name="__codelineno-46-32" href="#__codelineno-46-32"></a><span class="p">.</span>
+<a id="__codelineno-46-33" name="__codelineno-46-33" href="#__codelineno-46-33"></a><span class="p">.</span>
 </code></pre></div></li>
 <li>To launch the server, simply run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Corda_Relay2.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Corda_Relay2.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
 </code></pre></div></li>
 </ul>
 <p>If the relay starts up successfully, the following will be logged on your terminal:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>Relay Name: &quot;Corda2_Relay&quot;
-<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>RelayServer listening on [::1]:9082
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>Relay Name: &quot;Corda2_Relay&quot;
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>RelayServer listening on [::1]:9082
 </code></pre></div>
 <h3 id="corda-driver">Corda Driver<a class="headerlink" href="#corda-driver" title="Permanent link">&para;</a></h3>
 <p>The code for this lies in the <code>weaver/core/drivers/corda-driver</code> folder.</p>
@@ -4851,7 +4857,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <ul>
 <li>Navigate to the <code>weaver/core/drivers/corda-driver</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 </ul>
 <h4 id="configuring_1">Configuring<a class="headerlink" href="#configuring_1" title="Permanent link">&para;</a></h4>
@@ -4859,16 +4865,16 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <ul>
 <li>Navigate to the <code>weaver/core/drivers/corda-driver</code> folder and create a <code>.env</code> file.</li>
 <li>To run the drivers without TLS, set the following default values:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>RELAY_TLS=false
-<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>RELAY_TLSCA_TRUST_STORE=
-<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>RELAY_TLSCA_TRUST_STORE_PASSWORD=
-<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a>RELAY_TLSCA_CERT_PATHS=
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>RELAY_TLS=false
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>RELAY_TLSCA_TRUST_STORE=
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>RELAY_TLSCA_TRUST_STORE_PASSWORD=
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>RELAY_TLSCA_CERT_PATHS=
 </code></pre></div></li>
 <li>To run the drivers with TLS, set the following values (replace <code>&lt;PATH-TO-WEAVER&gt;</code> with the absolute path of the <code>weaver</code> folder within your Cacti repository clone):
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>RELAY_TLS=true
-<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>RELAY_TLSCA_TRUST_STORE=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_trust_store.jks
-<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>RELAY_TLSCA_TRUST_STORE_PASSWORD=trelay
-<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>RELAY_TLSCA_CERT_PATHS=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_ca_cert.pem
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>RELAY_TLS=true
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>RELAY_TLSCA_TRUST_STORE=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_trust_store.jks
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>RELAY_TLSCA_TRUST_STORE_PASSWORD=trelay
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a>RELAY_TLSCA_CERT_PATHS=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_ca_cert.pem
 </code></pre></div></li>
 </ul>
 <h4 id="running_1">Running<a class="headerlink" href="#running_1" title="Permanent link">&para;</a></h4>
@@ -4876,16 +4882,16 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <ul>
 <li>Navigate to the <code>weaver/core/drivers/corda-driver</code> folder.</li>
 <li>Run the following to start Corda driver for <code>Corda_Network</code>:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>./build/install/driver-corda/bin/driver-corda
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>./build/install/driver-corda/bin/driver-corda
 </code></pre></div>
   If the driver starts successfully, it should log the following message on your terminal:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>Corda driver gRPC server started. Listening on port 9099
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Corda driver gRPC server started. Listening on port 9099
 </code></pre></div></li>
 <li>Run the following to start Corda driver for <code>Corda_Network2</code>:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="nv">DRIVER_PORT</span><span class="o">=</span><span class="m">9098</span><span class="w"> </span>./build/install/corda-driver/bin/corda-driver
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="nv">DRIVER_PORT</span><span class="o">=</span><span class="m">9098</span><span class="w"> </span>./build/install/corda-driver/bin/corda-driver
 </code></pre></div>
   If the driver starts successfully, it should log the following message on your terminal:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>Corda driver gRPC server started. Listening on port 9098
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Corda driver gRPC server started. Listening on port 9098
 </code></pre></div></li>
 </ul>
 <h2 id="hyperledger-besu-components">Hyperledger Besu Components<a class="headerlink" href="#hyperledger-besu-components" title="Permanent link">&para;</a></h2>
@@ -4897,7 +4903,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <li>tmux: <code>sudo apt install tmux</code></li>
 <li>Besu: <ul>
 <li>Download and unpack the latest <a href="https://github.com/hyperledger/besu/releases/latest">https://github.com/hyperledger/besu/releases/latest</a>. You will find it in the link of the form: <a href="https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/x.y.z/besu-x.y.z.zip">https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/x.y.z/besu-x.y.z.zip</a> with x.y.z replaced with the version number. For instance, run the following command after updating version number accordingly.
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/21.7.0/besu-21.7.0.zip
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/21.7.0/besu-21.7.0.zip
 </code></pre></div></li>
 <li>Add the path to <code>besu-x.y.z/bin</code> to your system PATH</li>
 </ul>
@@ -4914,7 +4920,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <ul>
 <li>Navigate to the <code>weaver/sdks/besu/interoperation-node-sdk</code> folder.</li>
 <li>Run the following command:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 </ul>
 <h3 id="besu-network">Besu Network<a class="headerlink" href="#besu-network" title="Permanent link">&para;</a></h3>
@@ -4928,7 +4934,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <ul>
 <li>Navigate to the <code>weaver/tests/network-setups/besu</code> folder.</li>
 <li>To spin up both Network1 and Network2, run:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>make<span class="w"> </span>start
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>make<span class="w"> </span>start
 </code></pre></div></li>
 </ul>
 <table>
@@ -4950,7 +4956,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <li>Application contract <code>simpleasset</code>, located in <code>weaver/samples/besu/simpleasset</code> directory (for <a href="../../interop/asset-exchange/overview/">Asset Exchange</a>), which supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple <code>AliceERC20</code> and <code>BobERC20</code> tokens (examples of fungible assets), or <code>AliceERC721</code> and <code>BobERC721</code> tokens (example of non-fungible assets), or <code>AliceERC1155</code> and <code>BobERC1155</code> tokens (example of hybrid assets).</li>
 </ul>
 <p>To deploy <code>simpleasset</code> with <code>AssetExchangeContract</code> on both Besu networks, navigate to the <code>weaver/samples/besu/simpleasset</code> folder, and run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>make<span class="w"> </span>deploy-contracts
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>make<span class="w"> </span>deploy-contracts
 </code></pre></div></p>
 <table>
 <thead>
@@ -4986,7 +4992,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <ul>
 <li>Navigate to the <code>weaver/samples/besu/besu-cli</code> folder.</li>
 <li>Run the following to install dependencies:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>make<span class="w"> </span>build-local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>make<span class="w"> </span>build-local
 </code></pre></div></li>
 <li>Use the <code>besu-cli</code> executable in the <code>bin</code> folder for <a href="../ledger-initialization/">subsequent actions</a>.</li>
 </ul>
@@ -4997,21 +5003,21 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
 <li>To bring down the running Corda network:<ul>
 <li>Navigate to the <code>weaver/tests/network-setups/corda</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>make<span class="w"> </span>clean
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>make<span class="w"> </span>clean
 </code></pre></div></li>
 </ul>
 </li>
 <li>To bring down all the running Fabric networks:<ul>
 <li>Navigate to the <code>weaver/tests/network-setups/fabric/dev</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>make<span class="w"> </span>clean
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>make<span class="w"> </span>clean
 </code></pre></div></li>
 </ul>
 </li>
 <li>To bring down all the running Besu networks:<ul>
 <li>Navigate to the <code>weaver/tests/network-setups/besu</code> folder.</li>
 <li>Run the following:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>make<span class="w"> </span>clean
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>make<span class="w"> </span>clean
 </code></pre></div></li>
 </ul>
 </li>
@@ -5120,7 +5126,7 @@ The Corda nodes and notary may take a while (several minutes on memory-constrain
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.5cfa9459.min.js"></script>
       
     
   </body>
