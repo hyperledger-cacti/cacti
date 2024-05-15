@@ -290,7 +290,7 @@ test(`${testCase}`, async (t: Test) => {
     } catch (err) {
       const e = err as AxiosError;
       t2.equal(
-        (e as AxiosError)?.response?.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
       );

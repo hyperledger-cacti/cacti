@@ -24,6 +24,7 @@ import {
   PublicKey,
 } from "../../../../main/typescript/generated/openapi/typescript-axios/index";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import { AxiosError } from "axios";
 
 const testCase = "openapi validation on corda JVM implementation";
 const logLevel: LogLevelDesc = "TRACE";
@@ -434,8 +435,10 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cWithoutParams}: should fail`);
     } catch (e) {
+      const err = e as AxiosError<{ status: number }>
+
       t2.equal(
-        e.response?.data?.status,
+        err.response?.data?.status,
         400,
         "Deploy contract response status code === 400 OK",
       );
@@ -453,8 +456,10 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1(req);
       t2.fail(`${fInvoke} - ${cWithoutParams}: should fail`);
     } catch (e) {
+      const err = e as AxiosError<{ status: number }>
+
       t2.equal(
-        e.response?.data?.status,
+        err.response?.data?.status,
         400,
         "Invoke contract response status code === 400 OK",
       );
@@ -472,8 +477,10 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cInvalidParams}: should fail`);
     } catch (e) {
+      const err = e as AxiosError<{ status: number }>
+
       t2.equal(
-        e.response?.data?.status,
+        err.response?.data?.status,
         400,
         "Deploy contract response status code === 400 OK",
       );
@@ -487,8 +494,10 @@ test(testCase, async (t: Test) => {
       await apiClient.listFlowsV1(req);
       t2.fail(`${fFlows} - ${cInvalidParams}: should fail`);
     } catch (e) {
+      const err = e as AxiosError<{ status: number }>
+
       t2.equal(
-        e.response?.data?.status,
+        err.response?.data?.status,
         400,
         "List flows response status code === 400 OK",
       );
@@ -502,8 +511,10 @@ test(testCase, async (t: Test) => {
       await apiClient.diagnoseNodeV1(req);
       t2.fail(`${fDiagnose} - ${cInvalidParams}: should fail`);
     } catch (e) {
+      const err = e as AxiosError<{ status: number }>
+
       t2.equal(
-        e.response?.data?.status,
+        err.response?.data?.status,
         400,
         "Diagnose node response status code === 400 OK",
       );

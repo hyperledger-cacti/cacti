@@ -9,6 +9,7 @@ import {
 
 import {
   AuthorizationOptionsProvider,
+  handleRestEndpointException,
   registerWebServiceEndpoint,
 } from "@hyperledger/cactus-core";
 
@@ -133,12 +134,13 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
       res.json(body);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.json({
-        error: ex?.message,
-        // FIXME do not include stack trace
-        errorStack: ex?.stack,
-      });
+      if (typeof ex === 'object' && ex !== null) {
+        if ('message' in ex && typeof ex.message === 'string') {
+          const errorMsg = ex.message
+          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+
+        }
+      }
     }
   }
 
