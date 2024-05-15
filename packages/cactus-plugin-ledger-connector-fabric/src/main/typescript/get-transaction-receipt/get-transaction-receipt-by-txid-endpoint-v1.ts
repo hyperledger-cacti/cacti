@@ -6,6 +6,7 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -26,8 +27,7 @@ export interface IRunTransactionEndpointV1Options {
 }
 
 export class GetTransactionReceiptByTxIDEndpointV1
-  implements IWebServiceEndpoint
-{
+  implements IWebServiceEndpoint {
   private readonly log: Logger;
 
   constructor(public readonly opts: IRunTransactionEndpointV1Options) {
@@ -95,9 +95,10 @@ export class GetTransactionReceiptByTxIDEndpointV1
       res.json(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(ex),
+      });
     }
   }
 }

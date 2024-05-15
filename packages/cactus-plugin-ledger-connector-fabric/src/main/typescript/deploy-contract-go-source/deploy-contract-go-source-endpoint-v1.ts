@@ -8,6 +8,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -117,9 +118,10 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(ex),
+      });
     }
   }
 }

@@ -188,15 +188,14 @@ export interface IPluginLedgerConnectorFabricOptions
 
 export class PluginLedgerConnectorFabric
   implements
-    IPluginLedgerConnector<
-      DeployContractV1Request,
-      DeployContractV1Response,
-      RunTransactionRequest,
-      RunTransactionResponse
-    >,
-    ICactusPlugin,
-    IPluginWebService
-{
+  IPluginLedgerConnector<
+    DeployContractV1Request,
+    DeployContractV1Response,
+    RunTransactionRequest,
+    RunTransactionResponse
+  >,
+  ICactusPlugin,
+  IPluginWebService {
   public static readonly CLASS_NAME = "PluginLedgerConnectorFabric";
   private readonly instanceId: string;
   private readonly log: Logger;
@@ -1115,7 +1114,11 @@ export class PluginLedgerConnectorFabric
       }
     } catch (ex) {
       this.log.error(`Building transient map crashed: `, ex);
-      throw new Error(`Unable to build the transient map: ${ex.message}`);
+      if (typeof ex === 'object' && ex !== null) {
+        if ('message' in ex && typeof ex.message === 'string') {
+          throw new Error(`Unable to build the transient map: ${ex.message}`);
+        }
+      } else { throw new Error(`Unable to build the transient map. Error: ${ex}`); }
     }
 
     return transientMap;
@@ -1216,9 +1219,13 @@ export class PluginLedgerConnectorFabric
 
       return res;
     } catch (ex) {
-      this.log.error(`transact() crashed: `, ex);
-      throw new Error(`${fnTag} Unable to run transaction: ${ex.message}`);
+      this.log.error(`enrollAdmin() Failure:`, ex);
+
+      if (ex instanceof Error) {
+        throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+      } else { throw new Error(`${fnTag} Exception: ${ex}`) }
     }
+
   }
 
   public async getTransactionReceiptByTxID(
@@ -1254,7 +1261,11 @@ export class PluginLedgerConnectorFabric
       return new FabricCAServices(caUrl, tlsOptions, caName);
     } catch (ex) {
       this.log.error(`createCaClient() Failure:`, ex);
-      throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+
+      if (ex instanceof Error) {
+        throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+      } else { throw new Error(`${fnTag} Exception: ${ex}`) }
+
     }
   }
 
@@ -1290,7 +1301,9 @@ export class PluginLedgerConnectorFabric
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`enrollAdmin() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+      if (ex instanceof Error) {
+        throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+      } else { throw new Error(`${fnTag} Exception: ${ex}`) }
     }
   }
   /**
@@ -1634,10 +1647,8 @@ export class PluginLedgerConnectorFabric
     }
 
     this.log.info(
-      `Created channel for ${channelName} with ${
-        channel.getMspids().length
-      } Mspids, ${channel.getCommitters().length} commiters, ${
-        channel.getEndorsers().length
+      `Created channel for ${channelName} with ${channel.getMspids().length
+      } Mspids, ${channel.getCommitters().length} commiters, ${channel.getEndorsers().length
       } endorsers`,
     );
 
@@ -1766,11 +1777,10 @@ export class PluginLedgerConnectorFabric
         let endorsedMethodResponse: Buffer | undefined;
 
         for (const response of endorsementResponse.responses) {
-          const endorsementStatus = `${response.connection.name}: ${
-            response.response.status
-          } message ${response.response.message}, endorsement: ${Boolean(
-            response.endorsement,
-          )}`;
+          const endorsementStatus = `${response.connection.name}: ${response.response.status
+            } message ${response.response.message}, endorsement: ${Boolean(
+              response.endorsement,
+            )}`;
 
           if (response.response.status !== 200 || !response.endorsement) {
             this.log.warn(`Endorsement from peer ERROR: ${endorsementStatus}`);
