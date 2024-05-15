@@ -34,8 +34,7 @@ export interface IPluginKeychainVaultRemoteAdapterOptions
  * the author so desires.
  */
 export class PluginKeychainVaultRemoteAdapter
-  implements ICactusPlugin, IPluginWebService
-{
+  implements ICactusPlugin, IPluginWebService {
   public static readonly CLASS_NAME = "PluginKeychainVaultRemoteAdapter";
 
   private readonly instanceId: string;

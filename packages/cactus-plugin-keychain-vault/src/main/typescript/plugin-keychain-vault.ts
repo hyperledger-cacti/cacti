@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import Vault from "node-vault";
 import HttpStatus from "http-status-codes";
-
+import handleVaultResponse from "node-vault"
 import OAS from "../json/openapi.json";
 
 import {
@@ -27,6 +27,12 @@ import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-en
 import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
 import { HasKeychainEntryEndpointV1 } from "./web-services/has-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryEndpointV1 } from "./web-services/delete-keychain-entry-endpoint-v1";
+
+interface ErrorResponse extends Error {
+  response?: {
+    statusCode?: number;
+  };
+}
 
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -228,8 +234,9 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
         );
       }
     } catch (ex) {
+      const errorResponse = ex as ErrorResponse;
       // FIXME: Throw if not found, detect it in the endpoint code, status=404
-      if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
+      if (errorResponse?.response?.statusCode === HttpStatus.NOT_FOUND) {
         return null as unknown as string;
       } else {
         this.log.error(`Retrieval of "${key}" crashed:`, ex);
@@ -248,15 +255,17 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     const path = this.pathFor(key);
     try {
       const res = await this.backend.read(path);
-      return res;
+      return res; ``
     } catch (ex) {
+      const errorResponse = ex as ErrorResponse;
+      handleVaultResponse()
       // We have to make sure that the exception is either an expected
-      // or an unexpected one where the expected exception is what we
+      // or an unexpected one where the expected exception is `what we
       // get when the key is not present in the keychain and anything
       // else being an unexpected exception that we do not want to
       // handle nor suppress under any circumstances since doing so
       // would lead to silent failures or worse.
-      if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
+      if (errorResponse?.response?.statusCode === HttpStatus.NOT_FOUND) {
         return false;
       } else {
         this.log.error(`Presence check of "${key}" crashed:`, ex);
