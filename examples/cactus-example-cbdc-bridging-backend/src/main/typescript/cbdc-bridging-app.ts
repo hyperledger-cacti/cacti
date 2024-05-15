@@ -32,11 +32,19 @@ export interface ICbdcBridgingApp {
   apiHost: string;
   apiServer1Port: number;
   apiServer2Port: number;
+  apiCrpcHost: string;
+  apiServer1CrpcPort: number;
+  apiServer2CrpcPort: number;
   clientGatewayKeyPair: IKeyPair;
   serverGatewayKeyPair: IKeyPair;
   logLevel?: LogLevelDesc;
   apiServerOptions?: ICactusApiServerOptions;
   disableSignalHandlers?: true;
+}
+
+interface ICrpcOptions {
+  host: string;
+  port: number;
 }
 
 export type ShutdownHook = () => Promise<void>;
@@ -101,12 +109,11 @@ export class CbdcBridgingApp {
       nodeApiHostA,
       this.options.clientGatewayKeyPair,
     );
-
     const besuSatpGateway = await this.infrastructure.createServerGateway(
       nodeApiHostB,
       this.options.serverGatewayKeyPair,
     );
-
+	
     const clientPluginRegistry = new PluginRegistry({
       plugins: [
         new PluginKeychainMemory({
@@ -125,15 +132,18 @@ export class CbdcBridgingApp {
         }),
       ],
     });
-
+	
     clientPluginRegistry.add(fabricPlugin);
     clientPluginRegistry.add(fabricSatpGateway);
 
     serverPluginRegistry.add(besuPlugin);
     serverPluginRegistry.add(besuSatpGateway);
 
-    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry);
-    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry);
+    const crpcOptionsServer1 = {host: this.options.apiCrpcHost, port: this.options.apiServer1CrpcPort};
+    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry, crpcOptionsServer1);
+	
+    const crpcOptionsServer2 = {host: this.options.apiCrpcHost, port: this.options.apiServer2CrpcPort};
+    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry, crpcOptionsServer2);
 
     const fabricApiClient = new FabricApi(
       new Configuration({ basePath: nodeApiHostA }),
@@ -184,6 +194,7 @@ export class CbdcBridgingApp {
   public async startNode(
     httpServerApi: Server,
     pluginRegistry: PluginRegistry,
+    crpcOptions: ICrpcOptions,
   ): Promise<ApiServer> {
     this.log.info(`Starting API Server node...`);
 
@@ -204,6 +215,8 @@ export class CbdcBridgingApp {
       config.grpcPort = 0;
       config.logLevel = this.options.logLevel || "INFO";
       config.authorizationProtocol = AuthorizationProtocol.NONE;
+      config.crpcHost = crpcOptions.host;
+      config.crpcPort = crpcOptions.port;
     }
 
     const apiServer = new ApiServer({
