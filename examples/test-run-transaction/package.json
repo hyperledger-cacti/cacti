@@ -25,7 +25,7 @@
     "fabric-ca-client": "2.2.20",
     "fabric-network": "2.2.20",
     "http-errors": "1.6.3",
-    "jsonwebtoken": "8.5.1",
+    "jsonwebtoken": "9.0.0",
     "log4js": "6.4.0",
     "morgan": "1.9.1",
     "shelljs": "0.8.5",

@@ -71,7 +71,7 @@
     "@polkadot/rpc-provider": "10.9.1",
     "@polkadot/types": "10.9.1",
     "@polkadot/util": "12.6.2",
-    "bl": "5.0.0",
+    "bl": "5.1.0",
     "express": "4.19.2",
     "express-openapi-validator": "4.13.1",
     "form-data": "4.0.0",
