@@ -767,8 +767,10 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1(req);
       t2.fail(`${fInvoke} - ${cInvalidParams}: should fail`);
     } catch (e) {
+      const err = e as AxiosError<{ status: number }>
+
       t2.equal(
-        e.response?.data?.status,
+        err.response?.data?.status,
         400,
         "Invoke contract response status code === 400 OK",
       );
