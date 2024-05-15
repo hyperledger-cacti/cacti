@@ -319,7 +319,7 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
     extinguish: (call: { request: driverPb.ExtinguishRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const requestId: string = call.request.getSessionId();
 
-        extinguishHelper(call.request).then(() => {
+        extinguishHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
             const ack_response = new ack_pb.Ack();
             ack_response.setRequestId(requestId);
             ack_response.setMessage('Successfully extinguished the asset');
@@ -429,7 +429,6 @@ if (process.env.DRIVER_TLS === "true") {
     (cb) => {
       configSetup().then(() => {
         logger.info("Starting server with TLS");
-        server.start();
         monitorService();
       });
     },
@@ -441,7 +440,6 @@ if (process.env.DRIVER_TLS === "true") {
     (cb) => {
       configSetup().then(() => {
         logger.info("Starting server without TLS");
-        server.start();
         monitorService();
       });
     },

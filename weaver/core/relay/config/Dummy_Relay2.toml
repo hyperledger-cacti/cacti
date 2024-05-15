@@ -1,10 +1,10 @@
-name = "Dummy_Relay"
-port="9085"
+name = "Dummy_Relay2"
+port="9087"
 hostname="localhost"
-db_path="db/Dummy_Relay/requests"
+db_path="db/Dummy_Relay2/requests"
 # This will be replaced by the task queue.
-remote_db_path="db/Dummy_Relay/remote_request"
-db_satp_path="db/Dummy_Relay/satp"
+remote_db_path="db/Dummy_Relay2/remote_request"
+db_satp_path="db/Dummy_Relay2/satp"
 # max retries opening sled db if it is locked
 db_open_max_retries=500
 # retry back off time in ms if sled db is locked
@@ -18,8 +18,8 @@ tls=false
 # Networks map is used to identity the network behind the relay
 # by its network name so the request can be routed to the right driver
 [networks]
-[networks.Dummy_Network]
-network="Dummy"
+[networks.Dummy_Network2]
+network="Dummy2"
 
 # Location of the remote relays
 [relays]
@@ -56,8 +56,8 @@ hostname="localhost"
 port="9099"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
-[drivers.Dummy]
+[drivers.Dummy2]
 hostname="localhost"
-port="9090"
+port="9095"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"

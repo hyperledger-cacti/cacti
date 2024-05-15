@@ -72,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     let relay_name = settings.get_str("name").expect("No Relay name provided");
-    info!("Relay Name: {:?}", relay_name);
+    println!("Relay Name: {:?}", relay_name);
     let relay_port = settings.get_str("port").expect(&format!("Port does not exist for relay name {}. Make sure the config file <{}> has the name and port specified.", relay_name, config_file_name.to_string()));
     let host = settings
         .get_str("hostname")
@@ -100,9 +100,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let network = NetworkService {
         config_lock: RwLock::new(settings.clone()),
     };
-    info!("RelayServer listening on {}", addr);
+    println!("RelayServer listening on {}", addr);
     if with_tls == true {
-        debug!("Starting Server with TLS");
+        println!("Starting Server with TLS");
         let cert = tokio::fs::read(settings.get_str("cert_path").unwrap()).await?;
         let key = tokio::fs::read(settings.get_str("key_path").unwrap()).await?;
         let identity = Identity::from_pem(cert, key);

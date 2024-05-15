@@ -36,12 +36,8 @@ github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiu
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2 h1:RCScZbqnxdX1RDrp4HATGXs8Pbh2yLI6F6ULjAjTUso=
-github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2/go.mod h1:3DmkYfZoc+TtcAgF3kX6CmQDNKKKCHgbaoQuYu/3ayc=
-github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.0.0-alpha.2 h1:vF83NIQVQZWfq9WJfK2r1GZ9Db99m5l4OY4b+OzAhz8=
-github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.0.0-alpha.2/go.mod h1:tL6FpKOJ072pXdSVb+C565NLrOEfSyrw3Tq63ftJOuY=
-github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20240513093210-cf641c80c028 h1:IYGvhEekwbhhbSI9cNCcq7sdSCkEwiyRWY/Y7QCWZFs=
-github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20240513093210-cf641c80c028/go.mod h1:AM6B93C+yIr4TtjBrfnPQgkFQy0nyz3SjUYAwgQCWWc=
+github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.0.0-alpha.2 h1:Z7IdcqQC6hBBGc2EvvabIBMuE1tAXawiRhX/9fNyC0A=
+github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.0.0-alpha.2/go.mod h1:LPZLWY0HNjya7zz9BeRaexHolUcZO95+ycCHW7C8okA=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a h1:HwSCxEeiBthwcazcAykGATQ36oG9M+HEQvGLvB7aLvA=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a/go.mod h1:TDSu9gxURldEnaGSFbH1eMlfSQBWQcMQfnDBcpQv5lU=
 github.com/hyperledger/fabric-contract-api-go v1.2.1 h1:Ww9cKH/qHl5s6WqF+Ts5ju5eaBxC/awB/BJE+rOsEkM=

@@ -1,11 +1,18 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import * as path from "path";
 import satp_pb from '@hyperledger/cacti-weaver-protos-js/relay/satp_pb';
 import satp_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/satp_grpc_pb';
 import driverPb from '@hyperledger/cacti-weaver-protos-js/driver/driver_pb';
 import logger from './logger';
 import { credentials } from '@grpc/grpc-js';
-import { SatpAssetManager, AssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
+import { SatpAssetManager } from '@hyperledger/cacti-weaver-sdk-fabric'
 import fs from 'fs';
-import { Gateway, Network } from 'fabric-network'
+import { Gateway, Network, Wallets, X509Identity } from 'fabric-network'
 import { getNetworkGateway } from "./fabric-code";
 import { getDriverKeyCert } from './walletSetup';
 
@@ -17,87 +24,38 @@ async function performLockHelper(
     // TODO: remove the hardcoded values 
     let performLockRequest2 = {};
     performLockRequest2['target-network'] = 'network1';
-    performLockRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
     performLockRequest2['timeout-duration'] = parseInt('3600');
     performLockRequest2['locker'] = 'alice';
     performLockRequest2['recipient'] = 'bob';
     performLockRequest2['lockerWalletPath'] = '../wallet-network1/alice.id';
-    performLockRequest2['recipientWalletPath'] = '../wallet-network1/bob.id';
-    performLockRequest2['param'] = 'bond01:a05';
+    // HACK below; reading from temp file created by the relay SATP client; ideally, we shoudld get this info from the function parameter
+    performLockRequest2['param'] = fs.existsSync('satp_info.txt') ? fs.readFileSync('satp_info.txt').toString() : 'bond01:a05';
+    if (performLockRequest2['param'].split(':').length === 1) {
+        performLockRequest2['param'] = performLockRequest2['param'] + ':a05';
+    }
     performLockRequest2['channel'] = 'mychannel';
     performLockRequest2['chaincode-id'] = 'satpsimpleasset';
 
-    // Locker and recipient
-    const locker = performLockRequest2['locker'];
     const recipient = performLockRequest2['recipient'];
-    const recipientWalletPath = performLockRequest2['recipientWalletPath'];
-    let hashFn = performLockRequest2['hash_fn'];
-    let hashBase64 = performLockRequest2['hashBase64'];
-    const targetNetwork = performLockRequest2['target-network'];
     const channel = performLockRequest2['channel'];
     const chaincodeId = performLockRequest2['chaincode-id'];
-
-    // Hash
-    let hash: HashFunctions.Hash
-    if (hashFn == 'SHA512') {
-        hash = new HashFunctions.SHA512()
-    } else {
-        hash = new HashFunctions.SHA256()
-    }
-
-    if (hashBase64) {
-        hash.setSerializedHashBase64(hashBase64)
-    }
-    else {
-        logger.info(`No hash provided, using random preimage`)
-    }
-
-    // Timeout
-    let timeout = 0;
-    const currTime = Math.floor(Date.now() / 1000);
-    if (performLockRequest2['timeout-epoch']) {
-        timeout = performLockRequest2['timeout-epoch']
-    }
-    else if (performLockRequest2['timeout-duration']) {
-        timeout = currTime + performLockRequest2['timeout-duration']
-    }
 
     let gateway: Gateway = await getNetworkGateway(networkName);
     const network: Network = await gateway.getNetwork(channel);
     const contract = network.getContract(chaincodeId);
 
     const params = performLockRequest2['param'].split(':')
-    const recipientCert = Buffer.from(recipientWalletPath).toString('base64')
-
-    let funcToCall, asset
 
     try {
-        if (performLockRequest2['fungible']) {
-            funcToCall = AssetManager.createFungibleHTLC
-            asset = 'Fungible Asset'
-        } else {
-            funcToCall = AssetManager.createHTLC
-            asset = 'Asset'
-        }
-
-        logger.info(`Asset Lock: Lock ${asset}:\n`);
-    
-        logger.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
-        const res = await funcToCall(contract,
-            params[0],
-            params[1],
-            recipientCert,
-            hash,
-            timeout,
-            null)
-        if (!res.result) {
+        logger.info(`Trying to lock asset <${params[0]}, ${params[1]}> for SATP to ${recipient}`)
+        const res = await SatpAssetManager.lockAsset(contract, params[0], params[1])
+        if (!res) {
             throw new Error()
         }
-        logger.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
-        logger.info('Asset has been locked successfully')
+        logger.info(`Asset <${params[0]}, ${params[1]}> locked successfully for gateway`)
 
     } catch (error) {
-        logger.error(`Could not Lock ${asset} in ${targetNetwork}`)
+        logger.error(`Could not lock asset <${params[0]}, ${params[1]}>`)
     } finally {
         if (gateway) {
             await gateway.disconnect();
@@ -119,13 +77,19 @@ async function createAssetHelper(
 
     // TODO: remove the hardcoded values 
     let createAssetRequest2 = {};
-    createAssetRequest2['target-network'] = 'network1';
-    createAssetRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
+    createAssetRequest2['target-network'] = 'network2';
     createAssetRequest2['timeout-duration'] = parseInt('3600');
     createAssetRequest2['owner'] = 'admin';
     createAssetRequest2['type'] = 'bond';
-    createAssetRequest2['assetType'] = 'bond01';
-    createAssetRequest2['id'] = 'a0demo';
+    // HACK below; reading from temp file created by the relay SATP client; ideally, we shoudld get this info from the function parameter
+    const asset_info = fs.existsSync('satp_info.txt') ? fs.readFileSync('satp_info.txt').toString() : 'bond01:a05';
+    let asset_info_parts = asset_info.split(':');
+    createAssetRequest2['assetType'] = asset_info_parts[0] + '_new';
+    if (asset_info_parts.length === 1) {
+        createAssetRequest2['id'] = 'a05_new';
+    } else {
+        createAssetRequest2['id'] = asset_info_parts[1] + '_new';
+    }
     createAssetRequest2['issuer'] = 'admin';
     createAssetRequest2['facevalue'] = '300';
     createAssetRequest2['maturitydate'] = '05 May 48 00:00 MST';
@@ -170,7 +134,7 @@ async function createAssetHelper(
         }
         logger.info(currentQuery)
 
-        logger.info(`Trying creating the asset: type: ${ccType}, id: ${id}, by: ${owner}, facevalue: ${facevalue}, maturitydate: ${maturitydate}`)
+        logger.info(`Trying creating the asset: type: ${assetType}, id: ${id}, by: ${owner}, facevalue: ${facevalue}, maturitydate: ${maturitydate}`)
         const read = await contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
         const state = Buffer.from(read).toString()
         if (state) {
@@ -197,10 +161,43 @@ async function createAssetHelper(
 }
 
 async function extinguishHelper(
-    extinguishRequest: driverPb.ExtinguishRequest
+    extinguishRequest: driverPb.ExtinguishRequest,
+    networkName: string
 ) {
+    const channel = 'mychannel';
+    const chaincodeId = 'satpsimpleasset';
+    let gateway: Gateway = await getNetworkGateway(networkName);
+    const network: Network = await gateway.getNetwork(channel);
+    const contract = network.getContract(chaincodeId);
 
-    // TODO: run the appropriate extinguish logic
+    // HACK below; reading from temp file created by the relay SATP client; ideally, we shoudld get this info from the function parameter
+    const asset_info = fs.existsSync('satp_info.txt') ? fs.readFileSync('satp_info.txt').toString() : 'bond01:a05';
+    let asset_info_parts = asset_info.split(':');
+    const assetType = asset_info_parts[0];
+    let assetId;
+    if (asset_info_parts.length === 1) {
+        assetId = 'a05';
+    } else {
+        assetId = asset_info_parts[1];
+    }
+
+    try {
+        logger.info(`Trying to extinguish asset <${assetType}, ${assetId}> for SATP completion`)
+        const res = await SatpAssetManager.extinguishAsset(contract, assetType, assetId)
+        if (!res) {
+            throw new Error()
+        }
+        logger.info(`Asset <${assetType}, ${assetId}> extinguished successfully by gateway`)
+
+    } catch (error) {
+        logger.error(`Could not extinguish asset <${assetType}, ${assetId}>`)
+    } finally {
+        if (gateway) {
+            await gateway.disconnect();
+            logger.info('Gateway disconnected.');
+        }
+    }
+
     const client = getRelayClientForAssetStatusResponse();
     const request = new satp_pb.SendAssetStatusRequest();
     request.setSessionId(extinguishRequest.getSessionId());
@@ -215,25 +212,22 @@ async function assignAssetHelper(
 
     // TODO: remove the hardcoded values 
     let assignAssetRequest2 = {};
-    assignAssetRequest2['target-network'] = 'network1';
-    assignAssetRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
+    assignAssetRequest2['target-network'] = 'network2';
     assignAssetRequest2['timeout-duration'] = parseInt('3600');
     assignAssetRequest2['locker'] = 'admin';
     assignAssetRequest2['recipient'] = 'bob';
-    assignAssetRequest2['fungible'] = false;
-    assignAssetRequest2['contract-id'] = 'abc01';
-    assignAssetRequest2['hash_fn'] = '';
-    assignAssetRequest2['secret'] = 'secrettext';
-    assignAssetRequest2['param'] = 'bond01:a0demo';
+    // HACK below; reading from temp file created by the relay SATP client; ideally, we shoudld get this info from the function parameter
+    const asset_info = fs.existsSync('satp_info.txt') ? fs.readFileSync('satp_info.txt').toString() : 'bond01:a05';
+    let asset_info_parts = asset_info.split(':');
+    if (asset_info_parts.length === 1) {
+        assignAssetRequest2['param'] = asset_info_parts[0] + '_new:a05_new';
+    } else {
+        assignAssetRequest2['param'] = asset_info_parts[0] + '_new:' + asset_info_parts[1] + '_new';
+    }
     assignAssetRequest2['channel'] = 'mychannel';
     assignAssetRequest2['chaincode-id'] = 'satpsimpleasset';
 
-    const targetNetwork = assignAssetRequest2['target-network'];
-    const locker = assignAssetRequest2['locker'];
     const recipient = assignAssetRequest2['recipient'];
-    const fungible = assignAssetRequest2['fungible'];
-    const hashFn = assignAssetRequest2['hash_fn'];
-    const secret = assignAssetRequest2['secret'];
     const channel = assignAssetRequest2['channel'];
     const chaincodeId = assignAssetRequest2['chaincode-id'];
 
@@ -241,76 +235,41 @@ async function assignAssetHelper(
     const network: Network = await gateway.getNetwork(channel);
     const contract = network.getContract(chaincodeId);
 
-    // Hash
-    let hash: HashFunctions.Hash
-    if (hashFn === 'SHA512') {
-        hash = new HashFunctions.SHA512()
-    } else {
-        hash = new HashFunctions.SHA256()
-    }
-    hash.setPreimage(secret)
+    const params = assignAssetRequest2['param'].split(':');
+    // TODO: read the recipient's ID and certificate from service parameters
+    //       instead of reading a manually copied wallet ID from the local filesystem
+    const walletPath = process.env.WALLET_PATH
+      ? process.env.WALLET_PATH
+      : path.join(
+          process.cwd(),
+          `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : "network1"}`,
+        );
+    const wallet = await Wallets.newFileSystemWallet(walletPath)
+    const recipientId = await wallet.get(recipient)
+    const recipientCert = Buffer.from((recipientId as X509Identity).credentials.certificate).toString('base64')
 
-    let contractId: string = null
-    if (assignAssetRequest2['contract-id']) {
-        contractId = assignAssetRequest2['contract-id']
-    }
-
-    const params = assignAssetRequest2['param'].split(':')
-
-    let funcToCall = SatpAssetManager.assignAsset
-    let asset = assignAssetRequest2['param']
-
-    if (assignAssetRequest2['fungible']) {
-        // funcToCall = SatpAssetManager.claimFungibleAssetInHTLC
-        asset = 'Fungible Asset'
-    }
-
-    if (fungible) {
-        try {
-            logger.info(`Trying assigning the asset with contract id ${contractId}`)
-
-            // TODO
-        } catch (error) {
-            logger.error(`Could not assign ${asset} in ${targetNetwork}`)
-            throw new Error(`Could not assign ${asset} in ${targetNetwork}`)
-        } finally {
-            if (gateway) {
-                await gateway.disconnect();
-                logger.info('Gateway disconnected.');
-            }
+    try {
+        logger.info(`Trying to assign asset <${params[0]}, ${params[1]}> from SATP to ${recipient}`)
+        const res = await SatpAssetManager.assignAsset(contract, params[0], params[1], recipientCert)
+        if (!res) {
+            throw new Error()
         }
-    } else {
-        try {
-            const driverkeyCert = await getDriverKeyCert();
-            const certificate = Buffer.from(driverkeyCert.cert).toString('base64')
+        logger.info(`Asset <${params[0]}, ${params[1]}> assigned successfully successfully by gateway to ${recipient}`)
 
-            logger.info(`Trying assign asset with params: ${params[0]}, ${params[1]} locked by ${locker} for ${recipient}`)
-            const res = await funcToCall(contract,
-                params[0],
-                params[1],
-                certificate,
-                hash)
-            if (!res) {
-                throw new Error()
-            }
-            logger.info(`${asset} assigned complete: ${res}`)
-            logger.info(`Asset ${asset} assign complete: ${res}`)
-        } catch (error) {
-            logger.error(`Could not assign non-fungible ${asset} in ${targetNetwork}: ${error}`)
-            throw new Error(`Could not assign non-fungible ${asset} in ${targetNetwork}: ${error}`)
-        } finally {
-            if (gateway) {
-                await gateway.disconnect();
-                logger.info('Gateway disconnected.');
-            }
+    } catch (error) {
+        logger.error(`Could not assign asset <${params[0]}, ${params[1]}> to ${recipient}`)
+    } finally {
+        if (gateway) {
+            await gateway.disconnect();
+            logger.info('Gateway disconnected.');
         }
-
-        const client = getRelayClientForAssetStatusResponse();
-        const request = new satp_pb.SendAssetStatusRequest();
-        request.setSessionId(assignAssetRequest.getSessionId());
-        request.setStatus("Finalized");
-        client.sendAssetStatus(request, relayCallback);
     }
+
+    const client = getRelayClientForAssetStatusResponse();
+    const request = new satp_pb.SendAssetStatusRequest();
+    request.setSessionId(assignAssetRequest.getSessionId());
+    request.setStatus("Finalized");
+    client.sendAssetStatus(request, relayCallback);
 }
 
 function getRelayClientForAssetStatusResponse() {

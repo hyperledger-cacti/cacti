@@ -167,7 +167,6 @@ describe("Relay", () => {
         localRelayEndpoint,
         grpc.ServerCredentials.createInsecure(),
         () => {
-          relayServer.start();
         },
       );
     });
@@ -226,7 +225,6 @@ describe("Relay", () => {
         localRelayEndpoint,
         grpc.ServerCredentials.createInsecure(),
         () => {
-          relayServer.start();
         },
       );
     });
@@ -291,7 +289,6 @@ describe("Relay", () => {
         localRelayEndpoint,
         grpc.ServerCredentials.createInsecure(),
         () => {
-          relayServer.start();
         },
       );
     });
