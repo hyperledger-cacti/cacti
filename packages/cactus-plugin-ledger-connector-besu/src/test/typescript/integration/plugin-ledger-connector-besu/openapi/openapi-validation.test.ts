@@ -44,6 +44,7 @@ import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../../main/json/openapi.json";
 import { Account } from "web3-core";
+import { AxiosError } from "axios";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "able to validate OpenAPI requests";
@@ -212,15 +213,16 @@ describe("PluginLedgerConnectorBesu", () => {
       await apiClient.deployContractSolBytecodeV1(
         parameters as unknown as DeployContractSolidityBytecodeV1Request,
       );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
 
-      expect(fields.includes("contractName")).toBeTrue();
-      expect(fields.includes("bytecode")).toBeTrue();
-      expect(fields.includes("gas")).toBeFalse();
+      expect(fields?.includes("contractName")).toBeTrue();
+      expect(fields?.includes("bytecode")).toBeTrue();
+      expect(fields?.includes("gas")).toBeFalse();
     }
   });
 
@@ -243,12 +245,13 @@ describe("PluginLedgerConnectorBesu", () => {
       await apiClient.deployContractSolBytecodeV1(
         parameters as DeployContractSolidityBytecodeV1Request,
       );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -289,13 +292,14 @@ describe("PluginLedgerConnectorBesu", () => {
       await apiClient.invokeContractV1(
         parameters as any as InvokeContractV1Request,
       );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("contractName")).toBeTrue();
-      expect(fields.includes("gas")).toBeFalse();
+      expect(fields?.includes("contractName")).toBeTrue();
+      expect(fields?.includes("gas")).toBeFalse();
     }
   });
 
@@ -315,12 +319,13 @@ describe("PluginLedgerConnectorBesu", () => {
         fake: 4,
       };
       await apiClient.invokeContractV1(parameters as InvokeContractV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -368,12 +373,13 @@ describe("PluginLedgerConnectorBesu", () => {
         },
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("consistencyStrategy")).toBeTrue();
+      expect(fields?.includes("consistencyStrategy")).toBeTrue();
     }
   });
 
@@ -399,12 +405,13 @@ describe("PluginLedgerConnectorBesu", () => {
         fake: 4,
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -490,12 +497,13 @@ describe("PluginLedgerConnectorBesu", () => {
       };
 
       await apiClient.signTransactionV1(parameters as SignTransactionRequest);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: any) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("keychainId")).toBeTrue();
+      expect(fields?.includes("keychainId")).toBeTrue();
     }
   });
 
@@ -533,12 +541,13 @@ describe("PluginLedgerConnectorBesu", () => {
       };
 
       await apiClient.signTransactionV1(parameters as SignTransactionRequest);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -553,12 +562,13 @@ describe("PluginLedgerConnectorBesu", () => {
     try {
       const parameters = {};
       await apiClient.getBalanceV1(parameters as GetBalanceV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("address")).toBeTrue();
+      expect(fields?.includes("address")).toBeTrue();
     }
   });
 
@@ -569,12 +579,13 @@ describe("PluginLedgerConnectorBesu", () => {
         fake: 4,
       };
       await apiClient.getBalanceV1(parameters as GetBalanceV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -589,12 +600,13 @@ describe("PluginLedgerConnectorBesu", () => {
     try {
       const parameters = {};
       await apiClient.getBlockV1(parameters as GetBlockV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("blockHashOrBlockNumber")).toBeTrue();
+      expect(fields?.includes("blockHashOrBlockNumber")).toBeTrue();
     }
   });
 
@@ -605,12 +617,13 @@ describe("PluginLedgerConnectorBesu", () => {
         fake: 4,
       };
       await apiClient.getBlockV1(parameters as GetBlockV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -627,12 +640,13 @@ describe("PluginLedgerConnectorBesu", () => {
     try {
       const parameters = {};
       await apiClient.getPastLogsV1(parameters as GetPastLogsV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("address")).toBeTrue();
+      expect(fields?.includes("address")).toBeTrue();
     }
   });
 
@@ -643,12 +657,13 @@ describe("PluginLedgerConnectorBesu", () => {
         fake: 4,
       };
       await apiClient.getPastLogsV1(parameters as GetPastLogsV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
@@ -693,12 +708,13 @@ describe("PluginLedgerConnectorBesu", () => {
     try {
       const parameters = {};
       await apiClient.getBesuRecordV1(parameters as GetBesuRecordV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: any) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("transactionHash")).toBeTrue();
+      expect(fields?.includes("transactionHash")).toBeTrue();
     }
   });
 
@@ -709,12 +725,13 @@ describe("PluginLedgerConnectorBesu", () => {
         fake: 5,
       };
       await apiClient.getBesuRecordV1(parameters as GetBesuRecordV1Request);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
+      expect(e?.response?.status).toEqual(400);
+      const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
       );
-      expect(fields.includes("fake")).toBeTrue();
+      expect(fields?.includes("fake")).toBeTrue();
     }
   });
 
