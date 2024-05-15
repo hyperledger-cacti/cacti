@@ -289,7 +289,6 @@ if (process.env.IIN_AGENT_TLS === "true") {
             "Starting IIN agent server with TLS on",
             process.env.IIN_AGENT_ENDPOINT,
           );
-          iinAgentServer.start();
           loopSyncExternalState();
         })
         .catch((error) => {
@@ -308,7 +307,6 @@ if (process.env.IIN_AGENT_TLS === "true") {
             "Starting IIN agent server without TLS on",
             process.env.IIN_AGENT_ENDPOINT,
           );
-          iinAgentServer.start();
           loopSyncExternalState();
         })
         .catch((error) => {

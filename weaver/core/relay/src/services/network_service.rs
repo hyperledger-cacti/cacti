@@ -538,47 +538,32 @@ impl Network for NetworkService {
             get_request_id_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
         // TODO refactor / add log entry
 
-        let parsed_address = parse_address(network_asset_transfer.address.to_string());
-        match parsed_address {
-            Ok(_address) => {
-                let (relay_host, relay_port) = get_relay_from_transfer_proposal_claims(
-                    transfer_proposal_claims_request.clone(),
-                );
-                let (use_tls, tlsca_cert_path) =
-                    get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+        let (relay_host, relay_port) = get_relay_from_transfer_proposal_claims(
+            transfer_proposal_claims_request.clone(),
+        );
+        let (use_tls, tlsca_cert_path) =
+            get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
 
-                // TODO: verify that host and port are valid
-                // Spawns a child process to handle sending request
-                spawn_send_transfer_proposal_claims_request(
-                    transfer_proposal_claims_request,
-                    relay_host,
-                    relay_port,
-                    use_tls,
-                    tlsca_cert_path,
-                );
-                // Send Ack back to network while request is happening in a thread
-                let reply = Ack {
-                    status: ack::Status::Ok as i32,
-                    request_id: request_id,
-                    message: "Ack of the asset transfer request".to_string(),
-                };
-                println!(
-                    "Sending Ack of the asset transfer request back to network: {:?}\n",
-                    reply
-                );
-                Ok(Response::new(reply))
-            }
-            Err(e) => {
-                println!("Invalid Address");
-                let reply = Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id,
-                    message: format!("Error: Ack of the asset transfer request {:?}", e),
-                };
-                println!("Sending Ack back with an error to network: {:?}\n", reply);
-                Ok(Response::new(reply))
-            }
-        }
+        // TODO: verify that host and port are valid
+        // Spawns a child process to handle sending request
+        spawn_send_transfer_proposal_claims_request(
+            transfer_proposal_claims_request,
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path,
+        );
+        // Send Ack back to network while request is happening in a thread
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: request_id,
+            message: "Ack of the asset transfer request".to_string(),
+        };
+        println!(
+            "Sending Ack of the asset transfer request back to network: {:?}\n",
+            reply
+        );
+        Ok(Response::new(reply))
     }
 }
 

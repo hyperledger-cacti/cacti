@@ -37,7 +37,7 @@ pub fn parse_address(address: String) -> Result<Address, Error> {
 }
 
 #[allow(dead_code)]
-fn parse_location(location: String) -> Result<LocationSegment, Error> {
+pub fn parse_location(location: String) -> Result<LocationSegment, Error> {
     let v: Vec<&str> = location.split(":").collect();
     if v.len() != 2 {
         return Err(Error::new(

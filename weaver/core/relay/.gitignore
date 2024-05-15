@@ -4,3 +4,4 @@ protos-rs
 /db
 .env
 *.db
+*.sql

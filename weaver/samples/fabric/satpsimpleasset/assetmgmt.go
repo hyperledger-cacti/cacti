@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -43,6 +44,43 @@ func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionConte
 	return nil
 }
 
+// LockAssetForSATP transfers the ownership of an asset to a calling relay.
+// TODO: Currently, this is a hacky implementation.
+//       We will need to add some logic for owner's consent that can be verified here.
+//       Right now, we are treating the relay as a trusted party.
+func (s *SmartContract) LockAssetForSATP(ctx contractapi.TransactionContextInterface, assetType, id string) error {
+	// Read asset
+	asset, err := getBondAsset(ctx, assetType, id)
+	if err != nil {
+		return err
+	}
+	// Allow access for modification if caller is either the owner or a relay
+	relayAccessCheck, err := wutils.IsClientRelay(ctx.GetStub())
+	if err != nil {
+		return err
+	}
+	if !relayAccessCheck && !isCallerAssetOwner(ctx, asset) {
+		return logThenErrorf("Illegal update: caller is not owner of asset %s nor is a relay\n", asset.ID)
+	}
+
+	// Ensure that the asset is not locked
+	if isBondAssetLocked(s, ctx, asset) {
+		return logThenErrorf("Cannot update attributes of locked asset %s\n", asset.ID)
+	}
+
+	recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+	asset.Owner = recipientECertBase64
+	assetJSON, err := json.Marshal(asset)
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+
+	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
+}
+
 // Ledger transaction (invocation) functions
 
 func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
@@ -50,6 +88,10 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	assetAgreement, err := s.amc.ValidateAndExtractAssetAgreement(assetExchangeAgreementSerializedProto64)
 	if err != nil {
 		return "", err
+	}
+	err = s.BondAssetSpecificChecks(ctx, assetAgreement.AssetType, assetAgreement.Id, lockInfoSerializedProto64)
+	if err != nil {
+		return "", logThenErrorf(err.Error())
 	}
 
 	contractId, err := s.amc.LockAsset(ctx, assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
@@ -165,32 +207,32 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 }
 
-func (s *SmartContract) AssignAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
-	assetAgreement, err := s.amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+func (s *SmartContract) AssignAssetForSATP(ctx contractapi.TransactionContextInterface, assetType, assetId, recipientECertBase64 string) error {
+	// Allow access for assigning only if caller is a relay
+	relayAccessCheck, err := wutils.IsClientRelay(ctx.GetStub())
 	if err != nil {
-		return false, err
+		return err
+	}
+	if !relayAccessCheck {
+		return logThenErrorf("Illegal update: caller is not a relay\n")
 	}
 
-	// Change asset ownership to claimant
-	recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+	// Change asset ownership to recipient
+	asset, err := getBondAsset(ctx, assetType, assetId)
 	if err != nil {
-		return false, logThenErrorf(err.Error())
-	}
-	asset, err := getBondAsset(ctx, assetAgreement.AssetType, assetAgreement.Id)
-	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return logThenErrorf(err.Error())
 	}
 	asset.Owner = string(recipientECertBase64)
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return logThenErrorf(err.Error())
 	}
-	err = ctx.GetStub().PutState(getBondAssetKey(assetAgreement.AssetType, assetAgreement.Id), assetJSON)
+	err = ctx.GetStub().PutState(getBondAssetKey(assetType, assetId), assetJSON)
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return logThenErrorf(err.Error())
 	}
 
-	return true, nil
+	return nil
 }
 
 func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {

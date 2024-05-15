@@ -12,3 +12,4 @@ wallet-network1/*.id
 !wallet-network1/relay.id
 wallet-network2/*.id
 !wallet-network2/relay.id
+satp_info.txt

@@ -1,6 +1,0 @@
-[ansible_provisioners:children]
-local
-
-[local]
-localhost ansible_connection=local
-

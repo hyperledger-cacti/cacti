@@ -131,7 +131,7 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 
 // DeleteAsset deletes an given asset from the world state.
 func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
-	
+
 	// Read the asset (which internally check access)
 	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {

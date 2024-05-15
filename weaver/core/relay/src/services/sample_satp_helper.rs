@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::relay_proto::LocationSegment;
+use crate::relay_proto::{parse_location, LocationSegment};
 use crate::services::helpers::get_driver_client;
 use crate::services::logger::Operation;
 use config::Config;
@@ -19,6 +19,7 @@ use weaverpb::relay::satp::{
 };
 use super::logger::LogEntry;
 use super::types::Driver;
+use uuid::Uuid;
 
 // Sends a request to the receiving gateway
 pub fn spawn_send_transfer_proposal_claims_request(
@@ -857,20 +858,21 @@ pub fn create_ack_error_message(
 }
 
 pub fn create_transfer_proposal_claims_request(
-    _network_asset_transfer: NetworkAssetTransfer,
+    network_asset_transfer: NetworkAssetTransfer,
 ) -> TransferProposalClaimsRequest {
+    // TODO: remove hard coded values
     let transfer_proposal_claims_request = TransferProposalClaimsRequest {
         message_type: "message_type1".to_string(),
         client_identity_pubkey: "client_identity_pubkey1".to_string(),
         server_identity_pubkey: "server_identity_pubkey1".to_string(),
-        asset_asset_id: "asset_asset_id".to_string(),
-        asset_profile_id: "asset_profile_id".to_string(),
+        asset_asset_id: network_asset_transfer.asset_id,
+        asset_profile_id: network_asset_transfer.asset_type,
         verified_originator_entity_id: "verified_originator_entity_id".to_string(),
         verified_beneficiary_entity_id: "verified_beneficiary_entity_id".to_string(),
         originator_pubkey: "originator_pubkey".to_string(),
         beneficiary_pubkey: "beneficiary_pubkey".to_string(),
-        sender_gateway_network_id: "sender_gateway_network_id".to_string(),
-        recipient_gateway_network_id: "recipient_gateway_network_id".to_string(),
+        sender_gateway_network_id: network_asset_transfer.source_relay,
+        recipient_gateway_network_id: network_asset_transfer.destination_relay,
         sender_gateway_owner_id: "sender_gateway_owner_id".to_string(),
         receiver_gateway_owner_id: "receiver_gateway_owner_id".to_string(),
     };
@@ -880,7 +882,8 @@ pub fn create_transfer_proposal_claims_request(
 pub fn create_transfer_commence_request(
     _transfer_proposal_receipt_request: TransferProposalReceiptRequest,
 ) -> TransferCommenceRequest {
-    let session_id = "to_be_calculated_session_id";
+    // TODO: remove hard coded values
+    let session_id = Uuid::new_v4();
     let transfer_commence_request = TransferCommenceRequest {
         message_type: "message_type1".to_string(),
         session_id: session_id.to_string(),
@@ -896,21 +899,21 @@ pub fn create_transfer_commence_request(
 }
 
 pub fn create_transfer_proposal_receipt_request(
-    _transfer_proposal_claims_request: TransferProposalClaimsRequest,
+    transfer_proposal_claims_request: TransferProposalClaimsRequest,
 ) -> TransferProposalReceiptRequest {
     // TODO: remove hard coded values
     let transfer_proposal_receipt_request = TransferProposalReceiptRequest {
         message_type: "message_type1".to_string(),
         client_identity_pubkey: "client_identity_pubkey1".to_string(),
         server_identity_pubkey: "server_identity_pubkey1".to_string(),
-        asset_asset_id: "asset_asset_id".to_string(),
-        asset_profile_id: "asset_profile_id".to_string(),
+        asset_asset_id: transfer_proposal_claims_request.asset_asset_id,
+        asset_profile_id: transfer_proposal_claims_request.asset_profile_id,
         verified_originator_entity_id: "verified_originator_entity_id".to_string(),
         verified_beneficiary_entity_id: "verified_beneficiary_entity_id".to_string(),
         originator_pubkey: "originator_pubkey".to_string(),
         beneficiary_pubkey: "beneficiary_pubkey".to_string(),
-        sender_gateway_network_id: "sender_gateway_network_id".to_string(),
-        recipient_gateway_network_id: "recipient_gateway_network_id".to_string(),
+        sender_gateway_network_id: transfer_proposal_claims_request.sender_gateway_network_id,
+        recipient_gateway_network_id: transfer_proposal_claims_request.recipient_gateway_network_id,
         sender_gateway_owner_id: "sender_gateway_owner_id".to_string(),
         receiver_gateway_owner_id: "receiver_gateway_owner_id".to_string(),
     };
@@ -1068,82 +1071,102 @@ pub fn create_assign_asset_request(
 }
 
 pub fn get_relay_from_transfer_proposal_claims(
-    _transfer_proposal_claims_request: TransferProposalClaimsRequest,
+    transfer_proposal_claims_request: TransferProposalClaimsRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    let recipient_gateway_id = transfer_proposal_claims_request.recipient_gateway_network_id.clone();
+    let parsed_location = parse_location(recipient_gateway_id.clone());
+    match parsed_location {
+        Ok(location) => {
+            return (location.hostname, location.port);
+        }
+        Err(e) => {
+            println!("Error parsing recipient gateway address {}: {:?}\n", recipient_gateway_id, e);
+            return ("".to_string(), "".to_string());
+        }
+    }
 }
 
 pub fn get_relay_from_transfer_proposal_receipt(
-    _transfer_proposal_receipt_request: TransferProposalReceiptRequest,
+    transfer_proposal_receipt_request: TransferProposalReceiptRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    let sender_gateway_id = transfer_proposal_receipt_request.sender_gateway_network_id.clone();
+    let parsed_location = parse_location(sender_gateway_id.clone());
+    match parsed_location {
+        Ok(location) => {
+            return (location.hostname, location.port);
+        }
+        Err(e) => {
+            println!("Error parsing sender gateway address {}: {:?}\n", sender_gateway_id, e);
+            return ("".to_string(), "".to_string());
+        }
+    }
 }
 
 pub fn get_relay_from_transfer_commence(
     _transfer_commence_request: TransferCommenceRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9083".to_string());
 }
 
 pub fn get_relay_from_ack_commence(_ack_commence_request: AckCommenceRequest) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9080".to_string());
 }
 
 pub fn get_relay_from_lock_assertion(
     _lock_assertion_request: LockAssertionRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9083".to_string());
 }
 
 pub fn get_relay_from_commit_prepare(
     _commit_prepare_request: CommitPrepareRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9083".to_string());
 }
 
 pub fn get_relay_from_commit_ready(_commit_ready_request: CommitReadyRequest) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9080".to_string());
 }
 
 pub fn get_relay_from_commit_final_assertion(
     _commit_final_assertion_request: CommitFinalAssertionRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9083".to_string());
 }
 
 pub fn get_relay_from_ack_final_receipt(
     _ack_final_receipt_request: AckFinalReceiptRequest,
 ) -> (String, String) {
     // TODO
-    return ("localhost".to_string(), "9085".to_string());
+    return ("localhost".to_string(), "9080".to_string());
 }
 
 pub fn get_driver_address_from_perform_lock(_perform_lock_request: PerformLockRequest) -> String {
     // TODO
-    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+    return "localhost:9080/network1/assettransfer".to_string();
 }
 
 pub fn get_driver_address_from_create_asset(_create_asset_request: CreateAssetRequest) -> String {
     // TODO
-    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+    return "localhost:9083/network2/assettransfer".to_string();
 }
 
 pub fn get_driver_address_from_extinguish(_extinguish_request: ExtinguishRequest) -> String {
     // TODO
-    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+    return "localhost:9080/network1/assettransfer".to_string();
 }
 
 pub fn get_driver_address_from_assign_asset(_assign_asset_request: AssignAssetRequest) -> String {
     // TODO
-    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+    return "localhost:9083/network2/assettransfer".to_string();
 }
 
 pub fn get_relay_params(relay_host: String, relay_port: String, conf: Config) -> (bool, String) {

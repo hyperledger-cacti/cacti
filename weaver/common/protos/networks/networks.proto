@@ -77,13 +77,14 @@ message NetworkEventUnsubscription {
 }
 
 message NetworkAssetTransfer {
-  repeated string policy = 1;
-  string address = 2;
-  string requesting_relay = 3;
-  string requesting_network = 4;
-  string certificate = 5;
-  string requestor_signature = 6;
-  string nonce = 7;
-  string requesting_org = 8;
-  bool confidential = 9;
+  string asset_type = 1;
+  string asset_id = 2;
+  string sender = 3;
+  string source_contract_id = 4;
+  string source_relay = 5;
+  string source_network = 6;
+  string destination_relay = 7;
+  string destination_network = 8;
+  string recipient = 9;
+  string destination_contract_id = 10;
 }

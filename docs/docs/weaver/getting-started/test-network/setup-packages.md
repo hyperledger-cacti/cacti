@@ -694,7 +694,7 @@ Run a Corda driver as follows:
 - Navigate to the `weaver/core/drivers/corda-driver` folder.
 - Run the following to start Corda driver for `Corda_Network`:
   ```bash
-  ./build/install/corda-driver/bin/corda-driver
+  ./build/install/driver-corda/bin/driver-corda
   ```
   If the driver starts successfully, it should log the following message on your terminal:
   ```
@@ -702,7 +702,7 @@ Run a Corda driver as follows:
   ```
 - Run the following to start Corda driver for `Corda_Network2`:
   ```bash
-  DRIVER_PORT=9098 ./build/install/corda-driver/bin/corda-driver
+  DRIVER_PORT=9098 ./build/install/driver-corda/bin/driver-corda
   ```
   If the driver starts successfully, it should log the following message on your terminal:
   ```
