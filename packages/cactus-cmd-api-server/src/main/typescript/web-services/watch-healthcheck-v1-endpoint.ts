@@ -4,6 +4,7 @@ import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { HealthCheckResponse } from "../generated/openapi/typescript-axios";
 import { WatchHealthcheckV1 } from "../generated/openapi/typescript-axios";
+import { response } from "express";
 
 export interface IWatchHealthcheckV1EndpointOptions {
   logLevel?: LogLevelDesc;
@@ -53,7 +54,8 @@ export class WatchHealthcheckV1Endpoint {
         socket.emit(WatchHealthcheckV1.Next, next);
       } catch (ex) {
         log.error(`Failed to construct health check response:`, ex);
-        socket.emit(WatchHealthcheckV1.Error, ex);
+        let responseError = ex as HealthCheckResponse
+        socket.emit(WatchHealthcheckV1.Error, responseError);
         clearInterval(timerId);
       }
     }, 1000);

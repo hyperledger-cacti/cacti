@@ -6,6 +6,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -107,7 +108,7 @@ export class UnprotectedActionEndpoint implements IWebServiceEndpoint {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({
         message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
+        error: safeStringifyException(ex),
       });
     }
   }

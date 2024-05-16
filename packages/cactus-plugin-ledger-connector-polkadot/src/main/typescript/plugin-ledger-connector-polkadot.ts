@@ -101,15 +101,14 @@ export interface IPluginLedgerConnectorPolkadotOptions
 
 export class PluginLedgerConnectorPolkadot
   implements
-    IPluginLedgerConnector<
-      DeployContractInkRequest,
-      DeployContractInkResponse,
-      RunTransactionRequest,
-      RunTransactionResponse
-    >,
-    ICactusPlugin,
-    IPluginWebService
-{
+  IPluginLedgerConnector<
+    DeployContractInkRequest,
+    DeployContractInkResponse,
+    RunTransactionRequest,
+    RunTransactionResponse
+  >,
+  ICactusPlugin,
+  IPluginWebService {
   public static readonly CLASS_NAME = "PluginLedgerConnectorPolkadot";
   private readonly instanceId: string;
   private readonly log: Logger;
@@ -850,7 +849,7 @@ export class PluginLedgerConnectorPolkadot
     } catch (err) {
       throw createHttpError[500](
         `${fnTag} Obtaining Prometheus Exporter Metrics has failed. ` +
-          `InnerException: ${err}`,
+        `InnerException: ${err}`,
       );
     }
   }
@@ -900,7 +899,7 @@ export class PluginLedgerConnectorPolkadot
     } catch (err) {
       throw createHttpError[500](
         `${fnTag} Obtaining info for this transaction has failed. ` +
-          `InnerException: ${err}`,
+        `InnerException: ${err}`,
       );
     }
   }

@@ -98,15 +98,14 @@ export interface IPluginLedgerConnectorQuorumOptions
 
 export class PluginLedgerConnectorQuorum
   implements
-    IPluginLedgerConnector<
-      DeployContractSolidityBytecodeV1Request,
-      DeployContractSolidityBytecodeV1Response,
-      RunTransactionRequest,
-      RunTransactionResponse
-    >,
-    ICactusPlugin,
-    IPluginWebService
-{
+  IPluginLedgerConnector<
+    DeployContractSolidityBytecodeV1Request,
+    DeployContractSolidityBytecodeV1Response,
+    RunTransactionRequest,
+    RunTransactionResponse
+  >,
+  ICactusPlugin,
+  IPluginWebService {
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -126,17 +125,17 @@ export class PluginLedgerConnectorQuorum
     if (!this.options.rpcApiWsHost) {
       return this.options.httpProviderOptions
         ? new Web3.providers.HttpProvider(
-            this.options.rpcApiHttpHost,
-            this.options.httpProviderOptions,
-          )
+          this.options.rpcApiHttpHost,
+          this.options.httpProviderOptions,
+        )
         : new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
     }
 
     return this.options.wsProviderOptions
       ? new Web3.providers.WebsocketProvider(
-          this.options.rpcApiWsHost,
-          this.options.wsProviderOptions,
-        )
+        this.options.rpcApiWsHost,
+        this.options.wsProviderOptions,
+      )
       : new Web3.providers.WebsocketProvider(this.options.rpcApiWsHost);
   }
 
@@ -525,16 +524,16 @@ export class PluginLedgerConnectorQuorum
         } else {
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
-              ` since signing credential is specified as` +
-              `Web3SigningCredentialType.NONE`,
+            ` since signing credential is specified as` +
+            `Web3SigningCredentialType.NONE`,
           );
         }
       }
       default: {
         throw new Error(
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-            `${req.web3SigningCredential.type} Supported ones are: ` +
-            `${Object.values(Web3SigningCredentialType).join(";")}`,
+          `${req.web3SigningCredential.type} Supported ones are: ` +
+          `${Object.values(Web3SigningCredentialType).join(";")}`,
         );
       }
     }
@@ -577,7 +576,7 @@ export class PluginLedgerConnectorQuorum
     } catch (ex) {
       throw new Error(
         `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`,
+        `InnerException: ${ex}`,
       );
     }
   }
@@ -604,7 +603,7 @@ export class PluginLedgerConnectorQuorum
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
-          `signedTransaction.rawTransaction is blank after .signTransaction().`,
+        `signedTransaction.rawTransaction is blank after .signTransaction().`,
       );
     }
   }
@@ -924,9 +923,8 @@ export class PluginLedgerConnectorQuorum
       const isValidType = typeof argValue === input.type;
 
       if (!isValidType) {
-        const msg = `Invalid type for argument ${index + 1} in ${
-          args.contractMethod
-        }`;
+        const msg = `Invalid type for argument ${index + 1} in ${args.contractMethod
+          }`;
         throw new BadRequestError(msg);
       }
     });
