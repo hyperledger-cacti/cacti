@@ -3,14 +3,14 @@ module github.com/hyperledger/cacti/weaver/samples/fabric/satpsimpleasset
 go 1.20
 
 require (
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2
 	github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.0.0-alpha.2
 	github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20240513093210-cf641c80c028
 	github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.0.0-alpha.2
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a
 	github.com/hyperledger/fabric-contract-api-go v1.2.1
-	github.com/hyperledger/fabric-protos-go v0.3.0
+	github.com/hyperledger/fabric-protos-go v0.3.3
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.2
 )
@@ -36,8 +36,8 @@ require (
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
-	google.golang.org/grpc v1.56.3 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/grpc v1.64.0 // indirect
+	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
