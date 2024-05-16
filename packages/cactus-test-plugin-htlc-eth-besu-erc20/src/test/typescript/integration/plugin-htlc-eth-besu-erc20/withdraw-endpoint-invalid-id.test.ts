@@ -37,6 +37,7 @@ import DemoHelperJSON from "../../../solidity/token-erc20-contract/DemoHelpers.j
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { AxiosError } from "axios";
 
 const testCase = "Test invalid withdraw with invalid id";
 
@@ -248,8 +249,9 @@ describe(testCase, () => {
       };
       const resWithdraw = await api.withdrawV1(withdrawRequest);
       expect(resWithdraw.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
+    } catch (err) {
+      const e = err as AxiosError
+      expect(e?.response?.status).toEqual(400);
     }
 
     const responseFinalBalance = await connector.invokeContract({

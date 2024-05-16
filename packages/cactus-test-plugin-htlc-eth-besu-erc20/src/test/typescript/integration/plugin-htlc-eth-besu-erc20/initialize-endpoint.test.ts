@@ -31,6 +31,7 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
+import { AxiosError } from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 const estimatedGas = 6721975;
@@ -203,8 +204,9 @@ describe(testCase, () => {
     try {
       const res = await api.initializeV1(request);
       expect(res.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
+    } catch (err) {
+      const e = err as AxiosError
+      expect(e?.response?.status).toEqual(400);
     }
   });
 });

@@ -36,6 +36,7 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import TestTokenJSON from "../../../solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "../../../solidity/token-erc20-contract/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
+import { AxiosError } from "axios";
 const testCase = "Test refund endpoint";
 describe(testCase, () => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -280,8 +281,9 @@ describe(testCase, () => {
       };
       const resRefund = await api.refundV1(refundRequest);
       expect(resRefund.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
+    } catch (err) {
+      const e = err as AxiosError
+      expect(e?.response?.status).toEqual(400);
     }
 
     const responseFinalBalance = await connector.invokeContract({
