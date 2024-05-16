@@ -36,6 +36,7 @@ import { Server as SocketIoServer } from "socket.io";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../../../main/json/openapi.json";
+import { AxiosError } from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -190,20 +191,21 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractSolBytecodeJsonObjectV1(
         parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeploy} without required contractJSON and bytecode: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("contractJSON"),
+        fields?.includes("contractJSON"),
         "Rejected because contractJSON is required",
       );
-      t2.notOk(fields.includes("gas"), "gas is not required");
+      t2.notOk(fields?.includes("gas"), "gas is not required");
     }
 
     t2.end();
@@ -226,17 +228,18 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractSolBytecodeJsonObjectV1(
         parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -262,20 +265,21 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1NoKeychain(
         parameters as any as InvokeContractJsonObjectV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInvoke} without required contractJSON and methodName: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("contractJSON"),
+        fields?.includes("contractJSON"),
         "Rejected because contractJSON is required",
       );
-      t2.notOk(fields.includes("nonce"), "nonce is not required");
+      t2.notOk(fields?.includes("nonce"), "nonce is not required");
     }
 
     t2.end();
@@ -301,17 +305,18 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1NoKeychain(
         parameters as any as InvokeContractJsonObjectV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }

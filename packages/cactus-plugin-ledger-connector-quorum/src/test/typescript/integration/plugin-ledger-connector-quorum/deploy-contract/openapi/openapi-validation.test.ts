@@ -32,6 +32,7 @@ import { Server as SocketIoServer } from "socket.io";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../../../main/json/openapi.json";
+import { AxiosError } from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 const testCase = "Quorum API";
@@ -179,20 +180,21 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractSolBytecodeV1(
         parameters as DeployContractSolidityBytecodeV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeploy} without required contractName and bytecode: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("contractName"),
+        fields?.includes("contractName"),
         "Rejected because contractName is required",
       );
-      t2.notOk(fields.includes("gas"), "gas is not required");
+      t2.notOk(fields?.includes("gas"), "gas is not required");
     }
 
     t2.end();
@@ -214,17 +216,18 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractSolBytecodeV1(
         parameters as DeployContractSolidityBytecodeV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -275,20 +278,21 @@ test(testCase, async (t: Test) => {
         },
       };
       await apiClient.invokeContractV1(parameters as InvokeContractV1Request);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInvoke} without required methodName: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("methodName"),
+        fields?.includes("methodName"),
         "Rejected because methodName is required",
       );
-      t2.notOk(fields.includes("nonce"), "nonce is not required");
+      t2.notOk(fields?.includes("nonce"), "nonce is not required");
     }
 
     t2.end();
@@ -313,17 +317,18 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.invokeContractV1(parameters as InvokeContractV1Request);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -364,20 +369,21 @@ test(testCase, async (t: Test) => {
         },
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fRun} without required transactionConfig: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("transactionConfig"),
+        fields?.includes("transactionConfig"),
         "Rejected because transactionConfig is required",
       );
-      t2.notOk(fields.includes("timeoutMs"), "timeoutMs is not required");
+      t2.notOk(fields?.includes("timeoutMs"), "timeoutMs is not required");
     }
 
     t2.end();
@@ -399,17 +405,18 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }

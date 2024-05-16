@@ -16,6 +16,7 @@ import {
   LoggerProvider,
   Checks,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
@@ -26,8 +27,7 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint
-{
+  implements IWebServiceEndpoint {
   private readonly log: Logger;
 
   constructor(
@@ -95,8 +95,8 @@ export class GetPrometheusExporterMetricsEndpointV1
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      res.status(500);
+      res.json({ error: safeStringifyException(ex) });
     }
   }
 }

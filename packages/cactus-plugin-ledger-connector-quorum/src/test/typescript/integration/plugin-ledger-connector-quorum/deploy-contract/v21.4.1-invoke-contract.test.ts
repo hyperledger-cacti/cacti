@@ -170,7 +170,9 @@ describe(testCase, () => {
         });
         expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
       } catch (error) {
-        expect(error.message).toMatch(/nonce too low/);
+        if (error instanceof Error) {
+          expect(error.message).toMatch(/nonce too low/);
+        }
       }
 
       const getNameOut = await connector.getContractInfoKeychain({
@@ -263,7 +265,9 @@ describe(testCase, () => {
         });
         expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
       } catch (error) {
-        expect(error.message).toMatch(/nonce too low/);
+        if (error instanceof Error) {
+          expect(error.message).toMatch(/nonce too low/);
+        }
       }
       const { callOutput: getNameOut } =
         await connector.getContractInfoKeychain({
@@ -336,7 +340,9 @@ describe(testCase, () => {
         });
         expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
       } catch (error) {
-        expect(error.message).toMatch(/nonce too low/);
+        if (error instanceof Error) {
+          expect(error.message).toMatch(/nonce too low/);
+        }
       }
       const { callOutput: getNameOut } =
         await connector.getContractInfoKeychain({

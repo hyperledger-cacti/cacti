@@ -12,6 +12,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
@@ -26,8 +27,7 @@ export interface IDeployContractSolidityBytecodeOptionsJsonObject {
 }
 
 export class DeployContractSolidityBytecodeJsonObjectEndpoint
-  implements IWebServiceEndpoint
-{
+  implements IWebServiceEndpoint {
   public static readonly CLASS_NAME =
     "DeployContractSolidityBytecodeEndpointJsonObject";
 
@@ -100,10 +100,10 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      res.status(500);
+      res.json({ error: safeStringifyException(ex) });
     }
   }
 }
+
+
