@@ -66,7 +66,7 @@
     "build:prod": "npm-run-all build:prod:frontend",
     "build:prod:frontend": "lerna run build:prod:frontend",
     "build:dev": "npm-run-all build:dev:backend webpack:dev:web build:dev:frontend",
-    "build:dev:backend": "npm-run-all tsc build:dev:backend:postbuild",
+    "build:dev:backend": "NODE_OPTIONS=\"--max_old_space_size=3072\" npm-run-all tsc build:dev:backend:postbuild",
     "build:dev:frontend": "lerna run build:dev:frontend --scope='@hyperledger/cactus-example-*-frontend' --scope='@hyperledger/cacti-ledger-browser'",
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:backend:postbuild": "lerna run build:dev:backend:postbuild",
