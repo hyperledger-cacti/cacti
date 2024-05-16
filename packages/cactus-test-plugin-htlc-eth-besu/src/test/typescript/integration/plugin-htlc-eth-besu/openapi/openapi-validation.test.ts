@@ -41,6 +41,7 @@ import HashTimeLockJSON from "../../../../../../../cactus-plugin-htlc-eth-besu/s
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import { PluginHtlcEthBesu } from "@hyperledger/cactus-plugin-htlc-eth-besu";
+import { AxiosError } from "axios";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -207,17 +208,18 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.initializeV1(parameters as unknown as InitializeRequest);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInitialize} without required connectorId: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("connectorId"),
+        fields?.includes("connectorId"),
         "Rejected because connectorId is required",
       );
     }
@@ -237,17 +239,20 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.initializeV1(parameters as unknown as InitializeRequest);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fInitialize} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fInitialize} with fake=4: response.status === 400 OK`,
+        ));
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -316,17 +321,20 @@ test(testCase, async (t: Test) => {
     };
     try {
       await api.newContractV1(parameters as unknown as NewContractObj);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fNew} without required contractAddress: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fNew} without required contractAddress: response.status === 400 OK`,
+        ));
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("contractAddress"),
+        fields?.includes("contractAddress"),
         "Rejected because contractAddress is required",
       );
     }
@@ -352,17 +360,20 @@ test(testCase, async (t: Test) => {
     };
     try {
       await api.newContractV1(parameters as unknown as NewContractObj);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fNew} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fNew} with fake=4: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -415,16 +426,19 @@ test(testCase, async (t: Test) => {
     };
     try {
       await api.refundV1(parameters as unknown as RefundReq);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fRefund} without required id: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fRefund} without required id: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("id"), "Rejected because id is required");
+      t2.ok(fields?.includes("id"), "Rejected because id is required");
     }
 
     t2.end();
@@ -440,17 +454,20 @@ test(testCase, async (t: Test) => {
     };
     try {
       await api.refundV1(parameters as unknown as RefundReq);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fRefund} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fRefund} with fake=4: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -520,16 +537,19 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.withdrawV1(parameters as unknown as WithdrawReq);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fWithdraw} without required id: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fWithdraw} without required id: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("id"), "Rejected because id is required");
+      t2.ok(fields?.includes("id"), "Rejected because id is required");
     }
 
     t2.end();
@@ -548,17 +568,20 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.withdrawV1(parameters as unknown as WithdrawReq);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fWithdraw} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fWithdraw} with fake=4: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -637,16 +660,19 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.getStatusV1(parameters as unknown as GetStatusRequest);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fStatus} without required ids: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fStatus} without required ids: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("ids"), "Rejected because ids is required");
+      t2.ok(fields?.includes("ids"), "Rejected because ids is required");
     }
 
     t2.end();
@@ -663,17 +689,20 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.getStatusV1(parameters as unknown as GetStatusRequest);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fStatus} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fStatus} with fake=4: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -752,16 +781,19 @@ test(testCase, async (t: Test) => {
       await api.getSingleStatusV1(
         parameters as unknown as GetSingleStatusRequest,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSingleStatus} without required id: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fSingleStatus} without required id: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("id"), "Rejected because id is required");
+      t2.ok(fields?.includes("id"), "Rejected because id is required");
     }
 
     t2.end();
@@ -780,17 +812,20 @@ test(testCase, async (t: Test) => {
       await api.getSingleStatusV1(
         parameters as unknown as GetSingleStatusRequest,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSingleStatus} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: { path: string }) =>
+        e?.response?.status,
+        t2.equal(
+          e?.response?.status,
+          400,
+          `Endpoint ${fSingleStatus} with fake=4: response.status === 400 OK`,
+        ))
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
