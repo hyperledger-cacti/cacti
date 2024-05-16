@@ -5,8 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 BUILDDIR=./
-PROTOSDIR=../protos
-FABRIC_PROTOSDIR=../fabric-protos
+ROOT_DIR=${1:-'..'}
+PROTOSDIR=$ROOT_DIR/protos
+FABRIC_PROTOSDIR=$ROOT_DIR/fabric-protos
 
 protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go_out=$BUILDDIR --go_opt=paths=source_relative $PROTOSDIR/common/events.proto $PROTOSDIR/common/query.proto $PROTOSDIR/common/ack.proto $PROTOSDIR/common/proofs.proto $PROTOSDIR/common/state.proto $PROTOSDIR/common/access_control.proto $PROTOSDIR/common/membership.proto $PROTOSDIR/common/verification_policy.proto $PROTOSDIR/common/interop_payload.proto $PROTOSDIR/common/asset_locks.proto $PROTOSDIR/common/asset_transfer.proto
 protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go_out=$BUILDDIR --go_opt=paths=source_relative $PROTOSDIR/fabric/view_data.proto

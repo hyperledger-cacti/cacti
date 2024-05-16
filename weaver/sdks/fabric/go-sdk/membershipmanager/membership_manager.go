@@ -24,8 +24,8 @@ import (
 	"google.golang.org/grpc/credentials"
 	protoV2 "google.golang.org/protobuf/proto"
 
-	"github.com/hyperledger/fabric-protos-go-apiv2/common"
-	mspprotos "github.com/hyperledger/fabric-protos-go-apiv2/msp"
+	"github.com/hyperledger/fabric-protos-go/common"
+	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-admin-sdk/pkg/channel"
 	"github.com/hyperledger/fabric-admin-sdk/pkg/identity"
 	"github.com/hyperledger/fabric-gateway/pkg/client"

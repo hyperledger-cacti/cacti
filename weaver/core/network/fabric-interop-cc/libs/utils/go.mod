@@ -3,11 +3,11 @@ module github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/u
 go 1.20
 
 require (
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20210718160520-38d29fabecb9
 	github.com/hyperledger/fabric-contract-api-go v1.1.1
-	github.com/hyperledger/fabric-protos-go v0.3.0
+	github.com/hyperledger/fabric-protos-go v0.3.3
 )
 
 require (
@@ -30,7 +30,7 @@ require (
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
-	google.golang.org/grpc v1.56.3 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/grpc v1.64.0 // indirect
+	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
