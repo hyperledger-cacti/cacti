@@ -31,6 +31,18 @@ import { addRandomSuffix } from "../test-helpers/utils";
 import "jest-extended";
 import { TransactionPayload } from "@iroha2/data-model";
 import { signIrohaV2Query } from "../../../main/typescript/iroha-sign-utils";
+import { AxiosError } from "axios";
+import { ResponseError } from "@iroha2/client";
+
+interface ErrorResponse extends Error {
+  response?: {
+    status?: number;
+    data?: {
+      message: string;
+      error: any
+    }
+  };
+}
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -321,10 +333,15 @@ describe("Generate and send signed transaction tests", () => {
         baseConfig: env.defaultBaseConfig,
       });
       expect(false).toBe(true); // should always throw by now
-    } catch (err: any) {
-      expect(err.response.status).toBe(500);
-      expect(err.response.data.message).toEqual("Internal Server Error");
-      expect(err.response.data.error).toBeTruthy();
+    } catch (err) {
+      const errorResponse = err as ErrorResponse;
+      expect(errorResponse?.response?.status).toBe(500);
+      expect(errorResponse?.response?.data?.message).toEqual("Internal Server Error");
+      expect(errorResponse?.response?.data?.error).toBeTruthy();
+
+
+
+
     }
   });
 
@@ -342,10 +359,12 @@ describe("Generate and send signed transaction tests", () => {
         baseConfig: env.defaultBaseConfig,
       });
       expect(false).toBe(true); // should always throw by now
-    } catch (err: any) {
-      expect(err.response.status).toBe(500);
-      expect(err.response.data.message).toEqual("Internal Server Error");
-      expect(err.response.data.error).toBeTruthy();
+    } catch (err) {
+
+      const errorResponse = err as ErrorResponse;
+      expect(errorResponse?.response?.status).toBe(500);
+      expect(errorResponse?.response?.data?.message).toEqual("Internal Server Error");
+      expect(errorResponse?.response?.data?.error).toBeTruthy();
     }
   });
 
