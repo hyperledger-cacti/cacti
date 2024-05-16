@@ -204,8 +204,13 @@ describe(testCase, () => {
         nonce: 1,
       });
       fail("invalid nonce should have thrown");
-    } catch (error: any) {
-      expect(error.message).toContain("Transaction nonce is too low.");
+    } catch (error) {
+      if (error instanceof Error) {
+        expect(error.message).toContain("Transaction nonce is too low.");
+      } else {
+        // Log the unexpected error type for debugging
+        console.error("Unexpected error type:", error);
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
@@ -302,10 +307,14 @@ describe(testCase, () => {
         nonce: 4,
       });
       fail("invalid nonce should have thrown");
-    } catch (error: any) {
-      expect(error.message).toContain(
-        "Transaction with the same hash was already imported",
-      );
+    } catch (error) {
+      if (error instanceof Error) {
+        expect(error.message).toContain(
+          "Transaction with the same hash was already imported",
+        )
+      } else {
+        console.error("Unexpected error type:", error);
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,

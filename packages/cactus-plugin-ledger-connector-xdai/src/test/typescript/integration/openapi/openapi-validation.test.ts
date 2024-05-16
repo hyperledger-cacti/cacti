@@ -33,6 +33,7 @@ import {
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
+import { AxiosError } from "axios";
 
 const testCase = "xDai API";
 const logLevel: LogLevelDesc = "TRACE";
@@ -165,17 +166,18 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractV1(
         parameters as unknown as DeployContractV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeploy} without required keychainId: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("keychainId"),
+        fields?.includes("keychainId"),
         "Rejected because keychainId is required",
       );
     }
@@ -198,17 +200,18 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.deployContractV1(parameters);
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -259,17 +262,18 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1(
         parameters as unknown as InvokeContractV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInvoke} without required contractName: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("contractName"),
+        fields?.includes("contractName"),
         "Rejected because contractName is required",
       );
     }
@@ -296,17 +300,18 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1(
         parameters as any as InvokeContractV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -359,17 +364,18 @@ test(testCase, async (t: Test) => {
       await apiClient.runTransactionV1(
         parameters as any as RunTransactionV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fRun} without required consistencyStrategy: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("consistencyStrategy"),
+        fields?.includes("consistencyStrategy"),
         "Rejected because consistencyStrategy is required",
       );
     }
@@ -401,17 +407,18 @@ test(testCase, async (t: Test) => {
       await apiClient.runTransactionV1(
         parameters as any as RunTransactionV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: { path: string }) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
