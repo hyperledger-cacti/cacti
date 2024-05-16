@@ -39,5 +39,8 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger"
   },
-  "tag": "latest"
+  "tag": "latest",
+  "overrides": {
+    "got": "12.4.1"
+  }
 }

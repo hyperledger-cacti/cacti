@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
+    "@hyperledger/cacti-weaver-sdk-besu": "file:..",
     "log4js": "6.9.1",
     "web3": "1.10.0",
     "web3-utils": "1.10.0"
@@ -39,5 +40,8 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger"
   },
-  "tag": "latest"
+  "tag": "latest",
+  "overrides": {
+    "got": "12.4.1"
+  }
 }
