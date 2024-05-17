@@ -124,7 +124,7 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
         runtimeMs,
       });
       console.log(logMessage);
-    } catch (ex: unknown) {
+    } catch (ex) {
       // If it was a syntax error in the package.json file
       // then we just log it as a warning and move on.
       if (ex instanceof ManifestParseError) {
@@ -187,7 +187,7 @@ export async function lernaPkgList(req: {
     const pkgs = JSON.parse(stdout);
     const pkgNames = pkgs.map((x: { name: string }) => x.name);
     return { pkgNames };
-  } catch (ex: unknown) {
+  } catch (ex) {
     const msg = `${TAG} Failed to execute shell CMD: ${shellCmd}`;
     const throwable = ex instanceof Error ? ex : fastSafeStringify(ex);
     throw new RuntimeError(msg, throwable);
@@ -248,7 +248,7 @@ export async function generateSBoM(req: {
       console.error(`${TAG} stderr of the above command: ${stderr}`);
     }
     return { manifestFilePath, stderr, stdout };
-  } catch (ex: unknown) {
+  } catch (ex) {
     const msg = `${TAG} Failed to execute shell CMD: ${shellCmd}`;
     if (ex instanceof Error && ex.message.includes("SyntaxError: ")) {
       throw new ManifestParseError(msg, ex);
@@ -259,6 +259,6 @@ export async function generateSBoM(req: {
   }
 }
 
-export class ManifestParseError extends RuntimeError {}
+export class ManifestParseError extends RuntimeError { }
 
 main(process.argv, process.env);

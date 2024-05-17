@@ -59,7 +59,7 @@ export async function npmList(
       console.error(`${TAG} stderr of the above command: ${stderr}`);
     }
     return JSON.parse(stdout);
-  } catch (ex: unknown) {
+  } catch (ex) {
     // We have to detect if npm is giving a non-zero exit code only because
     // it found some extraneous dependencies (in which case it's output of
     // the list of dependencies is still a valid JSON document that is still
