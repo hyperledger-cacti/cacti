@@ -32,6 +32,7 @@ import { Configuration } from "@hyperledger/cactus-core-api";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
+import { AxiosError } from "axios";
 
 const testCase = "check openapi validation in fabric endpoints";
 const logLevel: LogLevelDesc = "TRACE";
@@ -228,17 +229,18 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractGoSourceV1(
         parameters as any as DeployContractGoSourceV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeployGo} without required targetPeerAddresses: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("targetPeerAddresses"),
+        fields?.includes("targetPeerAddresses"),
         "Rejected because targetPeerAddresses is required",
       );
     }
@@ -290,17 +292,18 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractGoSourceV1(
         parameters as any as DeployContractGoSourceV1Request,
       );
-    } catch (e) {
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDeployGo} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
