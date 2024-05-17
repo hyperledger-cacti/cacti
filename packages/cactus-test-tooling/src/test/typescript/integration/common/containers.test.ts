@@ -115,7 +115,7 @@ describe(testCase, () => {
           },
         });
         fail(Containers.getDiagnostics);
-      } catch (ex: unknown) {
+      } catch (ex) {
         expect(ex).toBeTruthy();
         const connectEN = "connect ENOENT ";
         const fullBadPath = connectEN.concat(badSocketPath);

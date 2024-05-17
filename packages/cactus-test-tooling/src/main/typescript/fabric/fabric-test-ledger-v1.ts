@@ -215,7 +215,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return new FabricCAServices(caUrl, tlsOptions, caName);
     } catch (ex) {
       this.log.error(`createCaClientV2() Failure:`, ex);
-      throw new RuntimeError(`${fnTag} Inner Exception:`, ex);
+      throw new RuntimeError(`${fnTag} Inner Exception: ${ex}`);
     }
   }
 
@@ -225,7 +225,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return this.createCaClientV2("org1");
     } catch (ex) {
       this.log.error(`createCaClient() Failure:`, ex);
-      throw new RuntimeError(`${fnTag} Inner Exception:`, ex);
+      throw new RuntimeError(`${fnTag} Inner Exception: ${ex}`);
     }
   }
 
@@ -293,7 +293,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`${fnTag} failed with inner exception:`, ex);
-      throw new RuntimeError(`${fnTag} failed with inner exception:`, ex);
+      throw new RuntimeError(`${fnTag} failed with inner exception: ${ex}`);
     }
   }
 
@@ -306,7 +306,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return out;
     } catch (ex) {
       this.log.error(`${fnTag} failed with inner exception:`, ex);
-      throw new RuntimeError(`${fnTag} failed with inner exception:`, ex);
+      throw new RuntimeError(`${fnTag} failed with inner exception: ${ex}`);
     }
   }
 
@@ -357,7 +357,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`${fnTag} Failure:`, ex);
-      throw new RuntimeError(`${fnTag} Exception:`, ex);
+      throw new RuntimeError(`${fnTag} Exception: ${ex}`);
     }
   }
 
@@ -368,7 +368,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return out;
     } catch (ex) {
       this.log.error(`${fnTag} Failure:`, ex);
-      throw new RuntimeError(`${fnTag} Exception:`, ex);
+      throw new RuntimeError(`${fnTag} Exception: ${ex}`);
     }
   }
 
@@ -483,17 +483,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const connectionProfilePath =
       orgName === "org1" || orgName === "org2"
         ? path.join(
-            "fabric-samples/test-network",
-            "organizations/peerOrganizations",
-            orgName + ".example.com",
-            "connection-" + orgName + ".json",
-          )
+          "fabric-samples/test-network",
+          "organizations/peerOrganizations",
+          orgName + ".example.com",
+          "connection-" + orgName + ".json",
+        )
         : path.join(
-            "add-org-" + orgName,
-            "organizations/peerOrganizations",
-            orgName + ".example.com",
-            "connection-" + orgName + ".json",
-          );
+          "add-org-" + orgName,
+          "organizations/peerOrganizations",
+          orgName + ".example.com",
+          "connection-" + orgName + ".json",
+        );
     const peer0Name = `peer0.${orgName}.example.com`;
     const peer1Name = `peer1.${orgName}.example.com`;
     const cInfo = await this.getContainerInfo();
