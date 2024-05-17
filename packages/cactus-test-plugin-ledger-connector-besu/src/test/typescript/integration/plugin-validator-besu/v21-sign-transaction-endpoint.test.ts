@@ -36,6 +36,7 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { AxiosError } from "axios";
 
 const testCase = "Test sign transaction endpoint";
 const logLevel: LogLevelDesc = "TRACE";
@@ -189,10 +190,11 @@ test(testCase, async (t: Test) => {
         "0x46eac4d1d1ff81837698cbab38862a428ddf042f92855a72010de2771a7b704d",
     };
     await api.signTransactionV1(notFoundRequest);
-  } catch (error) {
-    t.equal(error.response.status, 404, "HTTP response status are equal");
+  } catch (err) {
+    const e = err as AxiosError
+    t.equal(e.response?.status, 404, "HTTP response status are equal");
     t.equal(
-      error.response.statusText,
+      e.response?.statusText,
       "Transaction not found",
       "Response text are equal",
     );

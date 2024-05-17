@@ -177,7 +177,7 @@ describe(testCase, () => {
           "0x46eac4d1d1ff81837698cbab38862a428ddf042f92855a72010de2771a7b704d",
       };
       await api.signTransactionV1(notFoundRequest);
-    } catch (error: unknown) {
+    } catch (error) {
       if (axios.isAxiosError(error)) {
         expect(error.response?.status).toEqual(404);
         expect(error.response?.statusText).toEqual("Transaction not found");
