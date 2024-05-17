@@ -28,9 +28,9 @@
     {
       "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json"
     },
-    // {
-    //   "path": "./packages/cactus-plugin-htlc-eth-besu/tsconfig.json"
-    // },
+    {
+      "path": "./packages/cactus-plugin-htlc-eth-besu/tsconfig.json"
+    },
     {
       "path": "./packages/cactus-plugin-htlc-eth-besu-erc20/tsconfig.json"
     },

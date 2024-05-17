@@ -7,6 +7,7 @@ import escapeHtml from "escape-html";
 import { getLogger } from "log4js";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { connectToClientAgent } from "./transaction-indy";
+import { safeStringifyException } from "@hyperledger/cactus-common";
 
 const config: any = ConfigUtil.getConfig();
 const moduleName = "indy-endpoints";
@@ -38,7 +39,7 @@ router.post(
       });
     } catch (err) {
       res.status(500).send({
-        error: escapeHtml(err),
+        error: escapeHtml(safeStringifyException(err)),
       });
       next(err);
     }
