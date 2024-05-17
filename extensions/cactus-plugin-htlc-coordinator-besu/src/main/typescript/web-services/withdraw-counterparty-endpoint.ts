@@ -104,7 +104,7 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
       }) as unknown as PluginHTLCCoordinatorBesu;
       const resBody = await connector.withdrawCounterparty(request);
       res.json(resBody);
-    } catch (ex: unknown) {
+    } catch (ex) {
       if (ex instanceof WithdrawCounterpartyTxReverted) {
         this.log.debug("%o %o", reqTag, ex);
         res.status(400).json(ex);

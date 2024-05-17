@@ -334,7 +334,7 @@ export class PluginHTLCCoordinatorBesu
         try {
           const res = await pluginHtlc.withdraw(withdrawRequest);
           return res;
-        } catch (ex: unknown) {
+        } catch (ex) {
           const cause = ex instanceof Error ? ex : fastSafeStringify(ex);
           throw new WithdrawCounterpartyTxReverted(`EVM tx reverted:`, cause);
         }
