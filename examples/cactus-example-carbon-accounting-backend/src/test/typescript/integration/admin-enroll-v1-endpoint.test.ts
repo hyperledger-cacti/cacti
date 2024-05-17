@@ -12,7 +12,7 @@ import {
 } from "jose";
 import { StatusCodes } from "http-status-codes";
 import jsonStableStringify from "json-stable-stringify";
-
+import { AxiosError } from "axios";
 import {
   AuthorizationProtocol,
   ConfigService,
@@ -45,6 +45,17 @@ const log = LoggerProvider.getOrCreate({
   label: testCase,
   level: logLevel,
 });
+
+interface ResponseError<T> extends AxiosError {
+  response: {
+    data: T;
+    status: number;
+    statusText: string;
+    headers: any
+    config: any
+    request?: any;
+  };
+}
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
@@ -181,16 +192,18 @@ test.skip(testCase, async (t: Test) => {
   try {
     await apiClientBad.enrollAdminV1({ orgName: "does-not-matter" });
     t.fail("enroll admin response status === 403 FAIL");
-  } catch (out) {
-    t.ok(out, "error thrown for forbidden endpoint truthy OK");
-    t.ok(out.response, "enroll admin response truthy OK");
+  } catch (err) {
+    const e = err as ResponseError<any>
+
+    t.ok(e, "error thrown for forbidden endpoint truthy OK");
+    t.ok(e.response, "enroll admin response truthy OK");
     t.equal(
-      out.response.status,
+      e?.response?.status,
       StatusCodes.FORBIDDEN,
       "enroll admin response status === 403 OK",
     );
-    t.notok(out.response.data.data, "out.response.data.data falsy OK");
-    t.notok(out.response.data.success, "out.response.data.success falsy OK");
+    t.notok(e?.response?.data?.data, "out.response.data.data falsy OK");
+    t.notok(e?.response?.data?.success, "out.response.data.success falsy OK");
   }
 
   t.end();
