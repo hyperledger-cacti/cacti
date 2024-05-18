@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715844684493,
+  "lastUpdate": 1716071339817,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -138,6 +138,37 @@ window.BENCHMARK_DATA = {
             "range": "±2.52%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "9b41377c3885cf12be3c0f49bd2745200b0d07d3",
+          "message": "feat(plugin-keychain-memory): add observability via RxJS ReplaySubjects\n\n1. This is an example of how to add observability to a plugin such as\nif you had to somehow expose the stream of transaction execution requests\nflowing through a connector plugin but did not feel like setting up Kafka\nor RabbitMQ just for this and instead opted to do it with an in-process,\npurely NodeJS/Javascript based solution.\n2. The downside of this is of course that this doesn't work well in a\ndistributed computing environment just by itself, since if you were to\nhost a fleet of servers running the same connector plugin with horizontal\nscaling, then this wouldn't be able to observe all the invocations across\nthe server fleet, but it would still make it easier to implement a functionality\nlike that.\n3. The main purpose of this pull request is educational. The keychain memory\nplugin is only used for testing and demonstration purposes and I wanted to\nshow to a few other contributors what I meant when I was explaining that\nthey could just use RxJS subjects to allow consumers of the connector plugins\nto observe the stream of transactions flowing through said connector plugin\ninstance.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-05-18T15:03:59-07:00",
+          "tree_id": "090eee4ea4fb41114e168ae586a92de5df1f3ce4",
+          "url": "https://github.com/hyperledger/cacti/commit/9b41377c3885cf12be3c0f49bd2745200b0d07d3"
+        },
+        "date": 1716071337762,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 725,
+            "range": "±3.57%",
+            "unit": "ops/sec",
+            "extra": "179 samples"
           }
         ]
       }
