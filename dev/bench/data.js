@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1716073173343,
+  "lastUpdate": 1716073677217,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -207,6 +207,37 @@ window.BENCHMARK_DATA = {
             "range": "±1.37%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "ccc175a51400211255aaa6bb0b086787fa7a96ee",
+          "message": "build(deps-dev): bump express and @types/express project-wide\n\nBumps [express](https://github.com/expressjs/express) from 4.18.2 to 4.19.2.\n- [Release notes](https://github.com/expressjs/express/releases)\n- [Changelog](https://github.com/expressjs/express/blob/master/History.md)\n- [Commits](https://github.com/expressjs/express/compare/4.18.2...4.19.2)\n\n---\nupdated-dependencies:\n- dependency-name: express\n  dependency-type: direct:development\n...\n\nCo-authored-by: Peter Somogyvari <peter.somogyvari@accenture.com>\n\nSigned-off-by: dependabot[bot] <support@github.com>\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-05-18T15:42:35-07:00",
+          "tree_id": "77774fcb1feee4b0a7a644812eeddc65ee6d8489",
+          "url": "https://github.com/hyperledger/cacti/commit/ccc175a51400211255aaa6bb0b086787fa7a96ee"
+        },
+        "date": 1716073674033,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 761,
+            "range": "±2.98%",
+            "unit": "ops/sec",
+            "extra": "179 samples"
           }
         ]
       }
