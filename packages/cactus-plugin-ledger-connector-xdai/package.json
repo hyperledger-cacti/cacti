@@ -67,7 +67,7 @@
     "uuid": "9.0.1",
     "web3": "1.6.1",
     "web3-eth-contract": "1.6.1",
-    "web3-utils": "1.6.1"
+    "web3-utils": "1.7.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
