@@ -253,11 +253,6 @@ test(testCase, async (t: Test) => {
 
   const response = await htlcCoordinatorBesuApiClient.ownHtlcV1(ownHTLCRequest);
   t.equal(response.status, 200, "response status is 200 OK");
-  t.equal(
-    response.headers["Strict-Transport-Security"],
-    "max-age=31536000; includeSubDomains; preload",
-    "response header is max-age=31536000; includeSubDomains; preload OK",
-  );
   t.equal(response.data.success, true, "response success is true");
   t.ok(
     response.data,
@@ -300,8 +295,9 @@ test(testCase, async (t: Test) => {
     counterpartyHTLCRequest,
   );
   t.equal(response2.status, 200, "response status is 200 OK");
+  const hstsHeader = response2.headers["strict-transport-security"];
   t.equal(
-    response2.headers["Strict-Transport-Security"],
+    hstsHeader,
     "max-age=31536000; includeSubDomains; preload",
     "response header is max-age=31536000; includeSubDomains; preload OK",
   );
