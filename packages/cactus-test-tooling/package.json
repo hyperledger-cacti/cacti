@@ -43,6 +43,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Fabricius Zatti",
+      "email": "fazzatti@gmail.com",
+      "url": "https://oififo.com"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",

@@ -166,6 +166,11 @@ export {
 } from "./sawtooth/sawtooth-test-ledger";
 
 export {
+  IStellarTestLedgerOptions,
+  StellarTestLedger,
+} from "./stellar/stellar-test-ledger";
+
+export {
   ISubstrateTestLedgerOptions,
   SubstrateTestLedger,
 } from "./substrate-test-ledger/substrate-test-ledger";
