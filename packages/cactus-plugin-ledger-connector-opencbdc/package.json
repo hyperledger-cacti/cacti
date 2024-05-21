@@ -1,0 +1,98 @@
+{
+  "name": "@hyperledger/cactus-plugin-ledger-connector-opencbdc",
+  "version": "2.0.0-alpha.2",
+  "description": "Allows Cactus nodes to interact with OpenCBDC ledger",
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology",
+    "OpenCBDC"
+  ],
+  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Jihoon Ban",
+      "email": "gogo123058@snu.ac.kr",
+      "url": "http://dcslab.snu.ac.kr"
+    },
+    {
+      "name": "Minji Lee",
+      "email": "leemj410@snu.ac.kr",
+      "url": "http://dcslab.snu.ac.kr"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    },
+    {
+      "name": "Jordi Giron",
+      "email": "jordi.giron.amezcua@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-plugin-ledger-connector-opencbdc.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
+    "axios": "0.21.4",
+    "express": "4.17.1",
+    "joi": "17.9.1",
+    "openapi-types": "9.1.0",
+    "typescript-optional": "2.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.13"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-plugin-ledger-connector-opencbdc.web.umd.min.js",
+  "mainMinified": "dist/cactus-plugin-ledger-connector-opencbdc.node.umd.min.js",
+  "watch": {
+    "codegen:openapi": {
+      "patterns": [
+        "./src/main/json/openapi.json"
+      ]
+    }
+  }
+}
