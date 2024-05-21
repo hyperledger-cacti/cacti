@@ -46,7 +46,7 @@ jobs:
     # npm ERR! this command with --force or --legacy-peer-deps
     # npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
     - name: wipe_non_yaml_sources
-      run: rm -rf packages/ examples/ extensions/ package.json
+      run: rm -rf packages/ examples/ extensions/ package.json .github/workflows/test_weaver*.yaml .github/workflows/weaver_deploy*.yml weaver/
 
     - name: actionlint
       id: actionlint
@@ -65,4 +65,5 @@ jobs:
         echo "actionlint found ${{ steps.actionlint.outputs.total-errors }} errors"
         echo "actionlint checked ${{ steps.actionlint.outputs.total-files }} files"
         echo "actionlint cache used: ${{ steps.actionlint.outputs.cache-hit }}"
-        exit ${{ steps.actionlint.outputs.exit-code }}
+        echo "${{ steps.actionlint.outputs.exit-code }}" >&2
+        exit 1
