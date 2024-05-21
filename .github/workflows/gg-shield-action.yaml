@@ -2,7 +2,6 @@ name: GitGuardian scan
 
 on: 
   push:
-  pull_request:
     # Publish `main` as Docker `latest` image.
     branches:
       - main
@@ -10,6 +9,9 @@ on:
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   scanning:
