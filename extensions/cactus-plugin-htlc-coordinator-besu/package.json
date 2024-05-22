@@ -83,7 +83,7 @@
     "express": "4.19.2",
     "socket.io": "4.5.4",
     "web3-eth-abi": "4.2.1",
-    "web3-utils": "4.2.1"
+    "web3-utils": "1.7.0"
   },
   "engines": {
     "node": ">=18",

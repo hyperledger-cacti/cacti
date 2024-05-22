@@ -64,7 +64,7 @@
     "web3-core": "1.8.1",
     "web3-core-subscriptions": "1.8.1",
     "web3-eth": "1.8.1",
-    "web3-utils": "1.8.1"
+    "web3-utils": "1.7.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-api-client": "2.0.0-alpha.2",

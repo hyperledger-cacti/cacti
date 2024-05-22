@@ -68,7 +68,7 @@
     "typescript-optional": "2.0.1",
     "uuid": "9.0.1",
     "web3": "1.6.1",
-    "web3-utils": "1.6.1"
+    "web3-utils": "1.7.0"
   },
   "devDependencies": {
     "@types/body-parser": "1.19.4",
