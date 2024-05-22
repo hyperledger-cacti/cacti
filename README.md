@@ -1,3 +1,38 @@
+# SNU OpenCBDC Space
+## Notice
+* 본 Repository는 OpenCBDC를 위한 Cactus 커넥터 작업을 위해 [hyperledger/cacti](https://github.com/hyperledger/cacti)를 fork한 저장소입니다. (24년 4월 main 기준)
+* 개발 환경은 'snu-v0.0.1' 단일 브랜치에 반영하는 것을 원칙으로 하며, 그 외에 main 및 다른 브랜치는 활용하지 않습니다.
+* 코드 작업은 아래 명시된 디렉토리 내에서만 진행합니다. (그 외 위치 수정이 필요한 경우 별도 협의 후 진행)
+  * https://github.com/dcslab-bc/cacti/tree/snu-v0.0.1/extensions/cactus-plugin-htlc-coordinator-opencbdc
+  * https://github.com/dcslab-bc/cacti/tree/snu-v0.0.1/packages/cactus-plugin-ledger-connector-opencbdc
+  * https://github.com/dcslab-bc/cacti/tree/snu-v0.0.1/packages/opencbdc-json-rpc-server
+* 특정 함수 또는 API 구현 시, 이를 검증할 수 있는 Test 파일도 함께 개발하는 것을 권장합니다. (시간 지나서 하려면 기억이 안남)
+* Test 파일은 해당 디렉토리 내 src/test 경로에 파일을 두고 활용합니다. (Besu 쪽 테스트 코드 참조하여 개발 권장)
+
+## github 명령어 정리
+* github 코드 가져오기
+```
+# snu-v0.0.1 브랜치를 타겟으로 하는 cacti 저장소 가져오기
+git clone https://github.com/dcslab-bc/cacti.git -b snu-v0.0.1
+```
+
+* github 코드 수정 후 올리기
+```
+git status                                   # 수정된 내역 확인 (잘못 들어간 파일 없는지 체크)
+git add .                                    # 수정 내역을 Local에 반영
+git status                                   # 수정된 내역 확인 (초록색으로 잘 반영되었는지 체크)
+git commit -m "[COMMIT_MESSAGE_TITLE]"       # 업로드 할 커밋 생성
+git push origin snu-v0.0.1                   # 해당 커밋을 Remote에 반영
+```
+
+# Contributer
+* Minji Lee
+* Jongjin Lee
+* Jihoon Ban
+* Hyojin Song
+
+***
+
  [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/hyperledger/cactus)
  ![license](https://img.shields.io/github/license/hyperledger/cactus) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
  ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus)
