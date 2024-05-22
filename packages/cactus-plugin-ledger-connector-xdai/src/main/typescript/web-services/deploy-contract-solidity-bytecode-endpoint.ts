@@ -27,7 +27,8 @@ export interface IDeployContractSolidityBytecodeOptions {
 }
 
 export class DeployContractSolidityBytecodeEndpoint
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "DeployContractSolidityBytecodeEndpoint";
 
   private readonly log: Logger;

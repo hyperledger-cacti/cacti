@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import Vault from "node-vault";
 import HttpStatus from "http-status-codes";
-import handleVaultResponse from "node-vault"
+import handleVaultResponse from "node-vault";
 import OAS from "../json/openapi.json";
 
 import {
@@ -255,10 +255,11 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     const path = this.pathFor(key);
     try {
       const res = await this.backend.read(path);
-      return res; ``
+      return res;
+      ``;
     } catch (ex) {
       const errorResponse = ex as ErrorResponse;
-      handleVaultResponse()
+      handleVaultResponse();
       // We have to make sure that the exception is either an expected
       // or an unexpected one where the expected exception is `what we
       // get when the key is not present in the keychain and anything

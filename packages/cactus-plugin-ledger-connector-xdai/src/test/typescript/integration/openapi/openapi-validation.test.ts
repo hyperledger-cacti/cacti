@@ -167,7 +167,7 @@ test(testCase, async (t: Test) => {
         parameters as unknown as DeployContractV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -201,7 +201,7 @@ test(testCase, async (t: Test) => {
       };
       await apiClient.deployContractV1(parameters);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -263,7 +263,7 @@ test(testCase, async (t: Test) => {
         parameters as unknown as InvokeContractV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -301,7 +301,7 @@ test(testCase, async (t: Test) => {
         parameters as any as InvokeContractV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -365,7 +365,7 @@ test(testCase, async (t: Test) => {
         parameters as any as RunTransactionV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -408,7 +408,7 @@ test(testCase, async (t: Test) => {
         parameters as any as RunTransactionV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

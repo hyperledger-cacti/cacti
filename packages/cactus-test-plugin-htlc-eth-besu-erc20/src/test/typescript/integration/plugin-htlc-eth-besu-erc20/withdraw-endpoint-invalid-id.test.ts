@@ -250,7 +250,7 @@ describe(testCase, () => {
       const resWithdraw = await api.withdrawV1(withdrawRequest);
       expect(resWithdraw.status).toEqual(400);
     } catch (err) {
-      const e = err as AxiosError
+      const e = err as AxiosError;
       expect(e?.response?.status).toEqual(400);
     }
 

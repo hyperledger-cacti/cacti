@@ -192,7 +192,7 @@ test(testCase, async (t: Test) => {
         parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -229,7 +229,7 @@ test(testCase, async (t: Test) => {
         parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -266,7 +266,7 @@ test(testCase, async (t: Test) => {
         parameters as any as InvokeContractJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -306,7 +306,7 @@ test(testCase, async (t: Test) => {
         parameters as any as InvokeContractJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

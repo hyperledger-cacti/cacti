@@ -282,7 +282,7 @@ describe(testCase, () => {
       const resRefund = await api.refundV1(refundRequest);
       expect(resRefund.status).toEqual(400);
     } catch (err) {
-      const e = err as AxiosError
+      const e = err as AxiosError;
       expect(e?.response?.status).toEqual(400);
     }
 

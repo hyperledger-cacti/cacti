@@ -586,7 +586,7 @@ test("Test invalid refund with invalid time", async (t: Test) => {
     const resRefund = await api.refundV1(refundRequest);
     t.equal(resRefund.status, 400, "response status is 400");
   } catch (err) {
-    const e = err as AxiosError
+    const e = err as AxiosError;
     t.equal(e?.response?.status, 400, "response status is 400");
   }
 

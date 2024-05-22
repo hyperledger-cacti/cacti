@@ -208,7 +208,7 @@ describe(testCase, () => {
       });
       expect(res.status).toEqual(500);
     } catch (err) {
-      const e = err as AxiosError
+      const e = err as AxiosError;
       expect(e?.response?.status).toEqual(500);
     }
   });

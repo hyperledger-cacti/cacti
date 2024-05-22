@@ -11,7 +11,10 @@ import {
   IWebServiceEndpoint,
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
 import { RefundReq } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
@@ -93,7 +96,7 @@ export class RefundEndpoint implements IWebServiceEndpoint {
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       const errorMsg = "Internal server Error";
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

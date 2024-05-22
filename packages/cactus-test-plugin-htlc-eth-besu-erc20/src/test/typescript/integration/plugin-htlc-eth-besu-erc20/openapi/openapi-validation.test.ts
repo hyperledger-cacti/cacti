@@ -219,11 +219,11 @@ test(testCase, async (t: Test) => {
     try {
       await api.initializeV1(parameters as any as InitializeRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
-        `Endpoint ${fInitialize} waithout required connectorId: response.status === 400 OK`,
+        `Endpoint ${fInitialize} without required connectorId: response.status === 400 OK`,
       );
       const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
@@ -249,7 +249,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.initializeV1(parameters as any as InitializeRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -364,7 +364,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.newContractV1(parameters as any as NewContractRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -402,7 +402,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.newContractV1(parameters as any as NewContractRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -467,7 +467,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.refundV1(parameters as any as RefundRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -493,7 +493,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.refundV1(parameters as any as RefundRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -611,7 +611,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.withdrawV1(parameters as any as WithdrawRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -639,7 +639,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.withdrawV1(parameters as any as WithdrawRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -687,7 +687,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.getStatusV1(parameters as any as GetStatusRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -714,7 +714,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.getStatusV1(parameters as any as GetStatusRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -760,7 +760,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.getSingleStatusV1(parameters as any as GetSingleStatusRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -788,7 +788,7 @@ test(testCase, async (t: Test) => {
       // eslint-disable-next-line prettier/prettier
       await api.getSingleStatusV1(parameters as any as GetSingleStatusRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

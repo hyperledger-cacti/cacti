@@ -191,7 +191,7 @@ test(testCase, async (t: Test) => {
     };
     await api.signTransactionV1(notFoundRequest);
   } catch (err) {
-    const e = err as AxiosError
+    const e = err as AxiosError;
     t.equal(e.response?.status, 404, "HTTP response status are equal");
     t.equal(
       e.response?.statusText,

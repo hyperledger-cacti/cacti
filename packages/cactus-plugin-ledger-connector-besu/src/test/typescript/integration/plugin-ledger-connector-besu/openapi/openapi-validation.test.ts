@@ -214,7 +214,7 @@ describe("PluginLedgerConnectorBesu", () => {
         parameters as unknown as DeployContractSolidityBytecodeV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -246,7 +246,7 @@ describe("PluginLedgerConnectorBesu", () => {
         parameters as DeployContractSolidityBytecodeV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -293,7 +293,7 @@ describe("PluginLedgerConnectorBesu", () => {
         parameters as any as InvokeContractV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -320,7 +320,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.invokeContractV1(parameters as InvokeContractV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -374,7 +374,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -406,7 +406,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -498,7 +498,7 @@ describe("PluginLedgerConnectorBesu", () => {
 
       await apiClient.signTransactionV1(parameters as SignTransactionRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
@@ -542,7 +542,7 @@ describe("PluginLedgerConnectorBesu", () => {
 
       await apiClient.signTransactionV1(parameters as SignTransactionRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -563,7 +563,7 @@ describe("PluginLedgerConnectorBesu", () => {
       const parameters = {};
       await apiClient.getBalanceV1(parameters as GetBalanceV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -580,7 +580,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.getBalanceV1(parameters as GetBalanceV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -601,7 +601,7 @@ describe("PluginLedgerConnectorBesu", () => {
       const parameters = {};
       await apiClient.getBlockV1(parameters as GetBlockV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -618,7 +618,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.getBlockV1(parameters as GetBlockV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -641,7 +641,7 @@ describe("PluginLedgerConnectorBesu", () => {
       const parameters = {};
       await apiClient.getPastLogsV1(parameters as GetPastLogsV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -658,7 +658,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.getPastLogsV1(parameters as GetPastLogsV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),
@@ -709,7 +709,7 @@ describe("PluginLedgerConnectorBesu", () => {
       const parameters = {};
       await apiClient.getBesuRecordV1(parameters as GetBesuRecordV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
@@ -726,7 +726,7 @@ describe("PluginLedgerConnectorBesu", () => {
       };
       await apiClient.getBesuRecordV1(parameters as GetBesuRecordV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       expect(e?.response?.status).toEqual(400);
       const fields = e?.response?.data.map((param: { readonly path: string }) =>
         param.path.replace("/body/", ""),

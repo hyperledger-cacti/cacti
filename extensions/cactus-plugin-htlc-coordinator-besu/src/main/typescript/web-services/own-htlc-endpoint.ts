@@ -16,6 +16,7 @@ import {
 import {
   registerWebServiceEndpoint,
   PluginRegistry,
+  handleRestEndpointException,
 } from "@hyperledger/cactus-core";
 import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu";
 import { OwnHTLCRequest } from "../generated/openapi/typescript-axios";
@@ -103,10 +104,8 @@ export class OwnHTLCEndpoint implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex,
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

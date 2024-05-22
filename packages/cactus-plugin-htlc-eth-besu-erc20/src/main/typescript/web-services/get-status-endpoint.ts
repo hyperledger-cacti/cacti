@@ -12,7 +12,10 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
 
@@ -86,7 +89,7 @@ export class GetStatusEndpoint implements IWebServiceEndpoint {
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       const errorMsg = `Bar request`;
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

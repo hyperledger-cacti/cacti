@@ -17,7 +17,10 @@ import {
 
 import OAS from "../../json/openapi.json";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 import {
   DefaultApi,
   ListFlowsV1Request,
@@ -102,12 +105,19 @@ export class ListFlowsEndpointV1 implements IWebServiceEndpoint {
       res.send(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      if (typeof ex === 'object' && ex !== null) {
-        if ('message' in ex && typeof ex.message === 'string') {
-          const errorMsg = ex.message
-          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
-
-        }
+      if (
+        typeof ex === "object" &&
+        ex !== null &&
+        "message" in ex &&
+        typeof ex.message === "string"
+      ) {
+        const errorMsg = ex.message;
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
       }
     }
   }

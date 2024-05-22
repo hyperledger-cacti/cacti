@@ -289,7 +289,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.getNodeJwsV1({ fake: 4 });
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -313,7 +313,7 @@ test(testCase, async (t: Test) => {
     try {
       await api.getConsortiumJwsV1({ fake: 4 });
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

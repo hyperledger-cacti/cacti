@@ -16,7 +16,10 @@ import {
 
 import OAS from "../../json/openapi.json";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "../plugin-keychain-memory";
 
@@ -26,7 +29,8 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(
@@ -83,7 +87,6 @@ export class GetPrometheusExporterMetricsEndpointV1
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "GetPrometheusExporterMetrics#handleRequest()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
 
@@ -92,14 +95,28 @@ export class GetPrometheusExporterMetricsEndpointV1
       res.status(200);
       res.send(resBody);
     } catch (ex) {
-      if (typeof ex === 'object' && ex !== null) {
-        if ('message' in ex && ex['message'] && typeof ex.message === 'string') {
-          const errorMsg = ex.message
-          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
-        }
+      if (
+        typeof ex === "object" &&
+        ex !== null &&
+        "message" in ex &&
+        ex["message"] &&
+        typeof ex.message === "string"
+      ) {
+        const errorMsg = ex.message;
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
       } else {
-        const errorMsg = ''
-        handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+        const errorMsg = "";
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
       }
     }
   }

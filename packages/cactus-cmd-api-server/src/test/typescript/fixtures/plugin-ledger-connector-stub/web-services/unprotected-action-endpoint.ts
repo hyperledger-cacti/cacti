@@ -6,14 +6,16 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorStub } from "../plugin-ledger-connector-stub";
 
@@ -106,10 +108,8 @@ export class UnprotectedActionEndpoint implements IWebServiceEndpoint {
       res.json({ success: true, data });
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(ex),
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

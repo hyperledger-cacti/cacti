@@ -6,7 +6,6 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -15,7 +14,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import OAS from "../../json/openapi.json";
@@ -91,12 +93,10 @@ export class RunDelegatedSignTransactionEndpointV1
       res
         .status(200)
         .json(await this.opts.connector.transactDelegatedSign(req.body));
-    } catch (error) {
+    } catch (ex) {
       this.log.error(`Crash while serving ${fnTag}`, error);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(error),
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

@@ -230,7 +230,7 @@ test(testCase, async (t: Test) => {
         parameters as any as DeployContractGoSourceV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -293,7 +293,7 @@ test(testCase, async (t: Test) => {
         parameters as any as DeployContractGoSourceV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

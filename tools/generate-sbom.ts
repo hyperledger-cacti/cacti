@@ -259,6 +259,6 @@ export async function generateSBoM(req: {
   }
 }
 
-export class ManifestParseError extends RuntimeError { }
+export class ManifestParseError extends RuntimeError {}
 
 main(process.argv, process.env);

@@ -94,9 +94,9 @@ const waitForWsProviderRequestsTimeout = 5 * 1000; // 5s
 const waitForWsProviderRequestsStep = 500; // 500ms
 type RunContractDeploymentInput = {
   web3SigningCredential:
-  | Web3SigningCredentialCactiKeychainRef
-  | Web3SigningCredentialGethKeychainPassword
-  | Web3SigningCredentialPrivateKeyHex;
+    | Web3SigningCredentialCactiKeychainRef
+    | Web3SigningCredentialGethKeychainPassword
+    | Web3SigningCredentialPrivateKeyHex;
   contractJSON: ContractJSON;
   gasConfig?: GasTransactionConfig;
   constructorArgs?: unknown[];
@@ -131,14 +131,15 @@ export interface IPluginLedgerConnectorEthereumOptions
 
 export class PluginLedgerConnectorEthereum
   implements
-  IPluginLedgerConnector<
-    DeployContractV1Request,
-    RunTransactionResponse,
-    RunTransactionRequest,
-    RunTransactionResponse
-  >,
-  ICactusPlugin,
-  IPluginWebService {
+    IPluginLedgerConnector<
+      DeployContractV1Request,
+      RunTransactionResponse,
+      RunTransactionRequest,
+      RunTransactionResponse
+    >,
+    ICactusPlugin,
+    IPluginWebService
+{
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -695,16 +696,16 @@ export class PluginLedgerConnectorEthereum
         } else {
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
-            ` since signing credential is specified as` +
-            `Web3SigningCredentialType.NONE`,
+              ` since signing credential is specified as` +
+              `Web3SigningCredentialType.NONE`,
           );
         }
       }
       default: {
         throw new Error(
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-          `${req.web3SigningCredential.type} Supported ones are: ` +
-          `${Object.values(Web3SigningCredentialType).join(";")}`,
+            `${req.web3SigningCredential.type} Supported ones are: ` +
+            `${Object.values(Web3SigningCredentialType).join(";")}`,
         );
       }
     }
@@ -801,15 +802,14 @@ export class PluginLedgerConnectorEthereum
       if (ex instanceof Error) {
         throw new Error(
           `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`,
+            `InnerException: ${ex.stack}`,
         );
       } else {
         throw new Error(
           `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `Error: ${ex}`,
+            `Error: ${ex}`,
         );
       }
-
     }
   }
 
@@ -837,7 +837,7 @@ export class PluginLedgerConnectorEthereum
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
-        `signedTransaction.rawTransaction is blank after .signTransaction().`,
+          `signedTransaction.rawTransaction is blank after .signTransaction().`,
       );
     }
   }

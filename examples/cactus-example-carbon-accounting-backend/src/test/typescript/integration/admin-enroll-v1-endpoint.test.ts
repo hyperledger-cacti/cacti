@@ -46,13 +46,13 @@ const log = LoggerProvider.getOrCreate({
   level: logLevel,
 });
 
-interface ResponseError<T> extends AxiosError {
+interface ResponseError extends AxiosError {
   response: {
-    data: T;
+    data: any;
     status: number;
     statusText: string;
-    headers: any
-    config: any
+    headers: any;
+    config: any;
     request?: any;
   };
 }
@@ -193,7 +193,7 @@ test.skip(testCase, async (t: Test) => {
     await apiClientBad.enrollAdminV1({ orgName: "does-not-matter" });
     t.fail("enroll admin response status === 403 FAIL");
   } catch (err) {
-    const e = err as ResponseError<any>
+    const e = err as ResponseError;
 
     t.ok(e, "error thrown for forbidden endpoint truthy OK");
     t.ok(e.response, "enroll admin response truthy OK");

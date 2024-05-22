@@ -1,6 +1,9 @@
 import { Express, Request, Response } from "express";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
 
@@ -94,16 +97,28 @@ export class GetPrometheusExporterMetricsEndpointV1
       res.send(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      if (typeof ex === 'object' && ex !== null) {
-        if ('message' in ex && typeof ex.message === 'string') {
-          const errorMsg = ex.message
-          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
-        }
-      }
-      else {
+      if (
+        typeof ex === "object" &&
+        ex !== null &&
+        "message" in ex &&
+        typeof ex.message === "string"
+      ) {
+        const errorMsg = ex.message;
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
+      } else {
         this.log.error(`Crash while serving ${reqTag}`, ex);
         const errorMsg = `Internal server Error`;
-        handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
       }
     }
   }

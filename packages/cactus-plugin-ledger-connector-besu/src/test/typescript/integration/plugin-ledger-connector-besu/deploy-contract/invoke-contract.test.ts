@@ -200,8 +200,10 @@ describe(testCase, () => {
         });
         expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
       } catch (error) {
-        if (typeof error === 'object' && error !== null) {
-          if ('message' in error && typeof error.message === 'string') { expect(error.message).toMatch("Nonce too low"); }
+        if (typeof error === "object" && error !== null) {
+          if ("message" in error && typeof error.message === "string") {
+            expect(error.message).toMatch("Nonce too low");
+          }
         }
       }
 
@@ -301,8 +303,10 @@ describe(testCase, () => {
         });
         expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
       } catch (error) {
-        if (typeof error === 'object' && error !== null) {
-          if ('message' in error && typeof error.message === 'string') { expect(error.message).toMatch("Nonce too low"); }
+        if (typeof error === "object" && error !== null) {
+          if ("message" in error && typeof error.message === "string") {
+            expect(error.message).toMatch("Nonce too low");
+          }
         }
       }
 

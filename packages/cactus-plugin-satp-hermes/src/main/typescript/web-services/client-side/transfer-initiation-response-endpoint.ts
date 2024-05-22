@@ -13,7 +13,10 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway";
 import OAS from "../../../json/openapi.json";
@@ -24,7 +27,8 @@ export interface ITransferInitiationResponseEndpointOptions {
 }
 
 export class TransferInitiationResponseEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "TransferInitiationResponseEndpointV1";
 
   private readonly log: Logger;
@@ -48,7 +52,7 @@ export class TransferInitiationResponseEndpointV1
   public getPath(): string {
     const apiPath =
       OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse"
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.path;
   }
@@ -56,7 +60,7 @@ export class TransferInitiationResponseEndpointV1
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse"
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
@@ -100,7 +104,6 @@ export class TransferInitiationResponseEndpointV1
       this.log.error(`Crash while serving ${reqTag}`, ex);
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
-
     }
   }
 }

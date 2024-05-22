@@ -114,7 +114,7 @@ test(testCase, async (t: Test) => {
         value,
       } as any as SetKeychainEntryRequestV1);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -134,7 +134,7 @@ test(testCase, async (t: Test) => {
         {} as any as GetKeychainEntryRequestV1,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -154,7 +154,7 @@ test(testCase, async (t: Test) => {
         {} as any as HasKeychainEntryRequestV1,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -174,7 +174,7 @@ test(testCase, async (t: Test) => {
         {} as any as DeleteKeychainEntryRequestV1,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -196,7 +196,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       } as any as SetKeychainEntryRequestV1);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -220,7 +220,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       } as any as GetKeychainEntryRequestV1);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -244,7 +244,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       } as any as HasKeychainEntryRequestV1);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -268,7 +268,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       } as any as DeleteKeychainEntryRequestV1);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

@@ -13,7 +13,10 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway";
 
@@ -93,7 +96,6 @@ export class ClientRequestEndpointV1 implements IWebServiceEndpoint {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
-
     }
   }
 }

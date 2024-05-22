@@ -12,10 +12,12 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorCDL } from "../plugin-ledger-connector-cdl";
 import OAS from "../../json/openapi.json";
 
@@ -89,11 +91,8 @@ export class GetLineageDataEndpoint implements IWebServiceEndpoint {
       res.status(200).json(await this.options.connector.getLineage(req.body));
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(ex),
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

@@ -311,7 +311,7 @@ describe(testCase, () => {
       if (error instanceof Error) {
         expect(error.message).toContain(
           "Transaction with the same hash was already imported",
-        )
+        );
       } else {
         console.error("Unexpected error type:", error);
       }

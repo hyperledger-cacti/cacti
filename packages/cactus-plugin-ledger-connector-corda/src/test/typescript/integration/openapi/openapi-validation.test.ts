@@ -435,7 +435,7 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cWithoutParams}: should fail`);
     } catch (e) {
-      const err = e as AxiosError<{ status: number }>
+      const err = e as AxiosError<{ status: number }>;
 
       t2.equal(
         err.response?.data?.status,
@@ -456,7 +456,7 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1(req);
       t2.fail(`${fInvoke} - ${cWithoutParams}: should fail`);
     } catch (e) {
-      const err = e as AxiosError<{ status: number }>
+      const err = e as AxiosError<{ status: number }>;
 
       t2.equal(
         err.response?.data?.status,
@@ -477,7 +477,7 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cInvalidParams}: should fail`);
     } catch (e) {
-      const err = e as AxiosError<{ status: number }>
+      const err = e as AxiosError<{ status: number }>;
 
       t2.equal(
         err.response?.data?.status,
@@ -494,7 +494,7 @@ test(testCase, async (t: Test) => {
       await apiClient.listFlowsV1(req);
       t2.fail(`${fFlows} - ${cInvalidParams}: should fail`);
     } catch (e) {
-      const err = e as AxiosError<{ status: number }>
+      const err = e as AxiosError<{ status: number }>;
 
       t2.equal(
         err.response?.data?.status,
@@ -511,7 +511,7 @@ test(testCase, async (t: Test) => {
       await apiClient.diagnoseNodeV1(req);
       t2.fail(`${fDiagnose} - ${cInvalidParams}: should fail`);
     } catch (e) {
-      const err = e as AxiosError<{ status: number }>
+      const err = e as AxiosError<{ status: number }>;
 
       t2.equal(
         err.response?.data?.status,
@@ -767,7 +767,7 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractV1(req);
       t2.fail(`${fInvoke} - ${cInvalidParams}: should fail`);
     } catch (e) {
-      const err = e as AxiosError<{ status: number }>
+      const err = e as AxiosError<{ status: number }>;
 
       t2.equal(
         err.response?.data?.status,
@@ -780,6 +780,3 @@ test(testCase, async (t: Test) => {
 
   t.end();
 });
-
-
-

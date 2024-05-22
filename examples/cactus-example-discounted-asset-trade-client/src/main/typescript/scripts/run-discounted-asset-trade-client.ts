@@ -189,7 +189,12 @@ async function menuLoop(agent: AnoncredAgent) {
           break;
       }
     } catch (error) {
-      if (error && typeof error === 'object' && 'isTtyError' in error && error.isTtyError) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "isTtyError" in error &&
+        error.isTtyError
+      ) {
         log.error("Prompt couldn't be rendered in the current environment:");
         isRunning = false;
       }

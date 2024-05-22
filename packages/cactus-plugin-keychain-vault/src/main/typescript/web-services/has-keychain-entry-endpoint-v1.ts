@@ -12,7 +12,10 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginKeychainVault } from "../plugin-keychain-vault";
@@ -104,7 +107,7 @@ export class HasKeychainEntryEndpointV1 implements IWebServiceEndpoint {
     } catch (ex) {
       this.log.debug(`${tag} Failed to serve request:`, ex);
       const errorMsg = `Internal server Error`;
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

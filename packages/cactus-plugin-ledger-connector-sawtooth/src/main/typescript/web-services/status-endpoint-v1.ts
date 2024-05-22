@@ -8,14 +8,16 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import type {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginLedgerConnectorSawtooth } from "../plugin-ledger-connector-sawtooth";
@@ -95,10 +97,8 @@ export class StatusEndpointV1 implements IWebServiceEndpoint {
       res.status(200).json(await this.options.connector.getStatus());
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(ex),
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

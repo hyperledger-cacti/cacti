@@ -16,7 +16,10 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
 
@@ -93,10 +96,8 @@ export class HasObjectEndpointV1 implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       this.log.error(`${tag} Failed to serve request:`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex,
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

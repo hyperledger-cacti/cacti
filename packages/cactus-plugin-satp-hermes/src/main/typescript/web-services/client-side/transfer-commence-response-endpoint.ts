@@ -13,7 +13,10 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway";
 import OAS from "../../../json/openapi.json";
@@ -47,7 +50,7 @@ export class TransferCommenceResponseEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse"
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.path;
   }
@@ -55,7 +58,7 @@ export class TransferCommenceResponseEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse"
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
@@ -98,7 +101,6 @@ export class TransferCommenceResponseEndpointV1 implements IWebServiceEndpoint {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
-
     }
   }
 }

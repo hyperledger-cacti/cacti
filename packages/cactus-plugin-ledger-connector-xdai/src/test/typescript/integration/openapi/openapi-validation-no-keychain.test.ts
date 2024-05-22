@@ -143,7 +143,7 @@ test(testCase, async (t: Test) => {
         parameters as any as DeployContractJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -178,14 +178,15 @@ test(testCase, async (t: Test) => {
         parameters as any as DeployContractJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         t2.equal(
           e?.response?.status,
           400,
           `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
-        ));
+        ),
+      );
       const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
@@ -242,15 +243,15 @@ test(testCase, async (t: Test) => {
         parameters as any as InvokeContractJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         t2.equal(
           e?.response?.status,
           400,
           `Endpoint ${fInvoke} without required contractJSON: response.status === 400 OK`,
-        )
-      )
+        ),
+      );
       const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
@@ -283,14 +284,15 @@ test(testCase, async (t: Test) => {
         parameters as any as InvokeContractJsonObjectV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         t2.equal(
           e?.response?.status,
           400,
           `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
-        ))
+        ),
+      );
       const fields = e?.response?.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );

@@ -108,7 +108,7 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       const errorMsg = `${fnTag} request handler fn crashed for: ${reqTag}`;
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

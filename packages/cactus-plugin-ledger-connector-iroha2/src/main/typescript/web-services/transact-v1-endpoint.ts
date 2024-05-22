@@ -16,10 +16,12 @@ import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorIroha2 } from "../plugin-ledger-connector-iroha2";
-import { safeStringifyException } from "../utils";
 
 import OAS from "../../json/openapi.json";
 
@@ -97,10 +99,8 @@ export class Iroha2TransactEndpointV1 implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       this.log.warn(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(ex),
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

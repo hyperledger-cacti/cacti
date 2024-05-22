@@ -6,7 +6,6 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -15,7 +14,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
@@ -27,7 +29,8 @@ export interface IRunTransactionEndpointV1Options {
 }
 
 export class GetTransactionReceiptByTxIDEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(public readonly opts: IRunTransactionEndpointV1Options) {
@@ -95,10 +98,8 @@ export class GetTransactionReceiptByTxIDEndpointV1
       res.json(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(ex),
-      });
+      const errorMsg = "Internal Server Error";
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

@@ -7,7 +7,6 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -16,7 +15,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import { DeployContractV1Request } from "../generated/openapi/typescript-axios/index";
@@ -98,21 +100,13 @@ export class DeployContractEndpointV1 implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(ex),
+      const errorMsg = `Internal server Error`;
+      handleRestEndpointException({
+        errorMsg,
+        log: this.log,
+        error: ex,
+        res,
       });
     }
   }
 }
-
-
-// {
-//   this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
-//   if (typeof ex === 'object' && ex !== null) {
-//     if ('message' in ex && typeof ex.message === 'string') {=
-//       const errorMsg = ex.message
-//       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
-//     }
-//   }
-// }

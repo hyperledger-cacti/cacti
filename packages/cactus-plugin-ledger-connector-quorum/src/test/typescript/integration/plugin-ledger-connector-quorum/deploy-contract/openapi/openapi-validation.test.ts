@@ -181,7 +181,7 @@ test(testCase, async (t: Test) => {
         parameters as DeployContractSolidityBytecodeV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -217,7 +217,7 @@ test(testCase, async (t: Test) => {
         parameters as DeployContractSolidityBytecodeV1Request,
       );
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -279,7 +279,7 @@ test(testCase, async (t: Test) => {
       };
       await apiClient.invokeContractV1(parameters as InvokeContractV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -318,7 +318,7 @@ test(testCase, async (t: Test) => {
       };
       await apiClient.invokeContractV1(parameters as InvokeContractV1Request);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -370,7 +370,7 @@ test(testCase, async (t: Test) => {
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,
@@ -406,7 +406,7 @@ test(testCase, async (t: Test) => {
       };
       await apiClient.runTransactionV1(parameters as RunTransactionRequest);
     } catch (err) {
-      const e = err as AxiosError<{ path: string }[]>
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
         e?.response?.status,
         400,

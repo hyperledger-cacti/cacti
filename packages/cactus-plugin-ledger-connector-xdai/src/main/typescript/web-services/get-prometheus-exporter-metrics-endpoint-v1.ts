@@ -27,7 +27,8 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(

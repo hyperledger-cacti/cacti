@@ -16,7 +16,10 @@ import {
 
 import OAS from "../../json/openapi.json";
 
-import { handleRestEndpointException, registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorCorda } from "../plugin-ledger-connector-corda";
 
@@ -26,7 +29,8 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(
@@ -93,12 +97,19 @@ export class GetPrometheusExporterMetricsEndpointV1
       res.send(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      if (typeof ex === 'object' && ex !== null) {
-        if ('message' in ex && typeof ex.message === 'string') {
-          const errorMsg = ex.message
-          handleRestEndpointException({ errorMsg, log: this.log, error: ex, res })
-
-        }
+      if (
+        typeof ex === "object" &&
+        ex !== null &&
+        "message" in ex &&
+        typeof ex.message === "string"
+      ) {
+        const errorMsg = ex.message;
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
       }
     }
   }
