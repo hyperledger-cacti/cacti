@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Cacti Plugin - Connector Stellar
- * Can perform basic tasks on a Stellar ledger
+ * Can perform basic smart contract tasks on a Stellar ledger
  *
  * The version of the OpenAPI document: v2.0.0-alpha.2
  * 

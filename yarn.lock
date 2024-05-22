@@ -7375,6 +7375,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.5.4"
     socket.io-client-fixed-types: "npm:4.5.4"
+    stellar-plus: "npm:0.8.4"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:9.0.1"
   languageName: unknown
@@ -13526,6 +13527,53 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stellar/freighter-api@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "@stellar/freighter-api@npm:1.7.1"
+  checksum: 10/5cec07fd3b5fe7565db3ebd1698182b605f9060da782d6e081a9d8cf8325c43222599d417730fa21474a3acca1f4ac8e68eb93122e1055ec11a7d6458c5223e6
+  languageName: node
+  linkType: hard
+
+"@stellar/js-xdr@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "@stellar/js-xdr@npm:3.1.1"
+  checksum: 10/3bc8ee3f1611b55938ef0249b7a90b3d689177d45b4c8c24c5562b8fe32372148f7544a0aab67776f4c7b95aef8cb0f97606b86ec800bb087302ff404cb8ccbc
+  languageName: node
+  linkType: hard
+
+"@stellar/stellar-base@npm:^11.0.1":
+  version: 11.0.1
+  resolution: "@stellar/stellar-base@npm:11.0.1"
+  dependencies:
+    "@stellar/js-xdr": "npm:^3.1.1"
+    base32.js: "npm:^0.1.0"
+    bignumber.js: "npm:^9.1.2"
+    buffer: "npm:^6.0.3"
+    sha.js: "npm:^2.3.6"
+    sodium-native: "npm:^4.0.10"
+    tweetnacl: "npm:^1.0.3"
+  dependenciesMeta:
+    sodium-native:
+      optional: true
+  checksum: 10/03ad775791793548563f4dfecc62843d84f0fcf41ccc7f3bb30090dd0506061fb38ca505fbb4ebd8b97d48a06c026733fa7b1146dd04216f3363843f8d09f0f3
+  languageName: node
+  linkType: hard
+
+"@stellar/stellar-sdk@npm:^11.2.2":
+  version: 11.3.0
+  resolution: "@stellar/stellar-sdk@npm:11.3.0"
+  dependencies:
+    "@stellar/stellar-base": "npm:^11.0.1"
+    axios: "npm:^1.6.8"
+    bignumber.js: "npm:^9.1.2"
+    eventsource: "npm:^2.0.2"
+    randombytes: "npm:^2.1.0"
+    toml: "npm:^3.0.0"
+    urijs: "npm:^1.19.1"
+  checksum: 10/a4f35793aa6f43fb4384fddb9c4870751952228d2196f3bc9fbe6f7cdb796d960af1bce02aac957bb52e594c010a85326c909c0f8390bf738d98ccc23fc015db
+  languageName: node
+  linkType: hard
+
 "@stencil/core@npm:^2.18.0":
   version: 2.22.3
   resolution: "@stencil/core@npm:2.22.3"
@@ -18754,6 +18802,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"base32.js@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "base32.js@npm:0.1.0"
+  checksum: 10/7d7401a8f5c4ec45336ff72c97ee554b9bc22c2153b301acf657e6f9e25928a6205b2cfc55731072ba5686515e4903e2d3e462bea49db5f1515bbd01da1276ad
+  languageName: node
+  linkType: hard
+
 "base64-js@npm:*, base64-js@npm:^1.0.2, base64-js@npm:^1.2.0, base64-js@npm:^1.3.0, base64-js@npm:^1.3.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
@@ -18904,6 +18959,13 @@ __metadata:
   version: 9.0.2
   resolution: "bignumber.js@npm:9.0.2"
   checksum: 10/d270e73abb79a9beffd1347139266c08b9c022f91c5613226ec16a3eba240fabcbc7c597bbecbb43300038c9d94e3674a269784feac0f5b17c8d0b2b17940798
+  languageName: node
+  linkType: hard
+
+"bignumber.js@npm:^9.1.2":
+  version: 9.1.2
+  resolution: "bignumber.js@npm:9.1.2"
+  checksum: 10/d89b8800a987225d2c00dcbf8a69dc08e92aa0880157c851c287b307d31ceb2fc2acb0c62c3e3a3d42b6c5fcae9b004035f13eb4386e56d529d7edac18d5c9d8
   languageName: node
   linkType: hard
 
@@ -26283,6 +26345,13 @@ __metadata:
   version: 3.3.0
   resolution: "events@npm:3.3.0"
   checksum: 10/a3d47e285e28d324d7180f1e493961a2bbb4cad6412090e4dec114f4db1f5b560c7696ee8e758f55e23913ede856e3689cd3aa9ae13c56b5d8314cd3b3ddd1be
+  languageName: node
+  linkType: hard
+
+"eventsource@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "eventsource@npm:2.0.2"
+  checksum: 10/e1c4c3664cebf9efdd55c90818ef847099f298bf521768d479cf22d8a681e666b3042de85327711ba6a8414ac6a04c70d2aeb4f405bba8239a8c36e06a019374
   languageName: node
   linkType: hard
 
@@ -37735,6 +37804,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-gyp-build@npm:^4.8.0":
+  version: 4.8.0
+  resolution: "node-gyp-build@npm:4.8.0"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: 10/80f410ab412df38e84171d3634a5716b6c6f14ecfa4eb971424d289381fb76f8bcbe1b666419ceb2c81060e558fd7c6d70cc0f60832bcca6a1559098925d9657
+  languageName: node
+  linkType: hard
+
 "node-gyp-build@npm:~4.1.0":
   version: 4.1.1
   resolution: "node-gyp-build@npm:4.1.1"
@@ -45087,7 +45167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sha.js@npm:^2.4.0, sha.js@npm:^2.4.11, sha.js@npm:^2.4.8":
+"sha.js@npm:^2.3.6, sha.js@npm:^2.4.0, sha.js@npm:^2.4.11, sha.js@npm:^2.4.8":
   version: 2.4.11
   resolution: "sha.js@npm:2.4.11"
   dependencies:
@@ -45630,6 +45710,16 @@ __metadata:
     ip: "npm:^2.0.0"
     smart-buffer: "npm:^4.2.0"
   checksum: 10/5074f7d6a13b3155fa655191df1c7e7a48ce3234b8ccf99afa2ccb56591c195e75e8bb78486f8e9ea8168e95a29573cbaad55b2b5e195160ae4d2ea6811ba833
+  languageName: node
+  linkType: hard
+
+"sodium-native@npm:^4.0.10":
+  version: 4.1.1
+  resolution: "sodium-native@npm:4.1.1"
+  dependencies:
+    node-gyp: "npm:latest"
+    node-gyp-build: "npm:^4.8.0"
+  checksum: 10/cb30564f07c55b2a7f8016b4df16fd2b0ede10981c6d0b4dfe20ef884f702d55884d2128f22da1ffe9a378aec43a4f0c5539aadf23c4fd3fabc5d05ead1301d2
   languageName: node
   linkType: hard
 
@@ -46337,6 +46427,18 @@ __metadata:
   version: 1.1.1
   resolution: "stealthy-require@npm:1.1.1"
   checksum: 10/a408a51f5b6c1fe535e4459732ac0b66d7921583f89fc8289bfdc937a497fe8196219d1e04d234047349b90723ecff1a1cb4a92bef2315e01a3081dc72db8d41
+  languageName: node
+  linkType: hard
+
+"stellar-plus@npm:0.8.4":
+  version: 0.8.4
+  resolution: "stellar-plus@npm:0.8.4"
+  dependencies:
+    "@stellar/freighter-api": "npm:^1.7.1"
+    "@stellar/stellar-sdk": "npm:^11.2.2"
+    axios: "npm:^1.6.2"
+    uuid: "npm:^9.0.1"
+  checksum: 10/b5acd2a69c4616011990cca3000815beb12d746bfa358d3e12ab20f38a4e55b8f5f28edbd883ba903e8d8ed63f07c3800c12b2282dcd156e2342f8e3365cfe7b
   languageName: node
   linkType: hard
 
@@ -48036,6 +48138,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"toml@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "toml@npm:3.0.0"
+  checksum: 10/cfef0966868d552bd02e741f30945a611f70841b7cddb07ea2b17441fe32543985bc0a7c0dcf7971af26fcaf8a17712a485d911f46bfe28644536e9a71a2bd09
+  languageName: node
+  linkType: hard
+
 "topo@npm:3.x.x":
   version: 3.0.3
   resolution: "topo@npm:3.0.3"
@@ -49442,6 +49551,13 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 10/b271ca7e3d46b7160222e3afa3e531505161c9a4e097febae9664e4b59912f4cbe94861361a4175edac3a03fee99d91e44b6a58c17a634bc5a664b19fc76fbcb
+  languageName: node
+  linkType: hard
+
+"urijs@npm:^1.19.1":
+  version: 1.19.11
+  resolution: "urijs@npm:1.19.11"
+  checksum: 10/2aa5547b53c37ebee03a8ad70feae1638a37cc4c7e543abbffb14fc86b17f84f303d08e45c501441410c025bab22aa84673c97604b7b2619967f1dd49f69931f
   languageName: node
   linkType: hard
 
