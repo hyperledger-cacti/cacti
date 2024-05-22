@@ -1,7 +1,6 @@
 {
   "name": "@hyperledger/cacti-plugin-ledger-connector-stellar",
   "version": "2.0.0-alpha.2",
-  "private": true,
   "description": "Allows Cacti nodes to connect to a Stellar ledger.",
   "keywords": [
     "Hyperledger",
@@ -34,6 +33,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Fabricius Zatti",
+      "email": "fazzatti@gmail.com",
+      "url": "https://oififo.com"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -67,6 +71,7 @@
     "run-time-error-cjs": "1.4.0",
     "rxjs": "7.8.1",
     "socket.io-client-fixed-types": "4.5.4",
+    "stellar-plus": "0.8.4",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
@@ -86,7 +91,7 @@
     "npm": ">=8"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "browserMinified": "dist/cacti-plugin-ledger-connector-stellar.web.umd.min.js",
   "mainMinified": "dist/cacti-plugin-ledger-connector-stellar.node.umd.min.js",

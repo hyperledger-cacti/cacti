@@ -39,6 +39,7 @@ jobs:
       plugin-ledger-connector-ethereum-changed: ${{ steps.changes.outputs.plugin-ledger-connector-ethereum-changed }}
       plugin-ledger-connector-iroha2-changed: ${{ steps.changes.outputs.plugin-ledger-connector-iroha2-changed }}
       plugin-ledger-connector-quorum-changed: ${{ steps.changes.outputs.plugin-ledger-connector-quorum-changed }}
+      plugin-ledger-connector-stellar-changed: ${{ steps.changes.outputs.plugin-ledger-connector-stellar-changed }}
       plugin-htlc-coordinator-besu-changed: ${{ steps.changes.outputs.plugin-htlc-coordinator-besu-changed }}
       test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
       ghcr-corda-all-in-one-obligation-changed: ${{ steps.changes.outputs.ghcr-corda-all-in-one-obligation-changed }}
@@ -127,6 +128,15 @@ jobs:
             plugin-ledger-connector-quorum-changed:
               - './packages/cactus-plugin-ledger-connector-quorum/**'
               - './packages/cactus-test-plugin-ledger-connector-quorum/**'
+              - './packages/cactus-common/**'
+              - './packages/cactus-core/**'
+              - './packages/cactus-core-api/**'
+              - './packages/cactus-test-tooling/**'
+              - './packages/cactus-plugin-keychain-memory/**'
+              # - './.github/workflows/ci.yaml'
+
+            plugin-ledger-connector-stellar-changed:
+              - './packages/cacti-plugin-ledger-connector-stellar/**'
               - './packages/cactus-common/**'
               - './packages/cactus-core/**'
               - './packages/cactus-core-api/**'
@@ -1105,6 +1115,36 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  
+  cpl-connector-stellar:
+    continue-on-error: false
+    needs:
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-stellar-changed == 'true'
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cacti-plugin-ledger-connector-stellar/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4.1.1
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v4.0.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+
 
   plc-fabric-0:
     needs:

@@ -14,8 +14,6 @@ import {
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-
 import {
   Checks,
   Logger,
@@ -23,7 +21,11 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { WatchBlocksV1 } from "./generated/openapi/typescript-axios";
+import {
+  DeployContractV1Request,
+  DeployContractV1Response,
+  WatchBlocksV1,
+} from "./generated/openapi/typescript-axios";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
@@ -31,14 +33,22 @@ import {
   GetOpenApiSpecV1Endpoint,
   IGetOpenApiSpecV1EndpointOptions,
 } from "./web-services/get-open-api-spec-v1-endpoint";
+import { NetworkConfig } from "stellar-plus/lib/stellar-plus/network";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { deployContract } from "./core/contract-engine";
+import { convertApiTransactionInvocationToStellarPlus } from "./utils";
+import {
+  GetPrometheusExporterMetricsEndpointV1,
+  IGetPrometheusExporterMetricsEndpointV1Options,
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
 
 export const E_KEYCHAIN_NOT_FOUND =
   "cacti.connector.stellar.keychain_not_found";
 
 export interface IPluginLedgerConnectorStellarOptions
   extends ICactusPluginOptions {
-  rpcApiHttpHost: string;
-  rpcApiWsHost: string;
+  networkConfig: NetworkConfig;
   pluginRegistry: PluginRegistry;
   prometheusExporter?: PrometheusExporter;
   logLevel?: LogLevelDesc;
@@ -46,16 +56,21 @@ export interface IPluginLedgerConnectorStellarOptions
 
 export class PluginLedgerConnectorStellar
   implements
-    IPluginLedgerConnector<never, never, never, never>,
+    IPluginLedgerConnector<
+      DeployContractV1Request,
+      DeployContractV1Response,
+      unknown,
+      unknown
+    >,
     ICactusPlugin,
     IPluginWebService
 {
+  private networkConfig: NetworkConfig;
   private readonly instanceId: string;
-  public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
-  private readonly pluginRegistry: PluginRegistry;
-
   private endpoints: IWebServiceEndpoint[] | undefined;
+  private readonly pluginRegistry: PluginRegistry;
+  public prometheusExporter: PrometheusExporter;
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorStellar";
 
@@ -66,10 +81,13 @@ export class PluginLedgerConnectorStellar
   constructor(public readonly options: IPluginLedgerConnectorStellarOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.rpcApiHttpHost, `${fnTag} options.rpcApiHttpHost`);
-    Checks.truthy(options.rpcApiWsHost, `${fnTag} options.rpcApiWsHost`);
+    Checks.truthy(options.networkConfig, `${fnTag} options.networkConfig`);
+
     Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
+
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
+
+    this.networkConfig = options.networkConfig;
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
@@ -88,12 +106,33 @@ export class PluginLedgerConnectorStellar
     this.prometheusExporter.startMetricsCollection();
   }
 
-  public async deployContract(): Promise<never> {
+  public async deployContract(
+    req: DeployContractV1Request,
+  ): Promise<DeployContractV1Response> {
+    // const { logLevel } = this.options;
+
+    const wasm = req.wasmBuffer
+      ? { wasmBuffer: Buffer.from(req.wasmBuffer, "base64") }
+      : { wasmHash: req.wasmHash as string };
+
+    const response = await deployContract({
+      ...wasm,
+      txInvocation: convertApiTransactionInvocationToStellarPlus(
+        req.transactionInvocation,
+        this.networkConfig,
+      ),
+      networkConfig: this.networkConfig,
+      fnLogPrefix: this.className,
+    });
+
+    this.prometheusExporter.addCurrentTransaction();
+    return response;
+  }
+
+  public transact(): Promise<unknown> {
     throw new InternalServerError("Method not implemented.");
   }
-  public async transact(): Promise<never> {
-    throw new InternalServerError("Method not implemented.");
-  }
+
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     throw new InternalServerError("Method not implemented.");
   }
@@ -152,6 +191,21 @@ export class PluginLedgerConnectorStellar
     }
 
     const endpoints: IWebServiceEndpoint[] = [];
+    {
+      const endpoint = new DeployContractEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        connector: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
 
     {
       const oasPath =

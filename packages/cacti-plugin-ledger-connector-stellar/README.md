@@ -1,28 +1,22 @@
 # `@hyperledger/cacti-plugin-ledger-connector-stellar`
 
-
-## 🚧 **Package Under Construction** 🚧
-
-This package is a skeleton for now with no exported modules at all.
-Stay tuned for later improvements.
-
-## 🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
-
 This plugin provides `Cacti` a way to interact with Stellar networks. Using this we can perform:
-* Deploy Smart-contracts over the network.
-* Build and sign transactions using different keystores.
-* Invoke smart-contract functions that we have deployed on the network.
+
+- Deploy Smart-contracts over the network.
+- Build and sign transactions. (WIP)
+- Invoke smart-contract functions that we have deployed on the network. (WIP)
+
 ## Summary
 
-  - [Getting Started](#getting-started)
-  - [Architecture](#architecture)
-  - [Usage](#usage)
-  - [Prometheus Exporter](#prometheus-exporter)
-  - [Runing the tests](#running-the-tests)
-  - [Built With](#built-with)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Acknowledgments](#acknowledgments)
+- [Getting Started](#getting-started)
+- [Architecture](#architecture)
+- [Usage](#usage)
+- [Prometheus Exporter](#prometheus-exporter)
+- [Runing the tests](#running-the-tests)
+- [Built With](#built-with)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
 
 ## Getting Started
 
@@ -31,7 +25,8 @@ your local machine for development and testing purposes.
 
 ### Prerequisites
 
-In the root of the project to install the dependencies execute the command:
+In the root of the Cacti project to install the dependencies execute the command:
+
 ```sh
 npm run enable-corepack
 yarn configure
@@ -40,17 +35,81 @@ yarn configure
 ### Compiling
 
 In the project root folder, run this command to compile the plugin and create the dist directory:
+
 ```sh
 yarn tsc
 ```
 
 ### Architecture
 
-TODO
+The Stellar Ledger Connector offers a variaty of endpoints to handle specific actions for a given Stellar network.
+
+#### `deploy-contract` endpoint
+
+This endpoint is responsible for deploying smart contracts to Soroban (Stellar's smart contract platform).
+
+**Core Aspects**:
+
+- **Input**: Accepts either a compiled WASM buffer or a WASM hash.
+  - **WASM Buffer**: Uploads compiled code to Stellar, generates a on-chain WASM hash, then deploys the contract. Refer to the [Stellar documentation](https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/contracts) for further detail on this process.
+  - **WASM Hash**: Directly deploys the contract using the existing WASM hash.
+- **Output**: An object containing the on-chain WASM hash and a unique contract ID of the newly deployed instance.
+
+- **Transaction Invocation**: Provides data for assembling and executing the transactions.
 
 ### Usage
 
-TODO
+#### Initialization
+
+To use this import public-api and create new **PluginFactoryLedgerConnector**. Then use it to create a connector.
+
+```typescript
+const factory = new PluginFactoryLedgerConnector({
+  pluginImportType: PluginImportType.LOCAL,
+});
+const connector: PluginLedgerConnectorStellar = await factory.create({
+  networkConfig,
+  pluginRegistry: new PluginRegistry({}),
+  instanceId: uuidV4(),
+});
+```
+
+A key element of the connector intialization is the provided `networkConfig` object. It follows the standard format defined in the open source library [Stellar Plus](https://github.com/CheesecakeLabs/stellar-plus) and can be assembled by the `CustomNet()` function provided by it as well as the most common network environments for Stellar such as the `TestNet()` for Stellar testnet or `FutureNet()` for early features and protocol changes validation.
+
+When using the _Stellar Test Ledger_ provided under the Cacti Test tooling, the network can be assembled using the `CustomNet()` function combined with the test ledger `getNetworkConfiguration()` method. Once the test ledger has been fully started, it exposes the configuration parameters for all its services. See the following example:
+
+```typescript
+const stellarTestLedger = new StellarTestLedger({ logLevel });
+
+await stellarTestLedger.start();
+const networkConfig = CustomNet(
+  await stellarTestLedger.getNetworkConfiguration(),
+);
+```
+
+#### Making Calls
+
+One can make calls through the connector to the plugin API:
+
+```typescript
+async deployContract(req: DeployContractV1Request):Promise<DeployContractV1Response>;
+```
+
+Call example to deploy a contract:
+
+```typescript
+const deployOut = await connector.deployContract({
+  wasmBuffer: wasmBuffer.toString("base64"),
+  transactionInvocation: {
+    header: {
+      source: deployerAccount.getPublicKey(),
+      fee: 100,
+      timeout: 30,
+    },
+    signers: [deployerAccount.getSecretKey()],
+  },
+});
+```
 
 ### Building/running the container image locally
 
@@ -61,6 +120,7 @@ DOCKER_BUILDKIT=1 docker build -f ./packages/cacti-plugin-ledger-connector-stell
 ```
 
 Build with a specific version of the npm package:
+
 ```sh
 DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=2.0.0-alpha.2 -f ./packages/cacti-plugin-ledger-connector-stellar/Dockerfile . --tag cplcs --tag cacti-plugin-ledger-connector-stellar
 ```
@@ -68,6 +128,7 @@ DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=2.0.0-alpha.2 -f ./pa
 #### Running the container
 
 Launch container with plugin configuration as an **environment variable**:
+
 ```sh
 docker run \
   --rm \
@@ -78,6 +139,7 @@ docker run \
 ```
 
 Launch container with plugin configuration as a **CLI argument**:
+
 ```sh
 docker run \
   --rm \
@@ -89,6 +151,7 @@ docker run \
 ```
 
 Launch container with **configuration file** mounted from host machine:
+
 ```sh
 
 echo '[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id"}}]' > cactus.json
@@ -107,8 +170,7 @@ docker run \
 
 Don't have a Stellar network on hand to test with? Test or develop against our Stellar All-In-One container!
 
-TODO
-
+TODO (WIP)
 
 ## Prometheus Exporter
 
@@ -119,7 +181,10 @@ This class creates a prometheus exporter, which scrapes the transactions (total 
 The prometheus exporter object is initialized in the `PluginLedgerConnectorStellar` class constructor itself, so instantiating the object of the `PluginLedgerConnectorStellar` class, gives access to the exporter object.
 You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorStellarOptions` interface for `PluginLedgerConnectorStellar` constructor.
 
-`getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorStellar` class is called.
+`getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime a Stellar transaction is executed through the connector internal methods. This includes the methods
+
+- `deployContract`
+  - `runSorobanTransaction()` (_Soon_)
 
 ### Prometheus Integration
 
@@ -143,17 +208,26 @@ On the prometheus graphical interface (defaulted to http://localhost:9090), choo
 ### Helper code
 
 ###### response.type.ts
+
 This file contains the various responses of the metrics.
 
 ###### data-fetcher.ts
+
 This file contains functions encasing the logic to process the data points
 
 ###### metrics.ts
+
 This file lists all the prometheus metrics and what they are used for.
 
 ## Running the tests
 
-TODO
+To check that all has been installed correctly and that the pugin has no errors run the tests:
+
+- Run this command at the project's root:
+
+```sh
+yarn jest packages/cacti-plugin-ledger-connector-stellar/
+```
 
 ## Contributing
 
@@ -165,4 +239,4 @@ Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## Acknowledgments 
+## Acknowledgments
