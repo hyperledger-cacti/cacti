@@ -146,6 +146,8 @@ function mainTask()
 
   if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."
+  elif [ "${JEST_TEST_CODE_COVERAGE_ENABLED:-true}" = "true" ]; then
+   yarn jest $JEST_TEST_PATTERN --coverage --coverageDirectory=$JEST_TEST_COVERAGE_PATH
   else
     yarn test:jest:all $JEST_TEST_PATTERN
   fi
