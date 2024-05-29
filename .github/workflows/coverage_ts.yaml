@@ -1,0 +1,59 @@
+---
+    name: coverage_typescript
+    
+    env:
+      NODEJS_VERSION: v18.18.2
+    on:
+      workflow_run:
+        workflows: 
+         - Cactus_CI
+        types:
+          - completed
+    
+    jobs:
+      generate_coverage_report:
+        runs-on: ubuntu-22.04
+        if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success' }}
+        steps:
+          - name: Check out repository
+            uses: actions/checkout@v4.1.1
+    
+          - name: Set up Node.js
+            uses: actions/setup-node@v4.0.2
+            with:
+              node-version: ${{ env.NODEJS_VERSION }}
+    
+          - name: Restore Yarn Cache
+            uses: actions/cache@v4.0.1
+            with:
+              path: ./.yarn/
+              key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+              restore-keys: |
+                ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+    
+          - name: Install dependencies and istanbul-merge
+            run: |
+              yarn install
+              yarn add istanbul-merge --dev
+    
+          - name: Download coverage reports
+            uses: actions/download-artifact@v4.1.1
+            with:
+              run-id: ${{ github.event.workflow_run.id }}
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              path: ./code-coverage-ts/
+    
+          - name: Merge and generate coverage reports
+            run: |
+              ls -R ./code-coverage-ts/**/**/
+              npx istanbul-merge --out coverage.json ./code-coverage-ts/coverage-reports-*/*/coverage-final.json
+              npx istanbul report --include coverage.json --dir cacti html
+              npx istanbul report --include coverage.json --dir cacti text
+              npx istanbul report --include coverage.json --dir cacti text-summary
+    
+          - name: Upload coverage reports to Codecov
+            uses: codecov/codecov-action@v4.0.1
+            with:
+              name: code-coverage-report
+              fail_ci_if_error: true
+              token: ${{ secrets.CODECOV_TOKEN }}
