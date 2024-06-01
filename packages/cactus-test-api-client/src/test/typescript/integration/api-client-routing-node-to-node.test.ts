@@ -204,6 +204,7 @@ describe(testCase, () => {
       apiServerOptions.cockpitPort = 0;
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
+      apiServerOptions.crpcPort = 0;
       const config =
         await configService.newExampleConfigConvict(apiServerOptions);
 
@@ -250,6 +251,7 @@ describe(testCase, () => {
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       apiServerOptions.plugins = [];
+      apiServerOptions.crpcPort = 0;
       const config =
         await configService.newExampleConfigConvict(apiServerOptions);
 

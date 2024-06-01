@@ -756,13 +756,13 @@ export class ApiServer {
 
     log.debug("%s Registering %o CRPC routes handler(s).", fn, svcCount);
 
-    const registration = await this.crpcServer.register(fastifyConnectPlugin, {
+    await this.crpcServer.register(fastifyConnectPlugin, {
       routes: crpcRoutesHandler,
       shutdownTimeoutMs: 5000,
       grpc: true,
       grpcWeb: true,
     });
-    log.debug("%s Fastify registration OK=%o", fn, registration);
+    log.debug("%s Fastify CRPC service registration OK", fn);
 
     const crpcUrl = await this.crpcServer.listen({
       host: crpcHost,
