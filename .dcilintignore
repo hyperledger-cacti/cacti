@@ -29,3 +29,7 @@ CHANGELOG.md
 
 # Ignore the Gradle Wrapper scripts because they are vendored dependencies that we cannot alter
 **/gradlew
+
+# We  can't get around this one because there's a yarn plugin whose install URL 
+# only supports the old default branch name in git
+.yarnrc.yml

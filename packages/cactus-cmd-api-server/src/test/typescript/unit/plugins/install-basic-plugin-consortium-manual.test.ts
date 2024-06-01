@@ -61,6 +61,7 @@ test("can install plugin-consortium-manual", async (t: Test) => {
   apiServerOptions.apiPort = 0;
   apiServerOptions.cockpitPort = 0;
   apiServerOptions.grpcPort = 0;
+  apiServerOptions.crpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {

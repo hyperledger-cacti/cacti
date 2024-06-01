@@ -589,6 +589,7 @@ export class SupplyChainApp {
     properties.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     properties.authorizationConfigJson =
       await this.getOrCreateAuthorizationConfig();
+    properties.crpcPort = 0;
 
     const apiServer = new ApiServer({
       config: properties,

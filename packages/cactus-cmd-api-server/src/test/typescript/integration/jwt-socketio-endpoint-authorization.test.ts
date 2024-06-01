@@ -64,6 +64,7 @@ describe("cmd-api-server:ApiServer", () => {
     apiSrvOpts.apiPort = 0;
     apiSrvOpts.cockpitPort = 0;
     apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
     apiSrvOpts.logLevel = logLevel;
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [];

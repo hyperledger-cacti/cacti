@@ -117,6 +117,7 @@ describe("BesuGrpcSvcOpenApi", () => {
     apiSrvOpts.apiPort = addressInfo.port;
     apiSrvOpts.cockpitPort = 0;
     apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
     apiSrvOpts.grpcMtlsEnabled = false;
     apiSrvOpts.apiTlsEnabled = false;
     const cfg = await cfgSrv.newExampleConfigConvict(apiSrvOpts);
