@@ -35,6 +35,7 @@ test("can install plugins at runtime with specified version based on imports", a
   apiServerOptions.apiPort = 0;
   apiServerOptions.cockpitPort = 0;
   apiServerOptions.grpcPort = 0;
+  apiServerOptions.crpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {

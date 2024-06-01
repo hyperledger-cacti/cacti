@@ -34,6 +34,7 @@ test(testCase, async (t: Test) => {
   apiSrvOpts.apiTlsKeyPem = serverCert.privateKeyPem;
   apiSrvOpts.apiTlsClientCaPem = clientCert.certificatePem;
   apiSrvOpts.grpcPort = 0;
+  apiSrvOpts.crpcPort = 0;
   apiSrvOpts.cockpitPort = 0;
   apiSrvOpts.grpcMtlsEnabled = true;
   apiSrvOpts.apiTlsEnabled = false;

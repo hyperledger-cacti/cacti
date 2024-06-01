@@ -92,6 +92,7 @@ test.skip(testCase, async (t: Test) => {
   apiSrvOpts.apiPort = 0;
   apiSrvOpts.cockpitPort = 0;
   apiSrvOpts.grpcPort = 0;
+  apiSrvOpts.crpcPort = 0;
   apiSrvOpts.apiTlsEnabled = false;
   apiSrvOpts.plugins = [];
   const convictConfig = await configService.newExampleConfigConvict(apiSrvOpts);

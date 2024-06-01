@@ -234,6 +234,7 @@ export class CarbonAccountingApp {
       config.cockpitPort = addressInfoCockpit.port;
       config.grpcPort = 0; // TODO - make this configurable as well
       config.logLevel = this.options.logLevel || "INFO";
+      config.crpcPort = 0;
     }
 
     const apiServer = new ApiServer({

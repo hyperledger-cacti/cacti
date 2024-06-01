@@ -112,6 +112,7 @@ describe(testCase, () => {
     apiServerOptions.apiPort = addressInfo1.port;
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     const config =
       await configService.newExampleConfigConvict(apiServerOptions);

@@ -76,6 +76,7 @@ describe(testCase, () => {
       apiSrvOpts.apiPort = 0;
       apiSrvOpts.cockpitPort = 0;
       apiSrvOpts.grpcPort = 0;
+      apiSrvOpts.crpcPort = 0;
       apiSrvOpts.apiTlsEnabled = false;
       apiSrvOpts.plugins = [];
       const config = await configService.newExampleConfigConvict(apiSrvOpts);

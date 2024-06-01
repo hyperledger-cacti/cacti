@@ -37,6 +37,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
     apiServerOptions.apiPort = 0;
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
 
     const instanceId = uuidv4();
@@ -86,6 +87,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
     apiServerOptions.apiPort = 0;
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
 
     const versionToSendServer = "0.7.0";
@@ -183,6 +185,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
     apiServerOptions.apiPort = 0;
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     const versionToInstall = "0.8.0";
     apiServerOptions.plugins = [

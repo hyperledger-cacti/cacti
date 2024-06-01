@@ -1961,6 +1961,7 @@ jobs:
   ctp-htlc-eth-besu:
     continue-on-error: false
     env:
+      ETHERSCAN_KEY:  ${{ secrets.ETHERSCAN_KEY }}
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false

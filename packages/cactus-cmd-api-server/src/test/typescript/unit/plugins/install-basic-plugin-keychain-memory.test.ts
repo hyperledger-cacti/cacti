@@ -44,6 +44,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   apiServerOptions.apiPort = 0;
   apiServerOptions.cockpitPort = 0;
   apiServerOptions.grpcPort = 0;
+  apiServerOptions.crpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {
