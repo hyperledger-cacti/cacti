@@ -44,10 +44,10 @@
   ],
   "scripts": {
     "benchmark": "tsx ./src/test/typescript/benchmark/run-cmd-api-server-benchmark.ts .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log",
-    "codegen": "run-p 'codegen:*'",
+    "codegen": "run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "run-s proto:openapi proto:protoc-gen-ts",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "proto:openapi": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --additional-properties=packageName=org.hyperledger.cactus.cmd_api_server -o ./src/main/proto/generated/openapi/ -t=./src/main/openapi-generator/templates/protobuf-schema/",
