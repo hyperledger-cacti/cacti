@@ -40,8 +40,10 @@ describe(testCaseName, () => {
   const wasmHashPattern = /^[a-f0-9]{64}$/;
 
   beforeAll(async () => {
+    // Load the WASM file for the
+    // `hello_world`example contract.
     wasmBuffer = await loadWasmFile(
-      "./packages/cacti-plugin-ledger-connector-stellar/src/test/rust/token-contract/soroban_token_contract.wasm",
+      "./packages/cacti-plugin-ledger-connector-stellar/src/test/rust/demo-contract/hello_world.wasm",
     );
     expect(wasmBuffer).toBeDefined();
 

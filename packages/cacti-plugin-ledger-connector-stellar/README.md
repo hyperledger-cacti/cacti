@@ -3,8 +3,8 @@
 This plugin provides `Cacti` a way to interact with Stellar networks. Using this we can perform:
 
 - Deploy Smart-contracts over the network.
-- Build and sign transactions. (WIP)
-- Invoke smart-contract functions that we have deployed on the network. (WIP)
+- Build and sign transactions.
+- Invoke smart-contract functions that we have deployed on the network.
 
 ## Summary
 
@@ -51,11 +51,28 @@ This endpoint is responsible for deploying smart contracts to Soroban (Stellar's
 **Core Aspects**:
 
 - **Input**: Accepts either a compiled WASM buffer or a WASM hash.
-  - **WASM Buffer**: Uploads compiled code to Stellar, generates a on-chain WASM hash, then deploys the contract. Refer to the [Stellar documentation](https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/contracts) for further detail on this process.
-  - **WASM Hash**: Directly deploys the contract using the existing WASM hash.
+
+  - `wasmBuffer`: Uploads compiled code to Stellar, generates a on-chain WASM hash, then deploys the contract. Refer to the [Stellar documentation](https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/contracts) for further detail on this process.
+  - `wasmHash`: Directly deploys the contract using the existing WASM hash.
+  - `transactionInvocation`: An object containing data about how the transaction should be assembled and executed.
+
 - **Output**: An object containing the on-chain WASM hash and a unique contract ID of the newly deployed instance.
 
-- **Transaction Invocation**: Provides data for assembling and executing the transactions.
+#### `run-soroban-transaction` endpoint
+
+This endpoint is responsible for invoking smart contracts on Soroban (Stellar's smart contract platform) to either change or read a ledger state.
+
+**Core Aspects**:
+
+- **Input**: Accepts either a compiled WASM buffer or a WASM hash.
+  - `contractId`: The unique contract id of the contract instance to be invoked.
+  - `method`: The name of the contract method being invoked.
+  - `methodArgs`: An object containing the arguments accepted by the method.
+  - `specXdr`: An array containing the contract specification in XDR format.
+  - `transactionInvocation`: An object containing data about how the transaction should be assembled and executed.
+  - `readOnly`: A flag to indicate when the transaction should not alter ledger state. When `true`, the transaction will only be simulated based on the current ledger state and provide an up-to-date output without registering the transaction to the ledger, ensuring no fees are consumed.
+- **Output**: An object containing the response of the transaction invocation.
+  - `result`: The direct output of the invoked contract method.
 
 ### Usage
 
@@ -107,6 +124,28 @@ const deployOut = await connector.deployContract({
       timeout: 30,
     },
     signers: [deployerAccount.getSecretKey()],
+  },
+});
+```
+
+Call example to invoke a contract and return the output value:
+
+```typescript
+const res = await connector.runSorobanTransaction({
+  contractId,
+  method: "balance",
+  methodArgs: {
+    id: adminAccount.getPublicKey(),
+  },
+  specXdr: tokenSpec,
+  readOnly: true,
+  transactionInvocation: {
+    header: {
+      source: adminAccount.getPublicKey(),
+      fee: 100,
+      timeout: 30,
+    },
+    signers: [adminAccount.getSecretKey()],
   },
 });
 ```
@@ -168,9 +207,30 @@ docker run \
 
 #### Testing API calls with the container
 
-Don't have a Stellar network on hand to test with? Test or develop against our Stellar All-In-One container!
+Don't have a Stellar network on hand to test with? Test or develop against our Stellar All-In-One container by importing the `StellarTestLedger` from `cacti-test-tooling`. It will deploy and manage a docker image based on [Stellar quickstart](https://github.com/stellar/quickstart).
 
-TODO (WIP)
+**Usage Example**(refer to the integration tests for further examples):
+
+```typescript
+import { StellarTestLedger } from "@hyperledger/cactus-test-tooling";
+import { Network } from "stellar-plus/lib/stellar-plus";
+
+const logLevel: LogLevelDesc = "TRACE";
+const stellarTestLedger = new StellarTestLedger({ logLevel });
+
+await stellarTestLedger.start();
+const networkConfig = Network.CustomNet(
+  await stellarTestLedger.getNetworkConfiguration(),
+);
+
+// Here use the networkConfig object to connect to
+// your test ledger and run your tests.
+
+await stellarTestLedger.stop();
+await stellarTestLedger.destroy();
+```
+
+In this example, the `StellarTestLedger` is used to pull up a fresh new ledger with no history and all of its required services to interact with the network. In conjunction with the `stellar-plus` library, the method `getNetworkConfiguration` is used to get all services data and instantiate an object that can be used with all tools in Stellar Plus to directly interact with the test ledger.
 
 ## Prometheus Exporter
 
@@ -184,7 +244,7 @@ You can also initialize the prometheus exporter object seperately and then pass 
 `getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime a Stellar transaction is executed through the connector internal methods. This includes the methods
 
 - `deployContract`
-  - `runSorobanTransaction()` (_Soon_)
+- `runSorobanTransaction()`
 
 ### Prometheus Integration
 
