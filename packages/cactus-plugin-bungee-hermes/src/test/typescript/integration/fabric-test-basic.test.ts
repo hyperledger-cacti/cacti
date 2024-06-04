@@ -68,14 +68,14 @@ let pluginBungeeFabricOptions: IPluginBungeeHermesOptions;
 let pluginBungee: PluginBungeeHermes;
 const FABRIC_ASSET_ID = uuidv4();
 
-let networkDetails: FabricNetworkDetails;
+let networkDetailsList: FabricNetworkDetails[];
 
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "BUNGEE - Hermes",
 });
 
-beforeAll(async () => {
+beforeEach(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -329,124 +329,148 @@ beforeAll(async () => {
     );
 
     pluginBungeeFabricOptions = {
+      pluginRegistry,
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidv4(),
     };
 
-    networkDetails = {
-      connectorApiPath: fabricPath,
-      signingCredential: fabricSigningCredential,
-      channelName: fabricChannelName,
-      contractName: fabricContractName,
-      participant: "Org1MSP",
-    };
+    networkDetailsList = [
+      {
+        connectorApiPath: fabricPath,
+        signingCredential: fabricSigningCredential,
+        channelName: fabricChannelName,
+        contractName: fabricContractName,
+        participant: "Org1MSP",
+      },
+      {
+        connector: fabricConnector,
+        signingCredential: fabricSigningCredential,
+        channelName: fabricChannelName,
+        contractName: fabricContractName,
+        participant: "Org1MSP",
+      },
+    ];
 
     pluginBungee = new PluginBungeeHermes(pluginBungeeFabricOptions);
   }
 });
 
-test("test creation of views for different timeframes and states", async () => {
-  const strategy = "FABRIC";
-  pluginBungee.addStrategy(strategy, new StrategyFabric("INFO"));
+test.each([{ apiPath: true }, { apiPath: false }])(
+  //test for both FabricApiPath and FabricConnector
+  "test creation of views for different timeframes and states",
+  async ({ apiPath }) => {
+    let networkDetails: FabricNetworkDetails;
+    if (apiPath) {
+      networkDetails = networkDetailsList[0];
+    } else {
+      networkDetails = networkDetailsList[1];
+    }
 
-  const snapshot = await pluginBungee.generateSnapshot(
-    [],
-    strategy,
-    networkDetails,
-  );
-  const view = pluginBungee.generateView(
-    snapshot,
-    "0",
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
+    const strategy = "FABRIC";
+    pluginBungee.addStrategy(strategy, new StrategyFabric("INFO"));
 
-  //expect to return a view
-  expect(view.view).toBeTruthy();
-  expect(view.signature).toBeTruthy();
+    const snapshot = await pluginBungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
+    const view = pluginBungee.generateView(
+      snapshot,
+      "0",
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
 
-  //expect the view to have capture the new asset Fabric_ASSET_ID, and attributes to match
-  expect(snapshot.getStateBins().length).toEqual(1);
-  expect(snapshot.getStateBins()[0].getId()).toEqual(FABRIC_ASSET_ID);
-  expect(snapshot.getStateBins()[0].getTransactions().length).toEqual(1);
+    //expect to return a view
+    expect(view.view).toBeTruthy();
+    expect(view.signature).toBeTruthy();
 
-  //fabric transaction proofs include endorsements
-  expect(
-    snapshot.getStateBins()[0].getTransactions()[0].getProof().getEndorsements()
-      ?.length,
-  ).toEqual(2);
+    //expect the view to have capture the new asset Fabric_ASSET_ID, and attributes to match
+    expect(snapshot.getStateBins().length).toEqual(1);
+    expect(snapshot.getStateBins()[0].getId()).toEqual(FABRIC_ASSET_ID);
+    expect(snapshot.getStateBins()[0].getTransactions().length).toEqual(1);
 
-  //no valid states for this time frame
-  const view1 = pluginBungee.generateView(snapshot, "0", "9999", undefined);
-  expect(view1.view).toBeUndefined();
-  expect(view1.signature).toBeUndefined();
+    //fabric transaction proofs include endorsements
+    expect(
+      snapshot
+        .getStateBins()[0]
+        .getTransactions()[0]
+        .getProof()
+        .getEndorsements()?.length,
+    ).toEqual(2);
 
-  //creating new asset
-  const new_asset_id = uuidv4();
-  const createResponse = await apiClient.runTransactionV1({
-    contractName: fabricContractName,
-    channelName: fabricChannelName,
-    params: [new_asset_id, "10"],
-    methodName: "CreateAsset",
-    invocationType: FabricContractInvocationType.Send,
-    signingCredential: fabricSigningCredential,
-  });
-  expect(createResponse).not.toBeUndefined();
-  expect(createResponse.status).toBeGreaterThan(199);
-  expect(createResponse.status).toBeLessThan(300);
+    //no valid states for this time frame
+    const view1 = pluginBungee.generateView(snapshot, "0", "9999", undefined);
+    expect(view1.view).toBeUndefined();
+    expect(view1.signature).toBeUndefined();
 
-  //changing FABRIC_ASSET_ID value
-  const modifyResponse = await apiClient.runTransactionV1({
-    contractName: fabricContractName,
-    channelName: fabricChannelName,
-    params: [FABRIC_ASSET_ID, "18"],
-    methodName: "UpdateAsset",
-    invocationType: FabricContractInvocationType.Send,
-    signingCredential: fabricSigningCredential,
-  });
-  expect(modifyResponse).not.toBeUndefined();
-  expect(modifyResponse.status).toBeGreaterThan(199);
-  expect(modifyResponse.status).toBeLessThan(300);
+    //creating new asset
+    const new_asset_id = uuidv4();
+    const createResponse = await apiClient.runTransactionV1({
+      contractName: fabricContractName,
+      channelName: fabricChannelName,
+      params: [new_asset_id, "10"],
+      methodName: "CreateAsset",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: fabricSigningCredential,
+    });
+    expect(createResponse).not.toBeUndefined();
+    expect(createResponse.status).toBeGreaterThan(199);
+    expect(createResponse.status).toBeLessThan(300);
 
-  const snapshot1 = await pluginBungee.generateSnapshot(
-    [],
-    strategy,
-    networkDetails,
-  );
-  const view2 = pluginBungee.generateView(
-    snapshot1,
-    "0",
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
+    //changing FABRIC_ASSET_ID value
+    const modifyResponse = await apiClient.runTransactionV1({
+      contractName: fabricContractName,
+      channelName: fabricChannelName,
+      params: [FABRIC_ASSET_ID, "18"],
+      methodName: "UpdateAsset",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: fabricSigningCredential,
+    });
+    expect(modifyResponse).not.toBeUndefined();
+    expect(modifyResponse.status).toBeGreaterThan(199);
+    expect(modifyResponse.status).toBeLessThan(300);
 
-  //expect to return a view
-  expect(view2.view).toBeTruthy();
-  expect(view2.signature).toBeTruthy();
+    const snapshot1 = await pluginBungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
+    const view2 = pluginBungee.generateView(
+      snapshot1,
+      "0",
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
 
-  //expect to have captured state for both assets
-  const stateBins = snapshot1.getStateBins();
-  expect(stateBins.length).toEqual(2);
-  const bins = [stateBins[0].getId(), stateBins[1].getId()];
+    //expect to return a view
+    expect(view2.view).toBeTruthy();
+    expect(view2.signature).toBeTruthy();
 
-  expect(bins.includes(FABRIC_ASSET_ID)).toBeTrue();
-  expect(bins.includes(new_asset_id)).toBeTrue();
+    //expect to have captured state for both assets
+    const stateBins = snapshot1.getStateBins();
+    expect(stateBins.length).toEqual(2);
+    const bins = [stateBins[0].getId(), stateBins[1].getId()];
 
-  //checks if values match:
-  //  - new value of FABRIC_ASSET_ID state in new snapshot equals to new value)
-  //  - successfully captured transaction that created the new asset
-  if (bins[0] === FABRIC_ASSET_ID) {
-    expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(2);
-    expect(snapshot1.getStateBins()[0].getValue()).toEqual("18");
-    expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(1);
-  } else {
-    expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(1);
-    expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(2);
-    expect(snapshot1.getStateBins()[1].getValue()).toEqual("18");
-  }
-});
+    expect(bins.includes(FABRIC_ASSET_ID)).toBeTrue();
+    expect(bins.includes(new_asset_id)).toBeTrue();
 
-afterAll(async () => {
+    //checks if values match:
+    //  - new value of FABRIC_ASSET_ID state in new snapshot equals to new value)
+    //  - successfully captured transaction that created the new asset
+    if (bins[0] === FABRIC_ASSET_ID) {
+      expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(2);
+      expect(snapshot1.getStateBins()[0].getValue()).toEqual("18");
+      expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(1);
+    } else {
+      expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(1);
+      expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(2);
+      expect(snapshot1.getStateBins()[1].getValue()).toEqual("18");
+    }
+  },
+);
+
+afterEach(async () => {
   await fabricLedger.stop();
   await fabricLedger.destroy();
   await Servers.shutdown(fabricServer);

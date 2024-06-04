@@ -4,7 +4,7 @@ import {
   Configuration,
   FabricContractInvocationType,
   RunTransactionRequest,
-  GetBlockResponseTypeV1,
+  PluginLedgerConnectorFabric,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { NetworkDetails, ObtainLedgerStrategy } from "./obtain-ledger-strategy";
 import {
@@ -18,6 +18,7 @@ import { State } from "../view-creation/state";
 import { StateProof } from "../view-creation/state-proof";
 import { Proof } from "../view-creation/proof";
 import { TransactionProof } from "../view-creation/transaction-proof";
+import { BadRequestError, InternalServerError } from "http-errors-enhanced-cjs";
 
 export interface FabricNetworkDetails extends NetworkDetails {
   signingCredential: FabricSigningCredential;
@@ -40,18 +41,38 @@ export class StrategyFabric implements ObtainLedgerStrategy {
     stateIds: string[],
     networkDetails: FabricNetworkDetails,
   ): Promise<Map<string, State>> {
-    const fnTag = `${StrategyFabric.CLASS_NAME}#generateLedgerStates()`;
+    const fn = `${StrategyFabric.CLASS_NAME}#generateLedgerStates()`;
     this.log.debug(`Generating ledger snapshot`);
-    Checks.truthy(networkDetails, `${fnTag} networkDetails`);
+    Checks.truthy(networkDetails, `${fn} networkDetails`);
 
-    const config = new Configuration({
-      basePath: networkDetails.connectorApiPath,
-    });
-    const fabricApi = new FabricApi(config);
+    let fabricApi: FabricApi | undefined;
+    let connector: PluginLedgerConnectorFabric | undefined;
 
+    if (networkDetails.connector) {
+      connector = networkDetails.connector as PluginLedgerConnectorFabric;
+    } else if (networkDetails.connectorApiPath) {
+      const config = new Configuration({
+        basePath: networkDetails.connectorApiPath,
+      });
+      fabricApi = new FabricApi(config);
+    } else {
+      throw new Error(
+        `${fn} networkDetails must have either connector or connectorApiPath`,
+      );
+    }
+    const connectorOrApiClient = networkDetails.connector
+      ? connector
+      : fabricApi;
+    if (!connectorOrApiClient) {
+      throw new InternalServerError(
+        `${fn} got neither connector nor FabricAPI`,
+      );
+    }
     const assetsKey =
       stateIds.length == 0
-        ? (await this.getAllAssetsKey(fabricApi, networkDetails)).split(",")
+        ? (
+            await this.getAllAssetsKey(networkDetails, connectorOrApiClient)
+          ).split(",")
         : stateIds;
     const ledgerStates = new Map<string, State>();
     //For each key in ledgerAssetsKey
@@ -59,15 +80,19 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       const assetValues: string[] = [];
       const txWithTimeS: Transaction[] = [];
 
-      const txs = await this.getAllTxByKey(assetKey, fabricApi, networkDetails);
+      const txs = await this.getAllTxByKey(
+        networkDetails,
+        assetKey,
+        connectorOrApiClient,
+      );
       //For each tx get receipt
       let last_receipt;
       for (const tx of txs) {
         const receipt = JSON.parse(
           await this.fabricGetTxReceiptByTxIDV1(
-            tx.getId(),
-            fabricApi,
             networkDetails,
+            tx.getId(),
+            connectorOrApiClient,
           ),
         );
         tx.getProof().setCreator(
@@ -96,9 +121,9 @@ export class StrategyFabric implements ObtainLedgerStrategy {
         last_receipt = receipt;
       }
       const block = await this.fabricGetBlockByTxID(
-        txs[txs.length - 1].getId(),
-        fabricApi,
         networkDetails,
+        txs[txs.length - 1].getId(),
+        connectorOrApiClient,
       );
       const state = new State(assetKey, assetValues, txWithTimeS);
       ledgerStates.set(assetKey, state);
@@ -123,39 +148,74 @@ export class StrategyFabric implements ObtainLedgerStrategy {
   }
 
   async fabricGetTxReceiptByTxIDV1(
-    transactionId: string,
-    api: FabricApi,
     networkDetails: FabricNetworkDetails,
+    transactionId: string,
+    connectorOrApiClient: PluginLedgerConnectorFabric | FabricApi,
   ): Promise<string> {
-    const receiptLockRes = await api.getTransactionReceiptByTxIDV1({
+    const fn = `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1()`;
+    const parameters = {
       signingCredential: networkDetails.signingCredential,
       channelName: networkDetails.channelName,
       contractName: "qscc",
       invocationType: FabricContractInvocationType.Call,
       methodName: "GetBlockByTxID",
       params: [networkDetails.channelName, transactionId],
-    } as RunTransactionRequest);
+    } as RunTransactionRequest;
 
-    if (receiptLockRes.status >= 200 && receiptLockRes.status < 300) {
-      if (receiptLockRes.data) {
-        return JSON.stringify(receiptLockRes.data);
-      } else {
-        throw new Error(
-          `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1: contract qscc method GetBlockByTxID invocation output is falsy`,
-        );
+    if (!connectorOrApiClient) {
+      throw new BadRequestError(`${fn} connectorOrApiClient is falsy`);
+    } else if (connectorOrApiClient instanceof PluginLedgerConnectorFabric) {
+      const connector: PluginLedgerConnectorFabric = connectorOrApiClient;
+      const response = await connector.getTransactionReceiptByTxID(parameters);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
       }
+      const receiptLockRes = JSON.stringify(response);
+      if (!receiptLockRes) {
+        throw new InternalServerError(`${fn} receiptLockRes is falsy`);
+      }
+      return receiptLockRes;
+    } else if (connectorOrApiClient instanceof FabricApi) {
+      const api: FabricApi = connectorOrApiClient;
+      const response = await api.getTransactionReceiptByTxIDV1(parameters);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
+      }
+      if (!response.status) {
+        throw new InternalServerError(`${fn} response.status is falsy`);
+      }
+      const { status, data, statusText, config } = response;
+      if (response.status < 200 || response.status > 300) {
+        this.log.debug(
+          "FabricAPI non-2xx HTTP response:",
+          data,
+          status,
+          config,
+        );
+        const errorMessage = `${fn} FabricAPI error status: ${status}: ${statusText}`;
+        throw new InternalServerError(errorMessage);
+      }
+      if (!data) {
+        throw new InternalServerError(`${fn} response.data is falsy`);
+      }
+
+      const receiptLockRes = JSON.stringify(data);
+      if (!receiptLockRes) {
+        throw new InternalServerError(`${fn} receiptLockRes is falsy`);
+      }
+      return receiptLockRes;
     }
-    throw new Error(
-      `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1: FabricAPI error with status 500: ` +
-        receiptLockRes.data,
+    throw new InternalServerError(
+      `${fn}: neither FabricAPI nor Connector given`,
     );
   }
 
   async fabricGetBlockByTxID(
-    txId: string,
-    api: FabricApi,
     networkDetails: FabricNetworkDetails,
+    txId: string,
+    connectorOrApiClient: PluginLedgerConnectorFabric | FabricApi,
   ): Promise<{ hash: string; signers: string[] }> {
+    const fn = `${StrategyFabric.CLASS_NAME}#fabricGetBlockByTxID()`;
     const gatewayOptions = {
       identity: networkDetails.signingCredential.keychainRef,
       wallet: {
@@ -171,26 +231,51 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       query: {
         transactionId: txId,
       },
-      type: GetBlockResponseTypeV1.Full,
+      skipDecode: false,
     };
 
-    const getBlockResponse = await api.getBlockV1(getBlockReq);
+    let block_data;
 
-    if (getBlockResponse.status < 200 || getBlockResponse.status >= 300) {
-      throw new Error(
-        `${StrategyFabric.CLASS_NAME}#fabricGetTxReceiptByTxIDV1: FabricAPI getBlockV1 error with status ${getBlockResponse.status}: ` +
-          getBlockResponse.data,
+    if (!connectorOrApiClient) {
+      throw new BadRequestError(`${fn} connectorOrApiClient is falsy`);
+    } else if (connectorOrApiClient instanceof PluginLedgerConnectorFabric) {
+      const connector: PluginLedgerConnectorFabric = connectorOrApiClient;
+      const response = await connector.getBlock(getBlockReq);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
+      }
+      block_data = response;
+    } else if (connectorOrApiClient instanceof FabricApi) {
+      const api: FabricApi = connectorOrApiClient;
+      const response = await api.getBlockV1(getBlockReq);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
+      }
+      if (!response.status) {
+        throw new InternalServerError(`${fn} response.status is falsy`);
+      }
+      const { status, data, statusText, config } = response;
+      if (response.status < 200 || response.status > 300) {
+        this.log.debug(
+          "FabricAPI non-2xx HTTP response:",
+          data,
+          status,
+          config,
+        );
+        const errorMessage = `${fn} FabricAPI error status: ${status}: ${statusText}`;
+        throw new InternalServerError(errorMessage);
+      }
+      if (!data) {
+        throw new InternalServerError(`${fn} response.data is falsy`);
+      }
+      block_data = response.data;
+    } else {
+      throw new InternalServerError(
+        `${fn}: neither FabricAPI nor Connector given`,
       );
     }
-    if (!getBlockResponse.data) {
-      throw new Error(
-        `${StrategyFabric.CLASS_NAME}#fabricGetBlockByTxID: getBlockV1 API call output data is falsy`,
-      );
-    }
 
-    const block = JSON.parse(
-      JSON.stringify(getBlockResponse?.data),
-    ).decodedBlock;
+    const block = JSON.parse(JSON.stringify(block_data)).decodedBlock;
 
     const blockSig = block.metadata.metadata[0].signatures;
     const sigs = [];
@@ -213,59 +298,133 @@ export class StrategyFabric implements ObtainLedgerStrategy {
   }
 
   async getAllAssetsKey(
-    api: FabricApi,
     networkDetails: FabricNetworkDetails,
+    connectorOrApiClient: PluginLedgerConnectorFabric | FabricApi,
   ): Promise<string> {
-    const response = await api.runTransactionV1({
+    const fn = `${StrategyFabric.CLASS_NAME}#getAllAssetsKey()`;
+    const parameters = {
       signingCredential: networkDetails.signingCredential,
       channelName: networkDetails.channelName,
       contractName: networkDetails.contractName,
       methodName: "GetAllAssetsKey",
       invocationType: FabricContractInvocationType.Call,
       params: [],
-    } as RunTransactionRequest);
+    } as RunTransactionRequest;
 
-    if (response.status >= 200 && response.status < 300) {
-      if (response.data.functionOutput) {
-        return response.data.functionOutput;
-      } else {
-        throw new Error(
-          `${StrategyFabric.CLASS_NAME}#getAllAssetsKey: contract ${networkDetails.contractName} method GetAllAssetsKey invocation output is falsy`,
+    if (!connectorOrApiClient) {
+      throw new BadRequestError(`${fn} connectorOrApiClient is falsy`);
+    } else if (connectorOrApiClient instanceof PluginLedgerConnectorFabric) {
+      const connector: PluginLedgerConnectorFabric = connectorOrApiClient;
+      const response = await connector.transact(parameters);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
+      }
+      if (!response.functionOutput) {
+        throw new InternalServerError(`${fn} response.functionOutput is falsy`);
+      }
+      const { functionOutput } = response;
+      if (!(typeof functionOutput === "string")) {
+        throw new InternalServerError(
+          `${fn} response.functionOutput is not a string`,
         );
       }
+      return functionOutput;
+    } else if (connectorOrApiClient instanceof FabricApi) {
+      const api: FabricApi = connectorOrApiClient;
+      const response = await api.runTransactionV1(parameters);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
+      }
+      if (!response.status) {
+        throw new InternalServerError(`${fn} response.status is falsy`);
+      }
+      const { status, data, statusText, config } = response;
+      if (response.status < 200 || response.status > 300) {
+        this.log.debug(
+          "FabricAPI non-2xx HTTP response:",
+          data,
+          status,
+          config,
+        );
+        const errorMessage = `${fn} FabricAPI error status: ${status}: ${statusText}`;
+        throw new InternalServerError(errorMessage);
+      }
+      if (!data) {
+        throw new InternalServerError(`${fn} response.data is falsy`);
+      }
+      if (!data.functionOutput) {
+        throw new InternalServerError(`${fn} response.functionOutput is falsy`);
+      }
+      const { functionOutput } = data;
+      if (!(typeof functionOutput === "string")) {
+        throw new InternalServerError(
+          `${fn} response.functionOutput is not a string`,
+        );
+      }
+      return functionOutput;
     }
-    throw new Error(
-      `${StrategyFabric.CLASS_NAME}#getAllAssetsKey: FabricAPI error with status 500: ` +
-        response.data,
+    throw new InternalServerError(
+      `${fn}: neither FabricAPI nor Connector given`,
     );
   }
 
   async getAllTxByKey(
-    key: string,
-    api: FabricApi,
     networkDetails: FabricNetworkDetails,
+    key: string,
+    connectorOrApiClient: PluginLedgerConnectorFabric | FabricApi,
   ): Promise<Transaction[]> {
-    const response = await api.runTransactionV1({
+    const fn = `${StrategyFabric.CLASS_NAME}#getAllTxByKey()`;
+    const parameters = {
       signingCredential: networkDetails.signingCredential,
       channelName: networkDetails.channelName,
       contractName: networkDetails.contractName,
       methodName: "GetAllTxByKey",
       invocationType: FabricContractInvocationType.Call,
       params: [key],
-    } as RunTransactionRequest);
+    } as RunTransactionRequest;
 
-    if (response.status >= 200 && response.status < 300) {
-      if (response.data.functionOutput) {
-        return this.txsStringToTxs(response.data.functionOutput);
-      } else {
-        throw new Error(
-          `${StrategyFabric.CLASS_NAME}#getAllTxByKey: contract ${networkDetails.contractName} method GetAllTxByKey invocation output is falsy`,
-        );
+    if (!connectorOrApiClient) {
+      throw new BadRequestError(`${fn} connectorOrApiClient is falsy`);
+    } else if (connectorOrApiClient instanceof PluginLedgerConnectorFabric) {
+      const connector: PluginLedgerConnectorFabric = connectorOrApiClient;
+      const response = await connector.transact(parameters);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
       }
+      if (!response.functionOutput) {
+        throw new InternalServerError(`${fn} response.functionOutput is falsy`);
+      }
+      return this.txsStringToTxs(response.functionOutput);
+    } else if (connectorOrApiClient instanceof FabricApi) {
+      const api: FabricApi = connectorOrApiClient;
+      const response = await api.runTransactionV1(parameters);
+      if (!response) {
+        throw new InternalServerError(`${fn} response is falsy`);
+      }
+      if (!response.status) {
+        throw new InternalServerError(`${fn} response.status is falsy`);
+      }
+      const { status, data, statusText, config } = response;
+      if (response.status < 200 || response.status > 300) {
+        this.log.debug(
+          "FabricAPI non-2xx HTTP response:",
+          data,
+          status,
+          config,
+        );
+        const errorMessage = `${fn} FabricAPI error status: ${status}: ${statusText}`;
+        throw new InternalServerError(errorMessage);
+      }
+      if (!data) {
+        throw new InternalServerError(`${fn} response.data is falsy`);
+      }
+      if (!data.functionOutput) {
+        throw new InternalServerError(`${fn} response.functionOutput is falsy`);
+      }
+      return this.txsStringToTxs(data.functionOutput);
     }
-    throw new Error(
-      `${StrategyFabric.CLASS_NAME}#getAllTxByKey: FabricAPI error with status 500: ` +
-        response.data,
+    throw new InternalServerError(
+      `${fn}: neither FabricAPI nor Connector given`,
     );
   }
 

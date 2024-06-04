@@ -9931,6 +9931,7 @@ __metadata:
     express: "npm:4.19.2"
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
+    http-errors-enhanced-cjs: "npm:2.0.1"
     key-encoder: "npm:2.0.3"
     merkletreejs: "npm:0.3.11"
     socket.io: "npm:4.6.2"
