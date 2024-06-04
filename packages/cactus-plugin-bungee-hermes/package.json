@@ -35,6 +35,11 @@
       "name": "André Augusto",
       "email": "andre.augusto@tecnico.ulisboa.pt",
       "url": "https://github.com/AndreAugusto11"
+    },
+    {
+      "name": "Carlos Amaro",
+      "email": "carlosrscamaro@tecnico.ulisboa.pt",
+      "url": "https://github.com/LordKubaya"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -64,6 +69,7 @@
     "axios": "1.7.2",
     "body-parser": "1.20.2",
     "fs-extra": "11.2.0",
+    "http-errors-enhanced-cjs": "2.0.1",
     "key-encoder": "2.0.3",
     "merkletreejs": "0.3.11",
     "typescript-optional": "2.0.1",

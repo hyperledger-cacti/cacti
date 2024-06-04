@@ -57,14 +57,6 @@ import {
 import path from "path";
 import { DiscoveryOptions } from "fabric-network";
 import {
-  FabricNetworkDetails,
-  StrategyFabric,
-} from "../../../main/typescript/strategy/strategy-fabric";
-import {
-  BesuNetworkDetails,
-  StrategyBesu,
-} from "../../../main/typescript/strategy/strategy-besu";
-import {
   PluginLedgerConnectorEthereum,
   DefaultApi as EthereumApi,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
@@ -72,10 +64,33 @@ import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
 } from "@hyperledger/cactus-test-geth-ledger";
-import {
-  EthereumNetworkDetails,
-  StrategyEthereum,
-} from "../../../main/typescript/strategy/strategy-ethereum";
+import { StrategyEthereum } from "../../../main/typescript/strategy/strategy-ethereum";
+import { StrategyFabric } from "../../../main/typescript/strategy/strategy-fabric";
+import { StrategyBesu } from "../../../main/typescript/strategy/strategy-besu";
+
+interface BesuNetworkDetails {
+  connectorApiPath: string;
+  participant: string;
+  signingCredential: Web3SigningCredential;
+  keychainId: string;
+  contractName: string;
+  contractAddress: string;
+}
+interface FabricNetworkDetails {
+  connectorApiPath: string;
+  participant: string;
+  signingCredential: FabricSigningCredential;
+  contractName: string;
+  channelName: string;
+}
+interface EthereumNetworkDetails {
+  connectorApiPath: string;
+  participant: string;
+  signingCredential: Web3SigningCredential;
+  keychainId: string;
+  contractName: string;
+  contractAddress: string;
+}
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -101,10 +116,10 @@ const log = LoggerProvider.getOrCreate({
   label: "BUNGEE - Hermes",
 });
 
-let ethereumSigningCredential;
+let ethereumPath: string;
+let ethereumSigningCredential: Web3SigningCredential;
 let ethereumKeychainId: string;
 let ethereumContractAddress: string;
-let ethereumNetworkDetails: EthereumNetworkDetails;
 let ethereumServer: Server;
 let ethereumLedger: GethTestLedger;
 
@@ -145,13 +160,16 @@ beforeAll(async () => {
 });
 
 test("tests bungee api using different strategies", async () => {
+  const pluginRegistry = new PluginRegistry({ logLevel, plugins: [] });
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   pluginBungeeHermesOptions = {
+    pluginRegistry,
     keyPair,
     instanceId: uuidv4(),
     logLevel,
   };
   const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
+  pluginRegistry.add(bungee);
 
   //add strategies to BUNGEE - Hermes
   bungee.addStrategy(FABRIC_STRATEGY, new StrategyFabric("INFO"));
@@ -173,6 +191,15 @@ test("tests bungee api using different strategies", async () => {
     channelName: fabricChannelName,
     contractName: fabricContractName,
     participant: "Org1MSP",
+  };
+
+  const ethereumNetworkDetails: EthereumNetworkDetails = {
+    signingCredential: ethereumSigningCredential,
+    contractName: LockAssetContractJson.contractName,
+    connectorApiPath: ethereumPath,
+    keychainId: ethereumKeychainId,
+    contractAddress: ethereumContractAddress,
+    participant: WHALE_ACCOUNT_ADDRESS,
   };
 
   const expressApp = express();
@@ -755,8 +782,8 @@ async function setupEthereumTestLedger(): Promise<string> {
   };
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
   const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-  const apiConfig = new Configuration({ basePath: apiHost });
+  ethereumPath = `http://${address}:${port}`;
+  const apiConfig = new Configuration({ basePath: ethereumPath });
   const apiClient = new EthereumApi(apiConfig);
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
   const web3 = new Web3(rpcApiHttpHost);
@@ -871,15 +898,6 @@ async function setupEthereumTestLedger(): Promise<string> {
 
   ethereumContractAddress = deployOut.data.transactionReceipt
     .contractAddress as string;
-
-  ethereumNetworkDetails = {
-    signingCredential: ethereumSigningCredential,
-    contractName: LockAssetContractJson.contractName,
-    connectorApiPath: apiHost,
-    keychainId: ethereumKeychainId,
-    contractAddress: ethereumContractAddress,
-    participant: WHALE_ACCOUNT_ADDRESS,
-  };
 
   return "Ethereum Network setup successful";
 }

@@ -76,7 +76,9 @@ let bungeeServer: Server;
 
 let keychainPlugin: PluginKeychainMemory;
 
-beforeAll(async () => {
+let networkDetailsList: BesuNetworkDetails[];
+
+beforeEach(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -238,178 +240,209 @@ beforeAll(async () => {
       .contractAddress as string;
 
     pluginBungeeHermesOptions = {
+      pluginRegistry,
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidv4(),
       logLevel,
     };
   }
+  networkDetailsList = [
+    {
+      signingCredential: bungeeSigningCredential,
+      contractName,
+      connectorApiPath: besuPath,
+      keychainId: bungeeKeychainId,
+      contractAddress: bungeeContractAddress,
+      participant: firstHighNetWorthAccount,
+    } as BesuNetworkDetails,
+    {
+      signingCredential: bungeeSigningCredential,
+      contractName,
+      connector: connector,
+      keychainId: bungeeKeychainId,
+      contractAddress: bungeeContractAddress,
+      participant: firstHighNetWorthAccount,
+    } as BesuNetworkDetails,
+  ];
 });
 
-test("test merging views, and integrated view proofs", async () => {
-  const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
-  const strategy = "BESU";
-  bungee.addStrategy(strategy, new StrategyBesu("INFO"));
-  const networkDetails: BesuNetworkDetails = {
-    signingCredential: bungeeSigningCredential,
-    contractName,
-    connectorApiPath: besuPath,
-    keychainId: bungeeKeychainId,
-    contractAddress: bungeeContractAddress,
-    participant: firstHighNetWorthAccount,
-  };
+test.each([{ apiPath: true }, { apiPath: false }])(
+  //test for both BesuApiPath and BesuConnector
+  "test merging views, and integrated view proofs",
+  async ({ apiPath }) => {
+    let networkDetails: BesuNetworkDetails;
+    if (apiPath) {
+      networkDetails = networkDetailsList[0];
+    } else {
+      networkDetails = networkDetailsList[1];
+    }
+    const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
+    const strategy = "BESU";
+    bungee.addStrategy(strategy, new StrategyBesu("INFO"));
 
-  const snapshot = await bungee.generateSnapshot([], strategy, networkDetails);
-  const view = bungee.generateView(
-    snapshot,
-    "0",
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
-  //expect to return a view
-  expect(view.view).toBeTruthy();
-  expect(view.signature).toBeTruthy();
+    const snapshot = await bungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
+    const view = bungee.generateView(
+      snapshot,
+      "0",
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
+    //expect to return a view
+    expect(view.view).toBeTruthy();
+    expect(view.signature).toBeTruthy();
 
-  //changing BESU_ASSET_ID value
-  const lockAsset = await connector.invokeContract({
-    contractName,
-    keychainId: keychainPlugin.getKeychainId(),
-    invocationType: EthContractInvocationType.Send,
-    methodName: "lockAsset",
-    params: [BESU_ASSET_ID],
-    signingCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: besuKeyPair.privateKey,
-      type: Web3SigningCredentialType.PrivateKeyHex,
-    },
-    gas: 1000000,
-  });
-  expect(lockAsset).not.toBeUndefined();
-  expect(lockAsset.success).toBeTrue();
+    //changing BESU_ASSET_ID value
+    const lockAsset = await connector.invokeContract({
+      contractName,
+      keychainId: keychainPlugin.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "lockAsset",
+      params: [BESU_ASSET_ID],
+      signingCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 1000000,
+    });
+    expect(lockAsset).not.toBeUndefined();
+    expect(lockAsset.success).toBeTrue();
 
-  //creating new asset
-  const new_asset_id = uuidv4();
-  const depNew = await connector.invokeContract({
-    contractName,
-    keychainId: keychainPlugin.getKeychainId(),
-    invocationType: EthContractInvocationType.Send,
-    methodName: "createAsset",
-    params: [new_asset_id, 10],
-    signingCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: besuKeyPair.privateKey,
-      type: Web3SigningCredentialType.PrivateKeyHex,
-    },
-    gas: 1000000,
-  });
-  expect(depNew).not.toBeUndefined();
-  expect(depNew.success).toBeTrue();
+    //creating new asset
+    const new_asset_id = uuidv4();
+    const depNew = await connector.invokeContract({
+      contractName,
+      keychainId: keychainPlugin.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "createAsset",
+      params: [new_asset_id, 10],
+      signingCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 1000000,
+    });
+    expect(depNew).not.toBeUndefined();
+    expect(depNew.success).toBeTrue();
 
-  const snapshot1 = await bungee.generateSnapshot([], strategy, networkDetails);
-  const view2 = bungee.generateView(
-    snapshot1,
-    "0",
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
-  //expect to return a view
-  expect(view2.view).toBeTruthy();
-  expect(view2.signature).toBeTruthy();
+    const snapshot1 = await bungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
+    const view2 = bungee.generateView(
+      snapshot1,
+      "0",
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
+    //expect to return a view
+    expect(view2.view).toBeTruthy();
+    expect(view2.signature).toBeTruthy();
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  bungeeServer = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 3000,
-    server: bungeeServer,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { address, port } = addressInfo;
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    bungeeServer = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "127.0.0.1",
+      port: 3000,
+      server: bungeeServer,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
 
-  await bungee.getOrCreateWebServices();
-  await bungee.registerWebServices(expressApp);
-  const bungeePath = `http://${address}:${port}`;
+    await bungee.getOrCreateWebServices();
+    await bungee.registerWebServices(expressApp);
+    const bungeePath = `http://${address}:${port}`;
 
-  const config = new Configuration({ basePath: bungeePath });
-  const bungeeApi = new BungeeApi(config);
+    const config = new Configuration({ basePath: bungeePath });
+    const bungeeApi = new BungeeApi(config);
 
-  const mergeViewsNoPolicyReq = await bungeeApi.mergeViewsV1({
-    serializedViews: [
-      JSON.stringify({
-        view: JSON.stringify(view.view as View),
-        signature: view.signature,
-      }),
-      // eslint-disable-next-line prettier/prettier
-      JSON.stringify({
-        view: JSON.stringify(view2.view as View),
-        signature: view2.signature,
-      }),
-    ],
-    mergePolicy: MergePolicyOpts.NONE,
-  });
-  expect(mergeViewsNoPolicyReq.status).toBe(200);
+    const mergeViewsNoPolicyReq = await bungeeApi.mergeViewsV1({
+      serializedViews: [
+        JSON.stringify({
+          view: JSON.stringify(view.view as View),
+          signature: view.signature,
+        }),
+        // eslint-disable-next-line prettier/prettier
+        JSON.stringify({
+          view: JSON.stringify(view2.view as View),
+          signature: view2.signature,
+        }),
+      ],
+      mergePolicy: MergePolicyOpts.NONE,
+    });
+    expect(mergeViewsNoPolicyReq.status).toBe(200);
 
-  expect(mergeViewsNoPolicyReq.data.integratedView).toBeTruthy();
-  expect(mergeViewsNoPolicyReq.data.signature).toBeTruthy();
+    expect(mergeViewsNoPolicyReq.data.integratedView).toBeTruthy();
+    expect(mergeViewsNoPolicyReq.data.signature).toBeTruthy();
 
-  const mergeViewsNoPolicy = bungee.mergeViews(
-    [view.view as View, view2.view as View],
-    [view.signature as string, view2.signature as string],
-    MergePolicyOpts.NONE,
-    [],
-  );
-  //1 transaction captured in first view, and 3 in the second
-  expect(mergeViewsNoPolicy.integratedView.getAllTransactions().length).toBe(4);
-  //1 state captured in first view, and 2 in the second
-  expect(mergeViewsNoPolicy.integratedView.getAllStates().length).toBe(3);
+    const mergeViewsNoPolicy = bungee.mergeViews(
+      [view.view as View, view2.view as View],
+      [view.signature as string, view2.signature as string],
+      MergePolicyOpts.NONE,
+      [],
+    );
+    //1 transaction captured in first view, and 3 in the second
+    expect(mergeViewsNoPolicy.integratedView.getAllTransactions().length).toBe(
+      4,
+    );
+    //1 state captured in first view, and 2 in the second
+    expect(mergeViewsNoPolicy.integratedView.getAllStates().length).toBe(3);
 
-  const transactionReceipts: string[] = [];
+    const transactionReceipts: string[] = [];
 
-  mergeViewsNoPolicy.integratedView.getAllTransactions().forEach((t) => {
-    transactionReceipts.push(JSON.stringify(t.getProof()));
-  });
-  expect(
-    (
-      await bungeeApi.verifyMerkleRoot({
-        input: transactionReceipts,
-        root: mergeViewsNoPolicy.integratedView.getIntegratedViewProof()
-          .transactionsMerkleRoot,
-      })
-    ).data.result,
-  ).toBeTrue();
+    mergeViewsNoPolicy.integratedView.getAllTransactions().forEach((t) => {
+      transactionReceipts.push(JSON.stringify(t.getProof()));
+    });
+    expect(
+      (
+        await bungeeApi.verifyMerkleRoot({
+          input: transactionReceipts,
+          root: mergeViewsNoPolicy.integratedView.getIntegratedViewProof()
+            .transactionsMerkleRoot,
+        })
+      ).data.result,
+    ).toBeTrue();
 
-  const mergeViewsWithPolicy = bungee.mergeViews(
-    [view.view as View, view2.view as View],
-    [view.signature as string, view2.signature as string],
-    MergePolicyOpts.PruneState,
-    [BESU_ASSET_ID], //should remove all states related to this asset
-  );
+    const mergeViewsWithPolicy = bungee.mergeViews(
+      [view.view as View, view2.view as View],
+      [view.signature as string, view2.signature as string],
+      MergePolicyOpts.PruneState,
+      [BESU_ASSET_ID], //should remove all states related to this asset
+    );
 
-  //0 transactions captured in first view, and 1 in the second (because of policy)
-  // eslint-disable-next-line prettier/prettier
-  expect(mergeViewsWithPolicy.integratedView.getAllTransactions().length).toBe(
-    1,
-  );
-  //0 state captured in first view, and 1 in the second (because of policy)
-  expect(mergeViewsWithPolicy.integratedView.getAllStates().length).toBe(1);
+    //0 transactions captured in first view, and 1 in the second (because of policy)
+    // eslint-disable-next-line prettier/prettier
+    expect(
+      mergeViewsWithPolicy.integratedView.getAllTransactions().length,
+    ).toBe(1);
+    //0 state captured in first view, and 1 in the second (because of policy)
+    expect(mergeViewsWithPolicy.integratedView.getAllStates().length).toBe(1);
 
-  const mergeViewsWithPolicy2 = bungee.mergeViews(
-    [view.view as View, view2.view as View],
-    [view.signature as string, view2.signature as string],
-    MergePolicyOpts.PruneStateFromView,
-    [BESU_ASSET_ID, view2.view?.getKey() as string], //should remove all states related to this asset
-  );
+    const mergeViewsWithPolicy2 = bungee.mergeViews(
+      [view.view as View, view2.view as View],
+      [view.signature as string, view2.signature as string],
+      MergePolicyOpts.PruneStateFromView,
+      [BESU_ASSET_ID, view2.view?.getKey() as string], //should remove all states related to this asset
+    );
 
-  //1 transactions captured in first view, and 1 in the second (because of policy)
-  // eslint-disable-next-line prettier/prettier
-  expect(mergeViewsWithPolicy2.integratedView.getAllTransactions().length).toBe(
-    2,
-  );
-  //1 state captured in first view, and only 1 in the second (because of policy)
-  expect(mergeViewsWithPolicy2.integratedView.getAllStates().length).toBe(2);
-});
+    //1 transactions captured in first view, and 1 in the second (because of policy)
+    // eslint-disable-next-line prettier/prettier
+    expect(
+      mergeViewsWithPolicy2.integratedView.getAllTransactions().length,
+    ).toBe(2);
+    //1 state captured in first view, and only 1 in the second (because of policy)
+    expect(mergeViewsWithPolicy2.integratedView.getAllStates().length).toBe(2);
+  },
+);
 
-afterAll(async () => {
+afterEach(async () => {
   await Servers.shutdown(besuServer);
   await Servers.shutdown(bungeeServer);
   await besuLedger.stop();

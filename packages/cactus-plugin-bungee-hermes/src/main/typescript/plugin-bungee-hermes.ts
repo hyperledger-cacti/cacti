@@ -48,6 +48,7 @@ import { MergeViewsEndpointV1 } from "./web-services/merge-views-endpoint";
 import { ProcessViewEndpointV1 } from "./web-services/process-view-endpoint";
 
 import { PrivacyPolicies } from "./view-creation/privacy-policies";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 export interface IKeyPair {
   publicKey: Uint8Array;
@@ -56,6 +57,7 @@ export interface IKeyPair {
 
 export interface IPluginBungeeHermesOptions extends ICactusPluginOptions {
   instanceId: string;
+  readonly pluginRegistry: PluginRegistry;
   keyPair?: IKeyPair;
 
   logLevel?: LogLevelDesc;

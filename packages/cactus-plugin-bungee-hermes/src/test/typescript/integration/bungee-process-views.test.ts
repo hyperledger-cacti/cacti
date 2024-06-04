@@ -78,7 +78,9 @@ let bungeeServer: Server;
 
 let keychainPlugin: PluginKeychainMemory;
 
-beforeAll(async () => {
+let networkDetailsList: BesuNetworkDetails[];
+
+beforeEach(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -275,82 +277,108 @@ beforeAll(async () => {
       .contractAddress as string;
 
     pluginBungeeHermesOptions = {
+      pluginRegistry,
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidv4(),
       logLevel,
     };
   }
+  networkDetailsList = [
+    {
+      signingCredential: bungeeSigningCredential,
+      contractName,
+      connectorApiPath: besuPath,
+      keychainId: bungeeKeychainId,
+      contractAddress: bungeeContractAddress,
+      participant: firstHighNetWorthAccount,
+    } as BesuNetworkDetails,
+    {
+      signingCredential: bungeeSigningCredential,
+      contractName,
+      connector: connector,
+      keychainId: bungeeKeychainId,
+      contractAddress: bungeeContractAddress,
+      participant: firstHighNetWorthAccount,
+    } as BesuNetworkDetails,
+  ];
 });
 
-test("test merging views, and integrated view proofs", async () => {
-  const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
-  const strategy = "BESU";
-  bungee.addStrategy(strategy, new StrategyBesu("INFO"));
-  const networkDetails: BesuNetworkDetails = {
-    signingCredential: bungeeSigningCredential,
-    contractName,
-    connectorApiPath: besuPath,
-    keychainId: bungeeKeychainId,
-    contractAddress: bungeeContractAddress,
-    participant: firstHighNetWorthAccount,
-  };
+test.each([{ apiPath: true }, { apiPath: false }])(
+  //test for both BesuApiPath and BesuConnector
+  "test merging views, and integrated view proofs",
+  async ({ apiPath }) => {
+    let networkDetails: BesuNetworkDetails;
+    if (apiPath) {
+      networkDetails = networkDetailsList[0];
+    } else {
+      networkDetails = networkDetailsList[1];
+    }
 
-  const snapshot = await bungee.generateSnapshot([], strategy, networkDetails);
-  const view = bungee.generateView(
-    snapshot,
-    "0",
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
-  //expect to return a view
-  expect(view.view).toBeTruthy();
-  expect(view.signature).toBeTruthy();
+    const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
+    const strategy = "BESU";
+    bungee.addStrategy(strategy, new StrategyBesu("INFO"));
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  bungeeServer = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 3000,
-    server: bungeeServer,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { address, port } = addressInfo;
+    const snapshot = await bungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
+    const view = bungee.generateView(
+      snapshot,
+      "0",
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
+    //expect to return a view
+    expect(view.view).toBeTruthy();
+    expect(view.signature).toBeTruthy();
 
-  await bungee.getOrCreateWebServices();
-  await bungee.registerWebServices(expressApp);
-  const bungeePath = `http://${address}:${port}`;
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    bungeeServer = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "127.0.0.1",
+      port: 3000,
+      server: bungeeServer,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
 
-  const config = new Configuration({ basePath: bungeePath });
-  const bungeeApi = new BungeeApi(config);
+    await bungee.getOrCreateWebServices();
+    await bungee.registerWebServices(expressApp);
+    const bungeePath = `http://${address}:${port}`;
 
-  const processed = await bungeeApi.processViewV1({
-    serializedView: JSON.stringify({
-      view: JSON.stringify(view.view as View),
-      signature: view.signature,
-    }),
-    policyId: PrivacyPolicyOpts.PruneState,
-    policyArguments: [BESU_ASSET_ID],
-  });
+    const config = new Configuration({ basePath: bungeePath });
+    const bungeeApi = new BungeeApi(config);
 
-  expect(processed.status).toBe(200);
-  expect(processed.data.view).toBeTruthy();
-  expect(processed.data.signature).toBeTruthy();
+    const processed = await bungeeApi.processViewV1({
+      serializedView: JSON.stringify({
+        view: JSON.stringify(view.view as View),
+        signature: view.signature,
+      }),
+      policyId: PrivacyPolicyOpts.PruneState,
+      policyArguments: [BESU_ASSET_ID],
+    });
 
-  const processedView = deserializeView(JSON.stringify(processed.data));
+    expect(processed.status).toBe(200);
+    expect(processed.data.view).toBeTruthy();
+    expect(processed.data.signature).toBeTruthy();
 
-  //check view deserializer
-  expect(JSON.stringify(processedView)).toEqual(processed.data.view);
+    const processedView = deserializeView(JSON.stringify(processed.data));
 
-  expect(processedView.getPolicy()).toBeTruthy();
-  expect(processedView.getOldVersionsMetadata().length).toBe(1);
-  expect(processedView.getOldVersionsMetadata()[0].signature).toBe(
-    view.signature,
-  );
-  expect(processedView.getAllTransactions().length).toBe(1);
-});
+    //check view deserializer
+    expect(JSON.stringify(processedView)).toEqual(processed.data.view);
 
-afterAll(async () => {
+    expect(processedView.getPolicy()).toBeTruthy();
+    expect(processedView.getOldVersionsMetadata().length).toBe(1);
+    expect(processedView.getOldVersionsMetadata()[0].signature).toBe(
+      view.signature,
+    );
+    expect(processedView.getAllTransactions().length).toBe(1);
+  },
+);
+
+afterEach(async () => {
   await Servers.shutdown(besuServer);
   await Servers.shutdown(bungeeServer);
   await besuLedger.stop();

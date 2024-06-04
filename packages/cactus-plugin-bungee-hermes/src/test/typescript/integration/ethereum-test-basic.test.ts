@@ -14,9 +14,9 @@ const testLogLevel: LogLevelDesc = "info";
 import "jest-extended";
 import express from "express";
 import bodyParser from "body-parser";
-import http from "http";
 import { v4 as uuidV4 } from "uuid";
 import { AddressInfo } from "net";
+import http, { Server } from "http";
 import { Server as SocketIoServer } from "socket.io";
 import Web3 from "web3";
 
@@ -88,23 +88,16 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
   let bungeeContractAddress: string;
   let pluginBungeeHermesOptions: IPluginBungeeHermesOptions;
   const ETH_ASSET_NAME = uuidV4();
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
 
-  // set to address Type Error returned by Response.json()
-  // "Can't serialize BigInt"
-  expressApp.set("json replacer", stringifyBigIntReplacer);
-
-  const wsApi = new SocketIoServer(server, {
-    path: Constants.SocketIoConnectionPathV1,
-  });
+  let server: Server;
 
   //////////////////////////////////
   // Setup
   //////////////////////////////////
 
-  beforeAll(async () => {
+  let networkDetailsList: EthereumNetworkDetails[];
+
+  beforeEach(async () => {
     pruneDockerAllIfGithubAction({ logLevel: testLogLevel })
       .then(() => {
         log.info("Pruning throw OK");
@@ -119,6 +112,15 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
       containerImageVersion,
     });
     await ledger.start();
+
+    const expressApp = express();
+
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    // set to address Type Error returned by Response.json()
+    // "Can't serialize BigInt"
+    expressApp.set("json replacer", stringifyBigIntReplacer);
+
+    server = http.createServer(expressApp);
 
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
@@ -148,16 +150,21 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
       LockAssetContractJson.contractName,
       JSON.stringify(LockAssetContractJson),
     );
+    const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
     connector = new PluginLedgerConnectorEthereum({
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel: testLogLevel,
-      pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+      pluginRegistry,
     });
 
     // Instantiate connector with the keychain plugin that already has the
     // private key we want to use for one of our tests
     await connector.getOrCreateWebServices();
+    const wsApi = new SocketIoServer(server, {
+      path: Constants.SocketIoConnectionPathV1,
+    });
+
     await connector.registerWebServices(expressApp, wsApi);
 
     const initTransferValue = web3.utils.toWei("5000", "ether");
@@ -228,134 +235,170 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
       .contractAddress as string;
 
     pluginBungeeHermesOptions = {
+      pluginRegistry,
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidV4(),
       logLevel: testLogLevel,
     };
+    networkDetailsList = [
+      {
+        signingCredential: bungeeSigningCredential,
+        contractName: LockAssetContractJson.contractName,
+        connectorApiPath: apiHost,
+        keychainId: bungeeKeychainId,
+        contractAddress: bungeeContractAddress,
+        participant: WHALE_ACCOUNT_ADDRESS,
+      } as EthereumNetworkDetails,
+      {
+        signingCredential: bungeeSigningCredential,
+        contractName: LockAssetContractJson.contractName,
+        connector: connector,
+        keychainId: bungeeKeychainId,
+        contractAddress: bungeeContractAddress,
+        participant: WHALE_ACCOUNT_ADDRESS,
+      } as EthereumNetworkDetails,
+    ];
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
+    await Servers.shutdown(server);
     await ledger.stop();
     await ledger.destroy();
-    await Servers.shutdown(server);
 
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
-    await expect(pruning).resolves.toBeTruthy();
+    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel })
+      .then(() => {
+        log.info("Pruning throw OK");
+      })
+      .catch(async () => {
+        await Containers.logDiagnostics({ logLevel: testLogLevel });
+        fail("Pruning didn't throw OK");
+      });
   });
-  test("test creation of views for different timeframes and states", async () => {
-    const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
-    const strategy = "ETH";
-    bungee.addStrategy(strategy, new StrategyEthereum("INFO"));
-    const networkDetails: EthereumNetworkDetails = {
-      signingCredential: bungeeSigningCredential,
-      contractName: LockAssetContractJson.contractName,
-      connectorApiPath: apiHost,
-      keychainId: bungeeKeychainId,
-      contractAddress: bungeeContractAddress,
-      participant: WHALE_ACCOUNT_ADDRESS,
-    };
+  test.each([{ apiPath: true }, { apiPath: false }])(
+    //test for both EthereumApiPath and EthereumConnector
+    "test creation of views for different timeframes and states",
+    async ({ apiPath }) => {
+      if (!apiPath) {
+        // set to address Type Error returned by Response.json() when using the connector by it self
+        // "Can't serialize BigInt"
+        const originalStringify = JSON.stringify;
+        const mock = jest.spyOn(JSON, "stringify");
+        mock.mockImplementation((value: any) => {
+          return originalStringify(value, stringifyBigIntReplacer);
+        });
+      }
 
-    const snapshot = await bungee.generateSnapshot(
-      [],
-      strategy,
-      networkDetails,
-    );
-    const view = bungee.generateView(
-      snapshot,
-      "0",
-      Number.MAX_SAFE_INTEGER.toString(),
-      undefined,
-    );
-
-    //expect to return a view
-    expect(view.view).toBeTruthy();
-    expect(view.signature).toBeTruthy();
-
-    //expect the view to have capture the new asset ETH_ASSET_NAME, and attributes to match
-    expect(snapshot.getStateBins().length).toEqual(1);
-    expect(snapshot.getStateBins()[0].getId()).toEqual(ETH_ASSET_NAME);
-    expect(snapshot.getStateBins()[0].getTransactions().length).toEqual(1);
-
-    const view1 = bungee.generateView(snapshot, "0", "9999", undefined);
-
-    //expects nothing to limit time of 9999
-    expect(view1.view).toBeUndefined();
-    expect(view1.signature).toBeUndefined();
-
-    //changing ETH_ASSET_NAME value
-    const lockAsset = await apiClient.invokeContractV1({
-      contract: {
-        contractName: LockAssetContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "lockAsset",
-      params: [ETH_ASSET_NAME],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(lockAsset).not.toBeUndefined();
-    expect(lockAsset.status).toBe(200);
-
-    //changing ETH_ASSET_NAME value
-    const new_asset_id = uuidV4();
-    const depNew = await apiClient.invokeContractV1({
-      contract: {
-        contractName: LockAssetContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "createAsset",
-      params: [new_asset_id, 10],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(depNew).not.toBeUndefined();
-    expect(depNew.status).toBe(200);
-
-    const snapshot1 = await bungee.generateSnapshot(
-      [],
-      strategy,
-      networkDetails,
-    );
-    const view2 = bungee.generateView(
-      snapshot1,
-      "0",
-      Number.MAX_SAFE_INTEGER.toString(),
-      undefined,
-    );
-    //expect to return a view
-    expect(view2.view).toBeTruthy();
-    expect(view2.signature).toBeTruthy();
-
-    const stateBins = snapshot1.getStateBins();
-    expect(stateBins.length).toEqual(2); //expect to have captured state for both assets
-
-    const bins = [stateBins[0].getId(), stateBins[1].getId()];
-
-    //checks if values match:
-    //  - new value of ETH_ASSET_NAME state in new snapshot different than value from old snapshot)
-    //  - successfully captured transaction that created the new asset
-    if (bins[0] === ETH_ASSET_NAME) {
-      expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(2);
-      expect(snapshot1.getStateBins()[0].getValue()).not.toEqual(
-        snapshot.getStateBins()[0].getValue(),
+      let networkDetails: EthereumNetworkDetails;
+      if (apiPath) {
+        networkDetails = networkDetailsList[0];
+      } else {
+        networkDetails = networkDetailsList[1];
+      }
+      const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
+      const strategy = "ETH";
+      bungee.addStrategy(strategy, new StrategyEthereum("INFO"));
+      const snapshot = await bungee.generateSnapshot(
+        [],
+        strategy,
+        networkDetails,
       );
-      expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(1);
-    } else {
-      expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(1);
-      expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(2);
-      expect(snapshot1.getStateBins()[1].getValue()).not.toEqual(
-        snapshot.getStateBins()[0].getValue(),
+      const view = bungee.generateView(
+        snapshot,
+        "0",
+        Number.MAX_SAFE_INTEGER.toString(),
+        undefined,
       );
-    }
-  });
+
+      //expect to return a view
+      expect(view.view).toBeTruthy();
+      expect(view.signature).toBeTruthy();
+
+      //expect the view to have capture the new asset ETH_ASSET_NAME, and attributes to match
+      expect(snapshot.getStateBins().length).toEqual(1);
+      expect(snapshot.getStateBins()[0].getId()).toEqual(ETH_ASSET_NAME);
+      expect(snapshot.getStateBins()[0].getTransactions().length).toEqual(1);
+
+      const view1 = bungee.generateView(snapshot, "0", "9999", undefined);
+
+      //expects nothing to limit time of 9999
+      expect(view1.view).toBeUndefined();
+      expect(view1.signature).toBeUndefined();
+
+      //changing ETH_ASSET_NAME value
+      const lockAsset = await apiClient.invokeContractV1({
+        contract: {
+          contractName: LockAssetContractJson.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+        },
+        invocationType: EthContractInvocationType.Send,
+        methodName: "lockAsset",
+        params: [ETH_ASSET_NAME],
+        web3SigningCredential: {
+          ethAccount: WHALE_ACCOUNT_ADDRESS,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
+        },
+      });
+      expect(lockAsset).not.toBeUndefined();
+      expect(lockAsset.status).toBe(200);
+
+      //changing ETH_ASSET_NAME value
+      const new_asset_id = uuidV4();
+      const depNew = await apiClient.invokeContractV1({
+        contract: {
+          contractName: LockAssetContractJson.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+        },
+        invocationType: EthContractInvocationType.Send,
+        methodName: "createAsset",
+        params: [new_asset_id, 10],
+        web3SigningCredential: {
+          ethAccount: WHALE_ACCOUNT_ADDRESS,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
+        },
+      });
+      expect(depNew).not.toBeUndefined();
+      expect(depNew.status).toBe(200);
+
+      const snapshot1 = await bungee.generateSnapshot(
+        [],
+        strategy,
+        networkDetails,
+      );
+      const view2 = bungee.generateView(
+        snapshot1,
+        "0",
+        Number.MAX_SAFE_INTEGER.toString(),
+        undefined,
+      );
+      //expect to return a view
+      expect(view2.view).toBeTruthy();
+      expect(view2.signature).toBeTruthy();
+
+      const stateBins = snapshot1.getStateBins();
+      expect(stateBins.length).toEqual(2); //expect to have captured state for both assets
+
+      const bins = [stateBins[0].getId(), stateBins[1].getId()];
+
+      //checks if values match:
+      //  - new value of ETH_ASSET_NAME state in new snapshot different than value from old snapshot)
+      //  - successfully captured transaction that created the new asset
+      if (bins[0] === ETH_ASSET_NAME) {
+        expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(2);
+        expect(snapshot1.getStateBins()[0].getValue()).not.toEqual(
+          snapshot.getStateBins()[0].getValue(),
+        );
+        expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(1);
+      } else {
+        expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(1);
+        expect(snapshot1.getStateBins()[1].getTransactions().length).toEqual(2);
+        expect(snapshot1.getStateBins()[1].getValue()).not.toEqual(
+          snapshot.getStateBins()[0].getValue(),
+        );
+      }
+    },
+  );
 });
 
 function stringifyBigIntReplacer(key: string, value: bigint): string {

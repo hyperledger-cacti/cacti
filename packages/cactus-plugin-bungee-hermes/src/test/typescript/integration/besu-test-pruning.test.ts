@@ -72,7 +72,9 @@ let bungeeContractAddress: string;
 
 let keychainPlugin: PluginKeychainMemory;
 
-beforeAll(async () => {
+let networkDetailsList: BesuNetworkDetails[];
+
+beforeEach(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -234,89 +236,119 @@ beforeAll(async () => {
       .contractAddress as string;
 
     pluginBungeeHermesOptions = {
+      pluginRegistry,
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidv4(),
       logLevel,
     };
   }
+  networkDetailsList = [
+    {
+      signingCredential: bungeeSigningCredential,
+      contractName,
+      connectorApiPath: besuPath,
+      keychainId: bungeeKeychainId,
+      contractAddress: bungeeContractAddress,
+      participant: firstHighNetWorthAccount,
+    } as BesuNetworkDetails,
+    {
+      signingCredential: bungeeSigningCredential,
+      contractName,
+      connector: connector,
+      keychainId: bungeeKeychainId,
+      contractAddress: bungeeContractAddress,
+      participant: firstHighNetWorthAccount,
+    } as BesuNetworkDetails,
+  ];
 });
 
-test("test creation of views for specific timeframes", async () => {
-  const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
-  const strategy = "BESU";
-  bungee.addStrategy(strategy, new StrategyBesu("INFO"));
-  const netwokDetails: BesuNetworkDetails = {
-    signingCredential: bungeeSigningCredential,
-    contractName,
-    connectorApiPath: besuPath,
-    keychainId: bungeeKeychainId,
-    contractAddress: bungeeContractAddress,
-    participant: firstHighNetWorthAccount,
-  };
+test.each([{ apiPath: true }, { apiPath: false }])(
+  //test for both BesuApiPath and BesuConnector
+  "test creation of views for specific timeframes",
+  async ({ apiPath }) => {
+    let networkDetails: BesuNetworkDetails;
+    if (apiPath) {
+      networkDetails = networkDetailsList[0];
+    } else {
+      networkDetails = networkDetailsList[1];
+    }
+    const bungee = new PluginBungeeHermes(pluginBungeeHermesOptions);
+    const strategy = "BESU";
+    bungee.addStrategy(strategy, new StrategyBesu("INFO"));
 
-  const snapshot = await bungee.generateSnapshot([], strategy, netwokDetails);
-  const view = bungee.generateView(
-    snapshot,
-    "0",
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
+    const snapshot = await bungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
+    const view = bungee.generateView(
+      snapshot,
+      "0",
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
 
-  //expect to return a view
-  expect(view.view).toBeTruthy();
-  expect(view.signature).toBeTruthy();
+    //expect to return a view
+    expect(view.view).toBeTruthy();
+    expect(view.signature).toBeTruthy();
 
-  //expect the view to have capture the new asset BESU_ASSET_ID, and attributes to match
-  expect(snapshot.getStateBins().length).toEqual(1);
-  expect(snapshot.getStateBins()[0].getId()).toEqual(BESU_ASSET_ID);
-  expect(snapshot.getStateBins()[0].getTransactions().length).toEqual(1);
+    //expect the view to have capture the new asset BESU_ASSET_ID, and attributes to match
+    expect(snapshot.getStateBins().length).toEqual(1);
+    expect(snapshot.getStateBins()[0].getId()).toEqual(BESU_ASSET_ID);
+    expect(snapshot.getStateBins()[0].getTransactions().length).toEqual(1);
 
-  //changing BESU_ASSET_ID value
-  const lockAsset = await connector.invokeContract({
-    contractName,
-    keychainId: keychainPlugin.getKeychainId(),
-    invocationType: EthContractInvocationType.Send,
-    methodName: "lockAsset",
-    params: [BESU_ASSET_ID],
-    signingCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: besuKeyPair.privateKey,
-      type: Web3SigningCredentialType.PrivateKeyHex,
-    },
-    gas: 1000000,
-  });
-  expect(lockAsset).not.toBeUndefined();
-  expect(lockAsset.success).toBeTrue();
+    //changing BESU_ASSET_ID value
+    const lockAsset = await connector.invokeContract({
+      contractName,
+      keychainId: keychainPlugin.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "lockAsset",
+      params: [BESU_ASSET_ID],
+      signingCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 1000000,
+    });
+    expect(lockAsset).not.toBeUndefined();
+    expect(lockAsset.success).toBeTrue();
 
-  const snapshot1 = await bungee.generateSnapshot([], strategy, netwokDetails);
+    const snapshot1 = await bungee.generateSnapshot(
+      [],
+      strategy,
+      networkDetails,
+    );
 
-  //tI is the time of the first transaction + 1
-  const tI = (
-    parseInt(snapshot.getStateBins()[0].getTransactions()[0].getTimeStamp()) + 1
-  ).toString();
+    //tI is the time of the first transaction + 1
+    const tI = (
+      parseInt(snapshot.getStateBins()[0].getTransactions()[0].getTimeStamp()) +
+      1
+    ).toString();
 
-  const view1 = bungee.generateView(
-    snapshot1,
-    tI,
-    Number.MAX_SAFE_INTEGER.toString(),
-    undefined,
-  );
+    const view1 = bungee.generateView(
+      snapshot1,
+      tI,
+      Number.MAX_SAFE_INTEGER.toString(),
+      undefined,
+    );
 
-  //expect to return a view
-  expect(view1.view).toBeTruthy();
-  expect(view1.signature).toBeTruthy();
+    //expect to return a view
+    expect(view1.view).toBeTruthy();
+    expect(view1.signature).toBeTruthy();
 
-  expect(snapshot1.getStateBins().length).toEqual(1);
-  expect(snapshot1.getStateBins()[0].getId()).toEqual(BESU_ASSET_ID);
-  //expect the view to not include first transaction (made before tI)
-  expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(1);
-  //expect old and new snapshot state values to differ
-  expect(snapshot1.getStateBins()[0].getValue()).not.toEqual(
-    snapshot.getStateBins()[0].getValue(),
-  );
-});
+    expect(snapshot1.getStateBins().length).toEqual(1);
+    expect(snapshot1.getStateBins()[0].getId()).toEqual(BESU_ASSET_ID);
+    //expect the view to not include first transaction (made before tI)
+    expect(snapshot1.getStateBins()[0].getTransactions().length).toEqual(1);
+    //expect old and new snapshot state values to differ
+    expect(snapshot1.getStateBins()[0].getValue()).not.toEqual(
+      snapshot.getStateBins()[0].getValue(),
+    );
+  },
+);
 
-afterAll(async () => {
+afterEach(async () => {
   await Servers.shutdown(besuServer);
   await besuLedger.stop();
   await besuLedger.destroy();
