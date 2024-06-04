@@ -70,6 +70,62 @@ export interface DeployContractV1Response {
 /**
  * 
  * @export
+ * @interface RunSorobanTransactionRequest
+ */
+export interface RunSorobanTransactionRequest {
+    /**
+     * The ID of the contract that was deployed.
+     * @type {string}
+     * @memberof RunSorobanTransactionRequest
+     */
+    'contractId': string;
+    /**
+     * Array of strings containing the XDR of the contract specification.
+     * @type {Array<string>}
+     * @memberof RunSorobanTransactionRequest
+     */
+    'specXdr': Array<string>;
+    /**
+     * The method to be called on the contract.
+     * @type {string}
+     * @memberof RunSorobanTransactionRequest
+     */
+    'method': string;
+    /**
+     * The arguments to pass to the method.
+     * @type {object}
+     * @memberof RunSorobanTransactionRequest
+     */
+    'methodArgs'?: object | null;
+    /**
+     * 
+     * @type {TransactionInvocation}
+     * @memberof RunSorobanTransactionRequest
+     */
+    'transactionInvocation': TransactionInvocation;
+    /**
+     * Flag indicating if the transaction should be read-only.
+     * @type {boolean}
+     * @memberof RunSorobanTransactionRequest
+     */
+    'readOnly': boolean;
+}
+/**
+ * Response object containing the result of a contract invocation or error information if it failed.
+ * @export
+ * @interface RunSorobanTransactionResponse
+ */
+export interface RunSorobanTransactionResponse {
+    /**
+     * The result of the invoked contract method.
+     * @type {object}
+     * @memberof RunSorobanTransactionResponse
+     */
+    'result'?: object;
+}
+/**
+ * 
+ * @export
  * @interface TransactionHeader
  */
 export interface TransactionHeader {
@@ -242,6 +298,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Executes a Soroban transaction on a stellar ledger
+         * @param {RunSorobanTransactionRequest} [runSorobanTransactionRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runSorobanTransactionV1: async (runSorobanTransactionRequest?: RunSorobanTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(runSorobanTransactionRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -283,6 +373,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @summary Executes a Soroban transaction on a stellar ledger
+         * @param {RunSorobanTransactionRequest} [runSorobanTransactionRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runSorobanTransactionV1(runSorobanTransactionRequest?: RunSorobanTransactionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunSorobanTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runSorobanTransactionV1(runSorobanTransactionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -320,6 +421,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getPrometheusMetricsV1(options?: any): AxiosPromise<string> {
             return localVarFp.getPrometheusMetricsV1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Executes a Soroban transaction on a stellar ledger
+         * @param {RunSorobanTransactionRequest} [runSorobanTransactionRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runSorobanTransactionV1(runSorobanTransactionRequest?: RunSorobanTransactionRequest, options?: any): AxiosPromise<RunSorobanTransactionResponse> {
+            return localVarFp.runSorobanTransactionV1(runSorobanTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -363,6 +474,18 @@ export class DefaultApi extends BaseAPI {
      */
     public getPrometheusMetricsV1(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Executes a Soroban transaction on a stellar ledger
+     * @param {RunSorobanTransactionRequest} [runSorobanTransactionRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public runSorobanTransactionV1(runSorobanTransactionRequest?: RunSorobanTransactionRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).runSorobanTransactionV1(runSorobanTransactionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

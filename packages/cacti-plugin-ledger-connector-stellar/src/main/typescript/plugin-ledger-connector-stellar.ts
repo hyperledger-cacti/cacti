@@ -24,6 +24,8 @@ import {
 import {
   DeployContractV1Request,
   DeployContractV1Response,
+  RunSorobanTransactionRequest,
+  RunSorobanTransactionResponse,
   WatchBlocksV1,
 } from "./generated/openapi/typescript-axios";
 
@@ -35,13 +37,14 @@ import {
 } from "./web-services/get-open-api-spec-v1-endpoint";
 import { NetworkConfig } from "stellar-plus/lib/stellar-plus/network";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { deployContract } from "./core/contract-engine";
+import { deployContract, invokeContract } from "./core/contract-engine";
 import { convertApiTransactionInvocationToStellarPlus } from "./utils";
 import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
+import { RunSorobanTransactionEndpoint } from "./web-services/run-soroban-transaction-endpoint";
 
 export const E_KEYCHAIN_NOT_FOUND =
   "cacti.connector.stellar.keychain_not_found";
@@ -59,8 +62,8 @@ export class PluginLedgerConnectorStellar
     IPluginLedgerConnector<
       DeployContractV1Request,
       DeployContractV1Response,
-      unknown,
-      unknown
+      RunSorobanTransactionRequest,
+      RunSorobanTransactionResponse
     >,
     ICactusPlugin,
     IPluginWebService
@@ -129,8 +132,32 @@ export class PluginLedgerConnectorStellar
     return response;
   }
 
-  public transact(): Promise<unknown> {
-    throw new InternalServerError("Method not implemented.");
+  public async runSorobanTransaction(
+    req: RunSorobanTransactionRequest,
+  ): Promise<RunSorobanTransactionResponse> {
+    const invokeArgs = {
+      ...req,
+      methodArgs: req.methodArgs ?? {},
+      networkConfig: this.networkConfig,
+      readOnly: !!req.readOnly,
+      fnLogPrefix: this.className,
+      txInvocation: convertApiTransactionInvocationToStellarPlus(
+        req.transactionInvocation,
+        this.networkConfig,
+      ),
+    };
+
+    const result =
+      await invokeContract<typeof invokeArgs.methodArgs>(invokeArgs);
+
+    this.prometheusExporter.addCurrentTransaction();
+    return { result } as RunSorobanTransactionResponse;
+  }
+
+  public async transact(
+    req: RunSorobanTransactionRequest,
+  ): Promise<RunSorobanTransactionResponse> {
+    return this.runSorobanTransaction(req);
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
@@ -193,6 +220,13 @@ export class PluginLedgerConnectorStellar
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const endpoint = new DeployContractEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new RunSorobanTransactionEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });

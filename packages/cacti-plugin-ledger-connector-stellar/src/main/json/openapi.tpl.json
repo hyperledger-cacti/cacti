@@ -85,6 +85,68 @@
           }
         }
       },
+
+      "RunSorobanTransactionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "method",
+          "specXdr",
+          "transactionInvocation",
+          "readOnly"
+        ],
+        "properties": {
+          "contractId": {
+            "type": "string",
+            "pattern": "^C[a-zA-Z0-9]{55}$",
+            "nullable": false,
+            "minLength": 56,
+            "maxLength": 56,
+            "description": "The ID of the contract that was deployed."
+          },
+          "specXdr": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": false,
+            "description": "Array of strings containing the XDR of the contract specification."
+          },
+          "method": {
+            "type": "string",
+            "nullable": false,
+            "description": "The method to be called on the contract."
+          },
+          "methodArgs": {
+            "type": "object",
+            "nullable": true,
+            "description": "The arguments to pass to the method."
+          },
+          "transactionInvocation": {
+            "$ref": "#/components/schemas/TransactionInvocation",
+            "nullable": false,
+            "description": "The transaction invocation that will be used to run the contract."
+          },
+          "readOnly": {
+            "type": "boolean",
+            "nullable": false,
+            "description": "Flag indicating if the transaction should be read-only."
+          }
+        }
+      },
+
+      "RunSorobanTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object",
+            "description": "The result of the invoked contract method."
+          }
+        },
+        "description": "Response object containing the result of a contract invocation or error information if it failed."
+      },
+
       "DeployContractV1Request": {
         "type": "object",
         "additionalProperties": false,
@@ -209,6 +271,42 @@
         }
       }
     },
+
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"
+          }
+        },
+        "operationId": "runSorobanTransactionV1",
+        "summary": "Executes a Soroban transaction on a stellar ledger",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunSorobanTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunSorobanTransactionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {
