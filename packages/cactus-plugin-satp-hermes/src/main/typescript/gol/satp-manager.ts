@@ -5,6 +5,8 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+import { Stage0SATPHandler } from "../core/stage-handlers/stage0-handler";
+import { Stage0ServerService } from "../core/stage-services/server/stage0-server-service";
 
 import { Stage1SATPHandler } from "../core/stage-handlers/stage1-handler";
 import { Stage1ServerService } from "../core/stage-services/server/stage1-server-service";
@@ -12,6 +14,7 @@ import { Stage2ServerService } from "../core/stage-services/server/stage2-server
 import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../core/satp-session";
 import { SupportedChain } from "../core/types";
+import { Stage0ClientService } from "../core/stage-services/client/stage0-client-service";
 import { Stage1ClientService } from "../core/stage-services/client/stage1-client-service";
 import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
 import { Stage3ClientService } from "../core/stage-services/client/stage3-client-service";
@@ -66,12 +69,15 @@ export class SATPManager {
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
+      Stage0SATPHandler,
       Stage1SATPHandler,
       Stage2SATPHandler,
       Stage3SATPHandler,
     ];
 
     const serviceClasses = [
+      Stage0ServerService,
+      Stage0ClientService,
       Stage1ServerService,
       Stage1ClientService,
       Stage2ServerService,
