@@ -15,6 +15,10 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.CactiBlockFullEventV1
+import org.openapitools.client.models.CactiBlockFullResponseV1
+import org.openapitools.client.models.CactiBlockTransactionEventV1
+import org.openapitools.client.models.CactiBlockTransactionsResponseV1
 import org.openapitools.client.models.GetBlockResponseDecodedV1
 import org.openapitools.client.models.GetBlockResponseEncodedV1
 
@@ -24,12 +28,21 @@ import com.squareup.moshi.JsonClass
 /**
  * Response from GetBlock endpoint.
  *
+ * @param cactiTransactionsEvents List of transactions summary
+ * @param cactiFullEvents 
  * @param decodedBlock Full hyperledger fabric block data.
  * @param encodedBlock 
  */
 
 
 data class GetBlockResponseV1 (
+
+    /* List of transactions summary */
+    @Json(name = "cactiTransactionsEvents")
+    val cactiTransactionsEvents: kotlin.collections.List<CactiBlockTransactionEventV1>,
+
+    @Json(name = "cactiFullEvents")
+    val cactiFullEvents: CactiBlockFullEventV1,
 
     /* Full hyperledger fabric block data. */
     @Json(name = "decodedBlock")

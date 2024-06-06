@@ -23,6 +23,7 @@ import {
   FabricApiClient,
   GetBlockResponseV1,
   RunTransactionResponseType,
+  GetBlockResponseTypeV1,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
 import PostgresDatabaseClient from "./db-client/db-client";
@@ -416,7 +417,7 @@ export class PluginPersistenceFabric
         query: {
           blockNumber,
         },
-        skipDecode: false,
+        responseType: GetBlockResponseTypeV1.Full,
       });
 
     const tempBlockParse = block.data;
