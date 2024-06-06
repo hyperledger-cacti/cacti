@@ -16,7 +16,7 @@ import { GetStatusEndpointV1 } from "../web-services/status-endpoint";
 import {
   StatusRequest,
   StatusResponse,
-} from "../generated/gateway-client/typescript-axios";
+} from "../generated/gateway-client/typescript-axios/api";
 import { ExecuteGetStatus } from "./admin/get-status-handler-service";
 import { ISATPManagerOptions, SATPManager } from "../gol/satp-manager";
 import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
