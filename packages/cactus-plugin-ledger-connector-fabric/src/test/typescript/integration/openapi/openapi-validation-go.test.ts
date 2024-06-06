@@ -21,8 +21,6 @@ import {
   DeployContractGoSourceV1Request,
 } from "../../../../main/typescript/public-api";
 
-import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
-
 import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api";
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
@@ -127,67 +125,11 @@ test(testCase, async (t: Test) => {
   const apiClient = new FabricApi(config);
 
   const fDeployGo = "deployContractGoSourceV1";
-  const cOk = "without bad request error";
   const cWithoutParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
 
-  test.skip(`${testCase} - ${fDeployGo} - ${cOk}`, async (t2: Test) => {
-    const parameters = {
-      targetPeerAddresses: ["peer0.org1.example.com:7051"],
-      tlsRootCertFiles:
-        "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
-      policyDslSource: "AND('Org1MSP.member','Org2MSP.member')",
-      channelId: "mychannel",
-      chainCodeVersion: "1.0.0",
-      constructorArgs: { Args: ["john", "99"] },
-      goSource: {
-        body: Buffer.from(HELLO_WORLD_CONTRACT_GO_SOURCE).toString("base64"),
-        filename: "hello-world.go",
-      },
-      moduleName: "hello-world",
-      targetOrganizations: [org1Env, org2Env],
-      pinnedDeps: [
-        "github.com/Knetic/govaluate@v3.0.0+incompatible",
-        "github.com/Shopify/sarama@v1.27.0",
-        "github.com/fsouza/go-dockerclient@v1.6.5",
-        "github.com/grpc-ecosystem/go-grpc-middleware@v1.2.1",
-        "github.com/hashicorp/go-version@v1.2.1",
-        "github.com/hyperledger/fabric@v1.4.8",
-        "github.com/hyperledger/fabric-amcl@v0.0.0-20200424173818-327c9e2cf77a",
-        "github.com/miekg/pkcs11@v1.0.3",
-        "github.com/mitchellh/mapstructure@v1.3.3",
-        "github.com/onsi/ginkgo@v1.14.1",
-        "github.com/onsi/gomega@v1.10.2",
-        "github.com/op/go-logging@v0.0.0-20160315200505-970db520ece7",
-        "github.com/pkg/errors@v0.9.1",
-        "github.com/spf13/viper@v1.7.1",
-        "github.com/stretchr/testify@v1.6.1",
-        "github.com/sykesm/zap-logfmt@v0.0.3",
-        "go.uber.org/zap@v1.16.0",
-        "golang.org/x/crypto@v0.0.0-20200820211705-5c72a883971a",
-        "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
-        "google.golang.org/grpc@v1.31.1",
-      ],
-    };
-
-    const res = await apiClient.deployContractGoSourceV1(parameters);
-
-    t2.equal(
-      res.status,
-      200,
-      `Endpoint ${fDeployGo}: response.status === 200 OK`,
-    );
-    t2.true(
-      res.data.success,
-      "deployContractGoSourceV1 res.data.success === true",
-    );
-
-    t2.end();
-  });
-
   test(`${testCase} - ${fDeployGo} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
-      // targetPeerAddresses: ["peer0.org1.example.com:7051"],
       tlsRootCertFiles:
         "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
       policyDslSource: "AND('Org1MSP.member','Org2MSP.member')",
@@ -195,7 +137,7 @@ test(testCase, async (t: Test) => {
       chainCodeVersion: "1.0.0",
       constructorArgs: { Args: ["john", "99"] },
       goSource: {
-        body: Buffer.from(HELLO_WORLD_CONTRACT_GO_SOURCE).toString("base64"),
+        body: Buffer.from("some go source code").toString("base64"),
         filename: "hello-world.go",
       },
       moduleName: "hello-world",
@@ -256,7 +198,7 @@ test(testCase, async (t: Test) => {
       chainCodeVersion: "1.0.0",
       constructorArgs: { Args: ["john", "99"] },
       goSource: {
-        body: Buffer.from(HELLO_WORLD_CONTRACT_GO_SOURCE).toString("base64"),
+        body: Buffer.from("some go source code").toString("base64"),
         filename: "hello-world.go",
       },
       moduleName: "hello-world",

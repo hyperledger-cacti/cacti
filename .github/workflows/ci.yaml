@@ -2297,13 +2297,6 @@ jobs:
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
   
-  ghcr-fabric-all-in-one:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
-      
   ghcr-fabric2-all-in-one:
     runs-on: ubuntu-22.04
     steps:

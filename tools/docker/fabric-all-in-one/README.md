@@ -12,10 +12,6 @@ An all in one fabric docker image with the `fabric-samples` repo fully embedded.
 From the project root:
 
 ```sh
-# Fabric 1.4.X
-DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x -t faio14x
-docker run --detach --privileged --publish-all --name faio14x-testnet faio14x
-
 # Fabric 2.X
 DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t faio2x
 docker run --detach --privileged --publish-all --name faio2x-testnet faio2x
@@ -37,11 +33,6 @@ Example `.vscode/tasks.json` file for building/running the image:
 {
   "version": "2.0.0",
   "tasks": [
-    {
-      "label": "Docker - BUILD and TAG: 1.4.x",
-      "type": "shell",
-      "command": "docker build . -f Dockerfile_v1.4.x -t hyperledger/cactus-fabric-all-in-one:1.4.8"
-    },
     {
       "label": "Docker - BUILD and TAG: 2.x",
       "type": "shell",
@@ -78,28 +69,9 @@ docker cp db676059b79e:/etc/hyperledger/cactus/fabric-aio-image.key ./fabric-aio
 ssh root@localhost -p 32924 -i fabric-aio-image.key
 ```
 
-```sh
-DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x  -t faio14x
-docker run --detach --privileged --publish-all --env FABRIC_VERSION=1.4.8 faio14x
-
-docker ps
-
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                            PORTS                                                                                                                                                                                                                                                                                                                                                                                  NAMES
-c09eb94d94d3        faio14x             "/usr/bin/supervisor…"   5 seconds ago       Up 4 seconds (health: starting)   0.0.0.0:32990->22/tcp, 0.0.0.0:32989->2375/tcp, 0.0.0.0:32988->2376/tcp, 0.0.0.0:32987->5984/tcp, 0.0.0.0:32986->6984/tcp, 0.0.0.0:32985->7050/tcp, 0.0.0.0:32984->7051/tcp, 0.0.0.0:32983->7054/tcp, 0.0.0.0:32982->7984/tcp, 0.0.0.0:32981->8051/tcp, 0.0.0.0:32980->8054/tcp, 0.0.0.0:32979->8984/tcp, 0.0.0.0:32978->9001/tcp, 0.0.0.0:32977->9051/tcp, 0.0.0.0:32976->10051/tcp   funny_jepsen
-
-
-docker cp c09eb94d94d3:/etc/hyperledger/cactus/fabric-aio-image.key ./fabric-aio-image.key
-ssh root@localhost -p 32990 -i fabric-aio-image.key
-```
 
 ### Running Fabric CLI Container Commands
 
-For Fabric 1.4.x
-
-```sh
-$ docker exec -it --workdir /fabric-samples/fabcar/ dindy docker exec cli peer chaincode query --channelID mychannel --name fabcar --ctor '{"Args": [], "Function": "queryAllCars"}'
-[{"Key":"CAR0", "Record":{"colour":"blue","make":"Toyota","model":"Prius","owner":"Tom"}},{"Key":"CAR1", "Record":{"colour":"red","make":"Ford","model":"Mustang","owner":"Brad"}},{"Key":"CAR2", "Record":{"colour":"green","make":"Hyundai","model":"Tucson","owner":"Jin Soo"}},{"Key":"CAR3", "Record":{"colour":"yellow","make":"Volkswagen","model":"Passat","owner":"Max"}},{"Key":"CAR4", "Record":{"colour":"black","make":"Tesla","model":"S","owner":"Adriana"}},{"Key":"CAR5", "Record":{"colour":"purple","make":"Peugeot","model":"205","owner":"Michel"}},{"Key":"CAR6", "Record":{"colour":"white","make":"Chery","model":"S22L","owner":"Aarav"}},{"Key":"CAR7", "Record":{"colour":"violet","make":"Fiat","model":"Punto","owner":"Pari"}},{"Key":"CAR8", "Record":{"colour":"indigo","make":"Tata","model":"Nano","owner":"Valeria"}},{"Key":"CAR9", "Record":{"colour":"brown","make":"Holden","model":"Barina","owner":"Shotaro"}}]
-```
 
 For Fabric 2.x
 
