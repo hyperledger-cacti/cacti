@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { PreTransferVerificationAndContextEstablishmentRequest, PreTransferVerificationAndContextEstablishmentResponse } from "./stage_0_pb.js";
+import { PreTransferCommenceRequestMessage, PreTransferCommenceResponseMessage, PreTransferVerificationAndContextEstablishmentRequest, PreTransferVerificationAndContextEstablishmentResponse } from "./stage_0_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -17,12 +17,21 @@ export const SatpStage0Service = {
     /**
      * step RPCs
      *
-     * @generated from rpc cacti.satp.v02.SatpStage0Service.TransferProposalClaims
+     * @generated from rpc cacti.satp.v02.SatpStage0Service.PreTransferProposalClaims
      */
-    transferProposalClaims: {
-      name: "TransferProposalClaims",
+    preTransferProposalClaims: {
+      name: "PreTransferProposalClaims",
       I: PreTransferVerificationAndContextEstablishmentRequest,
       O: PreTransferVerificationAndContextEstablishmentResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cacti.satp.v02.SatpStage0Service.PreTransferCommence
+     */
+    preTransferCommence: {
+      name: "PreTransferCommence",
+      I: PreTransferCommenceRequestMessage,
+      O: PreTransferCommenceResponseMessage,
       kind: MethodKind.Unary,
     },
   }

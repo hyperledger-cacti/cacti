@@ -42,80 +42,110 @@ export enum MessageType {
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_INIT_PROPOSAL = 1;
+   * @generated from enum value: MESSAGE_TYPE_PRE_INIT_PROPOSAL = 1;
    */
-  INIT_PROPOSAL = 1,
+  PRE_INIT_PROPOSAL = 1,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_INIT_RECEIPT = 2;
+   * @generated from enum value: MESSAGE_TYPE_PRE_INIT_RECEIPT = 2;
    */
-  INIT_RECEIPT = 2,
+  PRE_INIT_RECEIPT = 2,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_INIT_REJECT = 3;
+   * @generated from enum value: MESSAGE_TYPE_PRE_INIT_REJECT = 3;
    */
-  INIT_REJECT = 3,
+  PRE_INIT_REJECT = 3,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 4;
+   * @generated from enum value: MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_REQUEST = 4;
    */
-  TRANSFER_COMMENCE_REQUEST = 4,
+  PRE_TRANSFER_COMMENCE_REQUEST = 4,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 5;
+   * @generated from enum value: MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_RESPONSE = 5;
    */
-  TRANSFER_COMMENCE_RESPONSE = 5,
+  PRE_TRANSFER_COMMENCE_RESPONSE = 5,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_LOCK_ASSERT = 6;
+   * @generated from enum value: MESSAGE_TYPE_INIT_PROPOSAL = 6;
    */
-  LOCK_ASSERT = 6,
+  INIT_PROPOSAL = 6,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_ASSERTION_RECEIPT = 7;
+   * @generated from enum value: MESSAGE_TYPE_INIT_RECEIPT = 7;
    */
-  ASSERTION_RECEIPT = 7,
+  INIT_RECEIPT = 7,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_COMMIT_PREPARE = 8;
+   * @generated from enum value: MESSAGE_TYPE_INIT_REJECT = 8;
    */
-  COMMIT_PREPARE = 8,
+  INIT_REJECT = 8,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_COMMIT_READY = 9;
+   * @generated from enum value: MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 9;
    */
-  COMMIT_READY = 9,
+  TRANSFER_COMMENCE_REQUEST = 9,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_COMMIT_FINAL = 10;
+   * @generated from enum value: MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 10;
    */
-  COMMIT_FINAL = 10,
+  TRANSFER_COMMENCE_RESPONSE = 10,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_ACK_COMMIT_FINAL = 11;
+   * @generated from enum value: MESSAGE_TYPE_LOCK_ASSERT = 11;
    */
-  ACK_COMMIT_FINAL = 11,
+  LOCK_ASSERT = 11,
 
   /**
-   * @generated from enum value: MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 12;
+   * @generated from enum value: MESSAGE_TYPE_ASSERTION_RECEIPT = 12;
    */
-  COMMIT_TRANSFER_COMPLETE = 12,
+  ASSERTION_RECEIPT = 12,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_COMMIT_PREPARE = 13;
+   */
+  COMMIT_PREPARE = 13,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_COMMIT_READY = 14;
+   */
+  COMMIT_READY = 14,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_COMMIT_FINAL = 15;
+   */
+  COMMIT_FINAL = 15,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_ACK_COMMIT_FINAL = 16;
+   */
+  ACK_COMMIT_FINAL = 16,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;
+   */
+  COMMIT_TRANSFER_COMPLETE = 17,
 }
 // Retrieve enum metadata with: proto3.getEnumType(MessageType)
 proto3.util.setEnumType(MessageType, "cacti.satp.v02.common.MessageType", [
   { no: 0, name: "MESSAGE_TYPE_UNSPECIFIED" },
-  { no: 1, name: "MESSAGE_TYPE_INIT_PROPOSAL" },
-  { no: 2, name: "MESSAGE_TYPE_INIT_RECEIPT" },
-  { no: 3, name: "MESSAGE_TYPE_INIT_REJECT" },
-  { no: 4, name: "MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST" },
-  { no: 5, name: "MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE" },
-  { no: 6, name: "MESSAGE_TYPE_LOCK_ASSERT" },
-  { no: 7, name: "MESSAGE_TYPE_ASSERTION_RECEIPT" },
-  { no: 8, name: "MESSAGE_TYPE_COMMIT_PREPARE" },
-  { no: 9, name: "MESSAGE_TYPE_COMMIT_READY" },
-  { no: 10, name: "MESSAGE_TYPE_COMMIT_FINAL" },
-  { no: 11, name: "MESSAGE_TYPE_ACK_COMMIT_FINAL" },
-  { no: 12, name: "MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE" },
+  { no: 1, name: "MESSAGE_TYPE_PRE_INIT_PROPOSAL" },
+  { no: 2, name: "MESSAGE_TYPE_PRE_INIT_RECEIPT" },
+  { no: 3, name: "MESSAGE_TYPE_PRE_INIT_REJECT" },
+  { no: 4, name: "MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_REQUEST" },
+  { no: 5, name: "MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_RESPONSE" },
+  { no: 6, name: "MESSAGE_TYPE_INIT_PROPOSAL" },
+  { no: 7, name: "MESSAGE_TYPE_INIT_RECEIPT" },
+  { no: 8, name: "MESSAGE_TYPE_INIT_REJECT" },
+  { no: 9, name: "MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST" },
+  { no: 10, name: "MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE" },
+  { no: 11, name: "MESSAGE_TYPE_LOCK_ASSERT" },
+  { no: 12, name: "MESSAGE_TYPE_ASSERTION_RECEIPT" },
+  { no: 13, name: "MESSAGE_TYPE_COMMIT_PREPARE" },
+  { no: 14, name: "MESSAGE_TYPE_COMMIT_READY" },
+  { no: 15, name: "MESSAGE_TYPE_COMMIT_FINAL" },
+  { no: 16, name: "MESSAGE_TYPE_ACK_COMMIT_FINAL" },
+  { no: 17, name: "MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE" },
 ]);
 
 /**
