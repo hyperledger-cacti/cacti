@@ -8,6 +8,49 @@ import { Message, proto3 } from "@bufbuild/protobuf";
 import { CommonSatp, TransferClaims } from "./common/message_pb.js";
 
 /**
+ * @generated from message cacti.satp.v02.PrivacyPolicy
+ */
+export class PrivacyPolicy extends Message<PrivacyPolicy> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: repeated string arguments = 2;
+   */
+  arguments: string[] = [];
+
+  constructor(data?: PartialMessage<PrivacyPolicy>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.PrivacyPolicy";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "arguments", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PrivacyPolicy {
+    return new PrivacyPolicy().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PrivacyPolicy {
+    return new PrivacyPolicy().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PrivacyPolicy {
+    return new PrivacyPolicy().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PrivacyPolicy | PlainMessage<PrivacyPolicy> | undefined, b: PrivacyPolicy | PlainMessage<PrivacyPolicy> | undefined): boolean {
+    return proto3.util.equals(PrivacyPolicy, a, b);
+  }
+}
+
+/**
  * @generated from message cacti.satp.v02.PreTransferVerificationAndContextEstablishmentRequest
  */
 export class PreTransferVerificationAndContextEstablishmentRequest extends Message<PreTransferVerificationAndContextEstablishmentRequest> {
@@ -17,11 +60,21 @@ export class PreTransferVerificationAndContextEstablishmentRequest extends Messa
   context?: CommonSatp;
 
   /**
-   * todo other fields
+   * needed ?
    *
-   * @generated from field: cacti.satp.v02.common.TransferClaims transferClaims = 2;
+   * @generated from field: cacti.satp.v02.common.TransferClaims transfer_claims = 2;
    */
   transferClaims?: TransferClaims;
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy processPolicies = 3;
+   */
+  processPolicies: PrivacyPolicy[] = [];
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy mergePolicies = 4;
+   */
+  mergePolicies: PrivacyPolicy[] = [];
 
   constructor(data?: PartialMessage<PreTransferVerificationAndContextEstablishmentRequest>) {
     super();
@@ -32,7 +85,9 @@ export class PreTransferVerificationAndContextEstablishmentRequest extends Messa
   static readonly typeName = "cacti.satp.v02.PreTransferVerificationAndContextEstablishmentRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "context", kind: "message", T: CommonSatp },
-    { no: 2, name: "transferClaims", kind: "message", T: TransferClaims },
+    { no: 2, name: "transfer_claims", kind: "message", T: TransferClaims },
+    { no: 3, name: "processPolicies", kind: "message", T: PrivacyPolicy, repeated: true },
+    { no: 4, name: "mergePolicies", kind: "message", T: PrivacyPolicy, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferVerificationAndContextEstablishmentRequest {
@@ -58,6 +113,31 @@ export class PreTransferVerificationAndContextEstablishmentRequest extends Messa
  * @generated from message cacti.satp.v02.PreTransferVerificationAndContextEstablishmentResponse
  */
 export class PreTransferVerificationAndContextEstablishmentResponse extends Message<PreTransferVerificationAndContextEstablishmentResponse> {
+  /**
+   * @generated from field: cacti.satp.v02.common.CommonSatp context = 1;
+   */
+  context?: CommonSatp;
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy processPolicies_counter_proposal = 2;
+   */
+  processPoliciesCounterProposal: PrivacyPolicy[] = [];
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy mergePolicies_counter_proposal = 3;
+   */
+  mergePoliciesCounterProposal: PrivacyPolicy[] = [];
+
+  /**
+   * @generated from field: string hash_pre_transfer_verification_and_context = 4;
+   */
+  hashPreTransferVerificationAndContext = "";
+
+  /**
+   * @generated from field: string timestamp = 5;
+   */
+  timestamp = "";
+
   constructor(data?: PartialMessage<PreTransferVerificationAndContextEstablishmentResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -66,6 +146,11 @@ export class PreTransferVerificationAndContextEstablishmentResponse extends Mess
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.PreTransferVerificationAndContextEstablishmentResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "context", kind: "message", T: CommonSatp },
+    { no: 2, name: "processPolicies_counter_proposal", kind: "message", T: PrivacyPolicy, repeated: true },
+    { no: 3, name: "mergePolicies_counter_proposal", kind: "message", T: PrivacyPolicy, repeated: true },
+    { no: 4, name: "hash_pre_transfer_verification_and_context", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferVerificationAndContextEstablishmentResponse {
@@ -82,6 +167,92 @@ export class PreTransferVerificationAndContextEstablishmentResponse extends Mess
 
   static equals(a: PreTransferVerificationAndContextEstablishmentResponse | PlainMessage<PreTransferVerificationAndContextEstablishmentResponse> | undefined, b: PreTransferVerificationAndContextEstablishmentResponse | PlainMessage<PreTransferVerificationAndContextEstablishmentResponse> | undefined): boolean {
     return proto3.util.equals(PreTransferVerificationAndContextEstablishmentResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.PreTransferCommenceRequestMessage
+ */
+export class PreTransferCommenceRequestMessage extends Message<PreTransferCommenceRequestMessage> {
+  /**
+   * @generated from field: cacti.satp.v02.common.CommonSatp common = 1;
+   */
+  common?: CommonSatp;
+
+  /**
+   * @generated from field: string hash_pre_transfer_verification_and_context = 2;
+   */
+  hashPreTransferVerificationAndContext = "";
+
+  /**
+   * @generated from field: string client_transfer_number = 3;
+   */
+  clientTransferNumber = "";
+
+  constructor(data?: PartialMessage<PreTransferCommenceRequestMessage>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.PreTransferCommenceRequestMessage";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "common", kind: "message", T: CommonSatp },
+    { no: 2, name: "hash_pre_transfer_verification_and_context", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferCommenceRequestMessage {
+    return new PreTransferCommenceRequestMessage().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreTransferCommenceRequestMessage {
+    return new PreTransferCommenceRequestMessage().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreTransferCommenceRequestMessage {
+    return new PreTransferCommenceRequestMessage().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreTransferCommenceRequestMessage | PlainMessage<PreTransferCommenceRequestMessage> | undefined, b: PreTransferCommenceRequestMessage | PlainMessage<PreTransferCommenceRequestMessage> | undefined): boolean {
+    return proto3.util.equals(PreTransferCommenceRequestMessage, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.PreTransferCommenceResponseMessage
+ */
+export class PreTransferCommenceResponseMessage extends Message<PreTransferCommenceResponseMessage> {
+  /**
+   * @generated from field: cacti.satp.v02.common.CommonSatp common = 1;
+   */
+  common?: CommonSatp;
+
+  constructor(data?: PartialMessage<PreTransferCommenceResponseMessage>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.PreTransferCommenceResponseMessage";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "common", kind: "message", T: CommonSatp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferCommenceResponseMessage {
+    return new PreTransferCommenceResponseMessage().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreTransferCommenceResponseMessage {
+    return new PreTransferCommenceResponseMessage().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreTransferCommenceResponseMessage {
+    return new PreTransferCommenceResponseMessage().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreTransferCommenceResponseMessage | PlainMessage<PreTransferCommenceResponseMessage> | undefined, b: PreTransferCommenceResponseMessage | PlainMessage<PreTransferCommenceResponseMessage> | undefined): boolean {
+    return proto3.util.equals(PreTransferCommenceResponseMessage, a, b);
   }
 }
 
