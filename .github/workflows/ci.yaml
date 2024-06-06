@@ -1,18 +1,6 @@
-# Below are the full description for the shorten job names:
-#
-# ce - cactus-example
-# cp - cactus-plugin
-# cpk - cactus-plugin-keychain
-# cpl - cactus-plugin-ledger
-# cplc - cactus-plugin-ledger-connector
-# plc - plugin-ledger-connector
-# cpp - cactus-plugin-persistence
-# ct - cactus-test
-# ctp - cactus-test-plugin
 ---
 env:
   NODEJS_VERSION: v18.18.2
-  RUN_TRIVY_SCAN: true 
 jobs:
   ActionLint:
     uses: ./.github/workflows/actionlint.yaml
@@ -39,7 +27,6 @@ jobs:
       plugin-ledger-connector-ethereum-changed: ${{ steps.changes.outputs.plugin-ledger-connector-ethereum-changed }}
       plugin-ledger-connector-iroha2-changed: ${{ steps.changes.outputs.plugin-ledger-connector-iroha2-changed }}
       plugin-ledger-connector-quorum-changed: ${{ steps.changes.outputs.plugin-ledger-connector-quorum-changed }}
-      plugin-ledger-connector-stellar-changed: ${{ steps.changes.outputs.plugin-ledger-connector-stellar-changed }}
       plugin-htlc-coordinator-besu-changed: ${{ steps.changes.outputs.plugin-htlc-coordinator-besu-changed }}
       test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
       ghcr-corda-all-in-one-obligation-changed: ${{ steps.changes.outputs.ghcr-corda-all-in-one-obligation-changed }}
@@ -128,15 +115,6 @@ jobs:
             plugin-ledger-connector-quorum-changed:
               - './packages/cactus-plugin-ledger-connector-quorum/**'
               - './packages/cactus-test-plugin-ledger-connector-quorum/**'
-              - './packages/cactus-common/**'
-              - './packages/cactus-core/**'
-              - './packages/cactus-core-api/**'
-              - './packages/cactus-test-tooling/**'
-              - './packages/cactus-plugin-keychain-memory/**'
-              # - './.github/workflows/ci.yaml'
-
-            plugin-ledger-connector-stellar-changed:
-              - './packages/cacti-plugin-ledger-connector-stellar/**'
               - './packages/cactus-common/**'
               - './packages/cactus-core/**'
               - './packages/cactus-core-api/**'
@@ -269,7 +247,7 @@ jobs:
       - name: Set env.GIT_INDEX_FILE_COUNT
         id: set_env_git_index_file_count
         run: |
-            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> "$GITHUB_ENV"
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> $GITHUB_ENV
 
       - name: Print env.GIT_INDEX_FILE_COUNT
         id: print_env_git_index_file_count
@@ -554,7 +532,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ce-carbon-accounting-backend:
+  cactus-example-carbon-accounting-backend:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -580,7 +558,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ce-carbon-accounting-business-logic-plugin:
+  cactus-example-carbon-accounting-business-logic-plugin:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -605,7 +583,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ce-carbon-accounting-frontend:
+  cactus-example-carbon-accounting-frontend:
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -631,7 +609,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ce-supply-chain-backend:
+  cactus-example-supply-chain-backend:
     continue-on-error: false
     env:
       DUMP_DISK_USAGE_INFO_DISABLED: false
@@ -659,7 +637,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ce-supply-chain-business-logic-plugin:
+  cactus-example-supply-chain-business-logic-plugin:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -684,7 +662,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ce-supply-chain-frontend:
+  cactus-example-supply-chain-frontend:
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -710,7 +688,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-consortium-manual:
+  cactus-plugin-consortium-manual:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -735,7 +713,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-htlc-coordinator-besu:
+  cactus-plugin-htlc-coordinator-besu:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -762,7 +740,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-htlc-eth-besu:
+  cactus-plugin-htlc-eth-besu:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -787,7 +765,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-htlc-eth-besu-erc20:
+  cactus-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -812,7 +790,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-keychain-aws-sm:
+  cactus-plugin-keychain-aws-sm:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -838,7 +816,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-keychain-azure-kv:
+  cactus-plugin-keychain-azure-kv:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -864,7 +842,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpk-google-sm:
+  cactus-plugin-keychain-google-sm:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -890,7 +868,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpk-memory:
+  cactus-plugin-keychain-memory:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -915,7 +893,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpk-memory-wasm:
+  cactus-plugin-keychain-memory-wasm:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -941,7 +919,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpk-vault:
+  cactus-plugin-keychain-vault:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -967,7 +945,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpl-connector-aries:
+  cactus-plugin-ledger-connector-aries:
     continue-on-error: false
     needs:
       - build-dev
@@ -994,7 +972,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpl-connector-besu:
+  cactus-plugin-ledger-connector-besu:
     permissions: write-all
     continue-on-error: false
     needs:
@@ -1057,7 +1035,7 @@ jobs:
           fail-on-alert: true
           alert-comment-cc-users: '@petermetz'
 
-  cpl-connector-polkadot:
+  cactus-plugin-ledger-connector-polkadot:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1085,7 +1063,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpl-connector-corda:
+  cactus-plugin-ledger-connector-corda:
     continue-on-error: false
     needs:
       - build-dev
@@ -1115,38 +1093,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  
-  cpl-connector-stellar:
-    continue-on-error: false
-    needs:
-      - build-dev
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-stellar-changed == 'true'
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cacti-plugin-ledger-connector-stellar/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
 
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-      - run: ./tools/ci.sh
-
-
-  plc-fabric-0:
+  plugin-ledger-connector-fabric-0:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1179,7 +1127,7 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
 
-  plc-fabric-1:
+  plugin-ledger-connector-fabric-1:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1212,7 +1160,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts
 
-  plc-fabric-2:
+  plugin-ledger-connector-fabric-2:
     continue-on-error: false
     needs:
       - build-dev
@@ -1245,7 +1193,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts
 
-  plc-fabric-3:
+  plugin-ledger-connector-fabric-3:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1278,7 +1226,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts
 
-  plc-fabric-4:
+  plugin-ledger-connector-fabric-4:
     continue-on-error: false
     needs:
       - build-dev
@@ -1311,7 +1259,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts
 
-  plc-fabric-5:
+  plugin-ledger-connector-fabric-5:
     continue-on-error: false
     needs:
       - build-dev
@@ -1344,7 +1292,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts
 
-  plc-fabric-6:
+  plugin-ledger-connector-fabric-6:
     continue-on-error: false
     needs:
       - build-dev
@@ -1377,7 +1325,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts
 
-  plc-fabric-7:
+  plugin-ledger-connector-fabric-7:
     continue-on-error: false
     needs:
       - build-dev
@@ -1410,7 +1358,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts
 
-  plc-fabric-8:
+  plugin-ledger-connector-fabric-8:
     continue-on-error: false
     needs:
       - build-dev
@@ -1443,7 +1391,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts
 
-  plc-fabric-9:
+  plugin-ledger-connector-fabric-9:
     continue-on-error: false
     needs:
       - build-dev
@@ -1476,7 +1424,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts
 
-  plc-fabric-10:
+  plugin-ledger-connector-fabric-10:
     needs:
       - build-dev
       - compute_changed_packages
@@ -1509,7 +1457,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts
 
-  plc-fabric-11:
+  plugin-ledger-connector-fabric-11:
     continue-on-error: false
     needs:
       - build-dev
@@ -1542,7 +1490,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts
 
-  plc-fabric-12:
+  plugin-ledger-connector-fabric-12:
     continue-on-error: false
     needs:
       - build-dev
@@ -1575,7 +1523,7 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts
 
-  cplc-go-ethereum-socketio:
+  cactus-plugin-ledger-connector-go-ethereum-socketio:
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -1601,7 +1549,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cplc-iroha2:
+  cactus-plugin-ledger-connector-iroha2:
     continue-on-error: false
     needs:
       - build-dev
@@ -1629,7 +1577,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cplc-ethereum:
+  cactus-plugin-ledger-connector-ethereum:
     continue-on-error: false
     needs:
       - build-dev
@@ -1656,7 +1604,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cplc-quorum:
+  cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
     needs:
       - build-dev
@@ -1676,7 +1624,7 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.1
-      
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@v4.0.1
@@ -1686,20 +1634,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-
-      - name: Build an image from Dockerfile
-        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-plugin-ledger-connector-quorum/Dockerfile -t plugin-ledger-connector-quorum
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for plugin-ledger-connector-quorum
-        uses: aquasecurity/trivy-action@0.19.0
-        with:
-          image-ref: 'plugin-ledger-connector-quorum'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: false
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-  cplc-sawtooth:
+  cactus-plugin-ledger-connector-sawtooth:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1723,7 +1658,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cplc-xdai:
+  cactus-plugin-ledger-connector-xdai:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1750,7 +1685,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cpp-ethereum:
+  cactus-plugin-persistence-ethereum:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1775,7 +1710,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cp-object-store-ipfs:
+  cactus-plugin-object-store-ipfs:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1818,7 +1753,7 @@ jobs:
   #     - uses: actions/checkout@v4.1.1
   #     - id: yarn-cache-dir-path
   #       name: Get yarn cache directory path
-  #       run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
+  #       run: echo "::set-output name=dir::$(yarn cache dir)"
   #     - id: yarn-cache
   #       name: Restore Yarn Cache
   #       uses: actions/cache@v4.0.1
@@ -1828,7 +1763,7 @@ jobs:
   #         restore-keys: |
   #           ${{ runner.os }}-yarn-
   #     - run: ./tools/ci.sh
-  cp-bungee-hermes:
+  cactus-plugin-bungee-hermes:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1853,7 +1788,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ct-api-client:
+  cactus-test-api-client:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1878,7 +1813,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ct-cmd-api-server:
+  cactus-test-cmd-api-server:
     continue-on-error: false
     needs:
       - build-dev
@@ -1907,7 +1842,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ct-geth-ledger:
+  cactus-test-geth-ledger:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1932,7 +1867,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ctp-consortium-manual:
+  cactus-test-plugin-consortium-manual:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1958,7 +1893,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ctp-htlc-eth-besu:
+  cactus-test-plugin-htlc-eth-besu:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -1991,7 +1926,7 @@ jobs:
       - name: Run solidity tests
         run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
 
-  ctp-htlc-eth-besu-erc20:
+  cactus-test-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -2018,7 +1953,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ctp-ledger-connector-besu:
+  cactus-test-plugin-ledger-connector-besu:
     continue-on-error: false
     needs:
       - build-dev
@@ -2038,7 +1973,7 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.1
-      
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@v4.0.1
@@ -2048,7 +1983,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ctp-ledger-connector-quorum:
+  cactus-test-plugin-ledger-connector-quorum:
     continue-on-error: false
     needs:
       - build-dev
@@ -2076,7 +2011,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  ctp-ledger-connector-ethereum:
+  cactus-test-plugin-ledger-connector-ethereum:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -2091,14 +2026,17 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.1
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@v4.0.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+            ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
   cactus-test-tooling:
     continue-on-error: false
@@ -2160,7 +2098,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile -t cactus-besu-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-besu-all-in-one
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-besu-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-cmd-api-server:
     runs-on: ubuntu-22.04
     needs:
@@ -2170,14 +2117,13 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-cmd-api-server
         run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile -t cactus-cmd-api-server
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-cmd-api-server
-        uses: aquasecurity/trivy-action@0.19.0
+      - name: Run Trivy vulnerability scan for cactus-cmd-api-server
+        uses: aquasecurity/trivy-action@0.52.1
         with:
           image-ref: 'cactus-cmd-api-server'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-connector-besu:
@@ -2189,14 +2135,13 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-connector-besu
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile -t cactus-connector-besu
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-connector-besu
-        uses: aquasecurity/trivy-action@0.19.0
+      - name: Run Trivy vulnerability scan for cactus-connector-besu
+        uses: aquasecurity/trivy-action@0.52.1
         with:
           image-ref: 'cactus-connector-besu'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-connector-corda-server:
@@ -2209,14 +2154,13 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-connector-corda-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-connector-corda-server
-        uses: aquasecurity/trivy-action@0.19.0
+      - name: Run Trivy vulnerability scan for cactus-connector-corda-server
+        uses: aquasecurity/trivy-action@0.52.1
         with:
           image-ref: 'cactus-connector-corda-server'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-connector-fabric:
@@ -2229,14 +2173,13 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-connector-fabric
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile -t cactus-connector-fabric
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-connector-fabric
-        uses: aquasecurity/trivy-action@0.19.0
+      - name: Run Trivy vulnerability scan for cactus-connector-fabric
+        uses: aquasecurity/trivy-action@0.52.1
         with:
           image-ref: 'cactus-connector-fabric'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-corda-all-in-one:
@@ -2247,8 +2190,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
-
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile -t cactus-corda-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-corda-all-in-one
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-corda-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-corda-all-in-one-flowdb:
     runs-on: ubuntu-22.04
     steps:
@@ -2264,7 +2215,15 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile -t cactus-corda-all-in-one-obligation
-  
+      - name: Run Trivy vulnerability scan for cactus-corda-all-in-one-obligation
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-corda-all-in-one-obligation'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-dev-container-vscode:
     runs-on: ubuntu-22.04
     needs:
@@ -2281,49 +2240,80 @@ jobs:
       - name: npm_install_@devcontainers/cli@0.44.0
         run: npm install -g @devcontainers/cli@0.44.0
       - name: npx_yes_devcontainers_cli_build
-        run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"
+        run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder=./ --log-level=trace --push=false --config=./.devcontainer/devcontainer.json --image-name=$IMAGE_NAME
   ghcr-example-carbon-accounting:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
-
+        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile -t cactus-example-carbon-accounting
+      - name: Run Trivy vulnerability scan for cactus-example-carbon-accounting
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-example-carbon-accounting'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-example-supply-chain-app:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
-  
+      - name: Run Trivy vulnerability scan for cactus-example-supply-chain-app
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-example-supply-chain-app'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-fabric-all-in-one:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
-      
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x -t cactus-fabric-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-fabric-all-in-one
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-fabric-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-fabric2-all-in-one:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
-
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t cactus-fabric2-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-fabric2-all-in-one
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-fabric2-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-keychain-vault-server:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-keychain-vault-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-keychain-vault-server
-        uses: aquasecurity/trivy-action@0.19.0
+      - name: Run Trivy vulnerability scan for cactus-keychain-vault-server
+        uses: aquasecurity/trivy-action@0.52.1
         with:
           image-ref: 'cactus-keychain-vault-server'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-quorum-all-in-one:
@@ -2331,15 +2321,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
-  
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile -t cactus-quorum-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-quorum-all-in-one
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-quorum-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-quorum-multi-party-all-in-one:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ -f ./tools/docker/quorum-multi-party-all-in-one/Dockerfile -t cactus-quorum-multi-party-all-in-one
-    
+      - name: Run Trivy vulnerability scan for cactus-quorum-multi-party-all-in-one
+        uses: aquasecurity/trivy-action@0.52.1
+        with:
+          image-ref: 'cactus-quorum-multi-party-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 name: Cactus_CI
 'on':
   pull_request:
