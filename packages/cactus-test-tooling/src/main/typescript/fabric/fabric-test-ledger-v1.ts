@@ -375,17 +375,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
   public async getConnectionProfileOrg1(): Promise<any> {
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
-    const CCP_JSON_PATH_FABRIC_V1 =
-      "/fabric-samples/first-network/connection-org1.json";
     const CCP_JSON_PATH_FABRIC_V2 =
       "/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json";
-    const ccpJsonPath = compareVersions.compare(
-      this.getFabricVersion(),
-      "2.0",
-      "<",
-    )
-      ? CCP_JSON_PATH_FABRIC_V1
-      : CCP_JSON_PATH_FABRIC_V2;
+    const ccpJsonPath = CCP_JSON_PATH_FABRIC_V2;
     const ccpJson = await Containers.pullFile(container, ccpJsonPath);
     const ccp = JSON.parse(ccpJson);
 
@@ -422,17 +414,11 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const privatePort = 7050;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
       const url = `grpcs://localhost:${hostPort}`;
-      const ORDERER_PEM_PATH_FABRIC_V1 =
-        "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
+
       const ORDERER_PEM_PATH_FABRIC_V2 =
         "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
-      const ordererPemPath = compareVersions.compare(
-        this.getFabricVersion(),
-        "2.0",
-        "<",
-      )
-        ? ORDERER_PEM_PATH_FABRIC_V1
-        : ORDERER_PEM_PATH_FABRIC_V2;
+
+      const ordererPemPath = ORDERER_PEM_PATH_FABRIC_V2;
       const pem = await Containers.pullFile(container, ordererPemPath);
 
       ccp.orderers = {
@@ -498,16 +484,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const peer1Name = `peer1.${orgName}.example.com`;
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
-    const CCP_JSON_PATH_FABRIC_V1 =
-      "/fabric-samples/first-network/connection-" + orgName + ".json";
     const CCP_JSON_PATH_FABRIC_V2 = connectionProfilePath;
-    const ccpJsonPath = compareVersions.compare(
-      this.getFabricVersion(),
-      "2.0",
-      "<",
-    )
-      ? CCP_JSON_PATH_FABRIC_V1
-      : CCP_JSON_PATH_FABRIC_V2;
+    const ccpJsonPath = CCP_JSON_PATH_FABRIC_V2;
     try {
       const cId = container.id;
       this.log.debug(`${fnTag} Pull Fabric CP %s :: %s`, cId, ccpJsonPath);
@@ -557,17 +535,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
         const privatePort = 7050;
         const hostPort = await Containers.getPublicPort(privatePort, cInfo);
         const url = `grpcs://localhost:${hostPort}`;
-        const ORDERER_PEM_PATH_FABRIC_V1 =
-          "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
         const ORDERER_PEM_PATH_FABRIC_V2 =
           "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
-        const ordererPemPath = compareVersions.compare(
-          this.getFabricVersion(),
-          "2.0",
-          "<",
-        )
-          ? ORDERER_PEM_PATH_FABRIC_V1
-          : ORDERER_PEM_PATH_FABRIC_V2;
+        const ordererPemPath = ORDERER_PEM_PATH_FABRIC_V2;
         const pem = await Containers.pullFile(container, ordererPemPath);
         ccp.orderers = {
           "orderer.example.com": {

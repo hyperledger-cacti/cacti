@@ -542,7 +542,7 @@ export class SupplyChainApp {
 
     const ledger3: Ledger = {
       id: "FabricDemoLedger",
-      ledgerType: LedgerType.Fabric14X,
+      ledgerType: LedgerType.Fabric2,
     };
 
     cactusNodeC.ledgerIds.push(ledger3.id);
