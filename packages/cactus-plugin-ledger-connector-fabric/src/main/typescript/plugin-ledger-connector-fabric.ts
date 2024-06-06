@@ -35,6 +35,9 @@ import {
   Endorser,
   ICryptoKey,
 } from "fabric-common";
+// BlockDecoder is not exported in ts definition so we need to use legacy import.
+const { BlockDecoder } = require("fabric-common");
+import fabricProtos from "fabric-protos";
 
 import {
   ConsensusAlgorithmFamily,
@@ -95,12 +98,15 @@ import {
   GetTransactionReceiptResponse,
   GatewayOptions,
   GetBlockRequestV1,
-  GetBlockResponseV1,
   WatchBlocksV1,
   WatchBlocksOptionsV1,
   RunDelegatedSignTransactionRequest,
   RunTransactionResponseType,
   WatchBlocksDelegatedSignOptionsV1,
+  GetBlockResponseTypeV1,
+  GetBlockResponseV1,
+  GetChainInfoRequestV1,
+  GetChainInfoResponseV1,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -137,10 +143,19 @@ import {
   getTransactionReceiptByTxID,
   IGetTransactionReceiptByTxIDOptions,
 } from "./common/get-transaction-receipt-by-tx-id";
+import {
+  formatCactiFullBlockResponse,
+  formatCactiTransactionsBlockResponse,
+} from "./get-block/cacti-block-formatters";
 import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
+import { GetChainInfoEndpointV1 } from "./get-chain-info/get-chain-info-endpoint-v1";
 import { querySystemChainCode } from "./common/query-system-chain-code";
 import { isSshExecOk } from "./common/is-ssh-exec-ok";
-import { asBuffer, assertFabricFunctionIsAvailable } from "./common/utils";
+import {
+  asBuffer,
+  assertFabricFunctionIsAvailable,
+  fabricLongToNumber,
+} from "./common/utils";
 import { findAndReplaceFabricLoggingSpec } from "./common/find-and-replace-fabric-logging-spec";
 import { deployContractGoSourceImplFabricV256 } from "./deploy-contract-go-source/deploy-contract-go-source-impl-fabric-v2-5-6";
 
@@ -837,6 +852,14 @@ export class PluginLedgerConnectorFabric
     }
 
     {
+      const endpoint = new GetChainInfoEndpointV1({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+
+    {
       const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
         connector: this,
         logLevel: this.opts.logLevel,
@@ -1506,15 +1529,14 @@ export class PluginLedgerConnectorFabric
     );
 
     const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
-    const { channelName, skipDecode } = req;
+    const { channelName, responseType } = req;
     const connectionChannelName = req.connectionChannelName ?? channelName;
     const queryConfig = {
       gateway,
       connectionChannelName,
-      skipDecode,
     };
 
-    let responseData: unknown;
+    let responseData: Buffer;
     if (req.query.blockNumber) {
       this.log.debug("getBlock by it's blockNumber:", req.query.blockNumber);
       responseData = await querySystemChainCode(
@@ -1554,25 +1576,69 @@ export class PluginLedgerConnectorFabric
       );
     }
 
-    this.log.debug("responseData:", responseData);
     if (!responseData) {
       const eMsg = `${fnTag} - expected string as GetBlockByTxID response from Fabric system chaincode but received a falsy value instead...`;
       throw new RuntimeError(eMsg);
     }
 
-    if (skipDecode) {
-      if (!(responseData instanceof Buffer)) {
-        const eMsg = `${fnTag} - expected Buffer as GetBlockByTxID response from Fabric system chaincode but received ${typeof responseData} instead...`;
-        throw new RuntimeError(eMsg);
-      }
+    if (responseType === GetBlockResponseTypeV1.Encoded) {
       const encodedBlockB64 = responseData.toString("base64");
       return {
         encodedBlock: encodedBlockB64,
       };
     }
 
+    const decodedBlock = BlockDecoder.decode(responseData);
+    switch (responseType) {
+      case GetBlockResponseTypeV1.CactiTransactions:
+        return formatCactiTransactionsBlockResponse(decodedBlock);
+      case GetBlockResponseTypeV1.CactiFullBlock:
+        return formatCactiFullBlockResponse(decodedBlock);
+      case GetBlockResponseTypeV1.Full:
+      default:
+        return {
+          decodedBlock,
+        };
+    }
+  }
+
+  /**
+   * Get fabric block from a channel, using one of selectors.
+   *
+   * @param req input parameters
+   * @returns Entire block object or encoded buffer (if req.skipDecode is true)
+   */
+  public async getChainInfo(
+    req: GetChainInfoRequestV1,
+  ): Promise<GetChainInfoResponseV1> {
+    const { channelName } = req;
+    this.log.debug("getChainInfo() called, channelName:", channelName);
+
+    const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
+    const connectionChannelName = req.connectionChannelName ?? channelName;
+    const queryConfig = {
+      gateway,
+      connectionChannelName,
+    };
+
+    const responseData = await querySystemChainCode(
+      queryConfig,
+      "GetChainInfo",
+      channelName,
+    );
+
+    const decodedResponse =
+      fabricProtos.common.BlockchainInfo.decode(responseData);
+    if (!decodedResponse) {
+      throw new RuntimeError("Could not decode BlockchainInfo");
+    }
+
     return {
-      decodedBlock: responseData,
+      height: fabricLongToNumber(decodedResponse.height),
+      currentBlockHash:
+        "0x" + Buffer.from(decodedResponse.currentBlockHash).toString("hex"),
+      previousBlockHash:
+        "0x" + Buffer.from(decodedResponse.previousBlockHash).toString("hex"),
     };
   }
 

@@ -20,22 +20,19 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Response type from WatchBlocks. 'Cacti*' are custom views, others correspond to fabric SDK call.
+ * Response type from GetBlock.
  *
- * Values: Filtered,Full,Private,CactiTransactions,CactiFullBlock
+ * Values: Full,Encoded,CactiTransactions,CactiFullBlock
  */
 
 @JsonClass(generateAdapter = false)
-enum class WatchBlocksListenerTypeV1(val value: kotlin.String) {
-
-    @Json(name = "filtered")
-    Filtered("filtered"),
+enum class GetBlockResponseTypeV1(val value: kotlin.String) {
 
     @Json(name = "full")
     Full("full"),
 
-    @Json(name = "private")
-    Private("private"),
+    @Json(name = "encoded")
+    Encoded("encoded"),
 
     @Json(name = "cacti:transactions")
     CactiTransactions("cacti:transactions"),
@@ -56,12 +53,12 @@ enum class WatchBlocksListenerTypeV1(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is WatchBlocksListenerTypeV1) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is GetBlockResponseTypeV1) "$data" else null
 
         /**
-         * Returns a valid [WatchBlocksListenerTypeV1] for [data], null otherwise.
+         * Returns a valid [GetBlockResponseTypeV1] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): WatchBlocksListenerTypeV1? = data?.let {
+        fun decode(data: kotlin.Any?): GetBlockResponseTypeV1? = data?.let {
           val normalizedData = "$it".lowercase()
           values().firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

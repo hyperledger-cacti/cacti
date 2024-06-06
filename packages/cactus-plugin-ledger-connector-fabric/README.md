@@ -331,6 +331,11 @@ Corresponds directly to `BlockType` from `fabric-common`:
   - `WatchBlocksListenerTypeV1.Full`,
   - `WatchBlocksListenerTypeV1.Private`,
 
+##### Cacti (custom)
+Parses the data and returns custom formatted block.
+- `WatchBlocksListenerTypeV1.CactiTransactions`: Returns transactions summary. Compatible with legacy `fabric-socketio` monitoring operation.
+- `WatchBlocksListenerTypeV1.CactiFullBlock`: Returns full block summary.
+
 ### 1.6 Delegated Signature
 - Custom signature callback can be used when increased security is needed or currently available options are not sufficient.
 - Signature callback is used whenever fabric request must be signed.
@@ -365,16 +370,12 @@ await apiClient.runDelegatedSignTransactionV1({
 
 // Monitor for transactions:
 apiClient.watchBlocksDelegatedSignV1({
-  type: WatchBlocksListenerTypeV1.CactusTransactions,
+  type: WatchBlocksListenerTypeV1.CactiTransactions,
   signerCertificate: adminIdentity.credentials.certificate,
   signerMspID: adminIdentity.mspId,
   channelName: ledgerChannelName,
 })
 ```
-
-##### Cactus (custom)
-Parses the data and returns custom formatted block.
-- `WatchBlocksListenerTypeV1.CactusTransactions`: Returns transactions summary. Compatible with legacy `fabric-socketio` monitoring operation.
 
 ## 2. Architecture
 The sequence diagrams for various endpoints are mentioned below

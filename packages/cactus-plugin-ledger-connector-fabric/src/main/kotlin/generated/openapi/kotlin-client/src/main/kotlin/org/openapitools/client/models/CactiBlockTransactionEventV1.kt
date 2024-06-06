@@ -29,7 +29,7 @@ import com.squareup.moshi.JsonClass
  */
 
 
-data class WatchBlocksCactusTransactionsEventV1 (
+data class CactiBlockTransactionEventV1 (
 
     /* ChainCode containing function that was executed. */
     @Json(name = "chaincodeId")

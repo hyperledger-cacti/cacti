@@ -47,6 +47,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**deployContractGoSourceV1**](docs/DefaultApi.md#deploycontractgosourcev1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source | Deploys a chaincode contract in the form of a go sources.
 *DefaultApi* | [**deployContractV1**](docs/DefaultApi.md#deploycontractv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract | Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
 *DefaultApi* | [**getBlockV1**](docs/DefaultApi.md#getblockv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
+*DefaultApi* | [**getChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
 *DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 *DefaultApi* | [**getTransactionReceiptByTxIDV1**](docs/DefaultApi.md#gettransactionreceiptbytxidv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid | get a transaction receipt by tx id on a Fabric ledger.
 *DefaultApi* | [**runDelegatedSignTransactionV1**](docs/DefaultApi.md#rundelegatedsigntransactionv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction | Runs a transaction on a Fabric ledger using user-provided signing callback.
@@ -56,6 +57,10 @@ Class | Method | HTTP request | Description
 <a id="documentation-for-models"></a>
 ## Documentation for Models
 
+ - [org.openapitools.client.models.CactiBlockFullEventV1](docs/CactiBlockFullEventV1.md)
+ - [org.openapitools.client.models.CactiBlockFullResponseV1](docs/CactiBlockFullResponseV1.md)
+ - [org.openapitools.client.models.CactiBlockTransactionEventV1](docs/CactiBlockTransactionEventV1.md)
+ - [org.openapitools.client.models.CactiBlockTransactionsResponseV1](docs/CactiBlockTransactionsResponseV1.md)
  - [org.openapitools.client.models.ChainCodeLanguageRuntime](docs/ChainCodeLanguageRuntime.md)
  - [org.openapitools.client.models.ChainCodeLifeCycleCommandResponses](docs/ChainCodeLifeCycleCommandResponses.md)
  - [org.openapitools.client.models.ChainCodeProgrammingLanguage](docs/ChainCodeProgrammingLanguage.md)
@@ -71,10 +76,15 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.DeploymentTargetOrgFabric2x](docs/DeploymentTargetOrgFabric2x.md)
  - [org.openapitools.client.models.DeploymentTargetOrganization](docs/DeploymentTargetOrganization.md)
  - [org.openapitools.client.models.ErrorExceptionResponseV1](docs/ErrorExceptionResponseV1.md)
+ - [org.openapitools.client.models.FabricCertificateIdentityV1](docs/FabricCertificateIdentityV1.md)
  - [org.openapitools.client.models.FabricContractInvocationType](docs/FabricContractInvocationType.md)
  - [org.openapitools.client.models.FabricSigningCredential](docs/FabricSigningCredential.md)
  - [org.openapitools.client.models.FabricSigningCredentialType](docs/FabricSigningCredentialType.md)
+ - [org.openapitools.client.models.FabricX509CertificateV1](docs/FabricX509CertificateV1.md)
  - [org.openapitools.client.models.FileBase64](docs/FileBase64.md)
+ - [org.openapitools.client.models.FullBlockTransactionActionV1](docs/FullBlockTransactionActionV1.md)
+ - [org.openapitools.client.models.FullBlockTransactionEndorsementV1](docs/FullBlockTransactionEndorsementV1.md)
+ - [org.openapitools.client.models.FullBlockTransactionEventV1](docs/FullBlockTransactionEventV1.md)
  - [org.openapitools.client.models.GatewayDiscoveryOptions](docs/GatewayDiscoveryOptions.md)
  - [org.openapitools.client.models.GatewayEventHandlerOptions](docs/GatewayEventHandlerOptions.md)
  - [org.openapitools.client.models.GatewayOptions](docs/GatewayOptions.md)
@@ -84,7 +94,10 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.GetBlockRequestV1QueryBlockHash](docs/GetBlockRequestV1QueryBlockHash.md)
  - [org.openapitools.client.models.GetBlockResponseDecodedV1](docs/GetBlockResponseDecodedV1.md)
  - [org.openapitools.client.models.GetBlockResponseEncodedV1](docs/GetBlockResponseEncodedV1.md)
+ - [org.openapitools.client.models.GetBlockResponseTypeV1](docs/GetBlockResponseTypeV1.md)
  - [org.openapitools.client.models.GetBlockResponseV1](docs/GetBlockResponseV1.md)
+ - [org.openapitools.client.models.GetChainInfoRequestV1](docs/GetChainInfoRequestV1.md)
+ - [org.openapitools.client.models.GetChainInfoResponseV1](docs/GetChainInfoResponseV1.md)
  - [org.openapitools.client.models.GetTransactionReceiptResponse](docs/GetTransactionReceiptResponse.md)
  - [org.openapitools.client.models.RunDelegatedSignTransactionRequest](docs/RunDelegatedSignTransactionRequest.md)
  - [org.openapitools.client.models.RunTransactionRequest](docs/RunTransactionRequest.md)
@@ -96,8 +109,6 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.TransactReceiptTransactionEndorsement](docs/TransactReceiptTransactionEndorsement.md)
  - [org.openapitools.client.models.VaultTransitKey](docs/VaultTransitKey.md)
  - [org.openapitools.client.models.WatchBlocksCactusErrorResponseV1](docs/WatchBlocksCactusErrorResponseV1.md)
- - [org.openapitools.client.models.WatchBlocksCactusTransactionsEventV1](docs/WatchBlocksCactusTransactionsEventV1.md)
- - [org.openapitools.client.models.WatchBlocksCactusTransactionsResponseV1](docs/WatchBlocksCactusTransactionsResponseV1.md)
  - [org.openapitools.client.models.WatchBlocksDelegatedSignOptionsV1](docs/WatchBlocksDelegatedSignOptionsV1.md)
  - [org.openapitools.client.models.WatchBlocksFilteredResponseV1](docs/WatchBlocksFilteredResponseV1.md)
  - [org.openapitools.client.models.WatchBlocksFullResponseV1](docs/WatchBlocksFullResponseV1.md)

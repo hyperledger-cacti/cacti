@@ -22,22 +22,22 @@ import {
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import OAS from "../../json/openapi.json";
 
-export interface IGetBlockEndpointV1Options {
+export interface IGetChainInfoEndpointV1Options {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorFabric;
 }
 
-export class GetBlockEndpointV1 implements IWebServiceEndpoint {
+export class GetChainInfoEndpointV1 implements IWebServiceEndpoint {
   private readonly log: Logger;
 
-  constructor(public readonly opts: IGetBlockEndpointV1Options) {
-    const fnTag = "GetBlockEndpointV1#constructor()";
+  constructor(public readonly opts: IGetChainInfoEndpointV1Options) {
+    const fnTag = "GetChainInfoEndpointV1#constructor()";
 
     Checks.truthy(opts, `${fnTag} options`);
     Checks.truthy(opts.connector, `${fnTag} options.connector`);
 
     this.log = LoggerProvider.getOrCreate({
-      label: "get-block-endpoint-v1",
+      label: "get-chain-info-endpoint-v1",
       level: opts.logLevel || "INFO",
     });
   }
@@ -56,9 +56,9 @@ export class GetBlockEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info"
     ];
   }
 
@@ -84,11 +84,11 @@ export class GetBlockEndpointV1 implements IWebServiceEndpoint {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "GetBlockEndpointV1#handleRequest()";
+    const fnTag = "GetChainInfoEndpointV1#handleRequest()";
     this.log.debug(`POST ${this.getPath()}`);
 
     try {
-      res.status(200).send(await this.opts.connector.getBlock(req.body));
+      res.status(200).send(await this.opts.connector.getChainInfo(req.body));
     } catch (error) {
       const errorMsg = `Crash while serving ${fnTag}`;
       handleRestEndpointException({ errorMsg, log: this.log, error, res });

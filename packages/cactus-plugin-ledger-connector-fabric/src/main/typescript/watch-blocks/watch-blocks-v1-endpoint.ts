@@ -25,9 +25,12 @@ import {
   WatchBlocksResponseV1,
   WatchBlocksListenerTypeV1,
   WatchBlocksOptionsV1,
-  WatchBlocksCactusTransactionsEventV1,
   WatchBlocksDelegatedSignOptionsV1,
 } from "../generated/openapi/typescript-axios";
+import {
+  formatCactiFullBlockResponse,
+  formatCactiTransactionsBlockResponse,
+} from "../get-block/cacti-block-formatters";
 
 const {
   newFilteredBlockEvent,
@@ -82,66 +85,53 @@ export class WatchBlocksV1Endpoint {
   }
 
   /**
-   * Callback executed when receiving block with custom cactus type "cactus:transactions"
+   * Callback executed when receiving block with custom cacti type "cacti:full-block"
    * Sends WatchBlocksV1.Next with new block to the client.
    *
    * @param blockEvent full block
    *
    * @returns Nothing.
    */
-  private monitorCactusTransactionsCallback(blockEvent: BlockEvent) {
+  private monitorCactiFullBlockCallback(blockEvent: BlockEvent) {
     const { socket, log } = this;
     const clientId = socket.id;
     log.debug(
-      `CactusTransactions BlockEvent received: #${blockEvent.blockNumber.toString()}, client: ${clientId}`,
+      `CactiFullBlock BlockEvent received: #${blockEvent.blockNumber.toString()}, client: ${clientId}`,
     );
 
     if (!("data" in blockEvent.blockData)) {
-      log.error("Wrong blockEvent type received - should not happen!");
-      return;
+      throw new Error("Wrong blockEvent type received - should not happen!");
     }
 
-    const blockData = blockEvent.blockData.data?.data as any;
-    if (!blockData) {
-      log.debug("Block data empty - ignore...");
-      return;
+    socket.emit(
+      WatchBlocksV1.Next,
+      formatCactiFullBlockResponse(blockEvent.blockData),
+    );
+  }
+
+  /**
+   * Callback executed when receiving block with custom cacti type "cacti:transactions"
+   * Sends WatchBlocksV1.Next with new block to the client.
+   *
+   * @param blockEvent full block
+   *
+   * @returns Nothing.
+   */
+  private monitorCactiTransactionsCallback(blockEvent: BlockEvent) {
+    const { socket, log } = this;
+    const clientId = socket.id;
+    log.debug(
+      `CactiTransactions BlockEvent received: #${blockEvent.blockNumber.toString()}, client: ${clientId}`,
+    );
+
+    if (!("data" in blockEvent.blockData)) {
+      throw new Error("Wrong blockEvent type received - should not happen!");
     }
 
-    const transactions: WatchBlocksCactusTransactionsEventV1[] = [];
-    for (const data of blockData) {
-      try {
-        const payload = data.payload;
-        const transaction = payload.data;
-        const actionPayload = transaction.actions[0].payload;
-        const proposalPayload = actionPayload.chaincode_proposal_payload;
-        const invocationSpec = proposalPayload.input;
-
-        // Decode args and function name
-        const rawArgs = invocationSpec.chaincode_spec.input.args as Buffer[];
-        const decodedArgs = rawArgs.map((arg: Buffer) => arg.toString("utf8"));
-        const functionName = decodedArgs.shift() ?? "<unknown>";
-
-        const chaincodeId = invocationSpec.chaincode_spec.chaincode_id.name;
-        const channelHeader = payload.header.channel_header;
-        const transactionId = channelHeader.tx_id;
-
-        transactions.push({
-          chaincodeId,
-          transactionId,
-          functionName,
-          functionArgs: decodedArgs,
-        });
-      } catch (error) {
-        log.warn(
-          "Could not retrieve transaction from received block. Error:",
-          safeStringifyException(error),
-        );
-      }
-    }
-
-    socket.emit(WatchBlocksV1.Next, {
-      cactusTransactionsEvents: transactions,
-    });
+    socket.emit(
+      WatchBlocksV1.Next,
+      formatCactiTransactionsBlockResponse(blockEvent.blockData),
+    );
   }
 
   /**
@@ -223,7 +213,7 @@ export class WatchBlocksV1Endpoint {
    * Get block listener callback and listener type it's expect.
    * Returns separate function object each time it's called (this is required y fabric node SDK).
    *
-   * @param type requested listener type (including custom Cactus ones).
+   * @param type requested listener type (including custom Cacti ones).
    *
    * @returns listener: BlockListener;
    * @returns listenerType: BlockType;
@@ -247,11 +237,17 @@ export class WatchBlocksV1Endpoint {
           this.monitorPrivateCallback(blockEvent);
         listenerType = "private";
         break;
-      case WatchBlocksListenerTypeV1.CactusTransactions:
+      case WatchBlocksListenerTypeV1.CactiTransactions:
         listener = async (blockEvent) =>
-          this.monitorCactusTransactionsCallback(blockEvent);
+          this.monitorCactiTransactionsCallback(blockEvent);
         listenerType = "full";
         break;
+      case WatchBlocksListenerTypeV1.CactiFullBlock:
+        listener = async (blockEvent) =>
+          this.monitorCactiFullBlockCallback(blockEvent);
+        listenerType = "full";
+        break;
+
       default:
         // Will not compile if any type was not handled by above switch.
         const unknownType: never = type;

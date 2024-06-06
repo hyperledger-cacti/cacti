@@ -23,7 +23,7 @@ import {
 import { json2str } from "@hyperledger/cactus-cmd-socketio-server";
 import { AssetTradeStatus } from "./define";
 import {
-  WatchBlocksCactusTransactionsEventV1 as FabricWatchBlocksCactusTransactionsEventV1,
+  CactiBlockTransactionEventV1,
   WatchBlocksListenerTypeV1 as FabricWatchBlocksListenerTypeV1,
   WatchBlocksResponseV1 as FabricWatchBlocksResponseV1,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
@@ -242,19 +242,19 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     const fabricApiClient = getFabricApiClient();
     const watchObservable = fabricApiClient.watchBlocksDelegatedSignV1({
       channelName: config.assetTradeInfo.fabric.channelName,
-      type: FabricWatchBlocksListenerTypeV1.CactusTransactions,
+      type: FabricWatchBlocksListenerTypeV1.CactiTransactions,
       signerCertificate: getSignerIdentity().credentials.certificate,
       signerMspID: getSignerIdentity().mspId,
       uniqueTransactionData: createSigningToken("watchBlock"),
     });
     const watchSub = watchObservable.subscribe({
       next: (event: FabricWatchBlocksResponseV1) => {
-        if (!("cactusTransactionsEvents" in event)) {
+        if (!("cactiTransactionsEvents" in event)) {
           logger.error("Wrong input block format!", event);
           return;
         }
 
-        for (const ev of event.cactusTransactionsEvents) {
+        for (const ev of event.cactiTransactionsEvents) {
           logger.debug(`##in onEventFabric()`);
 
           try {
@@ -363,7 +363,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   }
 
   executeNextTransaction(
-    txInfo: FabricWatchBlocksCactusTransactionsEventV1 | Web3TransactionReceipt,
+    txInfo: CactiBlockTransactionEventV1 | Web3TransactionReceipt,
     txId: string,
   ): void {
     let transactionInfo: TransactionInfo | null = null;

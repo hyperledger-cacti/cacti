@@ -27,6 +27,8 @@ import org.openapitools.client.models.DeployContractV1Response
 import org.openapitools.client.models.ErrorExceptionResponseV1
 import org.openapitools.client.models.GetBlockRequestV1
 import org.openapitools.client.models.GetBlockResponseV1
+import org.openapitools.client.models.GetChainInfoRequestV1
+import org.openapitools.client.models.GetChainInfoResponseV1
 import org.openapitools.client.models.GetTransactionReceiptResponse
 import org.openapitools.client.models.RunDelegatedSignTransactionRequest
 import org.openapitools.client.models.RunTransactionRequest
@@ -265,6 +267,78 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * Get fabric ledger chain info.
+     * 
+     * @param getChainInfoRequestV1  (optional)
+     * @return GetChainInfoResponseV1
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun getChainInfoV1(getChainInfoRequestV1: GetChainInfoRequestV1? = null) : GetChainInfoResponseV1 {
+        val localVarResponse = getChainInfoV1WithHttpInfo(getChainInfoRequestV1 = getChainInfoRequestV1)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as GetChainInfoResponseV1
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * Get fabric ledger chain info.
+     * 
+     * @param getChainInfoRequestV1  (optional)
+     * @return ApiResponse<GetChainInfoResponseV1?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun getChainInfoV1WithHttpInfo(getChainInfoRequestV1: GetChainInfoRequestV1?) : ApiResponse<GetChainInfoResponseV1?> {
+        val localVariableConfig = getChainInfoV1RequestConfig(getChainInfoRequestV1 = getChainInfoRequestV1)
+
+        return request<GetChainInfoRequestV1, GetChainInfoResponseV1>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation getChainInfoV1
+     *
+     * @param getChainInfoRequestV1  (optional)
+     * @return RequestConfig
+     */
+    fun getChainInfoV1RequestConfig(getChainInfoRequestV1: GetChainInfoRequestV1?) : RequestConfig<GetChainInfoRequestV1> {
+        val localVariableBody = getChainInfoRequestV1
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json"
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

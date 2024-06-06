@@ -24,6 +24,100 @@ import type { RequestArgs } from './base';
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
+ * Custom format full fabric block with transactions
+ * @export
+ * @interface CactiBlockFullEventV1
+ */
+export interface CactiBlockFullEventV1 {
+    /**
+     * 
+     * @type {number}
+     * @memberof CactiBlockFullEventV1
+     */
+    'blockNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CactiBlockFullEventV1
+     */
+    'blockHash': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CactiBlockFullEventV1
+     */
+    'previousBlockHash': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CactiBlockFullEventV1
+     */
+    'transactionCount': number;
+    /**
+     * 
+     * @type {Array<FullBlockTransactionEventV1>}
+     * @memberof CactiBlockFullEventV1
+     */
+    'cactiTransactionsEvents': Array<FullBlockTransactionEventV1>;
+}
+/**
+ * Custom response containing full block summary.
+ * @export
+ * @interface CactiBlockFullResponseV1
+ */
+export interface CactiBlockFullResponseV1 {
+    /**
+     * 
+     * @type {CactiBlockFullEventV1}
+     * @memberof CactiBlockFullResponseV1
+     */
+    'cactiFullEvents': CactiBlockFullEventV1;
+}
+/**
+ * Transaction summary from commited block.
+ * @export
+ * @interface CactiBlockTransactionEventV1
+ */
+export interface CactiBlockTransactionEventV1 {
+    /**
+     * ChainCode containing function that was executed.
+     * @type {string}
+     * @memberof CactiBlockTransactionEventV1
+     */
+    'chaincodeId': string;
+    /**
+     * Transaction identifier.
+     * @type {string}
+     * @memberof CactiBlockTransactionEventV1
+     */
+    'transactionId': string;
+    /**
+     * Function name that was executed.
+     * @type {string}
+     * @memberof CactiBlockTransactionEventV1
+     */
+    'functionName': string;
+    /**
+     * List of function arguments.
+     * @type {Array<string>}
+     * @memberof CactiBlockTransactionEventV1
+     */
+    'functionArgs': Array<string>;
+}
+/**
+ * Custom response containing block transactions summary. Compatible with legacy fabric-socketio connector monitoring.
+ * @export
+ * @interface CactiBlockTransactionsResponseV1
+ */
+export interface CactiBlockTransactionsResponseV1 {
+    /**
+     * List of transactions summary
+     * @type {Array<CactiBlockTransactionEventV1>}
+     * @memberof CactiBlockTransactionsResponseV1
+     */
+    'cactiTransactionsEvents': Array<CactiBlockTransactionEventV1>;
+}
+/**
  * Enumerates the supported programming language runtimes of Hyperledger Fabric
  * @export
  * @enum {string}
@@ -555,6 +649,25 @@ export interface ErrorExceptionResponseV1 {
     'error': string;
 }
 /**
+ * Combination of certificate and it\'s MSP ID used to identify fabric actors.
+ * @export
+ * @interface FabricCertificateIdentityV1
+ */
+export interface FabricCertificateIdentityV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricCertificateIdentityV1
+     */
+    'mspid': string;
+    /**
+     * 
+     * @type {FabricX509CertificateV1}
+     * @memberof FabricCertificateIdentityV1
+     */
+    'cert': FabricX509CertificateV1;
+}
+/**
  * 
  * @export
  * @enum {string}
@@ -624,6 +737,55 @@ export type FabricSigningCredentialType = typeof FabricSigningCredentialType[key
 
 
 /**
+ * Transaction endorser certificate object
+ * @export
+ * @interface FabricX509CertificateV1
+ */
+export interface FabricX509CertificateV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'issuer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'serialNumber': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'subject': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'subjectAltName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'validFrom': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'validTo': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricX509CertificateV1
+     */
+    'pem': string;
+}
+/**
  * Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string
  * @export
  * @interface FileBase64
@@ -647,6 +809,111 @@ export interface FileBase64 {
      * @memberof FileBase64
      */
     'filepath'?: string;
+}
+/**
+ * Transaction action returned from fabric block.
+ * @export
+ * @interface FullBlockTransactionActionV1
+ */
+export interface FullBlockTransactionActionV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionActionV1
+     */
+    'functionName': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof FullBlockTransactionActionV1
+     */
+    'functionArgs': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionActionV1
+     */
+    'chaincodeId': string;
+    /**
+     * 
+     * @type {FabricCertificateIdentityV1}
+     * @memberof FullBlockTransactionActionV1
+     */
+    'creator': FabricCertificateIdentityV1;
+    /**
+     * 
+     * @type {Array<FullBlockTransactionEndorsementV1>}
+     * @memberof FullBlockTransactionActionV1
+     */
+    'endorsements': Array<FullBlockTransactionEndorsementV1>;
+}
+/**
+ * Transaction endorsment object returned from fabric block.
+ * @export
+ * @interface FullBlockTransactionEndorsementV1
+ */
+export interface FullBlockTransactionEndorsementV1 {
+    /**
+     * 
+     * @type {FabricCertificateIdentityV1}
+     * @memberof FullBlockTransactionEndorsementV1
+     */
+    'signer': FabricCertificateIdentityV1;
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionEndorsementV1
+     */
+    'signature': string;
+}
+/**
+ * Transaction returned from fabric block.
+ * @export
+ * @interface FullBlockTransactionEventV1
+ */
+export interface FullBlockTransactionEventV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'hash': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'channelId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'timestamp': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'protocolVersion': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'transactionType': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'epoch': number;
+    /**
+     * 
+     * @type {Array<FullBlockTransactionActionV1>}
+     * @memberof FullBlockTransactionEventV1
+     */
+    'actions': Array<FullBlockTransactionActionV1>;
 }
 /**
  * 
@@ -781,12 +1048,14 @@ export interface GetBlockRequestV1 {
      */
     'query': GetBlockRequestV1Query;
     /**
-     * If true, encoded buffer will be returned. Otherwise, entire block object is returned.
-     * @type {boolean}
+     * 
+     * @type {GetBlockResponseTypeV1}
      * @memberof GetBlockRequestV1
      */
-    'skipDecode'?: boolean;
+    'responseType'?: GetBlockResponseTypeV1;
 }
+
+
 /**
  * Query selector, caller must provide at least one of them. First found will be used, rest will be ignored, so it\'s recommended to pass single selector.
  * @export
@@ -858,12 +1127,78 @@ export interface GetBlockResponseEncodedV1 {
     'encodedBlock': string;
 }
 /**
+ * Response type from GetBlock.
+ * @export
+ * @enum {string}
+ */
+
+export const GetBlockResponseTypeV1 = {
+    Full: 'full',
+    Encoded: 'encoded',
+    CactiTransactions: 'cacti:transactions',
+    CactiFullBlock: 'cacti:full-block'
+} as const;
+
+export type GetBlockResponseTypeV1 = typeof GetBlockResponseTypeV1[keyof typeof GetBlockResponseTypeV1];
+
+
+/**
  * @type GetBlockResponseV1
  * Response from GetBlock endpoint.
  * @export
  */
-export type GetBlockResponseV1 = GetBlockResponseDecodedV1 | GetBlockResponseEncodedV1;
+export type GetBlockResponseV1 = CactiBlockFullResponseV1 | CactiBlockTransactionsResponseV1 | GetBlockResponseDecodedV1 | GetBlockResponseEncodedV1;
 
+/**
+ * Request for GetChainInfo endpoint.
+ * @export
+ * @interface GetChainInfoRequestV1
+ */
+export interface GetChainInfoRequestV1 {
+    /**
+     * Fabric channel which we want to query.
+     * @type {string}
+     * @memberof GetChainInfoRequestV1
+     */
+    'channelName': string;
+    /**
+     * Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used
+     * @type {string}
+     * @memberof GetChainInfoRequestV1
+     */
+    'connectionChannelName'?: string;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof GetChainInfoRequestV1
+     */
+    'gatewayOptions': GatewayOptions;
+}
+/**
+ * Response from GetChainInfo endpoint.
+ * @export
+ * @interface GetChainInfoResponseV1
+ */
+export interface GetChainInfoResponseV1 {
+    /**
+     * Current height of fabric ledger
+     * @type {number}
+     * @memberof GetChainInfoResponseV1
+     */
+    'height': number;
+    /**
+     * Current block hash of fabric ledger
+     * @type {string}
+     * @memberof GetChainInfoResponseV1
+     */
+    'currentBlockHash': string;
+    /**
+     * Previous block hash of fabric ledger
+     * @type {string}
+     * @memberof GetChainInfoResponseV1
+     */
+    'previousBlockHash': string;
+}
 /**
  * 
  * @export
@@ -1259,50 +1594,6 @@ export interface WatchBlocksCactusErrorResponseV1 {
     'errorMessage': string;
 }
 /**
- * Transaction summary from commited block.
- * @export
- * @interface WatchBlocksCactusTransactionsEventV1
- */
-export interface WatchBlocksCactusTransactionsEventV1 {
-    /**
-     * ChainCode containing function that was executed.
-     * @type {string}
-     * @memberof WatchBlocksCactusTransactionsEventV1
-     */
-    'chaincodeId': string;
-    /**
-     * Transaction identifier.
-     * @type {string}
-     * @memberof WatchBlocksCactusTransactionsEventV1
-     */
-    'transactionId': string;
-    /**
-     * Function name that was executed.
-     * @type {string}
-     * @memberof WatchBlocksCactusTransactionsEventV1
-     */
-    'functionName': string;
-    /**
-     * List of function arguments.
-     * @type {Array<string>}
-     * @memberof WatchBlocksCactusTransactionsEventV1
-     */
-    'functionArgs': Array<string>;
-}
-/**
- * Custom response containing block transactions summary. Compatible with legacy fabric-socketio connector monitoring.
- * @export
- * @interface WatchBlocksCactusTransactionsResponseV1
- */
-export interface WatchBlocksCactusTransactionsResponseV1 {
-    /**
-     * List of transactions summary
-     * @type {Array<WatchBlocksCactusTransactionsEventV1>}
-     * @memberof WatchBlocksCactusTransactionsResponseV1
-     */
-    'cactusTransactionsEvents': Array<WatchBlocksCactusTransactionsEventV1>;
-}
-/**
  * Options passed when subscribing to block monitoring with delegated signing.
  * @export
  * @interface WatchBlocksDelegatedSignOptionsV1
@@ -1374,7 +1665,7 @@ export interface WatchBlocksFullResponseV1 {
     'fullBlock': any;
 }
 /**
- * Response type from WatchBlocks. \'Cactus*\' are custom views, others correspond to fabric SDK call.
+ * Response type from WatchBlocks. \'Cacti*\' are custom views, others correspond to fabric SDK call.
  * @export
  * @enum {string}
  */
@@ -1383,7 +1674,8 @@ export const WatchBlocksListenerTypeV1 = {
     Filtered: 'filtered',
     Full: 'full',
     Private: 'private',
-    CactusTransactions: 'cactus:transactions'
+    CactiTransactions: 'cacti:transactions',
+    CactiFullBlock: 'cacti:full-block'
 } as const;
 
 export type WatchBlocksListenerTypeV1 = typeof WatchBlocksListenerTypeV1[keyof typeof WatchBlocksListenerTypeV1];
@@ -1440,7 +1732,7 @@ export interface WatchBlocksPrivateResponseV1 {
  * Response block from WatchBlocks endpoint. Depends on \'type\' passed in subscription options.
  * @export
  */
-export type WatchBlocksResponseV1 = WatchBlocksCactusErrorResponseV1 | WatchBlocksCactusTransactionsResponseV1 | WatchBlocksFilteredResponseV1 | WatchBlocksFullResponseV1 | WatchBlocksPrivateResponseV1;
+export type WatchBlocksResponseV1 = CactiBlockFullResponseV1 | CactiBlockTransactionsResponseV1 | WatchBlocksCactusErrorResponseV1 | WatchBlocksFilteredResponseV1 | WatchBlocksFullResponseV1 | WatchBlocksPrivateResponseV1;
 
 /**
  * Websocket requests for monitoring new blocks.
@@ -1582,6 +1874,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(getBlockRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get fabric ledger chain info.
+         * @param {GetChainInfoRequestV1} [getChainInfoRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChainInfoV1: async (getChainInfoRequestV1?: GetChainInfoRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getChainInfoRequestV1, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1771,6 +2097,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get fabric ledger chain info.
+         * @param {GetChainInfoRequestV1} [getChainInfoRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChainInfoV1(getChainInfoRequestV1?: GetChainInfoRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetChainInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getChainInfoV1(getChainInfoRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1851,6 +2188,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getBlockV1(getBlockRequestV1?: GetBlockRequestV1, options?: any): AxiosPromise<GetBlockResponseV1> {
             return localVarFp.getBlockV1(getBlockRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get fabric ledger chain info.
+         * @param {GetChainInfoRequestV1} [getChainInfoRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChainInfoV1(getChainInfoRequestV1?: GetChainInfoRequestV1, options?: any): AxiosPromise<GetChainInfoResponseV1> {
+            return localVarFp.getChainInfoV1(getChainInfoRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1935,6 +2282,18 @@ export class DefaultApi extends BaseAPI {
      */
     public getBlockV1(getBlockRequestV1?: GetBlockRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getBlockV1(getBlockRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get fabric ledger chain info.
+     * @param {GetChainInfoRequestV1} [getChainInfoRequestV1] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getChainInfoV1(getChainInfoRequestV1?: GetChainInfoRequestV1, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getChainInfoV1(getChainInfoRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
