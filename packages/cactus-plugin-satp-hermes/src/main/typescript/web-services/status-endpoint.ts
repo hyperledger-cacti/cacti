@@ -16,7 +16,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi-blo-bundled.json";
 import { IRequestOptions } from "../core/types";
-import { StatusRequest } from "../generated/gateway-client/typescript-axios";
+import { StatusRequest } from "../generated/gateway-client/typescript-axios/api";
 
 export class GetStatusEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetStatusEndpointV1";
