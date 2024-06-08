@@ -73,9 +73,6 @@ describe("Corda Test Case", () => {
     const timeout = 180000; // 3 minutes
     const cwd = "/CSDE-cordapp-template-kotlin";
     shortHashID = await Containers.exec(container, cmd, timeout, logLevel, cwd);
-    // TODO: Remove the timeout below. This is a temporary fix to the flakiness of the test.
-    // Will do further investigation on this issue
-    await new Promise((resolve) => setTimeout(resolve, 60000));
   });
 
   describe("Endpoint Testing", () => {

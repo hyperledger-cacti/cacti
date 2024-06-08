@@ -33,8 +33,8 @@ export interface ICordaV5TestLedgerConstructorOptions {
  * Provides default options for Corda container
  */
 const DEFAULTS = Object.freeze({
-  imageVersion: "38c5858",
-  imageName: "ghcr.io/hyperledger/cactus-corda-5-all-in-one-alpha-2024-05-22",
+  imageVersion: "2024-06-18-issue3293-3e1660df4",
+  imageName: "ghcr.io/hyperledger/cacti-corda-5-all-in-one",
   publicPort: 8888,
   postgresPort: 5431,
   rpcPortA: 10008,
