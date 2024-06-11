@@ -29,11 +29,11 @@ const log: Logger = LoggerProvider.getOrCreate({
 jest.mock("fs");
 import { LPInfoHolder } from "../../../main/typescript/routing-interface/util/LPInfoHolder";
 jest.mock("../../../main/typescript/routing-interface/util/LPInfoHolder");
-const mockLedgerData = "{mockLedgerData}"
+const mockLedgerData = "{mockLedgerData}";
 const mockGetLegerPluginInfo = jest.fn().mockReturnValue(mockLedgerData);
 (LPInfoHolder as jest.Mock).mockImplementation(() => {
   return {
-    getLegerPluginInfo: mockGetLegerPluginInfo
+    getLegerPluginInfo: mockGetLegerPluginInfo,
   };
 });
 

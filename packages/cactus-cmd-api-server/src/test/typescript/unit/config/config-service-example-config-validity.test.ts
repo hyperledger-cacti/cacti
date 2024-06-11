@@ -34,9 +34,9 @@ describe(testcase, () => {
 
     // FIXME - this hack should not be necessary, we need to re-think how we
     // do configuration parsing. The convict library may not be the path forward.
-    exampleConfig.authorizationConfigJson = (JSON.stringify(
+    exampleConfig.authorizationConfigJson = JSON.stringify(
       exampleConfig.authorizationConfigJson,
-    ) as unknown) as IAuthorizationConfig;
+    ) as unknown as IAuthorizationConfig;
 
     exampleConfig.configFile = "";
     exampleConfig.apiPort = 0;

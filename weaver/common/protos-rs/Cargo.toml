@@ -3,17 +3,17 @@ name = "build-protos-rs"
 # Don't update this version, update the one in "pkg/Cargo.toml".
 version = "0.0.1"
 authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "weaverpb"
 path = "pkg/src/lib.rs"
 
 [dependencies]
-tonic = {version="0.8.3",  features = ["tls"]}
-prost = "0.11.8"
-tokio = { version = "1.27", features = ["macros", "fs"] }
-serde = {version="1.0.159", features = ["derive"]}
+tonic = {version="0.10.2",  features = ["tls"]}
+prost = "0.12.3"
+tokio = { version = "1.34.0", features = ["macros", "fs"] }
+serde = {version="1.0.193", features = ["derive"]}
 
 [build-dependencies]
-tonic-build = "0.8.4"
+tonic-build = "0.10.2"

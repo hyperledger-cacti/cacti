@@ -4,6 +4,7 @@ hostname="localhost"
 db_path="db/Dummy_Relay/requests"
 # This will be replaced by the task queue.
 remote_db_path="db/Dummy_Relay/remote_request"
+db_satp_path="db/Dummy_Relay/satp"
 # max retries opening sled db if it is locked
 db_open_max_retries=500
 # retry back off time in ms if sled db is locked
@@ -32,6 +33,11 @@ hostname="localhost"
 port="9085"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
+[relays.Dummy_Relay2]
+hostname="localhost"
+port="9087"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [relays.Fabric_Relay2]
 hostname="localhost"
 port="9083"
@@ -52,6 +58,6 @@ tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [drivers.Dummy]
 hostname="localhost"
-port="9092"
+port="9090"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"

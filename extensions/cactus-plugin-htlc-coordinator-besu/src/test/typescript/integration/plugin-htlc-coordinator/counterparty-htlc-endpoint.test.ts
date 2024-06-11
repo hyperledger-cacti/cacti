@@ -91,11 +91,11 @@ test(testCase, async (t: Test) => {
     ]),
     logLevel,
   });
-  keychainPlugin.set(
+  await keychainPlugin.set(
     DemoHelperJSON.contractName,
     JSON.stringify(DemoHelperJSON),
   );
-  keychainPlugin.set(
+  await keychainPlugin.set(
     HashTimeLockJSON.contractName,
     JSON.stringify(HashTimeLockJSON),
   );
@@ -143,7 +143,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -295,6 +295,12 @@ test(testCase, async (t: Test) => {
     counterpartyHTLCRequest,
   );
   t.equal(response2.status, 200, "response status is 200 OK");
+  const hstsHeader = response2.headers["strict-transport-security"];
+  t.equal(
+    hstsHeader,
+    "max-age=31536000; includeSubDomains; preload",
+    "response header is max-age=31536000; includeSubDomains; preload OK",
+  );
   t.equal(response2.data.success, true, "response success is true");
   t.equal(response2.data.callOutput, "1", "the contract status is 1 - Active");
 });

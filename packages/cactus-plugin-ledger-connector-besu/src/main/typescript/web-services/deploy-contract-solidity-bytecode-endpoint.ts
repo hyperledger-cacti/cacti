@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -14,7 +14,10 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 import { DeployContractSolidityBytecodeV1Request } from "../generated/openapi/typescript-axios";
@@ -26,7 +29,8 @@ export interface IDeployContractSolidityBytecodeOptions {
 }
 
 export class DeployContractSolidityBytecodeEndpoint
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "DeployContractSolidityBytecodeEndpoint";
 
   private readonly log: Logger;
@@ -45,18 +49,18 @@ export class DeployContractSolidityBytecodeEndpoint
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"
     ];
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -85,6 +89,8 @@ export class DeployContractSolidityBytecodeEndpoint
   }
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
+    const { log } = this;
+    const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     const reqBody: DeployContractSolidityBytecodeV1Request = req.body;
@@ -92,11 +98,8 @@ export class DeployContractSolidityBytecodeEndpoint
       const resBody = await this.options.connector.deployContract(reqBody);
       res.json(resBody);
     } catch (ex) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `${reqTag} ${fnTag} Failed to deploy contract:`;
+      await handleRestEndpointException({ errorMsg, log, error: ex, res });
     }
   }
 }

@@ -36,17 +36,17 @@ export class WithdrawEndpoint implements IWebServiceEndpoint {
     return WithdrawEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw"
     ];
   }
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getOperationId(): string {

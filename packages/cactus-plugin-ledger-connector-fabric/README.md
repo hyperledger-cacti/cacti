@@ -13,6 +13,8 @@
   - [1.5 Monitoring new blocks (WatchBlocks)](#15-monitoring-new-blocks-watchblocks)
     - [1.5.1 Example](#151-example)
     - [1.5.2 Listener Type](#152-listener-type)
+  - [1.6 Delegated Signature](#16-delegated-signature)
+    - [1.6.1 Example](#161-example)
 - [2. Architecture](#2-architecture)
   - [2.1. run-transaction-endpoint](#21-run-transaction-endpoint)
 - [3. Containerization](#3-containerization)
@@ -328,6 +330,47 @@ Corresponds directly to `BlockType` from `fabric-common`:
   - `WatchBlocksListenerTypeV1.Filtered`,
   - `WatchBlocksListenerTypeV1.Full`,
   - `WatchBlocksListenerTypeV1.Private`,
+
+### 1.6 Delegated Signature
+- Custom signature callback can be used when increased security is needed or currently available options are not sufficient.
+- Signature callback is used whenever fabric request must be signed.
+- To use delegate signature instead of identity supplied directly / through keychain use `transactDelegatedSign` (for transact) or `watchBlocksDelegatedSignV1` for block monitoring.
+- `uniqueTransactionData` can be passed to each delegate sign method on connector. This data is passed to signCallback to identify and verify the request. It can be used to pass signing tokens or any other data needed for performing the signing (e.g. user, scopes, etc...).
+- `signProposal` method from this package can be used to sign the requests in offline location.
+- For more complex examples see tests: `delegate-signing-methods.test` and `fabric-watch-blocks-delegated-sign-v1-endpoint.test`.
+
+#### 1.6.1 Example
+```typescript
+// Setup - supply callback when instantiating the connector plugin
+fabricConnectorPlugin = new PluginLedgerConnectorFabric({
+  instanceId: uuidv4(),
+  // ...
+  signCallback: async (payload, txData) => {
+    log.debug("signCallback called with txData (token):", txData);
+    return signProposal(adminIdentity.credentials.privateKey, payload);
+  },
+});
+
+// Run transactions
+await apiClient.runDelegatedSignTransactionV1({
+  signerCertificate: adminIdentity.credentials.certificate,
+  signerMspID: adminIdentity.mspId,
+  channelName: ledgerChannelName,
+  contractName: assetTradeContractName,
+  invocationType: FabricContractInvocationType.Call,
+  methodName: "ReadAsset",
+  params: ["asset1"],
+  uniqueTransactionData: myJwtToken,
+});
+
+// Monitor for transactions:
+apiClient.watchBlocksDelegatedSignV1({
+  type: WatchBlocksListenerTypeV1.CactusTransactions,
+  signerCertificate: adminIdentity.credentials.certificate,
+  signerMspID: adminIdentity.mspId,
+  channelName: ledgerChannelName,
+})
+```
 
 ##### Cactus (custom)
 Parses the data and returns custom formatted block.

@@ -10,16 +10,16 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "dependencies": {
-    "@types/node": "14.18.54",
+    "@types/node": "18.11.9",
     "config": "1.31.0",
     "ethereumjs-common": "1.5.2",
     "ethereumjs-tx": "2.1.2",
-    "socket.io-client": "4.5.4",
+    "socket.io-client-fixed-types": "4.5.4",
     "ts-node": "9.1.1",
     "web3": "1.7.0"
   },
   "devDependencies": {
-    "typescript": "4.9.5",
+    "typescript": "5.3.3",
     "@types/shelljs": "^0.8.12"
   }
 }

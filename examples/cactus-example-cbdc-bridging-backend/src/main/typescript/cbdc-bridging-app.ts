@@ -17,27 +17,34 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import {
   Configuration,
-  DefaultApi as OdapApi,
-} from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/index";
+  IKeyPair,
+  DefaultApi as SatpApi,
+} from "@hyperledger/cactus-plugin-satp-hermes/";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { IOdapPluginKeyPair } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
-import { DefaultApi as IpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { FabricOdapGateway } from "./odap-extension/fabric-odap-gateway";
-import { BesuOdapGateway } from "./odap-extension/besu-odap-gateway";
+import { FabricSatpGateway } from "./satp-extension/fabric-satp-gateway";
+import { BesuSatpGateway } from "./satp-extension/besu-satp-gateway";
 import CryptoMaterial from "../../crypto-material/crypto-material.json";
 
 export interface ICbdcBridgingApp {
   apiHost: string;
   apiServer1Port: number;
   apiServer2Port: number;
-  clientGatewayKeyPair: IOdapPluginKeyPair;
-  serverGatewayKeyPair: IOdapPluginKeyPair;
+  apiCrpcHost: string;
+  apiServer1CrpcPort: number;
+  apiServer2CrpcPort: number;
+  clientGatewayKeyPair: IKeyPair;
+  serverGatewayKeyPair: IKeyPair;
   logLevel?: LogLevelDesc;
   apiServerOptions?: ICactusApiServerOptions;
   disableSignalHandlers?: true;
+}
+
+interface ICrpcOptions {
+  host: string;
+  port: number;
 }
 
 export type ShutdownHook = () => Promise<void>;
@@ -78,10 +85,9 @@ export class CbdcBridgingApp {
     await this.infrastructure.start();
     this.onShutdown(() => this.infrastructure.stop());
 
-    const fabricPlugin = await this.infrastructure.createFabricLedgerConnector();
+    const fabricPlugin =
+      await this.infrastructure.createFabricLedgerConnector();
     const besuPlugin = await this.infrastructure.createBesuLedgerConnector();
-    const clientIpfsPlugin = await this.infrastructure.createIPFSConnector();
-    const serverIpfsPlugin = await this.infrastructure.createIPFSConnector();
 
     // Reserve the ports where the API Servers will run
     const httpApiA = await Servers.startOnPort(
@@ -99,18 +105,15 @@ export class CbdcBridgingApp {
     const addressInfoB = httpApiB.address() as AddressInfo;
     const nodeApiHostB = `http://${this.options.apiHost}:${addressInfoB.port}`;
 
-    const fabricOdapGateway = await this.infrastructure.createClientGateway(
+    const fabricSatpGateway = await this.infrastructure.createClientGateway(
       nodeApiHostA,
       this.options.clientGatewayKeyPair,
-      `http://${this.options.apiHost}:${addressInfoA.port}`,
     );
-
-    const besuOdapGateway = await this.infrastructure.createServerGateway(
+    const besuSatpGateway = await this.infrastructure.createServerGateway(
       nodeApiHostB,
       this.options.serverGatewayKeyPair,
-      `http://${this.options.apiHost}:${addressInfoB.port}`,
     );
-
+	
     const clientPluginRegistry = new PluginRegistry({
       plugins: [
         new PluginKeychainMemory({
@@ -129,17 +132,18 @@ export class CbdcBridgingApp {
         }),
       ],
     });
-
+	
     clientPluginRegistry.add(fabricPlugin);
-    clientPluginRegistry.add(fabricOdapGateway);
-    clientPluginRegistry.add(clientIpfsPlugin);
+    clientPluginRegistry.add(fabricSatpGateway);
 
     serverPluginRegistry.add(besuPlugin);
-    serverPluginRegistry.add(serverIpfsPlugin);
-    serverPluginRegistry.add(besuOdapGateway);
+    serverPluginRegistry.add(besuSatpGateway);
 
-    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry);
-    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry);
+    const crpcOptionsServer1 = {host: this.options.apiCrpcHost, port: this.options.apiServer1CrpcPort};
+    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry, crpcOptionsServer1);
+	
+    const crpcOptionsServer2 = {host: this.options.apiCrpcHost, port: this.options.apiServer2CrpcPort};
+    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry, crpcOptionsServer2);
 
     const fabricApiClient = new FabricApi(
       new Configuration({ basePath: nodeApiHostA }),
@@ -164,17 +168,16 @@ export class CbdcBridgingApp {
     return {
       apiServer1,
       apiServer2,
-      fabricGatewayApi: new OdapApi(
+      fabricGatewayApi: new SatpApi(
         new Configuration({ basePath: nodeApiHostA }),
       ),
-      besuGatewayApi: new OdapApi(
+      besuGatewayApi: new SatpApi(
         new Configuration({ basePath: nodeApiHostB }),
       ),
-      ipfsApiClient: new IpfsApi(new Configuration({ basePath: nodeApiHostA })),
       fabricApiClient,
       besuApiClient,
-      fabricOdapGateway,
-      besuOdapGateway,
+      fabricSatpGateway,
+      besuSatpGateway,
     };
   }
 
@@ -191,6 +194,7 @@ export class CbdcBridgingApp {
   public async startNode(
     httpServerApi: Server,
     pluginRegistry: PluginRegistry,
+    crpcOptions: ICrpcOptions,
   ): Promise<ApiServer> {
     this.log.info(`Starting API Server node...`);
 
@@ -211,6 +215,8 @@ export class CbdcBridgingApp {
       config.grpcPort = 0;
       config.logLevel = this.options.logLevel || "INFO";
       config.authorizationProtocol = AuthorizationProtocol.NONE;
+      config.crpcHost = crpcOptions.host;
+      config.crpcPort = crpcOptions.port;
     }
 
     const apiServer = new ApiServer({
@@ -230,11 +236,10 @@ export class CbdcBridgingApp {
 export interface IStartInfo {
   readonly apiServer1: ApiServer;
   readonly apiServer2: ApiServer;
-  readonly fabricGatewayApi: OdapApi;
-  readonly besuGatewayApi: OdapApi;
-  readonly ipfsApiClient: IpfsApi;
+  readonly fabricGatewayApi: SatpApi;
+  readonly besuGatewayApi: SatpApi;
   readonly besuApiClient: BesuApi;
   readonly fabricApiClient: FabricApi;
-  readonly fabricOdapGateway: FabricOdapGateway;
-  readonly besuOdapGateway: BesuOdapGateway;
+  readonly fabricSatpGateway: FabricSatpGateway;
+  readonly besuSatpGateway: BesuSatpGateway;
 }

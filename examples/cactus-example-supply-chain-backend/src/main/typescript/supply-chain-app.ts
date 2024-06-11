@@ -60,10 +60,9 @@ import {
   DefaultEventHandlerStrategy,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
-import {
-  SupplyChainAppDummyInfrastructure,
-  org1Env,
-} from "./infrastructure/supply-chain-app-dummy-infrastructure";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger/cactus-test-tooling";
+
+import { SupplyChainAppDummyInfrastructure } from "./infrastructure/supply-chain-app-dummy-infrastructure";
 import {
   Configuration,
   DefaultApi as SupplyChainApi,
@@ -193,6 +192,7 @@ export class SupplyChainApp {
 
     if (!this.options.disableSignalHandlers) {
       exitHook((callback: IAsyncExitHookDoneCallback) => {
+        console.log(`Executing Registered signal handler to stop container.`);
         this.stop().then(callback);
       });
       this.log.debug(`Registered signal handlers for graceful auto-shutdown`);
@@ -224,13 +224,13 @@ export class SupplyChainApp {
     const httpGuiC = await Servers.startOnPort(3200, "0.0.0.0");
 
     const addressInfoA = httpApiA.address() as AddressInfo;
-    const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
+    const nodeApiHostA = `http://127.0.0.1:${addressInfoA.port}`;
 
     const addressInfoB = httpApiB.address() as AddressInfo;
-    const nodeApiHostB = `http://localhost:${addressInfoB.port}`;
+    const nodeApiHostB = `http://127.0.0.1:${addressInfoB.port}`;
 
     const addressInfoC = httpApiC.address() as AddressInfo;
-    const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
+    const nodeApiHostC = `http://127.0.0.1:${addressInfoC.port}`;
 
     const token = await this.getOrCreateToken();
     const baseOptions = { headers: { Authorization: `Bearer ${token}` } };
@@ -277,7 +277,8 @@ export class SupplyChainApp {
     const rpcApiWsHostA = await this.ledgers.besu.getRpcApiWsHost();
     const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
 
-    const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
+    const connectionProfile =
+      await this.ledgers.fabric.getConnectionProfileOrg1();
     const sshConfig = await this.ledgers.fabric.getSshConfig();
 
     const registryA = new PluginRegistry({
@@ -387,7 +388,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
-          fabricEnvironment: org1Env,
+          fabricEnvironment: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         }),
         this.keychain,
       ],
@@ -402,7 +403,7 @@ export class SupplyChainApp {
       instanceId: "PluginLedgerConnectorFabric_C",
       dockerBinary: "/usr/local/bin/docker",
       peerBinary: "peer",
-      cliContainerEnv: org1Env,
+      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
       connectionProfile: connectionProfile,
       sshConfig: sshConfig,
       logLevel: "INFO",
@@ -463,7 +464,7 @@ export class SupplyChainApp {
     const memberIdA = uuidv4();
     const nodeIdA = uuidv4();
     const addressInfoA = serverA.address() as AddressInfo;
-    const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
+    const nodeApiHostA = `http://127.0.0.1:${addressInfoA.port}`;
 
     const publickKeyPemA = await exportSPKI(keyPairA);
     const cactusNodeA: CactusNode = {
@@ -491,7 +492,7 @@ export class SupplyChainApp {
     const memberIdB = uuidv4();
     const nodeIdB = uuidv4();
     const addressInfoB = serverB.address() as AddressInfo;
-    const nodeApiHostB = `http://localhost:${addressInfoB.port}`;
+    const nodeApiHostB = `http://127.0.0.1:${addressInfoB.port}`;
 
     const publickKeyPemB = await exportSPKI(keyPairB);
     const cactusNodeB: CactusNode = {
@@ -520,7 +521,7 @@ export class SupplyChainApp {
     const memberIdC = uuidv4();
     const nodeIdC = uuidv4();
     const addressInfoC = serverC.address() as AddressInfo;
-    const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
+    const nodeApiHostC = `http://127.0.0.1:${addressInfoC.port}`;
 
     const publickKeyPemC = await exportSPKI(keyPairC);
     const cactusNodeC: CactusNode = {
@@ -586,7 +587,8 @@ export class SupplyChainApp {
     properties.grpcPort = 0; // TODO - make this configurable as well
     properties.logLevel = this.options.logLevel || "INFO";
     properties.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
-    properties.authorizationConfigJson = await this.getOrCreateAuthorizationConfig();
+    properties.authorizationConfigJson =
+      await this.getOrCreateAuthorizationConfig();
 
     const apiServer = new ApiServer({
       config: properties,

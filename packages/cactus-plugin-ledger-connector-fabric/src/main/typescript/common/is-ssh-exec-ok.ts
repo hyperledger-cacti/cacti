@@ -1,5 +1,5 @@
 import { SSHExecCommandResponse } from "node-ssh";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export function isSshExecOk(res: SSHExecCommandResponse): boolean {
   const fnTag = "isSshExecOk()";

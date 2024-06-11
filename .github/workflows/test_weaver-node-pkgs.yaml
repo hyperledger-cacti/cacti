@@ -7,6 +7,10 @@
 
 name: Unit Test Weaver Node Packages
 
+env:
+  NODEJS_LTS_VERSION: v18.18.2
+  NODEJS_NEXT_LTS_VERSION: v20.9.0
+
 on:
   push:
     branches: [ main ]
@@ -18,86 +22,133 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit_test_weaver_node_sdk_local:
+  check_code_changed:
+    outputs:
+      fabric_sdk_changed: ${{ steps.changes.outputs.fabric_sdk_changed }}
+      iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
+      docs_changed: ${{ steps.changes.outputs.docs_changed }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.1
 
-    runs-on: ubuntu-latest
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            fabric_sdk_changed:
+              - '.github/workflows/test_weaver-node-pkgs.yaml'
+              - 'weaver/common/protos/**'
+              - 'weaver/common/protos-js/**'
+              - 'weaver/sdks/fabric/interoperation-node-sdk/**'
+
+            iin_agent_changed:
+              - '.github/workflows/test_weaver-node-pkgs.yaml'
+              - 'weaver/common/protos/**'
+              - 'weaver/common/protos-js/**'
+              - 'weaver/sdks/fabric/interoperation-node-sdk/**'
+              - 'weaver/core/identity-management/iin-agent/**'
+
+            docs_changed:
+              - '.github/workflows/test_weaver-node-pkgs.yaml'
+              - 'weaver/docs/**'
+
+  unit_test_weaver_node_sdk_local:
+    needs: check_code_changed
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x]
+        node-version: [v18.18.2, v20.9.0]
+        exclude:
+          - node-version: ${{ needs.check_code_changed.outputs.fabric_sdk_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
+
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3.6.0
+      uses: actions/setup-node@v4.0.2
       with:
         node-version: ${{ matrix.node-version }}
+  
     - name: Use Protoc 3.15
       run: |
         curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
         unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+  
     - name: Build JS Protos
       run: |
         export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
         make build
       working-directory: weaver/common/protos-js
+
     - name: Build
       run: make build-local
       working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
     - name: Tests
       run: npm run test
       working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
   unit_test_iin_agent_local:
-
-    runs-on: ubuntu-latest
+    needs: check_code_changed
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [v18.18.2, v20.9.0]
+        exclude:
+          - node-version: ${{ needs.check_code_changed.outputs.iin_agent_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
+
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3.6.0
+      uses: actions/setup-node@v4.0.2
       with:
         node-version: ${{ matrix.node-version }}
+
     - name: Use Protoc 3.15
       run: |
         curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
         unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+
     - name: Build JS Protos
       run: |
         export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
         make build
       working-directory: weaver/common/protos-js
+
     - name: Build
       run: make build-local
       working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
     - name: Build IIN Agent
       run: make build-local
       working-directory: weaver/core/identity-management/iin-agent
+
     - name: Tests
       run: npm run test
       working-directory: weaver/core/identity-management/iin-agent
 
   build_docs:
-    runs-on: ubuntu-latest
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.docs_changed == 'true'
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3.6.0
+      - uses: actions/checkout@v4.1.1
+
+      - name: Use Node.js ${{ env.NODEJS_LTS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 16.x
+          node-version: ${{ env.NODEJS_LTS_VERSION }}
 
       - name: NPM INSTALL
         run: npm install
         working-directory: weaver/docs
-        
+
       - name: Build
         run: npm run build
         working-directory: weaver/docs

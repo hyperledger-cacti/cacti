@@ -60,20 +60,22 @@
     "key-encoder": "2.0.3",
     "loglevel": "1.7.1",
     "loglevel-plugin-prefix": "0.8.4",
-    "sanitize-html": "2.7.0",
+    "run-time-error-cjs": "1.4.0",
+    "sanitize-html": "2.12.1",
     "secp256k1": "4.0.3",
     "sha3": "2.1.4"
   },
   "devDependencies": {
+    "@grpc/grpc-js": "1.10.3",
     "@types/json-stable-stringify": "1.0.33",
-    "@types/sanitize-html": "2.6.2",
+    "@types/sanitize-html": "2.9.5",
     "@types/secp256k1": "4.0.3",
-    "@types/uuid": "8.3.4",
-    "uuid": "8.3.2"
+    "@types/uuid": "9.0.8",
+    "uuid": "9.0.1"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

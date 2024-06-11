@@ -54,18 +54,18 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
     ];
   }
 
   getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -84,7 +84,8 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`POST ${this.getPath()}`);
 
     try {
-      const request: SignTransactionRequest = req.body as SignTransactionRequest;
+      const request: SignTransactionRequest =
+        req.body as SignTransactionRequest;
 
       const trxResponse = await this.options.connector.signTransaction(request);
 

@@ -1,43 +1,44 @@
 {
-    "name": "@hyperledger/cacti-weaver-driver-fabric",
-    "version": "2.0.0-alpha.2",
-    "description": "",
-    "main": "out/server.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "npm run tsc",
-        "tsc": "tsc",
-        "start": "node out/server.js",
-        "watch": "tsc --watch",
-        "dev": "nodemon out/server.js",
-        "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/hyperledger/cacti.git"
-    },
-    "author": "",
-    "license": "Apache-2.0",
-    "dependencies": {
-        "@fidm/x509": "1.2.1",
-        "@grpc/grpc-js": "1.9.0",
-        "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
-        "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
-        "@typescript-eslint/eslint-plugin": "5.62.0",
-        "@typescript-eslint/parser": "5.62.0",
-        "dotenv": "8.6.0",
-        "eslint-config-prettier": "8.10.0",
-        "eslint-plugin-prettier": "3.4.1",
-        "fabric-ca-client": "2.2.18",
-        "fabric-network": "2.2.18",
-        "level": "8.0.0",
-        "winston": "3.10.0"
-    },
-    "devDependencies": {
-        "@types/node": "16.18.41",
-        "nodemon": "2.0.22",
-        "patch-package": "6.5.1",
-        "typedoc": "0.24.8",
-        "typescript": "4.9.5"
-    }
+  "name": "@hyperledger/cacti-weaver-driver-fabric",
+  "version": "2.0.0-alpha.2",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": "",
+  "main": "out/server.js",
+  "scripts": {
+    "build": "npm run tsc",
+    "dev": "nodemon out/server.js",
+    "start": "node out/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@fidm/x509": "1.2.1",
+    "@grpc/grpc-js": "1.10.3",
+    "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
+    "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
+    "dotenv": "8.6.0",
+    "fabric-ca-client": "2.2.20",
+    "fabric-common": "2.2.20",
+    "fabric-network": "2.2.20",
+    "fabric-protos": "2.2.20",
+    "level": "8.0.0",
+    "winston": "3.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.9",
+    "nodemon": "2.0.22",
+    "patch-package": "6.5.1",
+    "typedoc": "0.25.6",
+    "typescript": "5.3.3"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  }
 }

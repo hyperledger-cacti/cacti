@@ -6,15 +6,11 @@
 // Constants
 //////////////////////////////////
 
-// Ledger settings
-// const containerImageName = "ghcr.io/hyperledger/cactus-geth-all-in-one";
-// const containerImageVersion = "2022-10-18-06770b6c";
-// const useRunningLedger = false;
-
 // Log settings
 const testLogLevel: LogLevelDesc = "info";
 
 import { GethTestLedger } from "../../../main/typescript/index";
+import contractData from "../../solidity/hello-world-contract/HelloWorld.json";
 
 import {
   LogLevelDesc,
@@ -37,6 +33,7 @@ const log: Logger = LoggerProvider.getOrCreate({
  */
 describe("Geth Test Ledger checks", () => {
   let ledger: GethTestLedger;
+  let web3Instance: Web3;
 
   //////////////////////////////////
   // Environment Setup
@@ -51,10 +48,12 @@ describe("Geth Test Ledger checks", () => {
       emitContainerLogs: true,
       logLevel: testLogLevel,
     });
-    log.debug("Geth image:", ledger.fullContainerImageName);
     expect(ledger).toBeTruthy();
+    log.debug("Geth image:", ledger.fullContainerImageName);
 
     await ledger.start();
+    web3Instance = new Web3(await ledger.getRpcApiHttpHost());
+    expect(web3Instance).toBeTruthy;
   });
 
   afterAll(async () => {
@@ -98,5 +97,79 @@ describe("Geth Test Ledger checks", () => {
     } finally {
       wsWeb3.provider?.disconnect();
     }
+  });
+
+  test("Class name is correct", async () => {
+    const className = ledger.className;
+    expect(className).toEqual("GethTestLedger");
+  });
+
+  test("Method createEthTestAccount works", async () => {
+    const testEthAcc = await ledger.createEthTestAccount();
+
+    expect(testEthAcc).toBeTruthy();
+    expect(testEthAcc.address).toHaveLength(42);
+    expect(testEthAcc.address).toStartWith("0x");
+  });
+
+  test("Method newEthPersonalAccount works", async () => {
+    const testEthAccount = await ledger.newEthPersonalAccount();
+
+    expect(testEthAccount).toBeTruthy();
+    expect(testEthAccount).toHaveLength(42);
+    expect(testEthAccount).toStartWith("0x");
+  });
+
+  test("Method transferAssetFromCoinbase works", async () => {
+    const testEthAcc = await ledger.createEthTestAccount();
+
+    const txReceipt = await ledger.transferAssetFromCoinbase(
+      testEthAcc.address,
+      1000,
+    );
+
+    expect(txReceipt).toBeTruthy();
+    expect(web3Instance.utils.toChecksumAddress(txReceipt.to)).toEqual(
+      testEthAcc.address,
+    );
+    expect(await web3Instance.eth.getBalance(testEthAcc.address)).toEqual(
+      BigInt("10000000000000001000"),
+    );
+  });
+
+  test("Method deployContract works and returns contract address", async () => {
+    const deployedData = await ledger.deployContract(
+      contractData.abi,
+      contractData.bytecode,
+      [],
+    );
+    expect(deployedData).toBeTruthy();
+    expect(deployedData.contractAddress).toStartWith("0x");
+    expect(deployedData.contractAddress).toHaveLength(42);
+
+    const contract = new web3Instance.eth.Contract(
+      contractData.abi,
+      deployedData.contractAddress,
+    );
+    expect(contract).toBeTruthy();
+
+    const contractCallResult = await contract.methods.sayHello().call();
+    expect(contractCallResult).toEqual("Hello World!");
+  });
+
+  test("Method getRpcApiHttpHost returns valid URL", async () => {
+    const httpHostAddress = await ledger.getRpcApiHttpHost();
+    const httpPort = await ledger.getHostPortHttp();
+    expect(httpHostAddress).toBeTruthy();
+    expect(httpHostAddress).toStartWith("http://");
+    expect(httpHostAddress).toContain(`${httpPort}`);
+  });
+
+  test("Method getRpcApiWebSocketHost returns valid URL", async () => {
+    const wsHostAddress = await ledger.getRpcApiWebSocketHost();
+    const wsPort = await ledger.getHostPortWs();
+    expect(wsHostAddress).toBeTruthy();
+    expect(wsHostAddress).toStartWith("ws://");
+    expect(wsHostAddress).toContain(`${wsPort}`);
   });
 });

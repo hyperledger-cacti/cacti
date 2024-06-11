@@ -68,7 +68,7 @@ describe(testCase, () => {
     console.log(`CactusKeychainVaultServer (Port=${hostPort}) started OK`);
 
     const configuration = new Configuration({
-      basePath: `http://localhost:${hostPort}`,
+      basePath: `http://127.0.0.1:${hostPort}`,
     });
     const apiClient = new DefaultApi(configuration);
 
@@ -82,9 +82,8 @@ describe(testCase, () => {
     apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     apiServerOptions.plugins = [];
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
 
     const factory = new PluginFactoryKeychain({
       pluginImportType: PluginImportType.Remote,

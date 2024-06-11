@@ -60,9 +60,7 @@ export class UtilityEmissionsFactor extends State {
   }
 }
 
-export class UtilityEmissionsFactorState extends WorldState<
-  UtilityEmissionsFactorInterface
-> {
+export class UtilityEmissionsFactorState extends WorldState<UtilityEmissionsFactorInterface> {
   constructor(stub: ChaincodeStub) {
     super(stub);
   }

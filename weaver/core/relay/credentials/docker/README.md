@@ -17,16 +17,28 @@ The sample certificates and private keys in this folder were generated for relay
   * _Private key_: `relay-corda-key.pem`
 - Fabric `network1` driver:
   * _Certificate_: `fabric-driver-network1-cert.pem`
-  * _Private key_: `fabric-driver-network1-cert.pem`
+  * _Private key_: `fabric-driver-network1-key.pem`
 - Fabric `network2` driver:
   * _Certificate_: `fabric-driver-network2-cert.pem`
-  * _Private key_: `fabric-driver-network2-cert.pem`
+  * _Private key_: `fabric-driver-network2-key.pem`
 - Corda `Corda_Network` driver:
   * _Certificate_: `corda-driver-cert.pem`
   * _Private key_: `corda-driver-key.pem`
 - Corda `Corda_Network2` driver:
   * _Certificate_: `corda2-driver-cert.pem`
   * _Private key_: `corda2-driver-key.pem`
+- Fabric `network1` `Org1MSP` IIN Agent:
+  * _Certificate_: `fabric-iin-agent-network1-org1-cert.pem`
+  * _Private key_: `fabric-iin-agent-network1-org1-key.pem`
+- Fabric `network1` `Org2MSP` IIN Agent:
+  * _Certificate_: `fabric-iin-agent-network1-org2-cert.pem`
+  * _Private key_: `fabric-iin-agent-network1-org2-key.pem`
+- Fabric `network2` `Org1MSP` IIN Agent:
+  * _Certificate_: `fabric-iin-agent-network2-org1-cert.pem`
+  * _Private key_: `fabric-iin-agent-network2-org1-key.pem`
+- Fabric `network2` `Org2MSP` IIN Agent:
+  * _Certificate_: `fabric-iin-agent-network2-org2-cert.pem`
+  * _Private key_: `fabric-iin-agent-network2-org2-key.pem`
 
 ## Useful commands
 
@@ -36,11 +48,11 @@ You can generate other certificates and keys for root CAs and the various compon
 
 - To create a self-signed key-cert pair, run:
   ```bash
-  openssl req -x509 -newkey rsa:4096 -keyout <key-file-path> -out <cert-file-path> -sha256 -days 365 -nodes -addext "subjectAltName = DNS:localhost,IP:127.0.0.1"
+  openssl req -x509 -newkey rsa:4096 -keyout <key-file-path> -out <cert-file-path> -sha256 -days <number-of-days-to-expiration> -nodes -addext "subjectAltName = DNS:localhost,IP:127.0.0.1"
   ```
-  The sample CA cert and key were generated thie following way:
+  The sample CA cert (5-year validity) and key were generated the following way:
   ```bash
-  openssl req -x509 -newkey rsa:4096 -keyout ca-key.pem -out ca-cert.pem -sha256 -days 365 -nodes -addext "subjectAltName = DNS:localhost,IP:127.0.0.1"
+  openssl req -x509 -newkey rsa:4096 -keyout ca-key.pem -out ca-cert.pem -sha256 -days 1826 -nodes -addext "subjectAltName = DNS:localhost,IP:127.0.0.1"
   ```
 
 - The truststore in the folder was created the following way:
@@ -50,11 +62,11 @@ You can generate other certificates and keys for root CAs and the various compon
 
 - To create a private key and CSR for a subject, run:
   ```bash
-  openssl req -newkey rsa:4096 -nodes -days 365 -keyout <subject-key-file-path> -out <subject-csr-file-path>
+  openssl req -newkey rsa:4096 -nodes -days <number-of-days-to-expiration> -keyout <subject-key-file-path> -out <subject-csr-file-path>
   ```
-  _Example_: the sample key and CSR for the Fabric `network1` relay were generated as follows:
+  _Example_: the sample key and CSR (5-year validity) for the Fabric `network1` relay were generated as follows:
   ```bash
-  openssl req -newkey rsa:4096 -nodes -days 365 -keyout relay-network1-key.pem -out relay-network1-csr.pem
+  openssl req -newkey rsa:4096 -nodes -days 1826 -keyout relay-network1-key.pem -out relay-network1-csr.pem
   ```
 
 - To create a certificate signed by a CA, first create an extensions file (say `v3.ext`) containing the subject's alternative names to be embedded in the certificate (replace `<subject-service-name>` with the hostname or the docker container service name below):
@@ -63,15 +75,15 @@ You can generate other certificates and keys for root CAs and the various compon
   ```
   Then run:
   ```bash
-  openssl x509 -req -in <subject-csr-file-path> -out <subject-cert-file-path> -sha256 -days 365 -CA <CA-cert-file-path> -CAkey <CA-key-file-path> -CAcreateserial -extfile v3.ext
+  openssl x509 -req -in <subject-csr-file-path> -out <subject-cert-file-path> -sha256 -days <number-of-days-to-expiration> -CA <CA-cert-file-path> -CAkey <CA-key-file-path> -CAcreateserial -extfile v3.ext
   ```
   _Example_: the sample `v3.ext` used for the Corda `Corda_Network` driver contained the following (note the reference to the Docker container service name):
   ```
   subjectAltName = DNS:corda-driver-Corda_Network,DNS:localhost,IP:127.0.0.1
   ```
-  The command to generate the Corda `Corda_Network` driver's certificate was as follows:
+  The command to generate the Corda `Corda_Network` driver's certificate (5-year validity) was as follows:
   ```bash
-  openssl x509 -req -in corda-driver-csr.pem -out corda-driver-cert.pem -sha256 -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -extfile v3.ext
+  openssl x509 -req -in corda-driver-csr.pem -out corda-driver-cert.pem -sha256 -days 1826 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -extfile v3.ext
   ```
 
 - To examine the contents of a certificate, run:

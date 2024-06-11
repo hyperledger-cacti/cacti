@@ -26,7 +26,7 @@ const mockAppConfig = {
     },
   ],
   logLevel: sutLogLevel,
-  applicationHostInfo: { hostName: "0.0.0.0", hostPort: 0 },
+  applicationHostInfo: { hostName: "127.0.0.1", hostPort: 0 },
   socketOptions: {
     rejectUnauthorized: false,
     reconnection: false,

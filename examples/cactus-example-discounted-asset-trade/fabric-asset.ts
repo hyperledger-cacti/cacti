@@ -8,7 +8,7 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
-import { FabricAssetManagement } from "./fabric-asset-management";
+import { queryAsset, queryAllAssets } from "./transaction-fabric";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -17,20 +17,18 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const router: Router = Router();
-const fabricAssetManagement: FabricAssetManagement = new FabricAssetManagement();
 
 /* GET query asset. */
 router.get("/:assetID", (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.debug(`start queryAsset`);
 
-    fabricAssetManagement
-      .queryAsset(req.params.assetID)
-      .then((result) => {
+    queryAsset(req.params.assetID)
+      .then((result: unknown) => {
         logger.debug("result(queryAsset) = " + JSON.stringify(result));
         res.status(200).json(result);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         logger.error(err);
       });
   } catch (err) {
@@ -55,13 +53,12 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.debug(`start queryAllAssets`);
 
-    fabricAssetManagement
-      .queryAllAssets()
-      .then((result) => {
+    queryAllAssets()
+      .then((result: unknown) => {
         logger.debug("result(queryAllAssets) = " + JSON.stringify(result));
         res.status(200).json(result);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         logger.error(err);
       });
   } catch (err) {

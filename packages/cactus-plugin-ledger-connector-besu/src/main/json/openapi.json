@@ -240,6 +240,15 @@
           "Complete"
         ]
       },
+      "WatchBlocksV1Request": {
+        "type": "object",
+        "required": ["event"],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/WatchBlocksV1"
+          }
+        }
+      },
       "Web3BlockHeader": {
         "type": "object",
         "required": [
@@ -950,7 +959,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
@@ -975,7 +984,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"
@@ -1009,7 +1018,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance"
@@ -1043,7 +1052,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block"
@@ -1077,7 +1086,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction"
@@ -1111,7 +1120,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction"
@@ -1145,7 +1154,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs"
@@ -1179,7 +1188,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"
@@ -1213,7 +1222,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
@@ -1252,7 +1261,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics"
@@ -1277,7 +1286,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record"

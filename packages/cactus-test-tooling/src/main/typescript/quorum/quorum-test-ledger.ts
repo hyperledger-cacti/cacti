@@ -1,4 +1,3 @@
-import { Stream } from "stream";
 import { EventEmitter } from "events";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
@@ -36,8 +35,8 @@ export const QUORUM_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   rpcApiWsPort: 8546,
 });
 
-export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     containerImageVersion: Joi.string().min(5).required(),
     containerImageName: Joi.string().min(1).required(),
     rpcApiHttpPort: Joi.number()
@@ -46,8 +45,7 @@ export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().ke
       .min(1024)
       .max(65535)
       .required(),
-  },
-);
+  });
 
 export class QuorumTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
@@ -117,11 +115,10 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getFileContents(filePath: string): Promise<string> {
-    const response: NodeJS.ReadableStream = await this.getContainer().getArchive(
-      {
+    const response: NodeJS.ReadableStream =
+      await this.getContainer().getArchive({
         path: filePath,
-      },
-    );
+      });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
@@ -195,9 +192,8 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getGenesisJsObject(): Promise<IQuorumGenesisOptions> {
-    const quorumGenesisJson: string = await this.getFileContents(
-      "/genesis.json",
-    );
+    const quorumGenesisJson: string =
+      await this.getFileContents("/genesis.json");
     return JSON.parse(quorumGenesisJson);
   }
 
@@ -363,7 +359,7 @@ export class QuorumTestLedger implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }
@@ -386,7 +382,7 @@ export class QuorumTestLedger implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }
@@ -418,22 +414,25 @@ export class QuorumTestLedger implements ITestLedger {
   private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
-        if (pullError) {
-          reject(pullError);
-        } else {
-          docker.modem.followProgress(
-            stream,
-            (progressError: unknown, output: unknown[]) => {
-              if (progressError) {
-                reject(progressError);
-              } else {
-                resolve(output);
-              }
-            },
-          );
-        }
-      });
+      docker.pull(
+        containerNameAndTag,
+        (pullError: unknown, stream: NodeJS.ReadableStream) => {
+          if (pullError) {
+            reject(pullError);
+          } else {
+            docker.modem.followProgress(
+              stream,
+              (progressError: unknown, output: unknown[]) => {
+                if (progressError) {
+                  reject(progressError);
+                } else {
+                  resolve(output);
+                }
+              },
+            );
+          }
+        },
+      );
     });
   }
 

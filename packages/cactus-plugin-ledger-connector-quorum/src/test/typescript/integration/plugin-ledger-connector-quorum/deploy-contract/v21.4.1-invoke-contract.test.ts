@@ -27,19 +27,23 @@ const contractName = "HelloWorld";
 const testCase = "Quorum Ledger Connector Plugin";
 
 describe(testCase, () => {
+  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
+  const ledgerOptions = { containerImageVersion };
+  const ledger = new QuorumTestLedger(ledgerOptions);
+
   afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
   });
 
-  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-  const ledgerOptions = { containerImageVersion };
-  const ledger = new QuorumTestLedger(ledgerOptions);
-
-  test(testCase, async () => {
+  beforeAll(async () => {
     await ledger.start();
+  });
+
+  test("can invoke contract methods", async () => {
     const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
-    const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
+    const quorumGenesisOptions: IQuorumGenesisOptions =
+      await ledger.getGenesisJsObject();
     expect(quorumGenesisOptions).toBeTruthy();
     expect(quorumGenesisOptions.alloc).toBeTruthy();
 
@@ -72,14 +76,13 @@ describe(testCase, () => {
     );
     // Instantiate connector with the keychain plugin that already has the
     // private key we want to use for one of our tests
-    const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
-      {
+    const connector: PluginLedgerConnectorQuorum =
+      new PluginLedgerConnectorQuorum({
         instanceId: uuidV4(),
         rpcApiHttpHost,
         logLevel,
         pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-      },
-    );
+      });
 
     await connector.transact({
       web3SigningCredential: {
@@ -184,20 +187,19 @@ describe(testCase, () => {
       });
       expect(getNameOut.success).toBeTruthy();
 
-      const {
-        callOutput: getNameOut2,
-      } = await connector.getContractInfoKeychain({
-        contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.Call,
-        methodName: "getName",
-        params: [],
-        web3SigningCredential: {
-          ethAccount: firstHighNetWorthAccount,
-          secret: "",
-          type: Web3SigningCredentialType.GethKeychainPassword,
-        },
-      });
+      const { callOutput: getNameOut2 } =
+        await connector.getContractInfoKeychain({
+          contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+          invocationType: EthContractInvocationType.Call,
+          methodName: "getName",
+          params: [],
+          web3SigningCredential: {
+            ethAccount: firstHighNetWorthAccount,
+            secret: "",
+            type: Web3SigningCredentialType.GethKeychainPassword,
+          },
+        });
       expect(getNameOut2).toEqual(newName);
     }
 
@@ -263,21 +265,20 @@ describe(testCase, () => {
       } catch (error) {
         expect(error.message).toMatch(/nonce too low/);
       }
-      const {
-        callOutput: getNameOut,
-      } = await connector.getContractInfoKeychain({
-        contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.Call,
-        methodName: "getName",
-        params: [],
-        gas: 1000000,
-        web3SigningCredential: {
-          ethAccount: testEthAccount.address,
-          secret: testEthAccount.privateKey,
-          type: Web3SigningCredentialType.PrivateKeyHex,
-        },
-      });
+      const { callOutput: getNameOut } =
+        await connector.getContractInfoKeychain({
+          contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+          invocationType: EthContractInvocationType.Call,
+          methodName: "getName",
+          params: [],
+          gas: 1000000,
+          web3SigningCredential: {
+            ethAccount: testEthAccount.address,
+            secret: testEthAccount.privateKey,
+            type: Web3SigningCredentialType.PrivateKeyHex,
+          },
+        });
       expect(getNameOut).toEqual(newName);
 
       const getNameOut2 = await connector.getContractInfoKeychain({
@@ -337,17 +338,16 @@ describe(testCase, () => {
       } catch (error) {
         expect(error.message).toMatch(/nonce too low/);
       }
-      const {
-        callOutput: getNameOut,
-      } = await connector.getContractInfoKeychain({
-        contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.Call,
-        methodName: "getName",
-        params: [],
-        gas: 1000000,
-        web3SigningCredential,
-      });
+      const { callOutput: getNameOut } =
+        await connector.getContractInfoKeychain({
+          contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+          invocationType: EthContractInvocationType.Call,
+          methodName: "getName",
+          params: [],
+          gas: 1000000,
+          web3SigningCredential,
+        });
       expect(getNameOut).toEqual(newName);
 
       const getNameOut2 = await connector.getContractInfoKeychain({

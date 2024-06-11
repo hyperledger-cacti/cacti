@@ -5,6 +5,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -14,8 +15,9 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
 import OAS from "../../json/openapi.json";
-import sanitizeHtml from "sanitize-html";
 import { InvokeRawWeb3EthContractV1Response } from "../generated/openapi/typescript-axios";
+import { ERR_INVALID_RESPONSE } from "web3";
+import { isWeb3Error } from "../public-api";
 
 export interface IInvokeRawWeb3EthContractEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -43,18 +45,18 @@ export class InvokeRawWeb3EthContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract"
     ];
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -85,24 +87,29 @@ export class InvokeRawWeb3EthContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-
     try {
-      const methodResponse = await this.options.connector.invokeRawWeb3EthContract(
-        req.body,
-      );
+      const methodResponse =
+        await this.options.connector.invokeRawWeb3EthContract(req.body);
       const response: InvokeRawWeb3EthContractV1Response = {
         status: 200,
         data: methodResponse,
       };
       res.json(response);
-    } catch (ex: any) {
-      this.log.warn(`Error while serving ${reqTag}`, ex);
-      res.json({
-        status: 504,
-        errorDetail: sanitizeHtml(ex, {
-          allowedTags: [],
-          allowedAttributes: {},
-        }),
+    } catch (ex) {
+      this.log.error(`Crash while serving ${reqTag}`, ex);
+
+      // Return errors responses from ethereum node as user errors
+      if (isWeb3Error(ex) && ex.code === ERR_INVALID_RESPONSE) {
+        res.status(400).json({
+          message: "Invalid Response Error",
+          error: safeStringifyException(ex),
+        });
+        return;
+      }
+
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(ex),
       });
     }
   }

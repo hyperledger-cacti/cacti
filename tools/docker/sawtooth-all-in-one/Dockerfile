@@ -1,5 +1,7 @@
 FROM docker:24.0.5-dind
 
+ENV APP_ROOT="/app"
+
 RUN apk update \
   && apk add --no-cache \
   docker-cli \
@@ -11,8 +13,10 @@ RUN apk update \
   make \
   supervisor
 
+WORKDIR ${APP_ROOT}
+
 # Copy sawtooth docker-compose
-COPY ./sawtooth-default.yaml /app/docker-compose.yaml
+COPY ./sawtooth-default.yaml ./docker-compose.yaml
 
 # Copy sawtooth shell helper
 COPY ./shell.sh /bin/shell
@@ -28,5 +32,6 @@ EXPOSE 8008
 
 # Setup supervisor entrypoint
 COPY supervisord.conf /etc/supervisord.conf
+COPY ./run-sawtooth-ledger.sh ./run-sawtooth-ledger.sh
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]

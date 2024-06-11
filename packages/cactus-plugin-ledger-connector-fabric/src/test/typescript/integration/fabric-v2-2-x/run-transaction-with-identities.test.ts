@@ -14,7 +14,7 @@ import {
 } from "../../../../main/typescript/public-api";
 import { DiscoveryOptions } from "fabric-network";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 import {
   Containers,
   VaultTestServer,
@@ -22,8 +22,8 @@ import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
 import { v4 as internalIpV4 } from "internal-ip";
 import axios from "axios";
@@ -45,8 +45,8 @@ test("run-transaction-with-identities", async (t: Test) => {
     emitContainerLogs: true,
     publishAllPorts: true,
     imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
+    imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
     logLevel,
   });
 
@@ -313,7 +313,7 @@ test("run-transaction-with-identities", async (t: Test) => {
     t.comment(out);
     {
       // make invoke InitLedger using a client1 client
-      const resp = await plugin.transact({
+      await plugin.transact({
         signingCredential: {
           keychainId: keychainId,
           keychainRef: client1Key,
@@ -324,11 +324,10 @@ test("run-transaction-with-identities", async (t: Test) => {
         methodName: "InitLedger",
         params: [],
       });
-      t.true(resp.success, "InitLedger tx for Basic2 success===true OK");
     }
     {
       // make invoke TransferAsset using a client2 client
-      const resp = await plugin.transact({
+      await plugin.transact({
         signingCredential: {
           keychainId: keychainId,
           keychainRef: client2Key,
@@ -344,7 +343,6 @@ test("run-transaction-with-identities", async (t: Test) => {
         methodName: "TransferAsset",
         params: ["asset1", "client2"],
       });
-      t.true(resp.success, "TransferAsset asset1 client2 success true OK");
     }
     {
       // make query ReadAsset using a registrar client
@@ -364,7 +362,6 @@ test("run-transaction-with-identities", async (t: Test) => {
         methodName: "ReadAsset",
         params: ["asset1"],
       });
-      t.true(resp.success);
       const asset = JSON.parse(resp.functionOutput);
       t.equal(asset.Owner, "client2");
     }

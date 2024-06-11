@@ -19,8 +19,6 @@ RUN npm install --unsafe-perm
 ADD server /driver/fabric/server
 ADD constants /driver/fabric/constants
 ADD tsconfig.json .
-ADD .eslintrc .
-ADD .prettierrc .
 
 RUN npm run build
 

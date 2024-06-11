@@ -1,29 +1,34 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
- * Source: https://github.com/hyperledger/fabric-samples/releases/tag/v1.4.8
+ * Source: https://github.com/hyperledger/fabric-samples
  */
 
 "use strict";
 
-const {
-  FileSystemWallet,
-  Gateway,
-  X509WalletMixin,
-} = require("fabric-network");
+const { Wallets } = require("fabric-network");
+const FabricCAServices = require("fabric-ca-client");
+const fs = require("fs");
 const path = require("path");
 
 const ccpPath = "./connection.json";
 
 async function main() {
   try {
+    // load the network configuration
+    const ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+
+    // Create a new CA client for interacting with the CA.
+    const caURL = ccp.certificateAuthorities["ca.org1.example.com"].url;
+    const ca = new FabricCAServices(caURL);
+
     // Create a new file system based wallet for managing identities.
     const walletPath = path.join(process.cwd(), "wallet");
-    const wallet = new FileSystemWallet(walletPath);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
     console.log(`Wallet path: ${walletPath}`);
 
     // Check to see if we've already enrolled the user.
-    const userExists = await wallet.exists("appUser");
-    if (userExists) {
+    const userIdentity = await wallet.get("appUser");
+    if (userIdentity) {
       console.log(
         'An identity for the user "appUser" already exists in the wallet',
       );
@@ -31,8 +36,8 @@ async function main() {
     }
 
     // Check to see if we've already enrolled the admin user.
-    const adminExists = await wallet.exists("admin");
-    if (!adminExists) {
+    const adminIdentity = await wallet.get("admin");
+    if (!adminIdentity) {
       console.log(
         'An identity for the admin user "admin" does not exist in the wallet',
       );
@@ -40,17 +45,11 @@ async function main() {
       return;
     }
 
-    // Create a new gateway for connecting to our peer node.
-    const gateway = new Gateway();
-    await gateway.connect(ccpPath, {
-      wallet,
-      identity: "admin",
-      discovery: { enabled: true, asLocalhost: true },
-    });
-
-    // Get the CA client object from the gateway for interacting with the CA.
-    const ca = gateway.getClient().getCertificateAuthority();
-    const adminIdentity = gateway.getCurrentIdentity();
+    // build a user object for authenticating with the CA
+    const provider = wallet
+      .getProviderRegistry()
+      .getProvider(adminIdentity.type);
+    const adminUser = await provider.getUserContext(adminIdentity, "admin");
 
     // Register the user, enroll the user, and import the new identity into the wallet.
     const secret = await ca.register(
@@ -59,18 +58,21 @@ async function main() {
         enrollmentID: "appUser",
         role: "client",
       },
-      adminIdentity,
+      adminUser,
     );
     const enrollment = await ca.enroll({
       enrollmentID: "appUser",
       enrollmentSecret: secret,
     });
-    const userIdentity = X509WalletMixin.createIdentity(
-      "Org1MSP",
-      enrollment.certificate,
-      enrollment.key.toBytes(),
-    );
-    await wallet.import("appUser", userIdentity);
+    const x509Identity = {
+      credentials: {
+        certificate: enrollment.certificate,
+        privateKey: enrollment.key.toBytes(),
+      },
+      mspId: "Org1MSP",
+      type: "X.509",
+    };
+    await wallet.put("appUser", x509Identity);
     console.log(
       'Successfully registered and enrolled admin user "appUser" and imported it into the wallet',
     );

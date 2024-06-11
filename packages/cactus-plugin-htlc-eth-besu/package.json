@@ -57,7 +57,7 @@
     "codegen:openapi": "npm run generate-sdk",
     "compile-contracts": "forge build",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "lint": "solhint --fix",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
@@ -72,26 +72,26 @@
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
-    "axios": "0.21.4",
+    "axios": "1.6.0",
     "bn.js": "5.2.1",
     "dotenv": "16.0.3",
     "ethers": "6.3.0",
-    "express": "4.17.1",
+    "express": "4.19.2",
     "joi": "17.9.1",
-    "openapi-types": "9.1.0",
+    "openapi-types": "12.1.3",
     "typescript-optional": "2.0.1",
     "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
-    "@types/express": "4.17.13",
+    "@types/express": "4.17.21",
     "ds-test": "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0",
     "forge-std": "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

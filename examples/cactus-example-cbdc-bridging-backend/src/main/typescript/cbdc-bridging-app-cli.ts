@@ -17,14 +17,13 @@ export async function launchApp(
   const configService = new ConfigService();
   const exampleConfig = await configService.newExampleConfig();
   exampleConfig.configFile = "";
-  exampleConfig.authorizationConfigJson = (JSON.stringify(
+  exampleConfig.authorizationConfigJson = JSON.stringify(
     exampleConfig.authorizationConfigJson,
-  ) as unknown) as IAuthorizationConfig;
+  ) as unknown as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
-
-  const convictConfig = await configService.newExampleConfigConvict(
-    exampleConfig,
-  );
+ 
+  const convictConfig =
+    await configService.newExampleConfigConvict(exampleConfig);
 
   env = await configService.newExampleConfigEnv(convictConfig.getProperties());
 
@@ -54,7 +53,10 @@ export async function launchApp(
   if (
     process.env.API_HOST == undefined ||
     process.env.API_SERVER_1_PORT == undefined ||
-    process.env.API_SERVER_2_PORT == undefined
+    process.env.API_SERVER_2_PORT == undefined ||
+    process.env.API_CRPC_HOST == undefined ||
+    process.env.API_SERVER_1_CRPC_PORT == undefined ||
+    process.env.API_SERVER_2_CRPC_PORT == undefined
   ) {
     throw new Error("Env variables not set");
   }
@@ -66,6 +68,9 @@ export async function launchApp(
     clientGatewayKeyPair: clientGatewayKeyPair,
     serverGatewayKeyPair: serverGatewayKeyPair,
     logLevel: "DEBUG",
+    apiCrpcHost: process.env.API_CRPC_HOST,
+    apiServer1CrpcPort: parseInt(process.env.API_SERVER_1_CRPC_PORT),
+    apiServer2CrpcPort: parseInt(process.env.API_SERVER_2_CRPC_PORT),
   };
 
   const cbdcBridgingApp = new CbdcBridgingApp(appOptions);

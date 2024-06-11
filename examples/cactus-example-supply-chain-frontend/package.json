@@ -67,9 +67,11 @@
     "@ionic-native/status-bar": "5.36.0",
     "@ionic/angular": "7.3.3",
     "net-browserify": "0.2.4",
+    "run-time-error": "1.4.0",
     "rxjs": "7.8.1",
     "tls-browserify": "0.2.2",
     "tslib": "2.6.2",
+    "uuid": "9.0.1",
     "zone.js": "0.13.1"
   },
   "devDependencies": {
@@ -80,6 +82,7 @@
     "@angular/compiler-cli": "16.2.4",
     "@angular/language-service": "16.2.4",
     "@ionic/angular-toolkit": "10.0.0",
+    "@types/uuid": "9.0.8",
     "browserify-fs": "1.0.0",
     "https-browserify": "1.0.0",
     "net-browserify": "0.2.4",
@@ -88,8 +91,8 @@
     "tls-browserify": "0.2.2"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

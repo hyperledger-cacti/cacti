@@ -54,7 +54,7 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "dockerode": "3.3.0",
     "internal-ip": "6.2.0",
-    "run-time-error": "1.4.0",
+    "run-time-error-cjs": "1.4.0",
     "web3": "4.0.3",
     "web3-eth-accounts": "4.0.3"
   },
@@ -62,8 +62,8 @@
     "@types/dockerode": "3.2.7"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

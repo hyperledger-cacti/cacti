@@ -20,8 +20,6 @@ import {
 } from "@hyperledger/cactus-cmd-socketio-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 
-import fs from "fs";
-import yaml from "js-yaml";
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -71,7 +69,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
   startMonitor(tradeInfo: TradeInfo) {
     // Get Verifier Instance
-    logger.debug( 
+    logger.debug(
       `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
@@ -83,18 +81,20 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     const options = {
       filterKey: config.electricityTradeInfo.tcsHuawei.filterKey,
     };
-    const verifierTcs = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][0],
-    );
-    verifierTcs.startMonitor(
-      "BusinessLogicTcsElectricityTrade",
-      options,
-      routesTransactionManagement,
-    );
+    routesVerifierFactory
+      .getVerifier(useValidator["validatorID"][0])
+      .then((verifierTcs) => {
+        verifierTcs.startMonitor(
+          "BusinessLogicTcsElectricityTrade",
+          options,
+          routesTransactionManagement,
+        );
+      });
+
     logger.debug("getVerifierTcs");
   }
 
-  remittanceTransaction(transactionSubset: object) {
+  async remittanceTransaction(transactionSubset: object) {
     logger.debug(
       `called remittanceTransaction(), accountInfo = ${json2str(
         transactionSubset,
@@ -130,7 +130,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       routesTransactionManagement.getValidatorToUse(this.businessLogicID),
     );
     //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
-    const verifierEthereum = routesVerifierFactory.getVerifier(
+    const verifierEthereum = await routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
     );
     verifierEthereum.startMonitor(
@@ -172,7 +172,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     logger.debug(
       `##onEvent(): ${json2str(ledgerEvent["data"]["blockData"][targetIndex])}`,
     );
-      switch (ledgerEvent.verifierId) {
+    switch (ledgerEvent.verifierId) {
       case config.electricityTradeInfo.tcsHuawei.validatorID:
         this.onEventTCS(ledgerEvent.data, targetIndex);
         break;
@@ -189,15 +189,21 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
   onEventTCS(event: any, targetIndex: number): void {
     logger.debug(`##in onEventTCS()`);
-    logger.debug("event.blockData", event["blockData"])
-    logger.debug("event.blockData[0]", event["blockData"][targetIndex])
-    logger.debug("event.blockData[0].Payload", event["blockData"][targetIndex]["Payload"])
-    logger.debug("event.blockData.Payload.Name", event["blockData"][targetIndex]["Payload"]["Name"])
+    logger.debug("event.blockData", event["blockData"]);
+    logger.debug("event.blockData[0]", event["blockData"][targetIndex]);
+    logger.debug(
+      "event.blockData[0].Payload",
+      event["blockData"][targetIndex]["Payload"],
+    );
+    logger.debug(
+      "event.blockData.Payload.Name",
+      event["blockData"][targetIndex]["Payload"]["Name"],
+    );
 
-    var trxPayload = event["blockData"][targetIndex]["Payload"]
+    const trxPayload = event["blockData"][targetIndex]["Payload"];
     if (trxPayload == undefined || trxPayload == NIL) {
-      logger.error("transaction payload is empty")
-      return
+      logger.error("transaction payload is empty");
+      return;
     }
     try {
       if (trxPayload["Verb"].Verb !== "set") {
@@ -209,9 +215,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         this.remittanceTransaction(transactionSubset);
       }
     } catch (err) {
-      logger.error(
-        `##onEventTCS(): err: ${err}, event: ${json2str(event)}`,
-      );
+      logger.error(`##onEventTCS(): err: ${err}, event: ${json2str(event)}`);
     }
   }
 
@@ -276,7 +280,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  getOperationStatus(tradeID: string): object {
+  getOperationStatus(): object {
     logger.debug(`##in getOperationStatus()`);
     return {};
   }
@@ -286,7 +290,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     targetIndex: number,
   ): string | null {
     logger.debug(`##in getTxIDFromEvent`);
-    //        logger.debug(`##event: ${json2str(ledgerEvent)}`);
 
     switch (ledgerEvent.verifierId) {
       case config.electricityTradeInfo.tcsHuawei.validatorID:
@@ -310,7 +313,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
 
     try {
-      return "txId-test-1"
+      return "txId-test-1";
       const txId = tx["header_signature"];
 
       if (typeof txId !== "string") {
@@ -423,7 +426,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     // add MeterInfo
     const meterInfo = new MeterInfo(meterParams);
-    const result: {} = this.meterManagement.addMeterInfo(meterInfo);
+    const result = this.meterManagement.addMeterInfo(meterInfo);
     return result;
   }
 }

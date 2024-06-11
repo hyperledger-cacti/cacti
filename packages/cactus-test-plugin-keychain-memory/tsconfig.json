@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-test-plugin-keychain-memory.tsbuildinfo"
+  },
+  "include": [
+    "./src",
+  ],
+  "references": [
+    {
+      "path": "../cactus-cmd-api-server/tsconfig.json"
+    },
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-keychain-memory/tsconfig.json"
+    }
+  ]
+}

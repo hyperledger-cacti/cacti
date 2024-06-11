@@ -10,7 +10,7 @@ import { WsIdentityClient } from "ws-identity-client";
 
 export interface WSClientOptions {
   // full url of web-socket identity server
-  // eg : http://localhost:8700
+  // eg : http://127.0.0.1:8700
   endpoint: string;
 
   // pathPrefix for incoming web-socket connections

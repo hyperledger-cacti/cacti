@@ -6,6 +6,7 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -17,7 +18,6 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
-import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
 export interface IRunTransactionEndpointV1Options {
@@ -54,18 +54,18 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"
     ];
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -84,15 +84,13 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`POST ${this.getPath()}`);
 
     try {
-      const reqBody = req.body as RunTransactionRequest;
-      const resBody = await this.opts.connector.transact(reqBody);
-      res.status(200);
-      res.json(resBody);
-    } catch (ex) {
-      this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      res.status(200).json(await this.opts.connector.transact(req.body));
+    } catch (error) {
+      this.log.error(`Crash while serving ${fnTag}`, error);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(error),
+      });
     }
   }
 }

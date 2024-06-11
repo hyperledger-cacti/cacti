@@ -1,5 +1,5 @@
 import path from "path";
-import { Duplex, Stream } from "stream";
+import { Duplex } from "stream";
 import { IncomingMessage } from "http";
 import throttle from "lodash/throttle";
 import { Container, ContainerInfo } from "dockerode";
@@ -8,7 +8,7 @@ import execa from "execa";
 import tar from "tar-stream";
 import fs from "fs-extra";
 import pRetry from "p-retry";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { Streams } from "../common/streams";
 import {
   Checks,
@@ -380,7 +380,7 @@ export class Containers {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${privatePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${privatePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${privatePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }
@@ -443,7 +443,10 @@ export class Containers {
         log.debug(JSON.stringify(msg.progress || msg.status));
       }, 1000);
 
-      const pullStreamStartedHandler = (pullError: unknown, stream: Stream) => {
+      const pullStreamStartedHandler = (
+        pullError: unknown,
+        stream: NodeJS.ReadableStream,
+      ) => {
         if (pullError) {
           log.error(`Could not even start ${imageFqn} pull:`, pullError);
           reject(pullError);

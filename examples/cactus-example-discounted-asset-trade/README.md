@@ -22,38 +22,22 @@ Alice knows that Acme Corp. provides digital certificates. She asks Acme Corp. t
 
 ### When Alice Uses the Service
 
-Alice will use credentials and other Indy formats such as schema and definition to create an employee proof that she will present when purchasing the asset. Alice then sends a purchase order and her employee proof to the Cactus Node Server via an End User Application. The employee proofs consist of proof requests and proofs on Hyperledger Indy. The Cactus Node server receives the schema and definition from the Indy ledger via Validator and uses this information to verify the proof with the BLP. Once verified, the BLP will decide what she should pay based on the price list and then proceed with the business logic using cactus as an escrow to transfer ETH currencies and asset ownership tokens to each other.
+- Alice will use her client application to connect with discounted-asset-trade BLP application. This will create anoncreds connection between her and the BLP app.
+- Alice will send a purchase order to the BLP application.
+- BLP will request the proof of employment from Alice client application.
+- Once verified, the BLP will decide what she should pay based on the price list and then proceed with the business logic using cactus as an escrow to transfer ETH currencies and asset ownership tokens to each other.
 
 ## Setup Overview
 
-### fabric-socketio-validator
+### fabric-connector
 
 - Validator for fabric ledger.
-- Docker networks: `fabric-all-in-one_testnet-2x`, `cactus-example-discounted-asset-trade-net`
+- Started as part of discounted asset trade BLP.
 
 ### ethereum-validator
 
 - Validator for ethereum ledger.
-- Docker network: `geth1net`, `cactus-example-discounted-asset-trade-net`
-
-### indy-sdk-cli-base-image
-
-- Base image for indy validator.
-- It will build the image and immediately exit on run.
-
-### indy-validator
-
-- Validator for indy ledger.
-- Assumes ledger runs at `172.16.0.2`
-- Docker network: `indy-testnet_indy_net`
-- Accessed only by nginx proxy container.
-
-### indy-validator-nginx
-
-- Load balancer / gateway for indy validator.
-- Use it's endpoint to talk to indy validator.
-- Uses config from `./nginx/nginx.conf`
-- Docker network: `indy-testnet_indy_net`, `cactus-example-discounted-asset-trade-net`
+- Started as part of discounted asset trade BLP.
 
 ### cmd-socketio-base-image
 
@@ -66,12 +50,6 @@ Alice will use credentials and other Indy formats such as schema and definition 
 - Main logic for this sample application.
 - Use it's endpoint (`localhost:5034`) to interact the bussiness logic.
 - Docker network: `cactus-example-discounted-asset-trade-net`
-
-### register-indy-data
-
-- Setup application.
-- Will generate proof and store it in local configuration on startup.
-- This application can also be used to send requests to the BLP.
 
 ## Indy Schema
 
@@ -88,6 +66,13 @@ Alice will use credentials and other Indy formats such as schema and definition 
    popd
    ```
 
+1. Create settings directory and make sure you have write permission on it
+
+   ```bash
+   sudo mkdir /etc/cactus
+   sudo chown -R __YOUR_USERNAME__ /etc/cactus/
+   ```
+
 1. Start the ledgers:
 
    ```
@@ -99,7 +84,55 @@ Alice will use credentials and other Indy formats such as schema and definition 
    - On success, this should start three containers:
      - `geth1`
      - `asset_trade_faio2x_testnet`
-     - `indy-testnet-pool`
+     - `asset_trade_indy_all_in_one`
+
+1. Setup Indy credentials:
+   - Before running the sample application we need to register employment credential and issue it to Alice (user of our app).
+   - Use `setup-credentials` script from `cactus-example-discounted-asset-trade-client`.
+
+```bash
+# In separate shell (can be used later for client app)
+cd ./examples/cactus-example-discounted-asset-trade-client
+yarn setup-credentials
+popd
+```
+
+- Copy the credential definition ID from the script output into this example application BLP configuration.
+
+```bash
+# setup-credentials script output
+Running with log level INFO
+Connecting Alice with Issuer...
+Connecting aliceCactiAgent to issuerCactiAgent...
+Agents connected!
+Register and issue the employment credential...
+Register Credential Schema...
+Register employment certificate credential schema 'cactiJobCert'...
+Employment credential schemaId: did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0
+Register Credential Definition...
+Register job certificate credential definition (schemaId: 'did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0') ...
+# COPY THIS >>
+Employment credential credentialDefinitionId: did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default
+# <<
+Issue the credential...
+Employment credential issued: 7f93ba15-98b2-4667-a7cf-ecec3059e9d4
+Accepting credential eb69032d-ec73-4fa1-bd83-1ff52a0dc4b5...
+Credential accepted!
+Credential was issed and accepted by a peer agent!
+Verify employment status proof...
+Proof request was sent
+Accepting proof 4d03e479-073a-4f51-98e4-befd7ba34345...
+Proof request accepted!
+Requested proof status: done
+Finishing - cleaning up the agents...
+All done.
+
+# Replace __CREDENTIAL_DEFINITION_ID__ in config file with actual credentialDefinitionId
+sed -i 's#__CREDENTIAL_DEFINITION_ID__#did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default#g' "./etc/cactus/usersetting.yaml"
+
+# ... or do it manually in text editor
+vim ./etc/cactus/usersetting.yaml
+```
 
 1. Launch discounted-asset-trade and validators from local `docker-compose.yml` (use separate console for that, docker-compose will block your prompt):
 
@@ -112,20 +145,12 @@ Alice will use credentials and other Indy formats such as schema and definition 
    This will build and launch all needed containers, the final output should look like this:
 
    ```
-   cactus-example-discounted-asset-trade-ethereum-validator | listening on *:5050
-   ...
-   cactus-example-discounted-asset-trade-fabric-socketio-validator | listening on *:5040
    ...
    cactus-example-discounted-asset-trade-indy-validator | 2022-01-31 16:00:49,552 INFO success: validator entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
    ...
    cactus-example-discounted-asset-trade-indy-validator-nginx | 2022/01/31 16:00:49 [notice] 1#1: start worker process 35
    ...
    cmd-socketio-base-dummy exited with code 0
-   ...
-   indy-sdk-cli-base-dummy exited with code 0
-   ...
-   register-indy-data      | Done.
-   register-indy-data exited with code 0
    ...
    cactus-example-discounted-asset-trade-blp      | [2022-01-31T16:00:56.208] [INFO] www - listening on *: 5034
    ```
@@ -134,164 +159,185 @@ Alice will use credentials and other Indy formats such as schema and definition 
 
 For development purposes, it might be useful to run the sample application outside of docker-compose environment.
 
-1. Install Indy SDK required by this sample app:
-   - [Installing the SDK](https://github.com/hyperledger/indy-sdk#installing-the-sdk)
-   - [Build the SDK from source](https://github.com/hyperledger/indy-sdk#how-to-build-indy-sdk-from-source)
-   - Or use these steps for Ubuntu 20.04:
-   ```bash
-   sudo apt-get install ca-certificates -y \
-    && sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
-    && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
-    && sudo apt-get update \
-    && sudo apt-get install -y \
-        libindy \
-        libnullpay \
-        libvcx \
-        indy-cli \
-    && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
-   ```
-1. Add indy-sdk node package: `yarn add indy-sdk@1.16.0-dev-1649` (or edit `package.json` directly)
 1. Configure cactus and start the ledgers as described above.
 1. Run `./script-dockerless-config-patch.sh` from `cactus-example-discounted-asset-trade/` directory. This will patch the configs and copy it to global location.
-1. Start validators (each in separate cmd window).
-   1. ```bash
-      cd packages/cactus-plugin-ledger-connector-fabric-socketio/ && npm run start
-      ```
-   1. ```bash
-      cd packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ && npm run start
-      ```
-   1. ```bash
-      docker build tools/docker/indy-sdk-cli -t indy-sdk-cli &&
-      pushd packages-python/cactus_validator_socketio_indy/ && sh ./setup_indy.sh && popd &&
-      docker build packages-python/cactus_validator_socketio_indy/ -t indy-validator &&
-      docker run -v/etc/cactus/:/etc/cactus --rm --net="indy-testnet_indy_net" -p 10080:8000 indy-validator
-      ```
 1. Start asset-trade: `npm run start-dockerless`
 
 ## How to use this application
 
-1. (Optional) Check the balance on Ethereum and the asset ownership on Fabric using the following script:
+- Use `run-discounted-asset-trade-client` script from `cactus-example-discounted-asset-trade-client` to interact with this application.
 
-   ```
-   node ./read-ledger-state.js
-   ```
+```bash
+# In separat shell
+cd ./examples/cactus-example-discounted-asset-trade-client
+yarn run-discounted-asset-trade-client
 
-   The result looks like the following (simplified output):
+# Sample output
+Running with log level INFO
+Connected to the discounted asset trade sample app agent! ID: 19949a1e-0ef6-449b-9c37-256449258b51
+Action: (Use arrow keys)
+❯ Start the trade
+  Get this agent credentials
+  Get assets
+  Exit
+```
 
-   ```
-   # Ethereum fromAccount:
-   { status: 200, amount: 1e+26 }
+1. (Optional) Check credentials in Alice wallet by selecting `Get this agent credentials`.
 
-   # Ethereum escrowAccount:
-   { status: 200, amount: 0 }
+```bash
+Action: Get this agent credentials
+[
+  {
+    "id": "eb69032d-ec73-4fa1-bd83-1ff52a0dc4b5",
+    "schemaId": "did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0",
+    # Note: This credential matches one we'll be requesting in discounted asset trade example
+    "credentialDefinitionId": "did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default",
+    "connectionId": "32134b50-a245-4de5-8408-f35fcb069373",
+    "credentials": [
+      {
+        "credentialRecordType": "anoncreds",
+        "credentialRecordId": "dd6aba0c-8674-451d-a063-a630004be1dd"
+      }
+    ],
+    "credentialAttributes": [
+      {
+        "mime-type": "text/plain",
+        "name": "first_name",
+        "value": "Alice"
+      },
+      {
+        "mime-type": "text/plain",
+        "name": "last_name",
+        "value": "Garcia"
+      },
+      {
+        "mime-type": "text/plain",
+        "name": "salary",
+        "value": "2400"
+      },
+      {
+        "mime-type": "text/plain",
+        "name": "employee_status",
+        # Note: Alice is a permanent employee
+        "value": "Permanent"
+      },
+      {
+        "mime-type": "text/plain",
+        "name": "experience",
+        "value": "10"
+      }
+    ]
+  }
+]
+```
 
-   # Ethereum toAccount:
-   { status: 200, amount: 0 }
+1. (Optional) Check the balance on Ethereum and the asset ownership on Fabric by selecting `Get assets`.
 
+```bash
+Action: Get assets
 
-   # Fabric:
-   [
-       {
-           ...
-       },
-       {
-           ID: 'asset2',
-           color: 'red',
-           size: 5,
-           owner: 'Brad',
-           appraisedValue: 400
-       },
-       ...
-   ]
-   ```
+# Ethereum fromAccount:
+1.00005515e+26
 
-1. Run the transaction execution:
+# Ethereum escrowAccount:
+0
 
-   **For docker-compose environment, run:**
+# Ethereum toAccount:
+0
 
-   ```
-   ./script-post-trade-request.sh
-   ```
+# Fabric:
+[
+   {
+      ...
+   },
+   {
+      ID: 'asset2',
+      color: 'red',
+      size: 5,
+      owner: 'Brad',
+      appraisedValue: 400
+   },
+   ...
+]
+```
 
-   ... or send request manually:
+1. Run the transaction execution by selecting `Start the trade`
 
-   ```
-   docker run --rm -ti -v "$(pwd)/etc/cactus/":"/etc/cactus/" --net="host" register-indy-data
-   ```
+```bash
+Action: Start the trade
+Trade request sent! Response: { tradeID: '20231103185232057-001' }
+```
 
-   **For dockerless environment, run:**
+1. (Optional) Check the final balance on Ethereum and the asset ownership on Fabric by selecting `Get assets`.
 
-   ```bash
-   pushd ../register-indy-data && sh ./script-build-docker.sh && popd &&
-   docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" register-indy-data --force
-   ```
+```bash
+Action: Get assets
 
-   **After sending the requests**
+# Ethereum fromAccount:
+1.000057e+26
 
-   - The transactions are executed by order.
-   - When the following log appears on the BLP console, the transactions are completed.
+# Ethereum escrowAccount:
+0
 
-   ```
-   [INFO] BusinessLogicAssetTrade - ##INFO: completed asset-trade, businessLogicID: guks32pf, tradeID: *******-001
-   ```
+# Ethereum toAccount:
+25
 
-1. (Optional) Check the balance on Ethereum and the asset ownership on Fabric using the following script
-
-   ```
-   node ./read-ledger-state.js
-   ```
-
-   The result looks like the following (simplified output). In the following case, 50 coins from `fromAccount` was transferred to `toAccount`, and the asset ownership ("owner") was transferred from Brad to Cathy.
-
-   ```
-   # Ethereum fromAccount:
-   { status: 200, amount: 1.00000045e+26 }
-
-   # Ethereum escrowAccount:
-   { status: 200, amount: 0 }
-
-   # Ethereum toAccount:
-   { status: 200, amount: 25 }
-
-
-   # Fabric:
-   [
-       {
-           ...
-       },
-       {
-           ID: 'asset2',
-           color: 'red',
-           size: 5,
-           owner: 'Cathy',
-           appraisedValue: 400
-       },
-       ...
-   ]
-   ```
+# Fabric:
+[
+   {
+      ...
+   },
+   {
+      ID: 'asset2',
+      color: 'red',
+      size: 5,
+      owner: 'Cathy',
+      appraisedValue: 400
+   },
+   ...
+]
 
 ## How to stop the application and Docker containers
 
 1. Press `Ctrl+C` in `docker-compose` console to stop the application.
 1. Run cleanup script
-   ```
-   sudo ./script-cleanup.sh
-   ```
+```
+
+sudo ./script-cleanup.sh # for root owned files
+./script-cleanup.sh # for user owner files
+
+```
 
 #### Manual cleanup instructions
 
 1. Remove the config files on your machine
-   ```
-   sudo rm -r ./etc/cactus/
-   ```
+```
+
+sudo rm -r ./etc/cactus/
+
+```
 1. Stop the docker containers of Ethereum, Fabric and Indy
 
-   - `docker stop geth1 asset_trade_faio2x_testnet indy-testnet-pool`
-   - `docker rm geth1 asset_trade_faio2x_testnet indy-testnet-pool`
+- `docker stop geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
+- `docker rm geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
 
-1. Clear indy testnet sandbox
-   ```
-   pushd ../../tools/docker/indy-testnet/
-   ./script-cleanup.sh
-   popd
-   ```
+1. Clear indy-all-in-one
+
+```
+
+pushd ../../tools/docker/indy-all-in-one/
+./script-cleanup.sh
+popd
+
+```
+
+1. Remove geth files
+```
+
+pushd ../../tools/docker/geth-testnet/
+rm -fr ./data-geth1/geth/
+popd
+
+```
+
+```

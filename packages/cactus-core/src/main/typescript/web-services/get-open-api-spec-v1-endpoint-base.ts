@@ -1,6 +1,4 @@
 import type { Express, Request, Response } from "express";
-import { RuntimeError } from "run-time-error";
-import { stringify } from "safe-stable-stringify";
 
 import {
   Logger,
@@ -19,6 +17,7 @@ import {
 import { PluginRegistry } from "../plugin-registry";
 
 import { registerWebServiceEndpoint } from "./register-web-service-endpoint";
+import { handleRestEndpointException } from "./handle-rest-endpoint-exception";
 
 export interface IGetOpenApiSpecV1EndpointBaseOptions<S, P> {
   logLevel?: LogLevelDesc;
@@ -87,7 +86,7 @@ export interface IGetOpenApiSpecV1EndpointBaseOptions<S, P> {
  * ```json
  * "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec": {
  *   "get": {
- *     "x-hyperledger-cactus": {
+ *     "x-hyperledger-cacti": {
  *       "http": {
  *         "verbLowerCase": "get",
  *         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
@@ -181,16 +180,8 @@ export class GetOpenApiSpecV1EndpointBase<S, P> implements IWebServiceEndpoint {
       res.status(200);
       res.json(oas);
     } catch (ex: unknown) {
-      const eMsg = `${fnTag} failed to serve request: ${reqMeta}`;
-      this.log.debug(eMsg, ex);
-
-      const cause = ex instanceof Error ? ex : stringify(ex);
-      const error = new RuntimeError(eMsg, cause);
-
-      res.status(500).json({
-        message: "Internal Server Error",
-        error,
-      });
+      const errorMsg = `${fnTag} request handler fn crashed for: ${reqMeta}`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

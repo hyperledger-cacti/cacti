@@ -72,11 +72,11 @@ export class GetObjectEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return this.getOperation()["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.getOperation()["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.getOperation()["x-hyperledger-cactus"].http.path;
+    return this.getOperation()["x-hyperledger-cacti"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

@@ -1,8 +1,6 @@
 const packageDir = process.cwd();
 const pkg = require(`${packageDir}/package.json`);
 const TerserPlugin = require("terser-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
 
 const packageNameNoScope = pkg.name.substring(pkg.name.lastIndexOf("/") + 1);
 const libraryName = `${packageNameNoScope}`;
@@ -48,13 +46,7 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js"],
   },
-  plugins: [
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: "static",
-    //   openAnalyzer: false,
-    //   reportFilename: `${pkg.mainMinified}.html`,
-    // }),
-  ],
+  plugins: [],
   optimization: {
     minimizer: [new TerserPlugin()],
   },
@@ -69,7 +61,6 @@ module.exports = {
   externals: {
     "swarm-js": "swarm-js",
     "node-ssh": "node-ssh",
-    "grpc": "grpc",      
     npm: "npm",
     "fabric-client": "fabric-client",
     "fabric-ca-client": "fabric-ca-client",

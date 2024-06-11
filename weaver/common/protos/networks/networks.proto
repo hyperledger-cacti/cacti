@@ -24,6 +24,10 @@ service Network {
   // NOTE: This rpc is just for debugging.
   rpc RequestDatabase(DbName) returns (RelayDatabase) {}
   
+  // SATP endpoints
+  // endpoint for a network to request asset transfer to a receiving gateway via local gateway
+  rpc RequestAssetTransfer(NetworkAssetTransfer) returns (common.ack.Ack) {}
+
   // Event endpoints
   // endpoint for a client to subscribe to event via local relay initiating subscription flow.
   rpc SubscribeEvent(NetworkEventSubscription) returns (common.ack.Ack) {}
@@ -70,4 +74,17 @@ message NetworkEventSubscription {
 message NetworkEventUnsubscription {
   NetworkEventSubscription request = 1;
   string request_id = 2;
+}
+
+message NetworkAssetTransfer {
+  string asset_type = 1;
+  string asset_id = 2;
+  string sender = 3;
+  string source_contract_id = 4;
+  string source_relay = 5;
+  string source_network = 6;
+  string destination_relay = 7;
+  string destination_network = 8;
+  string recipient = 9;
+  string destination_contract_id = 10;
 }

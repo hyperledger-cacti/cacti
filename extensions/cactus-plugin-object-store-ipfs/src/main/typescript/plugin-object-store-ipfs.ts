@@ -1,10 +1,12 @@
 import path from "path";
 import type { Express } from "express";
-import { create } from "ipfs-http-client";
-import type { Options } from "ipfs-http-client";
-import { RuntimeError } from "run-time-error";
-import { Logger, Checks, LoggerProvider } from "@hyperledger/cactus-common";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import { RuntimeError } from "run-time-error-cjs";
+import {
+  Logger,
+  Checks,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import type {
   IPluginObjectStore,
   ICactusPluginOptions,
@@ -22,8 +24,11 @@ import OAS from "../json/openapi.json";
 import { GetObjectEndpointV1 } from "./web-services/get-object-endpoint-v1";
 import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
-import type { IIpfsHttpClient } from "./i-ipfs-http-client";
-import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
+import {
+  LikeIpfsHttpClient,
+  isLikeIpfsHttpClient,
+  Options,
+} from "./kubo-rpc-client-types";
 
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
   "HTTPError: file does not exist";
@@ -31,13 +36,13 @@ export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
 export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly logLevel?: LogLevelDesc;
   readonly parentDir: string;
-  readonly ipfsClientOrOptions: Options | IIpfsHttpClient;
+  readonly ipfsClientOrOptions: Options | LikeIpfsHttpClient;
 }
 
 export class PluginObjectStoreIpfs implements IPluginObjectStore {
   public static readonly CLASS_NAME = "PluginObjectStoreIpfs";
 
-  private readonly ipfs: IIpfsHttpClient;
+  private ipfs: LikeIpfsHttpClient | undefined;
   private readonly log: Logger;
   private readonly instanceId: string;
   private readonly parentDir: string;
@@ -46,24 +51,44 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     return PluginObjectStoreIpfs.CLASS_NAME;
   }
 
+  /**
+   * We use dynamic import for kubo-rpc-client since it's ESM and we can't import it normally.
+   * This methods will load the module and initialize local IPFS client based on ctor arguments.
+   */
+  private async initIpfs(): Promise<void> {
+    if (isLikeIpfsHttpClient(this.opts.ipfsClientOrOptions)) {
+      this.ipfs = this.opts.ipfsClientOrOptions;
+    } else if (this.opts.ipfsClientOrOptions) {
+      const { create } = await import("kubo-rpc-client");
+      this.ipfs = create(this.opts.ipfsClientOrOptions);
+    } else {
+      const errorMessage = `initIpfs Need either "ipfsClient" or "ipfsClientOptions" to construct ${this.className} Neither was provided.`;
+      throw new RuntimeError(errorMessage);
+    }
+  }
+
+  /**
+   * Get IPFS client or initialize it from constructor args.
+   * @returns `LikeIpfsHttpClient` or exception
+   */
+  private async getIpfs(): Promise<LikeIpfsHttpClient> {
+    if (!this.ipfs) {
+      await this.initIpfs();
+    }
+
+    if (!this.ipfs) {
+      throw new Error("Could not instantiate ipfs http client");
+    }
+
+    return this.ipfs;
+  }
+
   constructor(public readonly opts: IPluginObjectStoreIpfsOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.nonBlankString(opts.instanceId, `${fnTag} options.instanceId`);
     Checks.nonBlankString(opts.parentDir, `${fnTag} options.parentDir`);
     Checks.truthy(opts.ipfsClientOrOptions, `${fnTag} ipfsClientOrOptions`);
-
-    if (isIpfsHttpClientOptions(opts.ipfsClientOrOptions)) {
-      this.ipfs = opts.ipfsClientOrOptions;
-    } else if (opts.ipfsClientOrOptions) {
-      this.ipfs = create({
-        ...(this.opts.ipfsClientOrOptions as Options),
-      });
-    } else {
-      const errorMessage = `${fnTag} Need either "ipfsClient" or "ipfsClientOptions" to construct ${this.className} Neither was provided.`;
-      throw new RuntimeError(errorMessage);
-    }
-    Checks.truthy(this.ipfs, `${fnTag} arg options.backend`);
 
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
@@ -80,7 +105,7 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
   }
 
   public async onPluginInit(): Promise<unknown> {
-    return; // no-op
+    return this.initIpfs();
   }
 
   public async registerWebServices(
@@ -131,7 +156,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
 
   public async get(req: GetObjectRequestV1): Promise<GetObjectResponseV1> {
     const keyPath = this.getKeyPath(req);
-    const chunksIterable = this.ipfs.files.read(keyPath);
+    const ipfs = await this.getIpfs();
+    const chunksIterable = ipfs.files.read(keyPath);
     const chunks = [];
     for await (const chunk of chunksIterable) {
       chunks.push(chunk);
@@ -152,7 +178,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     const checkedAt = new Date().toJSON();
     const keyPath = this.getKeyPath(req);
     try {
-      const statResult = await this.ipfs.files.stat(keyPath);
+      const ipfs = await this.getIpfs();
+      const statResult = await ipfs.files.stat(keyPath);
       this.log.debug(`StatResult for ${req.key}: %o`, statResult);
       return { key: req.key, checkedAt, isPresent: true };
     } catch (ex) {
@@ -171,7 +198,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     try {
       this.log.debug(`Seting object ${keyPath} in IPFS...`);
       const buffer = Buffer.from(req.value, "base64");
-      await this.ipfs.files.write(keyPath, buffer, {
+      const ipfs = await this.getIpfs();
+      await ipfs.files.write(keyPath, buffer, {
         create: true,
         parents: true,
       });

@@ -66,7 +66,8 @@ export interface IPluginLedgerConnectorCordaOptions
 }
 
 export class PluginLedgerConnectorCorda
-  implements IPluginLedgerConnector<any, any, any, any>, IPluginWebService {
+  implements IPluginLedgerConnector<any, any, any, any>, IPluginWebService
+{
   public static readonly CLASS_NAME = "DeployContractJarsEndpoint";
 
   private readonly instanceId: string;
@@ -118,13 +119,12 @@ export class PluginLedgerConnectorCorda
     return res;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }

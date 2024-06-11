@@ -10,7 +10,7 @@
   "author": "Hyperledger",
   "license": "Apache-2.0",
   "dependencies": {
-    "fabric-ca-client": "1.4.19",
-    "fabric-network": "1.4.19"
+    "fabric-ca-client": "2.2.20",
+    "fabric-network": "2.2.20"
   }
 }

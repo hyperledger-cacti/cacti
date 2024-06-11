@@ -14,9 +14,8 @@ describe("api-server shutdown-hook configuration tests", () => {
     const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.configFile = "";
 
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
 
     const apiServer = new ApiServer({
       config: config.getProperties(),

@@ -15,14 +15,14 @@ on:
 jobs:
   publish-protos-rs:
       if: github.repository_owner == 'hyperledger'
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
       permissions:
         packages: write
         contents: read
 
       steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-        - uses: actions/checkout@v3.5.2
+        - uses: actions/checkout@v4.1.1
 
         - name: Install RUST Toolchain minimal stable with clippy and rustfmt
           uses: actions-rs/toolchain@v1.0.6
@@ -40,14 +40,14 @@ jobs:
   publish-relay-image:
     if: github.repository_owner == 'hyperledger'
     needs: publish-protos-rs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.1.0

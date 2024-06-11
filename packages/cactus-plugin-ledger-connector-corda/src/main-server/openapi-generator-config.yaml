@@ -1,15 +1,19 @@
+templateDir: src/main-server/mustache/generator-template-overrides/
+
 additionalProperties:
   title: "Hyperledger Cactus - Corda Ledger Connector Plugin Server"
   groupId: org.hyperledger.cactus
   artifactId: cactus-connector-corda-server
   # TODO: Make sure this automatically gets bumped during releases so that it
   # remains in sync with the package.json version number.
-  artifactVersion: 0.3.0
+  artifactVersion: 2.0.0-alpha.2
   apiSuffix: PluginLedgerConnectorCorda
   basePackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server
   packageName: org.hyperledger.cactus.plugin.ledger.connector.corda.server
   apiPackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server.api
   modelPackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server.model
+
+  documentationProvider: none
 
   enumPropertyNaming: UPPERCASE
   delegatePattern: false

@@ -21,7 +21,11 @@ import { Contract } from "web3-eth-contract";
 import { ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
+import { BadRequestError } from "http-errors-enhanced-cjs";
+
 import OAS from "../json/openapi.json";
+
+import { Interface, FunctionFragment, isAddress } from "ethers";
 
 import {
   ConsensusAlgorithmFamily,
@@ -78,7 +82,7 @@ import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3
 
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
@@ -101,7 +105,8 @@ export class PluginLedgerConnectorQuorum
       RunTransactionResponse
     >,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -291,13 +296,12 @@ export class PluginLedgerConnectorQuorum
     return `@hyperledger/cactus-plugin-ledger-connector-quorum`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
@@ -442,10 +446,8 @@ export class PluginLedgerConnectorQuorum
       throw new Error(`${fnTag} Contract ABI is necessary`);
     }
 
-    const contractInstance: InstanceType<typeof Contract> = new this.web3.eth.Contract(
-      abi,
-      contractAddress,
-    );
+    const contractInstance: InstanceType<typeof Contract> =
+      new this.web3.eth.Contract(abi, contractAddress);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
       contractInstance,
@@ -543,9 +545,8 @@ export class PluginLedgerConnectorQuorum
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactSigned()`;
 
-    const receipt = await this.web3Quorum.eth.sendSignedTransaction(
-      rawTransaction,
-    );
+    const receipt =
+      await this.web3Quorum.eth.sendSignedTransaction(rawTransaction);
 
     if (receipt instanceof Error) {
       this.log.debug(`${fnTag} Web3 sendSignedTransaction failed`, receipt);
@@ -562,9 +563,8 @@ export class PluginLedgerConnectorQuorum
     const fnTag = `${this.className}#transactGethKeychain()`;
     const { sendTransaction } = this.web3Quorum.eth.personal;
     const { transactionConfig, web3SigningCredential } = txIn;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
 
     if (txIn.privateTransactionConfig) {
       return this.transactPrivate(txIn);
@@ -587,9 +587,8 @@ export class PluginLedgerConnectorQuorum
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     if (req.privateTransactionConfig) {
       return this.transactPrivate(req);
@@ -614,13 +613,11 @@ export class PluginLedgerConnectorQuorum
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const { web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
-    const signingAccount = this.web3Quorum.eth.accounts.privateKeyToAccount(
-      secret,
-    );
+    const signingAccount =
+      this.web3Quorum.eth.accounts.privateKeyToAccount(secret);
     const txCount = await this.web3Quorum.eth.getTransactionCount(
       signingAccount.address,
     );
@@ -643,9 +640,8 @@ export class PluginLedgerConnectorQuorum
 
     const { transactionHash } = block as IPrivateTransactionReceipt;
 
-    const transactionReceipt = await this.web3Quorum.priv.waitForTransactionReceipt(
-      transactionHash,
-    );
+    const transactionReceipt =
+      await this.web3Quorum.priv.waitForTransactionReceipt(transactionHash);
 
     return { transactionReceipt: transactionReceipt };
   }
@@ -671,11 +667,8 @@ export class PluginLedgerConnectorQuorum
       web3SigningCredential,
       privateTransactionConfig,
     } = req;
-    const {
-      ethAccount,
-      keychainEntryKey,
-      keychainId,
-    } = web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
+    const { ethAccount, keychainEntryKey, keychainId } =
+      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
 
     // locate the keychain plugin that has access to the keychain backend
     // denoted by the keychainID from the request.
@@ -693,9 +686,8 @@ export class PluginLedgerConnectorQuorum
       this.log.debug(
         `${fnTag} Gas not specified in the transaction values. Using the estimate from web3`,
       );
-      transactionConfig.gas = await this.web3Quorum.eth.estimateGas(
-        transactionConfig,
-      );
+      transactionConfig.gas =
+        await this.web3Quorum.eth.estimateGas(transactionConfig);
       this.log.debug(
         `${fnTag} Gas estimated from web3 is: `,
         transactionConfig.gas,
@@ -896,9 +888,8 @@ export class PluginLedgerConnectorQuorum
         args.invocationType,
       )
     ) {
-      throw new Error(
-        `Unknown invocationType (${args.invocationType}), must be specified in EthContractInvocationWeb3Method`,
-      );
+      const eMsg = `Unknown invocationType (${args.invocationType}), must be specified in EthContractInvocationWeb3Method`;
+      throw new BadRequestError(eMsg);
     }
 
     const contract = new this.web3.eth.Contract(
@@ -911,13 +902,66 @@ export class PluginLedgerConnectorQuorum
       args.contractMethod,
     );
     if (!isSafeToCall) {
-      throw new RuntimeError(
-        `Invalid method name provided in request. ${args.contractMethod} does not exist on the Web3 contract object's "methods" property.`,
-      );
+      const msg = `Invalid method name provided in request. ${args.contractMethod} does not exist on the Web3 contract object's "methods" property.`;
+      throw new BadRequestError(msg);
+    }
+    const abiInterface = new Interface(args.abi);
+    const methodFragment: FunctionFragment | null = abiInterface.getFunction(
+      args.contractMethod,
+    );
+    if (!methodFragment) {
+      const msg = `Method ${args.contractMethod} not found in ABI interface.`;
+      throw new BadRequestError(msg);
     }
 
-    return contract.methods[args.contractMethod](...contractMethodArgs)[
-      args.invocationType
-    ](args.invocationParams);
+    // validation for the contractMethod
+    if (methodFragment.inputs.length !== contractMethodArgs.length) {
+      const msg = `Incorrect number of arguments for ${args.contractMethod}`;
+      throw new BadRequestError(msg);
+    }
+    methodFragment.inputs.forEach((input, index) => {
+      const argValue = contractMethodArgs[index];
+      const isValidType = typeof argValue === input.type;
+
+      if (!isValidType) {
+        const msg = `Invalid type for argument ${index + 1} in ${
+          args.contractMethod
+        }`;
+        throw new BadRequestError(msg);
+      }
+    });
+
+    //validation for the invocationParams
+    const invocationParams = args.invocationParams as Record<string, unknown>;
+    const allowedKeys = ["from", "gasLimit", "gasPrice", "value"];
+
+    if (invocationParams) {
+      Object.keys(invocationParams).forEach((key) => {
+        if (!allowedKeys.includes(key)) {
+          throw new BadRequestError(`Invalid key '${key}' in invocationParams`);
+        }
+        if (key === "from" && !isAddress(invocationParams[key])) {
+          throw new BadRequestError(
+            `Invalid type for 'from' in invocationParams`,
+          );
+        }
+        if (key === "gasLimit" && typeof invocationParams[key] !== "number") {
+          throw new BadRequestError(
+            `Invalid type for '${key}' in invocationParams`,
+          );
+        }
+        if (key === "gasPrice" && typeof invocationParams[key] !== "number") {
+          throw new BadRequestError(
+            `Invalid type for '${key}'in invocationParams`,
+          );
+        }
+      });
+    }
+
+    const txObjectFactory = contract.methods[args.contractMethod];
+    const txObject = txObjectFactory(...contractMethodArgs);
+    const executor = txObject[args.invocationType];
+    const output = await executor(args.invocationParams);
+    return output;
   }
 }

@@ -2,7 +2,7 @@
 name = "relay"
 version = "0.0.1"
 authors = ["Antony Targett <atargett@au1.ibm.com>", "Nick Waywood <nwaywood@au1.ibm.com>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "pb"
@@ -10,13 +10,13 @@ path = "src/main/rust/pb.rs"
 
 
 [dependencies]
-tonic = {version="0.6.2",  features = ["tls"]}
-prost = "0.9"
-tokio = { version = "1.18", features = ["macros", "fs"] }
-serde = {version="1.0.110", features = ["derive"]}
+tonic = {version="0.10.2",  features = ["tls"]}
+prost = "0.12.3"
+tokio = { version = "1.34.0", features = ["macros", "fs"] }
+serde = {version="1.0.193", features = ["derive"]}
 
 [build-dependencies]
-tonic-build = "0.6.2"
+tonic-build = "0.10.2"
 
 
 

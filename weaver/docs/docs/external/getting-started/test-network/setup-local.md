@@ -50,6 +50,7 @@ Before starting, make sure you have the following software installed on your hos
     go install google.golang.org/protobuf/cmd/protoc-gen-go
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
+
     | Notes |
     |:------|
     | The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps. |
@@ -770,7 +771,7 @@ Run a Corda driver as follows:
   ```
 - Run the following to start Corda driver for `Corda_Network2`:
   ```bash
-  DRIVER_PORT=9098 ./build/install/corda-driver/bin/corda-driver
+  DRIVER_PORT=9098 ./build/install/driver-corda/bin/driver-corda
   ```
   If the driver starts successfully, it should log the following message on your terminal:
   ```

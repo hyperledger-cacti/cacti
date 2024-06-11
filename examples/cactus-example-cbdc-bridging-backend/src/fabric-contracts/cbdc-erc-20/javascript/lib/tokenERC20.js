@@ -377,15 +377,14 @@ class TokenERC20Contract extends Contract {
     //check contract options are already set first to execute the function
     await this.CheckInitialized(ctx);
 
+    const minter = ctx.clientIdentity.getID();
+
     // Check minter authorization - this sample assumes Org1 is the central banker with privilege to mint new tokens
     const clientMSPID = ctx.clientIdentity.getMSPID();
 
     if (clientMSPID !== "Org1MSP") {
       throw new Error("client is not authorized to mint new tokens");
     }
-
-    // Get ID of submitting client identity
-    const minter = ctx.clientIdentity.getID();
 
     const amountInt = parseInt(amount);
     if (amountInt <= 0) {

@@ -51,12 +51,12 @@ export class GetBesuRecordEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -88,7 +88,8 @@ export class GetBesuRecordEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      const reqBody: GetBesuRecordV1Request = req.body as GetBesuRecordV1Request;
+      const reqBody: GetBesuRecordV1Request =
+        req.body as GetBesuRecordV1Request;
       const resBody = await this.options.connector.getBesuRecord(reqBody);
       res.json(resBody);
     } catch (ex) {

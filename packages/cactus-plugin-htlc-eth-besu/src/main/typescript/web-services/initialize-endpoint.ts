@@ -38,18 +38,18 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
     return InitializeEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"
     ];
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getOperationId(): string {

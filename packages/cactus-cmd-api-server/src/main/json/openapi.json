@@ -83,7 +83,7 @@
       "get": {
         "summary": "Can be used to verify liveness of an API server instance",
         "description": "Returns the current timestamp of the API server as proof of health/liveness",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/api-server/healthcheck"
@@ -107,7 +107,7 @@
     },
     "/api/v1/api-server/get-prometheus-exporter-metrics": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/api-server/get-prometheus-exporter-metrics"
@@ -133,7 +133,7 @@
     "/api/v1/api-server/get-open-api-spec": {
       "get": {
         "description": "Returns the openapi.json document of specific plugin.",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/api-server/get-open-api-spec"

@@ -36,6 +36,9 @@ coverage/
 !.vscode/template.launch.json
 !.vscode/extensions.json
 
+# IntelliJ files
+.idea/
+
 # Introperability App specifics
 examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
@@ -65,3 +68,4 @@ site/
 tools/docker/geth-testnet/data-geth1/
 
 .history/
+.manual-geth-artillery-config.yaml

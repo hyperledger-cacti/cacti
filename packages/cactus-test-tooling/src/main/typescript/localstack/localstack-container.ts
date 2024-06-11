@@ -100,7 +100,7 @@ export class LocalStackContainer {
           Healthcheck: {
             Test: [
               "CMD-SHELL",
-              'curl -s localhost:4566/health | grep \'"secretsmanager": "running"\'',
+              'curl -s 127.0.0.1:4566/health | grep \'"secretsmanager": "running"\'',
             ],
             Interval: 100 * 1000000,
           },

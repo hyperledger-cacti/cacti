@@ -57,7 +57,7 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
     ];
@@ -82,12 +82,12 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

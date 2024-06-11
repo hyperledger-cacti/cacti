@@ -1,5 +1,8 @@
 name: ghpkg-all-kotlin-api-clients-publish
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 on:
   push:
     branches: [main, dev]
@@ -13,7 +16,7 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Indy SDK
       run: >
@@ -28,31 +31,32 @@ jobs:
           && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
 
     - name: Checkout
-      uses: actions/checkout@v3.5.2
+      uses: actions/checkout@v4.1.1
       with:
         fetch-depth: 0
 
     - name: Get the latest release version
       run: |
-        export GITVERSION=$(git describe --tags | awk -F'.' '{print $$1}')
-        echo "GITVERSION=$GITVERSION" >> $GITHUB_ENV
+        GITVERSION="$(git describe --tags | awk -F'.' '{print $$1}')"
+        export GITVERSION
+        echo "GITVERSION=$GITVERSION" >> "$GITHUB_ENV"
 
     - uses: actions/setup-java@v3.11.0
       with:
         distribution: 'adopt'
         java-version: '8'
 
-    - name: Set up NodeJS v16.9.1
-      uses: actions/setup-node@v3.6.0
+    - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
+      uses: actions/setup-node@v4.0.2
       with:
-        node-version: v16.9.1
+        node-version: ${{ env.NODEJS_VERSION }}
 
     - run: npm run configure
 
     - name: build-cactus-plugin-ledger-connector-corda-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -65,8 +69,8 @@ jobs:
 
     - name: build-cactus-cmd-api-server-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-cmd-api-server/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-cmd-api-server/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -79,8 +83,8 @@ jobs:
 
     - name: build-cactus-core-api-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-core-api/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-core-api/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -93,8 +97,8 @@ jobs:
 
     - name: build-cactus-plugin-consortium-manual-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-consortium-manual/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-consortium-manual/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -107,8 +111,8 @@ jobs:
 
     - name: build-cactus-plugin-keychain-google-sm-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-keychain-google-sm/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-keychain-google-sm/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -121,8 +125,8 @@ jobs:
 
     - name: build-cactus-plugin-keychain-aws-sm-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-keychain-aws-sm/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-keychain-aws-sm/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -135,8 +139,8 @@ jobs:
 
     - name: build-cactus-plugin-keychain-azure-kv-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-keychain-azure-kv/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-keychain-azure-kv/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -149,8 +153,8 @@ jobs:
 
     - name: build-cactus-plugin-keychain-memory-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-keychain-memory/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-keychain-memory/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -163,8 +167,8 @@ jobs:
 
     - name: build-cactus-plugin-keychain-vault-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-keychain-vault/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-keychain-vault/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -177,8 +181,8 @@ jobs:
 
     - name: build-cactus-plugin-ledger-connector-fabric-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-ledger-connector-fabric/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-ledger-connector-fabric/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -191,8 +195,8 @@ jobs:
 
     - name: build-cactus-plugin-keychain-memory-wasm-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -203,24 +207,24 @@ jobs:
         name: cactus-plugin-keychain-memory-wasm-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
 
-    - name: build-cactus-plugin-odap-hermes-kotlin-client
+    - name: build-cactus-plugin-satp-hermes-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
 
-    - name: publish-cactus-plugin-odap-hermes-kotlin-client
+    - name: publish-cactus-plugin-satp-hermes-kotlin-client
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: cactus-plugin-odap-hermes-kotlin-client-${{ env.GITVERSION }}.jar
-        path: packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+        name: cactus-plugin-satp-hermes-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
 
     - name: build-cactus-example-supply-chain-business-logic-plugin-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -233,8 +237,8 @@ jobs:
 
     - name: build-cactus-example-carbon-accounting-business-logic-plugin-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/examples/cactus-example-carbon-accounting-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/examples/cactus-example-carbon-accounting-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
@@ -247,8 +251,8 @@ jobs:
 
     - name: build-cactus-plugin-object-store-ipfs-kotlin-client
       run: |
-        WDIR=`pwd`
-        cd ${WDIR}/extensions/cactus-plugin-object-store-ipfs/src/main/kotlin/generated/openapi/kotlin-client
+        WDIR=$(pwd)
+        cd "${WDIR}/extensions/cactus-plugin-object-store-ipfs/src/main/kotlin/generated/openapi/kotlin-client"
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build

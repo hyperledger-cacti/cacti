@@ -71,9 +71,8 @@ export class SecretClientMock implements SecretClient {
     const deletedSecret = {
       properties: secretProperties,
     } as DeletedSecret;
-    const pollOperationsState = deletedSecret as PollOperationState<
-      DeletedSecret
-    >;
+    const pollOperationsState =
+      deletedSecret as PollOperationState<DeletedSecret>;
     const pollerLike = pollOperationsState as PollerLike<
       PollOperationState<DeletedSecret>,
       DeletedSecret
@@ -88,7 +87,7 @@ export class SecretClientMock implements SecretClient {
   async getSecret(secretName: string): Promise<KeyVaultSecret> {
     const result = this.secrets.get(secretName)?.toString();
     if (result == undefined) {
-      return (null as unknown) as KeyVaultSecret;
+      return null as unknown as KeyVaultSecret;
     } else {
       const secretProperties: SecretProperties = {
         vaultUrl: this.vaultUrl,
@@ -130,9 +129,7 @@ export class SecretClientMock implements SecretClient {
     throw new Error("Method not implemented");
   }
 
-  listPropertiesOfSecretVersions(): PagedAsyncIterableIterator<
-    SecretProperties
-  > {
+  listPropertiesOfSecretVersions(): PagedAsyncIterableIterator<SecretProperties> {
     throw new Error("Method not implemented");
   }
 

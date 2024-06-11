@@ -47,10 +47,9 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
     return {
       post: {
         operationId: "deployContractV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           http: {
-            path:
-              "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/deploy-contract-stub",
+            path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/deploy-contract-stub",
             verbLowerCase: "post",
           },
         },
@@ -60,12 +59,12 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

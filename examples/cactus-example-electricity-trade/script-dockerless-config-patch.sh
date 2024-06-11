@@ -11,10 +11,6 @@ sudo rm -rf "$COMMON_CACTUS_CONFIG"
 sudo cp -ar "./etc/cactus" "/etc"
 sudo chown -hR $(whoami) "$COMMON_CACTUS_CONFIG"
 
-echo "Patch validators..."
-sed -i 's/geth1/localhost/g' "${COMMON_CACTUS_CONFIG}/connector-go-ethereum-socketio/default.yaml"
-sed -i 's/sawtooth_all_in_one_ledger_1x/localhost/g' "${COMMON_CACTUS_CONFIG}/connector-sawtooth-socketio/default.yaml"
-
 echo "Patch validator-registry-config.yaml..."
 sed -i 's/ethereum-validator/localhost/g' "${COMMON_CACTUS_CONFIG}/validator-registry-config.yaml"
 sed -i 's/sawtooth-validator/localhost/g' "${COMMON_CACTUS_CONFIG}/validator-registry-config.yaml"

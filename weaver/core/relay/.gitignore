@@ -3,3 +3,5 @@ fingerprint.json
 protos-rs
 /db
 .env
+*.db
+*.sql

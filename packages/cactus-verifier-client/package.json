@@ -42,22 +42,57 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-corda": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-iroha": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.0.0-alpha.2",
     "jest-extended": "4.0.1",
     "rxjs": "7.8.1"
   },
+  "peerDependencies": {
+    "@hyperledger/cactus-api-client": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-corda": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.x",
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.x"
+  },
+  "peerDependenciesMeta": {
+    "@hyperledger/cactus-plugin-ledger-connector-besu": {
+      "optional": true
+    },
+    "@hyperledger/cactus-plugin-ledger-connector-corda": {
+      "optional": true
+    },
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": {
+      "optional": true
+    },
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": {
+      "optional": true
+    },
+    "@hyperledger/cactus-plugin-ledger-connector-iroha2": {
+      "optional": true
+    },
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": {
+      "optional": true
+    },
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": {
+      "optional": true
+    }
+  },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

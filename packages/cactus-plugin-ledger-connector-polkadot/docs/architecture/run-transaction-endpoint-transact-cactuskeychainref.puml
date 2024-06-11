@@ -1,0 +1,29 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransactCactusKeychainRef() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "transactCactusKeychainRef()" as tckr
+participant "transactMnemonicString()" as tms
+participant ".signAndSend()" as sas
+
+caller-> tckr: req
+activate caller
+group #LightBlue if web3SigningCredential == CACTUSKEYCHAINREF
+    activate tckr
+    tckr -> tms: [transactionConfig, web3SigningCredential]
+    activate tms
+    tms -> sas: [transactionConfig, mnemonicString]
+    activate sas
+    sas --> tms: return [success, blockhash, transactionHash]
+    deactivate sas
+        tms --> tckr: return [success, blockhash, transactionHash]
+        tckr --> caller : return {success, blockhash, transactionHash} as resBody
+        deactivate tckr
+    deactivate tms
+end
+@enduml

@@ -105,7 +105,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -121,7 +121,7 @@ test(testCase, async (t: Test) => {
 
   await plugin.getOrCreateWebServices();
   await plugin.registerWebServices(expressApp);
-  const apiUrl = `http://localhost:${port}`;
+  const apiUrl = `http://127.0.0.1:${port}`;
 
   const config = new Configuration({ basePath: apiUrl });
   const apiClient = new FabricApi(config);
@@ -226,7 +226,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.deployContractGoSourceV1(
-        (parameters as any) as DeployContractGoSourceV1Request,
+        parameters as any as DeployContractGoSourceV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -288,7 +288,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.deployContractGoSourceV1(
-        (parameters as any) as DeployContractGoSourceV1Request,
+        parameters as any as DeployContractGoSourceV1Request,
       );
     } catch (e) {
       t2.equal(

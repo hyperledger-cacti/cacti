@@ -11,7 +11,6 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { Containers } from "../common/containers";
-import { Stream } from "stream";
 
 /*
  * Contains options for Postgres container
@@ -38,14 +37,13 @@ export const POSTGRES_TEST_CONTAINER_DEFAULT_OPTIONS = Object.freeze({
 /*
  * Provides validations for Postgres container's options
  */
-export const POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     imageVersion: Joi.string().min(5).required(),
     imageName: Joi.string().min(1).required(),
     postgresPort: Joi.number().min(1024).max(65535).required(),
     envVars: Joi.array().allow(null).required(),
-  },
-);
+  });
 
 export class PostgresTestContainer implements ITestLedger {
   public readonly imageVersion: string;
@@ -257,7 +255,7 @@ export class PostgresTestContainer implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }
@@ -288,34 +286,36 @@ export class PostgresTestContainer implements ITestLedger {
   private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
-        if (pullError) {
-          reject(pullError);
-        } else {
-          docker.modem.followProgress(
-            stream,
-            (progressError: unknown, output: unknown[]) => {
-              if (progressError) {
-                reject(progressError);
-              } else {
-                resolve(output);
-              }
-            },
-          );
-        }
-      });
+      docker.pull(
+        containerNameAndTag,
+        (pullError: unknown, stream: NodeJS.ReadableStream) => {
+          if (pullError) {
+            reject(pullError);
+          } else {
+            docker.modem.followProgress(
+              stream,
+              (progressError: unknown, output: unknown[]) => {
+                if (progressError) {
+                  reject(progressError);
+                } else {
+                  resolve(output);
+                }
+              },
+            );
+          }
+        },
+      );
     });
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA.validate(
-      {
+    const validationResult =
+      POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA.validate({
         imageVersion: this.imageVersion,
         imageName: this.imageName,
         postgresPort: this.postgresPort,
         envVars: this.envVars,
-      },
-    );
+      });
 
     if (validationResult.error) {
       throw new Error(

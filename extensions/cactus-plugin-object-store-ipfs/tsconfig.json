@@ -7,11 +7,10 @@
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-object-store-ipfs.tsbuildinfo",
     "skipLibCheck": true,
     "composite": true,
+    "module": "Node16",
+    "moduleResolution": "Node16"
   },
-  "include": [
-    "./src",
-    "src/**/*.json",
-  ],
+  "include": ["./src", "src/**/*.json"],
   "references": [
     {
       "path": "../../packages/cactus-common/tsconfig.json"

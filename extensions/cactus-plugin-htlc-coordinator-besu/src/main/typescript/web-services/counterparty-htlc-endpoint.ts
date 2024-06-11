@@ -55,12 +55,12 @@ export class CounterpartyHTLCEndpoint implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -92,14 +92,19 @@ export class CounterpartyHTLCEndpoint implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      const request: CounterpartyHTLCRequest = req.body as CounterpartyHTLCRequest;
-      const connector = (this.options.pluginRegistry.plugins.find((plugin) => {
+      const request: CounterpartyHTLCRequest =
+        req.body as CounterpartyHTLCRequest;
+      const connector = this.options.pluginRegistry.plugins.find((plugin) => {
         return (
           plugin.getPackageName() ==
           "@hyperledger/cactus-plugin-htlc-coordinator-besu"
         );
-      }) as unknown) as PluginHTLCCoordinatorBesu;
+      }) as unknown as PluginHTLCCoordinatorBesu;
       const resBody = await connector.counterpartyHTLC(request);
+      res.setHeader(
+        "Strict-Transport-Security",
+        "max-age=31536000; includeSubDomains; preload",
+      );
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

@@ -5,6 +5,8 @@
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",
     "rootDir": "./src",
+    "moduleResolution": "Node16",
+    "module": "Node16",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-cbdc-bridging-backend.tsbuildinfo",
   },
   "references": [
@@ -36,7 +38,7 @@
       "path": "../../packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-plugin-odap-hermes/tsconfig.json"
+      "path": "../../packages/cactus-plugin-satp-hermes/tsconfig.json"
     },
     {
       "path": "../../packages/cactus-test-tooling/tsconfig.json"

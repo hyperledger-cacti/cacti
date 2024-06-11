@@ -56,12 +56,16 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
-    "axios": "0.21.4",
-    "jose": "4.9.2"
+    "axios": "1.6.0",
+    "jose": "4.15.5"
+  },
+  "devDependencies": {
+    "@types/uuid": "9.0.8",
+    "uuid": "9.0.1"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

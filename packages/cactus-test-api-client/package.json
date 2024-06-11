@@ -57,15 +57,17 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.2",
-    "jose": "4.9.2",
+    "jose": "4.15.5",
+    "uuid": "9.0.1",
     "web3": "1.6.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2"
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "@types/uuid": "9.0.8"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

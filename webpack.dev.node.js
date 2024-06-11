@@ -1,9 +1,8 @@
-const path = require("path");
 const packageDir = process.cwd();
+// This code does not run in production and therefore the dynamic require is
+// considered acceptable since it provides developer convenience.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require(`${packageDir}/package.json`);
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
-
 const packageNameNoScope = pkg.name.substring(pkg.name.lastIndexOf("/") + 1);
 const libraryName = `${packageNameNoScope}`;
 
@@ -45,13 +44,7 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: "static",
-    //   openAnalyzer: false,
-    //   reportFilename: `${pkg.main}.html`,
-    // }),
-  ],
+  plugins: [],
   resolve: {
     extensions: [".ts", ".js"],
   },

@@ -33,13 +33,13 @@
       "path": "../cactus-plugin-ledger-connector-corda/tsconfig.json"
     },
     {
-      "path": "../cactus-plugin-ledger-connector-iroha/tsconfig.json"
-    },
-    {
       "path": "../cactus-plugin-ledger-connector-iroha2/tsconfig.json"
     },
     {
       "path": "../cactus-plugin-ledger-connector-fabric/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
     }
   ]
 }

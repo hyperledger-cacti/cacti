@@ -205,9 +205,8 @@ export class IrohaV2TestEnv {
       logLevel: sutLogLevel,
     });
 
-    const [accountName, accountDomain] = this.clientConfig.ACCOUNT_ID.split(
-      "@",
-    );
+    const [accountName, accountDomain] =
+      this.clientConfig.ACCOUNT_ID.split("@");
 
     this._defaultBaseConfig = {
       torii: {

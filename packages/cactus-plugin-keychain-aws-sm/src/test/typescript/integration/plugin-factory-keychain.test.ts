@@ -17,7 +17,7 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
   };
 
   const invalid: IPluginFactoryOptions = {
-    pluginImportType: (null as unknown) as PluginImportType,
+    pluginImportType: null as unknown as PluginImportType,
   };
 
   const pluginRegistry = new PluginRegistry();

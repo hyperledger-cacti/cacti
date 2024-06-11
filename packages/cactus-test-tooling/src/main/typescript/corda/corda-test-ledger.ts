@@ -151,7 +151,7 @@ export class CordaTestLedger implements ITestLedger {
           // Healthcheck: {
           //   Test: [
           //     "CMD-SHELL",
-          //     `curl -v 'http://localhost:7005/jolokia/exec/org.apache.activemq.artemis:address=%22rpc.server%22,broker=%22RPC%22,component=addresses,queue=%22rpc.server%22,routing-type=%22multicast%22,subcomponent=queues/countMessages()/'`,
+          //     `curl -v 'http://127.0.0.1:7005/jolokia/exec/org.apache.activemq.artemis:address=%22rpc.server%22,broker=%22RPC%22,component=addresses,queue=%22rpc.server%22,routing-type=%22multicast%22,subcomponent=queues/countMessages()/'`,
           //   ],
           //   Interval: 1000000000, // 1 second
           //   Timeout: 3000000000, // 3 seconds
@@ -333,7 +333,7 @@ export class CordaTestLedger implements ITestLedger {
 
   public async getSupervisorDLocalhostUrl(): Promise<string> {
     const port = await this.getSupervisorDPublicPort();
-    return `http://localhost:${port}`;
+    return `http://127.0.0.1:${port}`;
   }
 
   public async getSSHPublicPort(): Promise<number> {

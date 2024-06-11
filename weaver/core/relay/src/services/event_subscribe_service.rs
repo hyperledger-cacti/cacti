@@ -297,9 +297,9 @@ fn spawn_send_subscription_status(
     tokio::spawn(async move {
         let request_id = ack.clone().request_id;
         println!("Sending Subscription Status back to requesting relay: Request ID = {:?}", request_id);
-        let client_addr = format!("http://{}:{}", requestor_host, requester_port);
         let mut response: Result<tonic::Response<Ack>, tonic::Status> = Err(tonic::Status::unimplemented("uninitialized"));
         if use_tls {
+            let client_addr = format!("https://{}:{}", requestor_host, requester_port);
             let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
             let ca = Certificate::from_pem(pem);
 
@@ -317,6 +317,7 @@ fn spawn_send_subscription_status(
             response = client_result.send_subscription_status(ack.clone()).await;
             println!("Response ACK from requesting relay={:?}\n", response);
         } else {
+            let client_addr = format!("http://{}:{}", requestor_host, requester_port);
             let client_result = EventSubscribeClient::connect(client_addr.clone()).await;
             match client_result {
                 Ok(client) => {
@@ -328,7 +329,7 @@ fn spawn_send_subscription_status(
                     // TODO: Add better error handling (Attempt a few times?)
                     println!(
                         "Failed to connect to client: ${:?}. Error: {}\n",
-                        requester_port,
+                        client_addr,
                         e.to_string()
                     );
                     // TODO: Handle this error thorugh join handle after thread completes.
@@ -365,7 +366,7 @@ fn spawn_send_subscription_status(
                     }
                 }
                 Err(_e) => {
-                    println!("Error: error connecting to relay at {}", client_addr);
+                    println!("Error: error connecting to relay");
                 }
             }
         }

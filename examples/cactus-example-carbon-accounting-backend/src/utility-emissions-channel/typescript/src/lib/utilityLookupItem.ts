@@ -45,9 +45,7 @@ export class UtilityLookupItem extends State {
   }
 }
 
-export class UtilityLookupItemState extends WorldState<
-  UtilityLookupItemInterface
-> {
+export class UtilityLookupItemState extends WorldState<UtilityLookupItemInterface> {
   constructor(stub: ChaincodeStub) {
     super(stub);
   }

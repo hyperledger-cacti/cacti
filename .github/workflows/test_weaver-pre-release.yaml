@@ -17,15 +17,17 @@ jobs:
   check_release:
     outputs:
       status: ${{ steps.early.outputs.status }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Ignore if not a release PR
         id: early
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         run : |
           status="skip"
-          if echo "${{ github.event.pull_request.title }}" | grep -q "chore(release)"; then
+          if echo ${TITLE} | grep -q "chore(release)"; then
             status="continue"
           fi
           echo "status=$status" >> $GITHUB_OUTPUT
@@ -33,16 +35,18 @@ jobs:
   test_weaver_pre-release:
     needs: check_release
     if: needs.check_release.outputs.status == 'continue'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Get release verison from PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         run: |
           # Assuming release PR follows pattern: chore(release): publish vA.B.C
           # Split PR title by space, and take 3rd word
-          VERSION=$(echo "${{ github.event.pull_request.title }}" | cut -d ' ' -f 3)
+          VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
           VERSION=$(echo $VERSION | sed -e 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -140,16 +144,18 @@ jobs:
   test_weaver_go_pre-release:
     needs: check_release
     if: needs.check_release.outputs.status == 'continue'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Get release verison from PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         run: |
           # Assuming release PR follows pattern: chore(release): publish vA.B.C
           # Split PR title by space, and take 3rd word
-          VERSION=$(echo "${{ github.event.pull_request.title }}" | cut -d ' ' -f 3)
+          VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
           VERSION=$(echo $VERSION | sed -e 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV

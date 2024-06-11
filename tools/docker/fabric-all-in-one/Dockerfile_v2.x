@@ -1,7 +1,7 @@
 FROM docker:24.0.5-dind
 
-ARG FABRIC_VERSION=2.4.4
-ARG FABRIC_NODEENV_VERSION=2.4.2
+ARG FABRIC_VERSION=2.5.6
+ARG FABRIC_NODEENV_VERSION=2.5.4
 ARG CA_VERSION=1.5.3
 ARG COUCH_VERSION_FABRIC=0.4
 ARG COUCH_VERSION=3.2.2
@@ -172,8 +172,15 @@ RUN /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -d
 # But we need at least NodeJS 16 and npm v7 for the dependency installation to work.
 RUN sed -i "s/fabric-nodeenv:\$(TWO_DIGIT_VERSION)/fabric-nodeenv:${FABRIC_NODEENV_VERSION}/g" /fabric-samples/test-network/compose/docker/peercfg/core.yaml
 
+RUN yq '.chaincode.logging.level = "debug"' \
+    --inplace /fabric-samples/test-network/compose/docker/peercfg/core.yaml
+
 # Set the log level of the peers and other containers to DEBUG instead of the default INFO
 RUN sed -i "s/FABRIC_LOGGING_SPEC=INFO/FABRIC_LOGGING_SPEC=DEBUG/g" /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
+
+# For now this cannot be used because it mangles the outupt of the "peer lifecycle chaincode queryinstalled" commands.
+# We need to refactor those commands in the deployment endpoints so that they are immune to this logging setting.
+# RUN sed -i "s/FABRIC_LOGGING_SPEC=INFO/FABRIC_LOGGING_SPEC=DEBUG/g" /fabric-samples/test-network/compose/compose-test-net.yaml
 
 # Update the docker-compose file of the fabric-samples repo so that the 
 # core.yaml configuration file of the peer containers can be customized.
@@ -190,6 +197,7 @@ RUN yq '.services."peer0.org2.example.com".volumes += "../..:/opt/gopath/src/git
     --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 RUN yq '.services."peer0.org2.example.com".volumes += "../../config/core.yaml:/etc/hyperledger/fabric/core.yaml"' \
     --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
+
 
 # Install supervisord because we need to run the docker daemon and also the fabric network
 # meaning that we have multiple processes to run.

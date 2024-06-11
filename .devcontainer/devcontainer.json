@@ -14,48 +14,35 @@
 		},
 		"ghcr.io/devcontainers/features/git:1": {
 			"ppa": true,
-			"version": "2.40.1"
+			"version": "lts"
 		},
 		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.20.4"
+			"version": "1.20.6"
 		},
 		"ghcr.io/devcontainers/features/java:1": {
 			"installGradle": true,
 			"installMaven": false,
 			"installAnt": false,
-			"version": "11.0.12-open",
-			"jdkDistro": "open",
-			"gradleVersion": "7.5.1",
-			"mavenVersion": "3.8.6",
-			"antVersion": "1.10.12"
+			"version": "8.0.392-amzn",
+			"jdkDistro": "amzn",
+			"gradleVersion": "5.6.4",
+			"mavenVersion": "3.9.5",
+			"antVersion": "1.10.13"
 		},
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
-			"version": "18.16.0"
+			"version": "18.19.0"
 		},
 		"ghcr.io/devcontainers/features/rust:1": {
-			"version": "1.63",
+			"version": "1.74",
 			"profile": "complete"
 		},
-		"ghcr.io/devcontainers-contrib/features/actions-runner:1": {
-			"version": "latest",
-			"dotnetVersion": "latest"
-		},
 		"ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
-		"ghcr.io/devcontainers-contrib/features/dive:1": {
-			"version": "v0.10.0"
-		},
-		"ghcr.io/devcontainers-contrib/features/gitmux:1": {
-			"version": "v0.10.2"
-		},
-		"ghcr.io/devcontainers-contrib/features/ionic-cli:2": {
-			"version": "7.1.1"
-		},
-		"ghcr.io/devcontainers-contrib/features/kind:1": {
-			"version": "v0.18.0"
-		},
 		"ghcr.io/devcontainers-contrib/features/protoc:1": {
 			"version": "v3.20.3"
+		},
+		"ghcr.io/dhoeric/features/trivy:1.0.0": {
+			"version": "0.49.1"
 		}
 	},
 	"customizations": {
@@ -78,7 +65,7 @@
 				"codeandstuff.package-json-upgrade"
 			]
 		}
-	}	
+	},	
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -87,7 +74,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	"postCreateCommand": "echo \"source /usr/share/bash-completion/completions/git\" >> ~/.bashrc"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

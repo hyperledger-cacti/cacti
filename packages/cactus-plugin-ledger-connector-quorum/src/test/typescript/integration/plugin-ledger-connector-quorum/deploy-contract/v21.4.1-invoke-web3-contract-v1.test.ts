@@ -63,7 +63,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
     await quorumTestLedger.start();
 
     log.info("Get highNetWorthAccounts...");
-    const quorumGenesisOptions: IQuorumGenesisOptions = await quorumTestLedger.getGenesisJsObject();
+    const quorumGenesisOptions: IQuorumGenesisOptions =
+      await quorumTestLedger.getGenesisJsObject();
     expect(quorumGenesisOptions).toBeTruthy();
     expect(quorumGenesisOptions.alloc).toBeTruthy();
 
@@ -109,6 +110,7 @@ describe("invokeRawWeb3EthContract Tests", () => {
       },
       gas: 1000000,
     });
+    log.debug("Contract deployed OK");
     expect(deployOut).toBeTruthy();
     expect(deployOut.transactionReceipt).toBeTruthy();
     expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
@@ -147,9 +149,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
       contractMethodArgs: [newName],
     };
 
-    const resultsSend = await connector.invokeRawWeb3EthContract(
-      sendInvokeArgs,
-    );
+    const resultsSend =
+      await connector.invokeRawWeb3EthContract(sendInvokeArgs);
     expect(resultsSend).toBeTruthy();
     expect(resultsSend.status).toBeTrue();
 
@@ -161,9 +162,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
       contractMethod: "getName",
     };
 
-    const resultsCall = await connector.invokeRawWeb3EthContract(
-      callInvokeArgs,
-    );
+    const resultsCall =
+      await connector.invokeRawWeb3EthContract(callInvokeArgs);
     expect(resultsCall).toBeTruthy();
     expect(resultsCall).toEqual(newName);
   });
@@ -199,5 +199,23 @@ describe("invokeRawWeb3EthContract Tests", () => {
     };
 
     await expect(connector.invokeRawWeb3EthContract(callInvokeArgs)).toReject();
+  });
+
+  it("validates input parameters based on their solidity type declarations", async () => {
+    const req: InvokeRawWeb3EthContractV1Request = {
+      abi: contractAbi,
+      address: contractAddress,
+      invocationType: EthContractInvocationWeb3Method.Call,
+      contractMethod: "setName",
+      contractMethodArgs: [42],
+      invocationParams: {
+        gasLimit: 999999,
+      },
+    };
+
+    const eMsgExpected = `Invalid type for argument ${0 + 1} in ${"setName"}`;
+
+    const theInvocation = connector.invokeRawWeb3EthContract(req);
+    await expect(theInvocation).rejects.toThrowWithMessage(Error, eMsgExpected);
   });
 });

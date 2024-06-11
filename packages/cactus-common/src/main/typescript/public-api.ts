@@ -29,7 +29,21 @@ export {
 export { isRecord } from "./types/is-record";
 export { hasKey } from "./types/has-key";
 
-export { asError, coerceUnknownToError } from "./exception/coerce-unknown-to-error";
-export { createRuntimeErrorWithCause, newRex } from "./exception/create-runtime-error-with-cause";
+export {
+  asError,
+  coerceUnknownToError,
+} from "./exception/coerce-unknown-to-error";
+export {
+  createRuntimeErrorWithCause,
+  newRex,
+} from "./exception/create-runtime-error-with-cause";
 export { ErrorFromUnknownThrowable } from "./exception/error-from-unknown-throwable";
 export { ErrorFromSymbol } from "./exception/error-from-symbol";
+
+export {
+  ALL_EXPRESS_HTTP_VERB_METHOD_NAMES,
+  ExpressHttpVerbMethodName,
+  isExpressHttpVerbMethodName,
+} from "./http/express-http-verb-method-name";
+
+export { isGrpcStatusObjectWithCode } from "./grpc/is-grpc-status-object-with-code";

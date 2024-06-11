@@ -6,6 +6,9 @@
 
 name: Test Data Sharing
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -23,15 +26,31 @@ concurrency:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  check_code_changed:
+    outputs:
+      status: ${{ steps.changes.outputs.weaver_code_changed }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.1
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**'
+              - '.github/workflows/test_weaver-data-sharing.yaml'
+
   data-sharing:
-    if: ${{ false }}
+    needs: check_code_changed
+    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
@@ -44,10 +63,10 @@ jobs:
         with:
           go-version: '1.20.2'
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
+          node-version: ${{ env.NODEJS_VERSION }}
 
       # CORDA NETWORK
       - name: Generate github.properties
@@ -165,17 +184,20 @@ jobs:
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: weaver/samples/fabric/fabric-cli
+
       - name: Build Fabric CLI
         run: |
           npm install --global yarn
           make build
         working-directory: weaver/samples/fabric/fabric-cli
+
       - name: Setup Fabric CLI Config
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
         working-directory: weaver/samples/fabric/fabric-cli
+
       - name: Setup Fabric CLI ENV
         run: |
           echo ${GITHUB_WORKSPACE}
@@ -337,56 +359,74 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
-        
-      - name: DEBUG Logs - corda partya
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda partya
         run: docker logs corda_partya_1
-        
-      - name: DEBUG Logs - corda network2 partya
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda network2 partya
         run: docker logs corda_network2_partya_1
-        
-      - name: DEBUG Logs - fabric n1 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 relay
         run: docker logs relay-network1
-        
-      - name: DEBUG Logs - fabric n2 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 relay
         run: docker logs relay-network2
-        
-      - name: DEBUG Logs - corda relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda relay
         run: docker logs relay-corda
-        
-      - name: DEBUG Logs - corda2 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda2 relay
         run: docker logs relay-corda2
-        
-      - name: DEBUG Logs - fabric n1 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 driver
         run: docker logs driver-fabric-network1
-        
-      - name: DEBUG Logs - fabric n2 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 driver
         run: docker logs driver-fabric-network2
-        
-      - name: DEBUG Logs - corda driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda driver
         run: docker logs driver-corda-Corda_Network
-        
-      - name: DEBUG Logs - corda2 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda2 driver
         run: docker logs driver-corda-Corda_Network2
 
+      - if: failure()
+        name: DEBUG Logs - iin agent n1 org1
+        run: docker logs iin-agent-Org1MSP-network1
+
+      - if: failure()
+        name: DEBUG Logs - iin agent n2 org1
+        run: docker logs iin-agent-Org1MSP-network2
+
   data-sharing-docker-local:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.status == 'true'
     # if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**'
+              - '.github/workflows/test_weaver-data-sharing.yaml'
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
@@ -399,10 +439,10 @@ jobs:
         with:
           go-version: '1.20.2'
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
+          node-version: ${{ env.NODEJS_VERSION }}
 
       - name: Use Protoc 3.15
         run: |
@@ -582,6 +622,7 @@ jobs:
           cp config.template.json config.json
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
         working-directory: weaver/samples/fabric/fabric-cli
+
       - name: Setup Fabric CLI ENV
         run: |
           echo ${GITHUB_WORKSPACE}
@@ -600,12 +641,12 @@ jobs:
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
           sleep 30
-          docker logs iin-agent-Org1MSP-network1
-          docker logs iin-agent-Org1MSP-network2
+          docker logs --tail 5 iin-agent-Org1MSP-network1
+          docker logs --tail 5 iin-agent-Org1MSP-network2
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 30
-          docker logs iin-agent-Org1MSP-network1
-          docker logs iin-agent-Org1MSP-network2
+          docker logs --tail 5 iin-agent-Org1MSP-network1
+          docker logs --tail 5 iin-agent-Org1MSP-network2
         working-directory: weaver/samples/fabric/fabric-cli
 
       # CORDA CLIENT
@@ -743,56 +784,74 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
-        
-      - name: DEBUG Logs - corda partya
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda partya
         run: docker logs corda_partya_1
-        
-      - name: DEBUG Logs - corda network2 partya
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda network2 partya
         run: docker logs corda_network2_partya_1
-        
-      - name: DEBUG Logs - fabric n1 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 relay
         run: docker logs relay-network1
-        
-      - name: DEBUG Logs - fabric n2 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 relay
         run: docker logs relay-network2
-        
-      - name: DEBUG Logs - corda relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda relay
         run: docker logs relay-corda
-        
-      - name: DEBUG Logs - corda2 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda2 relay
         run: docker logs relay-corda2
-        
-      - name: DEBUG Logs - fabric n1 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 driver
         run: docker logs driver-fabric-network1
-        
-      - name: DEBUG Logs - fabric n2 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 driver
         run: docker logs driver-fabric-network2
-        
-      - name: DEBUG Logs - corda driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda driver
         run: docker logs driver-corda-Corda_Network
-        
-      - name: DEBUG Logs - corda2 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda2 driver
         run: docker logs driver-corda-Corda_Network2
 
+      - if: failure()
+        name: DEBUG Logs - iin agent n1 org1
+        run: docker logs iin-agent-Org1MSP-network1
+
+      - if: failure()
+        name: DEBUG Logs - iin agent n2 org1
+        run: docker logs iin-agent-Org1MSP-network2
+
   data-sharing-local:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.status == 'true'
     # if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**'
+              - '.github/workflows/test_weaver-data-sharing.yaml'
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
@@ -805,10 +864,10 @@ jobs:
         with:
           go-version: '1.20.2'
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3.6.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 16.x
+          node-version: ${{ env.NODEJS_VERSION }}
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
         uses: actions-rs/toolchain@v1.0.6
@@ -1012,10 +1071,10 @@ jobs:
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
           sleep 10
-          tail -10 ../../../core/identity-management/iin-agent/iinagent-n1.out
+          tail -5 ../../../core/identity-management/iin-agent/iinagent-n1.out
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 10
-          tail -10 ../../../core/identity-management/iin-agent/iinagent-n2.out
+          tail -5 ../../../core/identity-management/iin-agent/iinagent-n2.out
         working-directory: weaver/samples/fabric/fabric-cli
 
       # CORDA CLIENT
@@ -1153,43 +1212,51 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
-        
-      - name: DEBUG Logs - corda partya
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda partya
         run: docker logs corda_partya_1
-        
-      - name: DEBUG Logs - corda network2 partya
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda network2 partya
         run: docker logs corda_network2_partya_1
-        
-      - name: DEBUG Logs - fabric n1 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 relay
         run: cat weaver/core/relay/relay-n1.out
-        
-      - name: DEBUG Logs - fabric n2 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 relay
         run: cat weaver/core/relay/relay-n2.out
-        
-      - name: DEBUG Logs - corda relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda relay
         run: cat weaver/core/relay/relay-corda.out
-        
-      - name: DEBUG Logs - corda2 relay
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda2 relay
         run: cat weaver/core/relay/relay-corda2.out
-        
-      - name: DEBUG Logs - fabric n1 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 driver
         run: cat weaver/core/drivers/fabric-driver/fdriver-n1.out
-        
-      - name: DEBUG Logs - fabric n2 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 driver
         run: cat weaver/core/drivers/fabric-driver/fdriver-n2.out
-        
-      - name: DEBUG Logs - corda driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda driver
         run: cat weaver/core/drivers/corda-driver/corda-driver.out
-        
-      - name: DEBUG Logs - corda2 driver
-        if: failure()
+
+      - if: failure()
+        name: DEBUG Logs - corda2 driver
         run: cat weaver/core/drivers/corda-driver/corda2-driver.out
+
+      - if: failure()
+        name: DEBUG Logs - iin agent n1 org1
+        run: cat weaver/core/identity-management/iin-agent/iinagent-n1.out
+
+      - if: failure()
+        name: DEBUG Logs - iin agent n2 org1
+        run: cat weaver/core/identity-management/iin-agent/iinagent-n2.out

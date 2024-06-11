@@ -1,8 +1,8 @@
+#!/bin/bash
+
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/bash
 
 echo -e "\n\n Corda_Network:"
 echo "Adding 30 t1 tokens to PartyA"

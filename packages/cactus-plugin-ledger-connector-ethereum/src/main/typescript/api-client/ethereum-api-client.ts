@@ -1,6 +1,6 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { io } from "socket.io-client";
+import { io } from "socket.io-client-fixed-types";
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
@@ -13,7 +13,7 @@ import {
   WatchBlocksV1Progress,
 } from "../generated/openapi/typescript-axios";
 import { Configuration } from "../generated/openapi/typescript-axios/configuration";
-import { AbiItem } from "web3-utils";
+import { ContractAbi } from "web3";
 
 export class EthereumApiClientOptions extends Configuration {
   readonly logLevel?: LogLevelDesc;
@@ -37,7 +37,7 @@ export type EthereumRequestInputWeb3EthContractMethod = {
 
 // Common input types for sending requests
 export type EthereumRequestInputContract = {
-  abi?: AbiItem[];
+  abi?: ContractAbi;
   address?: string;
 };
 export type EthereumRequestInputMethod =
@@ -49,7 +49,8 @@ export type EthereumRequestInputArgs = {
 
 export class EthereumApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksV1Progress> {
+  implements ISocketApiClient<WatchBlocksV1Progress>
+{
   public static readonly CLASS_NAME = "EthereumApiClient";
 
   private readonly log: Logger;
@@ -109,7 +110,7 @@ export class EthereumApiClient
       finalize(() => {
         this.log.info("FINALIZE - unsubscribing from the stream...");
         socket.emit(WatchBlocksV1.Unsubscribe);
-        socket.disconnect();
+        socket.close();
       }),
     );
   }
@@ -198,7 +199,7 @@ export class EthereumApiClient
 
       // Prepare input
       const invokeArgs: InvokeRawWeb3EthContractV1Request = {
-        abi: contract.abi as AbiItem[],
+        abi: contract.abi,
         address: contract.address as string,
         invocationType: method.command,
         invocationParams: args,

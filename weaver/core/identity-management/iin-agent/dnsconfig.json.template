@@ -2,12 +2,12 @@
     "<securityDomainName>": {
         "<iin-agent1-name>": {
             "endpoint": "<hostname:port>",
-            "tls": <true/false>,
+            "tls": "true"/"false",
             "tlsCACertPath": "<cacert-path-or-empty-string>"
         },
         "<iin-agent2-name>": {
             "endpoint": "<hostname:port>",
-            "tls": <true/false>,
+            "tls": "true"/"false",
             "tlsCACertPath": "<cacert-path-or-empty-string>"
         }
     }

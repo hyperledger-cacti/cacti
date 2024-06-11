@@ -14,23 +14,11 @@ This is the test ledger used by the `polkadot-connector` package.
 To run the test ledger, use:
 
 ```sh
-docker run --expose HOST_PORT --env WS_PORT=WS_PORT --env WORKING_DIR=/var/www/node-template --env CONTAINER_NAME=contracts-node-template-ovl --env CARGO_HOME=/var/www/node-template/.cargo -p HOST_PORT:WS_PORT rafaelapb/cactus-substrate-aio:2021-11-02-fix
-
-
-
-```
-
-Example:
-
-
-```
-docker run --expose 9946 --env WS_PORT=9947 --env WORKING_DIR=/var/www/node-template --env CONTAINER_NAME=contracts-node-template-ovl --env CARGO_HOME=/var/www/node-template/.cargo -p 9940:9947 rafaelapb/cactus-substrate-aio:2021-11-02-fix
-
-
+docker run -p 9944:9944 anmol02/cactus-substrate-aio:2023-10-28
 ```
 
 ## Build
 
 ```sh
-DOCKER_BUILDKIT=1 docker build ./tools/docker/substrate-all-in-one/ -f ./tools/docker/substrate-all-in-one/Dockerfile --tag saio
+docker build ./tools/docker/substrate-all-in-one/ -f ./tools/docker/substrate-all-in-one/Dockerfile --tag saio
 ```

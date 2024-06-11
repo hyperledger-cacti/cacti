@@ -3,7 +3,7 @@ import Docker, { Container } from "dockerode";
 import { v4 as internalIpV4 } from "internal-ip";
 import Web3, { ContractAbi, TransactionReceipt } from "web3";
 import type { Web3Account } from "web3-eth-accounts";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 import {
   Logger,
@@ -37,7 +37,8 @@ export const GETH_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
 
 export const WHALE_ACCOUNT_PRIVATE_KEY =
   "86bbf98cf5e5b1c43d2c8701764897357e0fa24982c0137efabf6dc3a6e7b69e";
-export const WHALE_ACCOUNT_ADDRESS = "6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0";
+export const WHALE_ACCOUNT_ADDRESS =
+  "0x6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0";
 
 export class GethTestLedger {
   public static readonly CLASS_NAME = "GethTestLedger";
@@ -129,7 +130,7 @@ export class GethTestLedger {
    * @param omitPull Don't pull docker image from upstream if true.
    * @returns Promise<Container>
    */
-  public async start(omitPull = false): Promise<Container> {
+  public async start(omitPull = false, cmd: string[] = []): Promise<Container> {
     if (this.useRunningLedger) {
       this.log.info(
         "Search for already running Geth Test Ledger because 'useRunningLedger' flag is enabled.",
@@ -167,7 +168,7 @@ export class GethTestLedger {
       const docker = new Docker();
       const eventEmitter: EventEmitter = docker.run(
         this.fullContainerImageName,
-        [],
+        cmd,
         [],
         {
           ExposedPorts: {
@@ -261,9 +262,9 @@ export class GethTestLedger {
    *
    * Uses `web3.eth.accounts.create`
    *
-   * @param [seedMoney=10e8] The amount of money to seed the new test account with.
+   * @param [seedMoney=10e18 (1ETH)] The amount of money to seed the new test account with.
    */
-  public async createEthTestAccount(seedMoney = 10e8): Promise<Web3Account> {
+  public async createEthTestAccount(seedMoney = 10e18): Promise<Web3Account> {
     const ethTestAccount = this.web3.eth.accounts.create();
 
     const receipt = await this.transferAssetFromCoinbase(
@@ -288,7 +289,7 @@ export class GethTestLedger {
    * @returns New account address
    */
   public async newEthPersonalAccount(
-    seedMoney = 10e8,
+    seedMoney = 10e18,
     password = "test",
   ): Promise<string> {
     const account = await this.web3.eth.personal.newAccount(password);
@@ -320,6 +321,7 @@ export class GethTestLedger {
         from: WHALE_ACCOUNT_ADDRESS,
         to: targetAccount,
         value: value,
+        gasPrice: await this.web3.eth.getGasPrice(),
         gas: 1000000,
       },
       WHALE_ACCOUNT_PRIVATE_KEY,
@@ -357,7 +359,8 @@ export class GethTestLedger {
       {
         from: WHALE_ACCOUNT_ADDRESS,
         data: contractTx.encodeABI(),
-        gas: 8000000, // Max possible gas
+        gasPrice: await this.web3.eth.getGasPrice(),
+        gasLimit: 8000000,
         nonce: await this.web3.eth.getTransactionCount(WHALE_ACCOUNT_ADDRESS),
       },
       WHALE_ACCOUNT_PRIVATE_KEY,

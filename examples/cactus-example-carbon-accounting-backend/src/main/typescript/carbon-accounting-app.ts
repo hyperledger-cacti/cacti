@@ -102,7 +102,8 @@ export class CarbonAccountingApp {
     const xdaiAccount = await this.ledgers.xdai.createEthTestAccount();
 
     const sshConfig = await this.ledgers.fabric.getSshConfig();
-    const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
+    const connectionProfile =
+      await this.ledgers.fabric.getConnectionProfileOrg1();
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await this.ledgers.fabric.enrollUser(adminWallet);
@@ -125,7 +126,7 @@ export class CarbonAccountingApp {
     }
 
     const addressInfo = httpApi.address() as AddressInfo;
-    const nodeApiHost = `http://localhost:${addressInfo.port}`;
+    const nodeApiHost = `http://127.0.0.1:${addressInfo.port}`;
 
     const config = new Configuration({ basePath: nodeApiHost });
 

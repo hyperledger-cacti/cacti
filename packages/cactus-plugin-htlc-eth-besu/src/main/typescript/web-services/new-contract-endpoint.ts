@@ -36,18 +36,18 @@ export class NewContractEndpoint implements IWebServiceEndpoint {
     return NewContractEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract"
     ];
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getOperationId(): string {

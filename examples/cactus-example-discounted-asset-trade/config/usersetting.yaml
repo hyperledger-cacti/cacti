@@ -1,33 +1,38 @@
 # Overwrite defaults
 blpRegistry:
-  -
-    businessLogicID: guks32pf
-    validatorID: [84jUisrs, r9IS4dDf]
+  - businessLogicID: guks32pf
+    validatorID: []
 
 logLevel: debug
 
+signTxInfo:
+  ethereum:
+    chainName: geth1
+    networkID: 10
+    chainID: 10
+    defaultHardfork: petersburg
+
 appRouters:
-  -
-    path: /api/v1/bl/trades/
+  - path: /api/v1/bl/trades/
     routerJs: /root/cactus/dist/trades.js
-  -
-    path: /api/v1/bl/balance/
+  - path: /api/v1/bl/balance/
     routerJs: /root/cactus/dist/balance.js
-  -
-    path: /api/v1/bl/fabric-asset/
+  - path: /api/v1/bl/fabric-asset/
     routerJs: /root/cactus/dist/fabric-asset.js
+  - path: /api/v1/bl/indy/
+    routerJs: /root/cactus/dist/indy-endpoints.js
 
 # BLP Config
 assetTradeInfo:
   fabric:
-    validatorID: r9IS4dDf
     mspID: Org1MSP
-    keystore: "/etc/cactus/connector-fabric-socketio/wallet"
+    keystore: "/etc/cactus/connector-fabric/wallet"
+    hostname: localhost
     connUserName: appUser
     contractName: basic
+    tokenSecret: secret123
     peers:
-      -
-        name: peer0.org1.example.com
+      - name: peer0.org1.example.com
         requests: grpc://localhost:7051
         orderer:
           name: orderer.example.com
@@ -43,9 +48,12 @@ assetTradeInfo:
     channelName: mychannel
     chaincodeID: basic
 
+  indy:
+    credentialDefinitionId: "__CREDENTIAL_DEFINITION_ID__"
+
   ethereum:
     validatorID: 84jUisrs
-    gethURL: http://localhost:8545
+    gethURL: ws://localhost:8546
     chainName: geth1
     networkID: 10
     chainID: 10

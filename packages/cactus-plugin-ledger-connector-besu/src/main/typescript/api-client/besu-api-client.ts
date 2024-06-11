@@ -1,6 +1,6 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { Socket, io } from "socket.io-client";
+import { Socket, io } from "socket.io-client-fixed-types";
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
@@ -19,7 +19,8 @@ export class BesuApiClientOptions extends Configuration {
 
 export class BesuApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksV1Progress> {
+  implements ISocketApiClient<WatchBlocksV1Progress>
+{
   public static readonly CLASS_NAME = "BesuApiClient";
 
   private readonly log: Logger;

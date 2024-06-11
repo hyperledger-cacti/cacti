@@ -60,7 +60,7 @@
       ],
       "console": "integratedTerminal",
       "sourceMaps": true,
-      "cwd": "${workspaceFolder}/examples/supply-chain-app/",
+      "cwd": "${workspaceFolder}/examples/cactus-example-supply-chain-backend/",
       "outFiles": [
         "${workspaceFolder}/**/*.js",
         "!**/node_modules/**"

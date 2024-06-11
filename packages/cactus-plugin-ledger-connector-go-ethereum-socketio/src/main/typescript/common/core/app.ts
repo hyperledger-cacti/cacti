@@ -9,7 +9,7 @@
  *
  */
 
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response, RequestHandler } from "express";
 import createError = require("http-errors");
 import express = require("express");
 import cookieParser = require("cookie-parser");
@@ -19,7 +19,7 @@ const app: express.Express = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser() as RequestHandler);
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -32,7 +32,7 @@ app.use(
     err: { message: string; status?: number },
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     // set locals, only providing error in development
     res.locals.message = err.message;
@@ -47,7 +47,7 @@ app.use(
     // render the error page
     res.status(err.status || 500);
     res.send(errorResponse);
-  }
+  },
 );
 
 export default app;

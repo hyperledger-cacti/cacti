@@ -537,7 +537,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact"
@@ -581,7 +581,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction"
@@ -625,7 +625,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query"

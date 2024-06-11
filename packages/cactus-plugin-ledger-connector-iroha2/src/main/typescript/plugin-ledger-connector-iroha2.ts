@@ -81,7 +81,8 @@ export class PluginLedgerConnectorIroha2
   implements
     IPluginLedgerConnector<never, never, TransactRequestV1, TransactResponseV1>,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly defaultConfig: Iroha2BaseConfig | undefined;
@@ -119,7 +120,8 @@ export class PluginLedgerConnectorIroha2
    * Iroha V2 ledger transaction finality
    */
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
@@ -281,9 +283,8 @@ export class PluginLedgerConnectorIroha2
    * @returns parsed entry value.
    */
   private async getFromKeychain(keychainId: string, keychainRef: string) {
-    const keychain = this.options.pluginRegistry.findOneByKeychainId(
-      keychainId,
-    );
+    const keychain =
+      this.options.pluginRegistry.findOneByKeychainId(keychainId);
     return JSON.parse(await keychain.get(keychainRef));
   }
 
@@ -467,7 +468,7 @@ export class PluginLedgerConnectorIroha2
    * @param expectedCount Expected parameter count
    */
   private addTransactionWithCheckedParams<
-    T extends (...args: any[]) => unknown
+    T extends (...args: any[]) => unknown,
   >(
     client: CactusIrohaV2Client,
     transactFunction: T,

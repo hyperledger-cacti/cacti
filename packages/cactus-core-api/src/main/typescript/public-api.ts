@@ -42,3 +42,13 @@ export {
   LedgerEvent,
   IVerifierEventListener,
 } from "./client/i-verifier";
+
+export { ISendRequestResultV1 } from "./plugin/ledger-connector/i-send-request-response-v1";
+
+export { IPluginGrpcService } from "./plugin/grpc-service/i-plugin-grpc-service";
+export { IGrpcSvcDefAndImplPair } from "./plugin/grpc-service/i-plugin-grpc-service";
+export { isIPluginGrpcService } from "./plugin/grpc-service/i-plugin-grpc-service";
+
+export { ICrpcSvcRegistration } from "./plugin/crpc-service/i-plugin-crpc-service";
+export { IPluginCrpcService } from "./plugin/crpc-service/i-plugin-crpc-service";
+export { isIPluginCrpcService } from "./plugin/crpc-service/i-plugin-crpc-service";

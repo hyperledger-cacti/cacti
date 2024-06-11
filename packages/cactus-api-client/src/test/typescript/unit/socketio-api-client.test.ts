@@ -203,10 +203,8 @@ describe("SocketIOApiClient Tests", function () {
   let sut: SocketIOApiClient;
 
   beforeAll(async () => {
-    [
-      testServer,
-      testServerPort,
-    ] = await SocketIOTestSetupHelpers.createListeningMockServer();
+    [testServer, testServerPort] =
+      await SocketIOTestSetupHelpers.createListeningMockServer();
   }, setupTimeout);
 
   afterAll((done) => {

@@ -1,7 +1,6 @@
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs-extra";
-import { create } from "ipfs-http-client";
 import {
   Logger,
   Checks,
@@ -10,11 +9,12 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   BesuTestLedger,
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
-  GoIpfsTestContainer,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -36,14 +36,15 @@ import {
   InvokeContractV1Request as BesuInvokeContractV1Request,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import AssetReferenceContractJson from "../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../solidity/cbdc-erc-20/CBDCcontract.json";
-import { IOdapPluginKeyPair } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
-import { FabricOdapGateway } from "../odap-extension/fabric-odap-gateway";
-import { BesuOdapGateway } from "../odap-extension/besu-odap-gateway";
+import { IKeyPair } from "@hyperledger/cactus-plugin-satp-hermes";
+import { FabricSatpGateway } from "../satp-extension/fabric-satp-gateway";
+import { BesuSatpGateway } from "../satp-extension/besu-satp-gateway";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
+import { ClientHelper } from "../satp-extension/client-helper";
+import { ServerHelper } from "../satp-extension/server-helper";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -57,9 +58,6 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   private readonly besu: BesuTestLedger;
   private readonly fabric: FabricTestLedgerV1;
-  private readonly ipfs: GoIpfsTestContainer;
-  private readonly ipfsParentPath: string;
-
   private readonly log: Logger;
 
   public get className(): string {
@@ -79,8 +77,6 @@ export class CbdcBridgingAppDummyInfrastructure {
     const level = this.options.logLevel || "INFO";
     const label = this.className;
 
-    this.ipfsParentPath = `/${uuidv4()}/${uuidv4()}/`;
-
     this.log = LoggerProvider.getOrCreate({ level, label });
 
     this.besu = new BesuTestLedger({
@@ -92,58 +88,26 @@ export class CbdcBridgingAppDummyInfrastructure {
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-      imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-      envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
-      logLevel: level || "DEBUG",
-    });
-
-    this.ipfs = new GoIpfsTestContainer({
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      envVars: new Map([
+        ["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION],
+      ]),
       logLevel: level || "DEBUG",
     });
   }
 
   public get org1Env(): NodeJS.ProcessEnv & DeploymentTargetOrgFabric2x {
-    return {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org1MSP",
-
-      ORDERER_CA: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      CORE_PEER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt`,
-      CORE_PEER_MSPCONFIGPATH: `${this.orgCfgDir}peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp`,
-      CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
-      ORDERER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
+    return FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1;
   }
 
   public get org2Env(): NodeJS.ProcessEnv & DeploymentTargetOrgFabric2x {
-    return {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org2MSP",
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      ORDERER_CA: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
-      CORE_PEER_MSPCONFIGPATH: `${this.orgCfgDir}peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp`,
-      CORE_PEER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt`,
-      ORDERER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
+    return FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2;
   }
 
   public async start(): Promise<void> {
     try {
       this.log.info(`Starting dummy infrastructure...`);
-      await Promise.all([
-        this.besu.start(),
-        this.fabric.start(),
-        this.ipfs.start(),
-      ]);
+      await Promise.all([this.besu.start(), this.fabric.start()]);
       this.log.info(`Started dummy infrastructure OK`);
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);
@@ -157,7 +121,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       await Promise.all([
         this.besu.stop().then(() => this.besu.destroy()),
         this.fabric.stop().then(() => this.fabric.destroy()),
-        this.ipfs.stop().then(() => this.ipfs.destroy()),
       ]);
       this.log.info(`Stopped OK`);
     } catch (ex) {
@@ -166,9 +129,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     }
   }
 
-  public async createFabricLedgerConnector(): Promise<
-    PluginLedgerConnectorFabric
-  > {
+  public async createFabricLedgerConnector(): Promise<PluginLedgerConnectorFabric> {
     const connectionProfileOrg1 = await this.fabric.getConnectionProfileOrg1();
     const enrollAdminOutOrg1 = await this.fabric.enrollAdminV2({
       organization: "org1",
@@ -286,33 +247,16 @@ export class CbdcBridgingAppDummyInfrastructure {
     return besuConnector;
   }
 
-  public async createIPFSConnector(): Promise<PluginObjectStoreIpfs> {
-    this.log.info(`Creating Besu Connector...`);
-
-    const ipfsClientOrOptions = create({
-      url: await this.ipfs.getApiUrl(),
-    });
-
-    return new PluginObjectStoreIpfs({
-      parentDir: this.ipfsParentPath,
-      logLevel: this.options.logLevel,
-      instanceId: uuidv4(),
-      ipfsClientOrOptions,
-    });
-  }
-
   public async createClientGateway(
     nodeApiHost: string,
-    keyPair: IOdapPluginKeyPair,
-    ipfsPath: string,
-  ): Promise<FabricOdapGateway> {
+    keyPair: IKeyPair,
+  ): Promise<FabricSatpGateway> {
     this.log.info(`Creating Source Gateway...`);
-    const pluginSourceGateway = new FabricOdapGateway({
-      name: "cactus-plugin-source#odapGateway",
+    const pluginSourceGateway = new FabricSatpGateway({
+      name: "cactus-plugin-source#satpGateway",
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
       keyPair: keyPair,
-      ipfsPath: ipfsPath,
       fabricPath: nodeApiHost,
       fabricSigningCredential: {
         keychainId: CryptoMaterial.keychains.keychain1.id,
@@ -320,26 +264,26 @@ export class CbdcBridgingAppDummyInfrastructure {
       },
       fabricChannelName: "mychannel",
       fabricContractName: "asset-reference-contract",
+      clientHelper: new ClientHelper(),
+      serverHelper: new ServerHelper({}),
     });
 
-    await pluginSourceGateway.database?.migrate.rollback();
-    await pluginSourceGateway.database?.migrate.latest();
+    await pluginSourceGateway.localRepository?.reset();
+    await pluginSourceGateway.remoteRepository?.reset();
 
     return pluginSourceGateway;
   }
 
   public async createServerGateway(
     nodeApiHost: string,
-    keyPair: IOdapPluginKeyPair,
-    ipfsPath: string,
-  ): Promise<BesuOdapGateway> {
+    keyPair: IKeyPair,
+  ): Promise<BesuSatpGateway> {
     this.log.info(`Creating Recipient Gateway...`);
-    const pluginRecipientGateway = new BesuOdapGateway({
-      name: "cactus-plugin-recipient#odapGateway",
+    const pluginRecipientGateway = new BesuSatpGateway({
+      name: "cactus-plugin-recipient#satpGateway",
       dltIDs: ["DLT1"],
       instanceId: uuidv4(),
       keyPair: keyPair,
-      ipfsPath: ipfsPath,
       besuPath: nodeApiHost,
       besuWeb3SigningCredential: {
         ethAccount: CryptoMaterial.accounts["bridge"].ethAddress,
@@ -348,10 +292,12 @@ export class CbdcBridgingAppDummyInfrastructure {
       },
       besuContractName: AssetReferenceContractJson.contractName,
       besuKeychainId: CryptoMaterial.keychains.keychain2.id,
+      clientHelper: new ClientHelper(),
+      serverHelper: new ServerHelper({}),
     });
 
-    await pluginRecipientGateway.database?.migrate.rollback();
-    await pluginRecipientGateway.database?.migrate.latest();
+    await pluginRecipientGateway.localRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
 
     return pluginRecipientGateway;
   }
@@ -441,7 +387,7 @@ export class CbdcBridgingAppDummyInfrastructure {
             sourceFiles,
             ccName: contractName,
             targetOrganizations: [this.org1Env, this.org2Env],
-            caFile: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
+            caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "asset-reference-contract",
             ccLang: ChainCodeProgrammingLanguage.Typescript,
             ccSequence: 1,
@@ -568,7 +514,7 @@ export class CbdcBridgingAppDummyInfrastructure {
             sourceFiles,
             ccName: contractName,
             targetOrganizations: [this.org1Env, this.org2Env],
-            caFile: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
+            caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "cbdc",
             ccLang: ChainCodeProgrammingLanguage.Javascript,
             ccSequence: 1,
@@ -624,19 +570,28 @@ export class CbdcBridgingAppDummyInfrastructure {
           // does the same thing, it just waits 10 seconds for good measure so there
           // might not be a way for us to avoid doing this, but if there is a way we
           // absolutely should not have timeouts like this, anywhere...
-          await new Promise((resolve) => setTimeout(resolve, 10000));
+          let retries_2 = 0;
+          while (retries_2 <= 5) {
+            await new Promise((resolve) => setTimeout(resolve, 10000));
 
-          await fabricApiClient.runTransactionV1({
-            contractName,
-            channelName,
-            params: ["name1", "symbol1", "8"],
-            methodName: "Initialize",
-            invocationType: FabricContractInvocationType.Send,
-            signingCredential: {
-              keychainId: CryptoMaterial.keychains.keychain1.id,
-              keychainRef: "userA",
-            },
-          });
+            await fabricApiClient
+              .runTransactionV1({
+                contractName,
+                channelName,
+                params: ["name1", "symbol1", "8"],
+                methodName: "Initialize",
+                invocationType: FabricContractInvocationType.Send,
+                signingCredential: {
+                  keychainId: CryptoMaterial.keychains.keychain1.id,
+                  keychainRef: "userA",
+                },
+              })
+              .then(() => (retries_2 = 6))
+              .catch(() =>
+                console.log("trying to Initialize fabric contract again"),
+              );
+            retries_2++;
+          }
         })
         .catch(() => console.log("trying to deploy fabric contract again"));
       retries++;
@@ -646,8 +601,8 @@ export class CbdcBridgingAppDummyInfrastructure {
   public async deployBesuContracts(besuApiClient: BesuApi): Promise<void> {
     const fnTag = `${this.className}#deployBesuContracts()`;
 
-    const deployCbdcContractResponse = await besuApiClient.deployContractSolBytecodeV1(
-      {
+    const deployCbdcContractResponse =
+      await besuApiClient.deployContractSolBytecodeV1({
         keychainId: CryptoMaterial.keychains.keychain2.id,
         contractName: CBDCcontractJson.contractName,
         contractAbi: CBDCcontractJson.abi,
@@ -659,15 +614,14 @@ export class CbdcBridgingAppDummyInfrastructure {
         },
         bytecode: CBDCcontractJson.bytecode,
         gas: 10000000,
-      } as DeployContractSolidityBytecodeV1Request,
-    );
+      } as DeployContractSolidityBytecodeV1Request);
 
     if (deployCbdcContractResponse == undefined) {
       throw new Error(`${fnTag}, error when deploying CBDC smart contract`);
     }
 
-    const deployAssetReferenceContractResponse = await besuApiClient.deployContractSolBytecodeV1(
-      {
+    const deployAssetReferenceContractResponse =
+      await besuApiClient.deployContractSolBytecodeV1({
         keychainId: CryptoMaterial.keychains.keychain2.id,
         contractName: AssetReferenceContractJson.contractName,
         contractAbi: AssetReferenceContractJson.abi,
@@ -681,8 +635,7 @@ export class CbdcBridgingAppDummyInfrastructure {
         },
         bytecode: AssetReferenceContractJson.bytecode,
         gas: 10000000,
-      } as DeployContractSolidityBytecodeV1Request,
-    );
+      } as DeployContractSolidityBytecodeV1Request);
 
     if (deployAssetReferenceContractResponse == undefined) {
       throw new Error(

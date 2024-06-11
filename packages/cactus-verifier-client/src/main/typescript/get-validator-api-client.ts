@@ -1,49 +1,42 @@
 /*
- * Copyright 2020-2022 Hyperledger Cactus Contributors
+ * Copyright 2020-2023 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * get-validator-api-client.ts
  */
 
-import {
+import type {
   SocketIOApiClient,
   SocketIOApiClientOptions,
 } from "@hyperledger/cactus-api-client";
-
-import {
+import type {
   BesuApiClient,
   BesuApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-
-import {
+import type {
   QuorumApiClient,
   QuorumApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
-
-import {
+import type {
   EthereumApiClient,
   EthereumApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-
-import {
+import type {
   CordaApiClient,
   CordaApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-
-import {
-  IrohaApiClient,
-  IrohaApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-iroha";
-
-import {
+import type {
   Iroha2ApiClient,
   Iroha2ApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
-
-import {
+import type {
   FabricApiClient,
   FabricApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import type {
+  SawtoothApiClient,
+  SawtoothApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
 
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
@@ -76,10 +69,6 @@ export type ClientApiConfig = {
     in: CordaApiClientOptions;
     out: CordaApiClient;
   };
-  IROHA_1X: {
-    in: IrohaApiClientOptions;
-    out: IrohaApiClient;
-  };
   IROHA_2X: {
     in: Iroha2ApiClientOptions;
     out: Iroha2ApiClient;
@@ -87,6 +76,10 @@ export type ClientApiConfig = {
   FABRIC_2X: {
     in: FabricApiClientOptions;
     out: FabricApiClient;
+  };
+  SAWTOOTH_1X: {
+    in: SawtoothApiClientOptions;
+    out: SawtoothApiClient;
   };
 };
 
@@ -96,31 +89,50 @@ export type ClientApiConfig = {
  * @param validatorType: what kind of validator to create, must be defined in ClientApiConfig.
  * @param options: Configuration for given ApiClients, depends on validatorType supplied earlier
  * @returns Api coresponding to validatorType requested in arguments.
- *
- * @todo Use dynamic import to save space and not require all the ApiClient packages.
  */
-export function getValidatorApiClient<K extends keyof ClientApiConfig>(
+export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
   validatorType: K,
   options: ClientApiConfig[K]["in"],
-): ClientApiConfig[K]["out"] {
+): Promise<ClientApiConfig[K]["out"]> {
   switch (validatorType) {
     case "legacy-socketio":
-      return new SocketIOApiClient(options as SocketIOApiClientOptions);
+      // TODO - replace with dynamic imports once ESM is supported
+      const apiClientPackage = require("@hyperledger/cactus-api-client");
+      return new apiClientPackage.SocketIOApiClient(
+        options as SocketIOApiClientOptions,
+      );
     case "BESU_1X":
     case "BESU_2X":
-      return new BesuApiClient(options as BesuApiClientOptions);
+      const besuPackage = require("@hyperledger/cactus-plugin-ledger-connector-besu");
+      return new besuPackage.BesuApiClient(options as BesuApiClientOptions);
     case "QUORUM_2X":
-      return new QuorumApiClient(options as QuorumApiClientOptions);
+      const quorumPackage = require("@hyperledger/cactus-plugin-ledger-connector-quorum");
+      return new quorumPackage.QuorumApiClient(
+        options as QuorumApiClientOptions,
+      );
     case "ETH_1X":
-      return new EthereumApiClient(options as EthereumApiClientOptions);
+      const ethereumPackage = require("@hyperledger/cactus-plugin-ledger-connector-ethereum");
+      return new ethereumPackage.EthereumApiClient(
+        options as EthereumApiClientOptions,
+      );
     case "CORDA_4X":
-      return new CordaApiClient(options as CordaApiClientOptions);
-    case "IROHA_1X":
-      return new IrohaApiClient(options as IrohaApiClientOptions);
+      const cordaPackage = require("@hyperledger/cactus-plugin-ledger-connector-corda");
+      return new cordaPackage.CordaApiClient(options as CordaApiClientOptions);
     case "IROHA_2X":
-      return new Iroha2ApiClient(options as CordaApiClientOptions);
+      const iroha2Package = require("@hyperledger/cactus-plugin-ledger-connector-iroha2");
+      return new iroha2Package.Iroha2ApiClient(
+        options as Iroha2ApiClientOptions,
+      );
     case "FABRIC_2X":
-      return new FabricApiClient(options as FabricApiClientOptions);
+      const fabricPackage = require("@hyperledger/cactus-plugin-ledger-connector-fabric");
+      return new fabricPackage.FabricApiClient(
+        options as FabricApiClientOptions,
+      );
+    case "SAWTOOTH_1X":
+      const sawtoothPackage = require("@hyperledger/cactus-plugin-ledger-connector-sawtooth");
+      return new sawtoothPackage.SawtoothApiClient(
+        options as SawtoothApiClientOptions,
+      );
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch
       const _: never = validatorType;

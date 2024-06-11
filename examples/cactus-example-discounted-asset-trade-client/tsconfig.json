@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-example-discounted-asset-trade-client.tsbuildinfo"
+  },
+  "include": ["./src"]
+}

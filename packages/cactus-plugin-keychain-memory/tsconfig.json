@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowJs": true,
     "composite": true,
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",

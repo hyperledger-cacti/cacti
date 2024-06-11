@@ -1,5 +1,6 @@
 import { Account } from "web3-core";
 import { v4 as uuidv4 } from "uuid";
+import { DiscoveryOptions } from "fabric-network";
 import {
   Logger,
   Checks,
@@ -13,38 +14,31 @@ import {
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+import { IPluginKeychain } from "@hyperledger/cactus-core-api";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger/cactus-test-tooling";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2 } from "@hyperledger/cactus-test-tooling";
 import {
   BesuTestLedger,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  FABRIC_25_LTS_AIO_FABRIC_VERSION,
+  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   QuorumTestLedger,
 } from "@hyperledger/cactus-test-tooling";
-
-import BambooHarvestRepositoryJSON from "../../json/generated/BambooHarvestRepository.json";
-import BookshelfRepositoryJSON from "../../json/generated/BookshelfRepository.json";
 import {
   IEthContractDeployment,
   ISupplyChainContractDeploymentInfo,
   IFabricContractDeployment,
-  //  OrgEnv,
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import {
   PluginLedgerConnectorFabric,
   DefaultEventHandlerStrategy,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { DiscoveryOptions } from "fabric-network";
-import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
-import { IPluginKeychain } from "@hyperledger/cactus-core-api";
 
-export const org1Env = {
-  CORE_PEER_LOCALMSPID: "Org1MSP",
-  CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
-  CORE_PEER_MSPCONFIGPATH:
-    "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
-  CORE_PEER_TLS_ROOTCERT_FILE:
-    "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
-  ORDERER_TLS_ROOTCERT_FILE:
-    "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
-};
+import BambooHarvestRepositoryJSON from "../../json/generated/BambooHarvestRepository.json";
+import BookshelfRepositoryJSON from "../../json/generated/BookshelfRepository.json";
+import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
+import { SHIPMENT_GOLANG_CONTRACT_PINNED_DEPENDENCIES } from "./shipment-golang-contract-pinned-dependencies";
 
 export interface ISupplyChainAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -113,8 +107,10 @@ export class SupplyChainAppDummyInfrastructure {
     });
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
-      imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       logLevel: level,
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       emitContainerLogs: true,
     });
 
@@ -150,7 +146,7 @@ export class SupplyChainAppDummyInfrastructure {
   public async start(): Promise<void> {
     try {
       this.log.info(`Starting dummy infrastructure...`);
-      await this.fabric.start();
+      await this.fabric.start({ omitPull: false });
       await this.besu.start();
       await this.quorum.start();
       this.log.info(`Started dummy infrastructure OK`);
@@ -162,11 +158,7 @@ export class SupplyChainAppDummyInfrastructure {
 
   public async deployContracts(): Promise<ISupplyChainContractDeploymentInfo> {
     try {
-      this.log.info(`Deploying smart contracts...`);
-
-      let bambooHarvestRepository: IEthContractDeployment;
-      let bookshelfRepository: IEthContractDeployment;
-      let shipmentRepository: IFabricContractDeployment;
+      this.log.info(`Deploying example supply chain app smart contracts...`);
 
       await this.keychain.set(
         BookshelfRepositoryJSON.contractName,
@@ -176,151 +168,10 @@ export class SupplyChainAppDummyInfrastructure {
         BambooHarvestRepositoryJSON.contractName,
         JSON.stringify(BambooHarvestRepositoryJSON),
       );
-      {
-        this._quorumAccount = await this.quorum.createEthTestAccount(2000000);
-        const rpcApiHttpHost = await this.quorum.getRpcApiHttpHost();
 
-        const pluginRegistry = new PluginRegistry();
-        pluginRegistry.add(this.keychain);
-        const connector = new PluginLedgerConnectorQuorum({
-          instanceId: "PluginLedgerConnectorQuorum_Contract_Deployment",
-          rpcApiHttpHost,
-          logLevel: this.options.logLevel,
-          pluginRegistry,
-        });
-
-        const res = await connector.deployContract({
-          contractName: BambooHarvestRepositoryJSON.contractName,
-          gas: 1000000,
-          web3SigningCredential: {
-            ethAccount: this.quorumAccount.address,
-            secret: this.quorumAccount.privateKey,
-            type: Web3SigningCredentialType.PrivateKeyHex,
-          },
-          keychainId: this.keychain.getKeychainId(),
-        });
-        const {
-          transactionReceipt: { contractAddress },
-        } = res;
-
-        bambooHarvestRepository = {
-          abi: BambooHarvestRepositoryJSON.abi,
-          address: contractAddress as string,
-          bytecode: BambooHarvestRepositoryJSON.bytecode,
-          contractName: BambooHarvestRepositoryJSON.contractName,
-          keychainId: this.keychain.getKeychainId(),
-        };
-      }
-
-      {
-        this._besuAccount = await this.besu.createEthTestAccount(2000000);
-        const rpcApiHttpHost = await this.besu.getRpcApiHttpHost();
-        const rpcApiWsHost = await this.besu.getRpcApiWsHost();
-
-        const pluginRegistry = new PluginRegistry();
-        pluginRegistry.add(this.keychain);
-        const connector = new PluginLedgerConnectorBesu({
-          instanceId: "PluginLedgerConnectorBesu_Contract_Deployment",
-          rpcApiHttpHost,
-          rpcApiWsHost,
-          logLevel: this.options.logLevel,
-          pluginRegistry,
-        });
-
-        const res = await connector.deployContract({
-          contractName: BookshelfRepositoryJSON.contractName,
-          bytecode: BookshelfRepositoryJSON.bytecode,
-          contractAbi: BookshelfRepositoryJSON.abi,
-          constructorArgs: [],
-          gas: 1000000,
-          web3SigningCredential: {
-            ethAccount: this.besuAccount.address,
-            secret: this.besuAccount.privateKey,
-            type: Web3SigningCredentialType.PrivateKeyHex,
-          },
-          keychainId: this.keychain.getKeychainId(),
-        });
-        const {
-          transactionReceipt: { contractAddress },
-        } = res;
-
-        bookshelfRepository = {
-          abi: BookshelfRepositoryJSON.abi,
-          address: contractAddress as string,
-          bytecode: BookshelfRepositoryJSON.bytecode,
-          contractName: BookshelfRepositoryJSON.contractName,
-          keychainId: this.keychain.getKeychainId(),
-        };
-      }
-
-      {
-        const connectionProfile = await this.fabric.getConnectionProfileOrg1();
-        const sshConfig = await this.fabric.getSshConfig();
-        const discoveryOptions: DiscoveryOptions = {
-          enabled: true,
-          asLocalhost: true,
-        };
-
-        const pluginRegistry = new PluginRegistry();
-        pluginRegistry.add(this.keychain);
-        const connector = new PluginLedgerConnectorFabric({
-          instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
-          dockerBinary: "/usr/local/bin/docker",
-          pluginRegistry,
-          peerBinary: "peer",
-          sshConfig: sshConfig,
-          logLevel: this.options.logLevel || "INFO",
-          connectionProfile: connectionProfile,
-          cliContainerEnv: org1Env,
-          discoveryOptions: discoveryOptions,
-          eventHandlerOptions: {
-            strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-          },
-        });
-
-        const res = await connector.deployContractGoSourceV1({
-          tlsRootCertFiles: org1Env.CORE_PEER_TLS_ROOTCERT_FILE as string,
-          targetPeerAddresses: [org1Env.CORE_PEER_ADDRESS as string],
-          policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",
-          channelId: "mychannel",
-          chainCodeVersion: "1.0.0",
-          constructorArgs: { Args: [] },
-          goSource: {
-            body: Buffer.from(SHIPMENT_CONTRACT_GO_SOURCE).toString("base64"),
-            filename: "shipment.go",
-          },
-          moduleName: "shipment",
-          targetOrganizations: [org1Env],
-          pinnedDeps: [
-            "github.com/Knetic/govaluate@v3.0.0+incompatible",
-            "github.com/Shopify/sarama@v1.27.0",
-            "github.com/fsouza/go-dockerclient@v1.6.5",
-            "github.com/grpc-ecosystem/go-grpc-middleware@v1.2.1",
-            "github.com/hashicorp/go-version@v1.2.1",
-            "github.com/hyperledger/fabric@v1.4.8",
-            "github.com/hyperledger/fabric-amcl@v0.0.0-20200424173818-327c9e2cf77a",
-            "github.com/miekg/pkcs11@v1.0.3",
-            "github.com/mitchellh/mapstructure@v1.3.3",
-            "github.com/onsi/ginkgo@v1.14.1",
-            "github.com/onsi/gomega@v1.10.2",
-            "github.com/op/go-logging@v0.0.0-20160315200505-970db520ece7",
-            "github.com/pkg/errors@v0.9.1",
-            "github.com/spf13/viper@v1.7.1",
-            "github.com/stretchr/testify@v1.6.1",
-            "github.com/sykesm/zap-logfmt@v0.0.3",
-            "go.uber.org/zap@v1.16.0",
-            "golang.org/x/crypto@v0.0.0-20200820211705-5c72a883971a",
-            "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
-            "google.golang.org/grpc@v1.31.1",
-          ],
-        });
-        this.log.debug(res);
-
-        shipmentRepository = {
-          chaincodeId: "shipment",
-          channelName: "mychannel",
-        };
-      }
+      const bambooHarvestRepository = await this.deployQuorumContract();
+      const bookshelfRepository = await this.deployBesuContract();
+      const shipmentRepository = await this.deployFabricContract();
 
       const out: ISupplyChainContractDeploymentInfo = {
         bambooHarvestRepository,
@@ -328,12 +179,150 @@ export class SupplyChainAppDummyInfrastructure {
         shipmentRepository,
       };
 
-      this.log.info(`Deployed smart contracts OK`);
+      this.log.info(`Deployed example supply chain app smart contracts OK`);
 
       return out;
     } catch (ex) {
+      await new Promise((res) => setTimeout(res, 6000000));
       this.log.error(`Deployment of smart contracts crashed: `, ex);
       throw ex;
     }
+  }
+
+  public async deployQuorumContract(): Promise<IEthContractDeployment> {
+    this._quorumAccount = await this.quorum.createEthTestAccount(2000000);
+    const rpcApiHttpHost = await this.quorum.getRpcApiHttpHost();
+
+    const pluginRegistry = new PluginRegistry();
+    pluginRegistry.add(this.keychain);
+    const connector = new PluginLedgerConnectorQuorum({
+      instanceId: "PluginLedgerConnectorQuorum_Contract_Deployment",
+      rpcApiHttpHost,
+      logLevel: this.options.logLevel,
+      pluginRegistry,
+    });
+
+    const res = await connector.deployContract({
+      contractName: BambooHarvestRepositoryJSON.contractName,
+      gas: 1000000,
+      web3SigningCredential: {
+        ethAccount: this.quorumAccount.address,
+        secret: this.quorumAccount.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      keychainId: this.keychain.getKeychainId(),
+    });
+    const {
+      transactionReceipt: { contractAddress },
+    } = res;
+
+    const bambooHarvestRepository: IEthContractDeployment = {
+      abi: BambooHarvestRepositoryJSON.abi,
+      address: contractAddress as string,
+      bytecode: BambooHarvestRepositoryJSON.bytecode,
+      contractName: BambooHarvestRepositoryJSON.contractName,
+      keychainId: this.keychain.getKeychainId(),
+    };
+
+    return bambooHarvestRepository;
+  }
+
+  public async deployBesuContract(): Promise<IEthContractDeployment> {
+    this._besuAccount = await this.besu.createEthTestAccount(2000000);
+    const rpcApiHttpHost = await this.besu.getRpcApiHttpHost();
+    const rpcApiWsHost = await this.besu.getRpcApiWsHost();
+
+    const pluginRegistry = new PluginRegistry();
+    pluginRegistry.add(this.keychain);
+    const connector = new PluginLedgerConnectorBesu({
+      instanceId: "PluginLedgerConnectorBesu_Contract_Deployment",
+      rpcApiHttpHost,
+      rpcApiWsHost,
+      logLevel: this.options.logLevel,
+      pluginRegistry,
+    });
+
+    const res = await connector.deployContract({
+      contractName: BookshelfRepositoryJSON.contractName,
+      bytecode: BookshelfRepositoryJSON.bytecode,
+      contractAbi: BookshelfRepositoryJSON.abi,
+      constructorArgs: [],
+      gas: 1000000,
+      web3SigningCredential: {
+        ethAccount: this.besuAccount.address,
+        secret: this.besuAccount.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      keychainId: this.keychain.getKeychainId(),
+    });
+    const {
+      transactionReceipt: { contractAddress },
+    } = res;
+
+    const bookshelfRepository: IEthContractDeployment = {
+      abi: BookshelfRepositoryJSON.abi,
+      address: contractAddress as string,
+      bytecode: BookshelfRepositoryJSON.bytecode,
+      contractName: BookshelfRepositoryJSON.contractName,
+      keychainId: this.keychain.getKeychainId(),
+    };
+
+    return bookshelfRepository;
+  }
+
+  public async deployFabricContract(): Promise<IFabricContractDeployment> {
+    const connectionProfile = await this.fabric.getConnectionProfileOrg1();
+    const sshConfig = await this.fabric.getSshConfig();
+    const discoveryOptions: DiscoveryOptions = {
+      enabled: true,
+      asLocalhost: true,
+    };
+
+    const pluginRegistry = new PluginRegistry();
+    pluginRegistry.add(this.keychain);
+    const connector = new PluginLedgerConnectorFabric({
+      instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
+      dockerBinary: "/usr/local/bin/docker",
+      pluginRegistry,
+      peerBinary: "peer",
+      sshConfig: sshConfig,
+      logLevel: this.options.logLevel || "INFO",
+      connectionProfile: connectionProfile,
+      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+      discoveryOptions: discoveryOptions,
+      eventHandlerOptions: {
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+      },
+    });
+
+    const res = await connector.deployContractGoSourceV1({
+      tlsRootCertFiles:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_TLS_ROOTCERT_FILE,
+      targetPeerAddresses: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+      ],
+      policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",
+      channelId: "mychannel",
+      chainCodeVersion: "1.0.0",
+      constructorArgs: { Args: [] },
+      goSource: {
+        body: Buffer.from(SHIPMENT_CONTRACT_GO_SOURCE).toString("base64"),
+        filename: "shipment.go",
+      },
+      moduleName: "shipment",
+      targetOrganizations: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+      ],
+      pinnedDeps: SHIPMENT_GOLANG_CONTRACT_PINNED_DEPENDENCIES,
+    });
+    this.log.debug("Supply chain app Fabric contract deployment result:", res);
+
+    const shipmentRepository = {
+      chaincodeId: "shipment",
+      channelName: "mychannel",
+    };
+    return shipmentRepository;
   }
 }

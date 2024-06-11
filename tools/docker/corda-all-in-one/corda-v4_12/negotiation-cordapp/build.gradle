@@ -1,0 +1,161 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+import static org.gradle.api.JavaVersion.VERSION_17
+import static org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
+
+buildscript { //properties that you need to build the project
+
+    Properties constants = new Properties()
+    file("$projectDir/../constants.properties").withInputStream { constants.load(it) }
+
+    ext {
+        corda_release_group = constants.getProperty("cordaReleaseGroup")
+        corda_core_release_group =  constants.getProperty("cordaCoreReleaseGroup")
+        corda_release_version = constants.getProperty("cordaVersion")
+        corda_shell_version = corda_release_version
+        corda_core_release_version = constants.getProperty("cordaCoreVersion")
+        corda_gradle_plugins_version = constants.getProperty("gradlePluginsVersion")
+        kotlin_version = constants.getProperty("kotlinVersion")
+        junit_version = constants.getProperty("junitVersion")
+        quasar_version = constants.getProperty("quasarVersion")
+        log4j_version = constants.getProperty("log4jVersion")
+        slf4j_version = constants.getProperty("slf4jVersion")
+        corda_platform_version = constants.getProperty("platformVersion").toInteger()
+        rxjava_version = constants.getProperty("rxJavaVersion")
+        snappy_version = constants.getProperty("snappyVersion")
+        //springboot
+        spring_boot_version = '2.0.2.RELEASE'
+        spring_boot_gradle_plugin_version = '2.0.2.RELEASE'
+
+        testJvmArgs = ['--add-opens', 'java.base/java.time=ALL-UNNAMED', '--add-opens', 'java.base/java.io=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.net=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.nio=ALL-UNNAMED', '--add-opens', 'java.base/java.lang.invoke=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.security.cert=ALL-UNNAMED', '--add-opens', 'java.base/java.security=ALL-UNNAMED',
+                       '--add-opens', 'java.base/javax.net.ssl=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED', '--add-opens', 'java.sql/java.sql=ALL-UNNAMED',]
+        testJvmFxArgs = [  '--add-exports', 'java.base/sun.nio.ch=ALL-UNNAMED',
+                           '--add-exports', 'javafx.base/com.sun.javafx=ALL-UNNAMED',
+                           '--add-exports', 'javafx.base/com.sun.javafx.collections=ALL-UNNAMED']
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+
+        maven { url 'https://download.corda.net/maven/corda-releases' }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_gradle_plugin_version"
+    }
+}
+
+allprojects { //Properties that you need to compile your project (The application)
+    apply from: "${rootProject.projectDir}/repositories.gradle"
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+
+    repositories {
+        mavenLocal()
+        maven { url 'https://download.corda.net/maven/corda-releases' }
+        mavenCentral()
+        maven { url 'https://download.corda.net/maven/corda-dependencies' }
+        maven { url 'https://jitpack.io' }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        compilerOptions {
+            languageVersion = KOTLIN_1_8
+            apiVersion = KOTLIN_1_8
+            jvmTarget = JVM_17
+            javaParameters = true   // Useful for reflection.
+            freeCompilerArgs = ['-Xjvm-default=all-compatibility']
+            allWarningsAsErrors = true
+        }
+    }
+
+    jar {
+        // This makes the JAR's SHA-256 hash repeatable.
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+
+apply plugin: 'net.corda.plugins.cordapp'
+apply plugin: 'net.corda.plugins.cordformation'
+apply plugin: 'net.corda.plugins.quasar-utils'
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file("config/dev")
+        }
+    }
+}
+
+//Module dependencis
+dependencies {
+    // Corda dependencies.
+    cordaProvided "$corda_release_group:corda-core:$corda_release_version"
+    cordaBootstrapper("$corda_release_group:corda-node-api:$corda_release_version") {
+        exclude group: "ch.qos.logback", module: "logback-classic"
+    }
+    corda "$corda_release_group:corda:$corda_release_version"
+
+    // CorDapp dependencies.
+    cordapp("$corda_release_group:corda-finance-contracts:$corda_release_version")
+    cordapp("$corda_release_group:corda-finance-workflows:$corda_release_version")
+    cordapp project(":workflows")
+    cordapp project(":contracts")
+
+    cordaProvided "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+    cordaProvided "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    cordaProvided "org.slf4j:jul-to-slf4j:$slf4j_version"
+    cordaDriver "net.corda:corda-shell:$corda_shell_version"
+}
+
+cordapp {
+    targetPlatformVersion corda_platform_version.toInteger()
+    minimumPlatformVersion corda_platform_version.toInteger()
+}
+
+
+task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
+    nodeDefaults {
+
+        cordapp project(':contracts')
+        cordapp project(':workflows')
+        runSchemaMigration = true
+    }
+    node {
+        name "O=Notary,L=London,C=GB"
+        notary = [validating : false]
+        p2pPort 10002
+        rpcSettings {
+            address("0.0.0.0:10003")
+            adminAddress("0.0.0.0:10043")
+        }
+    }
+    node {
+        name "O=PartyA,L=London,C=GB"
+        p2pPort 10005
+        rpcSettings {
+            address("0.0.0.0:10006")
+            adminAddress("0.0.0.0:10046")
+        }
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=PartyB,L=New York,C=US"
+        p2pPort 10008
+        rpcSettings {
+            address("0.0.0.0:10009")
+            adminAddress("0.0.0.0:10049")
+        }
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+}

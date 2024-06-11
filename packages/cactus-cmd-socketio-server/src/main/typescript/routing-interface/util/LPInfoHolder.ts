@@ -38,7 +38,7 @@ export class LPInfoHolder {
       });
       if (ret === "") {
         logger.warn(
-          "LegerPluginInfo is Not Found : validatorId = " + validatorId
+          "LegerPluginInfo is Not Found : validatorId = " + validatorId,
         );
       }
       return ret;

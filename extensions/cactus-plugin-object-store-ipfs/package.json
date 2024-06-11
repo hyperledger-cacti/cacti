@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cactus-plugin-object-store-ipfs",
   "version": "2.0.0-alpha.2",
-  "description": "IPFS backed objec store plugin implementation for Hyperledger Cactus",
+  "description": "IPFS backed object store plugin implementation for Hyperledger Cactus",
   "keywords": [
     "Hyperledger",
     "Cactus",
@@ -46,8 +46,8 @@
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios --reserved-words-mappings protected=protected",
+    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -58,22 +58,27 @@
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
-    "axios": "0.21.4",
-    "ipfs-http-client": "51.0.1",
-    "run-time-error": "1.4.0",
+    "axios": "1.6.0",
+    "run-time-error-cjs": "1.4.0",
     "typescript-optional": "2.0.1",
-    "uuid": "8.3.2"
+    "uuid": "9.0.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
-    "@types/express": "4.17.13",
-    "express": "4.17.1",
-    "ipfs-core-types": "0.6.1",
-    "multiformats": "9.4.9"
+    "@multiformats/multiaddr": "11.6.1",
+    "@types/body-parser": "1.19.4",
+    "@types/express": "4.17.21",
+    "body-parser": "1.20.2",
+    "express": "4.19.2",
+    "ipfs-core-types": "0.14.1",
+    "ipfs-unixfs": "9.0.1",
+    "kubo-rpc-client": "3.0.1",
+    "kubo-rpc-client-esm-cjs": "3.0.1",
+    "multiformats": "11.0.2"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

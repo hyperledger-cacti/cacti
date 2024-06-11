@@ -40,9 +40,9 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-function sleep(waitSec: number, callbackFunc: any) {
+function sleep(waitSec: number, callbackFunc: unknown) {
   let spanedSec = 0;
-  var id = setInterval(function () {
+  const id = setInterval(function () {
     spanedSec++;
     if (spanedSec >= waitSec) {
       clearInterval(id);

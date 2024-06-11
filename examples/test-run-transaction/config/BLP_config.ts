@@ -9,7 +9,7 @@ import { BusinessLogicPlugin } from "../../../packages/cactus-cmd-socketio-serve
 import { BusinessLogicRunTransaction } from "../BusinessLogicRunTransaction";
 
 export function getTargetBLPInstance(
-  businessLogicID: string
+  businessLogicID: string,
 ): BusinessLogicPlugin | null {
   switch (businessLogicID) {
     case "j71S9gLN":

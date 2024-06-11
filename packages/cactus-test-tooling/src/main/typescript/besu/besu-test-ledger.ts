@@ -34,8 +34,8 @@ export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   envVars: ["BESU_NETWORK=dev"],
 });
 
-export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     containerImageVersion: Joi.string().min(5).required(),
     containerImageName: Joi.string().min(1).required(),
     rpcApiHttpPort: Joi.number()
@@ -45,8 +45,7 @@ export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys
       .max(65535)
       .required(),
     envVars: Joi.array().allow(null).required(),
-  },
-);
+  });
 
 export class BesuTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
@@ -255,7 +254,7 @@ export class BesuTestLedger implements ITestLedger {
           Healthcheck: {
             Test: [
               "CMD-SHELL",
-              `curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545`,
+              `curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' 127.0.0.1:8545`,
             ],
             Interval: 1000000000, // 1 second
             Timeout: 3000000000, // 3 seconds
@@ -376,7 +375,7 @@ export class BesuTestLedger implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }

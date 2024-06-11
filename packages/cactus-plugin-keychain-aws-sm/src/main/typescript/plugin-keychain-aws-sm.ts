@@ -73,7 +73,8 @@ export interface IPluginKeychainAwsSmOptions extends ICactusPluginOptions {
 const SECRETMANAGER_STATUS_KEY_NOT_FOUND =
   "Secrets Manager can't find the specified secret.";
 export class PluginKeychainAwsSm
-  implements ICactusPlugin, IPluginWebService, IPluginKeychain {
+  implements ICactusPlugin, IPluginWebService, IPluginKeychain
+{
   public static readonly CLASS_NAME = "PluginKeychainAwsSm";
 
   private readonly log: Logger;
@@ -240,7 +241,7 @@ export class PluginKeychainAwsSm
   }
 
   public getEncryptionAlgorithm(): string {
-    return (null as unknown) as string;
+    return null as unknown as string;
   }
 
   async get(key: string): Promise<string> {

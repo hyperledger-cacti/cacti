@@ -290,13 +290,19 @@ public class CredentialsExtractor {
 		return configObj;
 	}
 
-	private static void deleteFolder(File folder) {
+	private static void deleteFolder(File folder) throws Exception {
 		if (folder.isDirectory()) {
-			for (File subf: folder.listFiles()) {
-				deleteFolder(subf);
+			for (File subf : folder.listFiles()) {
+				try {
+					deleteFolder(subf);
+				} catch (Exception e) {
+					String errorMessage = "An error occurred while deleting : " + subf.getPath();
+					throw new Exception(errorMessage);
+				}
 			}
 		}
 		folder.delete();
+		System.out.println((folder.exists() ? "Failed to delete : " : "Deleted successfully : ") + folder.getPath());
 	}
 
 	public static String getConfig(String baseNodesPath, String[] nodes) {
@@ -326,7 +332,11 @@ public class CredentialsExtractor {
 				//}
 				configObj.add(node, nodeConfigObj);
 			}
-			deleteFolder(new File(tempStore));
+			try {
+				deleteFolder(new File(tempStore));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			System.out.println("Extracted configuration for " + node);
 		}
 		System.out.println("Extracted configuration for all nodes");

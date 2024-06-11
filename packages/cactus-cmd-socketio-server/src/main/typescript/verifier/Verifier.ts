@@ -18,7 +18,7 @@ import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-import { Socket, io } from "socket.io-client";
+import { Socket, io } from "socket.io-client-fixed-types";
 
 const fs = require("fs");
 const path = require("path");
@@ -33,7 +33,7 @@ const VALIDATOR_TYPE = {
   SOCKET: "socketio",
   OPENAPI: "openapi",
 } as const;
-type VALIDATOR_TYPE = typeof VALIDATOR_TYPE[keyof typeof VALIDATOR_TYPE]; // 'socketio' | 'openapi'
+type VALIDATOR_TYPE = (typeof VALIDATOR_TYPE)[keyof typeof VALIDATOR_TYPE]; // 'socketio' | 'openapi'
 
 // abolish template-trade
 // const validatorRregistryConf: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/validator-registry.yaml", 'utf8'));

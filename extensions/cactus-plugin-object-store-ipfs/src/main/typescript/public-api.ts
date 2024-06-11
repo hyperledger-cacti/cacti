@@ -1,5 +1,9 @@
 export * from "./generated/openapi/typescript-axios/index";
-export { IIpfsHttpClient } from "./i-ipfs-http-client";
+export {
+  Options,
+  LikeIpfsHttpClientFile,
+  LikeIpfsHttpClient,
+} from "./kubo-rpc-client-types";
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 export {
   PluginObjectStoreIpfs,

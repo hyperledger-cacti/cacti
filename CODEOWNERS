@@ -1,2 +1,7 @@
-* @petermetz @takeutak @izuru0 @jagpreetsinghsasan @vramakrishna @sandeepnRES
+* @petermetz @takeutak @izuru0 @jagpreetsinghsasan @vramakrishna @sandeepnRES @outSH
 
+packages/cactus-plugin-satp-hermes @RafaelAPB
+packages/cactus-plugin-bungee-hermes @RafaelAPB
+examples/cactus-example-cbdc-bridging @RafaelAPB
+examples/cactus-example-cbdc-bridging-backend @RafaelAPB
+examples/cactus-example-cbdc-bridging-frontend @RafaelAPB

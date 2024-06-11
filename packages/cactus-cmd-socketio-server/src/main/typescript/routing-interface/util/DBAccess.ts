@@ -32,7 +32,7 @@ export class DBAccess {
   getLedgerPluginInfo(): LedgerPluginInfo[] {
     try {
       const configVerifier: ValidatorRegistry = new ValidatorRegistry(
-        path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
+        path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml"),
       );
       this.ledgerPluginInfo = configVerifier.ledgerPluginInfo;
     } catch (error) {
@@ -46,7 +46,7 @@ export class DBAccess {
   getContractInfo(): [] {
     try {
       const configContract: any = yaml.safeLoad(
-        fs.readFileSync("/etc/cactus/contractInfo.yaml", "utf8")
+        fs.readFileSync("/etc/cactus/contractInfo.yaml", "utf8"),
       );
 
       this.contractInfo = configContract.contractInfo;

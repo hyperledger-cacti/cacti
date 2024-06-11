@@ -629,7 +629,7 @@ export class ServerPlugin {
         );
       }
 
-      let result = await looseWeb3Eth[sendFunction](...sendArgs);
+      const result = await looseWeb3Eth[sendFunction](...sendArgs);
 
       const signedResults = signMessageJwt({ result: result });
       const retObj = {

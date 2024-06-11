@@ -1,5 +1,4 @@
 import { Given, When, Then, Before, After } from "cucumber";
-import { expect } from "chai";
 import axios from "axios";
 import CryptoMaterial from "../../../../crypto-material/crypto-material.json";
 import {
@@ -10,7 +9,12 @@ import {
 } from "../besu-helper";
 import AssetReferenceContractJson from "../../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../../solidity/cbdc-erc-20/CBDCcontract.json";
-import { getEthAddress, getPrvKey } from "./common";
+import {
+  getEthAddress,
+  getPrvKey,
+  assertEqual,
+  assertStringContains,
+} from "./common";
 
 const BESU_CONTRACT_CBDC_ERC20_NAME = CBDCcontractJson.contractName;
 const BESU_CONTRACT_ASSET_REF_NAME = AssetReferenceContractJson.contractName;
@@ -25,9 +29,10 @@ After({ timeout: 20 * 1000, tags: "@besu" }, async function () {
 
 Given(
   "{string} with {int} CBDC available in the sidechain smart contract",
+  { timeout: 10 * 1000 },
   async function (user: string, amount: number) {
     await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_ASSET_REF_NAME,
         invocationType: "SEND",
@@ -47,9 +52,10 @@ Given(
 
 When(
   "{string} escrows {int} CBDC and creates an asset reference with id {string} in the sidechain",
+  { timeout: 10 * 1000 },
   async function (user: string, amount: number, assetRefID: string) {
     await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_CBDC_ERC20_NAME,
         invocationType: "SEND",
@@ -69,6 +75,7 @@ When(
 
 When(
   "bob locks the asset reference with id {string} in the sidechain",
+  { timeout: 10 * 1000 },
   async function (assetRefID: string) {
     await lockBesuAssetReference(
       getEthAddress("bob"),
@@ -80,9 +87,10 @@ When(
 
 When(
   "bob deletes the asset reference with id {string} in the sidechain",
+  { timeout: 10 * 1000 },
   async function (assetRefID: string) {
     await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_ASSET_REF_NAME,
         invocationType: "SEND",
@@ -103,29 +111,29 @@ When(
 Then(
   "the asset reference smart contract has an asset reference with id {string}",
   async function (assetRefID: string) {
-    expect(await isBesuAssetReference(assetRefID)).to.be.true;
+    assertEqual(await isBesuAssetReference(assetRefID), true);
   },
 );
 
 Then(
   "the asset reference smart contract has no asset reference with id {string}",
   async function (assetRefID: string) {
-    expect(await isBesuAssetReference(assetRefID)).to.be.false;
+    assertEqual(await isBesuAssetReference(assetRefID), false);
   },
 );
 
-Then("{string} has {int} CBDC available in the sidechain", async function (
-  user: string,
-  amount: number,
-) {
-  expect(await getBesuBalance(getEthAddress(user))).to.equal(amount);
-});
+Then(
+  "{string} has {int} CBDC available in the sidechain",
+  async function (user: string, amount: number) {
+    assertEqual(await getBesuBalance(getEthAddress(user)), amount);
+  },
+);
 
 Then(
   "the asset reference with id {string} is locked in the sidechain",
   async function (assetRefID: string) {
     const response = await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_ASSET_REF_NAME,
         invocationType: "CALL",
@@ -141,7 +149,7 @@ Then(
       },
     );
 
-    expect(response.data.callOutput).to.equal(true);
+    assertEqual(response.data.callOutput, true);
   },
 );
 
@@ -153,7 +161,8 @@ Then(
       getPrvKey(user),
       assetRefID,
     ).catch((err) => {
-      expect(err.response.data.error).to.contain(
+      assertStringContains(
+        err.response.data.error,
         `Transaction has been reverted by the EVM`,
       );
     });

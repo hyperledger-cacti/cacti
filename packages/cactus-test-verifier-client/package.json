@@ -42,25 +42,35 @@
     "dist/*"
   ],
   "scripts": {
-    "stress-test": "node --expose-gc --no-opt dist/main/typescript/verifier-with-go-eth-stress-check.js",
-    "stress-test-inspect": "node --expose-gc --inspect-brk --no-opt dist/main/typescript/verifier-with-go-eth-stress-check.js"
+    "stress-test": "node --expose-gc --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js",
+    "stress-test-inspect": "node --expose-gc --inspect-brk --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.2",
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-geth-ledger": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.2",
+    "body-parser": "1.20.2",
+    "express": "4.19.2",
     "log4js": "6.4.1",
-    "web3": "1.7.3"
+    "socket.io": "4.5.4",
+    "web3": "1.7.3",
+    "web3-core": "1.7.3"
   },
   "devDependencies": {
-    "@types/node": "14.18.54"
+    "@types/body-parser": "1.19.4",
+    "@types/express": "4.17.21",
+    "@types/node": "18.11.9",
+    "@types/uuid": "9.0.8",
+    "uuid": "9.0.1",
+    "web3-eth-accounts": "4.0.3"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

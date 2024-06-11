@@ -3,6 +3,8 @@ import { Express } from "express";
 
 import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 
+import { createRuntimeErrorWithCause } from "@hyperledger/cactus-common";
+
 /**
  * Hooks up an endpoint instance to an ExpressJS web app object.
  *
@@ -21,7 +23,7 @@ export async function registerWebServiceEndpoint(
   const provider = endpoint.getAuthorizationOptionsProvider();
   const { isProtected, requiredRoles } = await provider.get();
 
-  const webAppCasted = (webApp as unknown) as Record<
+  const webAppCasted = webApp as unknown as Record<
     string,
     (...a: unknown[]) => unknown
   >;
@@ -40,10 +42,8 @@ export async function registerWebServiceEndpoint(
     } else {
       registrationMethod(httpPath, requestHandler);
     }
-  } catch (ex) {
-    throw new Error(
-      `${fnTag} Express verb method ${httpVerb} threw ` +
-        ` while registering endpoint: ${ex.message}`,
-    );
+  } catch (ex: unknown) {
+    const errorMessage = `${fnTag} Express verb method ${httpVerb} threw while registering endpoint on path ${httpPath}`;
+    throw createRuntimeErrorWithCause(errorMessage, ex);
   }
 }

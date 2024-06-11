@@ -1,5 +1,5 @@
 import { Bookshelf } from "../../generated/openapi/typescript-axios/index";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 /**
  * Responsible for converting model entities such as the `Bookshelf` to and
@@ -26,7 +26,10 @@ export class BookshelfConverter {
       const errMsg = `Expected the value of arr[${BookshelfConverter.SOLIDITY_FIELD_ID}] to be a string`;
       throw new RuntimeError(errMsg);
     }
-    const shelfCount = arr[BookshelfConverter.SOLIDITY_FIELD_SHELF_COUNT];
+    const shelfCountStr = arr[
+      BookshelfConverter.SOLIDITY_FIELD_SHELF_COUNT
+    ] as string;
+    const shelfCount = parseInt(shelfCountStr, 10);
     if (typeof shelfCount !== "number") {
       const errMsg = `Expected the value of arr[${BookshelfConverter.SOLIDITY_FIELD_SHELF_COUNT}] to be a number`;
       throw new RuntimeError(errMsg);

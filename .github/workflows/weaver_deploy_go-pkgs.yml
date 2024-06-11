@@ -15,10 +15,10 @@ on:
 jobs:
   publish-protos-go:
     if: github.repository_owner == 'hyperledger'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -72,10 +72,10 @@ jobs:
   publish-lib-utils:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: publish-protos-go
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
@@ -138,10 +138,10 @@ jobs:
   publish-lib-asset-exchange:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: publish-protos-go
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
@@ -204,10 +204,10 @@ jobs:
   publish-interface-asset-mgmt:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-go]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
@@ -270,10 +270,10 @@ jobs:
   publish-interop-cc:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-go, publish-lib-utils, publish-lib-asset-exchange]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
@@ -336,10 +336,10 @@ jobs:
   publish-go-sdk:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-go]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
@@ -402,10 +402,10 @@ jobs:
   publish-weaver-fabric-cc-image:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-go, publish-lib-utils, publish-lib-asset-exchange]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1

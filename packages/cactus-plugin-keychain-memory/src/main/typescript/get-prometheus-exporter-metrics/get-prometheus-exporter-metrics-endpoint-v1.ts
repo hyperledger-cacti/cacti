@@ -26,7 +26,8 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(
@@ -57,18 +58,18 @@ export class GetPrometheusExporterMetricsEndpointV1
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"
     ];
   }
 
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.path;
+    return this.oasPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

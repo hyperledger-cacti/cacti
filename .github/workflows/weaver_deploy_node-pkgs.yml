@@ -4,53 +4,56 @@
 
 name: Deploy Node JS Packages
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 on:
   push:
     tags:
       - v*
-      
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   publish-protos-js:
     if: github.repository_owner == 'hyperledger'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - uses: actions/checkout@v4.1.1
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
-          
+          node-version: ${{ env.NODEJS_VERSION }}
+
       - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-          
+
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: weaver/common/protos-js
-        
+
       - name: Build
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-js
-        
+
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
-          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false)
           LOCAL_VERSION=$(node -p "require('./package.json').version")
           if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
             echo "PROTOS_JS_PUBLISH=false" >> $GITHUB_ENV
@@ -58,46 +61,46 @@ jobs:
             echo "PROTOS_JS_PUBLISH=true" >> $GITHUB_ENV
           fi
         working-directory: weaver/common/protos-js
-        
+
       - name: Publish
         if: ${{ env.PROTOS_JS_PUBLISH == 'true' }}
         run: |
             export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
             make publish
         working-directory: weaver/common/protos-js
-        
+
   publish-fabric-sdk:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-js]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - uses: actions/checkout@v4.1.1
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
-          
+          node-version: ${{ env.NODEJS_VERSION }}
+
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
-        
+
       - name: Build
         run: make build
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
-        
+
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
-          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false)
           LOCAL_VERSION=$(node -p "require('./package.json').version")
           if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
             echo "WEAVER_FABRIC_SDK_PUBLISH=false" >> $GITHUB_ENV
@@ -105,44 +108,44 @@ jobs:
             echo "WEAVER_FABRIC_SDK_PUBLISH=true" >> $GITHUB_ENV
           fi
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
-        
+
       - name: Publish
         if: ${{ env.WEAVER_FABRIC_SDK_PUBLISH == 'true' }}
         run: make publish
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
-        
+
   publish-besu-sdk:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-js]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - uses: actions/checkout@v4.1.1
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
-          
+          node-version: ${{ env.NODEJS_VERSION }}
+
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: weaver/sdks/besu/node
-        
+
       - name: Build
         run: make build
         working-directory: weaver/sdks/besu/node
-        
+
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
-          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false)
           LOCAL_VERSION=$(node -p "require('./package.json').version")
           if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
             echo "WEAVER_BESU_SDK_PUBLISH=false" >> $GITHUB_ENV
@@ -150,31 +153,31 @@ jobs:
             echo "WEAVER_BESU_SDK_PUBLISH=true" >> $GITHUB_ENV
           fi
         working-directory: weaver/sdks/besu/node
-        
+
       - name: Publish
         if: ${{ env.WEAVER_BESU_SDK_PUBLISH == 'true' }}
         run: make publish
         working-directory: weaver/sdks/besu/node
-    
+
   publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-js, publish-fabric-sdk]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
+      - uses: actions/checkout@v4.1.1
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
@@ -190,31 +193,31 @@ jobs:
         if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
         run: make push-image
         working-directory: weaver/core/drivers/fabric-driver
-        
+
       - name: Push latest tag
         if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
         run: make push-image-latest
         working-directory: weaver/core/drivers/fabric-driver
-        
+
   publish-iin-agent-image:
     if: ${{ always() && github.repository_owner == 'hyperledger' }}
     needs: [publish-protos-js, publish-fabric-sdk]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
+      - uses: actions/checkout@v4.1.1
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-                    
+
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
@@ -230,7 +233,7 @@ jobs:
         if: ${{ env.IINAGENT_PUSH == 'true' }}
         run: make push-image
         working-directory: weaver/core/identity-management/iin-agent
-        
+
       - name: Push latest tag
         if: ${{ env.IINAGENT_PUSH == 'true' }}
         run: make push-image-latest

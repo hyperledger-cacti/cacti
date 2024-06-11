@@ -4,8 +4,7 @@ import {
   protos,
 } from "@google-cloud/secret-manager";
 
-import * as gax from "google-gax";
-import { Descriptors } from "google-gax";
+import type { GoogleAuth } from "google-gax";
 
 import {
   Logger,
@@ -38,12 +37,8 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
 
     this.log = LoggerProvider.getOrCreate({ level, label });
 
-    this.auth = ("" as unknown) as gax.GoogleAuth;
-    this.descriptors = ("" as unknown) as Descriptors;
-    this.innerApiCalls = ("" as unknown) as { [name: string]: Function };
-    this.pathTemplates = ("" as unknown) as {
-      [name: string]: gax.PathTemplate;
-    };
+    this.auth = "" as unknown as GoogleAuth;
+    this.innerApiCalls = "" as unknown as { [name: string]: Function };
 
     this.secrets = new Map<string, string>();
     this.log.info(`Created ${this.className}.`);
@@ -63,7 +58,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
       const result = {
         name: `${request.parent}?${request.secretId}`,
       };
-      return ([result] as unknown) as Promise<
+      return [result] as unknown as Promise<
         [
           protos.google.cloud.secretmanager.v1.ISecret,
           protos.google.cloud.secretmanager.v1.ICreateSecretRequest | undefined,
@@ -91,7 +86,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
         request.parent.split("?")[1],
         request.payload.data.toString(),
       );
-      return ([request.payload.data.toString()] as unknown) as Promise<
+      return [request.payload.data.toString()] as unknown as Promise<
         [
           protos.google.cloud.secretmanager.v1.ISecretVersion,
           (
@@ -122,7 +117,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
     } else {
       throw new Error("request.name not passed");
     }
-    return (undefined as unknown) as Promise<
+    return undefined as unknown as Promise<
       [
         protos.google.protobuf.IEmpty,
         protos.google.cloud.secretmanager.v1.IDeleteSecretRequest | undefined,
@@ -145,7 +140,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
   > {
     const result = this.secrets.has(request.name?.split("?")[1] || "");
     if (result) {
-      return (true as unknown) as Promise<
+      return true as unknown as Promise<
         [
           protos.google.cloud.secretmanager.v1.IAccessSecretVersionResponse,
           (
@@ -156,7 +151,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
         ]
       >;
     } else {
-      return (false as unknown) as Promise<
+      return false as unknown as Promise<
         [
           protos.google.cloud.secretmanager.v1.IAccessSecretVersionResponse,
           (
@@ -180,7 +175,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
   > {
     const result = this.secrets.get(request.name?.split("?")[1] || "");
     if (result) {
-      return ([result] as unknown) as Promise<
+      return [result] as unknown as Promise<
         [
           protos.google.cloud.secretmanager.v1.ISecret,
           protos.google.cloud.secretmanager.v1.IGetSecretRequest | undefined,

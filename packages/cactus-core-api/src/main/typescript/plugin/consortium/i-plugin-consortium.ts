@@ -7,7 +7,7 @@ export interface IPluginConsortium<
   GetNodeJwsIn,
   GetNodeJwsOut,
   GetConsortiumJwsIn,
-  GetConsortiumJwsOut
+  GetConsortiumJwsOut,
 > extends ICactusPlugin {
   /**
    * Returns the JSON Web Signature of the consortium metadata, as issued by the

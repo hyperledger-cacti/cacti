@@ -1,3 +1,4 @@
+import { v4 as uuidV4 } from "uuid";
 import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
@@ -8,12 +9,13 @@ import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import * as publicApi from "../../../main/typescript/public-api";
 import { ISupplyChainAppOptions } from "../../../main/typescript/public-api";
 import { SupplyChainApp } from "../../../main/typescript/public-api";
+import { Shipment } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
 const testCase =
   "can launch via CLI with generated API server .config.json file";
 const logLevel: LogLevelDesc = "TRACE";
 
-test.skip("BEFORE " + testCase, async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
@@ -21,7 +23,7 @@ test.skip("BEFORE " + testCase, async (t: Test) => {
 
 // FIXME: https://github.com/hyperledger/cactus/issues/1521
 // Skipping until test can be stabilized.
-test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
+test("Supply chain backend API calls can be executed", async (t: Test) => {
   t.ok(publicApi, "Public API of the package imported OK");
 
   const configService = new ConfigService();
@@ -40,14 +42,13 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
 
   // FIXME - this hack should not be necessary, we need to re-think how we
   // do configuration parsing. The convict library may not be the path forward.
-  exampleConfig.authorizationConfigJson = (JSON.stringify(
+  exampleConfig.authorizationConfigJson = JSON.stringify(
     exampleConfig.authorizationConfigJson,
-  ) as unknown) as IAuthorizationConfig;
+  ) as unknown as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
 
-  const convictConfig = await configService.newExampleConfigConvict(
-    exampleConfig,
-  );
+  const convictConfig =
+    await configService.newExampleConfigConvict(exampleConfig);
   t.ok(convictConfig, "configService.newExampleConfigConvict() truthy OK");
 
   const env = await configService.newExampleConfigEnv(
@@ -70,7 +71,7 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
 
   // Node A => Besu
   // Node B => Quorum
-  // Node C => Fabric 1.4.x
+  // Node C => Fabric v2.5.6
   const startResult = await app.start();
   const { apiServerA, apiServerB, apiServerC } = startResult;
   t.ok(apiServerA, "ApiServerA truthy OK");
@@ -111,7 +112,8 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
     supplyChainApiClientC,
   } = startResult;
 
-  const listBambooHarvestRes = await supplyChainApiClientA.listBambooHarvestV1();
+  const listBambooHarvestRes =
+    await supplyChainApiClientA.listBambooHarvestV1();
   t.ok(listBambooHarvestRes, "listBambooHarvestRes truthy OK");
   t.true(
     listBambooHarvestRes.status > 199,
@@ -143,6 +145,39 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
     listShipmentRes.status < 300,
     "listShipmentRes status < 300 truthy OK",
   );
+
+  const shipment: Shipment = {
+    bookshelfId: "some-id-of-a-bookshelf-" + uuidV4(),
+    id: "some-id-of-a-shipment-" + uuidV4(),
+  };
+
+  const insertShipmentRes = await supplyChainApiClientC.insertShipmentV1({
+    shipment,
+  });
+  t.ok(insertShipmentRes, "insertShipmentRes truthy OK");
+  t.true(
+    insertShipmentRes.status > 199,
+    "insertShipmentRes status > 199 truthy OK",
+  );
+  t.true(
+    insertShipmentRes.status < 300,
+    "insertShipmentRes status < 300 truthy OK",
+  );
+
+  const listShipmentRes2 = await supplyChainApiClientC.listShipmentV1();
+  t.ok(listShipmentRes2, "listShipmentRes2 truthy OK");
+  t.true(
+    listShipmentRes2.status > 199,
+    "listShipmentRes2 status > 199 truthy OK",
+  );
+  t.true(
+    listShipmentRes2.status < 300,
+    "listShipmentRes2 status < 300 truthy OK",
+  );
+
+  const shipments = listShipmentRes2.data.data;
+  const [firstShipment] = shipments;
+  t.equal(shipment.id, firstShipment.id, "Inserted shipment matches IDs OK");
 
   t.end();
 });

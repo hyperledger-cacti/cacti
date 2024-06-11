@@ -292,6 +292,11 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
                     try {
                         ssh.disconnect()
                         logger.debug("Disconnected OK from SSH host ${cred.hostname}:${cred.port}")
+                        // This is a hack to force the code to wait for the OS to close down the port. Without it, deployments
+                        // can fail intermittently because it'll try to reconnect too fast. The right way to fix it is
+                        // to make it probe the port openness and have retries with exponential backoff.
+                        // TODO: Implement the proper fix as described above.
+                        Thread.sleep(5000)
                     } catch (ex: Exception) {
                         logger.warn("Disconnect failed from SSH host ${cred.hostname}:${cred.port}. Ignoring since we are done anyway...")
                     }

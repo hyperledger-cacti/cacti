@@ -1,3 +1,5 @@
+CLIKT_VERSION=$(shell grep cliktVersion ./constants.properties | cut -d '=' -f 2)
+
 .PHONY: build-local-weaver-dependencies
 build-local-weaver-dependencies:
 	echo "Building local protos..."
@@ -8,6 +10,7 @@ build-local-weaver-dependencies:
 .PHONY: build-local	
 build-local:
 	cd ../fungible-house-token && rm -f github.properties && make build
+	#wget -P clients/libs/ https://repo1.maven.org/maven2/com/github/ajalt/clikt/${CLIKT_VERSION}/clikt-${CLIKT_VERSION}.jar && ./gradlew clean installDist jar
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
@@ -52,24 +55,40 @@ test: github.properties
 
 .PHONY: initialise-vault
 initialise-vault:
-	(docker logs corda_partya_1 > /dev/null && REMOTE_FLOW="localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
-	(docker logs corda_network2_partya_1 > /dev/null && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 REMOTE_FLOW="localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
+	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
+		REMOTE_FLOW="localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all; \
+	fi
+	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
+		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 REMOTE_FLOW="localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all; \
+	fi
 
 .PHONY: initialise-vault-docker
 initialise-vault-docker:
-	(docker logs corda_partya_1 > /dev/null && MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
-	(docker logs corda_network2_partya_1 > /dev/null && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
+	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
+		MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all; \
+	fi
+	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
+		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all; \
+	fi
 
 .PHONY: initialise-vault-asset-transfer
 initialise-vault-asset-transfer:
-	(docker logs corda_partya_1 > /dev/null && ./clients/build/install/clients/bin/clients configure network) || true
-	(docker logs corda_network2_partya_1 > /dev/null && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network) || true
+	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
+		./clients/build/install/clients/bin/clients configure network; \
+	fi
+	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
+		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network; \
+	fi
 	bash scripts/initNetworkId.sh
 
 .PHONY: initialise-vault-asset-transfer-docker
 initialise-vault-asset-transfer-docker:
-	(docker logs corda_partya_1 > /dev/null && MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" ./clients/build/install/clients/bin/clients configure network) || true
-	(docker logs corda_network2_partya_1 > /dev/null && MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network) || true
+	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
+		MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" ./clients/build/install/clients/bin/clients configure network; \
+	fi
+	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
+		MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network; \
+	fi
 	bash scripts/initNetworkId.sh
 
 .PHONY: get-access-control-policies
@@ -94,3 +113,4 @@ publish-cordapps:
 clean:
 	./gradlew clean
 	rm -rf .gradle
+	rm -rf clients/libs

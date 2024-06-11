@@ -9,7 +9,7 @@ package org.hyperledger.cacti.weaver.sdk.corda;
 import java.util.Base64
 import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.crypto.sha256
-import kotlin.random.Random
+import java.security.SecureRandom
 import org.hyperledger.cacti.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
 import org.hyperledger.cacti.weaver.imodule.corda.states.sha512
 
@@ -42,8 +42,9 @@ class HashFunctions {
         
         override fun generateRandomPreimage(length: Int)
         {
-            val bytes = ByteArray(length)
-            Random.nextBytes(bytes)
+            val secureRandom = SecureRandom.getInstanceStrong();
+            val bytes = ByteArray(length);
+            secureRandom.nextBytes(bytes);
             this.setPreimage(Base64.getEncoder().encodeToString(bytes));
         }
         override fun setPreimage(preImage: String) {

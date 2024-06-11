@@ -1,18 +1,17 @@
 /*
- * Copyright 2020-2021 Hyperledger Cactus Contributors
+ * Copyright 2020-2023 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
- * Verifier.ts
+ * verifier.ts
  */
 
-import { Subscription } from "rxjs";
+import type { Subscription } from "rxjs";
 
 import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-
 import {
   ISocketApiClient,
   IVerifier,
@@ -27,20 +26,17 @@ export {
 /**
  * Utility type for retrieving monitoring event / new block type from generic ISocketApiClient interface.
  */
-type BlockTypeFromSocketApi<T> = T extends ISocketApiClient<infer U>
-  ? U
-  : never;
+type BlockTypeFromSocketApi<T> =
+  T extends ISocketApiClient<infer U> ? U : never;
 
 /**
  * Extends ledger connector ApiClient with additional monitoring methods (using callbacks, instead of reactive).
  *
- * @remarks
- * Migrated from cmd-socketio-server for merging the codebases.
- *
  * @todo Don't throw exception for not supported operations, don't include these methods at all (if possible)
  */
 export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
-  implements IVerifier {
+  implements IVerifier
+{
   private readonly log: Logger;
   readonly className: string;
   readonly runningMonitors = new Map<string, Subscription>();
@@ -165,7 +161,7 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
   async sendAsyncRequest(
     contract: Record<string, unknown>,
     method: Record<string, unknown>,
-    args: any,
+    args: unknown,
   ): Promise<void> {
     if (!this.ledgerApi.sendAsyncRequest) {
       throw new Error("sendAsyncRequest not supported on this ledger");
@@ -184,8 +180,8 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
   async sendSyncRequest(
     contract: Record<string, unknown>,
     method: Record<string, unknown>,
-    args: any,
-  ): Promise<any> {
+    args: unknown,
+  ): Promise<unknown> {
     if (!this.ledgerApi.sendSyncRequest) {
       throw new Error("sendSyncRequest not supported on this ledger");
     }

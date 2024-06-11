@@ -39,3 +39,12 @@ export {
 } from "./authzn/authorizer-factory";
 export { IAuthorizationConfig } from "./authzn/i-authorization-config";
 export { AuthorizationProtocol } from "./config/authorization-protocol";
+
+export {
+  createGrpcInsecureChannelCredentials,
+  createGrpcInsecureServerCredentials,
+  createGrpcSslChannelCredentials,
+  createGrpcSslServerCredentials,
+} from "./grpc/grpc-credentials-factory";
+
+export { createGrpcServer } from "./grpc/grpc-server-factory";

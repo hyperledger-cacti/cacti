@@ -12,7 +12,7 @@ export async function lockBesuAssetReference(
   assetRefID: string,
 ): Promise<void> {
   await axios.post(
-    "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+    "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
     {
       contractName: BESU_CONTRACT_ASSET_REF_NAME,
       invocationType: "SEND",
@@ -31,7 +31,7 @@ export async function lockBesuAssetReference(
 
 export async function getBesuBalance(address: string): Promise<number> {
   const response = await axios.post(
-    "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+    "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
     {
       contractName: BESU_CONTRACT_CBDC_ERC20_NAME,
       invocationType: "CALL",
@@ -54,7 +54,7 @@ export async function isBesuAssetReference(
   assetRefID: string,
 ): Promise<boolean> {
   const response = await axios.post(
-    "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+    "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
     {
       contractName: BESU_CONTRACT_ASSET_REF_NAME,
       invocationType: "CALL",
@@ -75,7 +75,7 @@ export async function isBesuAssetReference(
 
 export async function resetBesu(): Promise<void> {
   await axios.post(
-    "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+    "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
     {
       contractName: BESU_CONTRACT_CBDC_ERC20_NAME,
       invocationType: "SEND",
@@ -98,7 +98,7 @@ export async function resetBesu(): Promise<void> {
   );
 
   await axios.post(
-    "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+    "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
     {
       contractName: BESU_CONTRACT_ASSET_REF_NAME,
       invocationType: "SEND",

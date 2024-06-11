@@ -3,15 +3,13 @@ import path from "path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { deleteAsync } from "del";
-import fs from "fs-extra";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { simpleGit, SimpleGit, SimpleGitOptions } from "simple-git";
-import { SimpleGitProgressEvent } from "simple-git";
-import fastSafeStringify from "fast-safe-stringify";
 import AdmZip from "adm-zip";
+
+import { createTemporaryClone } from "./create-temporary-clone";
 
 const TAG = "[tools/create-production-only-archive.ts] ";
 
@@ -63,7 +61,6 @@ export const DEFAULT_DELETE_INCLUDE_GLOBS = [
   ".yarn/**",
   "./docs/**",
   "./images/**",
-  "./packages-python/**",
   "./tools/**",
   "./typings/**",
   "./whitepaper/**",
@@ -124,67 +121,6 @@ async function getDeletionList(
   return out;
 }
 
-async function createTemporaryClone(req: {
-  readonly osTmpRootPath: string;
-  readonly cloneUrl: string;
-}): Promise<{ readonly clonePath: string; readonly gitCommitHash: string }> {
-  const fn = `${TAG}:createTemporaryClone()`;
-  const tmpDirPrefix = "cacti_tools_create_production_only_archive_";
-
-  if (!req) {
-    throw new RuntimeError(`${fn} req was falsy.`);
-  }
-  if (!req.cloneUrl) {
-    throw new RuntimeError(`${fn} req.cloneUrl was falsy.`);
-  }
-  if (typeof req.cloneUrl !== "string") {
-    throw new RuntimeError(`${fn} req.cloneUrl was non-string.`);
-  }
-  if (req.cloneUrl.length <= 0) {
-    throw new RuntimeError(`${fn} req.cloneUrl was blank string.`);
-  }
-  if (!req.osTmpRootPath) {
-    throw new RuntimeError(`${fn} req.osTmpRootPath was falsy.`);
-  }
-  if (typeof req.osTmpRootPath !== "string") {
-    throw new RuntimeError(`${fn} req.osTmpRootPath was non-string.`);
-  }
-  if (req.osTmpRootPath.length <= 0) {
-    throw new RuntimeError(`${fn} req.osTmpRootPath was blank string.`);
-  }
-
-  console.log("%s req.osTmpRootPath=%s", fn, req.osTmpRootPath);
-  const tmpDirPathBase = path.join(req.osTmpRootPath, tmpDirPrefix);
-  console.log("%s tmpDirPathBase=%s", fn, tmpDirPathBase);
-
-  const tmpDirPath = await fs.mkdtemp(tmpDirPathBase);
-  console.log("%s tmpDirPath=%s", fn, tmpDirPath);
-  console.log("%s Cloning into a temporary directory at %s...", fn, tmpDirPath);
-
-  const options: Partial<SimpleGitOptions> = {
-    baseDir: tmpDirPath,
-    binary: "git",
-    maxConcurrentProcesses: 6,
-    trimmed: false,
-    progress: (data: SimpleGitProgressEvent) => {
-      console.log("%s SimpleGit_Progress=%s", fn, fastSafeStringify(data));
-    },
-  };
-
-  // when setting all options in a single object
-  const git: SimpleGit = simpleGit(options);
-
-  const cloneResponse = await git.clone(req.cloneUrl, tmpDirPath);
-  console.log("%s Cloned %s OK into %o", fn, req.cloneUrl, cloneResponse);
-
-  await git.fetch("origin", "main");
-
-  const gitCommitHash = await git.revparse("HEAD");
-  console.log("s Current git commit hash=%s", fn, gitCommitHash);
-
-  return { clonePath: tmpDirPath, gitCommitHash };
-}
-
 async function createProductionOnlyArchive(
   req: ICreateProductionOnlyArchiveV1Request,
 ): Promise<ICreateProductionOnlyArchiveV1Response> {
@@ -225,7 +161,7 @@ async function createProductionOnlyArchive(
   console.log("%s Getting deletion list OK: %o", fnTag, deletionList);
 
   const dateAndTime = new Date().toJSON().slice(0, 24).replaceAll(":", "-");
-  const filename = `hyperledger_cacti_production_sources_${dateAndTime}_main_git_hash_${gitCommitHash}.zip`;
+  const filename = `hyperledger_cacti_temporary_clone_${dateAndTime}_main_git_hash_${gitCommitHash}.zip`;
   const zipFilePath = path.join(req.PROJECT_DIR, "./.tmp/", filename);
   console.log("%s Creating .zip archive at: %s", fnTag, zipFilePath);
 

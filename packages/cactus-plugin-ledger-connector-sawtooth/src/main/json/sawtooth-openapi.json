@@ -1,0 +1,1225 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "0.8.0",
+    "title": "Sawtooth REST API",
+    "description": "Official Sawtooth REST API specification with some modifications from Hyperledger Cacti project."
+  },
+  "paths": {
+    "/batches": {
+      "post": {
+        "summary": "Sends a BatchList to the validator",
+        "description": "Accepts a protobuf formatted `BatchList` as an octet-stream binary\nfile and submits it to the validator to be committed.\n\nThe API will return immediately with a status of `202`. There will be\nno `data` object, only a `link` to a `/batch_statuses` endpoint to be\npolled to check the status of submitted batches.\n",
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchList"
+              }
+            }
+          },
+          "description": "A binary encoded protobuf BatchList",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Batches submitted for validation, but not yet committed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "429": {
+            "$ref": "#/components/responses/429TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      },
+      "get": {
+        "summary": "Fetches a list of batches",
+        "description": "Fetches a paginated list of batches from the validator.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/head"
+          },
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/reverse"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved batches",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Batch"
+                      }
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    },
+                    "paging": {
+                      "$ref": "#/components/schemas/Paging"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/batches/{batch_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/batch_id"
+        }
+      ],
+      "get": {
+        "summary": "Fetches a particular batch",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved batch",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Batch"
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/404NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/batch_statuses": {
+      "get": {
+        "summary": "Fetches the committed statuses for a set of batches",
+        "description": "Fetches an array of objects with a status and id for each batch\nrequested. There are four possible statuses with string values\n`'COMMITTED'`, `'INVALID'`, `'PENDING'`, and `'UNKNOWN'`.\n\nThe batch(es) you want to check can be specified using the `id` filter\nparameter. If a `wait` time is specified in the URL, the API will wait\nto respond until all batches are committed, or the time in seconds has\nelapsed. If the value of `wait` is not set (i.e., `?wait&id=...`), or\nit is set to any non-integer value other than `false`, the wait time\nwill be just under the API's specified timeout (usually 300).\n\nNote that because this route does not return full resources, the\nresponse will not be paginated, and there will be no `head` or\n`paging` properties.\n",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "A comma-separated list of batch ids",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/wait"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved statuses",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BatchStatuses"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "Fetches the committed statuses for a set of batches",
+        "description": "Identical to `GET /batch_statuses`, but takes ids of batches as a JSON\nformatted POST body rather than a query parameter. This allows for many\nmore batches to be checked and should be used for more than 15 ids.\n\nNote that because query information is not encoded in the URL, no `link`\nwill be returned with this query.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/wait"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+                }
+              }
+            }
+          },
+          "description": "A JSON array of batch id strings",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved statuses",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BatchStatuses"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/state": {
+      "get": {
+        "summary": "Fetches the data for the current state",
+        "description": "Fetches a paginated list of entries for the current state, or relative to a particular head block. Using the `address` filter parameter will narrow the list to any entries that have an address beginning with the characters specified.\nNote that the partial address in `address` parameter should have even  number of hexadecimal characters (i.e., complete bytes).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/head"
+          },
+          {
+            "name": "address",
+            "in": "query",
+            "description": "A partial address to filter leaves by",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/reverse"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved state data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Entry"
+                      }
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    },
+                    "paging": {
+                      "$ref": "#/components/schemas/Paging"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/state/{address}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/address"
+        }
+      ],
+      "get": {
+        "summary": "Fetches a particular leaf from the current state",
+        "description": "Takes full 70-character address and fetches a particular leaf. For partial address (i.e., group of leaves) use `/state` above. \n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/head"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully fetched leaves",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "format": "byte",
+                      "example": "Zm9vOmJhcg=="
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/404NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/blocks": {
+      "get": {
+        "summary": "Fetches a list of blocks",
+        "description": "Fetches a paginated list of blocks from the validator.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/head"
+          },
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/reverse"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved blocks",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Block"
+                      }
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    },
+                    "paging": {
+                      "$ref": "#/components/schemas/Paging"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/blocks/{block_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/block_id"
+        }
+      ],
+      "get": {
+        "summary": "Fetches a particular block",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved block",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Block"
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/404NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/transactions": {
+      "get": {
+        "summary": "Fetches a list of transactions",
+        "description": "Fetches a paginated list of transactions from the validator.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/head"
+          },
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/reverse"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved transactions",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    },
+                    "paging": {
+                      "$ref": "#/components/schemas/Paging"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/transactions/{transaction_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/transaction_id"
+        }
+      ],
+      "get": {
+        "summary": "Fetches a particular transaction",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved transaction",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Block"
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Head"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/404NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/receipts": {
+      "get": {
+        "summary": "Fetches the receipts for a set of transactions",
+        "description": "Fetches an array of objects for each receipt requested.\n\nThe receipt(s) you want to retrieve can be specified using the `id`\nfilter parameter, where `id` refers to the transaction id of the\ntransaction the receipt is associated with.\n",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "A comma-separated list of transaction ids",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved transaction receipts",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TransactionReceipts"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "Fetches the receipts for a set of transactions",
+        "description": "Identical to `GET /receipts`, but takes ids of transactions as a JSON\nformatted POST body rather than a query parameter. This allows for many\nmore receipts to be fetched and should be used with more than 15 ids.\n\nNote that because query information is not encoded in the URL, no `link`\nwill be returned with this request.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/wait"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+                }
+              }
+            }
+          },
+          "description": "A JSON array of transaction id strings",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved transaction receipts",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TransactionReceipts"
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/peers": {
+      "get": {
+        "summary": "Fetches the endpoints of the authorized peers of the validator",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved peers",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "tcp://12.345.67.890:8800"
+                      }
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "summary": "Fetches information pertaining to the status of the validator",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved status",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "endpoint": {
+                          "type": "string",
+                          "example": "tcp://12.345.67.890:8800"
+                        },
+                        "peers": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "endpoint": {
+                                "type": "string",
+                                "example": "tcp://12.345.67.890:8800"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "link": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/500ServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/503ServiceUnavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "address": {
+        "name": "address",
+        "in": "path",
+        "required": true,
+        "description": "Radix address of a leaf",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "block_id": {
+        "name": "block_id",
+        "in": "path",
+        "required": true,
+        "description": "Block id",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "batch_id": {
+        "name": "batch_id",
+        "in": "path",
+        "required": true,
+        "description": "Batch id",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "transaction_id": {
+        "name": "transaction_id",
+        "in": "path",
+        "required": true,
+        "description": "Transaction id",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "head": {
+        "name": "head",
+        "in": "query",
+        "description": "Index or id of head block",
+        "schema": {
+          "type": "string",
+          "default": "latest"
+        }
+      },
+      "wait": {
+        "name": "wait",
+        "in": "query",
+        "description": "A time in seconds to wait for commit",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Number of items to return",
+        "schema": {
+          "type": "integer",
+          "default": 1000
+        }
+      },
+      "start": {
+        "name": "start",
+        "in": "query",
+        "description": "Id to start paging (inclusive)",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "reverse": {
+        "name": "reverse",
+        "in": "query",
+        "description": "If the list should be reversed",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "400BadRequest": {
+        "description": "Request was malformed",
+        "content": {
+          "*/*": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "404NotFound": {
+        "description": "Address or id did not match any resource",
+        "content": {
+          "*/*": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "429TooManyRequests": {
+        "description": "Too many requests have been made to process batches",
+        "content": {
+          "*/*": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "500ServerError": {
+        "description": "Something went wrong within the validator",
+        "content": {
+          "*/*": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "503ServiceUnavailable": {
+        "description": "API is unable to reach the validator",
+        "content": {
+          "*/*": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Head": {
+        "type": "string",
+        "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+      },
+      "Link": {
+        "type": "string",
+        "example": "https://api.sawtooth.com/state?head=65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+      },
+      "Paging": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+          },
+          "limit": {
+            "type": "integer",
+            "example": 54321
+          },
+          "next_position": {
+            "type": "string",
+            "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+          },
+          "next": {
+            "type": "string",
+            "example": "https://api.sawtooth.com/state?head=65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd&start=2000&limit=1000"
+          }
+        }
+      },
+      "Error": {
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "example": "No Batches Submitted"
+          },
+          "message": {
+            "type": "string",
+            "example": "The protobuf BatchList you submitted was empty and contained no Batches. You must submit at least one Batch.\n"
+          }
+        }
+      },
+      "BatchStatuses": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+            },
+            "status": {
+              "type": "string",
+              "example": "INVALID",
+              "enum": ["COMMITTED", "INVALID", "PENDING", "UNKNOWN"]
+            },
+            "invalid_transactions": {
+              "type": "array",
+              "items": {
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Verb is \\\"inc\\\" but name \\\"foo\\\" not in state"
+                  },
+                  "extended_data": {
+                    "type": "string",
+                    "format": "byte",
+                    "example": "ZXJyb3IgZGF0YQ=="
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Entry": {
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+          },
+          "data": {
+            "type": "string",
+            "format": "byte",
+            "example": "Zm9vOmJhcg=="
+          }
+        }
+      },
+      "TransactionHeader": {
+        "required": [
+          "batcher_public_key",
+          "dependencies",
+          "family_name",
+          "family_version",
+          "inputs",
+          "nonce",
+          "outputs",
+          "payload_sha512",
+          "signer_public_key"
+        ],
+        "properties": {
+          "batcher_public_key": {
+            "type": "string",
+            "example": "02d260a46457a064733153e09840c322bee1dff34445d7d49e19e60abd18fd0758"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "1baee350bdb60bcee60e3d325d43283cf830b4c23b2cb17d3bb43935bd7af3761c2bee79847c72a9e396a9ae58f48add4e43f94eb83f84442c6085c1dd5d4dbe"
+            }
+          },
+          "family_name": {
+            "type": "string",
+            "example": "intkey"
+          },
+          "family_version": {
+            "type": "string",
+            "example": "1.0"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+            }
+          },
+          "nonce": {
+            "type": "string",
+            "example": "QAApS4L"
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+            }
+          },
+          "payload_sha512": {
+            "type": "string",
+            "example": "fb6135ef73f4fe77367f9384b3bbbb158f4b8603c9d612157108e5c271868fce2242ee4abd7a29397ba63780c3ccab13783dfd4d9f0167beda03cdb0e37b87f4"
+          },
+          "signer_public_key": {
+            "type": "string",
+            "example": "038bba5708acc262464c9fe30d3de9e905a9a5fa30cedd151dd9cd09ea26d46d00"
+          }
+        }
+      },
+      "Transaction": {
+        "required": ["header", "header_signature", "payload"],
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/TransactionHeader"
+          },
+          "header_signature": {
+            "type": "string",
+            "example": "540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a"
+          },
+          "payload": {
+            "type": "string"
+          }
+        }
+      },
+      "TransactionReceipt": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "example": "540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a"
+          },
+          "state_changes": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "SET"
+                },
+                "address": {
+                  "type": "string",
+                  "example": "1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "event_type": {
+                  "type": "string",
+                  "example": "sawtooth/block-commit"
+                },
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TransactionReceipts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TransactionReceipt"
+        }
+      },
+      "BatchHeader": {
+        "required": ["signer_public_key", "transaction_ids"],
+        "properties": {
+          "signer_public_key": {
+            "type": "string",
+            "example": "038bba5708acc262464c9fe30d3de9e905a9a5fa30cedd151dd9cd09ea26d46d00"
+          },
+          "transaction_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a"
+            }
+          }
+        }
+      },
+      "Batch": {
+        "required": ["header", "header_signature", "transactions"],
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/BatchHeader"
+          },
+          "header_signature": {
+            "type": "string",
+            "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      "BatchList": {
+        "required": ["batches"],
+        "properties": {
+          "batches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Batch"
+            }
+          }
+        }
+      },
+      "BlockHeader": {
+        "required": [
+          "batch_ids",
+          "block_num",
+          "consensus",
+          "previous_block_id",
+          "signer_public_key",
+          "state_root_hash"
+        ],
+        "properties": {
+          "block_num": {
+            "type": "integer",
+            "example": 12345
+          },
+          "previous_block_id": {
+            "type": "string",
+            "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+          },
+          "signer_public_key": {
+            "type": "string",
+            "example": "02d260a46457a064733153e09840c322bee1dff34445d7d49e19e60abd18fd0758"
+          },
+          "batch_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+            }
+          },
+          "consensus": {
+            "type": "string"
+          },
+          "state_root_hash": {
+            "type": "string",
+            "example": "708ca7fbb701799bb387f2e50deaca402e8502abe229f705693d2d4f350e1ad6"
+          }
+        }
+      },
+      "Block": {
+        "required": ["header", "header_signature", "batches"],
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/BlockHeader"
+          },
+          "header_signature": {
+            "type": "string",
+            "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+          },
+          "batches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Batch"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,7 +2,6 @@ name: GitGuardian scan
 
 on: 
   push:
-  pull_request:
     # Publish `main` as Docker `latest` image.
     branches:
       - main
@@ -10,14 +9,17 @@ on:
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   scanning:
     name: GitGuardian scan
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0 # fetch all history so multiple commits can be scanned
         env:

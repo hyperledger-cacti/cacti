@@ -67,7 +67,8 @@ export interface ICarbonAccountingPluginOptions {
 }
 
 export class CarbonAccountingPlugin
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   public static readonly CLASS_NAME = "CarbonAccountingPlugin";
 
   private readonly log: Logger;

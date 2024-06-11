@@ -15,20 +15,66 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit_test_interopcc:
-    runs-on: ubuntu-latest
+  check_code_changed:
+    outputs:
+      interopcc_changed: ${{ steps.changes.outputs.interopcc_changed }}
+      gosdk_changed: ${{ steps.changes.outputs.gosdk_changed }}
+      gocli_changed: ${{ steps.changes.outputs.gocli_changed }}
+      simplestate_changed: ${{ steps.changes.outputs.simplestate_changed }}
+      satpsimpleasset_changed: ${{ steps.changes.outputs.satpsimpleasset_changed }}
+      simpleasset_changed: ${{ steps.changes.outputs.simpleasset_changed }}
+      simpleassetandinterop_changed: ${{ steps.changes.outputs.simpleassetandinterop_changed }}
+      simpleassettransfer_changed: ${{ steps.changes.outputs.simpleassettransfer_changed }}
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.1
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            interopcc_changed:
+              - 'weaver/common/protos-go/**'
+              - 'weaver/core/network/fabric-interop-cc/**'
+              - '.github/workflows/test_weaver-go.yaml'
+
+            gosdk_changed:
+              - 'weaver/sdks/fabric/go-sdk/**'
+
+            gocli_changed:
+              - 'weaver/samples/fabric/go-cli/**'
+
+            simplestate_changed:
+              - 'weaver/samples/fabric/simplestate/**'
+
+            satpsimpleasset_changed:
+              - 'weaver/samples/fabric/satpsimpleasset/**'
+
+            simpleasset_changed:
+              - 'weaver/samples/fabric/simpleasset/**'
+
+            simpleassetandinterop_changed:
+              - 'weaver/samples/fabric/simpleassetandinterop/**'
+
+            simpleassettransfer_changed:
+              - 'weaver/samples/fabric/simpleassettransfer/**'
+
+  unit_test_interopcc:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.interopcc_changed == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
-        
+
     - name: Vendor
-      run: make run-vendor
+      run: make run-vendor || echo "If this steps fails and asks to run 'go mod tidy' then run the script 'tools/go-mod-tidy.sh' to update all go modules"
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
-      
+
     - name: Build
       run: go build -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
@@ -38,16 +84,18 @@ jobs:
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
 
   unit_test_assetmgmt:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.interopcc_changed == 'true'
     # if: ${{ false }}  # disable
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
-        
+
     - name: Vendor
       run: make run-vendor
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
@@ -59,11 +107,97 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
+      
+  build_test_libs_utils:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.interopcc_changed == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/core/network/fabric-interop-cc/libs/utils
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/core/network/fabric-interop-cc/libs/utils
+      
+  build_test_libs_assetexchange:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.interopcc_changed == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
+      
+  unit_test_sdk:
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed   == 'true' }}
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/sdks/fabric/go-sdk
+
+    - name: Build
+      run: make build
+      working-directory: weaver/sdks/fabric/go-sdk
+
+    - name: Test
+      run: make test
+      working-directory: weaver/sdks/fabric/go-sdk
+      
+  build_test_cli:
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gocli_changed == 'true' }}
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/samples/fabric/go-cli
+
+    - name: Build
+      run: make build
+      working-directory: weaver/samples/fabric/go-cli
 
   unit_test_simplestate:
-    runs-on: ubuntu-latest
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simplestate_changed == 'true' }}
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -81,11 +215,37 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simplestate
- 
-  unit_test_simpleasset:
-    runs-on: ubuntu-latest
+
+  unit_test_satpsimpleasset:
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.satpsimpleasset_changed == 'true' }}
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/samples/fabric/satpsimpleasset
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/samples/fabric/satpsimpleasset
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/samples/fabric/satpsimpleasset
+
+  unit_test_simpleasset:
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleasset_changed == 'true' }}
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -105,9 +265,11 @@ jobs:
       working-directory: weaver/samples/fabric/simpleasset
 
   unit_test_simpleassetandinterop:
-    runs-on: ubuntu-latest
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassetandinterop_changed == 'true' }}
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -127,9 +289,11 @@ jobs:
       working-directory: weaver/samples/fabric/simpleassetandinterop
 
   unit_test_simpleassettransfer:
-    runs-on: ubuntu-latest
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassettransfer_changed == 'true' }}
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3.5.2
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0

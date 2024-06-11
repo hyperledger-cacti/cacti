@@ -7,11 +7,6 @@
 
 // transaction information
 
-export class ProofJsonObj {
-  tradeInfo = "";
-  proof_request = "";
-  proof = "";
-}
 export class TradeInfo {
   ethereumAccountFrom: string = "";
   ethereumAccountTo: string = "";
@@ -19,7 +14,7 @@ export class TradeInfo {
   fabricAccountTo: string = "";
   tradingValue: string = "";
   assetID: string = "";
-  proofJson: ProofJsonObj = new ProofJsonObj();
+  indyAgentConId: string = "";
 }
 
 // authorization information

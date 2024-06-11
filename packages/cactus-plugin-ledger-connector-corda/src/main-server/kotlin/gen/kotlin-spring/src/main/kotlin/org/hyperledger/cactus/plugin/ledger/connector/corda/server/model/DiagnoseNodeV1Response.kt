@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
-import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
@@ -21,9 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class DiagnoseNodeV1Response(
 
     @field:Valid
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("nodeDiagnosticInfo", required = true) val nodeDiagnosticInfo: NodeDiagnosticInfo
 ) {
 
 }
-

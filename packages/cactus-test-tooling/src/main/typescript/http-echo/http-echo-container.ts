@@ -3,7 +3,6 @@ import isPortReachable from "is-port-reachable";
 import Joi from "joi";
 import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
-import { Stream } from "stream";
 
 const OPTS_SCHEMA: Joi.Schema = Joi.object().keys({
   imageVersion: Joi.string().min(5).required(),
@@ -181,7 +180,7 @@ export class HttpEchoContainer implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }
@@ -211,22 +210,25 @@ export class HttpEchoContainer implements ITestLedger {
   private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
-        if (pullError) {
-          reject(pullError);
-        } else {
-          docker.modem.followProgress(
-            stream,
-            (progressError: unknown, output: unknown[]) => {
-              if (progressError) {
-                reject(progressError);
-              } else {
-                resolve(output);
-              }
-            },
-          );
-        }
-      });
+      docker.pull(
+        containerNameAndTag,
+        (pullError: unknown, stream: NodeJS.ReadableStream) => {
+          if (pullError) {
+            reject(pullError);
+          } else {
+            docker.modem.followProgress(
+              stream,
+              (progressError: unknown, output: unknown[]) => {
+                if (progressError) {
+                  reject(progressError);
+                } else {
+                  resolve(output);
+                }
+              },
+            );
+          }
+        },
+      );
     });
   }
 

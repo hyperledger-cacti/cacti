@@ -60,14 +60,6 @@ function start_ethereum_testnet() {
     popd
 }
 
-function copy_ethereum_validator_config() {
-    echo ">> copy_ethereum_validator_config()"
-    cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-go-ethereum-socketio/sample-config/* \
-        "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/"
-    generate_certificate "GoEthereumCactusValidator" "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/CA/"
-    echo ">> copy_ethereum_validator_config() done."
-}
-
 function start_sawtooth_testnet() {
     pushd "${ROOT_DIR}/tools/docker/sawtooth-all-in-one"
     ./script-start-docker.sh
@@ -84,14 +76,6 @@ function start_sawtooth_testnet() {
     echo ">> Sawtooth ${CACTUS_FABRIC_ALL_IN_ONE_VERSION} started."
 }
 
-function copy_sawtooth_validator_config() {
-    echo ">> copy_sawtooth_validator_config()"
-    cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-sawtooth-socketio/sample-config/* \
-        "${CONFIG_VOLUME_PATH}/connector-sawtooth-socketio/"
-    generate_certificate "SawtoothCactusValidator" "${CONFIG_VOLUME_PATH}/connector-sawtooth-socketio/CA/"
-    echo ">> copy_sawtooth_validator_config() done."
-}
-
 function start_ledgers() {
     # Clear ./etc/cactus
     mkdir -p "${CONFIG_VOLUME_PATH}/"
@@ -101,14 +85,10 @@ function start_ledgers() {
     cp -f ./config/*.yaml "${CONFIG_VOLUME_PATH}/"
 
     # Start Ethereum
-    mkdir -p "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio"
     start_ethereum_testnet
-    copy_ethereum_validator_config
 
     # Start Sawtooth
-    mkdir -p "${CONFIG_VOLUME_PATH}/connector-sawtooth-socketio"
     start_sawtooth_testnet
-    copy_sawtooth_validator_config
 }
 
 start_ledgers

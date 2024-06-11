@@ -22,8 +22,8 @@ The diagram below shows an example communication between two networks, A and B, 
 ![](/architecture-assets/relay_flow.png)
 
 1. An application sends a request to their networks relay over gRPC
-1. The local relay inspects the query within the request and uses the relevant information to forward the request to the correct remote relay
-1. The remote relay's driver interprets the query and invokes the smart contract for the query
-1. Once network B has returned a response to its relay, the relay forwards the response back to relay A
-1. The application gets the response from the relay, this can either be via a push or pull mechanism
-1. The application invokes a domain specific smart contract to process the response from network B
+2. The local relay inspects the query within the request and uses the relevant information to forward the request to the correct remote relay
+3. The remote relay's driver interprets the query and invokes the smart contract for the query
+4. Once network B has returned a response to its relay, the relay forwards the response back to relay A
+5. The application gets the response from the relay, this can either be via a push or pull mechanism
+6. The application invokes a domain specific smart contract to process the response from network B

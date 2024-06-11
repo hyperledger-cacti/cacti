@@ -1,5 +1,13 @@
-import test, { Test } from "tape-promise/tape";
+import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
+import Web3 from "web3";
+import { AddressInfo } from "net";
+import express from "express";
+import bodyParser from "body-parser";
+import http from "http";
+import { Server as SocketIoServer } from "socket.io";
+import { Account } from "web3-core";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   EthContractInvocationType,
@@ -21,132 +29,152 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
+  LoggerProvider,
 } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
-import Web3 from "web3";
 import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
-import { AddressInfo } from "net";
-import express from "express";
-import bodyParser from "body-parser";
-import http from "http";
-import { Server as SocketIoServer } from "socket.io";
 
-const testCase = "get record locator";
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
+describe("PluginLedgerConnectorBesu", () => {
+  const log = LoggerProvider.getOrCreate({
+    label: "besu-get-record-locator.test.ts",
+    level: logLevel,
+  });
   const besuTestLedger = new BesuTestLedger();
-  await besuTestLedger.start();
+  let api: BesuApiClient;
+  let firstHighNetWorthAccount: string;
+  let besuKeyPair: {
+    privateKey: string;
+  };
+  let server: http.Server;
+  let connector: PluginLedgerConnectorBesu;
+  let testEthAccount: Account;
+  let web3: Web3;
+  let keychainPlugin: PluginKeychainMemory;
+  let contractAddress: string;
 
-  test.onFinish(async () => {
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).not.toReject();
+  });
+
+  afterAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).toResolve();
+  });
+
+  beforeAll(async () => {
+    await besuTestLedger.start();
+  });
+
+  afterAll(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
   });
 
-  const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
-  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
-
-  /**
-   * Constant defining the standard 'dev' Besu genesis.json contents.
-   *
-   * @see https://github.com/hyperledger/besu/blob/1.5.1/config/src/main/resources/dev.json
-   */
-  const firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
-  const besuKeyPair = {
-    privateKey: besuTestLedger.getGenesisAccountPrivKey(),
-  };
-
-  const web3 = new Web3(rpcApiHttpHost);
-  const testEthAccount = web3.eth.accounts.create(uuidv4());
-
-  const keychainEntryKey = uuidv4();
-  const keychainEntryValue = testEthAccount.privateKey;
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: uuidv4(),
-    keychainId: uuidv4(),
-    // pre-provision keychain with mock backend holding the private key of the
-    // test account that we'll reference while sending requests with the
-    // signing credential pointing to this keychain entry.
-    backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-    logLevel,
-  });
-  keychainPlugin.set(
-    HelloWorldContractJson.contractName,
-    JSON.stringify(HelloWorldContractJson),
-  );
-  const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.Local,
+  afterAll(async () => {
+    if (server) {
+      await Servers.shutdown(server);
+    }
   });
 
-  const connector: PluginLedgerConnectorBesu = await factory.create({
-    rpcApiHttpHost,
-    rpcApiWsHost,
-    logLevel,
-    instanceId: uuidv4(),
-    pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+  beforeAll(async () => {
+    const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+    const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
+
+    firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
+    besuKeyPair = {
+      privateKey: besuTestLedger.getGenesisAccountPrivKey(),
+    };
+
+    web3 = new Web3(rpcApiHttpHost);
+    testEthAccount = web3.eth.accounts.create(uuidv4());
+
+    const keychainEntryKey = uuidv4();
+    const keychainEntryValue = testEthAccount.privateKey;
+    keychainPlugin = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      // pre-provision keychain with mock backend holding the private key of the
+      // test account that we'll reference while sending requests with the
+      // signing credential pointing to this keychain entry.
+      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+      logLevel,
+    });
+    keychainPlugin.set(
+      HelloWorldContractJson.contractName,
+      JSON.stringify(HelloWorldContractJson),
+    );
+    const factory = new PluginFactoryLedgerConnector({
+      pluginImportType: PluginImportType.Local,
+    });
+
+    connector = await factory.create({
+      rpcApiHttpHost,
+      rpcApiWsHost,
+      logLevel,
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+    });
+
+    await connector.onPluginInit();
+
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    server = http.createServer(expressApp);
+
+    const wsApi = new SocketIoServer(server, {
+      path: Constants.SocketIoConnectionPathV1,
+    });
+    const listenOptions: IListenOptions = {
+      hostname: "127.0.0.1",
+      port: 0,
+      server,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
+    const apiHost = `http://${address}:${port}`;
+    log.debug(
+      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
+    );
+
+    const wsBasePath = apiHost + Constants.SocketIoConnectionPathV1;
+    log.debug("WS base path: " + wsBasePath);
+    const besuApiClientOptions = new BesuApiClientOptions({
+      basePath: apiHost,
+    });
+    api = new BesuApiClient(besuApiClientOptions);
+
+    await connector.getOrCreateWebServices();
+    await connector.registerWebServices(expressApp, wsApi);
   });
 
-  await connector.onPluginInit();
+  it("can get record locator from Besu ledger", async () => {
+    await connector.transact({
+      web3SigningCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      transactionConfig: {
+        from: firstHighNetWorthAccount,
+        to: testEthAccount.address,
+        value: 10e9,
+        gas: 1000000,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NodeTxPoolAck,
+      },
+    });
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-
-  const wsApi = new SocketIoServer(server, {
-    path: Constants.SocketIoConnectionPathV1,
-  });
-  const listenOptions: IListenOptions = {
-    hostname: "localhost",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-  t.comment(
-    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
-  );
-
-  const wsBasePath = apiHost + Constants.SocketIoConnectionPathV1;
-  t.comment("WS base path: " + wsBasePath);
-  const besuApiClientOptions = new BesuApiClientOptions({ basePath: apiHost });
-  const api = new BesuApiClient(besuApiClientOptions);
-
-  await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp, wsApi);
-
-  await connector.transact({
-    web3SigningCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: besuKeyPair.privateKey,
-      type: Web3SigningCredentialType.PrivateKeyHex,
-    },
-    transactionConfig: {
-      from: firstHighNetWorthAccount,
-      to: testEthAccount.address,
-      value: 10e9,
-      gas: 1000000,
-    },
-    consistencyStrategy: {
-      blockConfirmations: 0,
-      receiptType: ReceiptType.NodeTxPoolAck,
-    },
+    const balance = await web3.eth.getBalance(testEthAccount.address);
+    expect(balance).toBeTruthy();
+    expect(parseInt(balance, 10)).toEqual(10e9);
   });
 
-  const balance = await web3.eth.getBalance(testEthAccount.address);
-  t.ok(balance, "Retrieved balance of test account OK");
-  t.equals(parseInt(balance, 10), 10e9, "Balance of test account is OK");
-
-  let contractAddress: string;
-
-  test("deploys contract", async (t2: Test) => {
+  it("deploys contract", async () => {
     const deployOut = await connector.deployContract({
       keychainId: keychainPlugin.getKeychainId(),
       contractName: HelloWorldContractJson.contractName,
@@ -160,21 +188,13 @@ test(testCase, async (t: Test) => {
       bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
     });
-    t2.ok(deployOut, "deployContract() output is truthy OK");
-    t2.ok(
-      deployOut.transactionReceipt,
-      "deployContract() output.transactionReceipt is truthy OK",
-    );
-    t2.ok(
-      deployOut.transactionReceipt.contractAddress,
-      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-    );
+    expect(deployOut).toBeTruthy();
+    expect(deployOut.transactionReceipt).toBeTruthy();
+    expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
 
     contractAddress = deployOut.transactionReceipt.contractAddress as string;
-    t2.ok(
-      typeof contractAddress === "string",
-      "contractAddress typeof string OK",
-    );
+    expect(contractAddress).toBeString();
+    expect(contractAddress).not.toBeEmpty();
 
     const { callOutput: helloMsg } = await connector.invokeContract({
       contractName: HelloWorldContractJson.contractName,
@@ -189,14 +209,12 @@ test(testCase, async (t: Test) => {
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
-    t2.ok(helloMsg, "sayHello() output is truthy");
-    t2.true(
-      typeof helloMsg === "string",
-      "sayHello() output is type of string",
-    );
+    expect(helloMsg).toBeTruthy();
+    expect(helloMsg).toBeString();
+    expect(helloMsg).not.toBeEmpty();
   });
 
-  test("getBesuRecord test 1", async (t2: Test) => {
+  test("getBesuRecord test 1", async () => {
     const testEthAccount2 = web3.eth.accounts.create(uuidv4());
 
     const { rawTransaction } = await web3.eth.accounts.signTransaction(
@@ -226,11 +244,10 @@ test(testCase, async (t: Test) => {
       transactionHash: transactionReceipt.transactionReceipt.transactionHash,
     };
     const getInputData = await api.getBesuRecordV1(request);
-    t2.ok(getInputData, "API response object is truthy");
-    t2.end();
+    expect(getInputData).toBeTruthy();
   });
 
-  test("getBesuRecord test 2", async (t2: Test) => {
+  test("getBesuRecord test 2", async () => {
     const newName = `DrCactus${uuidv4()}`;
     const setNameOut = await connector.invokeContract({
       contractName: HelloWorldContractJson.contractName,
@@ -246,10 +263,10 @@ test(testCase, async (t: Test) => {
       },
       nonce: 1,
     });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    expect(setNameOut).toBeTruthy();
 
     try {
-      const setNameOutInvalid = await connector.invokeContract({
+      await connector.invokeContract({
         contractName: HelloWorldContractJson.contractName,
         contractAbi: HelloWorldContractJson.abi,
         contractAddress,
@@ -264,12 +281,16 @@ test(testCase, async (t: Test) => {
         },
         nonce: 1,
       });
-      t2.ifError(setNameOutInvalid);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
+      throw new Error("This operation should not have succeeded, but it did.");
+    } catch (ex: unknown) {
+      // 'Returned error: Nonce too low'
+      expect(ex).toHaveProperty(
+        "message",
+        expect.stringContaining("Nonce too low"),
+      );
+      expect(ex).toHaveProperty(
+        "stack",
+        expect.stringContaining("Nonce too low"),
       );
     }
     const req: InvokeContractV1Request = {
@@ -289,7 +310,7 @@ test(testCase, async (t: Test) => {
     const { callOutput: getNameOut } = await connector.getBesuRecord({
       invokeCall: req,
     });
-    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
+    expect(getNameOut).toEqual(newName);
 
     const response = await connector.invokeContract({
       contractName: HelloWorldContractJson.contractName,
@@ -306,7 +327,7 @@ test(testCase, async (t: Test) => {
       },
       value: 10,
     });
-    t2.ok(response, "deposit() payable invocation output is truthy OK");
+    expect(response).toBeTruthy();
 
     const req2: InvokeContractV1Request = {
       contractName: HelloWorldContractJson.contractName,
@@ -323,21 +344,9 @@ test(testCase, async (t: Test) => {
       },
     };
 
-    const { callOutput } = await connector.getBesuRecord({ invokeCall: req2 });
-    t2.equal(
-      callOutput,
-      newName,
-      `getNameByIndex() output reflects the update OK`,
-    );
-
-    t2.end();
+    const { callOutput } = await connector.getBesuRecord({
+      invokeCall: req2,
+    });
+    expect(callOutput).toEqual(newName);
   });
-
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
 });

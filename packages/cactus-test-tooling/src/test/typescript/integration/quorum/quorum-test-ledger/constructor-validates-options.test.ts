@@ -39,8 +39,8 @@ tap.test("starts/stops/destroys a docker container", async (assert: any) => {
   assert.ok(hostPort, "getRpcApiPublicPort() returns truthy OK");
   assert.ok(isFinite(hostPort), "getRpcApiPublicPort() returns finite OK");
 
-  const isReachable = await isPortReachable(hostPort, { host: "localhost" });
-  assert.ok(isReachable, `HostPort ${hostPort} is reachable via localhost`);
+  const isReachable = await isPortReachable(hostPort, { host: "127.0.0.1" });
+  assert.ok(isReachable, `HostPort ${hostPort} is reachable via 127.0.0.1`);
 
   const quorumKeyPair: IKeyPair = await ledger.getQuorumKeyPair();
   assert.ok(quorumKeyPair);

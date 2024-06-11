@@ -2,6 +2,9 @@
 
 name: Test Asset Exchange Besu
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -19,51 +22,68 @@ concurrency:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-        
+  check_code_changed:
+    outputs:
+      status: ${{ steps.changes.outputs.weaver_code_changed }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.1
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**'
+              - '.github/workflows/test_weaver-asset-exchange-besu.yaml'
+
   asset-exchange-besu:
+    needs: check_code_changed
     if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-      
+    runs-on: ubuntu-22.04
+
     strategy:
       fail-fast: false
       matrix:
         app_contract: ["AliceERC1155", "AliceERC20", "AliceERC721"]
+        exclude:
+          - app_contract: ${{ needs.check_code_changed.outputs.status != 'true' }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
+      - uses: actions/checkout@v4.1.1
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3.11.0
         with:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
+          node-version: ${{ env.NODEJS_VERSION }}
 
       - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-        
+
       # PROTOS
       - name: Build Solidity Protos
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-sol
-        
+
       # BESU NETWORK
       - name: Start Besu Network
         run: |
           sudo apt install -y tmux jq
-          wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.7.0/besu-22.7.0.zip 
-          unzip besu-22.7.0.zip 
+          wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.7.0/besu-22.7.0.zip
+          unzip besu-22.7.0.zip
           export PATH="${PWD}/besu-22.7.0/bin:$PATH"
           wget https://artifacts.consensys.net/public/ethsigner/raw/names/ethsigner.zip/versions/22.1.3/ethsigner-22.1.3.zip
           unzip ethsigner-22.1.3.zip
@@ -71,7 +91,7 @@ jobs:
           make start
           sleep 100
         working-directory: weaver/tests/network-setups/besu
-      
+
       # Deploy contracts
       - name: Deploy contracts
         run: |
@@ -96,18 +116,18 @@ jobs:
          jq -r '.network2.tokenContract |= "../simpleasset/build/contracts/BobERC20.json"' tmp.json > config.json
          rm tmp.json
         working-directory: weaver/samples/besu/besu-cli
-        
+
       - name: Asset Exchange Besu CLI Tests
         run: |
           export PATH="${PWD}/bin:$PATH"
           COUNT=0
           TOTAL=10
-          
+
           # HTLC Params
           timeout=1000
           hashBase64="ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs="
           preimage="secrettext"
-          
+
           # issue tokens to account 1
           initAmount=10
           transferAmount=5
@@ -117,7 +137,7 @@ jobs:
               besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --asset_type=ERC20
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           elif [ ${{ matrix.app_contract }} == "AliceERC1155" ]; then
-              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --token_id=${tokenId} --token_data="" --asset_type=ERC1155 
+              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --token_id=${tokenId} --token_data="" --asset_type=ERC1155
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --token_id=${tokenId} --timeout=${timeout} --asset_type=ERC1155 --hash_base64=${hashBase64} 1> tmp.out
           else
               initAmount=1
@@ -128,7 +148,7 @@ jobs:
               echo $tokenId
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
-          
+
           balanceRem=$((initAmount-transferAmount))
           cat tmp.out | grep "Account balance of the sender in Network network1: ${initAmount} " && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out | grep "Account balance of the sender in Network network1: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -143,7 +163,7 @@ jobs:
           besu-cli asset is-locked --network=network1 --lock_contract_id=$LOCK_ID 1> tmp.out
           cat tmp.out | grep "in Network network1: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
-          
+
           # Claim asset
           besu-cli asset claim --network=network1 --recipient_account=2 --preimage=${preimage} --token_id=${tokenId} --lock_contract_id=$LOCK_ID 1> tmp.out
           cat tmp.out | grep "Account balance of the recipient in Network network1 before claiming: 0" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -172,7 +192,7 @@ jobs:
               echo $tokenId
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
-          
+
           balanceRem=$((initAmount-transferAmount))
           cat tmp.out | grep "Account balance of the sender in Network network1: ${initAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out | grep "Account balance of the sender in Network network1: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -182,14 +202,14 @@ jobs:
           tmp_string=$(cat tmp.out | grep "Lock contract ID:")
           arrIN=(${tmp_string//:/ })
           LOCK_ID=${arrIN[3]}
-          
+
           sleep $timeout
 
           besu-cli asset unlock --network=network1 --lock_contract_id=$LOCK_ID --sender_account=1 --token_id=${tokenId} 1> tmp.out
           cat tmp.out | grep "before unlocking: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out | grep "after unlocking: ${initAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
-          
+
           # RESULT
           echo "Passed $COUNT/$TOTAL Tests."
 
@@ -199,44 +219,53 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/besu/besu-cli
-        
+
   asset-exchange-besu-local:
+    needs: check_code_changed
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-      
+    runs-on: ubuntu-22.04
+
     strategy:
       fail-fast: false
       matrix:
         app_contract: ["AliceERC1155", "AliceERC20", "AliceERC721"]
+        exclude:
+          - app_contract: ${{ needs.check_code_changed.outputs.status != 'true' }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Print  needs.check_code_changed.outputs.status
+        run: echo needs.check_code_changed.outputs.status => ${{ needs.check_code_changed.outputs.status }}
+
+      - name: Print  needs.check_code_changed.outputs.status != true
+        run: echo needs.check_code_changed.outputs.status != true => ${{ needs.check_code_changed.outputs.status != 'true' }}
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.5.2
-      
+      - uses: actions/checkout@v4.1.1
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3.11.0
         with:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3.6.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: 14.x
+          node-version: ${{ env.NODEJS_VERSION }}
 
       - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-          
+
       # PROTOS
       - name: Build JS Protos
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-js
-        
+
       # PROTOS
       - name: Build Solidity Protos
         run: |
@@ -247,14 +276,14 @@ jobs:
       # BESU SDK
       - name: Setup BESU SDK
         run: make build-local
-        working-directory: weaver/sdks/besu/node 
-        
+        working-directory: weaver/sdks/besu/node
+
       # BESU NETWORK
       - name: Start Besu Network
         run: |
           sudo apt install -y tmux jq
-          wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.7.0/besu-22.7.0.zip 
-          unzip besu-22.7.0.zip 
+          wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.7.0/besu-22.7.0.zip
+          unzip besu-22.7.0.zip
           export PATH="${PWD}/besu-22.7.0/bin:$PATH"
           wget https://artifacts.consensys.net/public/ethsigner/raw/names/ethsigner.zip/versions/22.1.3/ethsigner-22.1.3.zip
           unzip ethsigner-22.1.3.zip
@@ -262,7 +291,7 @@ jobs:
           make start
           sleep 100
         working-directory: weaver/tests/network-setups/besu
-      
+
       # Deploy contracts
       - name: Deploy contracts
         run: |
@@ -279,19 +308,19 @@ jobs:
          cp config.json tmp.json
          jq -r '.network2.tokenContract |= "../simpleasset/build/contracts/BobERC20.json"' tmp.json > config.json
          rm tmp.json
-        working-directory: weaver/samples/besu/besu-cli  
-        
+        working-directory: weaver/samples/besu/besu-cli
+
       - name: Asset Exchange Besu CLI Tests
         run: |
           export PATH="${PWD}/bin:$PATH"
           COUNT=0
           TOTAL=10
-          
+
           # HTLC Params
           timeout=1000
           hashBase64="ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs="
           preimage="secrettext"
-          
+
           # issue tokens to account 1
           initAmount=10
           transferAmount=5
@@ -301,7 +330,7 @@ jobs:
               besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --asset_type=ERC20
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           elif [ ${{ matrix.app_contract }} == "AliceERC1155" ]; then
-              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --token_id=${tokenId} --token_data="" --asset_type=ERC1155 
+              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --token_id=${tokenId} --token_data="" --asset_type=ERC1155
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --token_id=${tokenId} --timeout=${timeout} --asset_type=ERC1155 --hash_base64=${hashBase64} 1> tmp.out
           else
               initAmount=1
@@ -312,7 +341,7 @@ jobs:
               echo $tokenId
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
-          
+
           balanceRem=$((initAmount-transferAmount))
           cat tmp.out | grep "Account balance of the sender in Network network1: ${initAmount} " && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out | grep "Account balance of the sender in Network network1: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -327,7 +356,7 @@ jobs:
           besu-cli asset is-locked --network=network1 --lock_contract_id=$LOCK_ID 1> tmp.out
           cat tmp.out | grep "in Network network1: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
-          
+
           # Claim asset
           besu-cli asset claim --network=network1 --recipient_account=2 --preimage=${preimage} --token_id=${tokenId} --lock_contract_id=$LOCK_ID 1> tmp.out
           cat tmp.out | grep "Account balance of the recipient in Network network1 before claiming: 0" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -356,7 +385,7 @@ jobs:
               echo $tokenId
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
-          
+
           balanceRem=$((initAmount-transferAmount))
           cat tmp.out | grep "Account balance of the sender in Network network1: ${initAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out | grep "Account balance of the sender in Network network1: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -366,14 +395,14 @@ jobs:
           tmp_string=$(cat tmp.out | grep "Lock contract ID:")
           arrIN=(${tmp_string//:/ })
           LOCK_ID=${arrIN[3]}
-          
+
           sleep $timeout
 
           besu-cli asset unlock --network=network1 --lock_contract_id=$LOCK_ID --sender_account=1 --token_id=${tokenId} 1> tmp.out
           cat tmp.out | grep "before unlocking: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out | grep "after unlocking: ${initAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
-          
+
           # RESULT
           echo "Passed $COUNT/$TOTAL Tests."
 

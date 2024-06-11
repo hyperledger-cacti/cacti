@@ -34,7 +34,7 @@ import path from "path";
 import fs from "fs";
 import yaml from "js-yaml";
 import { envMapToDocker } from "../common/env-map-to-docker";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export interface organizationDefinitionFabricV2 {
   path: string;
@@ -82,6 +82,10 @@ export const DEFAULT_FABRIC_2_AIO_IMAGE_NAME =
   "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
 export const DEFAULT_FABRIC_2_AIO_IMAGE_VERSION = "2023-08-17-issue2057-pr2135";
 export const DEFAULT_FABRIC_2_AIO_FABRIC_VERSION = "2.4.4";
+
+export const FABRIC_25_LTS_AIO_IMAGE_VERSION =
+  "2024-03-03--issue-2945-fabric-v2-5-6";
+export const FABRIC_25_LTS_AIO_FABRIC_VERSION = "2.5.6";
 
 /*
  * Provides default options for Fabric container
@@ -236,9 +240,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const { enrollmentID, organization, wallet } = opts;
     try {
       const mspId = this.capitalizedMspIdOfOrg(organization);
-      const connectionProfile = await this.getConnectionProfileOrgX(
-        organization,
-      );
+      const connectionProfile =
+        await this.getConnectionProfileOrgX(organization);
       // Create a new gateway for connecting to our peer node.
       const gateway = new Gateway();
       const discovery = { enabled: true, asLocalhost: true };
@@ -496,7 +499,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
     const CCP_JSON_PATH_FABRIC_V1 =
-      "/fabric-samples/first-network/connection-org" + orgName + ".json";
+      "/fabric-samples/first-network/connection-" + orgName + ".json";
     const CCP_JSON_PATH_FABRIC_V2 = connectionProfilePath;
     const ccpJsonPath = compareVersions.compare(
       this.getFabricVersion(),
@@ -687,18 +690,16 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
           dataCouch["networks"]["test"]["name"] = networkName;
 
-          dataCouch["services"][couchDbName][
-            "container_name"
-          ] = `couchdb${orgName}`;
+          dataCouch["services"][couchDbName]["container_name"] =
+            `couchdb${orgName}`;
           dataCouch["services"][couchDbName]["ports"] = [`${port}:5984`];
 
           // services: orgX.example.com:
           dataCouch["services"][peer0OrgName] =
             dataCouch["services"]["peer0.org3.example.com"];
 
-          dataCouch["services"][peer0OrgName][
-            "environment"
-          ][1] = `CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=${couchDbName}:5984`;
+          dataCouch["services"][peer0OrgName]["environment"][1] =
+            `CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=${couchDbName}:5984`;
 
           dataCouch["services"][peer0OrgName]["depends_on"] = [couchDbName];
 
@@ -752,58 +753,48 @@ export class FabricTestLedgerV1 implements ITestLedger {
           delete dataCompose["services"][peer0OrgName]["labels"];
 
           //l.18: container name
-          dataCompose["services"][peer0OrgName][
-            "container_name"
-          ] = peer0OrgName;
+          dataCompose["services"][peer0OrgName]["container_name"] =
+            peer0OrgName;
 
           //       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=cactusfabrictestnetwork_test
 
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][1] = `CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${networkName}`;
+          dataCompose["services"][peer0OrgName]["environment"][1] =
+            `CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${networkName}`;
 
           // CORE_PEER_ID=peer0.org3.example.com
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][8] = `CORE_PEER_ID=${peer0OrgName}`;
+          dataCompose["services"][peer0OrgName]["environment"][8] =
+            `CORE_PEER_ID=${peer0OrgName}`;
 
           // CORE_PEER_ADDRESS=peer0.org3.example.com:11051
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][9] = `CORE_PEER_ADDRESS=${peer0OrgName}:${port}`;
+          dataCompose["services"][peer0OrgName]["environment"][9] =
+            `CORE_PEER_ADDRESS=${peer0OrgName}:${port}`;
 
           // CORE_PEER_LISTENADDRESS=0.0.0.0:11051
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][10] = `CORE_PEER_LISTENADDRESS=0.0.0.0:${port}`;
+          dataCompose["services"][peer0OrgName]["environment"][10] =
+            `CORE_PEER_LISTENADDRESS=0.0.0.0:${port}`;
 
           //       - CORE_PEER_CHAINCODEADDRESS=peer0.org3.example.com:11052
           const chaincodePort = parseInt(port) + 1;
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][11] = `CORE_PEER_CHAINCODEADDRESS=${peer0OrgName}:${chaincodePort}`;
+          dataCompose["services"][peer0OrgName]["environment"][11] =
+            `CORE_PEER_CHAINCODEADDRESS=${peer0OrgName}:${chaincodePort}`;
 
           //    CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][12] = `CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:${chaincodePort}`;
+          dataCompose["services"][peer0OrgName]["environment"][12] =
+            `CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:${chaincodePort}`;
 
           //          - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org3.example.com:11051
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][13] = `CORE_PEER_GOSSIP_BOOTSTRAP=${peer0OrgName}:${port}`;
+          dataCompose["services"][peer0OrgName]["environment"][13] =
+            `CORE_PEER_GOSSIP_BOOTSTRAP=${peer0OrgName}:${port}`;
 
           //          -       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org3.example.com:11051
 
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][14] = `CORE_PEER_GOSSIP_EXTERNALENDPOINT=${peer0OrgName}:${port}`;
+          dataCompose["services"][peer0OrgName]["environment"][14] =
+            `CORE_PEER_GOSSIP_EXTERNALENDPOINT=${peer0OrgName}:${port}`;
 
           //            - CORE_PEER_LOCALMSPID=Org3MSP
 
-          dataCompose["services"][peer0OrgName][
-            "environment"
-          ][15] = `CORE_PEER_LOCALMSPID=${mspId}`;
+          dataCompose["services"][peer0OrgName]["environment"][15] =
+            `CORE_PEER_LOCALMSPID=${mspId}`;
 
           /*
           dataCompose["services"][peer0OrgName][
@@ -814,19 +805,16 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
           /// Volumes
           //         - ../../organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/msp:/etc/hyperledger/fabric/msp
-          dataCompose["services"][peer0OrgName][
-            "volumes"
-          ][1] = `/add-org-${orgName}/organizations/peerOrganizations/${orgName}.example.com/peers/peer0.${orgName}.example.com/msp:/etc/hyperledger/fabric/msp`;
+          dataCompose["services"][peer0OrgName]["volumes"][1] =
+            `/add-org-${orgName}/organizations/peerOrganizations/${orgName}.example.com/peers/peer0.${orgName}.example.com/msp:/etc/hyperledger/fabric/msp`;
 
           //        - ../../organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/etc/hyperledger/fabric/tls
-          dataCompose["services"][peer0OrgName][
-            "volumes"
-          ][2] = `/add-org-${orgName}/organizations/peerOrganizations/${orgName}.example.com/peers/peer0.${orgName}.example.com/tls:/etc/hyperledger/fabric/tls`;
+          dataCompose["services"][peer0OrgName]["volumes"][2] =
+            `/add-org-${orgName}/organizations/peerOrganizations/${orgName}.example.com/peers/peer0.${orgName}.example.com/tls:/etc/hyperledger/fabric/tls`;
 
           //         - peer0.org3.example.com:/var/hyperledger/production
-          dataCompose["services"][peer0OrgName][
-            "volumes"
-          ][3] = `${peer0OrgName}:/var/hyperledger/production`;
+          dataCompose["services"][peer0OrgName]["volumes"][3] =
+            `${peer0OrgName}:/var/hyperledger/production`;
 
           dataCompose["services"][peer0OrgName]["ports"] = [`${port}:${port}`];
 
@@ -872,14 +860,12 @@ export class FabricTestLedgerV1 implements ITestLedger {
           delete dataCa["services"]["ca_org3"];
 
           //      - FABRIC_CA_SERVER_CA_NAME=ca-org3
-          dataCa["services"][caName][
-            "environment"
-          ][1] = `FABRIC_CA_SERVER_CA_NAME=${caName}`;
+          dataCa["services"][caName]["environment"][1] =
+            `FABRIC_CA_SERVER_CA_NAME=${caName}`;
 
           //      - FABRIC_CA_SERVER_PORT=11054
-          dataCa["services"][caName][
-            "environment"
-          ][3] = `FABRIC_CA_SERVER_PORT=${port}`;
+          dataCa["services"][caName]["environment"][3] =
+            `FABRIC_CA_SERVER_PORT=${port}`;
 
           //      - "11054:11054"
           dataCa["services"][caName]["ports"] = [`${port}:${port}`];
@@ -962,19 +948,15 @@ export class FabricTestLedgerV1 implements ITestLedger {
           //dataConfigTxGen["Organizations"][orgName] = dataConfigTxGen["Organizations"];
           dataConfigTxGen["Organizations"][0]["Name"] = mspId;
           dataConfigTxGen["Organizations"][0]["ID"] = mspId;
-          dataConfigTxGen["Organizations"][0][
-            "MSPDir"
-          ] = `organizations/peerOrganizations/${orgName}.example.com/msp`;
-          dataConfigTxGen["Organizations"][0]["Policies"]["Readers"][
-            "Rule"
-          ] = `OR('${mspId}.admin','${mspId}.peer','${mspId}.client')`;
+          dataConfigTxGen["Organizations"][0]["MSPDir"] =
+            `organizations/peerOrganizations/${orgName}.example.com/msp`;
+          dataConfigTxGen["Organizations"][0]["Policies"]["Readers"]["Rule"] =
+            `OR('${mspId}.admin','${mspId}.peer','${mspId}.client')`;
 
-          dataConfigTxGen["Organizations"][0]["Policies"]["Writers"][
-            "Rule"
-          ] = `OR('${mspId}.admin','${mspId}.client')`;
-          dataConfigTxGen["Organizations"][0]["Policies"]["Admins"][
-            "Rule"
-          ] = `OR('${mspId}.admin')`;
+          dataConfigTxGen["Organizations"][0]["Policies"]["Writers"]["Rule"] =
+            `OR('${mspId}.admin','${mspId}.client')`;
+          dataConfigTxGen["Organizations"][0]["Policies"]["Admins"]["Rule"] =
+            `OR('${mspId}.admin')`;
           dataConfigTxGen["Organizations"][0]["Policies"]["Endorsement"][
             "Rule"
           ] = `OR('${mspId}.peer')`;
