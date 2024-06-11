@@ -85,7 +85,7 @@
     "http-status-codes": "2.1.4",
     "jose": "4.15.5",
     "json-stable-stringify": "1.0.2",
-    "qs": "6.7.3"
+    "qs": "6.8.3"
   },
   "engines": {
     "node": ">=18",
