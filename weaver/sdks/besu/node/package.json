@@ -8,7 +8,7 @@
   },
   "license": "Apache-2.0",
   "author": "",
-  "main": "build/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
