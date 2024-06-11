@@ -1,7 +1,7 @@
 name: connector-fabric-publish
 
 env:
-  NODEJS_VERSION: v20.3.0
+  NODEJS_VERSION: v20.11.1
   IMAGE_NAME: cacti-dev-container-vscode
 
 on:
