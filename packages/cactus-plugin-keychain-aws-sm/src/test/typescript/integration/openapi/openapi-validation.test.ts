@@ -1,20 +1,15 @@
-import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
-
 import {
   Containers,
   LocalStackContainer,
   K_DEFAULT_LOCALSTACK_HTTP_PORT,
 } from "@hyperledger/cactus-test-tooling";
-
 import { v4 as uuidv4 } from "uuid";
-
 import {
   IListenOptions,
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
-
 import {
   IPluginKeychainAwsSmOptions,
   PluginKeychainAwsSm,
@@ -26,14 +21,12 @@ import {
   HasKeychainEntryRequestV1,
   DeleteKeychainEntryRequestV1,
 } from "../../../../main/typescript/public-api";
-
 import fs from "fs";
 import path from "path";
 import os from "os";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
-
 import {
   installOpenapiValidationMiddleware,
   PluginRegistry,
@@ -41,73 +34,80 @@ import {
 import OAS from "../../../../main/json/openapi.json";
 import { AddressInfo } from "net";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 const testCase = "cactus-plugin-keychain-aws-sm API";
 
-test(testCase, async (t: Test) => {
-  const localStackContainer = new LocalStackContainer({
-    logLevel: logLevel,
+describe("PluginKeychainAwsSm", () => {
+  let localStackContainer: LocalStackContainer;
+  let tmpDirPath: string;
+  let plugin: PluginKeychainAwsSm;
+  let expressApp: express.Express;
+  let server: http.Server;
+  let apiClient: KeychainAwsSmApi;
+
+  beforeAll(async () => {
+    localStackContainer = new LocalStackContainer({ logLevel: logLevel });
+    await localStackContainer.start();
+
+    const ci = await Containers.getById(localStackContainer.containerId);
+    const localstackIpAddr = await internalIpV4();
+    const hostPort = await Containers.getPublicPort(
+      K_DEFAULT_LOCALSTACK_HTTP_PORT,
+      ci,
+    );
+    const localstackHost = `http://${localstackIpAddr}:${hostPort}`;
+
+    tmpDirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), "cactus-"));
+    await fs.promises.writeFile(
+      `${tmpDirPath}/credentials`,
+      "[default]\naws_secret_access_key = test\naws_access_key_id = test",
+      "utf-8",
+    );
+
+    const options: IPluginKeychainAwsSmOptions = {
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      pluginRegistry: new PluginRegistry({}),
+      awsEndpoint: localstackHost,
+      awsRegion: "us-east-1",
+      awsProfile: "default",
+      awsCredentialType: AwsCredentialType.LocalFile,
+      awsCredentialFilePath: `${tmpDirPath}/credentials`,
+      logLevel: logLevel,
+    };
+    plugin = new PluginKeychainAwsSm(options);
+
+    expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    server = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "127.0.0.1",
+      port: 0,
+      server,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
+    const apiHost = `http://${address}:${port}`;
+
+    const apiConfig = new Configuration({ basePath: apiHost });
+    apiClient = new KeychainAwsSmApi(apiConfig);
+
+    await installOpenapiValidationMiddleware({
+      logLevel,
+      app: expressApp,
+      apiSpec: OAS,
+    });
+
+    await plugin.getOrCreateWebServices();
+    await plugin.registerWebServices(expressApp);
   });
-  await localStackContainer.start();
 
-  const ci = await Containers.getById(localStackContainer.containerId);
-  const localstackIpAddr = await internalIpV4();
-  const hostPort = await Containers.getPublicPort(
-    K_DEFAULT_LOCALSTACK_HTTP_PORT,
-    ci,
-  );
-  const localstackHost = `http://${localstackIpAddr}:${hostPort}`;
-
-  test.onFinish(async () => {
+  afterAll(async () => {
+    await Servers.shutdown(server);
     await localStackContainer.stop();
     await localStackContainer.destroy();
+    fs.promises.rm(tmpDirPath, { recursive: true, force: true });
   });
-
-  let tmpDirPath = "tmpDirPath";
-  tmpDirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), "cactus-"));
-  await fs.promises.writeFile(
-    `${tmpDirPath}/credentials`,
-    "[default]\naws_secret_access_key = test\naws_access_key_id = test",
-    "utf-8",
-  );
-
-  const options: IPluginKeychainAwsSmOptions = {
-    instanceId: uuidv4(),
-    keychainId: uuidv4(),
-    pluginRegistry: new PluginRegistry({}),
-    awsEndpoint: localstackHost,
-    awsRegion: "us-east-1",
-    awsProfile: "default",
-    awsCredentialType: AwsCredentialType.LocalFile,
-    awsCredentialFilePath: `${tmpDirPath}/credentials`,
-    logLevel: logLevel,
-  };
-  const plugin = new PluginKeychainAwsSm(options);
-
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-
-  const apiConfig = new Configuration({ basePath: apiHost });
-  const apiClient = new KeychainAwsSmApi(apiConfig);
-
-  await installOpenapiValidationMiddleware({
-    logLevel,
-    app: expressApp,
-    apiSpec: OAS,
-  });
-
-  await plugin.getOrCreateWebServices();
-  await plugin.registerWebServices(expressApp);
 
   const key = uuidv4();
   const value = uuidv4();
@@ -120,115 +120,84 @@ test(testCase, async (t: Test) => {
   const cWithoutParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
 
-  test(`${testCase} - ${fSet} - ${cOk}`, async (t2: Test) => {
-    const res = await apiClient.setKeychainEntryV1({
-      key,
-      value,
-    });
-    t2.equal(res.status, 200, `Endpoint ${fSet}: response.status === 200 OK`);
-    t2.end();
+  test(`${testCase} - ${fSet} - ${cOk}`, async () => {
+    const res = await apiClient.setKeychainEntryV1({ key, value });
+    expect(res.status).toBe(200);
   });
 
-  test(`${testCase} - ${fGet} - ${cOk}`, async (t2: Test) => {
+  test(`${testCase} - ${fGet} - ${cOk}`, async () => {
     const res = await apiClient.getKeychainEntryV1({ key });
-    t2.equal(res.status, 200, `Endpoint ${fGet}: response.status === 200 OK`);
-    t2.equal(res.data.value, value, "response.data.value === value1");
-    t2.end();
+    expect(res.status).toBe(200);
+    expect(res.data.value).toBe(value);
   });
 
-  test(`${testCase} - ${fHas} - ${cOk}`, async (t2: Test) => {
+  test(`${testCase} - ${fHas} - ${cOk}`, async () => {
     const res = await apiClient.hasKeychainEntryV1({ key });
-    t2.equal(res.status, 200, `Endpoint ${fHas}: response.status === 200 OK`);
-    t2.end();
+    expect(res.status).toBe(200);
   });
 
-  test(`${testCase} - ${fDelete} - ${cOk}`, async (t2: Test) => {
+  test(`${testCase} - ${fDelete} - ${cOk}`, async () => {
     const res = await apiClient.deleteKeychainEntryV1({ key });
-    t2.equal(
-      res.status,
-      200,
-      `Endpoint ${fDelete}: response.status === 200 OK`,
-    );
-    t2.end();
+    expect(res.status).toBe(200);
   });
 
-  test(`${testCase} - ${fSet} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fSet} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.setKeychainEntryV1({
-        value: value,
+        value,
       } as any as SetKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSet} without required key: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(fields.includes("key")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fGet} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fGet} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.getKeychainEntryV1(
         {} as any as GetKeychainEntryRequestV1,
       );
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fGet} without required key: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(fields.includes("key")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fHas} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fHas} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.hasKeychainEntryV1(
         {} as any as HasKeychainEntryRequestV1,
       );
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fHas} without required key: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(fields.includes("key")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fDelete} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fDelete} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.deleteKeychainEntryV1(
         {} as any as DeleteKeychainEntryRequestV1,
       );
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDelete} without required key: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(fields.includes("key")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fSet} - ${cInvalidParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fSet} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.setKeychainEntryV1({
         key,
@@ -236,90 +205,56 @@ test(testCase, async (t: Test) => {
         fake: 4,
       } as any as SetKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSet} with fake=4: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(fields.includes("fake")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fGet} - ${cInvalidParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fGet} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.getKeychainEntryV1({
         key,
         fake: 4,
       } as any as GetKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fGet} with fake=4: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(fields.includes("fake")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fHas} - ${cInvalidParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fHas} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.hasKeychainEntryV1({
         key,
         fake: 4,
       } as any as HasKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fHas} with fake=4: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(fields.includes("fake")).toBeTruthy();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fDelete} - ${cInvalidParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fDelete} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.deleteKeychainEntryV1({
         key,
         fake: 4,
       } as any as DeleteKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
-      );
+      expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
         param.path.replace("/body/", ""),
       );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(fields.includes("fake")).toBeTruthy();
     }
-    t2.end();
   });
-
-  t.end();
 });
