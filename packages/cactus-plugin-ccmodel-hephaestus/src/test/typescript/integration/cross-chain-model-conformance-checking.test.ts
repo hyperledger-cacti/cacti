@@ -18,7 +18,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import {
+  Configuration,
+  Constants,
+  LedgerType,
+} from "@hyperledger/cactus-core-api";
 import {
   IListenOptions,
   Logger,
@@ -80,6 +84,8 @@ describe("Test cross-chain model serialization and conformance checking", () => 
 
   let hephaestus: CcModelHephaestus;
   let hephaestusOptions: IPluginCcModelHephaestusOptions;
+
+  let totalTxs = 0;
 
   //////////////////////////////////
   // Environment Setup
@@ -180,6 +186,8 @@ describe("Test cross-chain model serialization and conformance checking", () => 
       instanceId: uuidv4(),
       logLevel: testLogLevel,
       ethTxObservable: connector.getTxSubjectObservable(),
+      sourceLedger: LedgerType.Ethereum,
+      targetLedger: LedgerType.Ethereum,
     };
 
     hephaestus = new CcModelHephaestus(hephaestusOptions);
@@ -252,14 +260,7 @@ describe("Test cross-chain model serialization and conformance checking", () => 
       caseNumber++;
     }
 
-    const totalTxs = txsPerCase * numberOfCases;
-
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(totalTxs);
-    expect(hephaestus.numberEventsLog).toEqual(0);
-
-    await hephaestus.txReceiptToCrossChainEventLogEntry();
-
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
+    totalTxs = txsPerCase * numberOfCases;
     expect(hephaestus.numberEventsLog).toEqual(totalTxs);
 
     const model = await hephaestus.createModel();
@@ -270,7 +271,7 @@ describe("Test cross-chain model serialization and conformance checking", () => 
     hephaestus.setIsModeling(false);
   });
 
-  test("Check confomity of unmodeled transactions", async () => {
+  test("Check confomity of unmodeled transaction when they happen", async () => {
     const createResEth = await apiClient.invokeContractV1({
       contract: {
         contractName: LockAssetContractJson.contractName,
@@ -287,6 +288,7 @@ describe("Test cross-chain model serialization and conformance checking", () => 
     });
     expect(createResEth).toBeTruthy();
     expect(createResEth.data).toBeTruthy();
+    expect(hephaestus.numberEventsUnmodeledLog).toEqual(1);
 
     const lockResEth = await apiClient.invokeContractV1({
       contract: {
@@ -305,6 +307,7 @@ describe("Test cross-chain model serialization and conformance checking", () => 
     expect(lockResEth).toBeTruthy();
     expect(lockResEth.data).toBeTruthy();
     expect(lockResEth.status).toBe(200);
+    expect(hephaestus.numberEventsUnmodeledLog).toEqual(2);
 
     const deleteResEth = await apiClient.invokeContractV1({
       contract: {
@@ -324,129 +327,9 @@ describe("Test cross-chain model serialization and conformance checking", () => 
     expect(deleteResEth.data).toBeTruthy();
     expect(deleteResEth.status).toBe(200);
 
-    expect(hephaestus.numberEventsUncheckedLog).toEqual(0);
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(3);
-
-    await hephaestus.txReceiptToCrossChainEventLogEntry();
-    expect(hephaestus.numberEventsUncheckedLog).toEqual(3);
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
-
-    const serializedCCModel = hephaestus.getModel(CrossChainModelType.PetriNet);
-    expect(serializedCCModel).toBeTruthy();
-
-    const conformanceDetails = await hephaestus.checkConformance(
-      serializedCCModel!,
-    );
-    expect(conformanceDetails).toBeTruthy();
-    console.log(conformanceDetails);
-
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
-    expect(hephaestus.numberEventsUncheckedLog).toEqual(0);
-
-    const tree = hephaestus.convertModelToProcessTree();
-    expect(tree).toBeTruthy();
-    expect(
-      hephaestus.ccModel.getModel(CrossChainModelType.ProcessTree),
-    ).toBeTruthy();
-    console.log(hephaestus.ccModel.getModel(CrossChainModelType.ProcessTree));
-  });
-
-  test("Check confomity of unmodeled transactions that should not conform", async () => {
-    const createResEth = await apiClient.invokeContractV1({
-      contract: {
-        contractName: LockAssetContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "createAsset",
-      params: ["asset3", 10],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(createResEth).toBeTruthy();
-    expect(createResEth.data).toBeTruthy();
-
-    const lockResEth = await apiClient.invokeContractV1({
-      contract: {
-        contractName: LockAssetContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "lockAsset",
-      params: ["asset3"],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(lockResEth).toBeTruthy();
-    expect(lockResEth.data).toBeTruthy();
-    expect(lockResEth.status).toBe(200);
-
-    const deleteResEth = await apiClient.invokeContractV1({
-      contract: {
-        contractName: LockAssetContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "deleteAsset",
-      params: ["asset3"],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(deleteResEth).toBeTruthy();
-    expect(deleteResEth.data).toBeTruthy();
-    expect(deleteResEth.status).toBe(200);
-
-    const getResEth = await apiClient.invokeContractV1({
-      contract: {
-        contractName: LockAssetContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "getAsset",
-      params: ["asset3"],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(getResEth).toBeTruthy();
-    expect(getResEth.data).toBeTruthy();
-    expect(getResEth.status).toBe(200);
-
-    expect(hephaestus.numberEventsUncheckedLog).toEqual(0);
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(4);
-
-    await hephaestus.txReceiptToCrossChainEventLogEntry();
-    expect(hephaestus.numberEventsUncheckedLog).toEqual(4);
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
-
-    const serializedCCModel = hephaestus.getModel(CrossChainModelType.PetriNet);
-    expect(serializedCCModel).toBeTruthy();
-
-    const conformanceDetails = await hephaestus.checkConformance(
-      serializedCCModel!,
-    );
-    expect(conformanceDetails).toBeTruthy();
-    console.log(conformanceDetails);
-
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
-    expect(hephaestus.numberEventsUncheckedLog).toEqual(0);
-    expect(hephaestus.numberEventsNonConformanceLog).toEqual(4);
-
-    const tree = hephaestus.convertModelToProcessTree();
-    expect(tree).toBeTruthy();
-    expect(hephaestus.getModel(CrossChainModelType.ProcessTree)).toBeTruthy();
-    console.log(hephaestus.getModel(CrossChainModelType.ProcessTree));
+    expect(hephaestus.numberEventsUnmodeledLog).toEqual(0);
+    expect(hephaestus.numberEventsNonConformedLog).toEqual(0);
+    expect(hephaestus.numberEventsLog).toEqual(totalTxs + 3);
   });
 
   afterAll(async () => {

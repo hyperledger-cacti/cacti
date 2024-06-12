@@ -69,17 +69,17 @@ The plugin employs a structured pipeline to create a cross-chain model from moni
 With it we can generate process models from the event logs created from transactional data and compare event logs with process models to identify deviations.
 
 ## Running the tests
-  - **basic-mock-test.test.ts**: Conducts the simulation of a transaction without instantiating the connectors, and tests that the plugin monitors, captures, and processes the transactional data and creates a cross-chain event.
   - **monitor-4-besu-events.test.ts**: Tests the plugin's ability to monitor, capture, and process the transactional data from besu connectors, and exports transactional data, in both CSV and JSON formats, as cross-chain event logs.
   - **monitor-4-ethereum-events.test.ts**: Tests the plugin's ability to monitor, capture, and process the transactional data from ethereum connectors, and exports transactional data, in both CSV and JSON formats, as cross-chain event logs.
   - **monitor-4-fabric-events.test.ts**: Tests the plugin's ability to monitor, capture, and process the transactional data from fabric connectors, and exports transactional data, in both CSV and JSON formats, as cross-chain event logs.
-  - **monitor-besu-ethereum-fabric-events.test.ts**: Tests the plugin's ability to monitor transactional data from besu, ethereum, and fabric connectors at the same time.
   - **cross-chain-model-serialization.test.ts**: Tests the plugin's ability to create the cross-chain model using the PM4PY (Process Mining for Python) library and save it serialized.
   - **cross-chain-model-conformance-checking.test.ts**: Tests the plugin's ability to check the conformity of unmodeled transactions against the cross-chain model using the PM4PY (Process Mining for Python) library.
-  - **cross-chain-model-periodic-update.test.ts**: Tests the plugin's ability to periodically update the cross-chain model with received transactional data.
+  - **besu-ethereum-asset-transfer.test.ts**: Tests the plugin's ability to detect non-conformance in asset transactions across two ledgers. 
+  - **ethereum-fabric-asset-transfer.test.ts**: Tests the plugin's ability to detect non-conformance in asset transactions across two ledgers.
+  - **fabric-besu-asset-transfer.test.ts**: Tests the plugin's ability to detect non-conformance in asset transactions across two ledgers.
 
 ## Usage
-Let us consider three conectors: one connected to Hyperledger Besu and, another connected to Hyperledger Ethereum, and a third connected to Hyperledger Fabric. To monitor cross-chain transactions and create a cross-chain model we should follow the next steps.
+Let us consider two conectors: one connected to Hyperledger Besu and, and another connected to Hyperledger Ethereum. To monitor cross-chain transactions and create a cross-chain model we should follow the next steps.
 
 After instantiating the connectors, we instantiate the plugin as follows:
 ```typescript
@@ -90,55 +90,30 @@ hephaestusOptions = {
   logLevel: logLevel,
   besuTxObservable: besuConnector.getTxSubjectObservable(),
   ethereumTxObservable: ethereumConnector.getTxSubjectObservable(),
-  fabricTxObservable: fabricConnector.getTxSubjectObservable(),
+  sourceLedger: LedgerType.Besu2X,
+  targetLedger: LedgerType.Ethereum,
 };
 hephaestus = new CcModelHephaestus(hephaestusOptions);
 ```
 
-We set the desired caseID and start monitoring and processing the transactions into transaction receipts:
+We set the desired caseID and start monitoring transactions. These are then processed into cross-chain events when received and added to the cross-chain event log:
 
 ```typescript
 hephaestus.setCaseId("Desired_CaseID");
 hephaestus.monitorTransactions();
 ```
 
-We can create cross-chain events from processed transaction receipts and add them to the cross-chain event log:
-
-```typescript
-hephaestus.txReceiptToCrossChainEventLogEntry();
-```
-
-We can export the transactional data captured to CSV and JSON files:
-
-```typescript
-hephaestus.persistCrossChainLogCsv("output-file-CSV");
-hephaestus.persistCrossChainLogJson("output-file-JSON");
-```
-
 We can create the cross-chain model with events created from the transactional data captured:
+
 ```typescript
 await hephaestus.createModel();
 ```
 
-We can periodically update the cross-chain model with events created from the transactional data captured:
-```typescript
-const timeInterval = 10000;
-const fileName = "file-with-modeled-logs"
-await hephaestus.periodicCCModelUpdate(
-      fileName,
-      timeInterval,
-    );
-await hephaestus.stopPeriodicCCModelUpdate(fileName);
-```
+After creating a model with the desired event logs, we can turn off modeling so that newly received transactional data will be compared against the model through a conformance check:
 
-After creating or updating a model with the desired event logs, we can perform a conformance check of the newly received transactional data against the model:
 ```typescript
-const model = hephaestus.getModel(CrossChainModelType.PetriNet);
 hephaestus.setIsModeling(false);
-//receive more transactional data from connectors
-await hephaestus.checkConformance(model);
 ```
-
 
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!

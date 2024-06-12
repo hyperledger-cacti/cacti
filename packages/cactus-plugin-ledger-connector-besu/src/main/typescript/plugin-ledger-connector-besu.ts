@@ -154,7 +154,6 @@ export class PluginLedgerConnectorBesu
   } = {};
 
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private httpServer: Server | SecureServer | null = null;
 
   private txSubject: ReplaySubject<RunTransactionV1Exchange> =
     new ReplaySubject();
