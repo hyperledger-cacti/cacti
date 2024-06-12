@@ -1,8 +1,10 @@
+import { LedgerType } from "@hyperledger/cactus-core-api";
+
 export type CrossChainEvent = {
   caseID: string;
   receiptID: string;
   timestamp: string;
-  blockchainID: string;
+  blockchainID: LedgerType;
   invocationType: string;
   methodName: string;
   parameters: string[];
@@ -50,6 +52,11 @@ export class CrossChainEventLog {
 
   public addCrossChainEvent(event: CrossChainEvent): void {
     this.crossChainEvents.push(event);
+    this.lastUpdateDate = new Date();
+  }
+
+  public removeLastEvent(): void {
+    this.crossChainEvents.pop();
     this.lastUpdateDate = new Date();
   }
 

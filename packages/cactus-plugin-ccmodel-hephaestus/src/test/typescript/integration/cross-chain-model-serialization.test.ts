@@ -18,7 +18,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import {
+  Configuration,
+  Constants,
+  LedgerType,
+} from "@hyperledger/cactus-core-api";
 import {
   IListenOptions,
   Logger,
@@ -180,6 +184,8 @@ describe("Test cross-chain model serialization", () => {
       instanceId: uuidv4(),
       logLevel: testLogLevel,
       ethTxObservable: connector.getTxSubjectObservable(),
+      sourceLedger: LedgerType.Ethereum,
+      targetLedger: LedgerType.Ethereum,
     };
 
     hephaestus = new CcModelHephaestus(hephaestusOptions);
@@ -254,12 +260,6 @@ describe("Test cross-chain model serialization", () => {
 
     const totalTxs = txsPerCase * numberOfCases;
 
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(totalTxs);
-    expect(hephaestus.numberEventsLog).toEqual(0);
-
-    await hephaestus.txReceiptToCrossChainEventLogEntry();
-
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
     expect(hephaestus.numberEventsLog).toEqual(totalTxs);
 
     const model = await hephaestus.createModel();

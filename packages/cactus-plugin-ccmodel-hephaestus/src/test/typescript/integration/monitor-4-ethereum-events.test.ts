@@ -18,7 +18,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import {
+  Configuration,
+  Constants,
+  LedgerType,
+} from "@hyperledger/cactus-core-api";
 import {
   IListenOptions,
   Logger,
@@ -179,6 +183,8 @@ describe("Ethereum contract deploy and invoke while monitoring", () => {
       instanceId: uuidv4(),
       logLevel: testLogLevel,
       ethTxObservable: connector.getTxSubjectObservable(),
+      sourceLedger: LedgerType.Ethereum,
+      targetLedger: LedgerType.Ethereum,
     };
 
     hephaestus = new CcModelHephaestus(hephaestusOptions);
@@ -261,12 +267,6 @@ describe("Ethereum contract deploy and invoke while monitoring", () => {
     expect(deleteResEth.data).toBeTruthy();
     expect(deleteResEth.status).toBe(200);
 
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(4);
-    expect(hephaestus.numberEventsLog).toEqual(0);
-
-    await hephaestus.txReceiptToCrossChainEventLogEntry();
-
-    expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
     expect(hephaestus.numberEventsLog).toEqual(4);
 
     await hephaestus.persistCrossChainLogCsv("example-dummy-ethereum-4-events");
