@@ -34,8 +34,6 @@ export const CarbonFootPrintConstants = (ledger: LedgerType): number => {
     case LedgerType.Fabric2:
       return 0.00018;
 
-    case LedgerType.Fabric14X:
-      return 0.00018;
     default:
       return 0;
   }
