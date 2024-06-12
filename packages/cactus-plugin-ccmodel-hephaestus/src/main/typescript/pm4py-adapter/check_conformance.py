@@ -146,18 +146,56 @@ def unserialize_and_check_conformance(ccLog):
 
     # check  conformance:
     diagnostics = pm4py.conformance_diagnostics_alignments(ccLog, net, initial_marking, final_marking)
-    print(diagnostics)
+    if diagnostics == []:
+        print("No event log provided")
+        return
 
     alignment = diagnostics[0]["alignment"]
-    non_modeled_activities = []
-    skips = []
+    conforming_activities = []
+    non_conforming_activities = []
+    skipped_activities = []
+    all_activities = []
+
     for activity in alignment:
         if activity[0] == ">>" and activity[1] != None:
-            skips.append(activity)
+            all_activities.append(activity)
+            skipped_activities.append(activity)
         elif activity[0] != ">>" and activity[1] == ">>":
-            non_modeled_activities.append(activity)
-    print(skips)
-    print(non_modeled_activities)
+            all_activities.append(activity)
+            non_conforming_activities.append(activity)
+        elif activity[0] != None and activity[1] != None:
+            all_activities.append(activity)
+            conforming_activities.append(activity)
+            
+    # Check for non-confomant behaviour
+    if len(non_conforming_activities) != 0:
+        print("NON-CONFORMANCE:")
+        print(non_conforming_activities)
+        print(file)
+        return
+
+    if len(all_activities) == len(conforming_activities):
+        print("FULL CONFORMANCE:")
+        print(conforming_activities)
+        print(file)
+        return
+
+    # If there were no skips in the case, then all the conforming activities 
+    # will be the same as the initial activities of the model
+    # If not, then there were skips that cannot be ignored
+    ignore_skips = True
+    for i in range(len(conforming_activities)):
+        if(conforming_activities[i] != all_activities[i]):
+            ignore_skips = False
+
+    if ignore_skips == True:
+        print("PARTIAL CONFORMANCE:")
+        print(conforming_activities)
+        print(file)
+    else:
+        print("SKIPPED ACTIVITY:")
+        print(skipped_activities)
+        print(file)
 
 ##################################################################
 
@@ -179,9 +217,9 @@ def main():
         exit(1)
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 3:
-    #     print("Usage: python3 check_conformance_json.py file_with_new_logs serialized_ccmodel")
-    #     exit(1)
+    if len(sys.argv) != 3:
+        print("Usage: python3 check_conformance.py file_with_new_logs serialized_ccmodel")
+        exit(1)
     
     file = sys.argv[1]
     serialized_ccmodel = sys.argv[2]
