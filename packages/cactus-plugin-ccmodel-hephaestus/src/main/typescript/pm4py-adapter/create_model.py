@@ -77,7 +77,7 @@ def main():
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python3 create_model_csv.py file_with_logs")
+        print("Usage: python3 create_model.py file_with_logs")
         exit(1)
     
     file = sys.argv[1]
