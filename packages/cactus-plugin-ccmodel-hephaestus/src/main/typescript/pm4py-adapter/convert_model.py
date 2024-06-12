@@ -106,18 +106,13 @@ def unserialize_model(model):
 
 def main():
     (petri_net, initial_marking, final_marking) = unserialize_model(serialized_model)
-    if(convertion_type == "ProcessTree"):
-        process_tree = pm4py.convert_to_process_tree(petri_net, initial_marking, final_marking)
-        print(process_tree)
-    if(convertion_type == "BPMN"):
-        bpmn = pm4py.convert_to_bpmn(petri_net, initial_marking, final_marking)
-        print(bpmn)
+    process_tree = pm4py.convert_to_process_tree(petri_net, initial_marking, final_marking)
+    print(process_tree)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python3 convert_model_csv.py serialized_model type_to_convert_to")
+    if len(sys.argv) != 2:
+        print("Usage: python3 convert_model.py serialized_model")
         exit(1)
     
     serialized_model = sys.argv[1]
-    convertion_type = sys.argv[2]
     main()
