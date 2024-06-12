@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718215661709,
+  "lastUpdate": 1718216186571,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -107,6 +107,37 @@ window.BENCHMARK_DATA = {
             "range": "±1.55%",
             "unit": "ops/sec",
             "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "4521d10e34c556434fe551f6d55100198b4d469d",
+          "message": "test(plugin-consortium-manual): fix API server CRPC port allocation\n\n1. Also sneaking in a fix for a DCI-Lint failure that was introduced recently\nwhen we added a new Yarn plugin which then stored its install URL in the\n.yarnrc.yml file and it uses the old git default main branch name and does\nnot support the new one so we had to exclude the config file from linting.\n2. Also ensured that the ConnectRPC ports are bound to zero in all tests where the API\nserver is being used. This will prevent port conflicts randomly popping up across the\ntest suite in the future.\n3. Also removed a few test cases from the taprc file because they were already migrated to\nJest and therefore tap should not run them as they fail with the Jest syntax.\n4. Also fixing the lack of etherscan API key environment variable in the HTLC coordinator tests.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-06-12T10:56:35-07:00",
+          "tree_id": "5500e8622a1cc2873707e37cafce8a083e3531ec",
+          "url": "https://github.com/hyperledger/cacti/commit/4521d10e34c556434fe551f6d55100198b4d469d"
+        },
+        "date": 1718216183306,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 776,
+            "range": "±2.72%",
+            "unit": "ops/sec",
+            "extra": "179 samples"
           }
         ]
       }
