@@ -21,6 +21,7 @@ import { Account } from "web3-core";
 
 import { CcModelHephaestus } from "../../../main/typescript/plugin-ccmodel-hephaestus";
 import { IPluginCcModelHephaestusOptions } from "../../../main/typescript";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -140,11 +141,14 @@ beforeAll(async () => {
     expect(deployOut.transactionReceipt).toBeTruthy();
     expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
     log.info("Contract Deployed successfully");
-
+  }
+  {
     hephaestusOptions = {
       instanceId: uuidv4(),
       logLevel: logLevel,
       besuTxObservable: connector.getTxSubjectObservable(),
+      sourceLedger: LedgerType.Besu2X,
+      targetLedger: LedgerType.Besu2X,
     };
 
     hephaestus = new CcModelHephaestus(hephaestusOptions);
@@ -217,12 +221,6 @@ test("monitor Besu transactions", async () => {
   });
   expect(deleteResBesu).toBeTruthy();
 
-  expect(hephaestus.numberUnprocessedReceipts).toEqual(4);
-  expect(hephaestus.numberEventsLog).toEqual(0);
-
-  await hephaestus.txReceiptToCrossChainEventLogEntry();
-
-  expect(hephaestus.numberUnprocessedReceipts).toEqual(0);
   expect(hephaestus.numberEventsLog).toEqual(4);
 
   await hephaestus.persistCrossChainLogCsv("example-dummy-besu-4-events");
