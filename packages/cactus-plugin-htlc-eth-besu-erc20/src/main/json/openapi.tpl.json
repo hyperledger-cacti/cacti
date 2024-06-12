@@ -1,7 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Hyperledger Cactus Plugin - HTLC-ETH Besu",
+    "title": "Hyperledger Cactus Plugin - HTLC ETH BESU ERC20",
+    "description": "Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens",
     "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
@@ -10,17 +11,20 @@
   },
   "components": {
     "schemas": {
-      "NewContractObj": {
+      "NewContractRequest": {
         "type": "object",
         "required": [
           "contractAddress",
+          "inputAmount",
           "outputAmount",
           "expiration",
           "hashLock",
+          "tokenAddress",
+          "receiver",
           "outputNetwork",
           "outputAddress",
-          "connectorId",
           "web3SigningCredential",
+          "connectorId",
           "keychainId"
         ],
         "additionalProperties": false,
@@ -31,35 +35,54 @@
             "nullable": false
           },
           "inputAmount": {
-            "type": "number"
+            "description": "Input amount to lock",
+            "type": "number",
+            "nullable": false
           },
           "outputAmount": {
-            "type": "number"
+            "description": "Output amount to lock",
+            "type": "number",
+            "nullable": false
           },
           "expiration": {
-            "type": "number"
+            "description": "Timestamp to expire the contract",
+            "type": "number",
+            "nullable": false
           },
           "hashLock": {
-            "type": "string"
+            "description": "Hashlock needed to refund the amount",
+            "type": "string",
+            "nullable": false
+          },
+          "tokenAddress": {
+            "description": "The token address",
+            "type": "string",
+            "nullable": false
           },
           "receiver": {
-            "type": "string"
+            "description": "The receiver address",
+            "type": "string",
+            "nullable": false
           },
           "outputNetwork": {
+            "description": "The output network id",
             "type": "string",
             "nullable": false
           },
           "outputAddress": {
+            "description": "The output address to receive the tokens",
             "type": "string",
+            "nullable": false
+          },
+          "web3SigningCredential": {
+            "description": "Web3SigningCredentialType",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "connectorId": {
             "description": "connectorId for the connector besu plugin",
             "type": "string",
             "nullable": false
-          },
-          "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
           },
           "keychainId": {
             "description": "keychainId for the keychian plugin",
@@ -78,7 +101,7 @@
           }
         }
       },
-      "RefundReq": {
+      "RefundRequest": {
         "type": "object",
         "required": [
           "id",
@@ -94,7 +117,9 @@
             "nullable": false
           },
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
+            "description": "Web3SigningCredentialType",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "nullable": false
           },
           "connectorId": {
             "description": "connectorId for the connector besu plugin",
@@ -118,7 +143,7 @@
           }
         }
       },
-      "WithdrawReq": {
+      "WithdrawRequest": {
         "type": "object",
         "required": [
           "id",
@@ -141,7 +166,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredentialType",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "connectorId": {
@@ -163,6 +188,57 @@
                 "type": "number"
               }
             ]
+          }
+        }
+      },
+      "GetStatusRequest": {
+        "description": "Defines the parameters for retrieving the status of the HTLC swap.",
+        "required": [
+          "ids",
+          "web3SigningCredential",
+          "connectorId",
+          "keychainId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "web3SigningCredential": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+          },
+          "connectorId": {
+            "type": "string"
+          },
+          "keychainId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetSingleStatusRequest": {
+        "description": "Defines the parameters for retrieving the single status of the HTLC swap.",
+        "required": [
+          "id",
+          "web3SigningCredential",
+          "connectorId",
+          "keychainId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "web3SigningCredential": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+          },
+          "connectorId": {
+            "type": "string"
+          },
+          "keychainId": {
+            "type": "string"
           }
         }
       },
@@ -193,233 +269,11 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "gas": {
             "type": "number"
-          }
-        }
-      },
-      "GetStatusRequest": {
-        "description": "Defines the parameters for retrieving the status of the HTLC swap.",
-        "required": [
-          "ids",
-          "web3SigningCredential",
-          "connectorId",
-          "keychainId"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "ids": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
-          },
-          "connectorId": {
-            "type": "string"
-          },
-          "keychainId": {
-            "type": "string"
-          }
-        }
-      },
-      "GetSingleStatusRequest": {
-        "description": "Defines the parameters for retrieving the single status of the HTLC swap.",
-        "required": [
-          "id",
-          "web3SigningCredential",
-          "connectorId",
-          "keychainId"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
-          },
-          "connectorId": {
-            "type": "string"
-          },
-          "keychainId": {
-            "type": "string"
-          }
-        }
-      },
-      "Web3SigningCredentialType": {
-        "type": "string",
-        "enum": [
-          "CACTUS_KEYCHAIN_REF",
-          "GETH_KEYCHAIN_PASSWORD",
-          "PRIVATE_KEY_HEX",
-          "NONE"
-        ]
-      },
-      "Web3SigningCredentialCactusKeychainRef": {
-        "type": "object",
-        "required": ["type", "ethAccount", "keychainId", "keychainEntryKey"],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          },
-          "ethAccount": {
-            "type": "string",
-            "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
-            "minLength": 64,
-            "maxLength": 64,
-            "nullable": false
-          },
-          "keychainEntryKey": {
-            "type": "string",
-            "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
-            "minLength": 0,
-            "maxLength": 1024
-          },
-          "keychainId": {
-            "type": "string",
-            "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
-            "minLength": 0,
-            "maxLength": 1024
-          }
-        }
-      },
-      "Web3SigningCredentialPrivateKeyHex": {
-        "type": "object",
-        "required": ["type", "ethAccount", "secret"],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          },
-          "ethAccount": {
-            "type": "string",
-            "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
-            "minLength": 64,
-            "maxLength": 64,
-            "nullable": false
-          },
-          "secret": {
-            "type": "string",
-            "description": "The HEX encoded private key of an eth account.",
-            "minLength": 0,
-            "maxLength": 65535
-          }
-        }
-      },
-      "Web3SigningCredentialNone": {
-        "type": "object",
-        "required": ["type"],
-        "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          }
-        }
-      },
-      "Web3SigningCredential": {
-        "type": "object",
-        "required": ["type"],
-        "discriminator": {
-          "propertyName": "type"
-        },
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
-          },
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
-          },
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialNone"
-          }
-        ],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          }
-        }
-      },
-      "Web3TransactionReceipt": {
-        "type": "object",
-        "required": [
-          "blockHash",
-          "blockNumber",
-          "transactionHash",
-          "transactionIndex",
-          "status",
-          "from",
-          "to",
-          "gasUsed"
-        ],
-        "additionalProperties": true,
-        "properties": {
-          "status": {
-            "type": "boolean",
-            "nullable": false
-          },
-          "transactionHash": {
-            "type": "string",
-            "minLength": 66,
-            "maxLength": 66,
-            "pattern": "^0x([A-Fa-f0-9]{64})$"
-          },
-          "transactionIndex": {
-            "type": "number",
-            "nullable": false
-          },
-          "blockHash": {
-            "type": "string",
-            "minLength": 66,
-            "maxLength": 66,
-            "pattern": "^0x([A-Fa-f0-9]{64})$"
-          },
-          "blockNumber": {
-            "type": "number",
-            "nullable": false
-          },
-          "gasUsed": {
-            "type": "number",
-            "nullable": false
-          },
-          "contractAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "from": {
-            "type": "string",
-            "nullable": false
-          },
-          "to": {
-            "type": "string",
-            "nullable": false
-          }
-        }
-      },
-      "InvokeContractV1Response": {
-        "type": "object",
-        "required": ["success"],
-        "properties": {
-          "transactionReceipt": {
-            "$ref": "#/components/schemas/Web3TransactionReceipt"
-          },
-          "callOutput": {},
-          "success": {
-            "type": "boolean",
-            "nullable": false
-          }
-        }
-      },
-      "RunTransactionResponse": {
-        "type": "object",
-        "required": ["transactionReceipt"],
-        "properties": {
-          "transactionReceipt": {
-            "$ref": "#/components/schemas/Web3TransactionReceipt"
           }
         }
       }
@@ -453,85 +307,22 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize"
           }
         },
-        "operationId": "newContractV1",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewContractObj"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvokeContractV1Response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw": {
-      "post": {
-        "x-hyperledger-cacti": {
-          "http": {
-            "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw"
-          }
-        },
-        "operationId": "withdrawV1",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WithdrawReq"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvokeContractV1Response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund": {
-      "post": {
-        "x-hyperledger-cacti": {
-          "http": {
-            "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund"
-          }
-        },
-        "operationId": "refundV1",
+        "operationId": "initializeV1",
+        "summary": "Initialize contract",
         "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RefundReq"
+                "$ref": "#/components/schemas/InitializeRequest"
               }
             }
           }
@@ -542,7 +333,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/RunTransactionResponse"
                 }
               }
             }
@@ -550,12 +341,46 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw"
+          }
+        },
+        "operationId": "withdrawV1",
+        "summary": "Withdraw a hashtimelock contract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status"
           }
         },
         "operationId": "getStatusV1",
@@ -576,12 +401,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status"
           }
         },
         "operationId": "getSingleStatusV1",
@@ -602,20 +427,22 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund"
           }
         },
-        "operationId": "initializeV1",
+        "operationId": "refundV1",
+        "summary": "Refund a hashtimelock contract",
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InitializeRequest"
+                "$ref": "#/components/schemas/RefundRequest"
               }
             }
           }
@@ -626,7 +453,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RunTransactionResponse"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract"
+          }
+        },
+        "operationId": "newContractV1",
+        "summary": "Create a new hashtimelock contract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }

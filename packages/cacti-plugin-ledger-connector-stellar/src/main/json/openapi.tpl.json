@@ -85,6 +85,7 @@
           }
         }
       },
+
       "DeployContractV1Request": {
         "type": "object",
         "additionalProperties": false,
@@ -209,6 +210,7 @@
         }
       }
     },
+
     "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {

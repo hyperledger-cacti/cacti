@@ -69,7 +69,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "inputAmount": {
@@ -147,7 +147,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "gas": {
@@ -186,7 +186,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "htlcId": {
@@ -207,98 +207,6 @@
       "HtlcPackage": {
         "type": "string",
         "enum": ["BESU", "BESU_ERC20"]
-      },
-      "Web3SigningCredentialType": {
-        "type": "string",
-        "enum": [
-          "CACTUS_KEYCHAIN_REF",
-          "GETH_KEYCHAIN_PASSWORD",
-          "PRIVATE_KEY_HEX",
-          "NONE"
-        ]
-      },
-      "Web3SigningCredentialCactusKeychainRef": {
-        "type": "object",
-        "required": ["type", "ethAccount", "keychainId", "keychainEntryKey"],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          },
-          "ethAccount": {
-            "type": "string",
-            "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
-            "minLength": 64,
-            "maxLength": 64,
-            "nullable": false
-          },
-          "keychainEntryKey": {
-            "type": "string",
-            "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
-            "minLength": 0,
-            "maxLength": 1024
-          },
-          "keychainId": {
-            "type": "string",
-            "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
-            "minLength": 0,
-            "maxLength": 1024
-          }
-        }
-      },
-      "Web3SigningCredentialPrivateKeyHex": {
-        "type": "object",
-        "required": ["type", "ethAccount", "secret"],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          },
-          "ethAccount": {
-            "type": "string",
-            "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
-            "minLength": 64,
-            "maxLength": 64,
-            "nullable": false
-          },
-          "secret": {
-            "type": "string",
-            "description": "The HEX encoded private key of an eth account.",
-            "minLength": 0,
-            "maxLength": 65535
-          }
-        }
-      },
-      "Web3SigningCredentialNone": {
-        "type": "object",
-        "required": ["type"],
-        "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          }
-        }
-      },
-      "Web3SigningCredential": {
-        "type": "object",
-        "required": ["type"],
-        "discriminator": {
-          "propertyName": "type"
-        },
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
-          },
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
-          },
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialNone"
-          }
-        ],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          }
-        }
       }
     }
   },

@@ -59,7 +59,7 @@
             "nullable": false
           },
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "keychainId": {
             "description": "keychainId for the keychian plugin",
@@ -94,7 +94,7 @@
             "nullable": false
           },
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "connectorId": {
             "description": "connectorId for the connector besu plugin",
@@ -141,7 +141,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredentialType",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "connectorId": {
@@ -193,7 +193,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "gas": {
@@ -218,7 +218,7 @@
             }
           },
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "connectorId": {
             "type": "string"
@@ -242,184 +242,13 @@
             "type": "string"
           },
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "connectorId": {
             "type": "string"
           },
           "keychainId": {
             "type": "string"
-          }
-        }
-      },
-      "Web3SigningCredentialType": {
-        "type": "string",
-        "enum": [
-          "CACTUS_KEYCHAIN_REF",
-          "GETH_KEYCHAIN_PASSWORD",
-          "PRIVATE_KEY_HEX",
-          "NONE"
-        ]
-      },
-      "Web3SigningCredentialCactusKeychainRef": {
-        "type": "object",
-        "required": ["type", "ethAccount", "keychainId", "keychainEntryKey"],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          },
-          "ethAccount": {
-            "type": "string",
-            "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
-            "minLength": 64,
-            "maxLength": 64,
-            "nullable": false
-          },
-          "keychainEntryKey": {
-            "type": "string",
-            "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
-            "minLength": 0,
-            "maxLength": 1024
-          },
-          "keychainId": {
-            "type": "string",
-            "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
-            "minLength": 0,
-            "maxLength": 1024
-          }
-        }
-      },
-      "Web3SigningCredentialPrivateKeyHex": {
-        "type": "object",
-        "required": ["type", "ethAccount", "secret"],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          },
-          "ethAccount": {
-            "type": "string",
-            "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
-            "minLength": 64,
-            "maxLength": 64,
-            "nullable": false
-          },
-          "secret": {
-            "type": "string",
-            "description": "The HEX encoded private key of an eth account.",
-            "minLength": 0,
-            "maxLength": 65535
-          }
-        }
-      },
-      "Web3SigningCredentialNone": {
-        "type": "object",
-        "required": ["type"],
-        "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          }
-        }
-      },
-      "Web3SigningCredential": {
-        "type": "object",
-        "required": ["type"],
-        "discriminator": {
-          "propertyName": "type"
-        },
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
-          },
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
-          },
-          {
-            "$ref": "#/components/schemas/Web3SigningCredentialNone"
-          }
-        ],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/Web3SigningCredentialType"
-          }
-        }
-      },
-      "Web3TransactionReceipt": {
-        "type": "object",
-        "required": [
-          "blockHash",
-          "blockNumber",
-          "transactionHash",
-          "transactionIndex",
-          "status",
-          "from",
-          "to",
-          "gasUsed"
-        ],
-        "additionalProperties": true,
-        "properties": {
-          "status": {
-            "type": "boolean",
-            "nullable": false
-          },
-          "transactionHash": {
-            "type": "string",
-            "minLength": 66,
-            "maxLength": 66,
-            "pattern": "^0x([A-Fa-f0-9]{64})$"
-          },
-          "transactionIndex": {
-            "type": "number",
-            "nullable": false
-          },
-          "blockHash": {
-            "type": "string",
-            "minLength": 66,
-            "maxLength": 66,
-            "pattern": "^0x([A-Fa-f0-9]{64})$"
-          },
-          "blockNumber": {
-            "type": "number",
-            "nullable": false
-          },
-          "gasUsed": {
-            "type": "number",
-            "nullable": false
-          },
-          "contractAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "from": {
-            "type": "string",
-            "nullable": false
-          },
-          "to": {
-            "type": "string",
-            "nullable": false
-          }
-        }
-      },
-      "InvokeContractV1Response": {
-        "type": "object",
-        "required": ["success"],
-        "properties": {
-          "transactionReceipt": {
-            "$ref": "#/components/schemas/Web3TransactionReceipt"
-          },
-          "callOutput": {},
-          "success": {
-            "type": "boolean",
-            "nullable": false
-          }
-        }
-      },
-      "RunTransactionResponse": {
-        "type": "object",
-        "required": ["transactionReceipt"],
-        "properties": {
-          "transactionReceipt": {
-            "$ref": "#/components/schemas/Web3TransactionReceipt"
           }
         }
       }
@@ -477,7 +306,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }
@@ -509,7 +338,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }
@@ -542,7 +371,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }
@@ -626,7 +455,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RunTransactionResponse"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/RunTransactionResponse"
                 }
               }
             }

@@ -9433,8 +9433,10 @@ __metadata:
     "@lerna-lite/run": "npm:3.1.0"
     "@lerna-lite/version": "npm:3.1.0"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
+    "@redocly/openapi-core": "npm:1.15.0"
     "@types/adm-zip": "npm:0.5.0"
     "@types/benchmark": "npm:2.1.5"
+    "@types/debug": "npm:4.1.12"
     "@types/fs-extra": "npm:9.0.13"
     "@types/jest": "npm:29.5.3"
     "@types/node": "npm:18.11.9"
@@ -9452,6 +9454,7 @@ __metadata:
     cross-env: "npm:7.0.3"
     crypto-browserify: "npm:3.12.0"
     cspell: "npm:5.21.2"
+    debug: "npm:4.3.5"
     del: "npm:7.1.0"
     del-cli: "npm:4.0.1"
     depcheck: "npm:1.4.7"
@@ -12810,6 +12813,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@redocly/ajv@npm:^8.11.0":
+  version: 8.11.0
+  resolution: "@redocly/ajv@npm:8.11.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+    uri-js: "npm:^4.2.2"
+  checksum: 10/ec2fca2c08715e5618c498ce55884f7703e296deebf93675e3c9ad124caf5fe36f4da04be6729575f80a75e3d09295f7072ce066ed58393ced289e43dd6eabd8
+  languageName: node
+  linkType: hard
+
+"@redocly/config@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@redocly/config@npm:0.6.0"
+  checksum: 10/bde6c0f32e85bf70d7645fccd5332ddee6a4bbb07893bd61cd3c8067eee7b339edb1c1de3cb8b1bbd982ba461ac6e70837a4b9eafb20993cc0fd44dd8e500312
+  languageName: node
+  linkType: hard
+
+"@redocly/openapi-core@npm:1.15.0":
+  version: 1.15.0
+  resolution: "@redocly/openapi-core@npm:1.15.0"
+  dependencies:
+    "@redocly/ajv": "npm:^8.11.0"
+    "@redocly/config": "npm:^0.6.0"
+    colorette: "npm:^1.2.0"
+    js-levenshtein: "npm:^1.1.6"
+    js-yaml: "npm:^4.1.0"
+    lodash.isequal: "npm:^4.5.0"
+    minimatch: "npm:^5.0.1"
+    node-fetch: "npm:^2.6.1"
+    pluralize: "npm:^8.0.0"
+    yaml-ast-parser: "npm:0.0.43"
+  checksum: 10/7234f23d324999fcac38a7a78530cb3c88dcf9289ac331123324f7029ec79b701507de43137d86293273ef6be094ca1b818cf0e0bf0404509bccc1e575589655
+  languageName: node
+  linkType: hard
+
 "@redux-saga/core@npm:^1.0.0":
   version: 1.2.3
   resolution: "@redux-saga/core@npm:1.2.3"
@@ -14642,6 +14682,15 @@ __metadata:
   version: 4.0.4
   resolution: "@types/cucumber@npm:4.0.4"
   checksum: 10/c296941f0e80344c2a752fe21da73865788225e2914c189d875d9bd00dc408e7509e50d3584de9bf954837243fd26fa5f17e90d147dc79614b2b7d8af4a5dbf8
+  languageName: node
+  linkType: hard
+
+"@types/debug@npm:4.1.12":
+  version: 4.1.12
+  resolution: "@types/debug@npm:4.1.12"
+  dependencies:
+    "@types/ms": "npm:*"
+  checksum: 10/47876a852de8240bfdaf7481357af2b88cb660d30c72e73789abf00c499d6bc7cd5e52f41c915d1b9cd8ec9fef5b05688d7b7aef17f7f272c2d04679508d1053
   languageName: node
   linkType: hard
 
@@ -21056,7 +21105,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"colorette@npm:^1.4.0":
+"colorette@npm:^1.2.0, colorette@npm:^1.4.0":
   version: 1.4.0
   resolution: "colorette@npm:1.4.0"
   checksum: 10/c8d6c8c3ef5a99acfc3dd9a68f48019f1479ec347551387e4a1762e40f69e98ce19d4dc321ffb4919d1f28a7bdc90c39d4e9a901f4c474fd2124ad93a00c0454
@@ -22845,6 +22894,18 @@ __metadata:
     supports-color:
       optional: true
   checksum: 10/37b9f90428b65e59eb47f74435a9fc73dcb46b3550e838c0037ac05910f689bd59fd1d4a51154c1df3471a2f3e5926af8880cbe9f9f3b68beb7b2f8197a26f4a
+  languageName: node
+  linkType: hard
+
+"debug@npm:4.3.5":
+  version: 4.3.5
+  resolution: "debug@npm:4.3.5"
+  dependencies:
+    ms: "npm:2.1.2"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10/cb6eab424c410e07813ca1392888589972ce9a32b8829c6508f5e1f25f3c3e70a76731610ae55b4bbe58d1a2fffa1424b30e97fa8d394e49cd2656a9643aedd2
   languageName: node
   linkType: hard
 
@@ -33610,6 +33671,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-levenshtein@npm:^1.1.6":
+  version: 1.1.6
+  resolution: "js-levenshtein@npm:1.1.6"
+  checksum: 10/bb034043fdebab606122fe5b5c0316036f1bb0ea352038af8b0ba4cda4b016303b24f64efb59d9918f66e3680eea97ff421396ff3c153cb00a6f982908f61f8a
+  languageName: node
+  linkType: hard
+
 "js-sdsl@npm:^4.1.4":
   version: 4.4.0
   resolution: "js-sdsl@npm:4.4.0"
@@ -35343,6 +35411,13 @@ __metadata:
   version: 3.0.3
   resolution: "lodash.isboolean@npm:3.0.3"
   checksum: 10/b70068b4a8b8837912b54052557b21fc4774174e3512ed3c5b94621e5aff5eb6c68089d0a386b7e801d679cd105d2e35417978a5e99071750aa2ed90bffd0250
+  languageName: node
+  linkType: hard
+
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: 10/82fc58a83a1555f8df34ca9a2cd300995ff94018ac12cc47c349655f0ae1d4d92ba346db4c19bbfc90510764e0c00ddcc985a358bdcd4b3b965abf8f2a48a214
   languageName: node
   linkType: hard
 
@@ -54079,6 +54154,13 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 10/4cb02b42b8a93b5cf50caf5d8e9beb409400a8a4d85e83bb0685c1457e9ac0b7a00819e9f5991ac25ffabb56a78e2f017c1acc010b3a1babfe6de690ba531abd
+  languageName: node
+  linkType: hard
+
+"yaml-ast-parser@npm:0.0.43":
+  version: 0.0.43
+  resolution: "yaml-ast-parser@npm:0.0.43"
+  checksum: 10/a54d00c8e0716a392c6e76eee965b3b4bba434494196490946e416fc47f20a1d89820461afacd9431edbb8209e28fce33bcff1fb42dd83f90e51fc31e80251c9
   languageName: node
   linkType: hard
 
