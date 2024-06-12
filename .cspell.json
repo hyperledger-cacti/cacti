@@ -153,6 +153,8 @@
     "protos",
     "qscc",
     "recoverupdateackmessage",
+    "redoc",
+    "redocly",
     "rogpeppe",
     "RUSTC",
     "Rwset",
@@ -163,8 +165,8 @@
     "shrn",
     "Smonitor",
     "socketio",
-    "Soroban",
     "soroban",
+    "Soroban",
     "SPDX",
     "Splug",
     "Sprintf",
@@ -193,7 +195,9 @@
     "Xdai",
     "xeipuuv"
   ],
-  "dictionaries": ["typescript,node,npm,go,rust"],
+  "dictionaries": [
+    "typescript,node,npm,go,rust"
+  ],
   "ignorePaths": [
     "**/node_modules/**",
     "**/build/**",
