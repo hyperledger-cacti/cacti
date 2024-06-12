@@ -69,7 +69,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "inputAmount": {
@@ -147,7 +147,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "gas": {
@@ -186,7 +186,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "htlcId": {
