@@ -30,9 +30,10 @@ git rebase upstream/main
 git push --force-with-lease
 git checkout -b release-v1.1.3
 yarn run configure
-yarn lerna version 1.1.3 --ignore-scripts --conventional-commits --exact --git-remote upstream --message="chore(release): publish %s" --no-push --no-git-tag-version --no-ignore-changes --force-publish
-yarn tools:bump-openapi-spec-dep-versions
+yarn lerna version 1.1.3 --ignore-scripts --conventional-commits --exact --git-remote upstream --message="chore(release): publish %s" --no-push --no-git-tag-version --no-ignore-changes
+yarn tools:bump-openapi-spec-dep-versions --target-version=1.1.3
 yarn codegen
+yarn build:dev
 ./tools/weaver-update-version.sh 1.1.3 .
 ./tools/go-gen-checksum.sh 1.1.3 .
 ```
