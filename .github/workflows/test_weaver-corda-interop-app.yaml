@@ -8,13 +8,15 @@
 name: Unit Test Corda Interop App
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
+    
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: corda-interop-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,7 +38,7 @@ jobs:
 
   unit_test_interop_cordapp:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.interop_cordapp_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.interop_cordapp_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4.1.1

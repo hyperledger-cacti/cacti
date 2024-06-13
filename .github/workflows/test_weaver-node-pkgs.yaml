@@ -12,13 +12,14 @@ env:
   NODEJS_NEXT_LTS_VERSION: v20.9.0
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: node-pkg-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -133,6 +134,8 @@ jobs:
       working-directory: weaver/core/identity-management/iin-agent
 
   build-docs:
+    needs: check_code_changed
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.docs_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

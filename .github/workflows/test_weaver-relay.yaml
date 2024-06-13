@@ -5,13 +5,14 @@
 name: Unit Test Relay
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: relay-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -34,7 +35,7 @@ jobs:
 
   unit_test_relay_local:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.relay_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
     runs-on: ubuntu-22.04
     steps:
@@ -87,7 +88,7 @@ jobs:
 
   unit_test_relay_tls_local:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.relay_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
     runs-on: ubuntu-22.04
     steps:

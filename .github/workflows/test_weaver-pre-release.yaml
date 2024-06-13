@@ -5,12 +5,14 @@
 name: Pre-release Test Weaver Module versions
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: pre-release-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -34,7 +36,7 @@ jobs:
 
   test_weaver_pre-release:
     needs: check_release
-    if: needs.check_release.outputs.status == 'continue'
+    if:  inputs.run_all == 'true' || needs.check_release.outputs.status == 'continue'
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -143,7 +145,7 @@ jobs:
 
   test_weaver_go_pre-release:
     needs: check_release
-    if: needs.check_release.outputs.status == 'continue'
+    if:  inputs.run_all == 'true' || needs.check_release.outputs.status == 'continue'
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

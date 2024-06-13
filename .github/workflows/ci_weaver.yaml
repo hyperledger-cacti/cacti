@@ -1,0 +1,67 @@
+name: Weaver_CI
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # run at 1am the first day of every month
+    - cron: "0 1 1 * *"
+
+env:
+  RUN_ALL: "${{github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}"
+
+jobs:
+
+  fabric-fabric-satp:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-fabric-fabric-satp.yaml
+  asset-exchange-corda:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-asset-exchange-corda.yaml
+  asset-transfer:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-asset-transfer.yaml
+  relay:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-relay.yaml
+  corda-interop-app:
+    with: 
+      run_all: $RUN_ALL 
+    uses: ./.github/workflows/test_weaver-corda-interop-app.yaml
+  pre-release:
+    with: 
+      run_all: $RUN_ALL 
+    uses: ./.github/workflows/test_weaver-pre-release.yaml
+  asset-exchange-fabric:
+    with: 
+      run_all: $RUN_ALL 
+    uses: ./.github/workflows/test_weaver-asset-exchange-fabric.yaml
+  data-sharing:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-data-sharing.yaml
+  node-pkgs:
+    with: 
+      run_all: $RUN_ALL 
+    uses: ./.github/workflows/test_weaver-node-pkgs.yaml
+  docker-build:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-docker-build.yaml
+  asset-exchange-besu:
+    with: 
+      run_all: $RUN_ALL 
+    uses: ./.github/workflows/test_weaver-asset-exchange-besu.yaml
+  go:
+    with: 
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-go.yaml
+

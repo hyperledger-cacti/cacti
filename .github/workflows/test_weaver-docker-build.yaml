@@ -8,13 +8,14 @@ env:
   NODEJS_VERSION: v18.18.2
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: docker-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -61,7 +62,7 @@ jobs:
 
   build_docker_relay:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.relay_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
     runs-on: ubuntu-22.04
     steps:
@@ -74,7 +75,7 @@ jobs:
 
   build_docker_fabric_driver_local:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.fabric_driver_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.fabric_driver_changed == 'true'
     # if: ${{ false }}
     runs-on: ubuntu-22.04
     steps:
@@ -126,7 +127,7 @@ jobs:
 
   build_docker_corda_driver_local:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.corda_driver_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.corda_driver_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -186,7 +187,7 @@ jobs:
 
   build_docker_iin_agent_local:
     needs: check_code_changed
-    if: needs.check_code_changed.outputs.iin_agent_changed == 'true'
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.iin_agent_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
