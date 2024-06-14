@@ -87,52 +87,53 @@ Alice knows that Acme Corp. provides digital certificates. She asks Acme Corp. t
      - `asset_trade_indy_all_in_one`
 
 1. Setup Indy credentials:
+
    - Before running the sample application we need to register employment credential and issue it to Alice (user of our app).
    - Use `setup-credentials` script from `cactus-example-discounted-asset-trade-client`.
 
-```bash
-# In separate shell (can be used later for client app)
-cd ./examples/cactus-example-discounted-asset-trade-client
-yarn setup-credentials
-popd
-```
+   ```bash
+   # In separate shell (can be used later for client app)
+   cd ./examples/cactus-example-discounted-asset-trade-client
+   yarn setup-credentials
+   popd
+   ```
 
-- Copy the credential definition ID from the script output into this example application BLP configuration.
+   - Copy the credential definition ID from the script output into this example application BLP configuration.
 
-```bash
-# setup-credentials script output
-Running with log level INFO
-Connecting Alice with Issuer...
-Connecting aliceCactiAgent to issuerCactiAgent...
-Agents connected!
-Register and issue the employment credential...
-Register Credential Schema...
-Register employment certificate credential schema 'cactiJobCert'...
-Employment credential schemaId: did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0
-Register Credential Definition...
-Register job certificate credential definition (schemaId: 'did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0') ...
-# COPY THIS >>
-Employment credential credentialDefinitionId: did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default
-# <<
-Issue the credential...
-Employment credential issued: 7f93ba15-98b2-4667-a7cf-ecec3059e9d4
-Accepting credential eb69032d-ec73-4fa1-bd83-1ff52a0dc4b5...
-Credential accepted!
-Credential was issed and accepted by a peer agent!
-Verify employment status proof...
-Proof request was sent
-Accepting proof 4d03e479-073a-4f51-98e4-befd7ba34345...
-Proof request accepted!
-Requested proof status: done
-Finishing - cleaning up the agents...
-All done.
+     ```bash
+     # setup-credentials script output
+     Running with log level INFO
+     Connecting Alice with Issuer...
+     Connecting aliceCactiAgent to issuerCactiAgent...
+     Agents connected!
+     Register and issue the employment credential...
+     Register Credential Schema...
+     Register employment certificate credential schema 'cactiJobCert'...
+     Employment credential schemaId: did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0
+     Register Credential Definition...
+     Register job certificate credential definition (schemaId: 'did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0') ...
+     # COPY THIS >>
+     Employment credential credentialDefinitionId: did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default
+     # <<
+     Issue the credential...
+     Employment credential issued: 7f93ba15-98b2-4667-a7cf-ecec3059e9d4
+     Accepting credential eb69032d-ec73-4fa1-bd83-1ff52a0dc4b5...
+     Credential accepted!
+     Credential was issed and accepted by a peer agent!
+     Verify employment status proof...
+     Proof request was sent
+     Accepting proof 4d03e479-073a-4f51-98e4-befd7ba34345...
+     Proof request accepted!
+     Requested proof status: done
+     Finishing - cleaning up the agents...
+     All done.
 
-# Replace __CREDENTIAL_DEFINITION_ID__ in config file with actual credentialDefinitionId
-sed -i 's#__CREDENTIAL_DEFINITION_ID__#did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default#g' "./etc/cactus/usersetting.yaml"
+     # Replace __CREDENTIAL_DEFINITION_ID__ in config file with actual credentialDefinitionId
+     sed -i 's#__CREDENTIAL_DEFINITION_ID__#did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default#g' "./etc/cactus/usersetting.yaml"
 
-# ... or do it manually in text editor
-vim ./etc/cactus/usersetting.yaml
-```
+     # ... or do it manually in text editor
+     vim ./etc/cactus/usersetting.yaml
+     ```
 
 1. Launch discounted-asset-trade and validators from local `docker-compose.yml` (use separate console for that, docker-compose will block your prompt):
 
@@ -167,177 +168,179 @@ For development purposes, it might be useful to run the sample application outsi
 
 - Use `run-discounted-asset-trade-client` script from `cactus-example-discounted-asset-trade-client` to interact with this application.
 
-```bash
-# In separat shell
-cd ./examples/cactus-example-discounted-asset-trade-client
-yarn run-discounted-asset-trade-client
+  ```bash
+  # In separat shell
+  cd ./examples/cactus-example-discounted-asset-trade-client
+  yarn run-discounted-asset-trade-client
 
-# Sample output
-Running with log level INFO
-Connected to the discounted asset trade sample app agent! ID: 19949a1e-0ef6-449b-9c37-256449258b51
-Action: (Use arrow keys)
-❯ Start the trade
-  Get this agent credentials
-  Get assets
-  Exit
-```
+  # Sample output
+  Running with log level INFO
+  Connected to the discounted asset trade sample app agent! ID: 19949a1e-0ef6-449b-9c37-256449258b51
+  Action: (Use arrow keys)
+  ❯ Start the trade
+    Get this agent credentials
+    Get assets
+    Exit
+  ```
 
 1. (Optional) Check credentials in Alice wallet by selecting `Get this agent credentials`.
 
-```bash
-Action: Get this agent credentials
-[
-  {
-    "id": "eb69032d-ec73-4fa1-bd83-1ff52a0dc4b5",
-    "schemaId": "did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0",
-    # Note: This credential matches one we'll be requesting in discounted asset trade example
-    "credentialDefinitionId": "did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default",
-    "connectionId": "32134b50-a245-4de5-8408-f35fcb069373",
-    "credentials": [
-      {
-        "credentialRecordType": "anoncreds",
-        "credentialRecordId": "dd6aba0c-8674-451d-a063-a630004be1dd"
-      }
-    ],
-    "credentialAttributes": [
-      {
-        "mime-type": "text/plain",
-        "name": "first_name",
-        "value": "Alice"
-      },
-      {
-        "mime-type": "text/plain",
-        "name": "last_name",
-        "value": "Garcia"
-      },
-      {
-        "mime-type": "text/plain",
-        "name": "salary",
-        "value": "2400"
-      },
-      {
-        "mime-type": "text/plain",
-        "name": "employee_status",
-        # Note: Alice is a permanent employee
-        "value": "Permanent"
-      },
-      {
-        "mime-type": "text/plain",
-        "name": "experience",
-        "value": "10"
-      }
-    ]
-  }
-]
-```
+   ```bash
+   Action: Get this agent credentials
+   [
+     {
+       "id": "eb69032d-ec73-4fa1-bd83-1ff52a0dc4b5",
+       "schemaId": "did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/SCHEMA/cactiJobCert/1.0.0",
+       # Note: This credential matches one we'll be requesting in discounted asset trade example
+       "credentialDefinitionId": "did:indy:cacti:test:Th7MpTaRZVRYnPiabds81Y/anoncreds/v0/CLAIM_DEF/11/default",
+       "connectionId": "32134b50-a245-4de5-8408-f35fcb069373",
+       "credentials": [
+         {
+           "credentialRecordType": "anoncreds",
+           "credentialRecordId": "dd6aba0c-8674-451d-a063-a630004be1dd"
+         }
+       ],
+       "credentialAttributes": [
+         {
+           "mime-type": "text/plain",
+           "name": "first_name",
+           "value": "Alice"
+         },
+         {
+           "mime-type": "text/plain",
+           "name": "last_name",
+           "value": "Garcia"
+         },
+         {
+           "mime-type": "text/plain",
+           "name": "salary",
+           "value": "2400"
+         },
+         {
+           "mime-type": "text/plain",
+           "name": "employee_status",
+           # Note: Alice is a permanent employee
+           "value": "Permanent"
+         },
+         {
+           "mime-type": "text/plain",
+           "name": "experience",
+           "value": "10"
+         }
+       ]
+     }
+   ]
+   ```
 
 1. (Optional) Check the balance on Ethereum and the asset ownership on Fabric by selecting `Get assets`.
 
-```bash
-Action: Get assets
+   ```bash
+   Action: Get assets
 
-# Ethereum fromAccount:
-1.00005515e+26
+   # Ethereum fromAccount:
+   1.00005515e+26
 
-# Ethereum escrowAccount:
-0
+   # Ethereum escrowAccount:
+   0
 
-# Ethereum toAccount:
-0
+   # Ethereum toAccount:
+   0
 
-# Fabric:
-[
-   {
-      ...
-   },
-   {
-      ID: 'asset2',
-      color: 'red',
-      size: 5,
-      owner: 'Brad',
-      appraisedValue: 400
-   },
-   ...
-]
-```
+   # Fabric:
+   [
+     {
+         ...
+     },
+     {
+         ID: 'asset2',
+         color: 'red',
+         size: 5,
+         owner: 'Brad',
+         appraisedValue: 400
+     },
+     ...
+   ]
+   ```
 
 1. Run the transaction execution by selecting `Start the trade`
 
-```bash
-Action: Start the trade
-Trade request sent! Response: { tradeID: '20231103185232057-001' }
-```
+   ```bash
+   Action: Start the trade
+   Trade request sent! Response: { tradeID: '20231103185232057-001' }
+   ```
 
 1. (Optional) Check the final balance on Ethereum and the asset ownership on Fabric by selecting `Get assets`.
 
-```bash
-Action: Get assets
+   ```bash
+   Action: Get assets
 
-# Ethereum fromAccount:
-1.000057e+26
+   # Ethereum fromAccount:
+   1.000057e+26
 
-# Ethereum escrowAccount:
-0
+   # Ethereum escrowAccount:
+   0
 
-# Ethereum toAccount:
-25
+   # Ethereum toAccount:
+   25
 
-# Fabric:
-[
-   {
-      ...
-   },
-   {
-      ID: 'asset2',
-      color: 'red',
-      size: 5,
-      owner: 'Cathy',
-      appraisedValue: 400
-   },
-   ...
-]
+   # Fabric:
+   [
+     {
+         ...
+     },
+     {
+         ID: 'asset2',
+         color: 'red',
+         size: 5,
+         owner: 'Cathy',
+         appraisedValue: 400
+     },
+     ...
+   ]
+   ```
 
 ## How to stop the application and Docker containers
 
 1. Press `Ctrl+C` in `docker-compose` console to stop the application.
 1. Run cleanup script
-```
 
-sudo ./script-cleanup.sh # for root owned files
-./script-cleanup.sh # for user owner files
+   ```
 
-```
+   sudo ./script-cleanup.sh # for root owned files
+   ./script-cleanup.sh # for user owner files
+
+   ```
 
 #### Manual cleanup instructions
 
 1. Remove the config files on your machine
-```
 
-sudo rm -r ./etc/cactus/
+   ```
 
-```
+   sudo rm -r ./etc/cactus/
+
+   ```
+
 1. Stop the docker containers of Ethereum, Fabric and Indy
 
-- `docker stop geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
-- `docker rm geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
+   - `docker stop geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
+   - `docker rm geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
 
 1. Clear indy-all-in-one
 
-```
+   ```
 
-pushd ../../tools/docker/indy-all-in-one/
-./script-cleanup.sh
-popd
+   pushd ../../tools/docker/indy-all-in-one/
+   ./script-cleanup.sh
+   popd
 
-```
+   ```
 
 1. Remove geth files
-```
 
-pushd ../../tools/docker/geth-testnet/
-rm -fr ./data-geth1/geth/
-popd
+   ```
 
-```
-
-```
+   pushd ../../tools/docker/geth-testnet/
+   rm -fr ./data-geth1/geth/
+   popd
+   ```
