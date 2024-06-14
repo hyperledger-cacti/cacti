@@ -60,7 +60,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | b
     npm install --location=global yarn && \
     yarn config set nodeLinker node-modules && \
     yarn set version 4.1.0 && \
-    yarn add @hyperledger/cactus-cmd-api-server@2.0.0-alpha.2
+    yarn add @hyperledger/cactus-cmd-api-server@2.0.0-rc.1
 
 COPY ./packages/cactus-cmd-api-server/docker-entrypoint.sh /usr/local/bin/
 HEALTHCHECK --interval=5s --timeout=5s --start-period=1s --retries=30 CMD /healthcheck.sh

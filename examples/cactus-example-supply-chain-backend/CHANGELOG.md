@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
+
+### Bug Fixes
+
+* **security:** address CVE-2021-3749 - axios >=0.22.0 ([61fc700](https://github.com/hyperledger/cacti/commit/61fc7001b1dd0849ab1d9bcab08e2475c695adae))
+* **security:** remediate qs vulnerability CVE-2022-24999 ([536b6b1](https://github.com/hyperledger/cacti/commit/536b6b1b7ab9014ebcd6b162e1a467e78b52afdd))
+
+### Features
+
+* **connector-fabric:** drop support for Fabric v1.x ([ec8123c](https://github.com/hyperledger/cacti/commit/ec8123cf954b09ba8cb213c7332dfe82224c351f))
+
+### BREAKING CHANGES
+
+* **connector-fabric:** The Open API specification that has the enums for
+ledger versions will no longer have an option for Fabric v1.x
+This means that in the core-api package the LedgerType enum has changes
+which means that code that depends on that enum value will need to be
+updated.
+
+Fabric v1.x has had unmaintained dependencies associated with it such as
+the native grpc package that stopped receiving security updates years ago
+and therefore it's dangerous to have around.
+
+There are also some issues with Fabric v1.x that make the AIO image flaky
+which also makes the relevant tests flaky due to which we couldn't run
+the v1.x Fabric tests on the CI for a while now anyway.
+
+In order to reduce the CI resource usage and our own maintenance burden
+I suggest that we get rid of the Fabric v1.x support meaning that we can
+eliminate the AIO image build and some code complexity from the test ledger
+code as well.
+
+In addition some old fixtures can be removed that the tests were using.
+Overall a net-positive as deleting code without losing functionality (that
+we care about) is always a plus.
+
+Signed-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>
+
 # [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
 
 ### Bug Fixes

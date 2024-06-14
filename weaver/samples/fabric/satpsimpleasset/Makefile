@@ -2,7 +2,7 @@ run-vendor:
 	go mod edit -replace github.com/hyperledger/cacti/weaver/common/protos-go/v2=../../../common/protos-go/
 	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2=../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/
 	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils=../../../core/network/fabric-interop-cc/libs/testutils/
-	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils=../../../core/network/fabric-interop-cc/libs/utils/
+	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2=../../../core/network/fabric-interop-cc/libs/utils/
 	go mod vendor
 
 undo-vendor:
@@ -10,7 +10,7 @@ undo-vendor:
 	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/common/protos-go/v2
 	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2
 	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils
-	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2
 
 build-local: run-vendor build undo-vendor
 	

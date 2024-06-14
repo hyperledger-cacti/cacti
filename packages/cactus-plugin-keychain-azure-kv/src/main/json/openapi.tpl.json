@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus - Keychain API",
     "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
-    "version": "v2.0.0-alpha.2",
+    "version": "2.0.0-rc.1",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"

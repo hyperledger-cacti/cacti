@@ -6,7 +6,7 @@ additionalProperties:
   artifactId: cactus-connector-corda-server
   # TODO: Make sure this automatically gets bumped during releases so that it
   # remains in sync with the package.json version number.
-  artifactVersion: 2.0.0-alpha.2
+  artifactVersion: 2.0.0-rc.1
   apiSuffix: PluginLedgerConnectorCorda
   basePackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server
   packageName: org.hyperledger.cactus.plugin.ledger.connector.corda.server

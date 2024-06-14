@@ -1,6 +1,6 @@
 [package]
 name = "cacti_weaver_protos_rs"
-version = "2.0.0-alpha.2"
+version = "2.0.0-rc.1"
 authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
 edition = "2021"
 license = "Apache-2.0"

@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2
+	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.1
 	github.com/hyperledger/fabric-contract-api-go v1.1.1
 	github.com/hyperledger/fabric-protos-go v0.3.3
 	github.com/sirupsen/logrus v1.8.1

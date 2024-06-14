@@ -38,6 +38,6 @@ and then follow above 4 steps.
 5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
-	compile(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.0.0-alpha.2")
+	compile(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.0.0-rc.1")
 }
 ```

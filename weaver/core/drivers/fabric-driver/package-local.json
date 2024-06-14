@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-driver-fabric",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "",
   "repository": {
     "type": "git",

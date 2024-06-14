@@ -4,7 +4,7 @@
     <artifactId>cactus-connector-corda-server</artifactId>
     <packaging>jar</packaging>
     <name>cactus-connector-corda-server</name>
-    <version>2.0.0-alpha.2</version>
+    <version>2.0.0-rc.1</version>
     <properties>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <jakarta-annotation.version>2.1.0</jakarta-annotation.version>

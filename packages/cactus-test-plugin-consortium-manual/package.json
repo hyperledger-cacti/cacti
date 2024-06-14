@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-consortium-manual",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "Integration tests for the Quorum ledger and the API server.",
   "keywords": [
     "Hyperledger",
@@ -50,12 +50,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.2",
-    "@hyperledger/cactus-common": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.1",
+    "@hyperledger/cactus-common": "2.0.0-rc.1",
+    "@hyperledger/cactus-core": "2.0.0-rc.1",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.1",
     "axios": "1.6.0",
     "jose": "4.15.5"
   },

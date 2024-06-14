@@ -10,12 +10,12 @@ By default a [`pom.xml`](pom.xml) file will be generated. If you specified `grad
 
 To build the project using maven, run:
 ```bash
-mvn package && java -jar target/cactus-connector-corda-server-2.0.0-alpha.2.jar
+mvn package && java -jar target/cactus-connector-corda-server-2.0.0-rc.1.jar
 ```
 
 To build the project using gradle, run:
 ```bash
-gradle build && java -jar build/libs/cactus-connector-corda-server-2.0.0-alpha.2.jar
+gradle build && java -jar build/libs/cactus-connector-corda-server-2.0.0-rc.1.jar
 ```
 
 If all builds successfully, the server should run on [http://localhost:8080/](http://localhost:8080/)

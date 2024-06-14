@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cacti Plugin - Connector Ethereum",
     "description": "Can perform basic tasks on a Ethereum ledger",
-    "version": "v2.0.0-alpha.2",
+    "version": "2.0.0-rc.1",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"

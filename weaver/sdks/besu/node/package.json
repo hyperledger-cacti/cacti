@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-sdk-besu",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-rc.1",
     "log4js": "6.9.1",
     "web3": "1.10.0",
     "web3-utils": "1.10.0"
