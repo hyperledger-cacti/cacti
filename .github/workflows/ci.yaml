@@ -959,8 +959,7 @@ jobs:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/unit/plugin-keychain-memory-wasm.test.ts
-      TAPE_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
