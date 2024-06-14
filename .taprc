@@ -16,7 +16,6 @@ files:
   - ./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts
   - ./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation.test.ts
   - ./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts
-  - ./packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/unit/plugin-keychain-memory-wasm.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts
   - ./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts

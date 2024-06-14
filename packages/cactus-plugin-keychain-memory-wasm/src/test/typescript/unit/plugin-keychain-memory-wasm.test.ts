@@ -1,76 +1,81 @@
-import test, { Test } from "tape-promise/tape";
-
-import express from "express";
 import bodyParser from "body-parser";
+import express from "express";
 import http from "http";
+import "jest-extended";
 import { AddressInfo } from "net";
+import { v4 as uuidv4 } from "uuid";
 
 import { Bools, IListenOptions, Servers } from "@hyperledger/cactus-common";
 
-import { v4 as uuidv4 } from "uuid";
-import { Configuration } from "@hyperledger/cactus-core-api";
-
 import {
-  IPluginKeychainMemoryWasmOptions,
-  PluginKeychainMemoryWasm,
-} from "../../../main/typescript";
-
-import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api";
+  Configuration,
+  DefaultApi as KeychainMemoryApi,
+} from "../../../main/typescript/public-api";
 import { wasm } from "../../../main/typescript/public-api";
 
-test("PluginKeychainMemory", (t1: Test) => {
-  t1.doesNotThrow(
-    () =>
-      new PluginKeychainMemoryWasm({
-        instanceId: "a",
-        keychainId: "a",
-        wasmPlugin: {} as PluginKeychainMemoryWasm,
-      }),
-  );
+import { PluginKeychainMemoryWasm } from "../../../main/typescript";
+import { IPluginKeychainMemoryWasmOptions } from "../../../main/typescript/public-api";
 
-  test("Validates constructor arg instanceId", (t: Test) => {
-    t.throws(
+describe("PluginKeychainMemoryWasm", () => {
+  let server: http.Server;
+  afterAll(async () => {
+    await Servers.shutdown(server);
+  });
+  it("should not throw when creating a valid instance", () => {
+    expect(
       () =>
         new PluginKeychainMemoryWasm({
-          instanceId: null as unknown as string,
-          keychainId: "valid-value",
+          instanceId: "a",
+          keychainId: "a",
           wasmPlugin: {} as PluginKeychainMemoryWasm,
         }),
-    );
-    t.throws(
-      () =>
-        new PluginKeychainMemoryWasm({
-          instanceId: "",
-          keychainId: "valid-value",
-          wasmPlugin: {} as PluginKeychainMemoryWasm,
-        }),
-    );
-    t.end();
+    ).not.toThrow();
   });
 
-  test("Validates constructor arg keychainId", (t: Test) => {
-    t.throws(
-      () =>
-        new PluginKeychainMemoryWasm({
-          instanceId: "valid-value",
-          keychainId: null as unknown as string,
-          wasmPlugin: {} as PluginKeychainMemoryWasm,
-        }),
-    );
-    t.throws(
-      () =>
-        new PluginKeychainMemoryWasm({
-          instanceId: "valid-value",
-          keychainId: "",
-          wasmPlugin: {} as PluginKeychainMemoryWasm,
-        }),
-    );
-    t.end();
+  describe("constructor argument validation", () => {
+    it("throws for null or empty instanceId", () => {
+      expect(
+        () =>
+          new PluginKeychainMemoryWasm({
+            instanceId: null as unknown as string,
+            keychainId: "valid-value",
+            wasmPlugin: {} as PluginKeychainMemoryWasm,
+          }),
+      ).toThrow();
+      expect(
+        () =>
+          new PluginKeychainMemoryWasm({
+            instanceId: "",
+            keychainId: "valid-value",
+            wasmPlugin: {} as PluginKeychainMemoryWasm,
+          }),
+      ).toThrow();
+    });
+
+    it("throws for null or empty keychainId", () => {
+      expect(
+        () =>
+          new PluginKeychainMemoryWasm({
+            instanceId: "valid-value",
+            keychainId: null as unknown as string,
+            wasmPlugin: {} as PluginKeychainMemoryWasm,
+          }),
+      ).toThrow();
+      expect(
+        () =>
+          new PluginKeychainMemoryWasm({
+            instanceId: "valid-value",
+            keychainId: "",
+            wasmPlugin: {} as PluginKeychainMemoryWasm,
+          }),
+      ).toThrow();
+    });
   });
 
-  test("get,set,has,delete alters state as expected", async (t: Test) => {
-    const instanceId = uuidv4();
-    const keychainId = uuidv4();
+  it("get, set, has, delete alters state as expected", async () => {
+    const instanceId = await uuidv4(); // Assuming uuidv4 is available
+    const keychainId = await uuidv4();
+
     const pluginFactory = await wasm.createPluginFactory();
     const pluginWasm = await pluginFactory.create({
       instanceId,
@@ -85,14 +90,13 @@ test("PluginKeychainMemory", (t1: Test) => {
 
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
+    server = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
       port: 0,
       server,
     };
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
     const { address, port } = addressInfo;
     const apiHost = `http://${address}:${port}`;
 
@@ -101,50 +105,40 @@ test("PluginKeychainMemory", (t1: Test) => {
 
     await plugin.registerWebServices(expressApp);
 
-    t.equal(plugin.getKeychainId(), options.keychainId, "Keychain ID set OK");
-    t.equal(plugin.getInstanceId(), options.instanceId, "Instance ID set OK");
+    expect(plugin.getKeychainId()).toBe(options.keychainId);
+    expect(plugin.getInstanceId()).toBe(options.instanceId);
 
-    const key1 = uuidv4();
-    const value1 = uuidv4();
+    const key1 = await uuidv4();
+    const value1 = await uuidv4();
 
     const hasPriorRes = await apiClient.hasKeychainEntryV1({ key: key1 });
-    t.ok(hasPriorRes, "hasPriorRes truthy OK");
-    t.ok(hasPriorRes.data, "hasPriorRes.data truthy OK");
-    t.true(
-      Bools.isBooleanStrict(hasPriorRes.data.isPresent),
-      "hasPriorRes.data.isPresent strictly boolean OK",
-    );
+    expect(hasPriorRes).toBeTruthy();
+    expect(hasPriorRes.data).toBeTruthy();
+    expect(Bools.isBooleanStrict(hasPriorRes.data.isPresent)).toBeTrue();
 
-    const hasPrior = hasPriorRes.data.isPresent;
-    t.false(hasPrior, "hasPrior === false OK");
+    expect(hasPriorRes.data.isPresent).toBeFalsy();
 
     await plugin.set(key1, value1);
 
-    const hasAfter1 = await plugin.has(key1);
-    t.true(hasAfter1, "hasAfter === true OK");
+    expect(await plugin.has(key1)).toBeTruthy();
 
     const valueAfter1 = await plugin.get(key1);
-    t.ok(valueAfter1, "valueAfter truthy OK");
-    t.equal(valueAfter1, value1, "valueAfter === value OK");
+    expect(valueAfter1).toBeTruthy();
+    expect(valueAfter1).toBe(value1);
 
     await plugin.delete(key1);
 
-    const hasAfterDelete1 = await plugin.has(key1);
-    t.false(hasAfterDelete1, "hasAfterDelete === false OK");
+    expect(await plugin.has(key1)).toBeFalsy();
 
-    const key2 = uuidv4();
-    const value2 = uuidv4();
+    const key2 = await uuidv4();
+    const value2 = await uuidv4();
 
     await plugin.set(key2, value2);
 
-    const hasAfter = await plugin.has(key2);
-    t.true(hasAfter, "hasAfter === true OK");
+    expect(await plugin.has(key2)).toBeTruthy();
 
     const valueAfter2 = await plugin.get(key2);
-    t.ok(valueAfter2, "valueAfter truthy OK");
-    t.equal(valueAfter2, value2, "valueAfter === value OK");
-    t.end();
+    expect(valueAfter2).toBeTruthy();
+    expect(valueAfter2).toBe(value2);
   });
-
-  t1.end();
 });
