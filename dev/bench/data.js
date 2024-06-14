@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718354336695,
+  "lastUpdate": 1718354918689,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -314,6 +314,37 @@ window.BENCHMARK_DATA = {
             "range": "±1.52%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "c18b3fc6b119785f2c92359d89b33b4fb92bd863",
+          "message": "build: unpin OpenAPI specs from v2.0.0-alpha.2 URL refs, use REMOTE\n\nOn a high level this is a find & replace operation where the occurrences of the\nfirst bullet point were replaced with the second bullet point:\n* `\"$ref\": \"https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2`\n* `\"$ref\": \"../../../../..`\n\nThe firs bullet point above is called a URL reference while the second one is\ncalled a REMOTE references (remote as in a different spec file on the file-system).\n\n1. With this change, we unlock the release process being able to issue code that\nis working on the latest OpenAPI specifications that we are cross-referencing\nfrom one package to another.\n2. Previously you had to manually update the references in about a hundred\nand fifty locations to make sure that the versions are bumped but after this\nchange this happens automatically as the newly introduced bundling process\nand the usage of the REMOTE references instead of URL references.\n3. The problem so far with the release process was that with the URL references\nwe dependended on the existence of a pushed git tag for a successful release build.\nBut we cannot git push the tag before having performed a successful release build,\nso this was a chicken-egg problem that had to be somehow untangled from its\ncircular dependency hell and this change is what makes it happen by no longer\ndepending on the git tags having been pushed to the upstream repository.\n\nRelated to, but does not yet fix: https://github.com/hyperledger/cacti/issues/2175\n\nDepends on #3288\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-06-14T01:28:00-07:00",
+          "tree_id": "7b4ece36c7176aa4c7e8f0cfd4f3e493a0b498f4",
+          "url": "https://github.com/hyperledger/cacti/commit/c18b3fc6b119785f2c92359d89b33b4fb92bd863"
+        },
+        "date": 1718354915797,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 681,
+            "range": "±2.65%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
           }
         ]
       }
