@@ -8,16 +8,27 @@ on:
   push:
     branches:
       - main
+
     paths:
       - 'docs/**'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  
+env:
+  SITE_URL: https://${{ github.repository_owner }}.github.io/cacti
+  NODEJS_VERSION: v18.18.2
+
 
 jobs:
   deploy-docs:
     runs-on: ubuntu-22.04
     steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
       
@@ -30,6 +41,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         working-directory: docs
+
+      - name: Build packages
+        run: npm run configure
+
+      - name: Build markdown for openapi specs
+        run: 'python3 docs/scripts/publish_openapi.py'
         
       - name: Build and publish
         run: git pull && mkdocs gh-deploy

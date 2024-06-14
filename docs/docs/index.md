@@ -29,6 +29,7 @@ Client libraries and examples are provided in the following languages: JavaScrip
 * [Weaver RFCs](https://github.com/hyperledger/cacti/tree/main/weaver/rfcs)
 * [Running pipelines with Cactus packages](./cactus/)
 * [Running pipelines with Weaver packages](./weaver/)
+* [Open API Specifications](./references/openapi/index.md)
 
 !!! note
 
