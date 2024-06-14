@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
+
+### Bug Fixes
+
+* **weaver-fabric-node-sdk:** made AES key length configurable in ECIES functions ([e679801](https://github.com/hyperledger/cacti/commit/e67980141d2fb2e54ef8408e36dbab55b7195905))
+* **weaver-membership-functions:** reverted earlier buggy change affecting identity mgmt ([faf90dd](https://github.com/hyperledger/cacti/commit/faf90ddbe9c061cd6261d642842ab12ae4be3c48))
+* **weaver-satp:** bug and configuration fixes in relays and Fabric drivers for sample SATP implementation ([9f77871](https://github.com/hyperledger/cacti/commit/9f77871419712bacc623dd9fbbe40f6016f0a94f))
+* **weaver:** usage of weak PRNG issue ([fa17b52](https://github.com/hyperledger/cacti/commit/fa17b52d641345a6ffc3ff6b0845be75202dc945)), closes [#2765](https://github.com/hyperledger/cacti/issues/2765)
+
+### Features
+
+* **satp:** sample implementation of SATP standard using relays ([c23197c](https://github.com/hyperledger/cacti/commit/c23197c314885b99146b52c3cd0e056439193d6e))
+* **weaver-go:** upgraded Weaver Fabric Go SDK with membership functions ([43cce8e](https://github.com/hyperledger/cacti/commit/43cce8e3778a574514d2759c282a7f0108be86b5))
+* **weaver:** add build script and fix minor issues ([6d4fd00](https://github.com/hyperledger/cacti/commit/6d4fd00d457d3a72017a7cd8d4a9cf3fb4d5f37e))
+
 # [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
 
 ### Features

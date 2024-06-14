@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-fabric",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "Allows Cactus nodes to connect to a Fabric ledger.",
   "keywords": [
     "Hyperledger",
@@ -56,9 +56,9 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@hyperledger/cactus-common": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-rc.1",
+    "@hyperledger/cactus-core": "2.0.0-rc.1",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.1",
     "axios": "1.6.0",
     "bl": "5.0.0",
     "bn.js": "4.12.0",
@@ -90,8 +90,8 @@
     "ws-identity-client": "1.0.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.1",
     "@types/bn.js": "5.1.0",
     "@types/body-parser": "1.19.4",
     "@types/elliptic": "6.4.16",

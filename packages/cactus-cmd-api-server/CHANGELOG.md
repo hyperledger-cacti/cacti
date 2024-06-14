@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
+
+### Bug Fixes
+
+* **cmd-api-server:** add runtime type validation to HTTP verbs pulled from OAS ([b0ff599](https://github.com/hyperledger/cacti/commit/b0ff599b2c32b83d7d45c41ef215372044ccda23)), closes [#2751](https://github.com/hyperledger/cacti/issues/2751) [#2751](https://github.com/hyperledger/cacti/issues/2751) [#2751](https://github.com/hyperledger/cacti/issues/2751) [#2754](https://github.com/hyperledger/cacti/issues/2754)
+* **cmd-api-server:** address CVE-2022-25881 ([81da333](https://github.com/hyperledger/cacti/commit/81da3334d8e638f85e398dd228bcef836a278230)), closes [#2862](https://github.com/hyperledger/cacti/issues/2862)
+* **cmd-api-server:** healthcheck broken due to missing wget binary ([8f1ca3f](https://github.com/hyperledger/cacti/commit/8f1ca3fcce9fedaedd4ceafbb51d8e8cd41cc50e)), closes [#2894](https://github.com/hyperledger/cacti/issues/2894)
+* **security:** address CVE-2021-3749 - axios >=0.22.0 ([61fc700](https://github.com/hyperledger/cacti/commit/61fc7001b1dd0849ab1d9bcab08e2475c695adae))
+* **security:** remediate qs vulnerability CVE-2022-24999 ([536b6b1](https://github.com/hyperledger/cacti/commit/536b6b1b7ab9014ebcd6b162e1a467e78b52afdd))
+
+### Features
+
+* **cactus-plugin-ledger-connector-ethereum:** update web3js to 4.X ([55f82c9](https://github.com/hyperledger/cacti/commit/55f82c9568b3e875de4f3ceb89a828f8b23d65be)), closes [#2580](https://github.com/hyperledger/cacti/issues/2580) [#2535](https://github.com/hyperledger/cacti/issues/2535) [#2578](https://github.com/hyperledger/cacti/issues/2578)
+* **cmd-api-server:** add ConnectRPC auto-registration for plugins ([c569460](https://github.com/hyperledger/cacti/commit/c569460b099469184a7953ffc0f806ddf3facb38))
+* **cmd-api-server:** add gRPC plugin auto-registration support ([5762dad](https://github.com/hyperledger/cacti/commit/5762dadfe108c6c73251d5b474961e4888941b90))
+
+### Performance Improvements
+
+* **cmd-api-server:** add demonstration of continuous benchmarking ([0804bab](https://github.com/hyperledger/cacti/commit/0804bab4c9b43f2e22be6d77be127415a9a0532f))
+
 # [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
 
 ### Bug Fixes

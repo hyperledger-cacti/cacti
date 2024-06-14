@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
-	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2
+	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.1
 	github.com/hyperledger/fabric-admin-sdk v0.0.0
 	github.com/hyperledger/fabric-gateway v1.2.1
 	github.com/hyperledger/fabric-protos-go v0.3.3

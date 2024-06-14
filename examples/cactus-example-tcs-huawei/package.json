@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-tcs-huawei",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "license": "Apache-2.0",
   "main": "dist/www.js",
   "module": "dist/www.js",
@@ -12,9 +12,9 @@
     "start": "docker-compose build && docker-compose up"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
-    "@hyperledger/cactus-verifier-client": "2.0.0-alpha.2",
+    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-rc.1",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.1",
+    "@hyperledger/cactus-verifier-client": "2.0.0-rc.1",
     "@types/node": "18.11.9",
     "@types/uuid": "9.0.8",
     "body-parser": "1.20.2",

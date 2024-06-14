@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
+
+### Features
+
+* **cactus-plugin-ledger-connector-fabric-socketio:** remove fabric-socketio connector ([704e201](https://github.com/hyperledger/cactus/commit/704e201d6bd6bf7a38f0de7da60723118e18cea7)), closes [#2644](https://github.com/hyperledger/cactus/issues/2644)
+* **cactus-plugin-ledger-connector-iroha:** remove deprecated iroha connector ([fa27fde](https://github.com/hyperledger/cactus/commit/fa27fde9a28f83ff29964693be656dc107046517)), closes [#3159](https://github.com/hyperledger/cactus/issues/3159) [#3155](https://github.com/hyperledger/cactus/issues/3155)
+* **cactus-plugin-ledger-connector-sawtooth:** add new connector plugin ([e379504](https://github.com/hyperledger/cactus/commit/e37950403636a3fbc378fc7462b886294e6c7923))
+
 # [2.0.0-alpha.2](https://github.com/hyperledger/cactus/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
 
 ### Bug Fixes

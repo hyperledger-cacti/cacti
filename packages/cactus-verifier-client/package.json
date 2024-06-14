@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-verifier-client",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "Verifier cactus client library to communicate with validators through socket.io",
   "keywords": [
     "Hyperledger",
@@ -42,18 +42,18 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha.2",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.2"
+    "@hyperledger/cactus-common": "2.0.0-rc.1",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-corda": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.0.0-alpha.2",
+    "@hyperledger/cactus-api-client": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-corda": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-rc.1",
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.0.0-rc.1",
     "jest-extended": "4.0.1",
     "rxjs": "7.8.1"
   },

@@ -39,7 +39,7 @@ RUN source ~/.bashrc && \
     npm install --location=global yarn && \
     yarn config set nodeLinker node-modules && \
     yarn set version 4.1.0 && \
-    yarn add @hyperledger/cactus-example-carbon-accounting-backend@2.0.0-alpha.2
+    yarn add @hyperledger/cactus-example-carbon-accounting-backend@2.0.0-rc.1
     
 SHELL ["/bin/bash", "--login", "-c"]
 

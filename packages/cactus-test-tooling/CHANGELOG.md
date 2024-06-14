@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
+
+### Bug Fixes
+
+* **indy-vdr-nodejs:** update dependency version ([f81b46b](https://github.com/hyperledger/cactus/commit/f81b46bce5ca0880e6bf6b51be2233e2616759a5))
+* **security:** address CVE-2021-3749 - axios >=0.22.0 ([61fc700](https://github.com/hyperledger/cactus/commit/61fc7001b1dd0849ab1d9bcab08e2475c695adae))
+
+### Features
+
+* **cactus-plugin-ledger-connector-iroha:** remove deprecated iroha connector ([fa27fde](https://github.com/hyperledger/cactus/commit/fa27fde9a28f83ff29964693be656dc107046517)), closes [#3159](https://github.com/hyperledger/cactus/issues/3159) [#3155](https://github.com/hyperledger/cactus/issues/3155)
+* **connector-fabric:** drop support for Fabric v1.x ([ec8123c](https://github.com/hyperledger/cactus/commit/ec8123cf954b09ba8cb213c7332dfe82224c351f))
+* **connector-polkadot:** add connector pkg, openapi specs, test suite ([6a476a0](https://github.com/hyperledger/cactus/commit/6a476a0f1143380d2fd6bf81c68b0842c13c6ae2))
+* **indy-test-ledger:** add helper class for indy ledger ([8c746c3](https://github.com/hyperledger/cactus/commit/8c746c331564e76e8619c5c6987cd9380ce4a13f)), closes [#2861](https://github.com/hyperledger/cactus/issues/2861)
+* **test-tooling:** add Stellar test ledger ([58fa94e](https://github.com/hyperledger/cactus/commit/58fa94e194f7716934e717a0e3075773ebd31b4c)), closes [#3239](https://github.com/hyperledger/cactus/issues/3239)
+
+### BREAKING CHANGES
+
+* **connector-fabric:** The Open API specification that has the enums for
+ledger versions will no longer have an option for Fabric v1.x
+This means that in the core-api package the LedgerType enum has changes
+which means that code that depends on that enum value will need to be
+updated.
+
+Fabric v1.x has had unmaintained dependencies associated with it such as
+the native grpc package that stopped receiving security updates years ago
+and therefore it's dangerous to have around.
+
+There are also some issues with Fabric v1.x that make the AIO image flaky
+which also makes the relevant tests flaky due to which we couldn't run
+the v1.x Fabric tests on the CI for a while now anyway.
+
+In order to reduce the CI resource usage and our own maintenance burden
+I suggest that we get rid of the Fabric v1.x support meaning that we can
+eliminate the AIO image build and some code complexity from the test ledger
+code as well.
+
+In addition some old fixtures can be removed that the tests were using.
+Overall a net-positive as deleting code without losing functionality (that
+we care about) is always a plus.
+
+Signed-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>
+
 # [2.0.0-alpha.2](https://github.com/hyperledger/cactus/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
 
 ### Bug Fixes

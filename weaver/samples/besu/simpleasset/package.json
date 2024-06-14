@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-besu-simpleasset",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
   "keywords": [
     "ethereum",

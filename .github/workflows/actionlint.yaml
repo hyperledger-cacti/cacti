@@ -26,9 +26,9 @@ jobs:
     # npm ERR! Could not resolve dependency:
     # npm ERR! peerOptional typescript@"^3.2.1 || ^4" from react-scripts@5.0.1
     # npm ERR! node_modules/react-scripts
-    # npm ERR!   react-scripts@"5.0.1" from @hyperledger/cacti-example-cbdc-bridging-frontend@2.0.0-alpha.2
+    # npm ERR!   react-scripts@"5.0.1" from @hyperledger/cacti-example-cbdc-bridging-frontend
     # npm ERR!   examples/cactus-example-cbdc-bridging-frontend
-    # npm ERR!     @hyperledger/cacti-example-cbdc-bridging-frontend@2.0.0-alpha.2
+    # npm ERR!     @hyperledger/cacti-example-cbdc-bridging-frontend
     # npm ERR!     node_modules/@hyperledger/cacti-example-cbdc-bridging-frontend
     # npm ERR!       workspace examples/cactus-example-cbdc-bridging-frontend from the root project
     # npm ERR! 
@@ -36,9 +36,9 @@ jobs:
     # npm ERR! node_modules/typescript
     # npm ERR!   peerOptional typescript@"^3.2.1 || ^4" from react-scripts@5.0.1
     # npm ERR!   node_modules/react-scripts
-    # npm ERR!     react-scripts@"5.0.1" from @hyperledger/cacti-example-cbdc-bridging-frontend@2.0.0-alpha.2
+    # npm ERR!     react-scripts@"5.0.1" from @hyperledger/cacti-example-cbdc-bridging-frontend
     # npm ERR!     examples/cactus-example-cbdc-bridging-frontend
-    # npm ERR!       @hyperledger/cacti-example-cbdc-bridging-frontend@2.0.0-alpha.2
+    # npm ERR!       @hyperledger/cacti-example-cbdc-bridging-frontend
     # npm ERR!       node_modules/@hyperledger/cacti-example-cbdc-bridging-frontend
     # npm ERR!         workspace examples/cactus-example-cbdc-bridging-frontend from the root project
     # npm ERR! 

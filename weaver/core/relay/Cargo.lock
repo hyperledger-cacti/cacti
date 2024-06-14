@@ -223,7 +223,7 @@ checksum = "514de17de45fdb8dc022b1a7975556c53c86f9f0aa5f534b98977b171857c2c9"
 
 [[package]]
 name = "cacti_weaver_protos_rs"
-version = "2.0.0-alpha.2"
+version = "2.0.0-rc.1"
 dependencies = [
  "prost",
  "serde 1.0.201",
@@ -1323,7 +1323,7 @@ checksum = "adad44e29e4c806119491a7f06f03de4d1af22c3a680dd47f1e6e179439d1f56"
 
 [[package]]
 name = "relay"
-version = "2.0.0-alpha.2"
+version = "2.0.0-rc.1"
 dependencies = [
  "base64 0.20.0",
  "bincode",

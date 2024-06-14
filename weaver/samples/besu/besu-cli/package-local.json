@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-besu-cli",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-rc.1",
   "description": "besu-cli CLI",
   "license": "Apache-2.0",
   "types": "build/types/types.d.ts",

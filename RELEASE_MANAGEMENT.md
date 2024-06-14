@@ -56,6 +56,8 @@ With VSCode you can do a project wide search & replace where:
 
 - Also double check that the `"version": "?.?.?"` property has been updated in the package.json files all over the packages.
 
+- Finally a generic full-text search project-wide for the previous version string `?.?.?` where you exclude these from the results: `CHANGELOG.md,go.sum,go.mod,yarn.lock,package-lock.json` and then replace the findings with the new version such as `1.1.3`
+
 - update the lock file if necessary
     ```sh
     $ yarn
