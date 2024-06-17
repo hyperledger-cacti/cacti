@@ -58,11 +58,11 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.10.3",
+    "@grpc/grpc-js": "1.10.9",
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
-    "axios": "1.6.0",
+    "axios": "1.7.2",
     "express": "4.19.2",
     "google-protobuf": "3.21.2",
     "http-errors": "2.0.0",
