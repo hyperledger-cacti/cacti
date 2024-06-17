@@ -62,7 +62,7 @@ https://github.com/hyperledger/cactus/milestones
 
 **Communications**
 
-We use the Cactus email list for long-form communications and RocketChat for short, informal announcements and other communications.  We encourage all communication, whenever possible, to be public and in the clear (i.e. rather than sending an email directly to a person or two, send it out to the whole list if it pertains to the project).
+We use the Cactus email list for long-form communications and Discord for short, informal announcements and other communications.  We encourage all communication, whenever possible, to be public and in the clear (i.e. rather than sending an email directly to a person or two, send it out to the whole list if it pertains to the project).
 
 **Future Changes**
 
