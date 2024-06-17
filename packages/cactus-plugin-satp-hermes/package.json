@@ -81,7 +81,7 @@
     "express": "4.19.2",
     "fabric-network": "2.2.20",
     "kubo-rpc-client": "3.0.1",
-    "typescript": "5.3.3"
+    "typescript": "5.5.2"
   },
   "engines": {
     "node": ">=18",

@@ -33,8 +33,8 @@
   "devDependencies": {
     "@types/node": "18.11.9",
     "nodemon": "2.0.22",
-    "typedoc": "0.25.6",
-    "typescript": "5.3.3"
+    "typedoc": "0.26.2",
+    "typescript": "5.5.2"
   },
   "engines": {
     "node": ">=18",
