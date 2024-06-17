@@ -25,7 +25,7 @@
         "@types/node": "10.17.60",
         "@types/sinon": "5.0.7",
         "@types/sinon-chai": "3.2.8",
-        "typescript": "3.9.10"
+        "typescript": "5.5.2"
     },
     "nyc": {
         "extension": [
