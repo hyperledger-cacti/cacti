@@ -40,4 +40,4 @@ jobs:
         git config --global user.email "npm-ci@hyperledger.org"
         git config --global user.name "hyperledger-ghci"
         npm whoami
-        yarn lerna publish from-git --yes --loglevel=debug
+        yarn lerna publish from-git --yes --loglevel=debug --ignore-scripts
