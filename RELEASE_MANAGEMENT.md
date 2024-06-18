@@ -80,6 +80,14 @@ git push --set-upstream upstream release-v1.1.3
 
 ### Then create a PR here - once that's merged, rebase onto upstream/main and:
 
+**IMPORTANT**: Do not enable auto-merging on GitHub for the pull request doing the release.
+The problem with auto-merging here is that it would modify the release commit's SHA as the
+rebase would happen on GitHub's servers where your git signing identity is not available to use
+given that GitHub does (should) not have access to your private key for signing.
+The way the preserve your commit signature as valid the commit SHA must remain the same and the
+way to achieve this is to perform the pull request merging with fast forward. The merging
+ensures that there is no commit SHA change and the `--ff-only` option ensures that there is no
+merge commit to throw a wrench in the process.
 
 1. Do a merge freeze
 2. Unfreeze the specific pull request that you just opened for the release issuance
