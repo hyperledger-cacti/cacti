@@ -39,7 +39,8 @@
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "yarn run --top-level test:jest:all 'packages/cactus-verifier-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts'"
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-rc.1",

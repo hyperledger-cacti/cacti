@@ -1,0 +1,54 @@
+# Unified Cacti Build and Test
+---
+env:
+  NODEJS_VERSION: v18.18.2
+  
+jobs:
+
+  build-dev:
+    continue-on-error: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: ./.github/actions/build-and-cache/
+
+  yarn-tasks:
+    name: yarn ${{ matrix.yarn-task }}
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    strategy:
+      matrix:
+        yarn-task: 
+        - tools:validate-bundle-names
+        - custom-checks
+        - lint
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: ./.github/actions/build-and-cache/
+      - run: yarn ${{ matrix.yarn-task }}
+      
+  package-test:
+    name: test ${{ matrix.package-to-test }}
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    strategy:
+      matrix:
+        # this can eventually be the output of npx 'lerna changed' or 'lerna list', depending on how invoked
+        package-to-test: 
+        - cactus-api-client
+        - cactus-verifier-client
+        - cactus-test-plugin-consortium-manual
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: ./.github/actions/build-and-cache/ # restore cache and build what's not cached
+      - name: Test
+        run: npx lerna run test --scope "@hyperledger/${{ matrix.package-to-test }}" --stream
+
+name: Test Cacti
+'on':
+  push:
+    branches:
+      - main
+      - ci_improvement_use_lerna_test_in_matrix_job

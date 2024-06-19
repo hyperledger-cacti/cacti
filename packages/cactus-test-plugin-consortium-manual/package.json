@@ -47,7 +47,10 @@
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "test:jest": "yarn run --top-level test:jest:all 'packages/cactus-test-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts'",
+    "test:tap": "yarn run --top-level test:tap:all ./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/openapi/openapi-validation.test.ts",
+    "test": "yarn run test:jest test:tap"
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.1",
