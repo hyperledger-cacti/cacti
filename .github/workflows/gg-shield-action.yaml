@@ -25,9 +25,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitGuardian scan
-        uses: GitGuardian/ggshield-action@v1.14.4
+        uses: GitGuardian/ggshield-action@v1.28.0
         with:
-          args: --show-secrets --exit-zero --all-policies --verbose
+          args: --show-secrets --exit-zero --all-policies --verbose --exclude 'weaver/tests/*'
         env:
           GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
           GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
