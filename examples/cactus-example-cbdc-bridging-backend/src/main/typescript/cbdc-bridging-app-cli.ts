@@ -21,7 +21,7 @@ export async function launchApp(
     exampleConfig.authorizationConfigJson,
   ) as unknown as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
- 
+
   const convictConfig =
     await configService.newExampleConfigConvict(exampleConfig);
 

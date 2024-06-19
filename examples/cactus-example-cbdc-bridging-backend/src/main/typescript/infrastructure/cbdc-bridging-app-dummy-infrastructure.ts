@@ -89,9 +89,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
-      envVars: new Map([
-        ["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION],
-      ]),
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel: level || "DEBUG",
     });
   }
@@ -387,7 +385,8 @@ export class CbdcBridgingAppDummyInfrastructure {
             sourceFiles,
             ccName: contractName,
             targetOrganizations: [this.org1Env, this.org2Env],
-            caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+            caFile:
+              FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "asset-reference-contract",
             ccLang: ChainCodeProgrammingLanguage.Typescript,
             ccSequence: 1,
@@ -514,7 +513,8 @@ export class CbdcBridgingAppDummyInfrastructure {
             sourceFiles,
             ccName: contractName,
             targetOrganizations: [this.org1Env, this.org2Env],
-            caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+            caFile:
+              FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "cbdc",
             ccLang: ChainCodeProgrammingLanguage.Javascript,
             ccSequence: 1,

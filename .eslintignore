@@ -100,6 +100,8 @@ weaver/samples/fabric/fabric-cli/src/helpers/fabric-functions.ts
 weaver/samples/fabric/fabric-cli/src/helpers/helpers.ts
 weaver/samples/fabric/fabric-cli/src/helpers/interop-setup/configure-network.ts
 weaver/sdks/besu/node/src/AssetManager.ts
+weaver/sdks/fabric/interoperation-node-sdk/build/
+weaver/sdks/fabric/interoperation-node-sdk/coverage/prettify.js
 weaver/sdks/fabric/interoperation-node-sdk/src/AssetManager.ts
 weaver/sdks/fabric/interoperation-node-sdk/src/EventsManager.ts
 weaver/sdks/fabric/interoperation-node-sdk/src/HashFunctions.ts

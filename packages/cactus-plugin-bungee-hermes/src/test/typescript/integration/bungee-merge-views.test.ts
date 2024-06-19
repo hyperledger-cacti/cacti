@@ -340,7 +340,10 @@ test("test merging views, and integrated view proofs", async () => {
         signature: view.signature,
       }),
       // eslint-disable-next-line prettier/prettier
-      JSON.stringify({ view: JSON.stringify(view2.view as View), signature: view2.signature }),
+      JSON.stringify({
+        view: JSON.stringify(view2.view as View),
+        signature: view2.signature,
+      }),
     ],
     mergePolicy: MergePolicyOpts.NONE,
   });
@@ -384,7 +387,9 @@ test("test merging views, and integrated view proofs", async () => {
 
   //0 transactions captured in first view, and 1 in the second (because of policy)
   // eslint-disable-next-line prettier/prettier
-  expect(mergeViewsWithPolicy.integratedView.getAllTransactions().length).toBe(1);
+  expect(mergeViewsWithPolicy.integratedView.getAllTransactions().length).toBe(
+    1,
+  );
   //0 state captured in first view, and 1 in the second (because of policy)
   expect(mergeViewsWithPolicy.integratedView.getAllStates().length).toBe(1);
 
@@ -397,7 +402,9 @@ test("test merging views, and integrated view proofs", async () => {
 
   //1 transactions captured in first view, and 1 in the second (because of policy)
   // eslint-disable-next-line prettier/prettier
-  expect(mergeViewsWithPolicy2.integratedView.getAllTransactions().length).toBe(2);
+  expect(mergeViewsWithPolicy2.integratedView.getAllTransactions().length).toBe(
+    2,
+  );
   //1 state captured in first view, and only 1 in the second (because of policy)
   expect(mergeViewsWithPolicy2.integratedView.getAllStates().length).toBe(2);
 });

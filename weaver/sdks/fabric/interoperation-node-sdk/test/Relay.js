@@ -166,8 +166,7 @@ describe("Relay", () => {
       relayServer.bindAsync(
         localRelayEndpoint,
         grpc.ServerCredentials.createInsecure(),
-        () => {
-        },
+        () => {},
       );
     });
     after(() => {
@@ -224,8 +223,7 @@ describe("Relay", () => {
       relayServer.bindAsync(
         localRelayEndpoint,
         grpc.ServerCredentials.createInsecure(),
-        () => {
-        },
+        () => {},
       );
     });
     after(() => {
@@ -288,8 +286,7 @@ describe("Relay", () => {
       relayServer.bindAsync(
         localRelayEndpoint,
         grpc.ServerCredentials.createInsecure(),
-        () => {
-        },
+        () => {},
       );
     });
     after(() => {

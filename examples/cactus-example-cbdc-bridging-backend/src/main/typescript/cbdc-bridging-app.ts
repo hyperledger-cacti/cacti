@@ -113,7 +113,7 @@ export class CbdcBridgingApp {
       nodeApiHostB,
       this.options.serverGatewayKeyPair,
     );
-	
+
     const clientPluginRegistry = new PluginRegistry({
       plugins: [
         new PluginKeychainMemory({
@@ -132,18 +132,32 @@ export class CbdcBridgingApp {
         }),
       ],
     });
-	
+
     clientPluginRegistry.add(fabricPlugin);
     clientPluginRegistry.add(fabricSatpGateway);
 
     serverPluginRegistry.add(besuPlugin);
     serverPluginRegistry.add(besuSatpGateway);
 
-    const crpcOptionsServer1 = {host: this.options.apiCrpcHost, port: this.options.apiServer1CrpcPort};
-    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry, crpcOptionsServer1);
-	
-    const crpcOptionsServer2 = {host: this.options.apiCrpcHost, port: this.options.apiServer2CrpcPort};
-    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry, crpcOptionsServer2);
+    const crpcOptionsServer1 = {
+      host: this.options.apiCrpcHost,
+      port: this.options.apiServer1CrpcPort,
+    };
+    const apiServer1 = await this.startNode(
+      httpApiA,
+      clientPluginRegistry,
+      crpcOptionsServer1,
+    );
+
+    const crpcOptionsServer2 = {
+      host: this.options.apiCrpcHost,
+      port: this.options.apiServer2CrpcPort,
+    };
+    const apiServer2 = await this.startNode(
+      httpApiB,
+      serverPluginRegistry,
+      crpcOptionsServer2,
+    );
 
     const fabricApiClient = new FabricApi(
       new Configuration({ basePath: nodeApiHostA }),
