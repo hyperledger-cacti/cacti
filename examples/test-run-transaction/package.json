@@ -25,11 +25,11 @@
     "fabric-ca-client": "2.2.20",
     "fabric-network": "2.2.20",
     "http-errors": "1.6.3",
-    "jsonwebtoken": "8.5.1",
+    "jsonwebtoken": "9.0.0",
     "log4js": "6.4.0",
     "morgan": "1.9.1",
     "shelljs": "0.8.5",
-    "socket.io": "4.5.4",
+    "socket.io": "4.6.2",
     "ts-node": "8.9.1",
     "web3": "1.7.0",
     "xmlhttprequest": "1.8.0"

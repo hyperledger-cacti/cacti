@@ -53,15 +53,15 @@
     "@iroha2/crypto-core": "0.1.1",
     "@iroha2/crypto-target-node": "0.4.0",
     "@iroha2/data-model": "4.0.0",
-    "axios": "1.6.0",
+    "axios": "1.7.2",
     "express": "4.19.2",
     "fast-safe-stringify": "2.1.1",
     "hada": "0.0.8",
     "rxjs": "7.8.1",
     "sanitize-html": "2.12.1",
-    "socket.io": "4.4.1",
+    "socket.io": "4.6.2",
     "socket.io-client-fixed-types": "4.5.4",
-    "undici": "6.11.1"
+    "undici": "6.19.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.1",
@@ -72,7 +72,7 @@
     "express": "4.19.2",
     "jest": "29.6.2",
     "jest-extended": "4.0.1",
-    "socket.io": "4.5.4",
+    "socket.io": "4.6.2",
     "uuid": "9.0.1"
   },
   "engines": {

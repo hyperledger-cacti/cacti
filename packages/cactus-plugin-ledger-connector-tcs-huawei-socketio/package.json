@@ -54,12 +54,12 @@
     "debug": "4.3.1",
     "express": "4.19.2",
     "js-yaml": "3.14.1",
-    "jsonwebtoken": "8.5.1",
+    "jsonwebtoken": "9.0.0",
     "log4js": "6.4.1",
     "morgan": "1.10.0",
     "serve-favicon": "2.4.5",
     "shelljs": "0.8.5",
-    "socket.io": "4.5.4",
+    "socket.io": "4.6.2",
     "xmlhttprequest": "1.8.0"
   },
   "devDependencies": {

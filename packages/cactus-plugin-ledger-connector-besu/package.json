@@ -58,11 +58,11 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.10.3",
+    "@grpc/grpc-js": "1.10.9",
     "@hyperledger/cactus-common": "2.0.0-rc.1",
     "@hyperledger/cactus-core": "2.0.0-rc.1",
     "@hyperledger/cactus-core-api": "2.0.0-rc.1",
-    "axios": "1.6.0",
+    "axios": "1.7.2",
     "express": "4.19.2",
     "google-protobuf": "3.21.2",
     "http-errors": "2.0.0",
@@ -100,7 +100,7 @@
     "key-encoder": "2.0.3",
     "npm-run-all2": "6.1.2",
     "protobufjs": "7.2.5",
-    "socket.io": "4.5.4",
+    "socket.io": "4.6.2",
     "tsx": "4.7.0",
     "uuid": "9.0.1",
     "web3-core": "1.6.1",

@@ -37,7 +37,7 @@
     ]
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.10.3",
+    "@grpc/grpc-js": "1.10.9",
     "@grpc/proto-loader": "0.7.8",
     "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
     "elliptic": "6.5.4",

@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.10.3",
+    "@grpc/grpc-js": "1.10.9",
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-rc.1",
     "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-rc.1",
     "dotenv": "8.6.0",
@@ -33,7 +33,6 @@
   "devDependencies": {
     "@types/node": "18.11.9",
     "nodemon": "2.0.22",
-    "patch-package": "6.5.1",
     "typedoc": "0.25.6",
     "typescript": "5.3.3"
   },
