@@ -27,7 +27,7 @@ jobs:
       - name: GitGuardian scan
         uses: GitGuardian/ggshield-action@v1.28.0
         with:
-          args: --show-secrets --exit-zero --all-policies --verbose --exclude 'weaver/tests/*'
+          args: --show-secrets --exit-zero --all-policies --verbose --config-path ./.gitguardian.yaml
         env:
           GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
           GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
