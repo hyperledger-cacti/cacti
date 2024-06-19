@@ -45,8 +45,9 @@ export function signValidatorMessageJwt(
     );
   }
 
+  const privateKeyStr = privateKey.toString();
   // Check if key supported and JWT algorithm matches the provided key type
-  const keyType = crypto.createPrivateKey(privateKey).asymmetricKeyType;
+  const keyType = crypto.createPrivateKey(privateKeyStr).asymmetricKeyType;
   if (
     !(
       (keyType === "rsa" && jwtAlgo.startsWith("RS")) ||

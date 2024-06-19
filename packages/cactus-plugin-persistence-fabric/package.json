@@ -72,12 +72,12 @@
     "@hyperledger/cactus-core-api": "2.0.0-rc.1",
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.1",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.1",
-    "axios": "1.6.0",
+    "axios": "1.7.2",
     "fabric-protos": "2.2.20",
     "js-sha256": "0.9.0",
     "pg": "8.8.0",
     "safe-stable-stringify": "2.4.3",
-    "socket.io": "4.5.4"
+    "socket.io": "4.6.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.1",
