@@ -12,5 +12,8 @@ export const themeOptions: ThemeOptions = {
     warning: {
       main: "#D68C45",
     },
+    info: {
+      main: "#5D4037",
+    },
   },
 };

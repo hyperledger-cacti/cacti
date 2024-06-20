@@ -6,7 +6,7 @@ import Skeleton from "@mui/material/Skeleton";
 
 import { FabricTransaction } from "../../fabric-supabase-types";
 import ShortenedTypography from "../../../../components/ui/ShortenedTypography";
-import StackedRowItems from "../../components/ui/StackedRowItems";
+import StackedRowItems from "../../../../components/ui/StackedRowItems";
 
 const ListHeaderTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.secondary.main,
