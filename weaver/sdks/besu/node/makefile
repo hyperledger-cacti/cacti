@@ -28,7 +28,7 @@ build-local:
 
 .PHONE: publish
 publish: .npmrc
-	npm publish
+	npm publish --no-workspaces
 	
 
 clean:
