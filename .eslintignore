@@ -23,9 +23,6 @@ packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier.ts
 packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierFactory.ts
 packages/cactus-cmd-socketio-server/src/test/typescript/unit/Verifier.test.ts
 
-packages/cactus-plugin-ledger-connector-tcs-huawei-socketio/src/main/typescript/common/core/app.ts
-packages/cactus-plugin-ledger-connector-tcs-huawei-socketio/src/main/typescript/connector/ServerMonitorPlugin.ts
-
 weaver/common/policy-dsl/index.js
 weaver/common/policy-dsl/parser/PolicyListener.js
 weaver/common/policy-dsl/parser/PolicyParser.js

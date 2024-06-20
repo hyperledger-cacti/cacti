@@ -10495,33 +10495,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-ledger-connector-tcs-huawei-socketio@workspace:packages/cactus-plugin-ledger-connector-tcs-huawei-socketio":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-ledger-connector-tcs-huawei-socketio@workspace:packages/cactus-plugin-ledger-connector-tcs-huawei-socketio"
-  dependencies:
-    "@types/body-parser": "npm:1.19.3"
-    "@types/config": "npm:0.0.41"
-    "@types/cookie-parser": "npm:1.4.5"
-    "@types/express": "npm:4.17.21"
-    "@types/http-errors": "npm:2.0.1"
-    "@types/node": "npm:18.11.9"
-    body-parser: "npm:1.20.2"
-    cbor: "npm:6.0.1"
-    config: "npm:3.3.7"
-    cookie-parser: "npm:1.4.6"
-    debug: "npm:4.3.1"
-    express: "npm:4.19.2"
-    js-yaml: "npm:3.14.1"
-    jsonwebtoken: "npm:9.0.0"
-    log4js: "npm:6.4.1"
-    morgan: "npm:1.10.0"
-    serve-favicon: "npm:2.4.5"
-    shelljs: "npm:0.8.5"
-    socket.io: "npm:4.6.2"
-    xmlhttprequest: "npm:1.8.0"
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-ledger-connector-xdai@npm:2.0.0-rc.3, @hyperledger/cactus-plugin-ledger-connector-xdai@workspace:packages/cactus-plugin-ledger-connector-xdai":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-xdai@workspace:packages/cactus-plugin-ledger-connector-xdai"
@@ -16528,13 +16501,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/config@npm:0.0.41":
-  version: 0.0.41
-  resolution: "@types/config@npm:0.0.41"
-  checksum: 10/528eb5e5d60c48cf82a2b0988ee1e5e088472698ad25944131b0ba87b2e3bb0989f3b4d45edb9d49eefcc8bf158c267905c386aaec15857b9fb24be449c3f27c
-  languageName: node
-  linkType: hard
-
 "@types/config@npm:3.3.0":
   version: 3.3.0
   resolution: "@types/config@npm:3.3.0"
@@ -16954,7 +16920,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/http-errors@npm:*, @types/http-errors@npm:2.0.1":
+"@types/http-errors@npm:*":
   version: 2.0.1
   resolution: "@types/http-errors@npm:2.0.1"
   checksum: 10/3bb0c50b0a652e679a84c30cd0340d696c32ef6558518268c238840346c077f899315daaf1c26c09c57ddd5dc80510f2a7f46acd52bf949e339e35ed3ee9654f
@@ -22387,16 +22353,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cbor@npm:6.0.1":
-  version: 6.0.1
-  resolution: "cbor@npm:6.0.1"
-  dependencies:
-    bignumber.js: "npm:^9.0.1"
-    nofilter: "npm:^1.0.4"
-  checksum: 10/bcc41e3af491a01316bf849293332000b9bc754572ef99a5c6f076eace208366493e5f96f7fb35827f4cbf495c0fb16684fe86dea91be444d42eb4cfed9868e2
-  languageName: node
-  linkType: hard
-
 "cbor@npm:9.0.1":
   version: 9.0.1
   resolution: "cbor@npm:9.0.1"
@@ -25047,18 +25003,6 @@ __metadata:
     supports-color:
       optional: true
   checksum: 10/0073c3bcbd9cb7d71dd5f6b55be8701af42df3e56e911186dfa46fac3a5b9eb7ce7f377dd1d3be6db8977221f8eb333d945216f645cf56f6b688cd484837d255
-  languageName: node
-  linkType: hard
-
-"debug@npm:4.3.1":
-  version: 4.3.1
-  resolution: "debug@npm:4.3.1"
-  dependencies:
-    ms: "npm:2.1.2"
-  peerDependenciesMeta:
-    supports-color:
-      optional: true
-  checksum: 10/37b9f90428b65e59eb47f74435a9fc73dcb46b3550e838c0037ac05910f689bd59fd1d4a51154c1df3471a2f3e5926af8880cbe9f9f3b68beb7b2f8197a26f4a
   languageName: node
   linkType: hard
 
@@ -47089,13 +47033,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safe-buffer@npm:5.1.1":
-  version: 5.1.1
-  resolution: "safe-buffer@npm:5.1.1"
-  checksum: 10/e8acac337b7d7e108fcfe2b8b2cb20952abb1ed11dc60968b7adffb19b9477893d44136987a420f90ff4d7a0a1a932f147b3a222f73001f59fb4822097a1616d
-  languageName: node
-  linkType: hard
-
 "safe-buffer@npm:5.1.2, safe-buffer@npm:~5.1.0, safe-buffer@npm:~5.1.1":
   version: 5.1.2
   resolution: "safe-buffer@npm:5.1.2"
@@ -47637,19 +47574,6 @@ __metadata:
   dependencies:
     randombytes: "npm:^2.1.0"
   checksum: 10/f756b1ff34b655b2183c64dd6683d28d4d9b9a80284b264cac9fd421c73890491eafd6c5c2bbe93f1f21bf78b572037c5a18d24b044c317ee1c9dc44d22db94c
-  languageName: node
-  linkType: hard
-
-"serve-favicon@npm:2.4.5":
-  version: 2.4.5
-  resolution: "serve-favicon@npm:2.4.5"
-  dependencies:
-    etag: "npm:~1.8.1"
-    fresh: "npm:0.5.2"
-    ms: "npm:2.0.0"
-    parseurl: "npm:~1.3.2"
-    safe-buffer: "npm:5.1.1"
-  checksum: 10/ee5ac9c055a062a0d39af45aa6a0d34e8641119366283214b732e1780f48e3c0c1082cc0f6e12a4b8ceaf104a0f858ce91b8c76a39a543ca5f7606cdb90db92a
   languageName: node
   linkType: hard
 
