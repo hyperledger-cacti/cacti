@@ -6,7 +6,7 @@ build:
 
 .PHONY: publish
 publish: build
-	npm publish
+	npm publish --no-workspaces
 
 .PHONY: clean-build
 clean-build:
