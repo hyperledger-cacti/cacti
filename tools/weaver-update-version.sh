@@ -16,8 +16,8 @@ echo "VERSION: $VERSION"
 ## Node - Lerna handles it
 
 ## GO and Docker
-VERSION_FILES=("weaver/common/protos-go
-weaver/core/network/fabric-interop-cc/libs/utils"
+VERSION_FILES=("weaver/common/protos-go"
+"weaver/core/network/fabric-interop-cc/libs/utils"
 "weaver/core/network/fabric-interop-cc/libs/assetexchange"
 "weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt"
 "weaver/core/network/fabric-interop-cc/contracts/interop"

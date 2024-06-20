@@ -173,7 +173,7 @@ func getPolicyCriteriaForAddress(contract GatewayContract, address string) ([]st
 			matchingIdentifier = item
 			break
 		}
-		if validPatternString(item.Pattern) && isPatternAndAddressMatch(item.Pattern, parsedAddress.ViewSegment) &&
+		if ValidPatternString(item.Pattern) && isPatternAndAddressMatch(item.Pattern, parsedAddress.ViewSegment) &&
 			(matchingIdentifier.Pattern == "") || (len(item.Pattern) > len(matchingIdentifier.Pattern)) {
 			matchingIdentifier = item
 			break
@@ -183,7 +183,7 @@ func getPolicyCriteriaForAddress(contract GatewayContract, address string) ([]st
 	return matchingIdentifier.Policy.Criteria, nil
 }
 
-func validPatternString(pattern string) bool {
+func ValidPatternString(pattern string) bool {
 	// count number of stars in pattern
 	numStars := strings.Count(pattern, "*")
 
@@ -198,7 +198,7 @@ func validPatternString(pattern string) bool {
 
 func isPatternAndAddressMatch(pattern string, address string) bool {
 	// make sure the pattern is valid
-	if !validPatternString(pattern) {
+	if !ValidPatternString(pattern) {
 		return false
 	}
 
