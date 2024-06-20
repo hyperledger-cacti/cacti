@@ -42,7 +42,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const persistencePlugin = new PluginPersistenceEthereum({
   instanceId: uuidv4(),
-  apiClient: new SocketIOApiClient(apiConfigOptions),
+  apiClient: new EthereumApiClient(apiConfigOptions),
   logLevel: "info",
   connectionString:
     "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
@@ -65,7 +65,7 @@ const factory = new PluginFactoryLedgerPersistence({
 
 const persistencePlugin = await factory.create({
   instanceId: uuidv4(),
-  apiClient: new SocketIOApiClient(apiConfigOptions),
+  apiClient: new EthereumApiClient(apiConfigOptions),
   logLevel: "info",
   connectionString:
     "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",

@@ -10400,42 +10400,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio@workspace:packages/cactus-plugin-ledger-connector-go-ethereum-socketio":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio@workspace:packages/cactus-plugin-ledger-connector-go-ethereum-socketio"
-  dependencies:
-    "@hyperledger/cactus-api-client": "npm:2.0.0-rc.3"
-    "@hyperledger/cactus-cmd-socketio-server": "npm:2.0.0-rc.3"
-    "@hyperledger/cactus-common": "npm:2.0.0-rc.3"
-    "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.3"
-    "@types/config": "npm:3.3.2"
-    "@types/cookie-parser": "npm:1.4.5"
-    "@types/express": "npm:4.17.21"
-    "@types/http-errors": "npm:2.0.1"
-    "@types/node": "npm:18.11.9"
-    "@types/shelljs": "npm:0.8.12"
-    body-parser: "npm:1.20.2"
-    config: "npm:3.3.9"
-    cookie-parser: "npm:1.4.6"
-    debug: "npm:3.1.0"
-    express: "npm:4.19.2"
-    http-errors: "npm:1.6.3"
-    js-yaml: "npm:3.14.1"
-    jsonwebtoken: "npm:9.0.2"
-    log4js: "npm:6.4.1"
-    morgan: "npm:1.10.0"
-    serve-favicon: "npm:2.4.5"
-    shelljs: "npm:0.8.5"
-    socket.io: "npm:4.6.2"
-    socket.io-client-fixed-types: "npm:4.5.4"
-    web3: "npm:1.8.1"
-    web3-core: "npm:1.8.1"
-    web3-core-subscriptions: "npm:1.8.1"
-    web3-eth: "npm:1.8.1"
-    web3-utils: "npm:1.8.1"
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-ledger-connector-iroha2@npm:2.0.0-rc.3, @hyperledger/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2"
@@ -16578,13 +16542,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/config@npm:3.3.2":
-  version: 3.3.2
-  resolution: "@types/config@npm:3.3.2"
-  checksum: 10/1baf3f93b0a0415da89afc231210104f79dcfd982bb6a3c926a2a1b5582b3d247d618acb6fdab6b060a22599dc918e4a75d22693929116eeb9d1edc8e8bb5b66
-  languageName: node
-  linkType: hard
-
 "@types/connect-history-api-fallback@npm:^1.3.5":
   version: 1.3.5
   resolution: "@types/connect-history-api-fallback@npm:1.3.5"
@@ -16941,7 +16898,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/glob@npm:*, @types/glob@npm:^7.1.1, @types/glob@npm:~7.2.0":
+"@types/glob@npm:*, @types/glob@npm:^7.1.1":
   version: 7.2.0
   resolution: "@types/glob@npm:7.2.0"
   dependencies:
@@ -17875,16 +17832,6 @@ __metadata:
     "@types/glob": "npm:*"
     "@types/node": "npm:*"
   checksum: 10/0b890fcddd25f33326b8b23558a91378b298e6e36ae6525fa6f8715791547b8432775e4640fbaee23717314fe4db7d93e24307f46ef31270e69c762685899001
-  languageName: node
-  linkType: hard
-
-"@types/shelljs@npm:0.8.12":
-  version: 0.8.12
-  resolution: "@types/shelljs@npm:0.8.12"
-  dependencies:
-    "@types/glob": "npm:~7.2.0"
-    "@types/node": "npm:*"
-  checksum: 10/c0517e8355614bad2d391270538bd5c7b65d7a771b333cb3ba9fb6321b4b44e1787e99d19cda97ac5d25ec84e2d6b81cb8cc496da5bdae6a725d922de4b44c70
   languageName: node
   linkType: hard
 
@@ -23556,15 +23503,6 @@ __metadata:
   dependencies:
     json5: "npm:^2.1.1"
   checksum: 10/0e4dae97de77ca229feb63b715254b4219aa3b09d1bb66ecdadf82bd4d6617bf85bfec54b0b7ae09727058386fa9dadfe9ea66e73330a696ab1ae0c7e6555b63
-  languageName: node
-  linkType: hard
-
-"config@npm:3.3.9":
-  version: 3.3.9
-  resolution: "config@npm:3.3.9"
-  dependencies:
-    json5: "npm:^2.2.3"
-  checksum: 10/00e0ea40ffe407e63d13078ca5e36f52f0438bfe5a83ac0563e4fd566f91ffac9068ef74e18f1efbed0449e25b6a5f080772f168f133fd9eb365397cb1ef691e
   languageName: node
   linkType: hard
 
