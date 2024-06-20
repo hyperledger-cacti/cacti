@@ -4,13 +4,14 @@ Copyright 2020 IBM All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package helpers
+package helpers_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+     helpers "github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/helpers"
 )
 
 func TestParseAddress(t *testing.T) {
@@ -18,7 +19,7 @@ func TestParseAddress(t *testing.T) {
 	// Test success with the address passed in the correct format
 	address := "localhost:9080/network1/mychannel:simplestate:Read:Arcturus"
 	addressParts := []string{"localhost:9080", "network1", "mychannel:simplestate:Read:Arcturus"}
-	retValue, err := ParseAddress(address)
+	retValue, err := helpers.ParseAddress(address)
 	require.NoError(t, err)
 	require.Equal(t, retValue.LocationSegment, addressParts[0])
 	require.Equal(t, retValue.NetworkSegment, addressParts[1])
@@ -28,7 +29,7 @@ func TestParseAddress(t *testing.T) {
 	// Test failure with address not passed in the correct format
 	address = "localhost:9080//network1/mychannel:simplestate:Read:Arcturus"
 	expectedErr := "invalid address string " + address
-	retValue, err = ParseAddress(address)
+	retValue, err = helpers.ParseAddress(address)
 	require.Error(t, err)
 	require.EqualError(t, err, expectedErr)
 	fmt.Printf("Test failed as expected with error: %s\n", err)

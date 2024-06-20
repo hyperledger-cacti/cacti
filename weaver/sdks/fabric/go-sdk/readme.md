@@ -4,6 +4,12 @@
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
+# Go SDK for Fabric
+
+**NOTE:**
+Due to namespace conflict between `fabric-protos-go` and `fabric-protos-go-apiv2`, use `GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn` flag when using go-sdk at runtime.
+
+
 ## Integration tests for `asset-exchange` using go-sdk
 To run integration tests:
 - First, [launch a pair of test networks](../../../tests/network-setups/fabric/dev/), one of which must be a Fabric network.
@@ -24,47 +30,14 @@ Also note that similar checks need to be carried out for the connection profile 
 ### Testing membership manager functions
 
 The [membership manager functions](./membershipmanager) are currently not covered by unit tests. As a temporary measure,below are instructions to test them in a standalone package as follows.
-- Copy [membershipmanager/membership_manager.go](./membershipmanager/membership_manager.go) to an empty folder and rename the package to `main`.
-- Add a `main` function with the following contents. These are samples, and you can tweak these as needed in your setup.
-  ```go
-  func main() {
-    walletPath := "<path-to-folder-containing-wallet-identities>"    // e.g., <cacti-root>/weaver/samples/fabric/fabric-cli/src/wallet-network1/
-    userName := "networkadmin"          // e.g., networkadmin
-    connectionProfilePath := "<path-to-connection-profile-json>"    // e.g., <cacti-root>/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json"
-    
-    fmt.Printf("Get Recorded local Membership: ")
-    member, _ := GetMembershipUnit(walletPath, userName, connectionProfilePath, "mychannel", "Org1MSP")
-    fmt.Printf("%+v\n", member)
-
-    fmt.Printf("Get MSP Configuration for Org2MSP: ")
-    membership, _ := GetMSPConfigurations(walletPath, userName, connectionProfilePath, "mychannel", []string{"Org1MSP", "Org2MSP"})
-    fmt.Printf("%+v\n", membership)
-
-    fmt.Printf("Get All MSP Configuration for Org1MSP: ")
-    membership, _ = GetAllMSPConfigurations(walletPath, userName, connectionProfilePath, "mychannel", []string{"Org1MSP"})
-    fmt.Printf("%+v\n", membership)
-
-    fmt.Printf("Create Local Membership: ")
-    err := CreateLocalMembership(walletPath, userName, connectionProfilePath, "network1", "mychannel", "interop", []string{"Org1MSP"})
-    fmt.Println(err)
-
-    fmt.Printf("Update Local Membership: ")
-    err = UpdateLocalMembership(walletPath, userName, connectionProfilePath, "network1", "mychannel", "interop", []string{"Org1MSP"})
-    fmt.Println(err)
-
-    fmt.Printf("Read Local Membership: ")
-    m, err := ReadMembership(walletPath, userName, connectionProfilePath, "mychannel", "interop", "local-security-domain", []string{"Org1MSP"})
-    fmt.Println(m)
-    fmt.Println(err)
-
-    fmt.Printf("Delete Local Membership: ")
-    err = DeleteLocalMembership(walletPath, userName, connectionProfilePath, "mychannel", "interop", []string{"Org1MSP"})
-    fmt.Println(err)
-  }
-  ```
-- Build the program.
+- Build the go-sdk.
 - Start the Weaver testnet, e.g., by navigating to `<cacti-root>/weaver/tests/network-setups/fabric/dev` and running `make start-interop-local`.
-- Run the above program. You should see membership contents in the output with no errors.
+- From go-sdk, Run (replace `<cacti-root>` with path to the cacti clone):
+  ```bash
+    cd membershipmanager
+    GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn CACTI_ROOT=<cacti-root> go test -v .
+  ```
+  You should see membership contents in the output with no errors.
 
 ## Configurations
 
