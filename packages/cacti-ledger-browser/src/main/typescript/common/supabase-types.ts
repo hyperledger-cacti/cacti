@@ -108,3 +108,11 @@ export interface TokenERC20 {
   total_supply: number;
   token_address: string;
 }
+
+export interface PluginStatus {
+  name: string;
+  last_instance_id: string;
+  is_schema_initialized: boolean;
+  created_at: string;
+  last_connected_at: string;
+}

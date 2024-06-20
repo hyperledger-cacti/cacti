@@ -46,7 +46,9 @@ npm install
 - Run one or more persistence plugins:
   - [Ethereum](../cacti-plugin-persistence-ethereum)
   - [Fabric] (../cacti-plugin-persistence-fabric)
-- Edit [Supabase configuration file](./src/supabase-client.tsx), set correct supabase API URL and service_role key.
+- Edit Supabase configuration files, set correct supabase API URL and service_role key.
+  - ./src/main/typescript/common/supabase-client.tsx
+  - ./src/main/typescript/common/queries.ts
 - Execute `yarn run start` or `npm start` in this package directory.
 - The running application address: http://localhost:3001/ (can be changed in [Vite configuration](./vite.config.ts))
 
