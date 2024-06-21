@@ -1,7 +1,7 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 import { v4 as uuidv4 } from "uuid";
-import { Express } from "express";
+import type { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 import { RuntimeError } from "run-time-error-cjs";

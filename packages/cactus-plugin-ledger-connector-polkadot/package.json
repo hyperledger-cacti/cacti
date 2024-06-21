@@ -71,6 +71,7 @@
     "@polkadot/rpc-provider": "10.9.1",
     "@polkadot/types": "10.9.1",
     "@polkadot/util": "12.6.2",
+    "axios": "1.6.0",
     "bl": "5.0.0",
     "express": "4.19.2",
     "express-openapi-validator": "4.13.1",
@@ -100,7 +101,6 @@
     "@types/supertest": "2.0.11",
     "@types/temp": "0.9.1",
     "@types/uuid": "9.0.8",
-    "axios": "1.6.0",
     "supertest": "6.1.6"
   },
   "engines": {

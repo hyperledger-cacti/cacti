@@ -6,7 +6,7 @@ import {
   safeStringifyException,
 } from "@hyperledger/cactus-common";
 
-import {
+import type {
   BlockType,
   Channel,
   EventCallback,
@@ -14,7 +14,7 @@ import {
   IdentityContext,
 } from "fabric-common";
 import { BlockEvent, BlockListener, EventType, Gateway } from "fabric-network";
-import { Socket as SocketIoSocket } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { RuntimeError } from "run-time-error-cjs";
 

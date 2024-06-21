@@ -1,11 +1,11 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
-import { Express } from "express";
+import type { Express } from "express";
 import Web3 from "web3";
 
-import { Contract } from "web3-eth-contract";
-import { TransactionReceipt } from "web3-eth";
+import type { Contract } from "web3-eth-contract";
+import type { TransactionReceipt } from "web3-eth";
 
 import OAS from "../json/openapi.json";
 

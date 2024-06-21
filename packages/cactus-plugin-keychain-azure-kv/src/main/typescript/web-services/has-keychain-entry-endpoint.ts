@@ -1,4 +1,4 @@
-import { Express, Response, Request } from "express";
+import type { Express, Response, Request } from "express";
 
 import {
   Logger,

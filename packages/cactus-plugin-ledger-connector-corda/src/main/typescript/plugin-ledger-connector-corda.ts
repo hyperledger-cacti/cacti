@@ -1,7 +1,7 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-import { Config as SshConfig } from "node-ssh";
-import { Express } from "express";
+import type { Server } from "http";
+import type { Server as SecureServer } from "https";
+import type { Config as SshConfig } from "node-ssh";
+import type { Express } from "express";
 
 import OAS from "../json/openapi.json";
 

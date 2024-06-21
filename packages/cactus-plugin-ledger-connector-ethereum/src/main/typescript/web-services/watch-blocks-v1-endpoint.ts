@@ -6,7 +6,7 @@
 
 import Web3, { BlockHeaderOutput, FMT_BYTES, FMT_NUMBER } from "web3";
 import { NewHeadsSubscription } from "web3-eth";
-import { Socket as SocketIoSocket } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 
 import {
   Logger,

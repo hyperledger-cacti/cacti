@@ -1,4 +1,4 @@
-import { Socket as SocketIoSocket } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 import Web3 from "web3";
 
 import { Logger, Checks } from "@hyperledger/cactus-common";

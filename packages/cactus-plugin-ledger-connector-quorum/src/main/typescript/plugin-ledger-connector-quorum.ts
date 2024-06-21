@@ -5,21 +5,21 @@ import type {
   Socket as SocketIoSocket,
 } from "socket.io";
 
-import { Express } from "express";
+import type { Express } from "express";
 import Web3 from "web3";
 import Web3JsQuorum, {
   IWeb3Quorum,
   ISendRawTransaction,
   IPrivateTransactionReceipt,
 } from "web3js-quorum";
-import {
+import type {
   WebsocketProviderOptions,
   HttpProviderOptions,
 } from "web3-core-helpers";
-import { AbiItem } from "web3-utils";
+import type { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
-import { ContractSendMethod } from "web3-eth-contract";
-import { TransactionReceipt } from "web3-eth";
+import type { ContractSendMethod } from "web3-eth-contract";
+import type { TransactionReceipt } from "web3-eth";
 
 import { BadRequestError } from "http-errors-enhanced-cjs";
 
