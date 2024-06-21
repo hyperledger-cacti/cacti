@@ -341,20 +341,28 @@ export class CordaTestLedger implements ITestLedger {
     return Containers.getPublicPort(22, aContainerInfo);
   }
 
-  public async getCorDappsDirPartyA(): Promise<string> {
-    return "/samples-kotlin/Advanced/obligation-cordapp/build/nodes/ParticipantA/cordapps";
+  public async getCorDappsDirPartyA(
+    sampleCordapp: SampleCordappEnum = SampleCordappEnum.ADVANCED_OBLIGATION,
+  ): Promise<string> {
+    return SAMPLE_CORDAPP_DATA[sampleCordapp].cordappDirPartyA;
   }
 
-  public async getCorDappsDirPartyB(): Promise<string> {
-    return "/samples-kotlin/Advanced/obligation-cordapp/build/nodes/ParticipantB/cordapps";
+  public async getCorDappsDirPartyB(
+    sampleCordapp: SampleCordappEnum = SampleCordappEnum.ADVANCED_OBLIGATION,
+  ): Promise<string> {
+    return SAMPLE_CORDAPP_DATA[sampleCordapp].cordappDirPartyB;
   }
 
-  public async getCorDappsDirPartyC(): Promise<string> {
-    return "/samples-kotlin/Advanced/obligation-cordapp/build/nodes/ParticipantC/cordapps";
+  public async getCorDappsDirPartyC(
+    sampleCordapp: SampleCordappEnum = SampleCordappEnum.ADVANCED_OBLIGATION,
+  ): Promise<string> {
+    return SAMPLE_CORDAPP_DATA[sampleCordapp].cordappDirPartyC;
   }
 
-  public async getCorDappsDirPartyNotary(): Promise<string> {
-    return "/samples-kotlin/Advanced/obligation-cordapp/build/nodes/Notary/cordapps";
+  public async getCorDappsDirPartyNotary(
+    sampleCordapp: SampleCordappEnum = SampleCordappEnum.ADVANCED_OBLIGATION,
+  ): Promise<string> {
+    return SAMPLE_CORDAPP_DATA[sampleCordapp].cordappDirNotary;
   }
 
   public async getSshConfig(): Promise<SshConfig> {
