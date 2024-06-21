@@ -43,7 +43,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | b
 ARG NPM_PKG_VERSION="latest"
 RUN source ~/.bashrc && \
     nvm install 18.18.2 && \
-    npm i -g corepack && corepack enable && corepack prepare yarn@4.1.0 --activate && \
+    npm i -g corepack && corepack enable && corepack prepare yarn@4.3.1 --activate && \
     yarn init --yes --private && \
     yarn config set nodeLinker node-modules && \
     yarn add @hyperledger/cactus-example-supply-chain-backend@${NPM_PKG_VERSION} --exact && \
