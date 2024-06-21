@@ -9,12 +9,35 @@ enum class Direction {
     NORTH, SOUTH, WEST, EAST
 }
 
+class TestTxData {}
 class JsonJvmObjectDeserializerTest {
 
     companion object {
         val deserializer = JsonJvmObjectDeserializer()
     }
 
+
+    @Test
+    fun classForNameHappyPath() {
+        
+        val jvmObject = JvmObject(
+            jvmTypeKind = JvmTypeKind.REFERENCE,
+            jvmType = JvmType(
+                fqClassName = Class::class.java.name
+            ),
+            jvmCtorArgs = listOf(
+                JvmObject(
+                    jvmTypeKind = JvmTypeKind.PRIMITIVE,
+                    jvmType = JvmType(String::class.java.name),
+                    primitiveValue = TestTxData::class.java.name
+                )
+            )
+        )
+
+        val deserializedObject = deserializer.instantiate(jvmObject)
+
+        assert(deserializedObject == TestTxData::class.java)
+    }
     @Test
     fun enumHappyPath() {
         val actual = Direction.WEST

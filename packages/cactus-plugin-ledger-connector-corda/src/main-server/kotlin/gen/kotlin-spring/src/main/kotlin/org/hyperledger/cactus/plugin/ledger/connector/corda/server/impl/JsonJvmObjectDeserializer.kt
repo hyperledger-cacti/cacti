@@ -74,6 +74,10 @@ class JsonJvmObjectDeserializer(
                 val constructorArgs: Array<Any?> = jvmObject.jvmCtorArgs.map { x -> instantiate(x) }.toTypedArray()
 
                 when {
+                    Class::class.java.isAssignableFrom(clazz) -> {
+                        val x = constructorArgs.map { ca -> ca as String }.first()
+                        return Class.forName(x)
+                    }
                     DoubleArray::class.java.isAssignableFrom(clazz) -> {
                         return constructorArgs
                             .map { ca -> ca as Double }
