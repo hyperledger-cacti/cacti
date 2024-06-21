@@ -1,10 +1,10 @@
+import type { AddressInfo } from "net";
 import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
 import { v4 as uuidv4 } from "uuid";
 import http from "http";
 import bodyParser from "body-parser";
 import express from "express";
-import { AddressInfo } from "net";
 
 import { Containers, CordaTestLedger } from "@hyperledger/cactus-test-tooling";
 import {
@@ -16,6 +16,7 @@ import {
   SampleCordappEnum,
   CordaConnectorContainer,
 } from "@hyperledger/cactus-test-tooling";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 import {
   CordappDeploymentConfig,
@@ -25,7 +26,6 @@ import {
   InvokeContractV1Request,
   JvmTypeKind,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
-import { Configuration } from "@hyperledger/cactus-core-api";
 
 import {
   IPluginLedgerConnectorCordaOptions,
@@ -33,18 +33,16 @@ import {
 } from "../../../main/typescript/plugin-ledger-connector-corda";
 import { K_CACTUS_CORDA_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
-// Skipping this until we figure out how to make the test case stable
-// https://github.com/hyperledger/cactus/issues/1598
-test.skip("Tests are passing on the JVM side", async (t: Test) => {
+test("Tests are passing on the JVM side", async (t: Test) => {
   test.onFailure(async () => {
     await Containers.logDiagnostics({ logLevel });
   });
 
   const ledger = new CordaTestLedger({
     imageName: "ghcr.io/hyperledger/cactus-corda-4-8-all-in-one-obligation",
-    imageVersion: "2021-08-31--feat-889",
+    imageVersion: "2023-11-03-86d6b38",
     logLevel,
   });
   t.ok(ledger, "CordaTestLedger v4.8 instantaited OK");
@@ -111,7 +109,7 @@ test.skip("Tests are passing on the JVM side", async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-11-23--feat-1493",
+    imageVersion: "2023-08-25-ea5522b",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantiated OK");
