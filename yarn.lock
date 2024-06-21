@@ -2074,6 +2074,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/helper-string-parser@npm:^7.24.7":
+  version: 7.24.7
+  resolution: "@babel/helper-string-parser@npm:7.24.7"
+  checksum: 10/603d8d962bbe89907aa99a8f19a006759ab7b2464615f20a6a22e3e2e8375af37ddd0e5175c9e622e1c4b2d83607ffb41055a59d0ce34404502af30fde573a5c
+  languageName: node
+  linkType: hard
+
 "@babel/helper-validator-identifier@npm:^7.16.7":
   version: 7.16.7
   resolution: "@babel/helper-validator-identifier@npm:7.16.7"
@@ -2113,6 +2120,13 @@ __metadata:
   version: 7.22.5
   resolution: "@babel/helper-validator-identifier@npm:7.22.5"
   checksum: 10/12cb7d4535b3f8d109a446f7bef08d20eebe94fd97b534cd415c936ab342e9634edc5c99961af976bd78bcae6e6ec4b2ab8483d0da2ac5926fbe9f7dd9ab28ab
+  languageName: node
+  linkType: hard
+
+"@babel/helper-validator-identifier@npm:^7.24.7":
+  version: 7.24.7
+  resolution: "@babel/helper-validator-identifier@npm:7.24.7"
+  checksum: 10/86875063f57361471b531dbc2ea10bbf5406e12b06d249b03827d361db4cad2388c6f00936bcd9dc86479f7e2c69ea21412c2228d4b3672588b754b70a449d4b
   languageName: node
   linkType: hard
 
@@ -2345,6 +2359,15 @@ __metadata:
   bin:
     parser: ./bin/babel-parser.js
   checksum: 10/b3e96b86c86e7380c8bbc6b1eebb4eed217cd60d8e215257065dffc02a9ce7988a668044422279b35ea23f744e872f181a2fd45ed9f188fed0315b61c69afb07
+  languageName: node
+  linkType: hard
+
+"@babel/parser@npm:7.24.7":
+  version: 7.24.7
+  resolution: "@babel/parser@npm:7.24.7"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: 10/ef9ebce60e13db560ccc7af9235d460f6726bb7e23ae2d675098c1fc43d5249067be60d4118889dad33b1d4f85162cf66baf554719e1669f29bb20e71322568e
   languageName: node
   linkType: hard
 
@@ -4086,6 +4109,17 @@ __metadata:
     lodash: "npm:^4.17.5"
     to-fast-properties: "npm:^2.0.0"
   checksum: 10/b0c0fa3f6962e729daae2c9feabfb3347a08c10c2030fa00ce8241b486ed42c952410289b22eb9a0924387260f2658b256cad0c27e59ff9758a3f7dbc7ccd792
+  languageName: node
+  linkType: hard
+
+"@babel/types@npm:7.24.7":
+  version: 7.24.7
+  resolution: "@babel/types@npm:7.24.7"
+  dependencies:
+    "@babel/helper-string-parser": "npm:^7.24.7"
+    "@babel/helper-validator-identifier": "npm:^7.24.7"
+    to-fast-properties: "npm:^2.0.0"
+  checksum: 10/ad3c8c0d6fb4acb0bb74bb5b4bb849b181bf6185677ef9c59c18856c81e43628d0858253cf232f0eca806f02e08eff85a1d3e636a3e94daea737597796b0b430
   languageName: node
   linkType: hard
 
@@ -9417,6 +9451,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus@workspace:."
   dependencies:
+    "@babel/parser": "npm:7.24.7"
+    "@babel/types": "npm:7.24.7"
     "@bufbuild/buf": "npm:1.30.0"
     "@bufbuild/protobuf": "npm:1.8.0"
     "@bufbuild/protoc-gen-es": "npm:1.8.0"
