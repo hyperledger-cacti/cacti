@@ -10,7 +10,7 @@ import {
   WatchBlocksV1,
   WatchBlocksV1BlockData,
 } from "../generated/openapi/typescript-axios";
-import { Socket as SocketIoSocket } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 import Web3 from "web3";
 
 export interface IWatchBlocksV1EndpointConfiguration {

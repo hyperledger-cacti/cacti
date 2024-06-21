@@ -59,6 +59,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "1.8.0",
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/connect-express": "1.4.0",
     "@connectrpc/connect-fastify": "1.4.0",
@@ -101,7 +102,6 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "1.30.0",
-    "@bufbuild/protobuf": "1.8.0",
     "@bufbuild/protoc-gen-es": "1.8.0",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@hyperledger/cactus-plugin-keychain-vault": "2.0.0-rc.1",

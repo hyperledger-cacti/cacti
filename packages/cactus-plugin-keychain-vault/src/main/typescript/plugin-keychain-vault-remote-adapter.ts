@@ -1,4 +1,4 @@
-import { Express } from "express";
+import type { Express } from "express";
 
 import OAS from "../json/openapi.json";
 

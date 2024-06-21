@@ -1,5 +1,5 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
+import type { Server } from "http";
+import type { Server as SecureServer } from "https";
 import { setTimeout } from "timers/promises";
 
 import type { Server as SocketIoServer } from "socket.io";
@@ -16,7 +16,7 @@ import type { WebsocketProvider } from "web3-core";
 import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
-import { TransactionReceipt } from "web3-eth";
+import type { TransactionReceipt } from "web3-eth";
 import {
   GetBalanceV1Request,
   GetBalanceV1Response,

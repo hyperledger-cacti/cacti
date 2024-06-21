@@ -1,4 +1,4 @@
-import { Socket as SocketIoSocket } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 import { ProofStateChangedEvent, ProofEventTypes } from "@aries-framework/core";
 
 import {

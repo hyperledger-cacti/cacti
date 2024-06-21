@@ -9,18 +9,20 @@ import {
 } from "node-ssh";
 
 import { Checks, Logger } from "@hyperledger/cactus-common";
-import { FABRIC_25_LTS_FABRIC_SAMPLES__ORDERER_TLS_ROOTCERT_FILE_ORG_1 } from "@hyperledger/cactus-test-tooling";
 
-import {
+import type {
   DeployContractGoSourceV1Request,
   DeployContractGoSourceV1Response,
 } from "../generated/openapi/typescript-axios/api";
-import { IPluginLedgerConnectorFabricOptions } from "../plugin-ledger-connector-fabric";
+import type { IPluginLedgerConnectorFabricOptions } from "../plugin-ledger-connector-fabric";
 import { sshExec } from "../common/ssh-exec";
 import { findAndReplaceFabricLoggingSpec } from "../common/find-and-replace-fabric-logging-spec";
-import { IQueryInstalledResponse } from "../peer/i-query-installed-response";
+import type { IQueryInstalledResponse } from "../peer/i-query-installed-response";
 import { isSshExecOk } from "../common/is-ssh-exec-ok";
-import { IQueryCommittedResponse } from "../peer/i-query-committed-response";
+import type { IQueryCommittedResponse } from "../peer/i-query-committed-response";
+
+const FABRIC_25_LTS_FABRIC_SAMPLES__ORDERER_TLS_ROOTCERT_FILE_ORG_1 =
+  "/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
