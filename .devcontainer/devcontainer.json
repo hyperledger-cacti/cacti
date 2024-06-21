@@ -9,7 +9,7 @@
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
 			"moby": true,
 			"installDockerBuildx": true,
-			"version": "20.10.24",
+			"version": "26.1.4",
 			"dockerDashComposeVersion": "v2"
 		},
 		"ghcr.io/devcontainers/features/git:1": {
