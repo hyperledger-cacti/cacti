@@ -1242,6 +1242,7 @@
         "description": "Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1276,6 +1277,7 @@
         "summary": "Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1320,6 +1322,7 @@
         "summary": "Invokes a contract on a Corda ledger (e.g. a flow)",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1354,6 +1357,7 @@
         "summary": "Start monitoring corda changes (transactions) of given state class",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1388,6 +1392,7 @@
         "summary": "Get transactions for monitored state classes.",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1422,6 +1427,7 @@
         "summary": "Clear transactions from internal store so they'll not be available by GetMonitorTransactionsV1 anymore.",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1456,6 +1462,7 @@
         "summary": "Stop monitoring corda changes (transactions) of given state class",
         "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -1490,6 +1497,7 @@
         "description": "Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List<NodeInfo>",
         "parameters": [],
         "requestBody": {
+          "required": false,
           "content": {
             "application/json": {
               "schema": {
@@ -1524,6 +1532,7 @@
         "description": "Responds with a list of the flows on the Corda node.",
         "parameters": [],
         "requestBody": {
+          "required": false,
           "content": {
             "application/json": {
               "schema": {
@@ -1558,6 +1567,7 @@
         "description": "Responds with diagnostic information about the Corda node",
         "parameters": [],
         "requestBody": {
+          "required": false,
           "content": {
             "application/json": {
               "schema": {

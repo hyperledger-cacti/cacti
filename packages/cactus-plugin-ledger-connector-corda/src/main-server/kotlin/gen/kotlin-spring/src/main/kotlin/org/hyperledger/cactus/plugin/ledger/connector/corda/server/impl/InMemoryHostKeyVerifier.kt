@@ -71,4 +71,12 @@ class InMemoryHostKeyVerifier(inputStream: InputStream?, charset: Charset?) :
         logger.debug("Rejecting due to none of the {} entries being acceptable.", entries.size)
         return false
     }
+
+    // FIXME: 2024-01-03 Peter - host key verification is needed. SSH is only used
+    // for contract deployment via the connector which is an experimental feature not
+    // ready for production use so this is not an issue until we decide to make it
+    // production ready (the contract deployment endpoint)
+    override fun findExistingAlgorithms(hostname: String, port: Int): List<String> {
+        return listOf()
+    }
 }

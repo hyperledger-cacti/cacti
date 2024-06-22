@@ -6,6 +6,7 @@ import {
   CordaTestLedger,
   pruneDockerAllIfGithubAction,
   CordaConnectorContainer,
+  SampleCordappEnum,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
@@ -21,7 +22,9 @@ import { createJvmString } from "../../../main/typescript/jvm/serde/factory/crea
 import { createJvmInt } from "../../../main/typescript";
 
 const testCase = "Tests are passing on the JVM side";
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
+const logLevelJvmApp: LogLevelDesc = "INFO";
+const logLevelJvmRoot: LogLevelDesc = "WARN";
 
 test.onFailure(async () => {
   await Containers.logDiagnostics({ logLevel });
@@ -56,13 +59,7 @@ test(testCase, async (t: Test) => {
   await ledger.logDebugPorts();
   const partyARpcPort = await ledger.getRpcAPublicPort();
 
-  // We cannot import SampleCordappEnum here because it causes a circular
-  // import cycle which means that the import statement does compile but will
-  // yield undefinedat runtime and the test will crash on this line.
-  // So, instead of importing the enum, we just hardcode a magic string which is
-  // the exact opposite of what we should be doing but until we figure out the
-  // circular imports problem it's an acceptable workaround.
-  const jarFiles = await ledger.pullCordappJars("BASIC_FLOW" as never);
+  const jarFiles = await ledger.pullCordappJars(SampleCordappEnum.BASIC_FLOW);
   t.comment(`Fetched ${jarFiles.length} cordapp jars OK`);
 
   const internalIpOrUndefined = await internalIpV4();
@@ -75,10 +72,10 @@ test(testCase, async (t: Test) => {
   const springAppConfig = {
     logging: {
       level: {
-        root: "INFO",
-        "net.corda": "INFO",
-        "org.hyperledger.cactus": "DEBUG",
-        "org.hyperledger.cacti": "DEBUG",
+        root: logLevelJvmRoot,
+        "net.corda": logLevelJvmRoot,
+        "org.hyperledger.cactus": logLevelJvmApp,
+        "org.hyperledger.cacti": logLevelJvmApp,
       },
     },
     cactus: {

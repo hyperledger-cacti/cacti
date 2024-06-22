@@ -70,6 +70,9 @@ func (a *DefaultApiService) ClearMonitorTransactionsV1Execute(r ApiClearMonitorT
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.clearMonitorTransactionsV1Request == nil {
+		return localVarReturnValue, nil, reportError("clearMonitorTransactionsV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
@@ -175,6 +178,9 @@ func (a *DefaultApiService) DeployContractJarsV1Execute(r ApiDeployContractJarsV
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.deployContractJarsV1Request == nil {
+		return localVarReturnValue, nil, reportError("deployContractJarsV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
@@ -506,6 +512,9 @@ func (a *DefaultApiService) GetMonitorTransactionsV1Execute(r ApiGetMonitorTrans
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.getMonitorTransactionsV1Request == nil {
+		return localVarReturnValue, nil, reportError("getMonitorTransactionsV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
@@ -708,6 +717,9 @@ func (a *DefaultApiService) InvokeContractV1Execute(r ApiInvokeContractV1Request
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.invokeContractV1Request == nil {
+		return localVarReturnValue, nil, reportError("invokeContractV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
@@ -1353,6 +1365,9 @@ func (a *DefaultApiService) StartMonitorV1Execute(r ApiStartMonitorV1Request) (*
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.startMonitorV1Request == nil {
+		return localVarReturnValue, nil, reportError("startMonitorV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
@@ -1458,6 +1473,9 @@ func (a *DefaultApiService) StopMonitorV1Execute(r ApiStopMonitorV1Request) (*St
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.stopMonitorV1Request == nil {
+		return localVarReturnValue, nil, reportError("stopMonitorV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
@@ -1565,6 +1583,9 @@ func (a *DefaultApiService) VaultQueryV1Execute(r ApiVaultQueryV1Request) (map[s
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.vaultQueryV1Request == nil {
+		return localVarReturnValue, nil, reportError("vaultQueryV1Request is required and must be specified")
+	}
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}

@@ -1,7 +1,12 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl
 
+// import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import net.corda.core.contracts.ContractState
 import net.corda.core.flows.FlowLogic
@@ -19,6 +24,7 @@ import net.schmizz.sshj.xfer.InMemorySourceFile
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.api.ApiPluginLedgerConnectorCordaService
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.*
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.HtmlUtils.htmlEscape
@@ -54,9 +60,14 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         val jsonJvmObjectDeserializer = JsonJvmObjectDeserializer()
     }
 
-    fun dynamicInvoke(rpc: CordaRPCOps, req: InvokeContractV1Request): InvokeContractV1Response {
-        @Suppress("UNCHECKED_CAST")
-        val classFlowLogic = jsonJvmObjectDeserializer.getOrInferType(req.flowFullClassName) as Class<out FlowLogic<*>>
+    private fun dynamicInvoke(rpc: CordaRPCOps, req: InvokeContractV1Request): InvokeContractV1Response {
+        val classFlowLogic = try {
+            @Suppress("UNCHECKED_CAST")
+            jsonJvmObjectDeserializer.getOrInferType(req.flowFullClassName) as Class<out FlowLogic<*>>
+        } catch (ex: ClassNotFoundException) {
+            val reason = "flowFullClassName ${req.flowFullClassName} could not be loaded. Are you sure you have installed the correct .jar file(s)?"
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, reason, ex)
+        }
         val params = req.params.map { p -> jsonJvmObjectDeserializer.instantiate(p) }.toTypedArray()
         logger.info("params={}", params)
 
@@ -148,10 +159,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
     // https://docs.corda.net/docs/corda-enterprise/4.6/node-upgrade-notes.html#step-1-drain-the-node
     // The other solution is of course to make it so that this endpoint is a fully fledged, robust, production ready
     // implementation and that would be preferred over the longer term, but maybe it's actually just scope creep...
-    override fun deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request?): DeployContractJarsSuccessV1Response {
-        if (deployContractJarsV1Request == null) {
-            throw IllegalArgumentException("DeployContractJarsV1Request cannot be null")
-        }
+    override fun deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request): DeployContractJarsSuccessV1Response {
         try {
             val decoder = Base64.getDecoder()
 
@@ -173,6 +181,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
                 fun tryConnectingToSshHost () {
                     tries++
                     try {
+                        logger.debug("Connecting to node via SSH... ${cred.hostname}:${cred.port}")
                         ssh.connect(cred.hostname, cred.port)
                     } catch (ex: TransportException) {
                         if (tries < maxTries) {
@@ -331,9 +340,8 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request?): InvokeContractV1Response {
-        Objects.requireNonNull(invokeContractV1Request, "InvokeContractV1Request must be non-null!")
-        return dynamicInvoke(rpc.proxy, invokeContractV1Request!!)
+    override fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request): InvokeContractV1Response {
+        return dynamicInvoke(rpc.proxy, invokeContractV1Request)
     }
 
     override fun listFlowsV1(listFlowsV1Request: ListFlowsV1Request?): ListFlowsV1Response {
@@ -343,20 +351,18 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
 
     override fun networkMapV1(body: Any?): List<NodeInfo> {
         val reader = mapper.readerFor(object : TypeReference<List<NodeInfo?>?>() {})
-
         val networkMapSnapshot = rpc.proxy.networkMapSnapshot()
-        val networkMapJson = writer.writeValueAsString(networkMapSnapshot)
+        val serializer = CordaNetworkMapSnapshotJsonSerializer(networkMapSnapshot)
+        val x = serializer.asListOfMaps()
+        val networkMapJson = writer.writeValueAsString(x)
         logger.trace("networkMapSnapshot=\n{}", networkMapJson)
 
         val nodeInfoList = reader.readValue<List<NodeInfo>>(networkMapJson)
-        logger.info("Returning {} NodeInfo elements in response.", nodeInfoList.size)
+        logger.debug("Returning {} NodeInfo elements in response.", nodeInfoList.size)
         return nodeInfoList
     }
 
-    override fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request?): Any {
-        if (vaultQueryV1Request == null) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "QueryBySimpleV1Request cannot be null")
-        }
+    override fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request): Any {
         if (vaultQueryV1Request.contractStateType == null) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "QueryBySimpleV1Request.contractStateType cannot be null")
         }
@@ -385,17 +391,17 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
     /**
      * Start monitoring state changes for clientAppID of stateClass specified in the request body.
      */
-    override fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request?): StartMonitorV1Response {
-        val clientAppId = startMonitorV1Request?.clientAppId
-        val stateName = startMonitorV1Request?.stateFullClassName
+    override fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request): StartMonitorV1Response {
+        val clientAppId = startMonitorV1Request.clientAppId
+        val stateName = startMonitorV1Request.stateFullClassName
 
-        if (clientAppId.isNullOrEmpty()) {
+        if (clientAppId.isEmpty()) {
             val message = "Request rejected because missing client app ID"
             logger.info(message)
             return StartMonitorV1Response(false, message)
         }
 
-        if (stateName.isNullOrEmpty()) {
+        if (stateName.isEmpty()) {
             val message = "Request rejected because missing state class name"
             logger.info(message)
             return StartMonitorV1Response(false, message)
@@ -424,17 +430,17 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
      * Must be called after startMonitorV1 and before stopMonitorV1.
      * Transactions buffer must be explicitly cleared with clearMonitorTransactionsV1
      */
-    override fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request?): GetMonitorTransactionsV1Response {
-        val clientAppId = getMonitorTransactionsV1Request?.clientAppId
-        val stateName = getMonitorTransactionsV1Request?.stateFullClassName
+    override fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request): GetMonitorTransactionsV1Response {
+        val clientAppId = getMonitorTransactionsV1Request.clientAppId
+        val stateName = getMonitorTransactionsV1Request.stateFullClassName
 
-        if (clientAppId.isNullOrEmpty()) {
+        if (clientAppId.isEmpty()) {
             val message = "Request rejected because missing client app ID"
             logger.info(message)
             return GetMonitorTransactionsV1Response(false, message)
         }
 
-        if (stateName.isNullOrEmpty()) {
+        if (stateName.isEmpty()) {
             val message = "Request rejected because missing state class name"
             logger.info(message)
             return GetMonitorTransactionsV1Response(false, message)
@@ -455,24 +461,24 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
      * Clear monitored transactions based on index from internal client buffer.
      * Any future call to getMonitorTransactionsV1 will not return transactions removed by this call.
      */
-    override fun clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request?): ClearMonitorTransactionsV1Response {
-        val clientAppId = clearMonitorTransactionsV1Request?.clientAppId
-        val stateName = clearMonitorTransactionsV1Request?.stateFullClassName
-        val indexesToRemove = clearMonitorTransactionsV1Request?.txIndexes
+    override fun clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request): ClearMonitorTransactionsV1Response {
+        val clientAppId = clearMonitorTransactionsV1Request.clientAppId
+        val stateName = clearMonitorTransactionsV1Request.stateFullClassName
+        val indexesToRemove = clearMonitorTransactionsV1Request.txIndexes
 
-        if (clientAppId.isNullOrEmpty()) {
+        if (clientAppId.isEmpty()) {
             val message = "Request rejected because missing client app ID"
             logger.info(message)
             return ClearMonitorTransactionsV1Response(false, message)
         }
 
-        if (stateName.isNullOrEmpty()) {
+        if (stateName.isEmpty()) {
             val message = "Request rejected because missing state class name"
             logger.info(message)
             return ClearMonitorTransactionsV1Response(false, message)
         }
 
-        if (indexesToRemove.isNullOrEmpty()) {
+        if (indexesToRemove.isEmpty()) {
             val message = "No indexes to remove"
             logger.info(message)
             return ClearMonitorTransactionsV1Response(true, message)
@@ -494,17 +500,17 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
      * Stop monitoring state changes for clientAppID of stateClass specified in the request body.
      * Removes all transactions that were not read yet, unsubscribes from the monitor.
      */
-    override fun stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request?): StopMonitorV1Response {
-        val clientAppId = stopMonitorV1Request?.clientAppId
-        val stateName = stopMonitorV1Request?.stateFullClassName
+    override fun stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request): StopMonitorV1Response {
+        val clientAppId = stopMonitorV1Request.clientAppId
+        val stateName = stopMonitorV1Request.stateFullClassName
 
-        if (clientAppId.isNullOrEmpty()) {
+        if (clientAppId.isEmpty()) {
             val message = "Request rejected because missing client app ID"
             logger.info(message)
             return StopMonitorV1Response(false, message)
         }
 
-        if (stateName.isNullOrEmpty()) {
+        if (stateName.isEmpty()) {
             val message = "Request rejected because missing state class name"
             logger.info(message)
             return StopMonitorV1Response(false, message)

@@ -73,7 +73,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
      * 
-     * @param clearMonitorTransactionsV1Request  (optional)
+     * @param clearMonitorTransactionsV1Request 
      * @return ClearMonitorTransactionsV1Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -83,7 +83,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request? = null) : ClearMonitorTransactionsV1Response {
+    fun clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request) : ClearMonitorTransactionsV1Response {
         val localVarResponse = clearMonitorTransactionsV1WithHttpInfo(clearMonitorTransactionsV1Request = clearMonitorTransactionsV1Request)
 
         return when (localVarResponse.responseType) {
@@ -104,14 +104,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
      * 
-     * @param clearMonitorTransactionsV1Request  (optional)
+     * @param clearMonitorTransactionsV1Request 
      * @return ApiResponse<ClearMonitorTransactionsV1Response?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun clearMonitorTransactionsV1WithHttpInfo(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request?) : ApiResponse<ClearMonitorTransactionsV1Response?> {
+    fun clearMonitorTransactionsV1WithHttpInfo(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request) : ApiResponse<ClearMonitorTransactionsV1Response?> {
         val localVariableConfig = clearMonitorTransactionsV1RequestConfig(clearMonitorTransactionsV1Request = clearMonitorTransactionsV1Request)
 
         return request<ClearMonitorTransactionsV1Request, ClearMonitorTransactionsV1Response>(
@@ -122,10 +122,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation clearMonitorTransactionsV1
      *
-     * @param clearMonitorTransactionsV1Request  (optional)
+     * @param clearMonitorTransactionsV1Request 
      * @return RequestConfig
      */
-    fun clearMonitorTransactionsV1RequestConfig(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request?) : RequestConfig<ClearMonitorTransactionsV1Request> {
+    fun clearMonitorTransactionsV1RequestConfig(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request) : RequestConfig<ClearMonitorTransactionsV1Request> {
         val localVariableBody = clearMonitorTransactionsV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
@@ -145,7 +145,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
      * 
-     * @param deployContractJarsV1Request  (optional)
+     * @param deployContractJarsV1Request 
      * @return DeployContractJarsSuccessV1Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -155,7 +155,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request? = null) : DeployContractJarsSuccessV1Response {
+    fun deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request) : DeployContractJarsSuccessV1Response {
         val localVarResponse = deployContractJarsV1WithHttpInfo(deployContractJarsV1Request = deployContractJarsV1Request)
 
         return when (localVarResponse.responseType) {
@@ -176,14 +176,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
      * 
-     * @param deployContractJarsV1Request  (optional)
+     * @param deployContractJarsV1Request 
      * @return ApiResponse<DeployContractJarsSuccessV1Response?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deployContractJarsV1WithHttpInfo(deployContractJarsV1Request: DeployContractJarsV1Request?) : ApiResponse<DeployContractJarsSuccessV1Response?> {
+    fun deployContractJarsV1WithHttpInfo(deployContractJarsV1Request: DeployContractJarsV1Request) : ApiResponse<DeployContractJarsSuccessV1Response?> {
         val localVariableConfig = deployContractJarsV1RequestConfig(deployContractJarsV1Request = deployContractJarsV1Request)
 
         return request<DeployContractJarsV1Request, DeployContractJarsSuccessV1Response>(
@@ -194,10 +194,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation deployContractJarsV1
      *
-     * @param deployContractJarsV1Request  (optional)
+     * @param deployContractJarsV1Request 
      * @return RequestConfig
      */
-    fun deployContractJarsV1RequestConfig(deployContractJarsV1Request: DeployContractJarsV1Request?) : RequestConfig<DeployContractJarsV1Request> {
+    fun deployContractJarsV1RequestConfig(deployContractJarsV1Request: DeployContractJarsV1Request) : RequestConfig<DeployContractJarsV1Request> {
         val localVariableBody = deployContractJarsV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
@@ -360,7 +360,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Get transactions for monitored state classes.
      * 
-     * @param getMonitorTransactionsV1Request  (optional)
+     * @param getMonitorTransactionsV1Request 
      * @return GetMonitorTransactionsV1Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -370,7 +370,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request? = null) : GetMonitorTransactionsV1Response {
+    fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request) : GetMonitorTransactionsV1Response {
         val localVarResponse = getMonitorTransactionsV1WithHttpInfo(getMonitorTransactionsV1Request = getMonitorTransactionsV1Request)
 
         return when (localVarResponse.responseType) {
@@ -391,14 +391,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Get transactions for monitored state classes.
      * 
-     * @param getMonitorTransactionsV1Request  (optional)
+     * @param getMonitorTransactionsV1Request 
      * @return ApiResponse<GetMonitorTransactionsV1Response?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getMonitorTransactionsV1WithHttpInfo(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request?) : ApiResponse<GetMonitorTransactionsV1Response?> {
+    fun getMonitorTransactionsV1WithHttpInfo(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request) : ApiResponse<GetMonitorTransactionsV1Response?> {
         val localVariableConfig = getMonitorTransactionsV1RequestConfig(getMonitorTransactionsV1Request = getMonitorTransactionsV1Request)
 
         return request<GetMonitorTransactionsV1Request, GetMonitorTransactionsV1Response>(
@@ -409,10 +409,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation getMonitorTransactionsV1
      *
-     * @param getMonitorTransactionsV1Request  (optional)
+     * @param getMonitorTransactionsV1Request 
      * @return RequestConfig
      */
-    fun getMonitorTransactionsV1RequestConfig(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request?) : RequestConfig<GetMonitorTransactionsV1Request> {
+    fun getMonitorTransactionsV1RequestConfig(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request) : RequestConfig<GetMonitorTransactionsV1Request> {
         val localVariableBody = getMonitorTransactionsV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
@@ -499,7 +499,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Invokes a contract on a Corda ledger (e.g. a flow)
      * 
-     * @param invokeContractV1Request  (optional)
+     * @param invokeContractV1Request 
      * @return InvokeContractV1Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -509,7 +509,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request? = null) : InvokeContractV1Response {
+    fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request) : InvokeContractV1Response {
         val localVarResponse = invokeContractV1WithHttpInfo(invokeContractV1Request = invokeContractV1Request)
 
         return when (localVarResponse.responseType) {
@@ -530,14 +530,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Invokes a contract on a Corda ledger (e.g. a flow)
      * 
-     * @param invokeContractV1Request  (optional)
+     * @param invokeContractV1Request 
      * @return ApiResponse<InvokeContractV1Response?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun invokeContractV1WithHttpInfo(invokeContractV1Request: InvokeContractV1Request?) : ApiResponse<InvokeContractV1Response?> {
+    fun invokeContractV1WithHttpInfo(invokeContractV1Request: InvokeContractV1Request) : ApiResponse<InvokeContractV1Response?> {
         val localVariableConfig = invokeContractV1RequestConfig(invokeContractV1Request = invokeContractV1Request)
 
         return request<InvokeContractV1Request, InvokeContractV1Response>(
@@ -548,10 +548,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation invokeContractV1
      *
-     * @param invokeContractV1Request  (optional)
+     * @param invokeContractV1Request 
      * @return RequestConfig
      */
-    fun invokeContractV1RequestConfig(invokeContractV1Request: InvokeContractV1Request?) : RequestConfig<InvokeContractV1Request> {
+    fun invokeContractV1RequestConfig(invokeContractV1Request: InvokeContractV1Request) : RequestConfig<InvokeContractV1Request> {
         val localVariableBody = invokeContractV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
@@ -930,7 +930,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Start monitoring corda changes (transactions) of given state class
      * 
-     * @param startMonitorV1Request  (optional)
+     * @param startMonitorV1Request 
      * @return StartMonitorV1Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -940,7 +940,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request? = null) : StartMonitorV1Response {
+    fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request) : StartMonitorV1Response {
         val localVarResponse = startMonitorV1WithHttpInfo(startMonitorV1Request = startMonitorV1Request)
 
         return when (localVarResponse.responseType) {
@@ -961,14 +961,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Start monitoring corda changes (transactions) of given state class
      * 
-     * @param startMonitorV1Request  (optional)
+     * @param startMonitorV1Request 
      * @return ApiResponse<StartMonitorV1Response?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun startMonitorV1WithHttpInfo(startMonitorV1Request: StartMonitorV1Request?) : ApiResponse<StartMonitorV1Response?> {
+    fun startMonitorV1WithHttpInfo(startMonitorV1Request: StartMonitorV1Request) : ApiResponse<StartMonitorV1Response?> {
         val localVariableConfig = startMonitorV1RequestConfig(startMonitorV1Request = startMonitorV1Request)
 
         return request<StartMonitorV1Request, StartMonitorV1Response>(
@@ -979,10 +979,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation startMonitorV1
      *
-     * @param startMonitorV1Request  (optional)
+     * @param startMonitorV1Request 
      * @return RequestConfig
      */
-    fun startMonitorV1RequestConfig(startMonitorV1Request: StartMonitorV1Request?) : RequestConfig<StartMonitorV1Request> {
+    fun startMonitorV1RequestConfig(startMonitorV1Request: StartMonitorV1Request) : RequestConfig<StartMonitorV1Request> {
         val localVariableBody = startMonitorV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
@@ -1002,7 +1002,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Stop monitoring corda changes (transactions) of given state class
      * 
-     * @param stopMonitorV1Request  (optional)
+     * @param stopMonitorV1Request 
      * @return StopMonitorV1Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -1012,7 +1012,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request? = null) : StopMonitorV1Response {
+    fun stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request) : StopMonitorV1Response {
         val localVarResponse = stopMonitorV1WithHttpInfo(stopMonitorV1Request = stopMonitorV1Request)
 
         return when (localVarResponse.responseType) {
@@ -1033,14 +1033,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Stop monitoring corda changes (transactions) of given state class
      * 
-     * @param stopMonitorV1Request  (optional)
+     * @param stopMonitorV1Request 
      * @return ApiResponse<StopMonitorV1Response?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun stopMonitorV1WithHttpInfo(stopMonitorV1Request: StopMonitorV1Request?) : ApiResponse<StopMonitorV1Response?> {
+    fun stopMonitorV1WithHttpInfo(stopMonitorV1Request: StopMonitorV1Request) : ApiResponse<StopMonitorV1Response?> {
         val localVariableConfig = stopMonitorV1RequestConfig(stopMonitorV1Request = stopMonitorV1Request)
 
         return request<StopMonitorV1Request, StopMonitorV1Response>(
@@ -1051,10 +1051,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation stopMonitorV1
      *
-     * @param stopMonitorV1Request  (optional)
+     * @param stopMonitorV1Request 
      * @return RequestConfig
      */
-    fun stopMonitorV1RequestConfig(stopMonitorV1Request: StopMonitorV1Request?) : RequestConfig<StopMonitorV1Request> {
+    fun stopMonitorV1RequestConfig(stopMonitorV1Request: StopMonitorV1Request) : RequestConfig<StopMonitorV1Request> {
         val localVariableBody = stopMonitorV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
@@ -1074,7 +1074,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * 
      * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
-     * @param vaultQueryV1Request  (optional)
+     * @param vaultQueryV1Request 
      * @return kotlin.Any
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -1084,7 +1084,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request? = null) : kotlin.Any {
+    fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request) : kotlin.Any {
         val localVarResponse = vaultQueryV1WithHttpInfo(vaultQueryV1Request = vaultQueryV1Request)
 
         return when (localVarResponse.responseType) {
@@ -1105,14 +1105,14 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * 
      * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
-     * @param vaultQueryV1Request  (optional)
+     * @param vaultQueryV1Request 
      * @return ApiResponse<kotlin.Any?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun vaultQueryV1WithHttpInfo(vaultQueryV1Request: VaultQueryV1Request?) : ApiResponse<kotlin.Any?> {
+    fun vaultQueryV1WithHttpInfo(vaultQueryV1Request: VaultQueryV1Request) : ApiResponse<kotlin.Any?> {
         val localVariableConfig = vaultQueryV1RequestConfig(vaultQueryV1Request = vaultQueryV1Request)
 
         return request<VaultQueryV1Request, kotlin.Any>(
@@ -1123,10 +1123,10 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation vaultQueryV1
      *
-     * @param vaultQueryV1Request  (optional)
+     * @param vaultQueryV1Request 
      * @return RequestConfig
      */
-    fun vaultQueryV1RequestConfig(vaultQueryV1Request: VaultQueryV1Request?) : RequestConfig<VaultQueryV1Request> {
+    fun vaultQueryV1RequestConfig(vaultQueryV1Request: VaultQueryV1Request) : RequestConfig<VaultQueryV1Request> {
         val localVariableBody = vaultQueryV1Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()

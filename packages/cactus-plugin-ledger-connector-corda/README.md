@@ -19,6 +19,7 @@
 - [Testing Environment for Manual Tests via Docker Compose](#testing-environment-for-manual-tests-via-docker-compose)
 - [Building Docker Image Locally](#building-docker-image-locally)
 - [Scan The Locally Built Container Image for Vulnerabilities with Trivy](#scan-the-locally-built-container-image-for-vulnerabilities-with-trivy)
+- [Scan The Locally Built .jar File For Vulnerabilities with Trivy](#scan-the-locally-built-jar-file-for-vulnerabilities-with-trivy)
 - [Example NodeDiagnosticInfo JSON Response](#example-nodediagnosticinfo-json-response)
 - [Monitoring](#monitoring)
   - [Usage Prometheus](#usage-prometheus)
@@ -306,7 +307,8 @@ const res = await apiClient.invokeContractV1({
   docker compose \
     --project-directory=./ \
     --file=./packages/cactus-plugin-ledger-connector-corda/src/test/yaml/fixtures/docker-compose.yaml \
-    up
+    up \
+    --build connector
   ```
 2. Deploy contract:
   ```sh
@@ -574,6 +576,7 @@ DOCKER_BUILDKIT=1 docker build \
   ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ \
   --progress=plain \
   --tag cccs \
+  --tag cccs:latest \
   --tag "ghcr.io/hyperledger/cactus-connector-corda-server:$(date +%F)-$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)-$(git rev-parse --short HEAD)"
 ```
 
@@ -586,6 +589,16 @@ on your host OS or you are using the VSCode Dev Container which ships with Trivy
 
 ```sh
 trivy image cccs --scanners=vuln --severity=CRITICAL --severity=HIGH
+```
+
+## Scan The Locally Built .jar File For Vulnerabilities with Trivy
+
+```sh
+cd packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/
+
+./gradlew clean build -Pversion=dev -DrootProjectName=cacti-connector-corda-server
+
+trivy rootfs ./build/libs/cacti-connector-corda-server-dev.jar --scanners=vuln --severity=CRITICAL --severity=HIGH
 ```
 
 ## Example NodeDiagnosticInfo JSON Response

@@ -1362,11 +1362,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
-         * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+         * @param {ClearMonitorTransactionsV1Request} clearMonitorTransactionsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        clearMonitorTransactionsV1: async (clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        clearMonitorTransactionsV1: async (clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'clearMonitorTransactionsV1Request' is not null or undefined
+            assertParamExists('clearMonitorTransactionsV1', 'clearMonitorTransactionsV1Request', clearMonitorTransactionsV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1396,11 +1398,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
-         * @param {DeployContractJarsV1Request} [deployContractJarsV1Request] 
+         * @param {DeployContractJarsV1Request} deployContractJarsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployContractJarsV1: async (deployContractJarsV1Request?: DeployContractJarsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deployContractJarsV1: async (deployContractJarsV1Request: DeployContractJarsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deployContractJarsV1Request' is not null or undefined
+            assertParamExists('deployContractJarsV1', 'deployContractJarsV1Request', deployContractJarsV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1499,11 +1503,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Get transactions for monitored state classes.
-         * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+         * @param {GetMonitorTransactionsV1Request} getMonitorTransactionsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMonitorTransactionsV1: async (getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMonitorTransactionsV1: async (getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'getMonitorTransactionsV1Request' is not null or undefined
+            assertParamExists('getMonitorTransactionsV1', 'getMonitorTransactionsV1Request', getMonitorTransactionsV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1563,11 +1569,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Invokes a contract on a Corda ledger (e.g. a flow)
-         * @param {InvokeContractV1Request} [invokeContractV1Request] 
+         * @param {InvokeContractV1Request} invokeContractV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeContractV1: async (invokeContractV1Request?: InvokeContractV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeContractV1: async (invokeContractV1Request: InvokeContractV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invokeContractV1Request' is not null or undefined
+            assertParamExists('invokeContractV1', 'invokeContractV1Request', invokeContractV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1771,11 +1779,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Start monitoring corda changes (transactions) of given state class
-         * @param {StartMonitorV1Request} [startMonitorV1Request] 
+         * @param {StartMonitorV1Request} startMonitorV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        startMonitorV1: async (startMonitorV1Request?: StartMonitorV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        startMonitorV1: async (startMonitorV1Request: StartMonitorV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'startMonitorV1Request' is not null or undefined
+            assertParamExists('startMonitorV1', 'startMonitorV1Request', startMonitorV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1805,11 +1815,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Stop monitoring corda changes (transactions) of given state class
-         * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+         * @param {StopMonitorV1Request} stopMonitorV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        stopMonitorV1: async (stopMonitorV1Request?: StopMonitorV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        stopMonitorV1: async (stopMonitorV1Request: StopMonitorV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'stopMonitorV1Request' is not null or undefined
+            assertParamExists('stopMonitorV1', 'stopMonitorV1Request', stopMonitorV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1838,11 +1850,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
-         * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+         * @param {VaultQueryV1Request} vaultQueryV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        vaultQueryV1: async (vaultQueryV1Request?: VaultQueryV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        vaultQueryV1: async (vaultQueryV1Request: VaultQueryV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'vaultQueryV1Request' is not null or undefined
+            assertParamExists('vaultQueryV1', 'vaultQueryV1Request', vaultQueryV1Request)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1882,22 +1896,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
-         * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+         * @param {ClearMonitorTransactionsV1Request} clearMonitorTransactionsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ClearMonitorTransactionsV1Response>> {
+        async clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ClearMonitorTransactionsV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
-         * @param {DeployContractJarsV1Request} [deployContractJarsV1Request] 
+         * @param {DeployContractJarsV1Request} deployContractJarsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractJarsSuccessV1Response>> {
+        async deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractJarsSuccessV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractJarsV1(deployContractJarsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1925,11 +1939,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get transactions for monitored state classes.
-         * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+         * @param {GetMonitorTransactionsV1Request} getMonitorTransactionsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMonitorTransactionsV1Response>> {
+        async getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMonitorTransactionsV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMonitorTransactionsV1(getMonitorTransactionsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1946,11 +1960,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Invokes a contract on a Corda ledger (e.g. a flow)
-         * @param {InvokeContractV1Request} [invokeContractV1Request] 
+         * @param {InvokeContractV1Request} invokeContractV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+        async invokeContractV1(invokeContractV1Request: InvokeContractV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1(invokeContractV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2010,32 +2024,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Start monitoring corda changes (transactions) of given state class
-         * @param {StartMonitorV1Request} [startMonitorV1Request] 
+         * @param {StartMonitorV1Request} startMonitorV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StartMonitorV1Response>> {
+        async startMonitorV1(startMonitorV1Request: StartMonitorV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StartMonitorV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.startMonitorV1(startMonitorV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Stop monitoring corda changes (transactions) of given state class
-         * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+         * @param {StopMonitorV1Request} stopMonitorV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StopMonitorV1Response>> {
+        async stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StopMonitorV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.stopMonitorV1(stopMonitorV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
-         * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+         * @param {VaultQueryV1Request} vaultQueryV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async vaultQueryV1(vaultQueryV1Request?: VaultQueryV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+        async vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.vaultQueryV1(vaultQueryV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2052,21 +2066,21 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
-         * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+         * @param {ClearMonitorTransactionsV1Request} clearMonitorTransactionsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: any): AxiosPromise<ClearMonitorTransactionsV1Response> {
+        clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request, options?: any): AxiosPromise<ClearMonitorTransactionsV1Response> {
             return localVarFp.clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
-         * @param {DeployContractJarsV1Request} [deployContractJarsV1Request] 
+         * @param {DeployContractJarsV1Request} deployContractJarsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: any): AxiosPromise<DeployContractJarsSuccessV1Response> {
+        deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request, options?: any): AxiosPromise<DeployContractJarsSuccessV1Response> {
             return localVarFp.deployContractJarsV1(deployContractJarsV1Request, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2091,11 +2105,11 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Get transactions for monitored state classes.
-         * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+         * @param {GetMonitorTransactionsV1Request} getMonitorTransactionsV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: any): AxiosPromise<GetMonitorTransactionsV1Response> {
+        getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request, options?: any): AxiosPromise<GetMonitorTransactionsV1Response> {
             return localVarFp.getMonitorTransactionsV1(getMonitorTransactionsV1Request, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2110,11 +2124,11 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Invokes a contract on a Corda ledger (e.g. a flow)
-         * @param {InvokeContractV1Request} [invokeContractV1Request] 
+         * @param {InvokeContractV1Request} invokeContractV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
+        invokeContractV1(invokeContractV1Request: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
             return localVarFp.invokeContractV1(invokeContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2168,30 +2182,30 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Start monitoring corda changes (transactions) of given state class
-         * @param {StartMonitorV1Request} [startMonitorV1Request] 
+         * @param {StartMonitorV1Request} startMonitorV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: any): AxiosPromise<StartMonitorV1Response> {
+        startMonitorV1(startMonitorV1Request: StartMonitorV1Request, options?: any): AxiosPromise<StartMonitorV1Response> {
             return localVarFp.startMonitorV1(startMonitorV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Stop monitoring corda changes (transactions) of given state class
-         * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+         * @param {StopMonitorV1Request} stopMonitorV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any): AxiosPromise<StopMonitorV1Response> {
+        stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request, options?: any): AxiosPromise<StopMonitorV1Response> {
             return localVarFp.stopMonitorV1(stopMonitorV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
-         * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+         * @param {VaultQueryV1Request} vaultQueryV1Request 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        vaultQueryV1(vaultQueryV1Request?: VaultQueryV1Request, options?: any): AxiosPromise<object> {
+        vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request, options?: any): AxiosPromise<object> {
             return localVarFp.vaultQueryV1(vaultQueryV1Request, options).then((request) => request(axios, basePath));
         },
     };
@@ -2207,24 +2221,24 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
-     * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+     * @param {ClearMonitorTransactionsV1Request} clearMonitorTransactionsV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: AxiosRequestConfig) {
+    public clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
-     * @param {DeployContractJarsV1Request} [deployContractJarsV1Request] 
+     * @param {DeployContractJarsV1Request} deployContractJarsV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: AxiosRequestConfig) {
+    public deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deployContractJarsV1(deployContractJarsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2254,12 +2268,12 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Get transactions for monitored state classes.
-     * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+     * @param {GetMonitorTransactionsV1Request} getMonitorTransactionsV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: AxiosRequestConfig) {
+    public getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getMonitorTransactionsV1(getMonitorTransactionsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2277,12 +2291,12 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Invokes a contract on a Corda ledger (e.g. a flow)
-     * @param {InvokeContractV1Request} [invokeContractV1Request] 
+     * @param {InvokeContractV1Request} invokeContractV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: AxiosRequestConfig) {
+    public invokeContractV1(invokeContractV1Request: InvokeContractV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2347,35 +2361,35 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Start monitoring corda changes (transactions) of given state class
-     * @param {StartMonitorV1Request} [startMonitorV1Request] 
+     * @param {StartMonitorV1Request} startMonitorV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: AxiosRequestConfig) {
+    public startMonitorV1(startMonitorV1Request: StartMonitorV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).startMonitorV1(startMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Stop monitoring corda changes (transactions) of given state class
-     * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+     * @param {StopMonitorV1Request} stopMonitorV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: AxiosRequestConfig) {
+    public stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).stopMonitorV1(stopMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
-     * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+     * @param {VaultQueryV1Request} vaultQueryV1Request 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public vaultQueryV1(vaultQueryV1Request?: VaultQueryV1Request, options?: AxiosRequestConfig) {
+    public vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).vaultQueryV1(vaultQueryV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 }

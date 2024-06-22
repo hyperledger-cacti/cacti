@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-import static org.gradle.api.JavaVersion.VERSION_17
 import static org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
+import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 
 buildscript { //properties that you need to build the project
 
@@ -25,8 +22,8 @@ buildscript { //properties that you need to build the project
         rxjava_version = constants.getProperty("rxJavaVersion")
         snappy_version = constants.getProperty("snappyVersion")
         //springboot
-        spring_boot_version = '2.0.2.RELEASE'
-        spring_boot_gradle_plugin_version = '2.0.2.RELEASE'
+        spring_boot_version = '3.2.5'
+        spring_boot_gradle_plugin_version = '3.2.5'
 
         testJvmArgs = ['--add-opens', 'java.base/java.time=ALL-UNNAMED', '--add-opens', 'java.base/java.io=ALL-UNNAMED',
                        '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.net=ALL-UNNAMED',
@@ -34,9 +31,6 @@ buildscript { //properties that you need to build the project
                        '--add-opens', 'java.base/java.security.cert=ALL-UNNAMED', '--add-opens', 'java.base/java.security=ALL-UNNAMED',
                        '--add-opens', 'java.base/javax.net.ssl=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                        '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED', '--add-opens', 'java.sql/java.sql=ALL-UNNAMED',]
-        testJvmFxArgs = [  '--add-exports', 'java.base/sun.nio.ch=ALL-UNNAMED',
-                           '--add-exports', 'javafx.base/com.sun.javafx=ALL-UNNAMED',
-                           '--add-exports', 'javafx.base/com.sun.javafx.collections=ALL-UNNAMED']
     }
 
     repositories {
@@ -69,8 +63,8 @@ allprojects { //Properties that you need to compile your project (The applicatio
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
         compilerOptions {
-            languageVersion = KOTLIN_1_8
-            apiVersion = KOTLIN_1_8
+            languageVersion = KOTLIN_1_9
+            apiVersion = KOTLIN_1_9
             jvmTarget = JVM_17
             javaParameters = true   // Useful for reflection.
             freeCompilerArgs = ['-Xjvm-default=all-compatibility']
@@ -112,7 +106,7 @@ dependencies {
     cordapp project(":workflows")
     cordapp project(":contracts")
 
-    cordaProvided "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+    cordaProvided "org.apache.logging.log4j:log4j-slf4j2-impl:${log4j_version}"
     cordaProvided "org.apache.logging.log4j:log4j-web:${log4j_version}"
     cordaProvided "org.slf4j:jul-to-slf4j:$slf4j_version"
     cordaDriver "net.corda:corda-shell:$corda_shell_version"

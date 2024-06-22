@@ -1,0 +1,17 @@
+# SNYK-JAVA-ORGYAML-3016888:
+#   - '*':
+#       reason: >-
+#         Snakeyaml is being used by Jackson and liquidbase. Corda does not use
+#         Jackson for deserialization except in the optional shell which we
+#         recommend using standalone. The Corda node itself is not exposed.
+#         Corda does however provide mappings of Corda types to allow CorDapps
+#         to use Jackson, and CorDapps using Jackson should make their own
+#         assessment. Liquibase is used to apply the database migration changes.
+#         XML files are used here to define the changes not YAML and therefore
+#         the Corda node itself is not exposed to this deserialisation
+#         vulnerability.
+#       expires: 2023-07-21T13:39:49.450Z
+#       created: 2022-12-29T13:39:49.470Z
+#
+# Source: https://github.com/corda/corda/blob/release/os/4.12/.snyk
+CVE-2022-1471

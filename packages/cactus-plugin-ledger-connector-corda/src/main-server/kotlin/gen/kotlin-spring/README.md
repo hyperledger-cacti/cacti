@@ -1,4 +1,4 @@
-# Hyperledger Cactus - Corda Ledger Connector Plugin Server
+# Hyperledger Cacti - Corda V4 JVM Ledger Connector Plugin
 
 This Kotlin based [Spring Boot](https://spring.io/projects/spring-boot) application has been generated using the [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator).
 

@@ -11,7 +11,7 @@ WORKDIR /opt/corda/
 #
 #     ENT-11443 Function sig changes to support removing enterprise compiler warnings (#7671)
 RUN git switch release/os/4.12
-RUN git checkout c7514e1c603c077b49987fd79bd77060612967ed
+RUN git fetch --all && git checkout d578cae797ac5551d8a3c959354d7c6d69f0f97a
 RUN ./gradlew jar -x test
 
 FROM ubuntu:22.04
@@ -24,36 +24,34 @@ RUN  echo 'root:root' | chpasswd
 
 RUN mkdir /var/run/sshd
 
-ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8.11
-
 WORKDIR /
 
-ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
-RUN mkdir -p $CACTUS_CFG_PATH
-
-RUN curl https://download.corda.net/maven/corda-releases/net/corda/corda-tools-shell-cli/${CORDA_TOOLS_SHELL_CLI_VERSION}/corda-tools-shell-cli-${CORDA_TOOLS_SHELL_CLI_VERSION}-all.jar --output /corda-tools-shell-cli-all.jar
-# Make the "corda-shell" alias avaialble on the terminal
-RUN java -jar /corda-tools-shell-cli-all.jar install-shell-extensions
 
 # The image has a bleeding edge version of corda baked in for testing conveniece
 RUN mkdir -p /opt/bin/
 COPY --from=builder /opt/corda/node/capsule/build/libs/corda-4.12-SNAPSHOT.jar /opt/bin/corda.jar
 
+# Make the "corda-shell" alias avaialble on the terminal
+RUN java -jar /opt/bin/corda.jar install-shell-extensions
+
 RUN git clone https://github.com/corda/samples-kotlin.git
 WORKDIR /samples-kotlin
 
-ARG SAMPLES_KOTLIN_SHA=219750f8da2fd491c3b55c8eea821b1f345fef7d
-ARG SAMPLES_KOTLIN_BRANCH=arshadm/ent-6914-upgrade-kotlin19-jdk17
+ARG SAMPLES_KOTLIN_SHA=a5bb03027d7a6e1a5bca880e338a811b875f2815
+ARG SAMPLES_KOTLIN_BRANCH=release/4.12
 
-RUN git switch ${SAMPLES_KOTLIN_BRANCH}
+RUN git fetch --all && git switch ${SAMPLES_KOTLIN_BRANCH}
 RUN git checkout ${SAMPLES_KOTLIN_SHA}
 
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/negotiation-cordapp/"
 WORKDIR /samples-kotlin/${SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH}
 
 COPY ./negotiation-cordapp/build.gradle /samples-kotlin/Advanced/negotiation-cordapp/build.gradle
+COPY ./negotiation-cordapp/contracts/build.gradle /samples-kotlin/Advanced/negotiation-cordapp/contracts/build.gradle
+COPY ./negotiation-cordapp/workflows/build.gradle /samples-kotlin/Advanced/negotiation-cordapp/workflows/build.gradle
+COPY ./constants.properties /samples-kotlin/Advanced/constants.properties
 
-RUN ./gradlew build deployNodes
+RUN ./gradlew build deployNodes -x test
 
 WORKDIR /
 
@@ -62,7 +60,7 @@ RUN augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile ".ssh/authorized_
     augtool 'set /files/etc/ssh/sshd_config/PermitRootLogin yes' && \
     augtool 'set /files/etc/ssh/sshd_config/PasswordAuthentication yes' && \
     augtool 'set /files/etc/ssh/sshd_config/PermitEmptyPasswords yes' && \
-    augtool 'set /files/etc/ssh/sshd_config/Port 22' && \
+    augtool 'set /files/etc/ssh/sshd_config/Port 2222' && \
     augtool 'set /files/etc/ssh/sshd_config/LogLevel DEBUG2' && \
     augtool 'set /files/etc/ssh/sshd_config/LoginGraceTime 10'
 
@@ -76,6 +74,9 @@ RUN mkdir ~/.ssh && \
     chmod 700 ~/.ssh/ && \
     touch ~/.ssh/authorized_keys
 
+ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
+RUN mkdir -p $CACTUS_CFG_PATH
+
 RUN ["/bin/bash", "-c", "ssh-keygen -t rsa -N '' -f $CACTUS_CFG_PATH/corda-aio-image"]
 RUN mv $CACTUS_CFG_PATH/corda-aio-image $CACTUS_CFG_PATH/corda-aio-image.key
 RUN cp $CACTUS_CFG_PATH/corda-aio-image.pub ~/.ssh/authorized_keys
@@ -83,7 +84,7 @@ RUN cp $CACTUS_CFG_PATH/corda-aio-image.pub ~/.ssh/authorized_keys
 WORKDIR /samples-kotlin/${SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH}
 
 # OpenSSH server
-EXPOSE 22
+EXPOSE 2222
 
 # supervisord web ui/dashboard
 EXPOSE 9001
