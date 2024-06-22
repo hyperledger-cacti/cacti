@@ -203,7 +203,6 @@
             "$ref": "#/components/schemas/JvmTypeKind"
           },
           "primitiveValue": {
-            "type": "object"
           },
           "jvmCtorArgs": {
             "type": "array",

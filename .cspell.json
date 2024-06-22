@@ -162,6 +162,7 @@
     "Satp",
     "sbjpubkey",
     "Secp",
+    "serde",
     "shrn",
     "Smonitor",
     "socketio",

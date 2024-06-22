@@ -553,10 +553,10 @@ export interface JvmObject {
     'jvmTypeKind': JvmTypeKind;
     /**
      * 
-     * @type {object}
+     * @type {any}
      * @memberof JvmObject
      */
-    'primitiveValue'?: object;
+    'primitiveValue'?: any;
     /**
      * 
      * @type {Array<JvmObject>}
