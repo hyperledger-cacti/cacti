@@ -1,7 +1,7 @@
 templateDir: src/main-server/mustache/generator-template-overrides/
 
 additionalProperties:
-  title: "Hyperledger Cactus - Corda Ledger Connector Plugin Server"
+  title: "Hyperledger Cacti - Corda V4 JVM Ledger Connector Plugin"
   groupId: org.hyperledger.cactus
   artifactId: cactus-connector-corda-server
   # TODO: Make sure this automatically gets bumped during releases so that it
@@ -30,3 +30,9 @@ additionalProperties:
   # e: /kotlin-spring/src/test/kotlin/org/openapitools/api/ApiApiTest.kt: (47, 70): Suspend function 'cordaInvokeContractV1' should be called only from a coroutine or another suspend function
   #
   reactive: false
+
+  # annotationLibrary: none
+  # useSwaggerUI: "false"
+  # serializableModel: "true"
+  # beanValidations: "true"
+  useSpringBoot3: "true"

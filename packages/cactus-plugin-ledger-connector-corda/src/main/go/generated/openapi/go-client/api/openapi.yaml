@@ -20,6 +20,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VaultQueryV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -40,6 +41,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeployContractJarsV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -68,6 +70,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/InvokeContractV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -89,6 +92,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/StartMonitorV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -110,6 +114,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GetMonitorTransactionsV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -131,6 +136,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ClearMonitorTransactionsV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -153,6 +159,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/StopMonitorV1Request'
+        required: true
       responses:
         "200":
           content:
@@ -177,6 +184,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NetworkMapV1Request'
+        required: false
       responses:
         "200":
           content:
@@ -198,6 +206,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ListFlowsV1Request'
+        required: false
       responses:
         "200":
           content:
@@ -219,6 +228,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DiagnoseNodeV1Request'
+        required: false
       responses:
         "200":
           content:

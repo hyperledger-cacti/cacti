@@ -10,7 +10,7 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMoni
 import rx.Subscription
 import java.math.BigInteger
 import java.time.LocalDateTime
-import javax.annotation.PreDestroy
+import jakarta.annotation.PreDestroy
 
 /**
  * Monitoring session for single client, can track multiple state changes.

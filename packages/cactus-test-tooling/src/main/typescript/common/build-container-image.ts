@@ -1,6 +1,10 @@
 import Docker, { ImageBuildContext, ImageBuildOptions } from "dockerode";
 
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import {
+  createRuntimeErrorWithCause,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 
 export interface IBuildContainerImageRequest {
   readonly logLevel: LogLevelDesc;
@@ -12,9 +16,31 @@ export interface IBuildContainerImageRequest {
   readonly dockerodeImageBuildContext?: Partial<ImageBuildContext>;
 }
 
+export interface IBuildImageResultFail {
+  readonly errorDetail: {
+    readonly code: Readonly<number>;
+    readonly message: Readonly<string>;
+  };
+  readonly error: string;
+}
+
+export function isIBuildImageResultFail(
+  x: unknown,
+): x is IBuildImageResultFail {
+  if (!x) {
+    return false;
+  }
+  return (
+    typeof (x as IBuildImageResultFail).error === "string" &&
+    typeof (x as IBuildImageResultFail).errorDetail === "object" &&
+    typeof (x as IBuildImageResultFail).errorDetail.code === "number" &&
+    typeof (x as IBuildImageResultFail).errorDetail.message === "string"
+  );
+}
+
 export async function buildContainerImage(
   req: Readonly<IBuildContainerImageRequest>,
-): Promise<void> {
+): Promise<unknown> {
   if (!req) {
     throw new Error("Expected arg req to be truthy.");
   }
@@ -50,15 +76,27 @@ export async function buildContainerImage(
     imageBuildOptions,
   );
 
+  const buildErrors: IBuildImageResultFail[] = [];
   stream.on("data", (data: unknown) => {
     if (data instanceof Buffer) {
-      log.debug("[Build]: ", data.toString("utf-8"));
+      const logRowJson = data.toString("utf-8");
+      const logRow = JSON.parse(logRowJson);
+      if (isIBuildImageResultFail(logRow)) {
+        buildErrors.push(logRow);
+      }
+      log.debug("[Build]: %s", logRowJson);
     }
   });
 
-  await new Promise((resolve, reject) => {
+  const out = await new Promise((resolve, reject) => {
     dockerEngine.modem.followProgress(stream, (err, res) =>
       err ? reject(err) : resolve(res),
     );
   });
+
+  if (buildErrors.length > 0) {
+    const eMsg = `Could not build image ${req.imageTag} from ${req.buildDir}/${req.imageFile}`;
+    throw createRuntimeErrorWithCause(eMsg, { buildErrors });
+  }
+  return out;
 }

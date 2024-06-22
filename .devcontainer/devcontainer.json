@@ -21,13 +21,12 @@
 		},
 		"ghcr.io/devcontainers/features/java:1": {
 			"installGradle": true,
-			"installMaven": false,
+			"installMaven": true,
 			"installAnt": false,
-			"version": "8.0.392-amzn",
-			"jdkDistro": "amzn",
-			"gradleVersion": "5.6.4",
-			"mavenVersion": "3.9.5",
-			"antVersion": "1.10.13"
+			"version": "17.0.9-tem",
+			"jdkDistro": "tem",
+			"gradleVersion": "8.1.1",
+			"mavenVersion": "3.9.5"
 		},
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,

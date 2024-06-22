@@ -4,7 +4,7 @@ import net.corda.core.utilities.loggerFor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import javax.annotation.PreDestroy
+import jakarta.annotation.PreDestroy
 
 private const val SessionExpireMinutes = "cactus.sessionExpireMinutes"
 private const val SessionExpireMinutesDefault = "30"

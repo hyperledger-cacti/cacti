@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Hyperledger Cactus - Corda Ledger Connector Plugin Server
+    name: Hyperledger Cacti - Corda V4 JVM Ledger Connector Plugin
 
   jackson:
     serialization:

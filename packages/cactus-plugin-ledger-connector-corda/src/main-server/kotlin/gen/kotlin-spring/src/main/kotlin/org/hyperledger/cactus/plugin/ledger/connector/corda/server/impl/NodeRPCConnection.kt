@@ -1,5 +1,8 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl
 
+import kotlinx.coroutines.*
+import kotlin.time.toDuration
+import kotlin.time.DurationUnit
 
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.client.rpc.CordaRPCClientConfiguration
@@ -11,17 +14,17 @@ import net.corda.core.utilities.NetworkHostAndPort
 import net.corda.core.utilities.loggerFor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
-import javax.validation.Valid
+import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
+import jakarta.validation.Valid
 
 import java.net.InetAddress
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.validation.annotation.Validated
 import java.util.concurrent.CountDownLatch
-import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
 
 
 private const val CACTUS_CORDA_RPC_USERNAME = "cactus.corda.rpc.username"
@@ -72,12 +75,18 @@ open class NodeRPCConnection(
         // this workaround here is due to the Graceful Reconnect above not actually doing what it's supposed to
         // either because it has a bug or because I misread the documentation.
         // So this manual retry on top of the graceful reconnects is to make it resilient
+        var tryIntervalSec = 2
         var numberOfTriesRemaining = 5
         while (numberOfTriesRemaining > 0) {
             numberOfTriesRemaining--
             try {
                 logger.info("Trying to connect to RPC numberOfTriesRemaining=$numberOfTriesRemaining")
                 rpcConnection = rpcClient.start(username, password, gracefulReconnect = gracefulReconnect)
+                runBlocking {
+                    val tryIntervalDuration = tryIntervalSec.toDuration(DurationUnit.SECONDS)
+                    delay(tryIntervalDuration)
+                    tryIntervalSec *= 2
+                }
                 break;
             } catch (ex: net.corda.client.rpc.RPCException) {
                 logger.info("ManualReconnect:numberOfTriesRemaining=$numberOfTriesRemaining")

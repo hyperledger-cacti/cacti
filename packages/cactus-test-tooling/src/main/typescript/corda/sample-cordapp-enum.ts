@@ -42,9 +42,9 @@ export const SAMPLE_CORDAPP_DATA = Object.freeze({
   [SampleCordappEnum.ADVANCED_NEGOTIATION]: {
     rootDir: "/samples-kotlin/Advanced/negotiation-cordapp/",
     cordappDirPartyA:
-      "/samples-kotlin/Advanced/negotiation-cordapp/build/nodes/ParticipantA/cordapps",
+      "/samples-kotlin/Advanced/negotiation-cordapp/build/nodes/PartyA/cordapps",
     cordappDirPartyB:
-      "/samples-kotlin/Advanced/negotiation-cordapp/build/nodes/ParticipantB/cordapps",
+      "/samples-kotlin/Advanced/negotiation-cordapp/build/nodes/PartyB/cordapps",
     cordappDirPartyC: "NOT_APPLICABLE__THIS_SAMPLE_ONLY_HAS_A_AND_B_PARTIES",
     cordappDirNotary:
       "/samples-kotlin/Advanced/negotiation-cordapp/build/nodes/Notary/cordapps",

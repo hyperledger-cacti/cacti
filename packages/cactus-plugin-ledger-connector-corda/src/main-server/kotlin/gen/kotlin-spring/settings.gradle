@@ -12,4 +12,10 @@ pluginManagement {
         }
     }
 }
+
 rootProject.name = "cactus-connector-corda-server"
+// The template modification Cacti needs so that we can alter the artifact name
+// at build time in our scripts. This is handy when we build a .jar to be scanned
+// by trivy and we don't want to have to guess what the .jar filename ended up being
+// (which is different after each release)
+rootProject.name = System.getProperty('rootProjectName') ?: rootProject.name
