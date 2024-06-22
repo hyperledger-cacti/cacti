@@ -11,6 +11,7 @@ import {
   SampleCordappEnum,
   CordaConnectorContainer,
 } from "@hyperledger/cactus-test-tooling";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 import {
   CordappDeploymentConfig,
@@ -20,10 +21,15 @@ import {
   InvokeContractV1Request,
   JvmTypeKind,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
-import { Configuration } from "@hyperledger/cactus-core-api";
+
+import {
+  createJvmCordaIdentityParty,
+  createJvmCordaUniqueIdentifier,
+} from "../../../main/typescript/public-api";
+import { createJvmCordaAmount } from "../../../main/typescript/public-api";
 
 const testCase = "Tests are passing on the JVM side";
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
 test.onFailure(async () => {
   await Containers.logDiagnostics({ logLevel });
@@ -145,15 +151,14 @@ test(testCase, async (t: Test) => {
   );
 
   const networkMapRes = await apiClient.networkMapV1();
+
   const partyA = networkMapRes.data.find((it) =>
     it.legalIdentities.some((it2) => it2.name.organisation === "ParticipantA"),
   );
-  const partyAPublicKey = partyA?.legalIdentities[0].owningKey;
 
   const partyB = networkMapRes.data.find((it) =>
     it.legalIdentities.some((it2) => it2.name.organisation === "ParticipantB"),
   );
-  const partyBPublicKey = partyB?.legalIdentities[0].owningKey;
 
   const req: InvokeContractV1Request = {
     flowFullClassName: "net.corda.samples.obligation.flows.IOUIssueFlow",
@@ -166,228 +171,17 @@ test(testCase, async (t: Test) => {
         },
 
         jvmCtorArgs: [
-          {
-            jvmTypeKind: JvmTypeKind.Reference,
-            jvmType: {
-              fqClassName: "net.corda.core.contracts.Amount",
-            },
-
-            jvmCtorArgs: [
-              {
-                jvmTypeKind: JvmTypeKind.Primitive,
-                jvmType: {
-                  fqClassName: "long",
-                },
-                primitiveValue: 42,
-              },
-              {
-                jvmTypeKind: JvmTypeKind.Reference,
-                jvmType: {
-                  fqClassName: "java.util.Currency",
-                  constructorName: "getInstance",
-                },
-
-                jvmCtorArgs: [
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "USD",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            jvmTypeKind: JvmTypeKind.Reference,
-            jvmType: {
-              fqClassName: "net.corda.core.identity.Party",
-            },
-
-            jvmCtorArgs: [
-              {
-                jvmTypeKind: JvmTypeKind.Reference,
-                jvmType: {
-                  fqClassName: "net.corda.core.identity.CordaX500Name",
-                },
-
-                jvmCtorArgs: [
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "ParticipantA",
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "London",
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "GB",
-                  },
-                ],
-              },
-              {
-                jvmTypeKind: JvmTypeKind.Reference,
-                jvmType: {
-                  fqClassName:
-                    "org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
-                },
-
-                jvmCtorArgs: [
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: partyAPublicKey?.algorithm,
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: partyAPublicKey?.format,
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: partyAPublicKey?.encoded,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            jvmTypeKind: JvmTypeKind.Reference,
-            jvmType: {
-              fqClassName: "net.corda.core.identity.Party",
-            },
-
-            jvmCtorArgs: [
-              {
-                jvmTypeKind: JvmTypeKind.Reference,
-                jvmType: {
-                  fqClassName: "net.corda.core.identity.CordaX500Name",
-                },
-
-                jvmCtorArgs: [
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "ParticipantB",
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "New York",
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "US",
-                  },
-                ],
-              },
-              {
-                jvmTypeKind: JvmTypeKind.Reference,
-                jvmType: {
-                  fqClassName:
-                    "org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
-                },
-
-                jvmCtorArgs: [
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: partyBPublicKey?.algorithm,
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: partyBPublicKey?.format,
-                  },
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: partyBPublicKey?.encoded,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            jvmTypeKind: JvmTypeKind.Reference,
-            jvmType: {
-              fqClassName: "net.corda.core.contracts.Amount",
-            },
-
-            jvmCtorArgs: [
-              {
-                jvmTypeKind: JvmTypeKind.Primitive,
-                jvmType: {
-                  fqClassName: "long",
-                },
-                primitiveValue: 1,
-              },
-              {
-                jvmTypeKind: JvmTypeKind.Reference,
-                jvmType: {
-                  fqClassName: "java.util.Currency",
-                  constructorName: "getInstance",
-                },
-
-                jvmCtorArgs: [
-                  {
-                    jvmTypeKind: JvmTypeKind.Primitive,
-                    jvmType: {
-                      fqClassName: "java.lang.String",
-                    },
-                    primitiveValue: "USD",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            jvmTypeKind: JvmTypeKind.Reference,
-            jvmType: {
-              fqClassName: "net.corda.core.contracts.UniqueIdentifier",
-            },
-
-            jvmCtorArgs: [
-              {
-                jvmTypeKind: JvmTypeKind.Primitive,
-                jvmType: {
-                  fqClassName: "java.lang.String",
-                },
-                primitiveValue: "7fc2161e-f8d0-4c86-a596-08326bdafd56",
-              },
-            ],
-          },
+          createJvmCordaAmount({ currencyCode: "USD", amount: 42 }),
+          createJvmCordaIdentityParty({
+            party: partyA!.legalIdentities[0],
+          }),
+          createJvmCordaIdentityParty({
+            party: partyB!.legalIdentities[0],
+          }),
+          createJvmCordaAmount({ currencyCode: "USD", amount: 42 }),
+          createJvmCordaUniqueIdentifier({
+            uniqueidentifier: "7fc2161e-f8d0-4c86-a596-08326bdafd56",
+          }),
         ],
       },
     ],

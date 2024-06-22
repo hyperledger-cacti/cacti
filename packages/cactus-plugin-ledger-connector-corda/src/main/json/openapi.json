@@ -202,9 +202,7 @@
           "jvmTypeKind": {
             "$ref": "#/components/schemas/JvmTypeKind"
           },
-          "primitiveValue": {
-            "type": "object"
-          },
+          "primitiveValue": {},
           "jvmCtorArgs": {
             "type": "array",
             "items": {
