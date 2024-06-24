@@ -1,46 +1,33 @@
 import TokenAccount from "./TokenAccount";
 import styles from "./TokenHeader.module.css";
-import { useEffect, useState } from "react";
+import { ethTokenDetails } from "../../queries";
+import { useQuery } from "@tanstack/react-query";
 import { TokenMetadata20 } from "../../../../common/supabase-types";
-import { supabase } from "../../../../common/supabase-client";
 
-function TokenHeader(props: Record<string, any>) {
-  const [tokenData, setTokenData] = useState<TokenMetadata20 | any>();
+function TokenHeader(props: { accountNum: string; tokenAddress: string }) {
+  const { isError, data, error } = useQuery(
+    ethTokenDetails("erc20", props.tokenAddress),
+  );
 
-  const fetchData = async () => {
-    try {
-      const { data } = await supabase
-        .from(`token_metadata_erc20`)
-        .select("*")
-        .match({ address: props.token_address });
-      console.log(data);
-      if (data?.[0]) {
-        setTokenData(data[0]);
-      } else {
-        throw new Error("Failed to load token details");
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
+  if (isError) {
+    console.error("Token header fetch error:", error);
+  }
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  console.log(data);
 
   return (
     <div className={styles["token-header"]}>
       <TokenAccount accountNum={props.accountNum} />
       <div className={styles["token-details"]}>
         <p>
-          <b>Address:</b> {props.token_address}
+          <b>Address:</b> {props.tokenAddress}
         </p>
         <p>
-          <b>Created at:</b> {tokenData?.created_at}
+          <b>Created at:</b> {data?.created_at}
         </p>
         <p>
           <b>Total supply: </b>
-          {tokenData?.total_supply}
+          {(data as TokenMetadata20).total_supply}
         </p>
       </div>
     </div>

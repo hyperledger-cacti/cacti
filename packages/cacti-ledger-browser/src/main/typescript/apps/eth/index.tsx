@@ -4,7 +4,6 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Blocks from "./pages/Blocks/Blocks";
 import Transactions from "./pages/Transactions/Transactions";
 import Accounts from "./pages/Accounts/Accounts";
-import TokenTransactionDetails from "./pages/Details/TokenTransactionDetails";
 import TransactionDetails from "./pages/Details/TransactionDetails";
 import ERC20 from "./pages/ERC20/ERC20";
 import SingleTokenHistory from "./pages/SingleTokenHistory/SingleTokenHistory";
@@ -58,16 +57,6 @@ const ethConfig: AppConfig = {
         {
           path: ":number",
           element: <BlockDetails />,
-        },
-      ],
-    },
-    {
-      path: "token-txn-details",
-      element: <Outlet />,
-      children: [
-        {
-          path: ":standard/:address",
-          element: <TokenTransactionDetails />,
         },
       ],
     },

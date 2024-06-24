@@ -1,14 +1,17 @@
-import { supabase } from "../../../../common/supabase-client";
-import { Transaction } from "../../../../common/supabase-types";
 import CardWrapper from "../../../../components/ui/CardWrapper";
 
 import styles from "./Transactions.module.css";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ethereumAllTransactionsQuery } from "../../queries";
 
 function Transactions() {
   const navigate = useNavigate();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { isError, data, error } = useQuery(ethereumAllTransactionsQuery());
+
+  if (isError) {
+    console.error("Transactions fetch error:", error);
+  }
 
   const txnTableProps = {
     onClick: {
@@ -31,31 +34,13 @@ function Transactions() {
     ],
   };
 
-  const fetchTransactions = async () => {
-    try {
-      const { data } = await supabase.from("transaction").select("*");
-      if (data) {
-        console.log(JSON.stringify(data));
-        setTransactions(data);
-      } else {
-        throw new Error("Failed to load transactions");
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
-
   return (
     <div className={styles["transactions"]}>
       <CardWrapper
         columns={txnTableProps}
         title={"Transactions"}
         display={"All"}
-        data={transactions}
+        data={data ?? []}
         filters={["id", "from", "to"]}
         trimmed={false}
       ></CardWrapper>

@@ -1,59 +1,47 @@
-import { supabase } from "../../../../common/supabase-client";
-import { Block } from "../../../../common/supabase-types";
-
 import styles from "./Details.module.css";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ethereumBlockByNumber } from "../../queries";
 
 function BlockDetails() {
-  const [details, setDetails] = useState<Block | any>();
   const params = useParams();
+  if (typeof params.number === "undefined") {
+    throw new Error(`BlockDetails called with empty block number ${params}`);
+  }
+  const { isSuccess, isError, data, error } = useQuery({
+    ...ethereumBlockByNumber(params.number),
+    staleTime: Infinity,
+  });
 
-  const fethcData = async () => {
-    try {
-      const { data } = await supabase
-        .from("block")
-        .select("*")
-        .match({ number: params.number });
-      if (data?.[0]) {
-        setDetails(data[0]);
-      } else {
-        throw new Error("Failed to load block details");
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fethcData();
-  }, []);
+  if (isError) {
+    console.error("Data fetch error:", error);
+  }
 
   return (
     <div>
       <div className={styles["details-card"]}>
-        {details ? (
+        {isSuccess ? (
           <>
             <h1>Block Details</h1>
             <p>
-              <b> Address:</b> {details.number}{" "}
+              <b> Address:</b> {data.number}{" "}
             </p>
             <p>
               {" "}
               <b>Created at: </b>
-              {details.created_at}
+              {data.created_at}
             </p>
             <p>
               <b>Hash: </b>
-              {details.hash}
+              {data.hash}
             </p>
             <p>
               <b>Number of transaction: </b>
-              {details.number_of_tx}
+              {data.number_of_tx}
             </p>
             <p>
               <b>Sync at: </b>
-              {details.sync_at}
+              {data.sync_at}
             </p>
           </>
         ) : (
