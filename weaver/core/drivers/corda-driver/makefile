@@ -52,11 +52,11 @@ run:
 	
 .PHONY: deploy
 deploy:
-	docker-compose $(COMPOSE_ARG) up -d
+	docker compose $(COMPOSE_ARG) up -d
 	
 .PHONY: stop
 stop:
-	docker-compose $(COMPOSE_ARG) down
+	docker compose $(COMPOSE_ARG) down
 	
 .PHONY: clean
 clean:

@@ -27,7 +27,7 @@ function printHelp() {
   echo "      - 'up createChannel' - bring up fabric network with one channel"
   echo "      - 'createChannel' - create and join a channel after the network is created"
   echo "      - 'deployCC' - deploy the fabcar chaincode on the channel"
-  echo "      - 'down' - clear the network with docker-compose down"
+  echo "      - 'down' - clear the network with docker compose down"
   echo "      - 'clean' - clean the network"
   echo
   echo "    Flags:"
@@ -253,7 +253,7 @@ function createOrgs() {
     envsubst < docker/docker-compose-ca.yaml > docker/docker-compose-ca.real.yaml
     COMPOSE_FILE_CA=docker/docker-compose-ca.real.yaml
 
-    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
+    IMAGE_TAG=$IMAGETAG docker compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
 
     . $NW_CFG_PATH/fabric-ca/registerEnroll.sh
 
@@ -359,7 +359,7 @@ function networkUp() {
     envsubst < docker.env > docker.real.env
     envsubst < docker/docker-compose-ca.yaml > docker/docker-compose-ca.real.yaml
     COMPOSE_FILE_CA=docker/docker-compose-ca.real.yaml
-    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
+    IMAGE_TAG=$IMAGETAG docker compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
   fi
 
   envsubst < docker/docker-compose-test-net.yaml > docker/docker-compose-test-net.real.yaml
@@ -375,7 +375,7 @@ function networkUp() {
   echo "NW config path.. : "$NW_CFG_PATH
   cat docker.env
   envsubst < docker.env > docker.real.env
-  IMAGE_TAG=$IMAGETAG NW_CFG_PATH=$NW_CFG_PATH docker-compose ${COMPOSE_FILES} --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
+  IMAGE_TAG=$IMAGETAG NW_CFG_PATH=$NW_CFG_PATH docker compose ${COMPOSE_FILES} --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
 
   docker ps -a
   if [ $? -ne 0 ]; then
@@ -426,9 +426,9 @@ function networkDown() {
 
   cat docker.env
   envsubst < docker.env > docker.real.env
-  APP_ROOT=$APP_ROOT docker-compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES down --volumes --remove-orphans
-  #docker-compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.env down --volumes --remove-orphans
-  # docker-compose -f $COMPOSE_FILE_COUCH_ORG3 -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
+  APP_ROOT=$APP_ROOT docker compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES down --volumes --remove-orphans
+  #docker compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.env down --volumes --remove-orphans
+  # docker compose -f $COMPOSE_FILE_COUCH_ORG3 -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
 
   # Bring down the network, deleting the volumes
   #Cleanup the chaincode containers
@@ -471,7 +471,7 @@ CLI_DELAY=3
 CHANNEL_NAME="mychannel"
 # Deploy 1 org or 2 org: profiles
 DOCKER_PROFILES="1-node"
-# use this as the default docker-compose yaml definition
+# use this as the default docker compose yaml definition
 COMPOSE_FILE_BASE=docker/docker-compose-test-net.yaml
 # docker-compose.yaml file if you are using couchdb
 COMPOSE_FILE_COUCH=docker/docker-compose-couch.yaml
@@ -479,7 +479,7 @@ COMPOSE_FILE_COUCH=docker/docker-compose-couch.yaml
 COMPOSE_FILE_CA=docker/docker-compose-ca.yaml
 # use this as the docker compose couch file for org3
 #COMPOSE_FILE_COUCH_ORG3=addOrg3/docker/docker-compose-couch-org3.yaml
-# use this as the default docker-compose yaml definition for org3
+# use this as the default docker compose yaml definition for org3
 #COMPOSE_FILE_ORG3=addOrg3/docker/docker-compose-org3.yaml
 #
 # use golang as the default language for chaincode

@@ -66,11 +66,11 @@ restart-with-new-interop-app: stop
 
 .PHONY:	stop-network1
 stop-network1: 
-	docker-compose -f dev/Corda_Network/docker-compose.yml -p corda --profile $(PROFILE) down --volumes || true
+	docker compose -f dev/Corda_Network/docker-compose.yml -p corda --profile $(PROFILE) down --volumes || true
 
 .PHONY:	stop-network2
 stop-network2: 
-	docker-compose -f dev/Corda_Network2/docker-compose.yml -p corda_network2 --profile $(PROFILE) down --volumes || true
+	docker compose -f dev/Corda_Network2/docker-compose.yml -p corda_network2 --profile $(PROFILE) down --volumes || true
 
 stop: stop-network1 stop-network2
 

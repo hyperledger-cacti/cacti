@@ -55,7 +55,7 @@ Note: Can also be run in mocked mode by setting environment variable `MOCK=true`
 
 Make sure the env and config file have the expected values.
 
-Update the docker-compose with the correct external network and ports exposed
+Update the docker compose with the correct external network and ports exposed
 
 To do a full build run `make build-image`. This update/clones protos, generates js protos and compiles typescript.
 
@@ -67,8 +67,8 @@ To deploy, run `make deploy`
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc, check image details here: [cacti-weaver-fabric-driver](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-fabric-driver)).
 * Make sure connection profile used for docker, containers correct hostnames instead of localhost in urls.
-* If deploying more than one driver on same host, make sure to change service name in docker-compose to avoid conflicts.
-* Finally run `docker-compose up -d` to deploy the fabric driver.
+* If deploying more than one driver on same host, make sure to change service name in docker compose to avoid conflicts.
+* Finally run `docker compose up -d` to deploy the fabric driver.
 
 
 ### TL/MP Environment

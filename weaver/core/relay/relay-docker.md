@@ -149,7 +149,7 @@ First **login** to github container registry:
 * Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 
-**Some sample steps to deploy relay using docker-compose when Config File is available:**
+**Some sample steps to deploy relay using docker compose when Config File is available:**
 
 * Copy `.env.template` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
@@ -162,10 +162,10 @@ First **login** to github container registry:
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Run `make convert-compose-method1`.
 * Create docker network named `relay`: `docker network create relay`.
-* To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
+* To deploy relay, run: `docker compose up relay-server -d` (Given relay-server is the service name in docker-compose).
 * Also `make start-server` does the above 2 steps, if service name is not changed.
 
-**Some sample steps to deploy relay using docker-compose when Config is not available:**
+**Some sample steps to deploy relay using docker compose when Config is not available:**
 
 * Copy `.env.template.2` file to `.env`.
 * Configure the following environment variables in `.env` and delete (or ignore) the rest:
@@ -197,7 +197,7 @@ First **login** to github container registry:
 * Run `make convert-compose-method2`.
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Create docker network named `relay`: `docker network create relay`.
-* To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
+* To deploy relay, run: `docker compose up relay-server -d` (Given relay-server is the service name in docker-compose).
 * Also `make start-server` does the above 2 steps, if service name is not changed.
 
 ## Push Relay image to Github container registry
