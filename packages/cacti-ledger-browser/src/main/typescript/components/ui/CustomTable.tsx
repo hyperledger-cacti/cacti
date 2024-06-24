@@ -1,10 +1,14 @@
-
-
 import EmptyTablePlaceholder from "./EmptyTablePlaceholder/EmptyTablePlaceholder";
 import styles from "./CustomTable.module.css";
-import { useState, useEffect, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
+import {
+  useState,
+  useEffect,
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+} from "react";
 import { TableProperty } from "../../common/supabase-types";
-
 
 function CustomTable(props: any) {
   const [viewport, setViewport] = useState("");
@@ -42,7 +46,7 @@ function CustomTable(props: any) {
       ) : (
         <>
           {viewport === "wide" && (
-            <table>
+            <table className={styles["custom-table"]}>
               <thead>
                 <tr>
                   {props.cols.schema.map((col: any) => (
@@ -71,25 +75,43 @@ function CustomTable(props: any) {
               {props.data.map((row: any) => {
                 return (
                   <table
-                    className={styles["table-rwd"]}
+                    className={`${styles["custom-table"]} ${styles["table-rwd"]}`}
                     onClick={() => handleRowClick(row)}
                   >
                     <tbody>
-                      {props.cols.schema.map((heading: { display: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, idx: string | number) => {
-                        return (
-                          <tr>
-                            <td className={styles["table-rwd-heading"]}>
-                              {heading.display}
-                            </td>
-                            <td>
-                              {getObjPropVal(
-                                props.cols.schema[idx].objProp,
-                                row,
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {props.cols.schema.map(
+                        (
+                          heading: {
+                            display:
+                              | string
+                              | number
+                              | boolean
+                              | ReactElement<
+                                  any,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | ReactPortal
+                              | null
+                              | undefined;
+                          },
+                          idx: string | number,
+                        ) => {
+                          return (
+                            <tr>
+                              <td className={styles["table-rwd-heading"]}>
+                                {heading.display}
+                              </td>
+                              <td>
+                                {getObjPropVal(
+                                  props.cols.schema[idx].objProp,
+                                  row,
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )}
                     </tbody>
                   </table>
                 );

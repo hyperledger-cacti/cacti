@@ -17,12 +17,60 @@ import {
   TokenMetadata20,
 } from "../../common/supabase-types";
 
-export function ethereumAllTransactionsQuery() {
-  return supabaseQueryTable<Transaction>("transaction");
+function createQueryKey(
+  tableName: string,
+  pagination: { page: number; pageSize: number },
+) {
+  return [tableName, { pagination }];
 }
 
-export function ethereumAllBlocksQuery() {
-  return supabaseQueryTable<Block>("block");
+export function ethereumAllTransactionsQuery(page: number, pageSize: number) {
+  const fromIndex = page * pageSize;
+  const toIndex = fromIndex + pageSize - 1;
+  const tableName = "transaction";
+  return queryOptions({
+    queryKey: [supabaseQueryKey, createQueryKey(tableName, { page, pageSize })],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from(tableName)
+        .select()
+        .order("block_number", { ascending: false })
+        .range(fromIndex, toIndex);
+
+      if (error) {
+        throw new Error(
+          `Could not get data from '${tableName}' table: ${error.message}`,
+        );
+      }
+
+      return data as Transaction[];
+    },
+  });
+}
+
+// todo - refactor to single get-all query with paging
+export function ethereumAllBlocksQuery(page: number, pageSize: number) {
+  const fromIndex = page * pageSize;
+  const toIndex = fromIndex + pageSize - 1;
+  const tableName = "block";
+  return queryOptions({
+    queryKey: [supabaseQueryKey, createQueryKey(tableName, { page, pageSize })],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from(tableName)
+        .select()
+        .order("number", { ascending: false })
+        .range(fromIndex, toIndex);
+
+      if (error) {
+        throw new Error(
+          `Could not get data from '${tableName}' table: ${error.message}`,
+        );
+      }
+
+      return data as Block[];
+    },
+  });
 }
 
 export function ethereumBlockByNumber(blockNumber: number | string) {
