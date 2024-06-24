@@ -27,7 +27,7 @@ function TokenHeader(props: { accountNum: string; tokenAddress: string }) {
         </p>
         <p>
           <b>Total supply: </b>
-          {(data as TokenMetadata20).total_supply}
+          {(data as TokenMetadata20)?.total_supply}
         </p>
       </div>
     </div>

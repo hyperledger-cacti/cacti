@@ -2,6 +2,7 @@ import { useRoutes, BrowserRouter, RouteObject } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
@@ -9,6 +10,7 @@ import HeaderBar from "./components/Layout/HeaderBar";
 import WelcomePage from "./components/WelcomePage";
 import { AppConfig, AppListEntry } from "./common/types/app";
 import { patchAppRoutePath } from "./common/utils";
+import { NotificationProvider } from "./common/context/NotificationContext";
 
 type AppConfigProps = {
   appConfig: AppConfig[];
@@ -117,9 +119,11 @@ const CactiLedgerBrowserApp: React.FC<AppConfigProps> = ({ appConfig }) => {
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
-          <CssBaseline />
-          <App appConfig={appConfig} />
-          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <NotificationProvider>
+            <CssBaseline />
+            <App appConfig={appConfig} />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          </NotificationProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </BrowserRouter>

@@ -51,16 +51,6 @@ const ethConfig: AppConfig = {
       ],
     },
     {
-      path: "block-details",
-      element: <Outlet />,
-      children: [
-        {
-          path: ":number",
-          element: <BlockDetails />,
-        },
-      ],
-    },
-    {
       path: "token-details",
       element: <Outlet />,
       children: [
@@ -71,16 +61,6 @@ const ethConfig: AppConfig = {
               <TokenDetails></TokenDetails>
             </div>
           ),
-        },
-      ],
-    },
-    {
-      path: "txn-details",
-      element: <Outlet />,
-      children: [
-        {
-          path: ":id",
-          element: <TransactionDetails />,
         },
       ],
     },
