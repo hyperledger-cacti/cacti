@@ -1,17 +1,35 @@
-import TokenAccount from "../../../../components/TokenHeader/TokenAccount";
-import { supabase } from "../../../../common/supabase-client";
 import CardWrapper from "../../../../components/ui/CardWrapper";
 
 import styles from "./ERC721.module.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { ERC721Txn, TokenMetadata721 } from "../../../../common/supabase-types";
+import { useQuery } from "@tanstack/react-query";
+import { ethAllERC721History, ethERC721TokensByTxId } from "../../queries";
+import TokenAccount from "../../components/TokenHeader/TokenAccount";
 
 function ERC721() {
   const params = useParams();
+  if (typeof params.account === "undefined") {
+    throw new Error(`ERC721 list called with empty account address ${params}`);
+  }
   const navigate = useNavigate();
-  const [token_erc721, setToken_erc721] = useState<ERC721Txn[]>([]);
-  const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata721[]>([]);
+  const {
+    isError: isTokenListError,
+    data: tokenList,
+    error: tokenListError,
+  } = useQuery(ethERC721TokensByTxId(params.account));
+  const {
+    isError: isTokenMetadataError,
+    data: tokenMetadata,
+    error: tokenMetadataError,
+  } = useQuery(ethAllERC721History());
+
+  if (isTokenListError) {
+    console.error("Token list for account fetch error:", tokenListError);
+  }
+
+  if (isTokenMetadataError) {
+    console.error("Token metadata fetch error:", tokenMetadataError);
+  }
 
   const ercTableProps = {
     onClick: {
@@ -50,49 +68,11 @@ function ERC721() {
     ],
   };
 
-  const fetchERC721 = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("erc721_txn_meta_view")
-        .select()
-        .eq("account_address", params.account);
-      if (data) {
-        setToken_erc721(data);
-      }
-      if (error) {
-        throw new Error(error.message);
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  const fetchMetadata = async () => {
-    try {
-      const { data, error } = await supabase
-        .from(`erc721_token_history_view`)
-        .select("*");
-      if (data) {
-        setTokenMetadata(data);
-      }
-      if (error) {
-        console.error(error.message);
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchERC721();
-    fetchMetadata();
-  }, []);
-
   return (
     <div className={styles["erc-content"]}>
       <CardWrapper
         columns={ercTableProps}
-        data={token_erc721}
+        data={tokenList ?? []}
         display={"small"}
         title={"ERC721"}
         filters={["symbol"]}
@@ -101,7 +81,7 @@ function ERC721() {
         <TokenAccount accountNum={params.account} />
         <CardWrapper
           columns={metaProps}
-          data={tokenMetadata}
+          data={tokenMetadata ?? []}
           display={"all"}
           title={"Transactions"}
           filters={["token_address", "sender", "recipient"]}

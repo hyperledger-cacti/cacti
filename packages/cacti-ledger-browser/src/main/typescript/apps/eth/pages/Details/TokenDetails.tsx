@@ -1,61 +1,47 @@
-import { supabase } from "../../../../common/supabase-client";
 import { STANDARDS } from "../../../../common/token-standards";
-import {
-  TokenMetadata20,
-  TokenMetadata721,
-} from "../../../../common/supabase-types";
 import styles from "./Details.module.css";
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { ethTokenDetails } from "../../queries";
+import { TokenMetadata20 } from "../../../../common/supabase-types";
 
 const TokenDetails = () => {
-  const [tokenData, setTokenData] = useState<
-    TokenMetadata20 | TokenMetadata721 | any
-  >();
-
   const params = useParams();
+  if (
+    typeof params.standard === "undefined" ||
+    typeof params.address === "undefined"
+  ) {
+    throw new Error(`Token details called with empty args ${params}`);
+  }
+  const { isError, data, error } = useQuery(
+    ethTokenDetails(params.standard.toLowerCase(), params.address),
+  );
 
-  const fethcData = async () => {
-    try {
-      const { data } = await supabase
-        .from(`token_metadata_${params.standard?.toLowerCase()}`)
-        .select("*")
-        .match({ address: params.address });
-      if (data?.[0]) {
-        setTokenData(data[0]);
-      } else {
-        throw new Error("Failed to load token details");
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fethcData();
-  }, []);
+  if (isError) {
+    console.error("Token details fetch error:", error);
+  }
 
   return (
     <div className={styles.details}>
       <div className={styles["details-card"]}>
         <h1>Token Details</h1>
         <p>
-          <b>Adress:</b> {tokenData?.address}{" "}
+          <b>Adress:</b> {data?.address}{" "}
         </p>
         <p>
           <b>Created at: </b>
-          {tokenData?.created_at}
+          {data?.created_at}
         </p>
         <p>
           <b>Name: </b>
-          {tokenData?.name}
+          {data?.name}
         </p>
         <p>
           <b>Symbol: </b>
-          {tokenData?.symbol}
+          {data?.symbol}
         </p>
         {params.standard === STANDARDS.erc20 && (
-          <p>total_supply : {tokenData?.total_supply}</p>
+          <p>total_supply : {(data as TokenMetadata20).total_supply}</p>
         )}
       </div>
     </div>

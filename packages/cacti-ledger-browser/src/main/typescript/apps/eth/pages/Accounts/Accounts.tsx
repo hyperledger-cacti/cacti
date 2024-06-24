@@ -1,13 +1,23 @@
-import { supabase } from "../../../../common/supabase-client";
 import CardWrapper from "../../../../components/ui/CardWrapper";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ethGetTokenOwners } from "../../queries";
 
 function Accounts() {
   const params = useParams();
+  if (typeof params.standard === "undefined") {
+    throw new Error(`Accounts called with empty token standard ${params}`);
+  }
   const navigate = useNavigate();
-  const [accounts, setAccounts] = useState<{ address: string }[]>([]);
+  const { isError, data, error } = useQuery(
+    ethGetTokenOwners(params.standard.toLowerCase()),
+  );
   const [searchKey, setSearchKey] = useState("");
+
+  if (isError) {
+    console.error("Token owners fetch error:", error);
+  }
 
   const tableProps = {
     onClick: {
@@ -22,36 +32,13 @@ function Accounts() {
     ],
   };
 
-  const fetchAccounts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from(`token_${params.standard?.toLowerCase()}`)
-        .select("account_address");
-      if (data) {
-        const objData = [...new Set(data.map((el) => el.account_address))].map(
-          (el) => ({ address: el }),
-        );
-        setAccounts(objData);
-      }
-      if (error) {
-        console.error(error.message);
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
-
   return (
     <div>
       <CardWrapper
         display={"All"}
         title={"Accounts"}
         columns={tableProps}
-        data={accounts}
+        data={data ?? []}
         filters={["address"]}
         trimmed={false}
         getSearchValue={(e: any) => setSearchKey(e)}

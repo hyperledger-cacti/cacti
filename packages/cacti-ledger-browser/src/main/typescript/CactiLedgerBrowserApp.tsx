@@ -1,6 +1,7 @@
 import { useRoutes, BrowserRouter, RouteObject } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
@@ -105,14 +106,21 @@ const App: React.FC<AppConfigProps> = ({ appConfig }) => {
   );
 };
 
+// MUI Theme
 const theme = createTheme(themeOptions);
+
+// React Query client
+const queryClient = new QueryClient();
 
 const CactiLedgerBrowserApp: React.FC<AppConfigProps> = ({ appConfig }) => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App appConfig={appConfig} />
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <App appConfig={appConfig} />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+        </QueryClientProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

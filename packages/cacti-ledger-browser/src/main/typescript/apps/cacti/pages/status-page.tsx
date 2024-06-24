@@ -1,39 +1,15 @@
-import { useEffect, useState } from "react";
-import { supabase } from "../../../common/supabase-client";
 import CardWrapper from "../../../components/ui/CardWrapper";
+import { useQuery } from "@tanstack/react-query";
+import { persistencePluginStatusQuery } from "../queries";
 
 function StatusPage() {
-  const [getPluginStatus, setPluginStatuse] = useState<unknown[]>([]);
+  const { isSuccess, isError, data, error } = useQuery(
+    persistencePluginStatusQuery(),
+  );
 
-  const fetchPluginStatus = async () => {
-    try {
-      const { data, error } = await supabase.from("plugin_status").select();
-      if (error) {
-        throw new Error(
-          `Could not get plugin statuses from the DB: ${error.message}`,
-        );
-      }
-
-      if (data) {
-        setPluginStatuse(
-          data.map((p) => {
-            return {
-              ...p,
-              is_schema_initialized: p.is_schema_initialized
-                ? "Setup complete"
-                : "No schema",
-            };
-          }),
-        );
-      }
-    } catch (error) {
-      console.error("Error when fetching plugin statuses:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchPluginStatus();
-  }, []);
+  if (isError) {
+    console.error("Data fetch error:", error);
+  }
 
   return (
     <div>
@@ -49,7 +25,18 @@ function StatusPage() {
             ],
           } as any
         }
-        data={getPluginStatus}
+        data={
+          isSuccess
+            ? (data as any).map((p: any) => {
+                return {
+                  ...p,
+                  is_schema_initialized: p.is_schema_initialized
+                    ? "Setup complete"
+                    : "No schema",
+                };
+              })
+            : []
+        }
         title={"Persistence Plugins"}
         display={"All"}
         trimmed={false}

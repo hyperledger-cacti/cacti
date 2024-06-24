@@ -1,15 +1,38 @@
-import { supabase } from "../../../../common/supabase-client";
 import CardWrapper from "../../../../components/ui/CardWrapper";
-import { Transaction, TokenTransfer } from "../../../../common/supabase-types";
-
 import styles from "./Details.module.css";
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { ethereumTokenTransfersByTxId, ethereumTxById } from "../../queries";
 
 const TransactionsDetails = () => {
-  const [details, setDetails] = useState<Transaction | any>({});
-  const [transfers, setTransfers] = useState<TokenTransfer[]>([]);
   const params = useParams();
+  if (typeof params.id === "undefined") {
+    throw new Error(`TransactionsDetails called with empty txId ${params}`);
+  }
+  const {
+    isError: txIsError,
+    data: txData,
+    error: txError,
+  } = useQuery({
+    ...ethereumTxById(params.id),
+    staleTime: Infinity,
+  });
+
+  const {
+    isError: txTransfersIsError,
+    data: txTransfersData,
+    error: txTransfersError,
+  } = useQuery({
+    ...ethereumTokenTransfersByTxId(params.id),
+    staleTime: Infinity,
+  });
+
+  if (txIsError) {
+    console.error("Transaction fetch error:", txError);
+  }
+  if (txTransfersIsError) {
+    console.error("Token transfers fetch error:", txTransfersError);
+  }
 
   const detailsTableProps = {
     onClick: {
@@ -23,71 +46,34 @@ const TransactionsDetails = () => {
     ],
   };
 
-  const fetchDetails = async () => {
-    try {
-      const { data } = await supabase
-        .from("transaction")
-        .select("*")
-        .match({ id: params.id });
-      if (data?.[0]) {
-        setDetails(data[0]);
-      } else {
-        throw new Error("Failed to load transaction details");
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  const fetchTransfers = async () => {
-    try {
-      const { data } = await supabase
-        .from("token_transfer")
-        .select("*")
-        .match({ transaction_id: params.id });
-      if (data) {
-        setTransfers(data);
-      } else {
-        throw new Error("Failed to load transfers");
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchDetails();
-    fetchTransfers();
-  }, []);
-
   return (
     <div className={styles.details}>
       <div className={styles["details-card"]}>
         <h1> Details of Transaction</h1>
         <p>
           {" "}
-          <b>Hash:</b> {details.hash}{" "}
+          <b>Hash:</b> {txData?.hash}{" "}
         </p>
         <p>
           <b>Block: </b>
-          {details.block_number}
+          {txData?.block_number}
         </p>
         <p>
           <b>From: </b>
-          {details.from}
+          {txData?.from}
         </p>
         <p>
           <b>To: </b>
-          {details.to}{" "}
+          {txData?.to}{" "}
         </p>
         <p>
           {" "}
-          <b>Value: </b>&nbsp;&nbsp;{details.eth_value}
+          <b>Value: </b>&nbsp;&nbsp;{txData?.eth_value}
         </p>
       </div>
       <CardWrapper
         columns={detailsTableProps}
-        data={transfers}
+        data={txTransfersData ?? []}
         title={"Transfer list"}
         display={"small"}
         filters={["id", "sender", "recipient"]}

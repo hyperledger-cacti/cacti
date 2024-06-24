@@ -1,16 +1,23 @@
-import TokenAccount from "../../../../components/TokenHeader/TokenAccount";
-import { supabase } from "../../../../common/supabase-client";
 import CardWrapper from "../../../../components/ui/CardWrapper";
 import Chart from "../../components/Chart/Chart";
-import { ERC20Txn } from "../../../../common/supabase-types";
 import styles from "./ERC20.module.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ethERC20TokensByOwner } from "../../queries";
+import TokenAccount from "../../components/TokenHeader/TokenAccount";
 
 const ERC20 = () => {
   const params = useParams();
+  if (typeof params.account === "undefined") {
+    throw new Error(`ERC20 called with empty account address ${params}`);
+  }
   const navigate = useNavigate();
-  const [token_erc20, setToken_erc20] = useState<ERC20Txn[]>([]);
+  const { isError, data, error } = useQuery(
+    ethERC20TokensByOwner(params.account),
+  );
+  if (isError) {
+    console.error("Data fetch error:", error);
+  }
 
   const ercTableProps = {
     onClick: {
@@ -30,41 +37,20 @@ const ERC20 = () => {
     ],
   };
 
-  const fetchERC20 = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("token_erc20")
-        .select()
-        .eq("account_address", params.account);
-      if (data) {
-        setToken_erc20(data);
-      }
-      if (error) {
-        throw new Error(error.message);
-      }
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchERC20();
-  }, []);
-
   return (
     <div className={styles["erc-content"]}>
       <div className={styles["erc-wrap"]}>
         <TokenAccount accountNum={params.account} />
         <CardWrapper
           columns={ercTableProps}
-          data={token_erc20}
+          data={data ?? []}
           display={"wide"}
           title={"ERC20"}
           filters={["token_address"]}
         />
       </div>
       <div className={styles["erc-wrap"]}>
-        <Chart chartData={token_erc20} />
+        <Chart chartData={data ?? []} />
       </div>
     </div>
   );
