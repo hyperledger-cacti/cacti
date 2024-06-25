@@ -30,6 +30,11 @@
       "url": "https://example.com"
     },
     {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    },
+    {
       "name": "Tomasz Awramski",
       "email": "tomasz.awramski@fujitsu.com",
       "url": "https://www.fujitsu.com/global/"
@@ -56,18 +61,16 @@
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
     "@mui/icons-material": "5.15.10",
+    "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.15",
     "@supabase/supabase-js": "1.35.6",
     "@tanstack/react-query": "5.29.2",
     "apexcharts": "3.45.2",
-    "localforage": "1.10.0",
-    "match-sorter": "6.3.3",
-    "moment": "2.30.1",
+    "ethers": "6.12.1",
     "react": "18.2.0",
     "react-apexcharts": "1.4.1",
     "react-dom": "18.2.0",
     "react-router-dom": "6.21.3",
-    "sort-by": "1.2.0",
     "web3": "4.1.1"
   },
   "devDependencies": {
@@ -75,7 +78,6 @@
     "@tanstack/react-query-devtools": "5.29.2",
     "@types/react": "18.2.43",
     "@types/react-dom": "18.2.17",
-    "@types/sort-by": "1",
     "@vitejs/plugin-react": "4.2.1",
     "typescript": "5.2.2",
     "vite": "5.1.7"

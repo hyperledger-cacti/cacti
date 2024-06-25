@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ethereumAllBlocksQuery } from "../../queries";
+import { ethAllBlocksQuery } from "../../queries";
 import { blockColumnsConfig } from "./blockColumnsConfig";
 import type { UITableListingPaginationActionProps } from "../../../../components/ui/UITableListing/UITableListingPaginationAction";
 import UITableListing from "../../../../components/ui/UITableListing/UITableListing";
@@ -34,7 +34,7 @@ const BlockList: React.FC<BlockListProps> = ({
 }) => {
   return (
     <UITableListing
-      queryFunction={ethereumAllBlocksQuery}
+      queryFunction={ethAllBlocksQuery}
       label="block"
       columnConfig={blockColumnsConfig}
       footerComponent={footerComponent}

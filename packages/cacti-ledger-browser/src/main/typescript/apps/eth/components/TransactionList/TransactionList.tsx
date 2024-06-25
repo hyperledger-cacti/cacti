@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ethereumAllTransactionsQuery } from "../../queries";
+import { UseQueryOptions } from "@tanstack/react-query";
 import { transactionColumnsConfig } from "./transactionColumnsConfig";
 import type { UITableListingPaginationActionProps } from "../../../../components/ui/UITableListing/UITableListingPaginationAction";
 import UITableListing from "../../../../components/ui/UITableListing/UITableListing";
@@ -12,7 +12,11 @@ export type TransactionListColumn = keyof typeof transactionColumnsConfig;
 /**
  * TransactionList properties.
  */
-export interface TransactionListProps {
+export interface TransactionListProps<T> {
+  queryFunction: (
+    page: number,
+    pageSize: number,
+  ) => UseQueryOptions<T[], any, any, any>;
   footerComponent: React.ComponentType<UITableListingPaginationActionProps>;
   columns: TransactionListColumn[];
   rowsPerPage: number;
@@ -26,15 +30,21 @@ export interface TransactionListProps {
  * @param columns list of columns to be rendered.
  * @param rowsPerPage how many rows to show per page.
  */
-const TransactionList: React.FC<TransactionListProps> = ({
+
+export default function TransactionList<
+  T extends {
+    [key: string]: any;
+  },
+>({
+  queryFunction,
   footerComponent,
   columns,
   rowsPerPage,
   tableSize,
-}) => {
+}: TransactionListProps<T>) {
   return (
     <UITableListing
-      queryFunction={ethereumAllTransactionsQuery}
+      queryFunction={queryFunction}
       label="transaction"
       columnConfig={transactionColumnsConfig}
       footerComponent={footerComponent}
@@ -43,6 +53,4 @@ const TransactionList: React.FC<TransactionListProps> = ({
       tableSize={tableSize}
     />
   );
-};
-
-export default TransactionList;
+}

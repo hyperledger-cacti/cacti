@@ -303,7 +303,15 @@ GRANT ALL ON TABLE public.erc721_txn_meta_view TO service_role;
 CREATE MATERIALIZED VIEW IF NOT EXISTS public.token_erc20
 TABLESPACE pg_default
 AS
- SELECT balances.account_address,
+SELECT
+    balances.account_address,
+    balances.balance,
+    balances.token_address,
+    metadata.name,
+    metadata.symbol,
+    metadata.total_supply
+FROM
+ (SELECT balances.account_address,
     balances.token_address,
     sum(balances.balance) AS balance
    FROM ( SELECT erc20_token_history_view.recipient AS account_address,
@@ -318,8 +326,25 @@ AS
            FROM erc20_token_history_view
           GROUP BY erc20_token_history_view.token_address, erc20_token_history_view.sender) balances
   GROUP BY balances.token_address, balances.account_address
- HAVING sum(balances.balance) >= 0::numeric
+ HAVING sum(balances.balance) >= 0::numeric) AS balances
+ JOIN token_metadata_erc20 AS metadata ON balances.token_address = metadata.address
 WITH DATA;
+
+-- Refresh public.token_erc20 on new token transfers
+CREATE OR REPLACE FUNCTION refresh_token_erc20()
+RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW public.token_erc20;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER refresh_token_erc20_on_token_transfers_trigger
+AFTER INSERT OR UPDATE OR DELETE ON public.token_transfer
+FOR EACH STATEMENT
+EXECUTE FUNCTION refresh_token_erc20();
+
+CREATE INDEX token_erc20_account_address_idx ON public.token_erc20(account_address);
 
 ALTER TABLE IF EXISTS public.token_erc20
     OWNER TO postgres;
