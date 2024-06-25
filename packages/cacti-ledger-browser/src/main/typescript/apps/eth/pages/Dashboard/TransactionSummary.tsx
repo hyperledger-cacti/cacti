@@ -2,6 +2,7 @@ import { Link as RouterLink } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TransactionList from "../../components/TransactionList/TransactionList";
+import { ethAllTransactionsQuery } from "../../queries";
 
 function TransactionListViewAllAction() {
   return (
@@ -22,6 +23,7 @@ function TransactionListViewAllAction() {
 export default function TransactionSummary() {
   return (
     <TransactionList
+      queryFunction={ethAllTransactionsQuery}
       footerComponent={TransactionListViewAllAction}
       columns={["hash", "from", "to"]}
       rowsPerPage={15}

@@ -14,7 +14,7 @@ import TableHead from "@mui/material/TableHead";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { useNotification } from "../../../common/context/NotificationContext";
-import ShortHash from "../ShortHash";
+import ShortenedTypography from "../ShortenedTypography";
 import {
   StyledTableCell,
   StyledTableCellHeader,
@@ -74,7 +74,7 @@ function getKeyField(columnConfig: ColumnConfigType) {
 
 function formatCellValue(config: ColumnConfigEntry, value: any) {
   if (config.isLongString) {
-    return <ShortHash hash={value} />;
+    return <ShortenedTypography text={value} />;
   } else if (config.isDate) {
     const date = new Date(value);
     return date.toLocaleString();

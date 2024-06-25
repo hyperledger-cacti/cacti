@@ -1,50 +1,69 @@
-import CardWrapper from "../../../../components/ui/CardWrapper";
-import { useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ethGetTokenOwners } from "../../queries";
+import * as React from "react";
+import { ethers } from "ethers";
+import SearchIcon from "@mui/icons-material/Search";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
-function Accounts() {
-  const params = useParams();
-  if (typeof params.standard === "undefined") {
-    throw new Error(`Accounts called with empty token standard ${params}`);
-  }
-  const navigate = useNavigate();
-  const { isError, data, error } = useQuery(
-    ethGetTokenOwners(params.standard.toLowerCase()),
-  );
-  const [searchKey, setSearchKey] = useState("");
+import AccountTokenList from "./AccountTokenList";
+import AccountTransactionList from "./AccountTransactionList";
 
-  if (isError) {
-    console.error("Token owners fetch error:", error);
-  }
+export default function Accounts() {
+  const [accountSearchText, setAccountSearchText] = React.useState("");
+  const [errorText, setErrorText] = React.useState("");
+  const [account, setAccount] = React.useState("");
 
-  const tableProps = {
-    onClick: {
-      action: (param: string) => navigate(`/eth/${params.standard}/${param}`),
-      prop: "address",
-    },
-    schema: [
-      {
-        display: "Account address",
-        objProp: ["address"],
-      },
-    ],
+  const handleSearchClick = () => {
+    if (!ethers.isAddress(accountSearchText.toLowerCase())) {
+      return setErrorText(
+        "Address format not recognized, use valid hexadecimal address",
+      );
+    }
+
+    setAccount(accountSearchText);
   };
 
   return (
-    <div>
-      <CardWrapper
-        display={"All"}
-        title={"Accounts"}
-        columns={tableProps}
-        data={data ?? []}
-        filters={["address"]}
-        trimmed={false}
-        getSearchValue={(e: any) => setSearchKey(e)}
-      ></CardWrapper>
-    </div>
+    <Box>
+      {/* Search Bar */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ padding: 2 }}>
+          <TextField
+            label="Account address"
+            sx={{ width: 600 }}
+            variant={account ? "filled" : "standard"}
+            value={accountSearchText}
+            onChange={(e) => {
+              setErrorText("");
+              setAccountSearchText(e.target.value.trim());
+            }}
+            error={Boolean(errorText)}
+            helperText={errorText}
+          />
+        </Box>
+        <Button
+          variant="contained"
+          size="large"
+          endIcon={<SearchIcon />}
+          onClick={handleSearchClick}
+        >
+          Search
+        </Button>
+      </Box>
+
+      {/* Account transactions */}
+      <Box paddingBottom={4}>
+        {account && <AccountTransactionList accountAddress={account} />}
+      </Box>
+
+      {/* Account token list */}
+      {account && <AccountTokenList accountAddress={account} />}
+    </Box>
   );
 }
-
-export default Accounts;

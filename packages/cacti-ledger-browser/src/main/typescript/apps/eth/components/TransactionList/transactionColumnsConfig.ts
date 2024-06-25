@@ -24,7 +24,7 @@ export const transactionColumnsConfig = {
     isLongString: true,
   },
   value: {
-    name: "Value",
+    name: "Eth Value",
     field: "eth_value",
   },
   method: {
