@@ -32,13 +32,13 @@ RUN apk add --no-cache npm nodejs
 RUN apk add --no-cache yq
 
 # Download and setup path variables for Go
-RUN wget https://golang.org/dl/go1.20.6.linux-amd64.tar.gz
-RUN tar -xvf go1.20.6.linux-amd64.tar.gz
+RUN wget https://golang.org/dl/go1.22.4.linux-amd64.tar.gz
+RUN tar -xvf go1.22.4.linux-amd64.tar.gz
 RUN mv go /usr/local
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/usr/local/go
 ENV PATH=$PATH:$GOPATH/bin
-RUN rm go1.20.6.linux-amd64.tar.gz
+RUN rm go1.22.4.linux-amd64.tar.gz
 
 # Needed as of as of go v1.20
 # @see https://github.com/golang/go/issues/59305#issuecomment-1488478737
