@@ -59,7 +59,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.10.9",
+    "@grpc/grpc-js": "1.10.10",
     "@hyperledger/cactus-common": "2.0.0-rc.1",
     "axios": "1.7.2",
     "google-protobuf": "3.21.2"
