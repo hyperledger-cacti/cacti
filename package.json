@@ -29,7 +29,7 @@
     "reset:git": "git clean -f -X",
     "reset:yarn-lock": "yarn run init-registries && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
-    "configure": "npm run init-registries && yarn install && yarn build:dev:backend",
+    "configure": "npm run init-registries && NODE_OPTIONS=\"--max_old_space_size=3072\" yarn install && yarn build:dev:backend",
     "set-yarn-version": "yarn set version stable",
     "enable-corepack": "npm i -g corepack && corepack enable && corepack prepare yarn@4.3.1 --activate",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
@@ -129,12 +129,6 @@
     "@commitlint/config-conventional": "17.7.0",
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
-    "@lerna-lite/cli": "3.7.0",
-    "@lerna-lite/exec": "3.7.0",
-    "@lerna-lite/list": "3.7.0",
-    "@lerna-lite/publish": "3.7.0",
-    "@lerna-lite/run": "3.7.0",
-    "@lerna-lite/version": "3.7.0",
     "@openapitools/openapi-generator-cli": "2.7.0",
     "@redocly/openapi-core": "1.15.0",
     "@types/adm-zip": "0.5.0",
@@ -311,5 +305,8 @@
       "built": false
     }
   },
-  "packageManager": "yarn@4.3.1"
+  "packageManager": "yarn@4.3.1",
+  "dependencies": {
+    "lerna": "^8.1.5"
+  }
 }
