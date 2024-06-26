@@ -540,7 +540,7 @@ export class Stage1ServerService extends SATPService {
       sessionData.clientTransferNumber = request.clientTransferNumber;
     }
 
-    this.Log.info(`TransferCommenceRequest passed all checks.`);
+    this.Log.info(`${fnTag}, TransferCommenceRequest passed all checks.`);
     return sessionData;
   }
 

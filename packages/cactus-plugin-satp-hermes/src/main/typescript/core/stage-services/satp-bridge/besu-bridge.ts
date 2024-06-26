@@ -8,7 +8,7 @@ import {
   PluginLedgerConnectorBesu,
   RunTransactionResponse,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { NetworkBridge } from "./network-bridge";
+import { NetworkBridge } from "./network-bridge-interface";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
 import { PrivacyPolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/generated/openapi/typescript-axios";

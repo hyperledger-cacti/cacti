@@ -22,7 +22,8 @@ export type SATPServiceClient =
   | typeof SatpStage2Service
   | typeof SatpStage3Service;
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
+import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge-interface";
+import { BridgeConfig } from "../types/blockchain-interaction";
 
 export enum CurrentDrafts {
   Core = "Core",
@@ -82,6 +83,17 @@ export interface SATPGatewayConfig {
   enableOpenAPI?: boolean;
   validationOptions?: ValidatorOptions;
 }
+
+export interface SATPBridgeOptions {
+  logLevel?: LogLevelDesc;
+  networks: BridgeConfig[];
+  validationOptions?: ValidatorOptions;
+}
+export interface SATPBridgeConfig {
+  logLevel?: LogLevelDesc;
+  network: NetworkBridge;
+}
+
 export type Immutable<T> = {
   readonly [K in keyof T]: Immutable<T[K]>;
 };
@@ -110,8 +122,4 @@ export interface RemoteLog {
   hash: string;
   signature: string;
   signerPubKey: string;
-}
-
-export interface SATPBridgeConfig {
-  network: NetworkBridge;
 }

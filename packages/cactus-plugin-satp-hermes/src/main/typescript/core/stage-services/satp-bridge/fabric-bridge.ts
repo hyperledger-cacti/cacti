@@ -11,17 +11,13 @@ import {
 } from "../../../types/blockchain-interaction";
 import { PrivacyPolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/generated/openapi/typescript-axios";
 import { FabricAsset } from "./types/fabric-asset";
-import {
-  Logger,
-  LogLevelDesc,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { NetworkBridge } from "./network-bridge";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { NetworkBridge } from "./network-bridge-interface";
 
 export class FabricBridge implements NetworkBridge {
   public static readonly CLASS_NAME = "FabricBridge";
 
-  network: string = "FABRIC";
+  public network: string = "FABRIC";
 
   public log: Logger;
 
@@ -30,7 +26,7 @@ export class FabricBridge implements NetworkBridge {
   options: IPluginLedgerConnectorFabricOptions;
   config: FabricConfig;
 
-  constructor(fabricConfig: FabricConfig, level: LogLevelDesc) {
+  constructor(fabricConfig: FabricConfig) {
     this.config = fabricConfig;
     this.options = fabricConfig.options;
     this.connector = new PluginLedgerConnectorFabric(fabricConfig.options);
@@ -38,7 +34,7 @@ export class FabricBridge implements NetworkBridge {
     this.bungee.addStrategy(this.network, new StrategyFabric("INFO"));
     this.log = LoggerProvider.getOrCreate({
       label: StrategyFabric.CLASS_NAME,
-      level,
+      level: fabricConfig.logLevel || "INFO",
     });
   }
   public async wrapAsset(asset: FabricAsset): Promise<TransactionResponse> {

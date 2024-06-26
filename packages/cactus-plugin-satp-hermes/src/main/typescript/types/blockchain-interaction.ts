@@ -16,23 +16,24 @@ export type SATPLedgerConnector = string;
 
 // TODO Define lock interfaces and strategy pattern for locking (as function of locking blockchain) (see what smart contract implementations return)
 
-export interface FabricConfig {
+export interface FabricConfig extends BridgeConfig {
   signingCredential: FabricSigningCredential;
   channelName: string;
-  contractName: string;
   options: IPluginLedgerConnectorFabricOptions;
-  bungeeOptions: IPluginBungeeHermesOptions;
-  logLevel?: LogLevelDesc;
 }
-export interface BesuConfig {
+export interface BesuConfig extends BridgeConfig {
   keychainId: string;
   signingCredential: Web3SigningCredential;
-  contractName: string;
   contractAddress: string;
   gas: number;
   options: IPluginLedgerConnectorBesuOptions;
-  bungeeOptions: IPluginBungeeHermesOptions;
+}
+
+export interface BridgeConfig {
+  network: string;
   logLevel?: LogLevelDesc;
+  contractName: string;
+  bungeeOptions: IPluginBungeeHermesOptions;
 }
 
 export interface TransactionResponse {

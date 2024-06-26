@@ -8,13 +8,13 @@ import {
 
 import { Stage1SATPHandler } from "../core/stage-handlers/stage1-handler";
 import { Stage1ServerService } from "../core/stage-services/server/stage1-server-service";
-// import { Stage2ServerService } from "../core/stage-services/server/stage2-server-service";
-// import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
+import { Stage2ServerService } from "../core/stage-services/server/stage2-server-service";
+import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../core/satp-session";
 import { SupportedChain } from "../core/types";
 import { Stage1ClientService } from "../core/stage-services/client/stage1-client-service";
-// import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
-// import { Stage3ClientService } from "../core/stage-services/client/stage3-client-service";
+import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
+import { Stage3ClientService } from "../core/stage-services/client/stage3-client-service";
 import {
   SATPService,
   SATPHandler,
@@ -22,6 +22,8 @@ import {
   SATPHandlerOptions,
 } from "../types/satp-protocol";
 import { ISATPServiceOptions } from "../core/stage-services/satp-service";
+import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
+import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -58,11 +60,18 @@ export class SATPManager {
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
       Stage1SATPHandler,
-      // Stage2SATPHandler,
-      // Stage3SATPHandler,
+      Stage2SATPHandler,
+      Stage3SATPHandler,
     ];
 
-    const serviceClasses = [Stage1ServerService, Stage1ClientService];
+    const serviceClasses = [
+      Stage1ServerService,
+      Stage1ClientService,
+      Stage2ServerService,
+      Stage2ClientService,
+      Stage3ServerService,
+      Stage3ClientService,
+    ];
 
     const serviceOptions = this.initializeServiceOptions(
       serviceClasses,

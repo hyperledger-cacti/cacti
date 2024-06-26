@@ -50,7 +50,6 @@ export class Stage1ClientService extends SATPService {
   }
 
   async transferProposalRequest(
-    sessionID: string,
     session: SATPSession,
     supportedDLTs: SupportedChain[],
   ): Promise<void | TransferProposalRequestMessage> {
@@ -408,13 +407,13 @@ export class Stage1ClientService extends SATPService {
         return true;
       } else {
         this.Log.info(
-          `TransferProposalReceipt proposedTransferClaims were rejected`,
+          `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
         );
         sessionData.completed = true;
         return false;
       }
     }
-    this.Log.info(`TransferProposalReceipt passed all checks.`);
+    this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
     return true;
   }
 

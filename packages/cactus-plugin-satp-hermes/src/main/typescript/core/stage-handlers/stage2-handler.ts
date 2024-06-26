@@ -1,58 +1,61 @@
-/*
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
-import { LockAssertionRequestMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
-import { SATPGateway } from "../../plugin-satp-hermes-gateway";
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
-import { TimestampType, saveTimestamp } from "../session-utils";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATPSession } from "../satp-session";
-import { ServiceType } from "@bufbuild/protobuf";
 import { SupportedChain } from "../types";
+import { SATPHandler, SATPHandlerOptions } from "../../types/satp-protocol";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  LockAssertionReceiptMessage,
+  LockAssertionRequestMessage,
+} from "../../generated/proto/cacti/satp/v02/stage_2_pb";
+export class Stage2SATPHandler implements SATPHandler {
+  public static readonly CLASS_NAME = "Stage2SATPHandler";
+  private session: SATPSession;
+  private serverService: Stage2ServerService;
+  private supportedDLTs: SupportedChain[];
+  private logger: Logger;
 
-export const Stage2Handler =
-  (
-    session: SATPSession,
-    service: Stage2ServerService,
-    connectClients: ServiceType[],
-    supportedDLTs: SupportedChain[],
-  ) =>
-  (router: ConnectRouter) =>
-    router.service(SatpStage2Service, {
-      async lockAssertion(
-        req: LockAssertionRequestMessage,
-        context: HandlerContext,
-      ) {
-        console.log("Received LockAssertionRequest", req, context);
-        const recvTimestamp: string = Date.now().toString();
+  constructor(ops: SATPHandlerOptions) {
+    this.session = ops.session;
+    this.serverService = ops.serverService as Stage2ServerService;
+    this.supportedDLTs = ops.supportedDLTs;
+    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.logger.trace(`Initialized ${Stage2SATPHandler.CLASS_NAME}`);
+  }
 
-        const sessionData = await service.checkLockAssertionRequestMessage(
+  getHandlerIdentifier(): string {
+    return Stage2SATPHandler.CLASS_NAME;
+  }
+
+  async lockAssertion(
+    req: LockAssertionRequestMessage,
+    context: HandlerContext,
+  ): Promise<LockAssertionReceiptMessage> {
+    try {
+      console.log("Received LockAssertionRequest", req, context);
+      const sessionData =
+        await this.serverService.checkLockAssertionRequestMessage(
           req,
-          session,
+          this.session,
         );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.LOCK_ASSERT,
-          TimestampType.RECEIVED,
-          recvTimestamp,
-        );
-
-        const message = await service.lockAssertionResponse(req, session);
-
-        if (!message) {
-          throw new Error("No message returned from lockAssertionResponse");
-        }
-
-        saveTimestamp(
-          sessionData,
-          MessageType.ASSERTION_RECEIPT,
-          TimestampType.PROCESSED,
-        );
-
-        console.log("Returning response", message);
-
-        return message;
-      },
+      const message = await this.serverService.lockAssertionResponse(
+        req,
+        this.session,
+      );
+      console.log("Returning response", message);
+      console.log("Returning response", sessionData);
+      //to do
+      const response = new LockAssertionReceiptMessage();
+      return response;
+    } catch (error) {
+      console.error("Error handling LockAssertionRequest:", error);
+      throw new Error("Failed to process LockAssertionRequest");
+    }
+  }
+  setupRouter(router: ConnectRouter): void {
+    router.service(SatpStage2Service, {
+      lockAssertion: this.lockAssertion,
     });
-*/
+  }
+}

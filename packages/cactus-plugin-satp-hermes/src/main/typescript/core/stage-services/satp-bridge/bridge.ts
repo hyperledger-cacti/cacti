@@ -3,7 +3,7 @@
 
 import { Asset } from "./types/asset";
 
-export abstract class BridgeManager {
+export abstract class Bridge {
   /**
    * wraps an asset on the wrapper contract
    * @param asset

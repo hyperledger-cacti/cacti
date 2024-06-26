@@ -41,11 +41,9 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
-import { SATPLedgerConnector } from "./types/blockchain-interaction";
 import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
 import fs from "fs";
 import swaggerUi, { JsonObject } from "swagger-ui-express";
-import { SATPSession } from "./core/satp-session";
 import {
   IPluginWebService,
   ICactusPlugin,

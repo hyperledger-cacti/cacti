@@ -1,23 +1,34 @@
 // this file contains a class that encapsulates the logic for managing the SATP bridge (lock, unlock, etc).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
-import { BridgeManager } from "./bridge-manager";
+import { Bridge } from "./bridge";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPBridgeConfig } from "../../types";
 import { Asset } from "./types/asset";
+import { NetworkBridge } from "./network-bridge-interface";
 
-export class SatpBridgeManager implements BridgeManager {
-  public static readonly CLASS_NAME = "FabricBridgeManager";
+export class SATPBridge implements Bridge {
+  public static readonly CLASS_NAME = "SATPBridgeManager";
 
-  private _log: Logger;
+  private Log: Logger;
 
   public get log(): Logger {
-    return this._log;
+    return this.Log;
   }
 
+  private network: NetworkBridge;
+
+  public networkName: string;
+
   constructor(private config: SATPBridgeConfig) {
-    const level = "INFO";
-    const label = SatpBridgeManager.CLASS_NAME;
-    this._log = LoggerProvider.getOrCreate({ level, label });
+    const level = config.logLevel;
+    const label = SATPBridge.CLASS_NAME;
+    this.Log = LoggerProvider.getOrCreate({ level, label });
+    this.network = this.config.network;
+    this.networkName = this.network.networkName();
+  }
+
+  public getNetworkName(): string {
+    return this.networkName;
   }
 
   public async wrapAsset(asset: Asset): Promise<string> {
@@ -58,7 +69,7 @@ export class SatpBridgeManager implements BridgeManager {
   }
 
   public get className(): string {
-    return SatpBridgeManager.CLASS_NAME;
+    return SATPBridge.CLASS_NAME;
   }
 
   public async lockAsset(assetId: string, amount: number): Promise<string> {
@@ -163,6 +174,7 @@ export class SatpBridgeManager implements BridgeManager {
 
     return receipt;
   }
+
   public async verifyAssetExistence(
     assetId: string,
     invocationType: unknown,
