@@ -160,8 +160,6 @@ export class ApiServer {
       exitHook(() => this.shutdown());
     }
 
-    LoggerProvider.setLogLevel(options.config.logLevel);
-
     if (this.options.httpServerApi) {
       this.httpServerApi = this.options.httpServerApi;
     } else if (this.options.config.apiTlsEnabled) {
