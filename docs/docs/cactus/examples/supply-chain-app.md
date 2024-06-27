@@ -23,9 +23,9 @@ Usage
 
     2.  a test consortium with multiple members and their Cactus nodes
 
-3.  Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3200`
+3.  Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://127.0.0.1:3200`
 
-4.  Visit http://0.0.0.0:3200 in your web browser with Javascript enabled
+4.  Visit http://127.0.0.1:3200 in your web browser with Javascript enabled
 
 
 Building and running the container locally
@@ -76,23 +76,17 @@ On the terminal, issue the following commands (steps 1 to 6) and then perform th
 
 3.  `yarn build:dev`
 
-4.  `cd ./examples/cactus-example-supply-chain-backend/`
+4.  Locate the `.vscode/template.launch.json` file
 
-5.  `yarn install`
+5.  Within that file locate the entry named `"Example: Supply Chain App"`
 
-6.  `cd ../../`
+6.  Copy the VSCode debug definition object from 2) to your `.vscode/launch.json` file
 
-7.  Locate the `.vscode/template.launch.json` file
+7.   At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which starts the application
 
-8.  Within that file locate the entry named `"Example: Supply Chain App"`
+8.   When the application finishes loading, the JWT token generated is displayed on the terminal
 
-9.  Copy the VSCode debug definition object from 2) to your `.vscode/launch.json` file
-
-10.  At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which starts the application
-
-11.  When the application finishes loading, the JWT token generated is displayed on the terminal
-
-12.  Visit http://localhost:3200 in a web browser with Javascript enabled and insert the token when prompted
+9.   Visit http://localhost:3200 in a web browser with Javascript enabled and insert the token when prompted
 
 
 Live Reloading the GUI Application
