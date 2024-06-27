@@ -5,7 +5,7 @@ import type { Server as SecureServer } from "https";
 import type { Request, Response, RequestHandler } from "express";
 import type { ServerOptions as SocketIoServerOptions } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
-import exitHook from "async-exit-hook";
+import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 import os from "os";
 import path from "path";
 import tls from "tls";
@@ -207,6 +207,23 @@ export class ApiServer {
       label: "api-server",
       level: options.config.logLevel,
     });
+
+    if (this.enableShutdownHook) {
+      exitHook((onHookDone: IAsyncExitHookDoneCallback) => {
+        this.log.info("Starting async-exit-hook for cmd-api-server ...");
+        this.shutdown()
+          .catch((ex: unknown) => {
+            this.log.warn("Failed async-exit-hook for cmd-api-server", ex);
+            throw ex;
+          })
+          .finally(() => {
+            this.log.info("Concluded async-exit-hook for cmd-api-server ...");
+            onHookDone();
+          });
+        this.log.info("Started async-exit-hook for cmd-api-server OK");
+      });
+      this.log.info("Registered async-exit-hook for cmd-api-server shutdown.");
+    }
 
     const defaultPluginsPath = path.join(
       os.tmpdir(),
