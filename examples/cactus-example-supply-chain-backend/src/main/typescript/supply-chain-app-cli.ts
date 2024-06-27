@@ -21,7 +21,7 @@ export async function launchApp(
     await supplyChainApp.start();
   } catch (ex) {
     console.error(`SupplyChainApp crashed. Existing...`, ex);
-    await supplyChainApp?.stop();
+    await supplyChainApp.stop();
     process.exit(-1);
   }
 }

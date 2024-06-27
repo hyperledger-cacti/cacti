@@ -191,15 +191,28 @@ export class SupplyChainApp {
     this.log.debug(`Starting SupplyChainApp...`);
 
     if (!this.options.disableSignalHandlers) {
-      exitHook((callback: IAsyncExitHookDoneCallback) => {
-        console.log(`Executing Registered signal handler to stop container.`);
-        this.stop().then(callback);
+      exitHook((onHookDone: IAsyncExitHookDoneCallback) => {
+        this.log.info("Starting async-exit-hook for supply-chain-app ...");
+        this.stop()
+          .catch((ex: unknown) => {
+            this.log.warn("Failed async-exit-hook for supply-chain-app", ex);
+            throw ex;
+          })
+          .finally(() => {
+            this.log.info("Concluded async-exit-hook for supply-chain-app ...");
+            onHookDone();
+          });
+        this.log.info("Started async-exit-hook for supply-chain-app OK");
       });
-      this.log.debug(`Registered signal handlers for graceful auto-shutdown`);
+      this.log.info("Registered async-exit-hook for supply-chain-app shutdown");
     }
 
+    this.onShutdown(async () => {
+      this.log.info("SupplyChainApp onShutdown() - stopping ledgers...");
+      await this.ledgers.stop();
+      this.log.info("SupplyChainApp onShutdown() - stopped ledgers OK");
+    });
     await this.ledgers.start();
-    this.onShutdown(() => this.ledgers.stop());
 
     const contractsInfo = await this.ledgers.deployContracts();
 
@@ -441,8 +454,12 @@ export class SupplyChainApp {
   }
 
   public async stop(): Promise<void> {
+    let i = 0;
     for (const hook of this.shutdownHooks) {
+      i++;
+      this.log.info("Executing exit hook #%d...", i);
       await hook(); // FIXME add timeout here so that shutdown does not hang
+      this.log.info("Executed exit hook #%d OK", i);
     }
   }
 
@@ -590,15 +607,25 @@ export class SupplyChainApp {
     properties.authorizationConfigJson =
       await this.getOrCreateAuthorizationConfig();
     properties.crpcPort = 0;
+    // We must disable the API server's own shutdown hooks because if we didn't
+    // it would clash with the supply chain app's own shutdown hooks and the
+    // async functions wouldn't be waited for their conclusion leaving the containers
+    // running after the supply chain app NodeJS process has exited.
+    properties.enableShutdownHook = false;
 
     const apiServer = new ApiServer({
       config: properties,
       httpServerApi,
       httpServerCockpit,
       pluginRegistry,
+      enableShutdownHook: false,
     });
 
-    this.onShutdown(() => apiServer.shutdown());
+    this.onShutdown(async () => {
+      this.log.info("SupplyChainApp onShutdown() - stopping API server");
+      await apiServer.shutdown();
+      this.log.info("SupplyChainApp onShutdown() - stopped API server OK");
+    });
 
     await apiServer.start();
 
