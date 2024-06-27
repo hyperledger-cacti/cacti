@@ -19,8 +19,8 @@
 2. Observe the example application pulling up in the logs
    1. the test ledger containers,
    2. a test consortium with multiple members and their Cactus nodes
-3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3200`
-4. Visit http://0.0.0.0:3200 in your web browser with Javascript enabled
+3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://127.0.0.1:3200`
+4. Visit http://127.0.0.1:3200 in your web browser with Javascript enabled
 
 ## Building and running the container locally
 
@@ -28,7 +28,11 @@
 # Change directories to the project root
 
 # Build the docker image and tag it as "scaeb" for supply chain app example backend
-DOCKER_BUILDKIT=1 docker build -f ./examples/cactus-example-supply-chain-backend/Dockerfile . -t scaeb
+DOCKER_BUILDKIT=1 docker build --file \
+  ./examples/cactus-example-supply-chain-backend/Dockerfile \
+  . \
+  --tag scaeb \
+  --tag ghcr.io/hyperledger/cactus-example-supply-chain-app:$(git describe --contains --all HEAD)_$(git rev-parse --short HEAD)_$(date -u +"%Y-%m-%dT%H-%M-%SZ")
 
 # Run the built image with ports mapped to the host machine as you see fit
 # The --privileged flag is required because we use Docker-in-Docker for pulling

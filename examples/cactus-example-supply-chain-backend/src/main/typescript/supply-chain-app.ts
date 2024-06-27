@@ -585,7 +585,7 @@ export class SupplyChainApp {
     properties.cockpitHost = addressInfoCockpit.address;
     properties.cockpitPort = addressInfoCockpit.port;
     properties.grpcPort = 0; // TODO - make this configurable as well
-    properties.logLevel = this.options.logLevel || "INFO";
+    properties.logLevel = "WARN"; // silence the logs about 0.0.0.0 web hosts
     properties.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     properties.authorizationConfigJson =
       await this.getOrCreateAuthorizationConfig();
@@ -601,6 +601,12 @@ export class SupplyChainApp {
     this.onShutdown(() => apiServer.shutdown());
 
     await apiServer.start();
+
+    const restApiUrl = `http://127.0.0.1:${properties.apiPort}`;
+    this.log.info("Cacti API Server - REST API reachable at: %s", restApiUrl);
+
+    const guiUrl = `http://127.0.0.1:${properties.cockpitPort}`;
+    this.log.info("SupplyChainApp Web GUI - reachable at: %s", guiUrl);
 
     return apiServer;
   }
