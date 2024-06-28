@@ -422,7 +422,7 @@ FAQ
 
 ### What is the difference between a Cactus Node and a Cactus API Server?
 
-The node is what has an identity within your PKI and can be made up of 1-N API server instances that all share the same configuration/identity of the node. See deployment scenarios above for a much more detailed explanation.
+The node is what has an identity within your PKI and can be made up of 1-N API server instances that all share the same configuration/identity of the node. See the deployment scenarios above for a much more detailed explanation.
 
 ### Is the API server horizontally scalable?
 
