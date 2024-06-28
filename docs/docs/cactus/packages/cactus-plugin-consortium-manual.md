@@ -30,7 +30,7 @@ Once edited, you can start the prometheus service by referencing the above edite
 
 #### response.type.ts
 
-This file contains the various responses of the metrics.
+This file contains the various responses to the metrics.
 
 #### data-fetcher.ts
 
