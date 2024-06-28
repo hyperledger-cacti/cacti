@@ -109,7 +109,7 @@ Getting Started
         
     *   Docker Compose
         
-    *   OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
+    *   OpenJDK (Corda support Java 8 JDK but does not currently support Java 9 or higher)
         
         *   `sudo apt install openjdk-8-jdk-headless`
             
