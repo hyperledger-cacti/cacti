@@ -27,6 +27,7 @@ import { BesuAsset } from "../../../../main/typescript/core/stage-services/satp-
 import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { BesuConfig } from "../../../../main/typescript/types/blockchain-interaction";
+import { SupportedChain } from "../../../../main/typescript/core/types";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -213,6 +214,7 @@ beforeAll(async () => {
     };
 
     besuConfig = {
+      network: SupportedChain.BESU,
       keychainId: keychainPlugin2.getKeychainId(),
       signingCredential: {
         ethAccount: bridgeEthAccount.address,

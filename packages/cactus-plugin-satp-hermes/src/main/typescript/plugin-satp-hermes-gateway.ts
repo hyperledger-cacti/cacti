@@ -49,6 +49,10 @@ import {
   ICactusPlugin,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
+import {
+  ISATPBridgesOptions,
+  SATPBridgesManager,
+} from "./gol/satp-bridges-manager";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -70,6 +74,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public readonly instanceId: string;
   private supportedDltIDs: SupportedChain[];
   private gatewayOrchestrator: GatewayOrchestrator;
+  private bridgesManager: SATPBridgesManager;
 
   private BLOApplication?: Express;
   private BLOServer?: http.Server;
@@ -118,6 +123,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       signer: this.signer!,
     };
 
+    const bridgesManagerOptions: ISATPBridgesOptions = {
+      logLevel: this.config.logLevel,
+      supportedDLTs: this.config.gid!.supportedDLTs,
+      networks: [], //todo add networks
+    };
+
     if (this.config.gid) {
       this.logger.info(
         "Initializing gateway connection manager with seed gateways",
@@ -129,6 +140,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       throw new Error("GatewayIdentity is not defined");
     }
 
+    this.bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
+
+    if (!this.bridgesManager) {
+      throw new Error("BridgesManager is not defined");
+    }
+
     this.instanceId = uuidv4();
     const dispatcherOps: BLODispatcherOptions = {
       logger: this.logger,
@@ -136,6 +153,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       instanceId: this.config.gid!.id,
       orchestrator: this.gatewayOrchestrator,
       signer: this.signer,
+      bridgesManager: this.bridgesManager,
     };
 
     this.supportedDltIDs = this.config.gid!.supportedDLTs;

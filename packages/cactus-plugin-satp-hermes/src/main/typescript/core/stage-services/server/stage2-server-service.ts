@@ -43,6 +43,7 @@ export class Stage2ServerService extends SATPService {
   ): Promise<void | LockAssertionReceiptMessage> {
     const stepTag = `lockAssertionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, lockAssertionResponse...`);
 
     if (request.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -119,6 +120,7 @@ export class Stage2ServerService extends SATPService {
   ): Promise<SessionData> {
     const stepTag = `checkLockAssertionRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkLockAssertionRequestMessage...`);
 
     if (
       request.common == undefined ||
@@ -210,13 +212,13 @@ export class Stage2ServerService extends SATPService {
 
     sessionData.lockAssertionClaim = request.lockAssertionClaim;
 
-    if (request.lockAssertionFormat == undefined) {
+    if (request.lockAssertionClaimFormat == undefined) {
       throw new Error(
         `${fnTag},  LockAssertionRequest lockAssertionFormat is missing`,
       );
     }
 
-    sessionData.lockAssertionFormat = request.lockAssertionFormat;
+    sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat;
 
     if (request.lockAssertionExpiration == undefined) {
       throw new Error(

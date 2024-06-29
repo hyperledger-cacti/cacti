@@ -652,7 +652,7 @@ beforeAll(async () => {
 
 describe("Fabric Bridge Test", () => {
   it("Should Initialize the bridge", async () => {
-    fabricBridge = new FabricBridge(fabricConfig, logLevel);
+    fabricBridge = new FabricBridge(fabricConfig);
     expect(fabricBridge).not.toBeUndefined();
 
     bridgeId = await fabricBridge.getClientId();

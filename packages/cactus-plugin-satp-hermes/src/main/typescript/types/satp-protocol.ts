@@ -15,6 +15,7 @@ import {
 export interface SATPHandler {
   setupRouter(router: ConnectRouter): void;
   getHandlerIdentifier(): string;
+  getSessionId(): string;
 }
 
 export interface SATPHandlerOptions {

@@ -23,7 +23,6 @@ export type SATPServiceClient =
   | typeof SatpStage3Service;
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge-interface";
-import { BridgeConfig } from "../types/blockchain-interaction";
 
 export enum CurrentDrafts {
   Core = "Core",
@@ -84,11 +83,6 @@ export interface SATPGatewayConfig {
   validationOptions?: ValidatorOptions;
 }
 
-export interface SATPBridgeOptions {
-  logLevel?: LogLevelDesc;
-  networks: BridgeConfig[];
-  validationOptions?: ValidatorOptions;
-}
 export interface SATPBridgeConfig {
   logLevel?: LogLevelDesc;
   network: NetworkBridge;

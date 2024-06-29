@@ -1,14 +1,26 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  Logger,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
 import { BesuBridge } from "../core/stage-services/satp-bridge/besu-bridge";
 import { FabricBridge } from "../core/stage-services/satp-bridge/fabric-bridge";
 import { NetworkBridge } from "../core/stage-services/satp-bridge/network-bridge-interface";
 import { SATPBridge } from "../core/stage-services/satp-bridge/satp-bridge";
-import { SATPBridgeOptions, SATPBridgeConfig } from "../core/types";
+import { SATPBridgeConfig, SupportedChain } from "../core/types";
 import {
   FabricConfig,
   BesuConfig,
   BridgeConfig,
 } from "../types/blockchain-interaction";
+import { ValidatorOptions } from "class-validator";
+
+export interface ISATPBridgesOptions {
+  logLevel?: LogLevelDesc;
+  networks: BridgeConfig[];
+  validationOptions?: ValidatorOptions;
+  supportedDLTs: SupportedChain[];
+}
 
 export class SATPBridgesManager {
   static CLASS_NAME: string = "SATPBridgesManager";
@@ -16,7 +28,7 @@ export class SATPBridgesManager {
   bridges: Map<string, SATPBridge> = new Map<string, SATPBridge>();
   log: Logger;
 
-  constructor(private config: SATPBridgeOptions) {
+  constructor(private config: ISATPBridgesOptions) {
     this.log = LoggerProvider.getOrCreate({
       level: config.logLevel,
       label: SATPBridgesManager.CLASS_NAME,
@@ -25,10 +37,10 @@ export class SATPBridgesManager {
     config.networks.map((bridgeConfig) => {
       let bridge: NetworkBridge;
       switch (bridgeConfig.network) {
-        case "Fabric":
+        case SupportedChain.FABRIC:
           bridge = new FabricBridge(bridgeConfig as FabricConfig);
           break;
-        case "Besu":
+        case SupportedChain.BESU:
           bridge = new BesuBridge(bridgeConfig as BesuConfig);
           break;
         default:
@@ -57,10 +69,10 @@ export class SATPBridgesManager {
   public addBridgeFromConfig(bridgeConfig: BridgeConfig) {
     let bridge: NetworkBridge;
     switch (bridgeConfig.network) {
-      case "Fabric":
+      case SupportedChain.FABRIC:
         bridge = new FabricBridge(bridgeConfig as FabricConfig);
         break;
-      case "Besu":
+      case SupportedChain.BESU:
         bridge = new BesuBridge(bridgeConfig as BesuConfig);
         break;
       default:

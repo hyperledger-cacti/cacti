@@ -7,8 +7,10 @@ import {
 } from "../../../generated/proto/cacti/satp/v02/stage_3_pb";
 import { SATP_VERSION } from "../../constants";
 import {
+  AssignmentAssertionClaim,
   CommonSatp,
   MessageType,
+  MintAssertionClaim,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SessionData } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import {
@@ -25,10 +27,14 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { SATPSession } from "../../../core/satp-session";
+import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import { SATPBridge } from "../satp-bridge/satp-bridge";
 
 export class Stage3ServerService extends SATPService {
   public static readonly SATP_STAGE = "3";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
+
+  private bridgeManager: SATPBridgesManager;
 
   constructor(ops: ISATPServerServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
@@ -37,8 +43,15 @@ export class Stage3ServerService extends SATPService {
       serviceName: ops.serviceName,
       signer: ops.signer,
       serviceType: Stage3ServerService.SERVICE_TYPE,
+      bridgeManager: ops.bridgeManager,
     };
     super(commonOptions);
+    if (ops.bridgeManager == undefined) {
+      throw new Error(
+        `${this.getServiceIdentifier()}#constructor() bridgeManager is required`,
+      );
+    }
+    this.bridgeManager = ops.bridgeManager;
   }
 
   async commitReady(
@@ -47,6 +60,7 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void | CommitReadyResponseMessage> {
     const stepTag = `commitReady()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, commitReady...`);
 
     if (request.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -79,9 +93,9 @@ export class Stage3ServerService extends SATPService {
     const commitReadyMessage = new CommitReadyResponseMessage();
     commitReadyMessage.common = commonBody;
 
-    commitReadyMessage.mintAssertionClaims = sessionData.mintAssertionClaims;
-    commitReadyMessage.mintAssertionClaimsFormat =
-      sessionData.mintAssertionClaimsFormat;
+    commitReadyMessage.mintAssertionClaim = sessionData.mintAssertionClaim;
+    commitReadyMessage.mintAssertionClaimFormat =
+      sessionData.mintAssertionClaimFormat;
 
     if (sessionData.transferContextId != undefined) {
       commitReadyMessage.common.transferContextId =
@@ -124,6 +138,7 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void | CommitFinalAcknowledgementReceiptResponseMessage> {
     const stepTag = `commitFinalAcknowledgementReceiptResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, commitFinalAcknowledgementReceiptResponse...`);
 
     if (request.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -207,6 +222,7 @@ export class Stage3ServerService extends SATPService {
   ): Promise<SessionData> {
     const stepTag = `checkCommitPreparationRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkCommitPreparationRequestMessage...`);
 
     if (request.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -300,6 +316,7 @@ export class Stage3ServerService extends SATPService {
   ): Promise<SessionData> {
     const stepTag = `checkCommitFinalAssertionRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkCommitFinalAssertionRequestMessage...`);
 
     if (request.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -406,6 +423,7 @@ export class Stage3ServerService extends SATPService {
   ): Promise<SessionData> {
     const stepTag = `checkTransferCompleteRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferCompleteRequestMessage...`);
 
     if (request.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -505,5 +523,75 @@ export class Stage3ServerService extends SATPService {
     );
 
     return sessionData;
+  }
+  async mintAsset(session: SATPSession): Promise<void> {
+    const stepTag = `mintAsset()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    try {
+      this.Log.info(`${fnTag}, Minting Asset...`);
+      const sessionData = session.getSessionData();
+      const assetId = sessionData.transferInitClaims?.digitalAssetId;
+      const amount = sessionData.transferInitClaims?.amountToBeneficiary;
+
+      this.logger.debug(
+        `${fnTag}, Mint Asset ID: ${assetId} amount: ${amount}`,
+      );
+      if (assetId == undefined) {
+        throw new Error(`${fnTag}, Asset ID is missing`);
+      }
+
+      const bridge: SATPBridge = this.bridgeManager.getBridge(
+        sessionData.recipientGatewayNetworkId,
+      );
+
+      sessionData.mintAssertionClaim = new MintAssertionClaim();
+      sessionData.mintAssertionClaim.receipt = await bridge.mintAsset(
+        assetId,
+        Number(amount),
+      );
+      sessionData.mintAssertionClaim.signature = bufArray2HexStr(
+        sign(this.Signer, sessionData.mintAssertionClaim.receipt),
+      );
+    } catch (error) {
+      throw new Error(`${fnTag}, Failed to process Mint Asset ${error}`);
+    }
+  }
+
+  async assignAsset(session: SATPSession): Promise<void> {
+    const stepTag = `assignAsset()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    try {
+      this.Log.info(`${fnTag}, Assigning Asset...`);
+      const sessionData = session.getSessionData();
+      const assetId = sessionData.transferInitClaims?.digitalAssetId;
+      const amount = sessionData.transferInitClaims?.amountToBeneficiary;
+      const recipient = sessionData.transferInitClaims?.beneficiaryPubkey;
+
+      if (recipient == undefined) {
+        throw new Error(`${fnTag}, Recipient is missing`);
+      }
+      this.logger.debug(
+        `${fnTag}, Assign Asset ID: ${assetId} amount: ${amount} recipient: ${recipient}`,
+      );
+      if (assetId == undefined) {
+        throw new Error(`${fnTag}, Asset ID is missing`);
+      }
+
+      const bridge: SATPBridge = this.bridgeManager.getBridge(
+        sessionData.recipientGatewayNetworkId,
+      );
+
+      sessionData.assignmentAssertionClaim = new AssignmentAssertionClaim();
+      sessionData.assignmentAssertionClaim.receipt = await bridge.assignAsset(
+        assetId,
+        recipient,
+        Number(amount),
+      );
+      sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
+        sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
+      );
+    } catch (error) {
+      throw new Error(`${fnTag}, Failed to process Assign Asset ${error}`);
+    }
   }
 }

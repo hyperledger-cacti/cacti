@@ -19,7 +19,6 @@ import {
 import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   TimestampType,
-  createSessionData,
   getMessageHash,
   getMessageTimestamp,
   saveHash,
@@ -57,6 +56,7 @@ export class Stage1ServerService extends SATPService {
   ): Promise<void | TransferProposalReceiptMessage> {
     const stepTag = `transferProposalResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferProposalResponse...`);
 
     if (
       request.common == undefined ||
@@ -179,6 +179,7 @@ export class Stage1ServerService extends SATPService {
   ): Promise<void | TransferCommenceResponseMessage> {
     const stepTag = `transferCommenceResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferCommenceResponse...`);
 
     if (request.common == undefined) {
       throw new Error(
@@ -271,6 +272,24 @@ export class Stage1ServerService extends SATPService {
   ): Promise<SessionData> {
     const stepTag = `checkTransferProposalRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferProposalRequestMessage...`);
+
+    if (session == undefined) {
+      throw new Error(`${fnTag}, session is undefined`);
+    }
+    const sessionData = session.getSessionData();
+
+    if (request.common == undefined) {
+      throw new Error(
+        `${fnTag}, message satp common body is missing or is missing required fields`,
+      );
+    }
+
+    if (sessionData == undefined) {
+      throw new Error(
+        `${fnTag}, session data not found for session id ${request.common.sessionId}`,
+      );
+    }
 
     if (
       request.common == undefined ||
@@ -332,25 +351,33 @@ export class Stage1ServerService extends SATPService {
 
     this.Log.info(`TransferProposalRequest passed all checks.`);
 
-    const sessionData = createSessionData(
-      request.common.sessionId,
-      request.common.version,
-      request.transferInitClaims.digitalAssetId,
-      request.transferInitClaims.senderGatewayNetworkId,
-      request.transferInitClaims.recipientGatewayNetworkId,
-      request.transferInitClaims.originatorPubkey,
-      request.transferInitClaims.beneficiaryPubkey,
-      request.transferInitClaims.senderGatewayOwnerId,
-      request.transferInitClaims.receiverGatewayOwnerId,
-      request.transferInitClaims.clientGatewayPubkey,
-      request.transferInitClaims.serverGatewayPubkey,
-      request.networkCapabilities.signatureAlgorithm,
-      request.networkCapabilities.lockType,
-      request.networkCapabilities.lockExpirationTime,
-      request.networkCapabilities.credentialProfile,
-      request.networkCapabilities.loggingProfile,
-      request.networkCapabilities.accessControlProfile,
-    );
+    sessionData.version = request.common.version;
+    sessionData.digitalAssetId = request.transferInitClaims.digitalAssetId;
+    sessionData.originatorPubkey = request.transferInitClaims.originatorPubkey;
+    sessionData.beneficiaryPubkey =
+      request.transferInitClaims.beneficiaryPubkey;
+    sessionData.senderGatewayNetworkId =
+      request.transferInitClaims.senderGatewayNetworkId;
+    sessionData.recipientGatewayNetworkId =
+      request.transferInitClaims.recipientGatewayNetworkId;
+    sessionData.clientGatewayPubkey =
+      request.transferInitClaims.clientGatewayPubkey;
+    sessionData.serverGatewayPubkey =
+      request.transferInitClaims.serverGatewayPubkey;
+    sessionData.receiverGatewayOwnerId =
+      request.transferInitClaims.receiverGatewayOwnerId;
+    sessionData.senderGatewayOwnerId =
+      request.transferInitClaims.senderGatewayOwnerId;
+    sessionData.signatureAlgorithm =
+      request.networkCapabilities.signatureAlgorithm;
+    sessionData.lockType = request.networkCapabilities.lockType;
+    sessionData.lockExpirationTime =
+      request.networkCapabilities.lockExpirationTime;
+    sessionData.credentialProfile =
+      request.networkCapabilities.credentialProfile;
+    sessionData.loggingProfile = request.networkCapabilities.loggingProfile;
+    sessionData.accessControlProfile =
+      request.networkCapabilities.accessControlProfile;
 
     if (request.networkCapabilities.permissions != undefined) {
       this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);

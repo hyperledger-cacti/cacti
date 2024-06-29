@@ -1,4 +1,5 @@
 import {
+  BurnAssertionClaim,
   CommonSatp,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -25,10 +26,13 @@ import {
 } from "../satp-service";
 import { SATPSession } from "../../satp-session";
 import { LockAssertionReceiptMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
+import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
 
 export class Stage3ClientService extends SATPService {
   public static readonly SATP_STAGE = "3";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
+
+  private bridgeManager: SATPBridgesManager;
 
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
@@ -37,8 +41,16 @@ export class Stage3ClientService extends SATPService {
       serviceName: ops.serviceName,
       signer: ops.signer,
       serviceType: Stage3ClientService.SERVICE_TYPE,
+      bridgeManager: ops.bridgeManager,
     };
     super(commonOptions);
+
+    if (ops.bridgeManager == undefined) {
+      throw new Error(
+        `${this.getServiceIdentifier()}#constructor(), bridgeManager is missing`,
+      );
+    }
+    this.bridgeManager = ops.bridgeManager;
   }
 
   async commitPreparation(
@@ -47,6 +59,7 @@ export class Stage3ClientService extends SATPService {
   ): Promise<void | CommitPreparationRequestMessage> {
     const stepTag = `commitPreparation()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, CommitPreparation...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -124,6 +137,7 @@ export class Stage3ClientService extends SATPService {
   ): Promise<void | CommitFinalAssertionRequestMessage> {
     const stepTag = `commitFinalAssertion()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, CommitFinalAssertion...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -210,6 +224,7 @@ export class Stage3ClientService extends SATPService {
   ): Promise<void | TransferCompleteRequestMessage> {
     const stepTag = `transferComplete()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, TransferComplete...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -297,6 +312,7 @@ export class Stage3ClientService extends SATPService {
   ): void {
     const stepTag = `checkLockAssertionReceiptMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, CheckLockAssertionReceiptMessage...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -406,6 +422,7 @@ export class Stage3ClientService extends SATPService {
   ): void {
     const stepTag = `checkCommitReadyResponseMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, CommitReadyResponse...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -472,21 +489,20 @@ export class Stage3ClientService extends SATPService {
       throw new Error(`${fnTag}, message signature verification failed`);
     }
 
-    if (response.mintAssertionClaimsFormat != undefined) {
+    if (response.mintAssertionClaimFormat != undefined) {
       //todo
       this.Log.info(
         `${fnTag},  Optional variable loaded: mintAssertionClaimsFormat `,
       );
-      sessionData.mintAssertionClaimsFormat =
-        response.mintAssertionClaimsFormat;
+      sessionData.mintAssertionClaimFormat = response.mintAssertionClaimFormat;
     }
 
-    if (response.mintAssertionClaims == undefined) {
+    if (response.mintAssertionClaim == undefined) {
       //todo
       throw new Error(`${fnTag}, mintAssertionClaims is missing`);
     }
 
-    sessionData.mintAssertionClaims = response.mintAssertionClaims;
+    sessionData.mintAssertionClaim = response.mintAssertionClaim;
 
     if (
       sessionData.transferContextId != undefined &&
@@ -514,6 +530,7 @@ export class Stage3ClientService extends SATPService {
   ): void {
     const stepTag = `checkCommitFinalAcknowledgementReceiptResponseMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, CommitFinalAcknowledgementReceipt...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -614,5 +631,36 @@ export class Stage3ClientService extends SATPService {
     this.Log.info(
       `${fnTag}, CommitFinalAcknowledgementReceiptResponseMessage passed all checks.`,
     );
+  }
+
+  async burnAsset(session: SATPSession): Promise<void> {
+    const stepTag = `lockAsset()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    try {
+      this.Log.debug(`${fnTag}, Burning Asset...`);
+      const sessionData = session.getSessionData();
+      const assetId = sessionData.transferInitClaims?.digitalAssetId;
+      const amount = sessionData.transferInitClaims?.amountFromOriginator;
+
+      this.Log.debug(`${fnTag}, Burn Asset ID: ${assetId} amount: ${amount}`);
+      if (assetId == undefined) {
+        throw new Error(`${fnTag}, Asset ID is missing`);
+      }
+
+      const bridge = this.bridgeManager.getBridge(
+        sessionData.senderGatewayNetworkId,
+      );
+
+      sessionData.burnAssertionClaim = new BurnAssertionClaim();
+      sessionData.burnAssertionClaim.receipt = await bridge.burnAsset(
+        assetId,
+        Number(amount),
+      );
+      sessionData.burnAssertionClaim.signature = bufArray2HexStr(
+        sign(this.Signer, sessionData.burnAssertionClaim.receipt),
+      );
+    } catch (error) {
+      throw new Error(`${fnTag}, Failed to process Burn Asset ${error}`);
+    }
   }
 }

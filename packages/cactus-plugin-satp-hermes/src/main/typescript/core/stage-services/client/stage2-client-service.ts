@@ -2,6 +2,7 @@ import { TransferCommenceResponseMessage } from "../../../generated/proto/cacti/
 import { SATP_VERSION } from "../../constants";
 import {
   CommonSatp,
+  LockAssertionClaim,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LockAssertionRequestMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
@@ -19,10 +20,13 @@ import {
   SATPServiceType,
 } from "../satp-service";
 import { ISATPServiceOptions } from "../satp-service";
+import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
 
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
+
+  private bridgeManager: SATPBridgesManager;
 
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
@@ -31,8 +35,16 @@ export class Stage2ClientService extends SATPService {
       serviceName: ops.serviceName,
       signer: ops.signer,
       serviceType: Stage2ClientService.SERVICE_TYPE,
+      bridgeManager: ops.bridgeManager,
     };
     super(commonOptions);
+
+    if (ops.bridgeManager == undefined) {
+      throw new Error(
+        `${this.getServiceIdentifier()}#constructor(), bridgeManager is missing`,
+      );
+    }
+    this.bridgeManager = ops.bridgeManager;
   }
 
   async lockAssertionRequest(
@@ -41,6 +53,7 @@ export class Stage2ClientService extends SATPService {
   ): Promise<void | LockAssertionRequestMessage> {
     const stepTag = `lockAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, lockAssertionRequest...`);
 
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message common body is missing`);
@@ -77,8 +90,8 @@ export class Stage2ClientService extends SATPService {
 
     lockAssertionRequestMessage.lockAssertionClaim =
       sessionData.lockAssertionClaim;
-    lockAssertionRequestMessage.lockAssertionFormat =
-      sessionData.lockAssertionFormat;
+    lockAssertionRequestMessage.lockAssertionClaimFormat =
+      sessionData.lockAssertionClaimFormat;
 
     if (sessionData.transferContextId != undefined) {
       lockAssertionRequestMessage.common.transferContextId =
@@ -122,6 +135,7 @@ export class Stage2ClientService extends SATPService {
   ): void {
     const stepTag = `checkTransferCommenceResponseMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferCommenceResponseMessage...`);
 
     if (
       response.common == undefined ||
@@ -228,5 +242,37 @@ export class Stage2ClientService extends SATPService {
     }
 
     this.Log.info(`${fnTag}, TransferCommenceResponse passed all checks.`);
+  }
+
+  async lockAsset(session: SATPSession): Promise<void> {
+    const stepTag = `lockAsset()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    try {
+      this.Log.info(`${fnTag}, Locking Asset...`);
+      const sessionData = session.getSessionData();
+      const assetId = sessionData.transferInitClaims?.digitalAssetId;
+      const amount = sessionData.transferInitClaims?.amountFromOriginator;
+
+      this.Log.debug(`${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`);
+      if (assetId == undefined) {
+        throw new Error(`${fnTag}, Asset ID is missing`);
+      }
+
+      const bridge = this.bridgeManager.getBridge(
+        sessionData.senderGatewayNetworkId,
+      );
+
+      sessionData.lockAssertionClaim = new LockAssertionClaim();
+      sessionData.lockAssertionClaim.receipt = await bridge.lockAsset(
+        assetId,
+        Number(amount),
+      );
+
+      sessionData.lockAssertionClaim.signature = bufArray2HexStr(
+        sign(this.Signer, sessionData.lockAssertionClaim.receipt),
+      );
+    } catch (error) {
+      throw new Error(`${fnTag}, Failed to process Lock Asset ${error}`);
+    }
   }
 }

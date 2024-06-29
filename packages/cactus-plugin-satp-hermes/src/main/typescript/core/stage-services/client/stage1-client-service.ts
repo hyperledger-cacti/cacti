@@ -55,6 +55,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<void | TransferProposalRequestMessage> {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferProposalRequest...`);
 
     const sessionData = session.getSessionData();
 
@@ -209,6 +210,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<void | TransferCommenceRequestMessage> {
     const stepTag = `transferCommenceRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferCommenceRequest...`);
 
     if (response.common == undefined) {
       throw new Error("Response or response.common is undefined");
@@ -295,6 +297,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<boolean> {
     const stepTag = `checkTransferProposalReceiptMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferProposalReceiptMessage...`);
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message has no satp common body`);
     }

@@ -10,6 +10,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SupportedChain } from "../core/types";
 
 // inject gateway, get connectors
 export type SATPLedgerConnector = string;
@@ -30,7 +31,7 @@ export interface BesuConfig extends BridgeConfig {
 }
 
 export interface BridgeConfig {
-  network: string;
+  network: SupportedChain;
   logLevel?: LogLevelDesc;
   contractName: string;
   bungeeOptions: IPluginBungeeHermesOptions;
