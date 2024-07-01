@@ -115,6 +115,6 @@ xDai 1.8.27
 
   
 
-[Previous](fabric.md "Fabric Support")
+[Previous](quorum.md "Quorum Support") [Next](substrate.md "Substrate Support")
 
 * * *
