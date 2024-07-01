@@ -50,7 +50,7 @@ jobs:
 
             docs_changed:
               - '.github/workflows/test_weaver-node-pkgs.yaml'
-              - 'weaver/docs/**'
+              - 'docs/**'
 
   unit_test_weaver_node_sdk_local:
     needs: check_code_changed
@@ -132,23 +132,22 @@ jobs:
       run: npm run test
       working-directory: weaver/core/identity-management/iin-agent
 
-  build_docs:
-    needs: check_code_changed
-    if: needs.check_code_changed.outputs.docs_changed == 'true'
+  build-docs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
 
-      - name: Use Node.js ${{ env.NODEJS_LTS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+      - name: Use Python 3.x
+        uses: actions/setup-python@v4
         with:
-          node-version: ${{ env.NODEJS_LTS_VERSION }}
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
 
-      - name: NPM INSTALL
-        run: npm install
-        working-directory: weaver/docs
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        working-directory: docs
 
       - name: Build
-        run: npm run build
-        working-directory: weaver/docs
+        run: mkdocs build
+        working-directory: docs

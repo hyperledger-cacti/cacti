@@ -28,6 +28,31 @@ Maintainers
 | Name | GitHub | Chat |
 |------|--------|------|
 | Jonathan Hamilton | [jonathan-m-hamilton][jonathan-m-hamilton] | JHamilton |
+| Krishnasuri Narayanam | [knarayan][knarayan] | Krishnasuri |
+| Dhinakaran Vinayagamurthy | [dhinakaran2705][dhinakaran2705] | Dhinakaran |
 
 [jonathan-m-hamilton]: https://github.com/jonathan-m-hamilton
+[knarayan]: https://github.com/knarayan
+[dhinakaran2705]: https://github.com/dhinakaran2705
 
+Below is a list of former contributors to the [Weaver Lab](https://github.com/hyperledger-labs/weaver-dlt-interoperability) project, which is now a part of Cacti.
+
+| Name | GitHub | Chat |
+|------|--------|------|
+| Ermyas Abebe | [ermyas][ermyas] | - |
+| Nick Waywood | [nwaywood][nwaywood] | - |
+| Dileban Karunamoorthy | [dileban][dileban] | - |
+| Allison Irvin | [airvin][airvin] | - |
+| Antony Targett | [AntTargett][AntTargett] | - |
+| Yining Hu | [Yining-Hu][Yining-Hu] | - |
+| Vinayaka Pandit | [Vinayaka-Pandit][Vinayaka-Pandit] | - |
+| Christian Vecchiola | [Christian-Vecchiola][Christian-Vecchiola] | - |
+
+[ermyas]: https://github.com/ermyas
+[nwaywood]: https://github.com/nwaywood
+[dileban]: https://github.com/dileban
+[airvin]: https://github.com/airvin
+[AntTargett]: https://github.com/AntTargett
+[Yining-Hu]: https://github.com//Yining-Hu
+[Vinayaka-Pandit]: https://github.com/Vinayaka-Pandit
+[Christian-Vecchiola]: https://github.com/hyp0th3rmi4

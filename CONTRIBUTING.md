@@ -36,6 +36,10 @@ As a developer:
 * if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger/cacti/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger/cacti/labels/good%20first%20issue) task
 * If you can commit to full-time development, then please contact us on our [Discord channel](https://discord.com/channels/905194001349627914/908379338716631050) to work through logistics!
 
+We welcome contributions to this project in many forms, whether it is to fix a bug, improve the documentation, add a new feature, or add support for any new DLT platform.
+
+Please familiarize yourself with the [documentation](https://hyperledger.github.io/cacti/). In particular, review the [vision and design methodology](https://hyperledger.github.io/cacti/vision/) and [system architecture](https://hyperledger.github.io/cacti/architecture/). Follow the tutorial instructions to test the [Cactus](https://hyperledger.github.io/cacti/cactus/introduction/) and [Weaver](https://hyperledger.github.io/cacti/weaver/introduction/) features respectively. (For a deeper understanding of the Weaver design and specifications, also check out the [Weaver RFCs](https://github.com/hyperledger/cacti/tree/main/weaver/rfcs).)
+
 ## Git Know How / Reading List
 
 This section is for you if you do not know your way around advanced git concepts such as
