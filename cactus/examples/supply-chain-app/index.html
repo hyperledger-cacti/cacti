@@ -1480,10 +1480,10 @@
 </ol>
 </li>
 <li>
-<p>Wait for the output to show the message <code>INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3200</code></p>
+<p>Wait for the output to show the message <code>INFO (api-server): Cactus Cockpit reachable http://127.0.0.1:3200</code></p>
 </li>
 <li>
-<p>Visit <a href="http://0.0.0.0:3200">http://0.0.0.0:3200</a> in your web browser with Javascript enabled</p>
+<p>Visit <a href="http://127.0.0.1:3200">http://127.0.0.1:3200</a> in your web browser with Javascript enabled</p>
 </li>
 </ol>
 <h2 id="building-and-running-the-container-locally">Building and running the container locally<a class="headerlink" href="#building-and-running-the-container-locally" title="Permanent link">¶</a></h2>
@@ -1529,15 +1529,6 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
 </li>
 <li>
 <p><code>yarn build:dev</code></p>
-</li>
-<li>
-<p><code>cd ./examples/cactus-example-supply-chain-backend/</code></p>
-</li>
-<li>
-<p><code>yarn install</code></p>
-</li>
-<li>
-<p><code>cd ../../</code></p>
 </li>
 <li>
 <p>Locate the <code>.vscode/template.launch.json</code> file</p>
