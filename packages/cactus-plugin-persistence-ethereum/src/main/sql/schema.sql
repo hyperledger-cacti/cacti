@@ -39,10 +39,10 @@ GRANT ALL ON TABLE public.plugin_status TO service_role;
 CREATE TABLE IF NOT EXISTS public.block
 (
     "number" numeric NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamptz NOT NULL,
     hash text COLLATE pg_catalog."default" NOT NULL,
     number_of_tx numeric NOT NULL,
-    sync_at timestamp with time zone NOT NULL DEFAULT now(),
+    sync_at timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT block_pkey PRIMARY KEY ("number"),
     CONSTRAINT block_hash_key UNIQUE (hash),
     CONSTRAINT block_number_key UNIQUE ("number")
