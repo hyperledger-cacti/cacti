@@ -135,7 +135,7 @@
     "grpc_tools_node_protoc_ts": "5.3.3",
     "http-status-codes": "2.1.4",
     "protobufjs": "7.2.5",
-    "tsx": "4.7.0"
+    "tsx": "4.16.2"
   },
   "engines": {
     "node": ">=18",
