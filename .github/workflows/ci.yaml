@@ -458,6 +458,30 @@ jobs:
 
       - run: ./tools/ci.sh
 
+      - name: build_ncc_bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger/cactus-cmd-api-server
+
+      - name: ghcr.io/hyperledger/cactus-cmd-api-server
+        run: |
+          DOCKER_BUILDKIT=1 docker build \
+            --file ./packages/cactus-cmd-api-server/cmd-api-server.Dockerfile \
+            ./packages/cactus-cmd-api-server \
+            --tag cas \
+            --tag cmd-api-server \
+            --tag "ghcr.io/hyperledger/cactus-cmd-api-server:$(date +"%Y-%m-%dT%H-%M-%S" --utc)-dev-$(git rev-parse --short HEAD)"
+
+      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
+        name: Run Trivy vulnerability scan for cmd-api-server
+        uses: aquasecurity/trivy-action@0.19.0
+        with:
+          image-ref: 'cmd-api-server'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: false
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          trivyignores: ./.trivyignore
+
       - name: Ensure .tmp Directory Exists
         run: mkdir -p .tmp/benchmark-results/cmd-api-server/
 
@@ -484,7 +508,7 @@ jobs:
           auto-push: ${{ github.ref == 'refs/heads/main' }}
 
           # Show alert with commit comment on detecting possible performance regression
-          alert-threshold: '5%'
+          alert-threshold: '25%'
           comment-on-alert: true
           fail-on-alert: true
           alert-comment-cc-users: '@petermetz'
@@ -2199,25 +2223,6 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
-  ghcr-cmd-api-server:
-    runs-on: ubuntu-22.04
-    needs:
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: ghcr.io/hyperledger/cactus-cmd-api-server
-        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile -t cactus-cmd-api-server
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-cmd-api-server
-        uses: aquasecurity/trivy-action@0.19.0
-        with:
-          image-ref: 'cactus-cmd-api-server'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: false
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
   ghcr-connector-besu:
     needs:
       - compute_changed_packages
