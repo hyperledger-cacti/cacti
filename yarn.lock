@@ -7703,6 +7703,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@thream/socketio-jwt": "npm:2.1.1"
+    "@types/async-exit-hook": "npm:2.0.2"
     "@types/benchmark": "npm:2.1.5"
     "@types/compression": "npm:1.7.4"
     "@types/convict": "npm:6.1.1"
@@ -7721,6 +7722,7 @@ __metadata:
     "@types/semver": "npm:7.3.8"
     "@types/uuid": "npm:9.0.8"
     "@types/xml2js": "npm:0.4.9"
+    "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.7.2"
     benchmark: "npm:2.1.4"
@@ -14501,6 +14503,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/async-exit-hook@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@types/async-exit-hook@npm:2.0.2"
+  checksum: 10/f0afd1548d93784c3500b84ff9d804010896246efcfc4f57f71c6eecb619207d9ae31af6cef267d9792a9d30bb2f5d97b9e4d60b89cf2c468e60a758270242eb
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.0.0":
   version: 7.20.2
   resolution: "@types/babel__core@npm:7.20.2"
@@ -16614,6 +16623,17 @@ __metadata:
     expo-modules-autolinking: "npm:^0.3.2"
     expo-modules-core: "npm:~0.4.0"
   checksum: 10/adb1157ce5df860369acb64ef302915a5afc2caf9108921f221fc8f5475eb1071bcc5eeea56788cfd8ff73313530a0683ed76056ca1cd55ae193880d1e03e5d5
+  languageName: node
+  linkType: hard
+
+"@vercel/ncc@npm:0.38.1":
+  version: 0.38.1
+  resolution: "@vercel/ncc@npm:0.38.1"
+  dependencies:
+    node-gyp: "npm:latest"
+  bin:
+    ncc: dist/ncc/cli.js
+  checksum: 10/2ed9dff34ba2e7c2ba7113ed075effd023549d5041d355a367f5bf749b20916f68d2adad6737f7a2d03f0d92237f948ce8dfbc9429bdf3febc18d4fa5159d9b4
   languageName: node
   linkType: hard
 

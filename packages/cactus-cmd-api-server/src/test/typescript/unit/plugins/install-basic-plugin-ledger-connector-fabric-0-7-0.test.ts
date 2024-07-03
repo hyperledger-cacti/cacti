@@ -22,7 +22,8 @@ import path from "path";
 
 const logLevel: LogLevelDesc = "TRACE";
 
-test("can install plugin-ledger-connector-fabric", async (t: Test) => {
+// FIXME: Add this back when 2.0.0-rc.2 goes out.
+test.skip("can install plugin-ledger-connector-fabric", async (t: Test) => {
   const pluginsPath = path.join(
     __dirname, // start at the current file's path
     "../../../../../../../", // walk back up to the project root
