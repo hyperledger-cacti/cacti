@@ -1,0 +1,7 @@
+diff --git a/package.json b/package.json
+index 2f7070b3e70fd5b9e013e3a707b589bad7f984f1..bc0094f00ef993e32e1b4a79fbb894d4780f0b92 100644
+--- a/package.json
++++ b/package.json
+@@ -1 +1 @@
+-{"description":"Ionic Native - Native plugins for ionic apps","main":"bundle.js","module":"index.js","typings":"index.d.ts","author":"ionic","license":"MIT","repository":{"type":"git","url":"https://github.com/ionic-team/ionic-native.git"},"name":"@ionic-native/status-bar","dependencies":{"@types/cordova":"latest"},"peerDependencies":{"rxjs":"^5.5.0 || ^6.5.0","@ionic-native/core":"^5.1.0"},"version":"5.36.0"}
++{"description":"Ionic Native - Native plugins for ionic apps","main":"ngx/bundle.js","module":"index.js","typings":"index.d.ts","author":"ionic","license":"MIT","repository":{"type":"git","url":"https://github.com/ionic-team/ionic-native.git"},"name":"@ionic-native/status-bar","dependencies":{"@types/cordova":"latest"},"peerDependencies":{"rxjs":"^5.5.0 || ^6.5.0","@ionic-native/core":"^5.1.0"},"version":"5.36.0"}
