@@ -5,6 +5,7 @@ target/
 .DS_Store
 node_modules/
 docs/main
+docs/docs/references/openapi
 logs/
 jspm_packages/
 generated-sources/

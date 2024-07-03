@@ -45,6 +45,15 @@ export interface ISupplyChainAppDummyInfrastructureOptions {
   keychain?: IPluginKeychain;
 }
 
+function ledgerStopFailErrorMsg(ledgerName: Readonly<string>): string {
+  return (
+    `Failed to stop ${ledgerName} ledger. This is most likely safe to ignore if the ` +
+    `error states that the container was not running to begin with. This usually means` +
+    `that the process exited before the application boot has finished and it did not` +
+    `have enough time to start launching the ${ledgerName} ledger yet.`
+  );
+}
+
 /**
  * Contains code that is meant to simulate parts of a production grade deployment
  * that would otherwise not be part of the application itself.
@@ -131,12 +140,21 @@ export class SupplyChainAppDummyInfrastructure {
   public async stop(): Promise<void> {
     try {
       this.log.info(`Stopping...`);
-      await Promise.all([
-        this.besu.stop().then(() => this.besu.destroy()),
-        this.quorum.stop().then(() => this.quorum.destroy()),
-        this.fabric.stop().then(() => this.fabric.destroy()),
+      await Promise.allSettled([
+        this.besu
+          .stop()
+          .then(() => this.besu.destroy())
+          .catch((ex) => this.log.warn(ledgerStopFailErrorMsg("Besu"), ex)),
+        this.quorum
+          .stop()
+          .then(() => this.quorum.destroy())
+          .catch((ex) => this.log.warn(ledgerStopFailErrorMsg("Quorum"), ex)),
+        this.fabric
+          .stop()
+          .then(() => this.fabric.destroy())
+          .catch((ex) => this.log.warn(ledgerStopFailErrorMsg("Fabric"), ex)),
       ]);
-      this.log.info(`Stopped OK`);
+      this.log.info(`Ledgers of dummy infrastructure Stopped OK`);
     } catch (ex) {
       this.log.error(`Stopping crashed: `, ex);
       throw ex;

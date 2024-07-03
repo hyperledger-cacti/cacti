@@ -7,7 +7,9 @@ ROOT_DIR=${2:-'..'}
 REPO='github.com/hyperledger/cacti'
 
 # install go-checksum
+echo "Installing go-checksum..."
 go install github.com/vikyd/go-checksum@latest
+echo "Installed."
 
 GOMODULE_PATHS=("weaver/core/network/fabric-interop-cc/libs/utils"
 "weaver/core/network/fabric-interop-cc/libs/assetexchange"
@@ -63,6 +65,8 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
       echo "------------ END --------------"
       continue
     fi
+
+    (cat VERSION | grep "$VERSION") || echo $VERSION > VERSION
     GOMOD_VERSION=v$(cat VERSION)
     GOMOD_SUM=$(go-checksum . $GOMOD_NAME@$GOMOD_VERSION | grep "GoCheckSum" | cut -d ' ' -f 2 | cut -d '"' -f 2)
     GOMOD_DOTMOD_SUM=$(go-checksum go.mod | grep "GoCheckSum" | cut -d ' ' -f 2 | cut -d '"' -f 2)
@@ -74,17 +78,17 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     rm $ROOT_DIR/$GOMOD_PATH/LICENSE
     
     pushd $ROOT_DIR/$GOMODULE > /dev/null
-    UPDATE=false
-    (cat go.mod | grep -q "$GOMOD_NAME $GOMOD_VERSION") || UPDATE=True
-    if $UPDATE; then
+    UPDATE="false"
+    (cat go.mod | grep -q "$GOMOD_NAME $GOMOD_VERSION") || UPDATE="true"
+    if [ "$UPDATE" = "true" ]; then
       go mod edit -require $GOMOD_NAME@$GOMOD_VERSION
     else
       echo "ERROR: Version $GOMOD_VERSION already there in go.mod, skipping $GOMOD_PATH in $GOMODULE"
     fi
-    UPDATE=false
-    (cat go.sum | grep -q "$GOMOD_SUM_ENTRY") || UPDATE=True
-    (cat go.sum | grep -q "$GOMOD_DOTMOD_SUM_ENTRY") || UPDATE=True
-    if $UPDATE; then
+    UPDATE="false"
+    (cat go.sum | grep -q "$GOMOD_SUM_ENTRY") || UPDATE="true"
+    (cat go.sum | grep -q "$GOMOD_DOTMOD_SUM_ENTRY") || UPDATE="true"
+    if [ "$UPDATE" = "true" ]; then
       # mv go.sum go.sum.old
       # grep -v "$GOMOD_NAME $GOMOD_VERSION" go.sum.old > go.sum
       echo $GOMOD_SUM_ENTRY >> go.sum

@@ -371,7 +371,7 @@ jobs:
         working-directory: weaver/sdks/fabric/go-sdk
         
       - name: Build test
-        run: go build -v ./...
+        run: make build
         working-directory: weaver/sdks/fabric/go-sdk
         
       - name: Check if release already exists

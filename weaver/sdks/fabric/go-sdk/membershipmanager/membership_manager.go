@@ -22,6 +22,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"github.com/golang/protobuf/proto"
 	protoV2 "google.golang.org/protobuf/proto"
 
 	"github.com/hyperledger/fabric-protos-go/common"
@@ -149,36 +150,40 @@ func GetConfigBlockFromChannel(walletPath, userName, connectionProfilePath, chan
 	ctx, cancel := context.WithTimeout(context.Background(), seconds*time.Second)
 	defer cancel()
 
-	configBlock, err := channel.GetConfigBlock(ctx, connection, clientId, channelId)
+	configBlockV2, err := channel.GetConfigBlock(ctx, connection, clientId, channelId)
 	if err != nil {
 		return nil, err
 	}
+	
+	configBlockBytes, err := protoV2.Marshal(configBlockV2)
+	var configBlock common.Block
+	err = proto.Unmarshal(configBlockBytes, &configBlock)
 
-	return configBlock, err
+	return &configBlock, err
 }
 
 func GetMembershipForMspIdFromBlock(block *common.Block, mspId string) (*cactiprotos.Member, error) {
 	var envelope common.Envelope
-	err := protoV2.Unmarshal((block.GetData().GetData())[0], &envelope)
+	err := proto.Unmarshal((block.GetData().GetData())[0], &envelope)
 	if err != nil {
 		return nil, err
 	}
 
 	var payload common.Payload
-	err = protoV2.Unmarshal(envelope.GetPayload(), &payload)
+	err = proto.Unmarshal(envelope.GetPayload(), &payload)
 	if err != nil {
 		return nil, err
 	}
 
 	var channelHeader common.ChannelHeader
-	err = protoV2.Unmarshal(payload.GetHeader().GetChannelHeader(), &channelHeader)
+	err = proto.Unmarshal(payload.GetHeader().GetChannelHeader(), &channelHeader)
 	if err != nil {
 		return nil, err
 	}
 
 	if common.HeaderType(channelHeader.GetType()) == common.HeaderType_CONFIG {
 		var configEnvelope common.ConfigEnvelope
-		err = protoV2.Unmarshal(payload.GetData(), &configEnvelope)
+		err = proto.Unmarshal(payload.GetData(), &configEnvelope)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +195,7 @@ func GetMembershipForMspIdFromBlock(block *common.Block, mspId string) (*cactipr
 				fmt.Println("Warning: Channel Application group has no 'MSP' key")
 				continue
 			}
-			err = protoV2.Unmarshal(groupValMsp.GetValue(), &mspConfig)
+			err = proto.Unmarshal(groupValMsp.GetValue(), &mspConfig)
 			if err != nil {
 				return nil, err
 			}
@@ -202,7 +207,7 @@ func GetMembershipForMspIdFromBlock(block *common.Block, mspId string) (*cactipr
 			// which is imported by this module.
 			if mspConfig.GetType() == 0 {
 				var fabricMspConfig mspprotos.FabricMSPConfig
-				err = protoV2.Unmarshal(mspConfig.GetConfig(), &fabricMspConfig)
+				err = proto.Unmarshal(mspConfig.GetConfig(), &fabricMspConfig)
 				if err != nil {
 					return nil, err
 				}
@@ -235,19 +240,19 @@ func GetMembershipForMspIdsFromBlock(block *common.Block, mspIds []string) (*cac
 	}
 
 	var envelope common.Envelope
-	err := protoV2.Unmarshal((block.GetData().GetData())[0], &envelope)
+	err := proto.Unmarshal((block.GetData().GetData())[0], &envelope)
 	if err != nil {
 		return nil, err
 	}
 
 	var payload common.Payload
-	err = protoV2.Unmarshal(envelope.GetPayload(), &payload)
+	err = proto.Unmarshal(envelope.GetPayload(), &payload)
 	if err != nil {
 		return nil, err
 	}
 
 	var channelHeader common.ChannelHeader
-	err = protoV2.Unmarshal(payload.GetHeader().GetChannelHeader(), &channelHeader)
+	err = proto.Unmarshal(payload.GetHeader().GetChannelHeader(), &channelHeader)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +262,7 @@ func GetMembershipForMspIdsFromBlock(block *common.Block, mspIds []string) (*cac
 
 	if common.HeaderType(channelHeader.GetType()) == common.HeaderType_CONFIG {
 		var configEnvelope common.ConfigEnvelope
-		err = protoV2.Unmarshal(payload.GetData(), &configEnvelope)
+		err = proto.Unmarshal(payload.GetData(), &configEnvelope)
 		if err != nil {
 			return nil, err
 		}
@@ -269,7 +274,7 @@ func GetMembershipForMspIdsFromBlock(block *common.Block, mspIds []string) (*cac
 				fmt.Println("Warning: Channel Application group has no 'MSP' key")
 				continue
 			}
-			err = protoV2.Unmarshal(groupValMsp.GetValue(), &mspConfig)
+			err = proto.Unmarshal(groupValMsp.GetValue(), &mspConfig)
 			if err != nil {
 				return nil, err
 			}
@@ -281,7 +286,7 @@ func GetMembershipForMspIdsFromBlock(block *common.Block, mspIds []string) (*cac
 			// which is imported by this module.
 			if mspConfig.GetType() == 0 {
 				var fabricMspConfig mspprotos.FabricMSPConfig
-				err = protoV2.Unmarshal(mspConfig.GetConfig(), &fabricMspConfig)
+				err = proto.Unmarshal(mspConfig.GetConfig(), &fabricMspConfig)
 				if err != nil {
 					return nil, err
 				}
@@ -314,19 +319,19 @@ func GetMembershipForAllMspIdsFromBlock(block *common.Block, ordererMspIds []str
 	}
 
 	var envelope common.Envelope
-	err := protoV2.Unmarshal((block.GetData().GetData())[0], &envelope)
+	err := proto.Unmarshal((block.GetData().GetData())[0], &envelope)
 	if err != nil {
 		return nil, err
 	}
 
 	var payload common.Payload
-	err = protoV2.Unmarshal(envelope.GetPayload(), &payload)
+	err = proto.Unmarshal(envelope.GetPayload(), &payload)
 	if err != nil {
 		return nil, err
 	}
 
 	var channelHeader common.ChannelHeader
-	err = protoV2.Unmarshal(payload.GetHeader().GetChannelHeader(), &channelHeader)
+	err = proto.Unmarshal(payload.GetHeader().GetChannelHeader(), &channelHeader)
 	if err != nil {
 		return nil, err
 	}
@@ -336,7 +341,7 @@ func GetMembershipForAllMspIdsFromBlock(block *common.Block, ordererMspIds []str
 
 	if common.HeaderType(channelHeader.GetType()) == common.HeaderType_CONFIG {
 		var configEnvelope common.ConfigEnvelope
-		err = protoV2.Unmarshal(payload.GetData(), &configEnvelope)
+		err = proto.Unmarshal(payload.GetData(), &configEnvelope)
 		if err != nil {
 			return nil, err
 		}
@@ -348,7 +353,7 @@ func GetMembershipForAllMspIdsFromBlock(block *common.Block, ordererMspIds []str
 				fmt.Println("Warning: Channel Application group has no 'MSP' key")
 				continue
 			}
-			err = protoV2.Unmarshal(groupValMsp.GetValue(), &mspConfig)
+			err = proto.Unmarshal(groupValMsp.GetValue(), &mspConfig)
 			if err != nil {
 				return nil, err
 			}
@@ -360,7 +365,7 @@ func GetMembershipForAllMspIdsFromBlock(block *common.Block, ordererMspIds []str
 			// which is imported by this module.
 			if mspConfig.GetType() == 0 {
 				var fabricMspConfig mspprotos.FabricMSPConfig
-				err = protoV2.Unmarshal(mspConfig.GetConfig(), &fabricMspConfig)
+				err = proto.Unmarshal(mspConfig.GetConfig(), &fabricMspConfig)
 				if err != nil {
 					return nil, err
 				}

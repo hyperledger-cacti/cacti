@@ -311,3 +311,33 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simpleassettransfer
+      
+  unit_test_sdk_membership:
+    needs: check_code_changed
+    if: ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed   == 'true' }}
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+        
+    # FABRIC NETWORK
+    - name: Start Fabric Network
+      run: make start-interop-local
+      working-directory: weaver/tests/network-setups/fabric/dev
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/sdks/fabric/go-sdk
+
+    - name: Build
+      run: make build
+      working-directory: weaver/sdks/fabric/go-sdk
+
+    # Test the MembershipManager
+    - name: Test
+      run: GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn CACTI_ROOT=$GITHUB_WORKSPACE go test -v .
+      working-directory: weaver/sdks/fabric/go-sdk/membershipmanager

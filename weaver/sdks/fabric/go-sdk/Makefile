@@ -9,9 +9,7 @@ undo-vendor:
 build-local: run-vendor build undo-vendor
 
 build:
-	cd helpers && go build -v .
-	cd asset-manager && go build -v .
-	cd interoperablehelper && go build -v .
+	go build -v ./...
 
 test-local: run-vendor test undo-vendor
 
