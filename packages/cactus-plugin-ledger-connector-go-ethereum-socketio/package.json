@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "description": "Allows Cactus nodes to connect to a Ethereum ledger ",
   "keywords": [
     "Hyperledger",
@@ -45,8 +45,8 @@
     "start": "cd ./dist && node common/core/bin/www.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-rc.1",
-    "@hyperledger/cactus-common": "2.0.0-rc.1",
+    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-rc.2",
+    "@hyperledger/cactus-common": "2.0.0-rc.2",
     "@types/node": "18.11.9",
     "body-parser": "1.20.2",
     "config": "3.3.9",
@@ -67,9 +67,9 @@
     "web3-utils": "1.8.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-rc.1",
-    "@hyperledger/cactus-common": "2.0.0-rc.1",
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.1",
+    "@hyperledger/cactus-api-client": "2.0.0-rc.2",
+    "@hyperledger/cactus-common": "2.0.0-rc.2",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.2",
     "@types/config": "3.3.2",
     "@types/cookie-parser": "1.4.5",
     "@types/express": "4.17.21",

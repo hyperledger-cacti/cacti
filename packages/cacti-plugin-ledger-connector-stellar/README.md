@@ -161,7 +161,7 @@ DOCKER_BUILDKIT=1 docker build -f ./packages/cacti-plugin-ledger-connector-stell
 Build with a specific version of the npm package:
 
 ```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=2.0.0-rc.1 -f ./packages/cacti-plugin-ledger-connector-stellar/Dockerfile . --tag cplcs --tag cacti-plugin-ledger-connector-stellar
+DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=2.0.0-rc.2 -f ./packages/cacti-plugin-ledger-connector-stellar/Dockerfile . --tag cplcs --tag cacti-plugin-ledger-connector-stellar
 ```
 
 #### Running the container
