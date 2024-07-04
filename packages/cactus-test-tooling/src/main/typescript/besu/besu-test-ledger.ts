@@ -261,10 +261,9 @@ export class BesuTestLedger implements ITestLedger {
             Retries: 299,
             StartPeriod: 3000000000, // 1 second
           },
-          // This is a workaround needed for macOS which has issues with routing
-          // to docker container's IP addresses directly...
-          // https://stackoverflow.com/a/39217691
-          PublishAllPorts: true,
+          HostConfig: {
+            PublishAllPorts: true,
+          },
           Env: this.envVars,
         },
         {},
