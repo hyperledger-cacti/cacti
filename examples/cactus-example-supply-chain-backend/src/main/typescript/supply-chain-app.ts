@@ -44,10 +44,10 @@ import { PluginConsortiumManual } from "@hyperledger/cactus-plugin-consortium-ma
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
 import {
-  PluginLedgerConnectorQuorum,
+  PluginLedgerConnectorXdai,
   Web3SigningCredentialType,
-  DefaultApi as QuorumApi,
-} from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+  DefaultApi as XdaiApi,
+} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
 
 import {
   PluginLedgerConnectorBesu,
@@ -84,7 +84,7 @@ export class SupplyChainApp {
   private readonly ledgers: SupplyChainAppDummyInfrastructure;
   public readonly keychain: IPluginKeychain;
   private _besuApiClient?: BesuApi;
-  private _quorumApiClient?: QuorumApi;
+  private _xdaiApiClient?: XdaiApi;
   private _fabricApiClient?: FabricApi;
   private authorizationConfig?: IAuthorizationConfig;
   private token?: string;
@@ -97,9 +97,9 @@ export class SupplyChainApp {
     }
   }
 
-  public get quorumApiClientOrThrow(): QuorumApi {
-    if (this._quorumApiClient) {
-      return this._quorumApiClient;
+  public get xdaiApiClientOrThrow(): XdaiApi {
+    if (this._xdaiApiClient) {
+      return this._xdaiApiClient;
     } else {
       throw new Error("Invalid state: ledgers were not started yet.");
     }
@@ -218,7 +218,7 @@ export class SupplyChainApp {
 
     const besuAccount = await this.ledgers.besu.createEthTestAccount();
     await this.keychain.set(besuAccount.address, besuAccount.privateKey);
-    const quorumAccount = await this.ledgers.quorum.createEthTestAccount();
+    const quorumAccount = await this.ledgers.xdaiBesu.createEthTestAccount();
     await this.keychain.set(quorumAccount.address, quorumAccount.privateKey);
 
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
@@ -262,7 +262,7 @@ export class SupplyChainApp {
     });
 
     const besuApiClient = new BesuApi(besuConfig);
-    const quorumApiClient = new QuorumApi(quorumConfig);
+    const xdaiApiClient = new XdaiApi(quorumConfig);
     const fabricApiClient = new FabricApi(fabricConfig);
 
     const keyPairA = await generateKeyPair("ES256K");
@@ -288,7 +288,7 @@ export class SupplyChainApp {
     this.log.info(`Configuring Cactus Node for Ledger A...`);
     const rpcApiHostA = await this.ledgers.besu.getRpcApiHttpHost();
     const rpcApiWsHostA = await this.ledgers.besu.getRpcApiWsHost();
-    const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
+    const rpcApiHostB = await this.ledgers.xdaiBesu.getRpcApiHttpHost();
 
     const connectionProfile =
       await this.ledgers.fabric.getConnectionProfileOrg1();
@@ -312,7 +312,7 @@ export class SupplyChainApp {
           contracts: contractsInfo,
           instanceId: uuidv4(),
           besuApiClient,
-          quorumApiClient,
+          xdaiApiClient,
           fabricApiClient,
           web3SigningCredential: {
             keychainEntryKey: besuAccount.address,
@@ -356,7 +356,7 @@ export class SupplyChainApp {
           contracts: contractsInfo,
           instanceId: uuidv4(),
           besuApiClient,
-          quorumApiClient,
+          xdaiApiClient,
           fabricApiClient,
           web3SigningCredential: {
             keychainEntryKey: quorumAccount.address,
@@ -368,8 +368,8 @@ export class SupplyChainApp {
       ],
     });
 
-    const quorumConnector = new PluginLedgerConnectorQuorum({
-      instanceId: "PluginLedgerConnectorQuorum_B",
+    const quorumConnector = new PluginLedgerConnectorXdai({
+      instanceId: "PluginLedgerConnectorXdai_B",
       rpcApiHttpHost: rpcApiHostB,
       logLevel: this.options.logLevel,
       pluginRegistry: registryB,
@@ -399,7 +399,7 @@ export class SupplyChainApp {
           contracts: contractsInfo,
           instanceId: uuidv4(),
           besuApiClient,
-          quorumApiClient,
+          xdaiApiClient,
           fabricApiClient,
           fabricEnvironment: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         }),
@@ -440,7 +440,7 @@ export class SupplyChainApp {
       apiServerC,
       besuApiClient,
       fabricApiClient,
-      quorumApiClient,
+      xdaiApiClient,
       supplyChainApiClientA: new SupplyChainApi(
         new Configuration({ basePath: nodeApiHostA, baseOptions }),
       ),
@@ -644,7 +644,7 @@ export interface IStartInfo {
   readonly apiServerB: ApiServer;
   readonly apiServerC: ApiServer;
   readonly besuApiClient: BesuApi;
-  readonly quorumApiClient: QuorumApi;
+  readonly xdaiApiClient: XdaiApi;
   readonly fabricApiClient: FabricApi;
   readonly supplyChainApiClientA: SupplyChainApi;
   readonly supplyChainApiClientB: SupplyChainApi;

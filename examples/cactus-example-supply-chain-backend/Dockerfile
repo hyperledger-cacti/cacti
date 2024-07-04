@@ -60,7 +60,7 @@ RUN source ~/.bashrc && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-keychain-memory": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-besu": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-fabric": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-quorum": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-xdai": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     yarn install
 
 SHELL ["/bin/bash", "--login", "-c"]
