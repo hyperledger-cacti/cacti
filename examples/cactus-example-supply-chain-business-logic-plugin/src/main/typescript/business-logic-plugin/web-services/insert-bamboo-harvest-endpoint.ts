@@ -20,10 +20,10 @@ import {
 } from "@hyperledger/cactus-core";
 
 import {
-  DefaultApi as QuorumApi,
+  DefaultApi as XdaiApi,
   EthContractInvocationType,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
 
 import OAS from "../../../json/openapi.json";
 import { InsertBambooHarvestRequest } from "../../generated/openapi/typescript-axios";
@@ -32,7 +32,7 @@ export interface IInsertBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;
   contractName: string;
   //  contractAbi: any;
-  apiClient: QuorumApi;
+  apiClient: XdaiApi;
   web3SigningCredential: Web3SigningCredential;
   keychainId: string;
   authorizationOptionsProvider?: AuthorizationOptionsProvider;

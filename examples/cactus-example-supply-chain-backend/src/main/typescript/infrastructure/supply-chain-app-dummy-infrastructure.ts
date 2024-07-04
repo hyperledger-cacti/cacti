@@ -11,9 +11,9 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
-  PluginLedgerConnectorQuorum,
+  PluginLedgerConnectorXdai,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
 import { IPluginKeychain } from "@hyperledger/cactus-core-api";
 import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger/cactus-test-tooling";
 import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2 } from "@hyperledger/cactus-test-tooling";
@@ -23,7 +23,6 @@ import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
-  QuorumTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 import {
   IEthContractDeployment,
@@ -69,18 +68,18 @@ export class SupplyChainAppDummyInfrastructure {
   public static readonly CLASS_NAME = "SupplyChainAppDummyInfrastructure";
 
   public readonly besu: BesuTestLedger;
-  public readonly quorum: QuorumTestLedger;
+  public readonly xdaiBesu: BesuTestLedger;
   public readonly fabric: FabricTestLedgerV1;
   public readonly keychain: IPluginKeychain;
   private readonly log: Logger;
-  private _quorumAccount?: Account;
+  private _xdaiAccount?: Account;
   private _besuAccount?: Account;
 
-  public get quorumAccount(): Account {
-    if (!this._quorumAccount) {
+  public get xdaiAccount(): Account {
+    if (!this._xdaiAccount) {
       throw new Error(`Must call deployContracts() first.`);
     } else {
-      return this._quorumAccount;
+      return this._xdaiAccount;
     }
   }
 
@@ -110,7 +109,7 @@ export class SupplyChainAppDummyInfrastructure {
       logLevel: level,
       emitContainerLogs: true,
     });
-    this.quorum = new QuorumTestLedger({
+    this.xdaiBesu = new BesuTestLedger({
       logLevel: level,
       emitContainerLogs: true,
     });
@@ -145,10 +144,10 @@ export class SupplyChainAppDummyInfrastructure {
           .stop()
           .then(() => this.besu.destroy())
           .catch((ex) => this.log.warn(ledgerStopFailErrorMsg("Besu"), ex)),
-        this.quorum
+        this.xdaiBesu
           .stop()
-          .then(() => this.quorum.destroy())
-          .catch((ex) => this.log.warn(ledgerStopFailErrorMsg("Quorum"), ex)),
+          .then(() => this.xdaiBesu.destroy())
+          .catch((ex) => this.log.warn(ledgerStopFailErrorMsg("BesuXdai"), ex)),
         this.fabric
           .stop()
           .then(() => this.fabric.destroy())
@@ -166,7 +165,7 @@ export class SupplyChainAppDummyInfrastructure {
       this.log.info(`Starting dummy infrastructure...`);
       await this.fabric.start({ omitPull: false });
       await this.besu.start();
-      await this.quorum.start();
+      await this.xdaiBesu.start();
       this.log.info(`Started dummy infrastructure OK`);
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);
@@ -187,8 +186,8 @@ export class SupplyChainAppDummyInfrastructure {
         JSON.stringify(BambooHarvestRepositoryJSON),
       );
 
-      const bambooHarvestRepository = await this.deployQuorumContract();
       const bookshelfRepository = await this.deployBesuContract();
+      const bambooHarvestRepository = await this.deployXdaiContract();
       const shipmentRepository = await this.deployFabricContract();
 
       const out: ISupplyChainContractDeploymentInfo = {
@@ -200,32 +199,38 @@ export class SupplyChainAppDummyInfrastructure {
       this.log.info(`Deployed example supply chain app smart contracts OK`);
 
       return out;
-    } catch (ex) {
-      await new Promise((res) => setTimeout(res, 6000000));
+    } catch (ex: unknown) {
       this.log.error(`Deployment of smart contracts crashed: `, ex);
       throw ex;
     }
   }
 
-  public async deployQuorumContract(): Promise<IEthContractDeployment> {
-    this._quorumAccount = await this.quorum.createEthTestAccount(2000000);
-    const rpcApiHttpHost = await this.quorum.getRpcApiHttpHost();
+  public async deployXdaiContract(): Promise<IEthContractDeployment> {
+    this.log.debug("ENTER deployXdaiContract()");
+
+    this._xdaiAccount = await this.xdaiBesu.createEthTestAccount(2000000);
+    this.log.debug("Created test ledger account with initial balance OK");
+
+    const rpcApiHttpHost = await this.xdaiBesu.getRpcApiHttpHost();
+    this.log.debug("Xdai test ledger rpcApiHttpHost=%s", rpcApiHttpHost);
 
     const pluginRegistry = new PluginRegistry();
     pluginRegistry.add(this.keychain);
-    const connector = new PluginLedgerConnectorQuorum({
-      instanceId: "PluginLedgerConnectorQuorum_Contract_Deployment",
+    const connector = new PluginLedgerConnectorXdai({
+      instanceId: "PluginLedgerConnectorXdai_Contract_Deployment",
       rpcApiHttpHost,
       logLevel: this.options.logLevel,
       pluginRegistry,
     });
 
+    this.log.debug("Instantiated Xdai connector plugin OK");
+
     const res = await connector.deployContract({
       contractName: BambooHarvestRepositoryJSON.contractName,
       gas: 1000000,
       web3SigningCredential: {
-        ethAccount: this.quorumAccount.address,
-        secret: this.quorumAccount.privateKey,
+        ethAccount: this.xdaiAccount.address,
+        secret: this.xdaiAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       keychainId: this.keychain.getKeychainId(),

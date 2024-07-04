@@ -12,9 +12,9 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import {
-  DefaultApi as QuorumApi,
+  DefaultApi as XdaiApi,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { InsertBambooHarvestEndpoint } from "./web-services/insert-bamboo-harvest-endpoint";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
@@ -37,7 +37,7 @@ export interface OrgEnv {
 export interface ISupplyChainCactusPluginOptions {
   logLevel?: LogLevelDesc;
   instanceId: string;
-  quorumApiClient: QuorumApi;
+  xdaiApiClient: XdaiApi;
   besuApiClient: BesuApi;
   fabricApiClient: FabricApi;
   web3SigningCredential?: Web3SigningCredential;
@@ -66,10 +66,7 @@ export class SupplyChainCactusPlugin
     Checks.truthy(options.instanceId, `${fnTag} arg options.instanceId`);
     Checks.nonBlankString(options.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(options.contracts, `${fnTag} arg options.contracts`);
-    Checks.truthy(
-      options.quorumApiClient,
-      `${fnTag} arg options.quorumApiClient`,
-    );
+    Checks.truthy(options.xdaiApiClient, `${fnTag} arg options.xdaiApiClient`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
@@ -95,7 +92,7 @@ export class SupplyChainCactusPlugin
       // contractAddress: this.options.contracts.bambooHarvestRepository.address,
       // contractAbi: this.options.contracts.bambooHarvestRepository.abi,
       contractName: this.options.contracts.bambooHarvestRepository.contractName,
-      apiClient: this.options.quorumApiClient,
+      apiClient: this.options.xdaiApiClient,
       web3SigningCredential: this.options
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
@@ -106,7 +103,7 @@ export class SupplyChainCactusPlugin
       // contractAddress: this.options.contracts.bambooHarvestRepository.address,
       // contractAbi: this.options.contracts.bambooHarvestRepository.abi,
       contractName: this.options.contracts.bambooHarvestRepository.contractName,
-      apiClient: this.options.quorumApiClient,
+      apiClient: this.options.xdaiApiClient,
       logLevel: this.options.logLevel,
       keychainId: this.options.contracts.bambooHarvestRepository.keychainId,
     });

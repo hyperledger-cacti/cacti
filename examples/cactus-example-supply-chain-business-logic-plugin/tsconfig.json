@@ -37,7 +37,7 @@
       "path": "../../packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-plugin-ledger-connector-quorum/tsconfig.json"
+      "path": "../../packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
     }
   ]
 }

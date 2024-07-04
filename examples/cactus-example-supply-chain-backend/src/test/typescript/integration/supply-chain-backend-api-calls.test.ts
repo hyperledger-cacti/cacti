@@ -89,7 +89,7 @@ test("Supply chain backend API calls can be executed", async (t: Test) => {
   t.true(httpSrvApiB.listening, "httpSrvApiB.listening true OK");
   t.true(httpSrvApiC.listening, "httpSrvApiC.listening true OK");
 
-  const { besuApiClient, fabricApiClient, quorumApiClient } = startResult;
+  const { besuApiClient, fabricApiClient, xdaiApiClient } = startResult;
 
   const metricsResB = await besuApiClient.getPrometheusMetricsV1();
   t.ok(metricsResB, "besu metrics res truthy OK");
@@ -101,7 +101,7 @@ test("Supply chain backend API calls can be executed", async (t: Test) => {
   t.true(metricsResF.status > 199, "metricsResF.status > 199 true OK");
   t.true(metricsResF.status < 300, "metricsResF.status < 300 true OK");
 
-  const metricsResQ = await quorumApiClient.getPrometheusMetricsV1();
+  const metricsResQ = await xdaiApiClient.getPrometheusMetricsV1();
   t.ok(metricsResQ, "quorum metrics res truthy OK");
   t.true(metricsResQ.status > 199, "metricsResQ.status > 199 true OK");
   t.true(metricsResQ.status < 300, "metricsResQ.status < 300 true OK");

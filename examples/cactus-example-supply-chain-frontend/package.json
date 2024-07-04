@@ -61,7 +61,7 @@
     "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-rc.2",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.2",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.2",
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-rc.2",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-rc.2",
     "@ionic-native/core": "5.36.0",
     "@ionic-native/splash-screen": "patch:@ionic-native/splash-screen@npm%3A5.36.0#~/.yarn/patches/@ionic-native-splash-screen-npm-5.36.0-531cbbe0f8.patch",
     "@ionic-native/status-bar": "patch:@ionic-native/status-bar@npm%3A5.36.0#~/.yarn/patches/@ionic-native-status-bar-npm-5.36.0-1ca86cbaad.patch",
