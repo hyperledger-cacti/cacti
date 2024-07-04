@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-sawtooth",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "description": "Allows Cactus nodes to connect to a Sawtooth ledger.",
   "keywords": [
     "Hyperledger",
@@ -55,16 +55,16 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-rc.1",
-    "@hyperledger/cactus-core": "2.0.0-rc.1",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.1",
+    "@hyperledger/cactus-common": "2.0.0-rc.2",
+    "@hyperledger/cactus-core": "2.0.0-rc.2",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.2",
     "axios": "1.7.2",
     "cbor": "9.0.1",
     "rxjs": "7.8.1",
     "socket.io-client-fixed-types": "4.5.4"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.2",
     "@types/express": "4.17.21",
     "@types/uuid": "9.0.8",
     "body-parser": "1.20.2",

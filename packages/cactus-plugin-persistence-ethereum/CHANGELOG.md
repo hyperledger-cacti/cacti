@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.2](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2024-07-03)
+
+### Bug Fixes
+
+* **plugin-persistence-ethereum:** make created_at TIMESTAMPTZ in schema ([08925ff](https://github.com/hyperledger/cacti/commit/08925ffc8815d9613a69204a74c85d168f8a8305)), closes [#3373](https://github.com/hyperledger/cacti/issues/3373)
+
+### Features
+
+* **ledger-browser:** refactor eth tokens page into accounts page ([0b0c22c](https://github.com/hyperledger/cacti/commit/0b0c22cd39fb67e809595ceb23fb8b3c2a0f1da0)), closes [#3237](https://github.com/hyperledger/cacti/issues/3237)
+
 # [2.0.0-rc.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
 
 ### Bug Fixes
