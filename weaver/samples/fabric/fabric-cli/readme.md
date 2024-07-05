@@ -86,7 +86,7 @@ Set up `.npmrc` by copying across the `.npmrc.template` and updating the values 
 
 Run `make build-image` to build fabric-cli docker image.
 
-Then run `docker-compose up -d` to start fabric-cli container.
+Then run `docker compose up -d` to start fabric-cli container.
 
 Then run `docker exec -it fabric-cli bash`, to open interactive shell for fabric-cli, where regular fabric-cli calls can be made.
 
