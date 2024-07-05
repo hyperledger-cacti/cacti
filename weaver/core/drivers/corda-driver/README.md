@@ -111,7 +111,7 @@ To push image to github container registry:
 
 **NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
-### Docker-Compose Deployment
+### Docker Compose Deployment
 
 * Copy `.env.docker.template` to `.env`
     - `NETWORK_NAME`: Used as suffix to driver-corda container name, i.e. `driver-corda-<network-name>` will be the name of the container.
@@ -133,7 +133,7 @@ To push image to github container registry:
 * Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run: `make deploy`.
-* To stop, run: `docker-compose down`
+* To stop, run: `docker compose down`
 
 ## Documentation
 

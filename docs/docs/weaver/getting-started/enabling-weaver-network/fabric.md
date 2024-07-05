@@ -610,7 +610,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
 
 To start the relay server, navigate to the folder containing the above files and run the following:
 ```bash
-docker-compose up -d relay-server
+docker compose up -d relay-server
 ```
 
 #### Launch Driver
@@ -647,7 +647,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - **Enabling TLS**:
         - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
         - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
-        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker-compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
+        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
 
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
   ```json
@@ -669,7 +669,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
       - As in the `.env` configuration, you should pick an organization for the driver to associate with. The `admin` section specifies the registrar name and password (this should be familiar to any Fabric network administrator) used to enroll clients. Default values of `admin` and `adminpw` are specified above as examples, which you should replace with the right values configured in your network organization's CA.
     - `<affiliation>` should be what's specified in your organization's Fabric CA server configuration. The default is `org1.department1`, but you should look up the appropriate value from the CA server's configuration file.
     - `<msp-id>` should be set to the (or an) MSP ID of the selected organization.
-    - `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name.
+    - `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker compose file, this should be set to the container's service name.
 
   | Notes |
   |:------|
@@ -679,7 +679,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
 
 To start the driver, navigate to the folder containing the above files and run the following:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 #### Launch IIN Agents
@@ -790,13 +790,13 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - `EXTERNAL_NETWORK`: Set to the network [name](https://docs.docker.com/compose/networking/) of your Fabric network.
     - **Enabling TLS**:
         - Make your IIN Agent accept TLS connections by specifying `IIN_AGENT_TLS` as `true` and specifying a TLS certificate file path and private key file path in `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` respectively. The same certificate should be specified in this agent's JSON object in another agent's `dnsconfig.json` file under the appropriate security domain and IIN Agent ID scope.
-        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/opt/iinagent/credentials` folder in the IIN Agent container as specified in the [docker-compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` variables respectively.
+        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/opt/iinagent/credentials` folder in the IIN Agent container as specified in the [docker compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` variables respectively.
 
 - `docker-compose.yaml`: This specifies the properties of the IIN agent container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml) verbatim.
 
 Now to start the IIN agent, navigate to the folder containing the above files and run the following:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Repeat the above steps to launch an IIN Agent for every other organization on your channnel, i.e., create similar configuration files in an organization-specific folder. Make sure you:

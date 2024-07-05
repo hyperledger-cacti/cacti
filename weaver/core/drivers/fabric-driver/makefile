@@ -63,10 +63,10 @@ push-image-latest:
 
 deploy:
 	mkdir -p wallet-$(NETWORK_NAME) && chmod 777 wallet-$(NETWORK_NAME)
-	docker-compose $(COMPOSE_ARG) up -d
+	docker compose $(COMPOSE_ARG) up -d
 
 stop:
-	docker-compose $(COMPOSE_ARG) down
+	docker compose $(COMPOSE_ARG) down
 
 re-deploy: stop deploy
 	

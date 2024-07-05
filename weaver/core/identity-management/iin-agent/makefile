@@ -65,10 +65,10 @@ push-image-latest:
 deploy:
 	chmod 777 $(DLT_SPECIFIC_DIR)
 	docker network create iin || true
-	docker-compose $(COMPOSE_ARG) up -d
+	docker compose $(COMPOSE_ARG) up -d
 
 stop:
-	docker-compose $(COMPOSE_ARG) down
+	docker compose $(COMPOSE_ARG) down
 
 re-deploy: stop deploy
 	

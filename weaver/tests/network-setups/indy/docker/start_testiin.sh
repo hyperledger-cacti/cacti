@@ -13,4 +13,4 @@ INDY_NODE_PORT_RANGE=$STARTPORT-$ENDPORT
 echo Starting test iin network.
 echo NOTE: To change number of nodes and clients please set the environment variables INDYNODES and INDYCLIENTS.
 
-INDYNODES=$INDYNODES INDYCLIENTS=$INDYCLIENTS INDY_NODE_PORT_RANGE=$INDY_NODE_PORT_RANGE docker-compose up -d
+INDYNODES=$INDYNODES INDYCLIENTS=$INDYCLIENTS INDY_NODE_PORT_RANGE=$INDY_NODE_PORT_RANGE docker compose up -d

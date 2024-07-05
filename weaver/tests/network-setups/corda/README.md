@@ -131,7 +131,7 @@ Start the nodes with:
 
 This script copies the interoperation and simple state CorDapps
 from `artifacts` into the CorDapp folder of the nodes. It then uses
-docker-compose to start the Corda nodes in containers.
+docker compose to start the Corda nodes in containers.
 
 ## Restarting the nodes after changing the interop workflows cordapp
 

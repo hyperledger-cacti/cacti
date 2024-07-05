@@ -519,7 +519,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
 
 To start the relay server, navigate to the folder containing the above files and run the following:
 ```bash
-docker-compose up -d relay-server
+docker compose up -d relay-server
 ```
 
 #### Launch Driver
@@ -553,13 +553,13 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - **Enabling TLS**:
         - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
         - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
-        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/corda-driver/credentials` folder in the Fabric Driver container as specified in the [docker-compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
+        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/corda-driver/credentials` folder in the Fabric Driver container as specified in the [docker compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
 
 - `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/corda-driver/docker-compose.yml) verbatim.
 
 To start the driver, navigate to the folder containing the above files and run the following:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 #### Vault Initialization
