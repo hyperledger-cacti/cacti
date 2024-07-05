@@ -10975,7 +10975,7 @@ __metadata:
     secp256k1: "npm:4.0.4"
     socket.io: "npm:4.6.2"
     sqlite3: "npm:5.1.5"
-    swagger-cli: "npm:^4.0.4"
+    swagger-cli: "npm:4.0.4"
     swagger-ui-express: "npm:5.0.0"
     typescript: "npm:5.5.2"
     typescript-optional: "npm:2.0.1"
@@ -17966,12 +17966,12 @@ __metadata:
   linkType: hard
 
 "@types/readable-stream@npm:^4.0.0":
-  version: 4.0.15
-  resolution: "@types/readable-stream@npm:4.0.15"
+  version: 4.0.14
+  resolution: "@types/readable-stream@npm:4.0.14"
   dependencies:
     "@types/node": "npm:*"
     safe-buffer: "npm:~5.1.1"
-  checksum: 10/33a273dcd74bec84f0d7d507c0d719487f9d0b4f48cd9e3fd2b0c6e848f23ce0c6cac1250be03c94df29e78cfd29940aae80ed2a4407fe4188eb959d15b32646
+  checksum: 10/5ec03edfc96653866d45c6dca54c16f890e7d1bf9ab837f520d056bd55de257a2c177ba9ba8831dae9ded73887ed4fd31320e5a6bb3b4304bf88ca59519b68c0
   languageName: node
   linkType: hard
 
@@ -49241,7 +49241,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-cli@npm:^4.0.4":
+"swagger-cli@npm:4.0.4":
   version: 4.0.4
   resolution: "swagger-cli@npm:4.0.4"
   dependencies:
