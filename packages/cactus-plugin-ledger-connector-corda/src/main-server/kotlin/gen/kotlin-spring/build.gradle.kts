@@ -1,5 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+group = "org.hyperledger.cactus.plugin.ledger.connector.corda.server"
+version = project.properties["version"]!!
+
 val corda_release_group = "net.corda"
 val corda_core_release_group =  "net.corda"
 val corda_release_version = "4.6"
@@ -18,9 +21,6 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.0.M3")
     }
 }
-
-group = "org.hyperledger.cactus.plugin.ledger.connector.corda.server"
-version = "0.3.0"
 
 repositories {
     maven { url = uri("https://repo1.maven.org/maven2") }

@@ -18,6 +18,7 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMo
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.VaultQueryV1Request
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -152,5 +153,16 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     fun stopMonitorV1( @Valid @RequestBody(required = false) stopMonitorV1Request: StopMonitorV1Request?): ResponseEntity<StopMonitorV1Response> {
         return ResponseEntity(service.stopMonitorV1(stopMonitorV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @RequestMapping(
+        method = [RequestMethod.POST],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun vaultQueryV1( @Valid @RequestBody(required = false) vaultQueryV1Request: VaultQueryV1Request?): ResponseEntity<kotlin.Any> {
+        return ResponseEntity(service.vaultQueryV1(vaultQueryV1Request), HttpStatus.valueOf(200))
     }
 }

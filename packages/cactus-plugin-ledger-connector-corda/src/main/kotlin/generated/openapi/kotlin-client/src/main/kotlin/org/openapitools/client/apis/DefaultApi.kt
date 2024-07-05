@@ -37,6 +37,7 @@ import org.openapitools.client.models.StartMonitorV1Request
 import org.openapitools.client.models.StartMonitorV1Response
 import org.openapitools.client.models.StopMonitorV1Request
 import org.openapitools.client.models.StopMonitorV1Response
+import org.openapitools.client.models.VaultQueryV1Request
 
 import com.squareup.moshi.Json
 
@@ -770,6 +771,78 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         return RequestConfig(
             method = RequestMethod.DELETE,
             path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * 
+     * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+     * @param vaultQueryV1Request  (optional)
+     * @return kotlin.Any
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request? = null) : kotlin.Any {
+        val localVarResponse = vaultQueryV1WithHttpInfo(vaultQueryV1Request = vaultQueryV1Request)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * 
+     * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+     * @param vaultQueryV1Request  (optional)
+     * @return ApiResponse<kotlin.Any?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun vaultQueryV1WithHttpInfo(vaultQueryV1Request: VaultQueryV1Request?) : ApiResponse<kotlin.Any?> {
+        val localVariableConfig = vaultQueryV1RequestConfig(vaultQueryV1Request = vaultQueryV1Request)
+
+        return request<VaultQueryV1Request, kotlin.Any>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation vaultQueryV1
+     *
+     * @param vaultQueryV1Request  (optional)
+     * @return RequestConfig
+     */
+    fun vaultQueryV1RequestConfig(vaultQueryV1Request: VaultQueryV1Request?) : RequestConfig<VaultQueryV1Request> {
+        val localVariableBody = vaultQueryV1Request
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json"
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

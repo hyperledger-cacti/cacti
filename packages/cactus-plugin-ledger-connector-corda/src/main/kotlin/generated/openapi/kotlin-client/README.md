@@ -1,4 +1,4 @@
-# org.openapitools.client - Kotlin client library for Hyperledger Cactus Plugin - Connector Corda
+# org.openapitools.client - Kotlin client library for Hyperledger Cacti Plugin - Connector Corda
 
 Can perform basic tasks on a Corda ledger
 
@@ -54,6 +54,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**networkMapV1**](docs/DefaultApi.md#networkmapv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map | 
 *DefaultApi* | [**startMonitorV1**](docs/DefaultApi.md#startmonitorv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor | Start monitoring corda changes (transactions) of given state class
 *DefaultApi* | [**stopMonitorV1**](docs/DefaultApi.md#stopmonitorv1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor | Stop monitoring corda changes (transactions) of given state class
+*DefaultApi* | [**vaultQueryV1**](docs/DefaultApi.md#vaultqueryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query | 
 
 
 <a id="documentation-for-models"></a>
@@ -93,6 +94,7 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.StartMonitorV1Response](docs/StartMonitorV1Response.md)
  - [org.openapitools.client.models.StopMonitorV1Request](docs/StopMonitorV1Request.md)
  - [org.openapitools.client.models.StopMonitorV1Response](docs/StopMonitorV1Response.md)
+ - [org.openapitools.client.models.VaultQueryV1Request](docs/VaultQueryV1Request.md)
  - [org.openapitools.client.models.X500Principal](docs/X500Principal.md)
 
 

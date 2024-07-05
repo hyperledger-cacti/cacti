@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Hyperledger Cactus Plugin - Connector Corda
+ * Hyperledger Cacti Plugin - Connector Corda
  * Can perform basic tasks on a Corda ledger
  *
  * The version of the OpenAPI document: 2.0.0-rc.2
@@ -878,6 +878,19 @@ export interface StopMonitorV1Response {
 /**
  * 
  * @export
+ * @interface VaultQueryV1Request
+ */
+export interface VaultQueryV1Request {
+    /**
+     * Valid, fully qualified JVM class name which will be fed into Class.forName(...)
+     * @type {string}
+     * @memberof VaultQueryV1Request
+     */
+    'contractStateType'?: string;
+}
+/**
+ * 
+ * @export
  * @interface X500Principal
  */
 export interface X500Principal {
@@ -1234,6 +1247,39 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+         * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        vaultQueryV1: async (vaultQueryV1Request?: VaultQueryV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(vaultQueryV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1350,6 +1396,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.stopMonitorV1(stopMonitorV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+         * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async vaultQueryV1(vaultQueryV1Request?: VaultQueryV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.vaultQueryV1(vaultQueryV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -1455,6 +1511,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any): AxiosPromise<StopMonitorV1Response> {
             return localVarFp.stopMonitorV1(stopMonitorV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+         * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        vaultQueryV1(vaultQueryV1Request?: VaultQueryV1Request, options?: any): AxiosPromise<object> {
+            return localVarFp.vaultQueryV1(vaultQueryV1Request, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1580,6 +1645,17 @@ export class DefaultApi extends BaseAPI {
      */
     public stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).stopMonitorV1(stopMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+     * @param {VaultQueryV1Request} [vaultQueryV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public vaultQueryV1(vaultQueryV1Request?: VaultQueryV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).vaultQueryV1(vaultQueryV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

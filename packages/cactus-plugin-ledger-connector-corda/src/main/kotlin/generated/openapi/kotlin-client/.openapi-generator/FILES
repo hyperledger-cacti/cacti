@@ -55,4 +55,5 @@ src/main/kotlin/org/openapitools/client/models/StartMonitorV1Request.kt
 src/main/kotlin/org/openapitools/client/models/StartMonitorV1Response.kt
 src/main/kotlin/org/openapitools/client/models/StopMonitorV1Request.kt
 src/main/kotlin/org/openapitools/client/models/StopMonitorV1Response.kt
+src/main/kotlin/org/openapitools/client/models/VaultQueryV1Request.kt
 src/main/kotlin/org/openapitools/client/models/X500Principal.kt

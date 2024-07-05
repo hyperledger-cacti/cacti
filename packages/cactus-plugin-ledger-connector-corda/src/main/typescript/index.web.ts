@@ -29,3 +29,9 @@ export {
   ICreateJvmCordaUniqueIdentifierOptions,
   createJvmCordaUniqueIdentifier,
 } from "./jvm/serde/factory/create-jvm-corda-unique-identifier";
+
+export {
+  CordaApiClient,
+  CordaApiClientOptions,
+  watchBlocksV1Options,
+} from "./api-client/corda-api-client";
