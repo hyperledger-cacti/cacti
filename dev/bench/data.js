@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1720108484858,
+  "lastUpdate": 1720220779352,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -38,6 +38,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.37%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "315e345911668a64ff3c493857c34aa06c728828",
+          "message": "test(common): jest migration of the key-converter utility test cases\n\n1. Also upgraded the tsx dependency to the latest version.\n2. We are planning on retiring ts-node in favor of tsx and this helps with\nfurther triage of it.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-07-05T14:53:11-07:00",
+          "tree_id": "84731e99195ef63e9f44eecab0f3e8d644e5e027",
+          "url": "https://github.com/hyperledger/cacti/commit/315e345911668a64ff3c493857c34aa06c728828"
+        },
+        "date": 1720220776456,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 613,
+            "range": "±1.62%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 371,
+            "range": "±1.55%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
