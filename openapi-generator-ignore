@@ -4,3 +4,10 @@
 **/generated/openapi/kotlin-client/docs/**
 **/generated/openapi/kotlin-client/gradle/**
 **/generated/**/.openapi-generator-ignore
+
+# TODO: Figure out a better way to generalize these ignore patterns that are
+# currently specific to the corda connector server v4
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/pom.xml
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/build.gradle.kts
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/Application.kt
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/test/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCordaTest.kt

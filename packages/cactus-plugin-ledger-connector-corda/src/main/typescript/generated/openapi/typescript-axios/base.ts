@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Hyperledger Cactus Plugin - Connector Corda
+ * Hyperledger Cacti Plugin - Connector Corda
  * Can perform basic tasks on a Corda ledger
  *
  * The version of the OpenAPI document: 2.0.0-rc.2

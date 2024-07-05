@@ -18,6 +18,7 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMo
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.VaultQueryV1Request
 
 interface ApiPluginLedgerConnectorCordaService {
 
@@ -113,4 +114,14 @@ interface ApiPluginLedgerConnectorCordaService {
      * @see ApiPluginLedgerConnectorCorda#stopMonitorV1
      */
     fun stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request?): StopMonitorV1Response
+
+    /**
+     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query
+     * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
+     *
+     * @param vaultQueryV1Request  (optional)
+     * @return OK (status code 200)
+     * @see ApiPluginLedgerConnectorCorda#vaultQueryV1
+     */
+    fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request?): kotlin.Any
 }

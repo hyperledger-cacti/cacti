@@ -1,0 +1,18 @@
+services:
+
+  connector:
+    build:
+      context: ./packages/cactus-plugin-ledger-connector-corda/src/main-server/
+      dockerfile: Dockerfile
+    network_mode: host
+    depends_on: 
+      - ledger
+    environment:
+      - SPRING_APPLICATION_JSON={"logging":{"level":{"root":"INFO","net.corda":"INFO","org.hyperledger.cactus":"DEBUG"}},"cactus":{"corda":{"node":{"host":"127.0.0.1"},"rpc":{"port":10006,"username":"user1","password":"test"}}}}
+
+  ledger:
+    build:
+      context: ./tools/docker/corda-all-in-one/corda-v4_12/
+      dockerfile: Dockerfile
+    network_mode: host
+    privileged: true

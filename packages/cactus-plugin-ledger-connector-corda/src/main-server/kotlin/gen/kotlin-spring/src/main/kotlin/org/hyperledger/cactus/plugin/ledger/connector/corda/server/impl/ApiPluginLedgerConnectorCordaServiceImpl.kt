@@ -1,12 +1,9 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectWriter
-import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.springframework.stereotype.Service
+import net.corda.core.contracts.ContractState
 import net.corda.core.flows.FlowLogic
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.FlowProgressHandle
@@ -21,15 +18,15 @@ import net.schmizz.sshj.userauth.password.PasswordUtils
 import net.schmizz.sshj.xfer.InMemorySourceFile
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.api.ApiPluginLedgerConnectorCordaService
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.*
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.util.HtmlUtils.htmlEscape
 import java.io.IOException
 import java.io.InputStream
-import java.lang.RuntimeException
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.IllegalArgumentException
-import net.corda.core.contracts.ContractState
-import org.springframework.web.util.HtmlUtils.htmlEscape
-import kotlin.Exception
+
 
 // TODO Look into this project for powering the connector of ours:
 // https://github.com/180Protocol/codaptor
@@ -50,6 +47,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         val mapper: ObjectMapper = jacksonObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            // .registerModule(JavaTimeModule())
 
         val writer: ObjectWriter = mapper.writer()
 
@@ -255,7 +253,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
                                 logger.debug("${it.filename} has db migrations declared, executing those now...")
                                 val session = ssh.startSession()
                                 session.allocateDefaultPTY()
-                                val migrateCmd = "java -jar ${cdc.cordaJarPath} run-migration-scripts --app-schemas --base-directory=${cdc.nodeBaseDirPath}"
+                                val migrateCmd = "java -jar ${cdc.cordaJarPath} run-migration-scripts --verbose --app-schemas --base-directory=${cdc.nodeBaseDirPath}"
                                 logger.debug("migrateCmd=$migrateCmd")
                                 val migrateCmdRes = session.exec(migrateCmd)
                                 val migrateCmdOut = net.schmizz.sshj.common.IOUtils.readFully(migrateCmdRes.inputStream).toString()
@@ -353,6 +351,35 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         val nodeInfoList = reader.readValue<List<NodeInfo>>(networkMapJson)
         logger.info("Returning {} NodeInfo elements in response.", nodeInfoList.size)
         return nodeInfoList
+    }
+
+    override fun vaultQueryV1(vaultQueryV1Request: VaultQueryV1Request?): Any {
+        if (vaultQueryV1Request == null) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "QueryBySimpleV1Request cannot be null")
+        }
+        if (vaultQueryV1Request.contractStateType == null) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "QueryBySimpleV1Request.contractStateType cannot be null")
+        }
+        logger.trace("ENTER vaultQueryV1() vaultQueryV1Request.contractStateType={}", vaultQueryV1Request.contractStateType);
+        val contractStateType = vaultQueryV1Request.contractStateType;
+
+        val clazz: Class<out ContractState>;
+        try {
+            clazz = jsonJvmObjectDeserializer.getOrInferType(contractStateType) as Class<out ContractState>
+        } catch (ex: Throwable) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not load $contractStateType class from classpath:", ex)
+        }
+
+        if(!ContractState::class.java.isAssignableFrom(clazz)) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Provided QueryBySimpleV1Request.contractStateType (${contractStateType}) must be assignable from (e.g. a sub-class of) ${ContractState::class.java.name}")
+        }
+
+        logger.debug("vaultQueryV1() Querying Corda vault...");
+        val results = rpc.proxy.vaultQuery(clazz)
+        logger.debug("vaultQueryV1() Queried Corda vault OK");
+        logger.trace("EXIT vaultQueryV1() results={}", results);
+
+        return results
     }
 
     /**
