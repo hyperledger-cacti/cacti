@@ -61,7 +61,7 @@
     "axios": "1.6.0",
     "run-time-error-cjs": "1.4.0",
     "typescript-optional": "2.0.1",
-    "uuid": "9.0.1"
+    "uuid": "10.0.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.2",

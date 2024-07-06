@@ -26,12 +26,12 @@
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
-    "uuid": "9.0.1"
+    "uuid": "10.0.0"
   },
   "devDependencies": {
     "@types/jsrsasign": "10.5.11",
     "@types/node": "18.11.9",
-    "@types/uuid": "9.0.8",
+    "@types/uuid": "10.0.0",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "jsrsasign": "11.0.0",

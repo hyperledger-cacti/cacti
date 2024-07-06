@@ -60,10 +60,10 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.2",
     "kubo-rpc-client": "3.0.1",
     "typescript-optional": "2.0.1",
-    "uuid": "9.0.1"
+    "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@types/uuid": "9.0.8"
+    "@types/uuid": "10.0.0"
   },
   "engines": {
     "node": ">=18",
