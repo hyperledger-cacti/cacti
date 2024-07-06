@@ -45,7 +45,7 @@
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
     "gluegun": "5.1.6",
-    "uuid": "9.0.1",
+    "uuid": "10.0.0",
     "winston": "3.10.0"
   },
   "devDependencies": {

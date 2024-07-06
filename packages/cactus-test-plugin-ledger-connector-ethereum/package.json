@@ -63,9 +63,9 @@
     "@hyperledger/cactus-test-geth-ledger": "2.0.0-rc.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.2",
     "@types/lodash": "4.14.195",
-    "@types/uuid": "9.0.8",
+    "@types/uuid": "10.0.0",
     "lodash": "4.17.21",
-    "uuid": "9.0.1",
+    "uuid": "10.0.0",
     "web3": "4.4.0"
   },
   "engines": {

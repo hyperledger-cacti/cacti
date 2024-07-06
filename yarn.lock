@@ -4300,6 +4300,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bufbuild/protobuf@npm:1.10.0":
+  version: 1.10.0
+  resolution: "@bufbuild/protobuf@npm:1.10.0"
+  checksum: 10/1f120f72bbb40dd3d0f8c73f1474b001cfb9be09c38b7b0292e35fec98c5184a3db380a6feff7626fb3fff108c8a8aa7fc8cfea14904dc0a1174a01c8e637cc6
+  languageName: node
+  linkType: hard
+
 "@bufbuild/protobuf@npm:1.8.0, @bufbuild/protobuf@npm:^1.7.2, @bufbuild/protobuf@npm:^1.8.0":
   version: 1.8.0
   resolution: "@bufbuild/protobuf@npm:1.8.0"
@@ -4677,345 +4684,498 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cspell/cspell-bundled-dicts@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "@cspell/cspell-bundled-dicts@npm:5.21.2"
+"@cspell/cspell-bundled-dicts@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/cspell-bundled-dicts@npm:8.10.4"
   dependencies:
-    "@cspell/dict-ada": "npm:^2.0.0"
-    "@cspell/dict-aws": "npm:^2.0.0"
-    "@cspell/dict-bash": "npm:^2.0.2"
-    "@cspell/dict-companies": "npm:^2.0.4"
-    "@cspell/dict-cpp": "npm:^3.1.0"
-    "@cspell/dict-cryptocurrencies": "npm:^2.0.0"
-    "@cspell/dict-csharp": "npm:^3.0.1"
-    "@cspell/dict-css": "npm:^2.0.0"
-    "@cspell/dict-dart": "npm:^1.1.0"
-    "@cspell/dict-django": "npm:^2.0.0"
-    "@cspell/dict-dotnet": "npm:^2.0.1"
-    "@cspell/dict-elixir": "npm:^2.0.1"
-    "@cspell/dict-en-gb": "npm:^1.1.33"
-    "@cspell/dict-en_us": "npm:^2.2.5"
-    "@cspell/dict-filetypes": "npm:^2.0.1"
-    "@cspell/dict-fonts": "npm:^2.0.0"
-    "@cspell/dict-fullstack": "npm:^2.0.5"
-    "@cspell/dict-git": "npm:^1.0.1"
-    "@cspell/dict-golang": "npm:^3.0.1"
-    "@cspell/dict-haskell": "npm:^2.0.0"
-    "@cspell/dict-html": "npm:^3.0.1"
-    "@cspell/dict-html-symbol-entities": "npm:^3.0.0"
-    "@cspell/dict-java": "npm:^2.0.0"
-    "@cspell/dict-latex": "npm:^2.0.3"
-    "@cspell/dict-lorem-ipsum": "npm:^2.0.0"
-    "@cspell/dict-lua": "npm:^2.0.0"
-    "@cspell/dict-node": "npm:^2.0.1"
-    "@cspell/dict-npm": "npm:^2.0.3"
-    "@cspell/dict-php": "npm:^2.0.0"
-    "@cspell/dict-powershell": "npm:^2.0.0"
-    "@cspell/dict-public-licenses": "npm:^1.0.4"
-    "@cspell/dict-python": "npm:^3.0.5"
-    "@cspell/dict-r": "npm:^1.0.2"
-    "@cspell/dict-ruby": "npm:^2.0.1"
-    "@cspell/dict-rust": "npm:^2.0.0"
-    "@cspell/dict-scala": "npm:^2.0.0"
-    "@cspell/dict-software-terms": "npm:^2.1.7"
-    "@cspell/dict-swift": "npm:^1.0.2"
-    "@cspell/dict-typescript": "npm:^2.0.0"
-    "@cspell/dict-vue": "npm:^2.0.2"
-  checksum: 10/533ad77933ff1420566cf0aa23a2d76c534fa51c6935b5ca887cc0e542a7c942f8a90c1e58ebcc3956fc8aeb5a1c4641b9c038708e3e98550e990d4bcc863dea
+    "@cspell/dict-ada": "npm:^4.0.2"
+    "@cspell/dict-aws": "npm:^4.0.2"
+    "@cspell/dict-bash": "npm:^4.1.3"
+    "@cspell/dict-companies": "npm:^3.1.2"
+    "@cspell/dict-cpp": "npm:^5.1.10"
+    "@cspell/dict-cryptocurrencies": "npm:^5.0.0"
+    "@cspell/dict-csharp": "npm:^4.0.2"
+    "@cspell/dict-css": "npm:^4.0.12"
+    "@cspell/dict-dart": "npm:^2.0.3"
+    "@cspell/dict-django": "npm:^4.1.0"
+    "@cspell/dict-docker": "npm:^1.1.7"
+    "@cspell/dict-dotnet": "npm:^5.0.2"
+    "@cspell/dict-elixir": "npm:^4.0.3"
+    "@cspell/dict-en-common-misspellings": "npm:^2.0.3"
+    "@cspell/dict-en-gb": "npm:1.1.33"
+    "@cspell/dict-en_us": "npm:^4.3.23"
+    "@cspell/dict-filetypes": "npm:^3.0.4"
+    "@cspell/dict-fonts": "npm:^4.0.0"
+    "@cspell/dict-fsharp": "npm:^1.0.1"
+    "@cspell/dict-fullstack": "npm:^3.1.8"
+    "@cspell/dict-gaming-terms": "npm:^1.0.5"
+    "@cspell/dict-git": "npm:^3.0.0"
+    "@cspell/dict-golang": "npm:^6.0.9"
+    "@cspell/dict-google": "npm:^1.0.1"
+    "@cspell/dict-haskell": "npm:^4.0.1"
+    "@cspell/dict-html": "npm:^4.0.5"
+    "@cspell/dict-html-symbol-entities": "npm:^4.0.0"
+    "@cspell/dict-java": "npm:^5.0.7"
+    "@cspell/dict-julia": "npm:^1.0.1"
+    "@cspell/dict-k8s": "npm:^1.0.5"
+    "@cspell/dict-latex": "npm:^4.0.0"
+    "@cspell/dict-lorem-ipsum": "npm:^4.0.0"
+    "@cspell/dict-lua": "npm:^4.0.3"
+    "@cspell/dict-makefile": "npm:^1.0.0"
+    "@cspell/dict-monkeyc": "npm:^1.0.6"
+    "@cspell/dict-node": "npm:^5.0.1"
+    "@cspell/dict-npm": "npm:^5.0.16"
+    "@cspell/dict-php": "npm:^4.0.8"
+    "@cspell/dict-powershell": "npm:^5.0.4"
+    "@cspell/dict-public-licenses": "npm:^2.0.7"
+    "@cspell/dict-python": "npm:^4.2.1"
+    "@cspell/dict-r": "npm:^2.0.1"
+    "@cspell/dict-ruby": "npm:^5.0.2"
+    "@cspell/dict-rust": "npm:^4.0.4"
+    "@cspell/dict-scala": "npm:^5.0.2"
+    "@cspell/dict-software-terms": "npm:^3.4.9"
+    "@cspell/dict-sql": "npm:^2.1.3"
+    "@cspell/dict-svelte": "npm:^1.0.2"
+    "@cspell/dict-swift": "npm:^2.0.1"
+    "@cspell/dict-terraform": "npm:^1.0.0"
+    "@cspell/dict-typescript": "npm:^3.1.5"
+    "@cspell/dict-vue": "npm:^3.0.0"
+  checksum: 10/c2cc2171e64f759ecc5fe38b31508d99cf38a2ce35e589c6b6027efe0cb83f3b10130d82fafbd0dc26f7f163de3e4ec0981dbc8eded039bd8a2965a12efb88e5
   languageName: node
   linkType: hard
 
-"@cspell/cspell-pipe@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "@cspell/cspell-pipe@npm:5.21.2"
-  checksum: 10/0f634969e8f0370a1d96c728861d48e55adf4f079da861d9c97ee2ee709c6fe468a70637f29f435208ec10337fcecb93bd703c86b37f6d11cfcc546e5be2988f
+"@cspell/cspell-json-reporter@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/cspell-json-reporter@npm:8.10.4"
+  dependencies:
+    "@cspell/cspell-types": "npm:8.10.4"
+  checksum: 10/4eba16203c021f5e118907996958e57c2f930fb33557b7960bb372f59f377611be4b6564072e1d8dc001872186ecd7d48ede84a000b20707d05a1bb3e8a7bed6
   languageName: node
   linkType: hard
 
-"@cspell/cspell-types@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "@cspell/cspell-types@npm:5.21.2"
-  checksum: 10/1a079e1525bc30049325510fcffc67faa56cd3957a140e63a793bc501b62c507328d20209dbdc8d486c89b525a9040c6bfa05c985f4aa946649d5c835266aa32
+"@cspell/cspell-pipe@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/cspell-pipe@npm:8.10.4"
+  checksum: 10/06602031930827f751acf6b24bf9229b78abd2c524036123cc628288c0a0023ac927ef03709aaf01335af45235bb85e6d725bc2eca8f13e92a109f5174131ad2
   languageName: node
   linkType: hard
 
-"@cspell/dict-ada@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-ada@npm:2.0.0"
-  checksum: 10/80dc84c2101d37f8ed84e26502374295bb8a3ed7bb907ff76405dc41f6e3017fe0465c0ffe0fd951a07db8388991303df175508d7620fcc2ecfb4bccbe5d1c2a
+"@cspell/cspell-resolver@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/cspell-resolver@npm:8.10.4"
+  dependencies:
+    global-directory: "npm:^4.0.1"
+  checksum: 10/80ec4da36bc58f48b5ef9453cf9a2b42169869f8c63b9b253af1bd62138d3130c8a13f040f4fd97564bd51a9555a5aa0ee723ed63c371d177a26f0befa614910
   languageName: node
   linkType: hard
 
-"@cspell/dict-aws@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-aws@npm:2.0.0"
-  checksum: 10/594b2629be250d4d015716fdaaa0e06d74b78d72d8455dcd54c6096a11a916e5dbeb9d8f21c06a66312fad66716a48f0cde36d2fe4e55261e97b0396f37f2deb
+"@cspell/cspell-service-bus@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/cspell-service-bus@npm:8.10.4"
+  checksum: 10/f0a9759605e920eef5ca41ef11a41b477d823b6d8b8df2b4360b950a6da7e418285af60e8f7158f4e4f6f342f44891d82b6fd4f98726947332f0935e30b9db18
   languageName: node
   linkType: hard
 
-"@cspell/dict-bash@npm:^2.0.2":
-  version: 2.0.4
-  resolution: "@cspell/dict-bash@npm:2.0.4"
-  checksum: 10/319521811adb2d172fe6fa816408783ae5dad1d5623631eeee63b902d4a340f70b020b3af516296a49f363d44b4e8bba33610dacbfae10e70faa6ddeed1172fc
+"@cspell/cspell-types@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/cspell-types@npm:8.10.4"
+  checksum: 10/b5f5ca7e64e01c21f37b7b7d68135d8fad42dc90da3f1e590b84dc8c0f29fb3506b67f3d17f9da047134004d401d4c18eaa2e0509004cac13a4ed7d53d17c056
   languageName: node
   linkType: hard
 
-"@cspell/dict-companies@npm:^2.0.4":
-  version: 2.0.14
-  resolution: "@cspell/dict-companies@npm:2.0.14"
-  checksum: 10/5a7b3468c48ddfba8297f3c849d43df87e2ef6e8cd04c3dffff643be69f33616be41c7fa441fe82b6dc6fc05174c1149bf0ab1d22f3e39ff5b8adf9fa03eb2d8
+"@cspell/dict-ada@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "@cspell/dict-ada@npm:4.0.2"
+  checksum: 10/31b0f0f6b9b324e8d3be4074302ddc9a7e968833d79c0a9f7899de9138b386bd6dcad3f63afdb1d42e87838bba5881c7b7f2b0916621fb1e64c7fdb6a572afe5
   languageName: node
   linkType: hard
 
-"@cspell/dict-cpp@npm:^3.1.0":
-  version: 3.2.1
-  resolution: "@cspell/dict-cpp@npm:3.2.1"
-  checksum: 10/f3b5bf6b3b0bfa6fb9be372a24ef0b0fa9f57cb07ba80b323f7aa49fec59d69adb75e2fed5dac33d51198f227fc92a297dd287b4ca4349128ac77f6838ee85bd
+"@cspell/dict-aws@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "@cspell/dict-aws@npm:4.0.2"
+  checksum: 10/7f784f0a054f4d142a22e94d411d6383b5bbba8b1d77952d45664a3bf35626926a0b8057293663287e6c53655c7dd32c6348905ecceb2970056e1cc5cf962e11
   languageName: node
   linkType: hard
 
-"@cspell/dict-cryptocurrencies@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-cryptocurrencies@npm:2.0.0"
-  checksum: 10/2125b8557199e29b7e4eb1ab58bd76b6b9e79207857543ee4081505f33bba33976a39d47f4efaedfabbc9e1dc3b57d1229d50121d68d026eb128d2a746aa85bb
+"@cspell/dict-bash@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "@cspell/dict-bash@npm:4.1.3"
+  checksum: 10/4ba66c76c144d4c7ea1dd0fb92dfb0d7fd1e43a106a73fc7e9010b4a5c276aa4ef791c7161f56bf911356e3667ba043ee63271c1ffc485d9f8712553770e3ea9
   languageName: node
   linkType: hard
 
-"@cspell/dict-csharp@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "@cspell/dict-csharp@npm:3.0.1"
-  checksum: 10/98e1e5a37166204f16a582ed6ba6f3e4a4b19e228c6ff9ac6dd4afd733277416fad595ed3e1a4a535c5eb4713da0a7aac47415af8277cbc990093c8f0a6db85c
+"@cspell/dict-companies@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "@cspell/dict-companies@npm:3.1.2"
+  checksum: 10/58a95faba7cf7397530064ab9fc29aea0b5a95c5d4c31abd2abd0537f344705c71112a50ae61a1c026078dd1ca2e4433164eee1761cd05bfae4b25a75161ba4f
   languageName: node
   linkType: hard
 
-"@cspell/dict-css@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-css@npm:2.0.0"
-  checksum: 10/6397d14f7f867a960b8f55acb74e4957f4c74f276117076b9cd53cc91a672622a4affc68fec8281cda507b3d1746ba021be8c27dabecff1c744430bb19d92cd5
+"@cspell/dict-cpp@npm:^5.1.10":
+  version: 5.1.10
+  resolution: "@cspell/dict-cpp@npm:5.1.10"
+  checksum: 10/ba8727af8ab3ac18f0ba030f043378bb6c951d819b7fba0114ca9377271752d04c1b3b6dfe4f9384fc35069ab7ff671313bc681a06345ef6625be7ca7fc37132
   languageName: node
   linkType: hard
 
-"@cspell/dict-dart@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@cspell/dict-dart@npm:1.1.0"
-  checksum: 10/fce2a3a7c2566346d3658a3531237e78bacb7873a9a85944bba6f57aa8af9525ad278a498ba80424642493071985eb63db0409beec2976aacf88582a874e7d61
+"@cspell/dict-cryptocurrencies@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@cspell/dict-cryptocurrencies@npm:5.0.0"
+  checksum: 10/116e7f117b59ea4c9fa7ae1c3b47fc963e050448d43e059fb93731a256881ee262420edd5b9701ffe88af3d5e95b0337fc99b4dde1b0283ee0aaed45b23e281e
   languageName: node
   linkType: hard
 
-"@cspell/dict-django@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-django@npm:2.0.0"
-  checksum: 10/d7144232834c4bd50207c701fcd1daac88debdcd41c902a9e26c8d1594efaa78925a831e8b0a9a39248efcaa33f9f324006c3e80991214eec6818eb2a2a74d97
+"@cspell/dict-csharp@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "@cspell/dict-csharp@npm:4.0.2"
+  checksum: 10/d2ecb2aada51c5f0d6d557fd4f0c6eddb5b299e0955e066c49cd2afe96a1c6fe0afde699fdb885dd3183603a1efbd1d793b6a490b8d039256445b4b154b7375b
   languageName: node
   linkType: hard
 
-"@cspell/dict-dotnet@npm:^2.0.1":
+"@cspell/dict-css@npm:^4.0.12":
+  version: 4.0.12
+  resolution: "@cspell/dict-css@npm:4.0.12"
+  checksum: 10/da812243c92ef07082334d512561606f178e003fa50324332c322655fab0982ed1bea055d75a348b37cea71fbe652224dcfff14dc445d26530cfa3c491b2b324
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-dart@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@cspell/dict-dart@npm:2.0.3"
+  checksum: 10/66bfcfa029baacd0b14b3ff5b6ab7597cf9459f77185d88b25123b42a4babb66df6786806843f1b6506c335326100599a2e1db6e6104e66bd021ede9ccb3cec4
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-data-science@npm:^2.0.1":
   version: 2.0.1
-  resolution: "@cspell/dict-dotnet@npm:2.0.1"
-  checksum: 10/4aa27b315ffc51db4a285a0bf97a3069a4d8326eb091967f491bab88392db3256ffee5faf3db416f2f4b5084f4f63a423d3c1263beac851b23c584e6f6bf3c4b
+  resolution: "@cspell/dict-data-science@npm:2.0.1"
+  checksum: 10/1ae8e71161a02e8ee1bfed86bc815b81ae3eaeb9476fea4bc3c41556c525657123bac85fc2789bdbe18e444f9629fe8a1e69fd78a99f89b42edfa3211098a588
   languageName: node
   linkType: hard
 
-"@cspell/dict-elixir@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@cspell/dict-elixir@npm:2.0.1"
-  checksum: 10/e9cfa4c060c3ad38b48a0b87cfa7a90ea21f6dd12b72f383560756b713d522dab861184d00729ffd6c7824c956ceebd1e0bd7c13cc1ffb6ba0f27cfa5acdb3aa
+"@cspell/dict-django@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "@cspell/dict-django@npm:4.1.0"
+  checksum: 10/d64b830ab761f3610ca5eb81b06447c91a64b988bc3e40bac214fc611de498fa019e1cd76f6f21254ad2d3bfaeb3d10248481f0a02711d6a3ed715df062b2ba6
   languageName: node
   linkType: hard
 
-"@cspell/dict-en-gb@npm:^1.1.33":
+"@cspell/dict-docker@npm:^1.1.7":
+  version: 1.1.7
+  resolution: "@cspell/dict-docker@npm:1.1.7"
+  checksum: 10/307f8b5132edca7cd291ba0ab6ed88f8787df984d6a42401b12a0da1ecb935d50af3a108ede885ce5bede96c445acdc88bb9ea8396de151c565a90a3bf66853e
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-dotnet@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@cspell/dict-dotnet@npm:5.0.2"
+  checksum: 10/319c6ed2793ad9f5ab01b2a7a3fa7280edd762714ff109dfafc24b397bc7ba7e8917cf8c68dd2d124eb11a7b7f60e677b1fd36d3610733b3f32668f966902ebd
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-elixir@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "@cspell/dict-elixir@npm:4.0.3"
+  checksum: 10/f084449b2de5a2fa08076ac699c6073beaa4bb43796a662d681ea8fe5cba31f9efe718f3f98ef432ba75d4ea574316de34ab8422f79f4f2022cfddee7a7b8653
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-en-common-misspellings@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@cspell/dict-en-common-misspellings@npm:2.0.3"
+  checksum: 10/8ea5f6843635089a82f135ca4302b8ed0c208254cda83b56fa72a72a30ee983452a1abaf003f5ccf76a8f1faf9596da91dfe4441f2bbd00145b305a2e501311e
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-en-gb@npm:1.1.33":
   version: 1.1.33
   resolution: "@cspell/dict-en-gb@npm:1.1.33"
   checksum: 10/72db891c955ce9b24ba756c1baad41e92854a85fe326699f9ab328358b02a76d57b65d26d02afa050c4f96668a51c1dab6fce7eaad51c70c113588bbc2b46756
   languageName: node
   linkType: hard
 
-"@cspell/dict-en_us@npm:^2.2.5":
-  version: 2.3.3
-  resolution: "@cspell/dict-en_us@npm:2.3.3"
-  checksum: 10/a537b5e4455c8f70a6218f3e9fa2ddf7fce644a3bbd6fe11c375702b5884c832a7da2ad0cbc9fbb80d4e301b772f4a6c400e11c4000353e5e276c620502c89d6
+"@cspell/dict-en_us@npm:^4.3.23":
+  version: 4.3.23
+  resolution: "@cspell/dict-en_us@npm:4.3.23"
+  checksum: 10/d1c9a5b599ab13a9fe572b240e473b87945bd95ffbe9d39b66da2938b3902dc84448a1ce120c99b22bdcad0e0547523f1d92f027ea38ed8d5902441bbb0c0c53
   languageName: node
   linkType: hard
 
-"@cspell/dict-filetypes@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@cspell/dict-filetypes@npm:2.0.1"
-  checksum: 10/d787ada0d08fd659b65c0310993973695834b23d8ca53845ec726bd517973f84b14a9e38d38886c821a9fbf010faf1681f157df506934769df813c22b45d06d7
+"@cspell/dict-filetypes@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@cspell/dict-filetypes@npm:3.0.4"
+  checksum: 10/d5e8e46f9caf40c895326c7557f42c0648458717f79d9f41f145170dbe36ec9e21dea322117a92a6a904385dfb3efd0dd63a349edf705c6cc4255861f8b97cce
   languageName: node
   linkType: hard
 
-"@cspell/dict-fonts@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-fonts@npm:2.0.0"
-  checksum: 10/d6336490137f8dbb7166ae3642348176dd5b8c81d01216931dc617cd0e9f78466dbed19c49b714fedf697417a5c4e9f6fbe92ca2131fa38c360890171927df72
+"@cspell/dict-fonts@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@cspell/dict-fonts@npm:4.0.0"
+  checksum: 10/894a31f3df8e3a43a3dcf13e1706eb94cb5e83bd6d2aa26b0e9fc79c2de304eb5e9118eec4dff6a673e2a3243c842ca694c8e0f3c0ad78301004f983acf53832
   languageName: node
   linkType: hard
 
-"@cspell/dict-fullstack@npm:^2.0.5":
-  version: 2.0.6
-  resolution: "@cspell/dict-fullstack@npm:2.0.6"
-  checksum: 10/0a085cfa6160e34f96624a9712a5126e2973706c02ede3503e16b128acf6d001ecc092fa27dc64bfc47d8e05f9307e2156950b3b7063f8fcc101d21e6f9a45ab
-  languageName: node
-  linkType: hard
-
-"@cspell/dict-git@npm:^1.0.1":
+"@cspell/dict-fsharp@npm:^1.0.1":
   version: 1.0.1
-  resolution: "@cspell/dict-git@npm:1.0.1"
-  checksum: 10/352864bcb4e9a9dba19ea5e4d23fc107670c69fab038a0043c9921164b5fdff1ca25370ad7458e18cb81fceeb6b242b3f397aa18a6912771688f5b2e98e52d8e
+  resolution: "@cspell/dict-fsharp@npm:1.0.1"
+  checksum: 10/ce0df20704bf95d1fe434d2889cc764279cbce2b057fc5247be1ccaf7a8cc57372de3da2cdab6643b3df5221119716929b2e2aaad3f60533dcf0bd3c7d892fab
   languageName: node
   linkType: hard
 
-"@cspell/dict-golang@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "@cspell/dict-golang@npm:3.0.1"
-  checksum: 10/1f2f68766e2ccae72eb48c8dc0dc9211da63b580a30e1793a815d1f9d25b86da36db14fd22f2551c486d799348fa3be6840109562a4219d57dc1c8a3279a1d31
+"@cspell/dict-fullstack@npm:^3.1.8":
+  version: 3.1.8
+  resolution: "@cspell/dict-fullstack@npm:3.1.8"
+  checksum: 10/c0f178e751f0e4779600749d5f77e313e33362ba6d4737d3969f64ca272200bb8cc94dd10cccc18de58e60223b46a39247c5e4ca1d5eda768a1d08c1725fb9e7
   languageName: node
   linkType: hard
 
-"@cspell/dict-haskell@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-haskell@npm:2.0.0"
-  checksum: 10/973f3c7908d727cc5f231b15ce534f93fea208a58d3f1b1f1dadc2cae32a0d5ed4528f03c6c0efdebe3decab0c0d00f1c5143612c711cdc063eaac249d78e85e
+"@cspell/dict-gaming-terms@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@cspell/dict-gaming-terms@npm:1.0.5"
+  checksum: 10/25d50653ed5e940f9302cc5536c37a20854bb274dec9302d73c5349e51ec623d33d99e4fe283e3b30e70f452063361fbc4cae7dc603232fa82004262f37d0f50
   languageName: node
   linkType: hard
 
-"@cspell/dict-html-symbol-entities@npm:^3.0.0":
+"@cspell/dict-git@npm:^3.0.0":
   version: 3.0.0
-  resolution: "@cspell/dict-html-symbol-entities@npm:3.0.0"
-  checksum: 10/bb230243e08213c1a0eb3a426cb205a6a2c9f80768cdc9f5706da88435a190b0929b3eac1f097775d57132cee061e4eb611e2bd7c3dad9b139fc88f3bafff5ea
+  resolution: "@cspell/dict-git@npm:3.0.0"
+  checksum: 10/97b6da58c93108bae0867515f790d84728f0bce580cc8ad6f0f5f63b2c81eaf6d084d543d99b693ff4d7fbea2413ff068c3e4811fc107820d243da2c06d381fa
   languageName: node
   linkType: hard
 
-"@cspell/dict-html@npm:^3.0.1":
-  version: 3.3.2
-  resolution: "@cspell/dict-html@npm:3.3.2"
-  checksum: 10/5aecb2a24e0d3d22d890578e18771e04457828505b395ebb1918bc68000075e87f9c7ad2544ae18e53e87974d309556f44774887d05878a8603b8744e26449aa
+"@cspell/dict-golang@npm:^6.0.9":
+  version: 6.0.9
+  resolution: "@cspell/dict-golang@npm:6.0.9"
+  checksum: 10/4ce7fc8f1a925eb3c4a2a2a2ae4d75be79e698d2f6cd90ff549892705687011a190b9aabc8bb5c2c7616d24f42a3264121ad8ae056a844937984d301fa7cd90f
   languageName: node
   linkType: hard
 
-"@cspell/dict-java@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-java@npm:2.0.0"
-  checksum: 10/fe97985bfd5721ccc660fb3dc0762f264346caa406e84012aa54c352cd80bf5aa534ee38920f9fa3c2d39bf467bbed984935a898bcc16c87e8a03330b23a1f5b
+"@cspell/dict-google@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@cspell/dict-google@npm:1.0.1"
+  checksum: 10/4e2975c76e661884defdce928847f6babd3e0e296867540cf37ca56623854f97f74e225d668116b904d572574915c8c723f17171f1d00847bb877e1eae375e7d
   languageName: node
   linkType: hard
 
-"@cspell/dict-latex@npm:^2.0.3":
-  version: 2.0.9
-  resolution: "@cspell/dict-latex@npm:2.0.9"
-  checksum: 10/fe748a69a8da9b84523e59bcd429c0d41a822d26cabbd4fd7777cfbfbdabd29f1b0806b75fffe20dda54ce0785bff5b21b69fdaa572f076f06308307d8da42da
+"@cspell/dict-haskell@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@cspell/dict-haskell@npm:4.0.1"
+  checksum: 10/cfb51e415b60c5eb266a5782d0a4b19a37f1389b9b018d1bbb2ff4358bd739af1f76f68f26a138d4b4bd0ab67146d6eb9032fc3d3c212695237c134e05339c79
   languageName: node
   linkType: hard
 
-"@cspell/dict-lorem-ipsum@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-lorem-ipsum@npm:2.0.0"
-  checksum: 10/5d6f2ed5db1436fa34cb6e44195d6ef4bd2cddea449cdcd92598e236fc0a35f12edc45ed7b653dc1eaf46e54a9f8b41f3269bf2530b530b0805b0867cfed60e9
+"@cspell/dict-html-symbol-entities@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@cspell/dict-html-symbol-entities@npm:4.0.0"
+  checksum: 10/79f05f9080f39dbde703980eb587ed6624b8fc2f5cedc297327bc1b9b7e6022a7c382e6013149b1afe00609b96003ab5c8d18d378979f76f336ab626317183f4
   languageName: node
   linkType: hard
 
-"@cspell/dict-lua@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-lua@npm:2.0.0"
-  checksum: 10/e2f6d58c997fa2b9f7f540e9b714a2abbc36651fe08066c62c06eff4377f6a90a92f7ab234d84667b841a7645f8d9beba533e6c3a4790d2a1f20047699aec398
+"@cspell/dict-html@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "@cspell/dict-html@npm:4.0.5"
+  checksum: 10/8801b7f77910f6a269efc652c88ecc3299cabedec03566ad6fb661845fdf9a4950bd7a2cdd1216dde982eddc9caf9ec00c6917ac90707fabb7686d02b30b0a5c
   languageName: node
   linkType: hard
 
-"@cspell/dict-node@npm:^2.0.1":
+"@cspell/dict-java@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@cspell/dict-java@npm:5.0.7"
+  checksum: 10/c33b5e69c7eb03d6416a5a9a6971e69374167967a380dbc91062d8143e249c9595fcc26f9163112ff36d3b8dbca23eed2025b48e086c622eb6bb450f755087ef
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-julia@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@cspell/dict-julia@npm:1.0.1"
+  checksum: 10/4cce630dddb7579b3750875af43f40fb4e6019fe6ab30791b160b71a677c17e2c6e227d54555193255b43dd08a1f1fab500a82012d9831ccca923c4f8791b976
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-k8s@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@cspell/dict-k8s@npm:1.0.5"
+  checksum: 10/d7a251e44412ff7d337dabe20deedd5bb9553e2825f81a7c01788aa80dbae99a24c57cc6f686d9a249bcfbd0436248d1814b8c786425a3b20a7e189b1019775f
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-latex@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@cspell/dict-latex@npm:4.0.0"
+  checksum: 10/7e7a520196d143d0a3185689d09d84bf1e23b5328dfc78187c4e4ab264bd49c3dd695eb92f8d582583e5bc26bcab4ed0976b310b56a000af81d88a7acdea7f8c
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-lorem-ipsum@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@cspell/dict-lorem-ipsum@npm:4.0.0"
+  checksum: 10/d3575fb7b9684480192d2cd647484312c555f3d1215d6b35371b70de3ecde4273010e5916cc2d130ff1e1223a1a49f75825651671a76d3dabdec98acf67a3902
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-lua@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "@cspell/dict-lua@npm:4.0.3"
+  checksum: 10/eee20135a4f0620302c5feeb50485f59af93c24b64eb2081a9e2096a106ce33ae565d6d92607582b44c9f17c8a091d82fbcb443ebae9b77f8512b0d66a703c3b
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-makefile@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@cspell/dict-makefile@npm:1.0.0"
+  checksum: 10/f0cac4caf31e27accd5df5e0c2f53097cccbbd085126c4b4ecc08be2a32bd7f89fe6b052e9eae4ec99843175cafa94561868271fb53c5389f27cc078565b5123
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-monkeyc@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "@cspell/dict-monkeyc@npm:1.0.6"
+  checksum: 10/3d174203af5c12e515e0bdcc7b43a75cc8f5ef097db65249773f386e063febbfe6a47c39414fc52e0970e7dde1f0b32bc5fc0e586761f1e0cd082f1bce0e7572
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-node@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "@cspell/dict-node@npm:5.0.1"
+  checksum: 10/553d09eb7a0ec6eb1d5be85b7fb34fb88c9f87712708982a289f67157068a5e69e0e7e46321c17c9d9c2e57d1e442399fa0f96bc2916221eddcc6519c96b0105
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-npm@npm:^5.0.16":
+  version: 5.0.16
+  resolution: "@cspell/dict-npm@npm:5.0.16"
+  checksum: 10/ec77d0e297e6a50b1889a15332771c6605997bb1c4a8d9f0528ded69ea993fae449f303f4bca04c4cd56c24ad4151feb67b64cfade58aa21c81d80e1b0474b32
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-php@npm:^4.0.8":
+  version: 4.0.8
+  resolution: "@cspell/dict-php@npm:4.0.8"
+  checksum: 10/245c46db2d387044b9d9cfa6de4eb46b5a8cbbb33a0875c171c75230db599af5d8592165a618c849e99610f2c173564a6867c5475a2dbc5bbdea437bcb2b569b
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-powershell@npm:^5.0.4":
+  version: 5.0.4
+  resolution: "@cspell/dict-powershell@npm:5.0.4"
+  checksum: 10/13aa687130db6330a86f7b9cd1f7be9046ac3102aa96be9c71e130639fc3eff9b0a1ad45914bcaa497af2d628e2d3bc8babf02d6b657fd18d88fddc412ec4fec
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-public-licenses@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@cspell/dict-public-licenses@npm:2.0.7"
+  checksum: 10/7bbd067668499c45bad9eb8e3dae598bc5635e6035160bff7343b87cd31e419387e704fa290d0e23903fff6c80b65838ebe5638e2951dc5d9214df9b98b60ce2
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-python@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "@cspell/dict-python@npm:4.2.1"
+  dependencies:
+    "@cspell/dict-data-science": "npm:^2.0.1"
+  checksum: 10/f0941bcfd518a3c63c68d8ed08304b98142e90e3b445b12ab4b13ce23508b573e323f4a5136bde2cd610f99814963e119b8b06c0d91fc5808e1a7c29a804cce4
+  languageName: node
+  linkType: hard
+
+"@cspell/dict-r@npm:^2.0.1":
   version: 2.0.1
-  resolution: "@cspell/dict-node@npm:2.0.1"
-  checksum: 10/20eef1dd4ec3aaf00de97e321cfaa48f2a693395b67f9a52872754b849942240827d14a11a6cc0ede195d3b9d9cbd20e2b41a77fb4f575c4ca9ea63008049c3b
+  resolution: "@cspell/dict-r@npm:2.0.1"
+  checksum: 10/fe85939ad4c8ada34284a673918be711cca60b6d6f1c48ee98602c27905228dfbaea3462a350094633032c1d6b6bba9548df7019e0b21673cf1cf887c57ca228
   languageName: node
   linkType: hard
 
-"@cspell/dict-npm@npm:^2.0.3":
-  version: 2.0.5
-  resolution: "@cspell/dict-npm@npm:2.0.5"
-  checksum: 10/6ab275c144d5afa24a82a7615d329e85f917d09d95dc7d0c416881a43675a33fff287adcff87182a545caaf603b0a2923f7f77587545d4004a70ee1310c4f335
+"@cspell/dict-ruby@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@cspell/dict-ruby@npm:5.0.2"
+  checksum: 10/c2006bcc808448b1eef146eb4b6b74388113c50334206191a9fe5817fb13669482ecd114f7bbd397562ad2e19a9683266ff396f48c6ce282f6445c2cfa8e82c7
   languageName: node
   linkType: hard
 
-"@cspell/dict-php@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-php@npm:2.0.0"
-  checksum: 10/7aee934770e478a4e69c91bf721724acf46d81562d2a5e0a378c01fe889274ddda9e4dd74f82c8d5cc72d5ae9e26cce1d26afb1f1438d71ee35a3ffc2df21e04
+"@cspell/dict-rust@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "@cspell/dict-rust@npm:4.0.4"
+  checksum: 10/7ff86c4f172bf039ff1264f4736d9638d0792ab39ff5fc48812831241d622040f6591a3d9f630325537b0a4913e242bea14005ec3d2e3c167f933fe1416e0caa
   languageName: node
   linkType: hard
 
-"@cspell/dict-powershell@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-powershell@npm:2.0.0"
-  checksum: 10/4fe805d7c9101a593fd791960d2b190533d09534debcb2e0cb06057363f64021d58c37c38555d04216ff79440e289177a9199d915fde6921970c4971fa680500
+"@cspell/dict-scala@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@cspell/dict-scala@npm:5.0.2"
+  checksum: 10/c07bda723929f8b01ae0575af3d05ffffee9ed7523e0658a22d533cf287dd564d11bf16062a1692fb06c3aff2d519d07c7c2c3e5662ced8af1194b31b352af51
   languageName: node
   linkType: hard
 
-"@cspell/dict-public-licenses@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@cspell/dict-public-licenses@npm:1.0.4"
-  checksum: 10/fdd0418b396c4df89d5527cb5f3c534dc404e8b979ebb8f628ef665a551bf9618ddcb589a365bbaa000655dd90b683b11899240b010b4475e288f96492bc56c3
+"@cspell/dict-software-terms@npm:^3.4.9":
+  version: 3.4.9
+  resolution: "@cspell/dict-software-terms@npm:3.4.9"
+  checksum: 10/2fc21d7fefbd0269b760d2f634b22d6e54bd71dd3c03d96b59931fd1ef0c7380b6596e578621f907823eb8423bbdd297f56d8eaa150f2bbb23ed0559656c7523
   languageName: node
   linkType: hard
 
-"@cspell/dict-python@npm:^3.0.5":
-  version: 3.0.6
-  resolution: "@cspell/dict-python@npm:3.0.6"
-  checksum: 10/77564ba1c5870c9e24fdb7994f1fa05aa16a8ca290ed529daa3e47f1cf062745141f55191d449ace6be2640e05143edbdd2df88a1d4bddadf23a8aa2bc66d1c6
+"@cspell/dict-sql@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "@cspell/dict-sql@npm:2.1.3"
+  checksum: 10/a435812cc697d4c453f11efa49962992150702518e49808381ea34548b8a8ed81432a10cca36682007912b013c28e9ce3c6c183341c6cde58c8af0eef25cddc3
   languageName: node
   linkType: hard
 
-"@cspell/dict-r@npm:^1.0.2":
+"@cspell/dict-svelte@npm:^1.0.2":
   version: 1.0.2
-  resolution: "@cspell/dict-r@npm:1.0.2"
-  checksum: 10/b5c0425d496ba8d07b53dda3702490a1d4866b897c45e53f6586bf2d40870004497c5a0cf3b463d7837a2347784264e24ff1fa6c2a78049dc616d6e6cf8ed4ee
+  resolution: "@cspell/dict-svelte@npm:1.0.2"
+  checksum: 10/5b42989bc6743a26ca5172cc23ebc1449d930695b10c908376048ce1835bf57fef7a0004f02ec5e43219f24a97f154e125041df470441199a045ed0be9e654fc
   languageName: node
   linkType: hard
 
-"@cspell/dict-ruby@npm:^2.0.1":
-  version: 2.0.2
-  resolution: "@cspell/dict-ruby@npm:2.0.2"
-  checksum: 10/471a0d09c0904d727442c3282c1554fbdee8b473a1993d1befa1d8cd416348d9f880e8355aa6189fe51231b4e20c551c5ba270a47db41e49d11682f19f21e2d3
+"@cspell/dict-swift@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@cspell/dict-swift@npm:2.0.1"
+  checksum: 10/0bbb106266205c5f5e12886a73ebf0db2078bab1bdd2e1f304fe28445cd72d847a4c5072bf4fe8f9e8cdb4bc69d52fffec0806aea19ea9b64b7a87c67ee01175
   languageName: node
   linkType: hard
 
-"@cspell/dict-rust@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-rust@npm:2.0.0"
-  checksum: 10/1ae8f6a8cb0c3bac78fd8c7a7d6f3410ea7f20a13ceae456cacaa30fabb3d51b14a88d296a9b4f4479797815a82ad60df7b4f5d59169a389952bdb96e6c25f81
+"@cspell/dict-terraform@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@cspell/dict-terraform@npm:1.0.0"
+  checksum: 10/132b8f0532aa5a6a08fa57487313722bc10ad37a4b94a5d76b072922eb4eb56d204a3e33c1569613af5b337bd125b8e2d30cae6bf5400a07fa58c551c7fe3b37
   languageName: node
   linkType: hard
 
-"@cspell/dict-scala@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-scala@npm:2.0.0"
-  checksum: 10/3f23ba46510cd21e8ac509646187a4e118845d35cee45a509a258873461ac3f16dc9f3d47ebaed483534e58cc8eee0307584ec5356849735b6959a229830dd99
+"@cspell/dict-typescript@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "@cspell/dict-typescript@npm:3.1.5"
+  checksum: 10/9e99aa7c849133fcab6d16864045b512be3f0b89c76caf31234fcc6edf818e06e2af4087f576e5837e209dc0bdc1d1379d6752bac48aab517e0661c0e4eeff58
   languageName: node
   linkType: hard
 
-"@cspell/dict-software-terms@npm:^2.1.7":
-  version: 2.3.0
-  resolution: "@cspell/dict-software-terms@npm:2.3.0"
-  checksum: 10/ce705186ef008fede89421351c871f748a7d753a497568a2f75af87e3a7a626d1ea94dbd2ab99aeef1e4f45d9964bc8dbf8427f3c19eff9fb2d0a035ea8c2962
+"@cspell/dict-vue@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@cspell/dict-vue@npm:3.0.0"
+  checksum: 10/4db58b1d6f9be1a523a35678877f2cca2bb04548b136ec5ec4e7186500978dbc32cc8747ced80ade3cad3acc3c80eb23afe980679165810f8f8f26802e952e2f
   languageName: node
   linkType: hard
 
-"@cspell/dict-swift@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@cspell/dict-swift@npm:1.0.2"
-  checksum: 10/afbf6da336d1cdd60b0781f1a9266d634bbefabfec0a7b9dfd5b52110855c9b21f04ceaba90c9acda50a2ddc905efa1c79895299d205223a1e77f99efbde7162
+"@cspell/dynamic-import@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/dynamic-import@npm:8.10.4"
+  dependencies:
+    import-meta-resolve: "npm:^4.1.0"
+  checksum: 10/d07b83c990a0ff4a645df5ea45a7aa9eb6a948a16132382a2b3aafe470094892b90d53bb81cad336d5df27cd7f6a30c0c4289327825e05fcb26556a59ae91b15
   languageName: node
   linkType: hard
 
-"@cspell/dict-typescript@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@cspell/dict-typescript@npm:2.0.0"
-  checksum: 10/00a862d11dd0beb9b4725ba0326383445d31083942e4640174e0e9639fcfd153bfd9b6e2e2499f816e3c52e7bd2b15f0071a8198a83820c9469a81c38fbeb629
+"@cspell/strong-weak-map@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/strong-weak-map@npm:8.10.4"
+  checksum: 10/3249a3584b38c0079ac3b245c419b99ba65dfede461c81b3a14747107d20760c1b2b7f912e5cba220bdd7c9d5f2756b8bb977f05e33f3674f91d98fc604d12c5
   languageName: node
   linkType: hard
 
-"@cspell/dict-vue@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "@cspell/dict-vue@npm:2.0.2"
-  checksum: 10/fa135ac9672d03a05285b48756b3e845a2a1fe2a8b470152aad19699264bb1b9e6ae8efbc39fe3662a18633c89bf64c9423c955bbe8b36bd46d81f6c9fcc5214
+"@cspell/url@npm:8.10.4":
+  version: 8.10.4
+  resolution: "@cspell/url@npm:8.10.4"
+  checksum: 10/d288407f2b623502302afe76a17279d414b87d1c8523d37c5ebac780cf30706fc9eaceaa8f07ac3ca0ceae2ad5ec3eb0d533349c14bb92aad4d5163ff812a7a4
   languageName: node
   linkType: hard
 
@@ -7549,13 +7709,13 @@ __metadata:
     "@types/node": "npm:18.11.9"
     "@types/react": "npm:^18.2.39"
     "@types/react-dom": "npm:^18.2.17"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-scripts: "npm:5.0.1"
     typescript: "npm:5.5.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web-vitals: "npm:^2.1.4"
   languageName: unknown
   linkType: soft
@@ -7600,7 +7760,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
     "@types/http-errors": "npm:2.0.4"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
@@ -7608,14 +7768,14 @@ __metadata:
     joi: "npm:17.9.1"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     stellar-plus: "npm:0.8.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7719,7 +7879,7 @@ __metadata:
     ts-jest: "npm:29.1.1"
     ts-node: "npm:10.9.1"
     typescript: "npm:5.5.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     winston: "npm:3.10.0"
   bin:
     fabric-cli: bin/fabric-cli
@@ -7736,7 +7896,7 @@ __metadata:
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-rc.2"
     "@types/jsrsasign": "npm:10.5.11"
     "@types/node": "npm:18.11.9"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
     dotenv: "npm:8.6.0"
@@ -7754,7 +7914,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7820,7 +7980,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7848,7 +8008,7 @@ __metadata:
   resolution: "@hyperledger/cactus-cmd-api-server@workspace:packages/cactus-cmd-api-server"
   dependencies:
     "@bufbuild/buf": "npm:1.30.0"
-    "@bufbuild/protobuf": "npm:1.8.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
     "@bufbuild/protoc-gen-es": "npm:1.8.0"
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-express": "npm:1.4.0"
@@ -7881,7 +8041,7 @@ __metadata:
     "@types/passport-saml": "npm:1.1.3"
     "@types/passport-strategy": "npm:0.2.35"
     "@types/semver": "npm:7.3.8"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     "@types/xml2js": "npm:0.4.9"
     "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
@@ -7899,7 +8059,7 @@ __metadata:
     express-openapi-validator: "npm:5.0.4"
     express-rate-limit: "npm:6.7.0"
     fastify: "npm:4.26.2"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.18.0-rc.2"
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
@@ -7908,17 +8068,17 @@ __metadata:
     json-stable-stringify: "npm:1.0.2"
     lmify: "npm:0.3.0"
     node-forge: "npm:1.3.0"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     protobufjs: "npm:7.2.5"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     safe-stable-stringify: "npm:2.4.3"
-    semver: "npm:7.5.2"
+    semver: "npm:7.6.2"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     tsx: "npm:4.16.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7988,7 +8148,7 @@ __metadata:
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/secp256k1": "npm:4.0.3"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     fast-safe-stringify: "npm:2.1.1"
     json-stable-stringify: "npm:1.0.1"
     key-encoder: "npm:2.0.3"
@@ -7998,7 +8158,7 @@ __metadata:
     sanitize-html: "npm:2.12.1"
     secp256k1: "npm:4.0.3"
     sha3: "npm:2.1.4"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8006,7 +8166,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-core-api@workspace:packages/cactus-core-api"
   dependencies:
-    "@bufbuild/protobuf": "npm:1.8.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
     "@connectrpc/connect": "npm:1.4.0"
     "@grpc/grpc-js": "npm:1.10.9"
     "@grpc/proto-loader": "npm:0.7.8"
@@ -8044,7 +8204,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     safe-stable-stringify: "npm:2.4.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8065,14 +8225,14 @@ __metadata:
     "@openzeppelin/contracts": "npm:4.9.6"
     "@openzeppelin/contracts-upgradeable": "npm:4.9.6"
     "@types/express": "npm:4.17.21"
-    "@types/fs-extra": "npm:9.0.13"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/json-stable-stringify": "npm:1.0.34"
     "@types/qs": "npm:6.9.14"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
     express-jwt: "npm:8.4.1"
     fabric-network: "npm:2.2.20"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     hardhat: "npm:2.17.2"
     http-cache-semantics: "npm:4.1.1"
     http-status-codes: "npm:2.1.4"
@@ -8081,7 +8241,7 @@ __metadata:
     openapi-types: "npm:12.1.3"
     qs: "npm:6.8.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -8101,13 +8261,13 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
     "@types/ssh2": "npm:0.5.47"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.6.0"
     express: "npm:4.19.2"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8173,16 +8333,16 @@ __metadata:
     "@types/cucumber": "npm:4.0.4"
     "@types/express": "npm:4.17.21"
     "@types/express-jwt": "npm:6.0.2"
-    "@types/fs-extra": "npm:9.0.13"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/node": "npm:18.11.9"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.6.0"
     crypto-js: "npm:4.2.0"
     cucumber: "npm:5.0.3"
     dotenv: "npm:16.0.1"
     fabric-network: "npm:2.2.20"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     hardhat: "npm:2.17.2"
     http-status-codes: "npm:2.1.4"
     jose: "npm:4.15.5"
@@ -8194,7 +8354,7 @@ __metadata:
     sqlite3: "npm:5.1.5"
     ts-node: "npm:7.0.1"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3-core: "npm:1.10.1"
     web3-utils: "npm:1.10.1"
   languageName: unknown
@@ -8242,7 +8402,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:9.0.6"
     "@types/jsrsasign": "npm:10.5.8"
     "@types/node": "npm:18.11.9"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     cookie-parser: "npm:1.4.6"
@@ -8264,7 +8424,7 @@ __metadata:
     shelljs: "npm:0.8.5"
     socket.io: "npm:4.6.2"
     ts-node: "npm:8.9.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     xmlhttprequest: "npm:1.8.0"
   languageName: unknown
   linkType: soft
@@ -8283,7 +8443,7 @@ __metadata:
     "@types/escape-html": "npm:1.0.1"
     "@types/express": "npm:4.17.21"
     "@types/node": "npm:18.11.9"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     body-parser: "npm:1.20.2"
     cookie-parser: "npm:1.4.6"
     debug: "npm:3.1.0"
@@ -8301,7 +8461,7 @@ __metadata:
     shelljs: "npm:0.8.5"
     socket.io: "npm:4.6.2"
     ts-node: "npm:8.9.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.8.1"
     xmlhttprequest: "npm:1.8.0"
   languageName: unknown
@@ -8325,7 +8485,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.6.0"
     dotenv: "npm:16.0.0"
@@ -8336,7 +8496,7 @@ __metadata:
     openapi-types: "npm:12.1.3"
     solc: "npm:0.8.6"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3-core: "npm:1.6.1"
   languageName: unknown
   linkType: soft
@@ -8356,14 +8516,14 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
     "@types/ssh2": "npm:0.5.47"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.6.0"
     express: "npm:4.19.2"
     openapi-types: "npm:12.1.3"
     run-time-error-cjs: "npm:1.4.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8396,7 +8556,7 @@ __metadata:
     "@ionic-native/status-bar": "patch:@ionic-native/status-bar@npm%3A5.36.0#~/.yarn/patches/@ionic-native-status-bar-npm-5.36.0-1ca86cbaad.patch"
     "@ionic/angular": "npm:7.3.3"
     "@ionic/angular-toolkit": "npm:10.0.0"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     browserify-fs: "npm:1.0.0"
     https-browserify: "npm:1.0.0"
     net-browserify: "npm:0.2.4"
@@ -8406,7 +8566,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     tls-browserify: "npm:0.2.2"
     tslib: "npm:2.6.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     zone.js: "npm:0.13.1"
   languageName: unknown
   linkType: soft
@@ -8428,19 +8588,19 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
     "@types/express": "npm:4.17.21"
-    "@types/fs-extra": "npm:11.0.3"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
-    "@types/uuid": "npm:9.0.6"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     fabric-network: "npm:2.2.20"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     key-encoder: "npm:2.0.3"
     merkletreejs: "npm:0.3.11"
     socket.io: "npm:4.6.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -8455,15 +8615,15 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
     "@types/json-stable-stringify": "npm:1.0.33"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.1"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8481,19 +8641,19 @@ __metadata:
     "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     fast-safe-stringify: "npm:2.1.1"
     joi: "npm:14.3.1"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.1.0"
+    prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3-eth-abi: "npm:4.2.1"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -8552,7 +8712,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
     "@types/request": "npm:2.48.7"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     aws-sdk: "npm:2.965.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
@@ -8560,9 +8720,9 @@ __metadata:
     http-status-codes: "npm:2.1.4"
     internal-ip: "npm:6.2.0"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8586,7 +8746,7 @@ __metadata:
     internal-ip: "npm:6.2.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8602,7 +8762,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
     "@types/request": "npm:2.48.7"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
@@ -8611,7 +8771,7 @@ __metadata:
     internal-ip: "npm:6.2.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8627,10 +8787,10 @@ __metadata:
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     cpy-cli: "npm:4.2.0"
-    del-cli: "npm:4.0.1"
+    del-cli: "npm:5.1.0"
     express: "npm:4.19.2"
-    prom-client: "npm:13.2.0"
-    uuid: "npm:9.0.1"
+    prom-client: "npm:15.1.3"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8639,7 +8799,7 @@ __metadata:
   resolution: "@hyperledger/cactus-plugin-keychain-memory@workspace:packages/cactus-plugin-keychain-memory"
   dependencies:
     "@bufbuild/buf": "npm:1.30.0"
-    "@bufbuild/protobuf": "npm:1.8.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
     "@bufbuild/protoc-gen-es": "npm:1.8.0"
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
@@ -8652,9 +8812,9 @@ __metadata:
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     npm-run-all2: "npm:6.1.2"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     rxjs: "npm:7.8.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8671,7 +8831,7 @@ __metadata:
     "@types/internal-ip": "npm:4.1.0"
     "@types/request": "npm:2.48.7"
     "@types/tape-promise": "npm:4.0.1"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
@@ -8679,9 +8839,9 @@ __metadata:
     internal-ip: "npm:6.2.0"
     node-vault: "npm:0.9.22"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8704,7 +8864,7 @@ __metadata:
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
@@ -8713,7 +8873,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8731,15 +8891,15 @@ __metadata:
     "@types/benchmark": "npm:2.1.5"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
-    "@types/fs-extra": "npm:9.0.13"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/google-protobuf": "npm:3.15.5"
     "@types/http-errors": "npm:2.0.4"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     benchmark: "npm:2.1.4"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.21.2"
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
@@ -8749,7 +8909,7 @@ __metadata:
     key-encoder: "npm:2.0.3"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     protobufjs: "npm:7.2.5"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
@@ -8757,7 +8917,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     tsx: "npm:4.16.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -8782,7 +8942,7 @@ __metadata:
     express: "npm:4.19.2"
     jest-extended: "npm:4.0.1"
     sanitize-html: "npm:2.12.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8798,7 +8958,7 @@ __metadata:
     "@types/express": "npm:4.17.21"
     "@types/multer": "npm:1.4.7"
     "@types/temp": "npm:0.9.1"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
@@ -8806,11 +8966,11 @@ __metadata:
     internal-ip: "npm:6.2.0"
     joi: "npm:17.9.1"
     node-ssh: "npm:13.1.0"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     rxjs: "npm:7.8.1"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8831,7 +8991,7 @@ __metadata:
     "@types/js-yaml": "npm:4.0.5"
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     chalk: "npm:4.1.2"
@@ -8840,14 +9000,14 @@ __metadata:
     http-proxy-middleware: "npm:2.0.6"
     js-yaml: "npm:4.1.0"
     minimist: "npm:1.2.8"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     sanitize-html: "npm:2.12.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:4.4.0"
     web3-eth: "npm:4.4.0"
     web3-eth-accounts: "npm:4.1.1"
@@ -8871,13 +9031,13 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/elliptic": "npm:6.4.16"
     "@types/express": "npm:4.17.21"
-    "@types/fs-extra": "npm:9.0.13"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/jsrsasign": "npm:8.0.13"
     "@types/multer": "npm:1.4.7"
     "@types/node-vault": "npm:0.9.13"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/temp": "npm:0.9.1"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     bl: "npm:6.0.12"
     bn.js: "npm:4.12.0"
@@ -8890,7 +9050,7 @@ __metadata:
     fabric-protos: "npm:2.5.0-snapshot.23"
     fast-safe-stringify: "npm:2.1.1"
     form-data: "npm:4.0.0"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     http-status-codes: "npm:2.1.4"
     internal-ip: "npm:6.2.0"
     jsrsasign: "npm:11.0.0"
@@ -8900,7 +9060,7 @@ __metadata:
     node-ssh: "npm:13.1.0"
     node-vault: "npm:0.9.22"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     sanitize-filename: "npm:1.6.3"
@@ -8910,7 +9070,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     ws-identity-client: "npm:1.0.2"
     ws-wallet: "npm:1.1.5"
   languageName: unknown
@@ -8979,7 +9139,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     undici: "npm:6.19.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9004,7 +9164,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.44"
     "@types/supertest": "npm:2.0.11"
     "@types/temp": "npm:0.9.1"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     bl: "npm:5.1.0"
     express: "npm:4.19.2"
@@ -9017,13 +9177,13 @@ __metadata:
     multer: "npm:1.4.2"
     ngo: "npm:2.6.2"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     run-time-error: "npm:1.4.0"
     supertest: "npm:6.1.6"
     temp: "npm:0.9.1"
     tslint: "npm:6.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9041,7 +9201,7 @@ __metadata:
     "@types/http-errors": "npm:2.0.4"
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     chalk: "npm:4.1.2"
@@ -9049,14 +9209,14 @@ __metadata:
     express: "npm:4.19.2"
     http-errors-enhanced-cjs: "npm:2.0.0"
     minimist: "npm:1.2.8"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     sanitize-html: "npm:2.12.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-core-helpers: "npm:1.6.1"
@@ -9078,7 +9238,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     cbor: "npm:9.0.1"
@@ -9086,7 +9246,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9133,10 +9293,10 @@ __metadata:
     express: "npm:4.19.2"
     joi: "npm:17.9.1"
     openapi-types: "npm:12.1.3"
-    prom-client: "npm:13.2.0"
+    prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -9166,7 +9326,7 @@ __metadata:
     multiformats: "npm:11.0.2"
     run-time-error-cjs: "npm:1.4.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9195,7 +9355,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:4.0.3"
     web3-eth-accounts: "npm:4.0.3"
     web3-utils: "npm:4.2.1"
@@ -9215,7 +9375,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
     "@types/pg": "npm:8.6.5"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
@@ -9225,7 +9385,7 @@ __metadata:
     pg: "npm:8.8.0"
     safe-stable-stringify: "npm:2.4.3"
     socket.io: "npm:4.6.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9245,15 +9405,15 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
     "@types/express": "npm:4.17.21"
-    "@types/fs-extra": "npm:11.0.3"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     crypto-js: "npm:4.2.0"
     express: "npm:4.19.2"
     fabric-network: "npm:2.2.20"
-    fs-extra: "npm:11.1.1"
+    fs-extra: "npm:11.2.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
     secp256k1: "npm:4.0.3"
@@ -9261,7 +9421,7 @@ __metadata:
     sqlite3: "npm:5.1.5"
     typescript: "npm:5.5.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -9279,9 +9439,9 @@ __metadata:
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
   languageName: unknown
   linkType: soft
@@ -9296,10 +9456,10 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-keychain-vault": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     express-jwt-authz: "npm:2.4.1"
     jose: "npm:4.15.5"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9328,10 +9488,10 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-rc.2"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     jose: "npm:4.15.5"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9349,11 +9509,11 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3-eth-abi: "npm:4.0.3"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -9373,12 +9533,12 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     key-encoder: "npm:2.0.3"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
   languageName: unknown
@@ -9397,7 +9557,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-rc.2"
     express: "npm:4.19.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9415,12 +9575,12 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-verifier-client": "npm:2.0.0-rc.2"
     "@types/express": "npm:4.17.21"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.2"
     express: "npm:4.19.2"
     key-encoder: "npm:2.0.3"
     socket.io: "npm:4.6.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
@@ -9441,9 +9601,9 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-verifier-client": "npm:2.0.0-rc.2"
     "@types/lodash": "npm:4.14.195"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     lodash: "npm:4.17.21"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:4.4.0"
     web3-eth-contract: "npm:4.2.0"
   languageName: unknown
@@ -9463,10 +9623,10 @@ __metadata:
     "@hyperledger/cactus-verifier-client": "npm:2.0.0-rc.2"
     "@types/convict": "npm:6.1.1"
     "@types/lodash": "npm:4.14.195"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     convict: "npm:6.2.4"
     lodash: "npm:4.17.21"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core-helpers: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -9486,7 +9646,7 @@ __metadata:
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.0"
     "@types/dockerode": "npm:3.2.7"
     "@types/esm": "npm:3.2.0"
-    "@types/fs-extra": "npm:9.0.13"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/js-yaml": "npm:4.0.3"
     "@types/lodash": "npm:4.14.172"
     "@types/node": "npm:18.11.9"
@@ -9503,7 +9663,7 @@ __metadata:
     execa: "npm:5.1.1"
     fabric-ca-client: "npm:2.5.0-snapshot.23"
     fabric-network: "npm:2.5.0-snapshot.23"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     internal-ip: "npm:6.2.0"
     is-port-reachable: "npm:3.0.0"
     joi: "npm:17.9.1"
@@ -9519,7 +9679,7 @@ __metadata:
     tar-stream: "npm:2.2.0"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -9540,12 +9700,12 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:4.17.21"
     "@types/node": "npm:18.11.9"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     log4js: "npm:6.4.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
     web3: "npm:1.7.3"
     web3-core: "npm:1.7.3"
     web3-eth-accounts: "npm:4.0.3"
@@ -9604,10 +9764,10 @@ __metadata:
     "@hyperledger/cactus-core": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     kubo-rpc-client: "npm:3.0.1"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:9.0.1"
+    uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9618,7 +9778,7 @@ __metadata:
     "@babel/parser": "npm:7.24.7"
     "@babel/types": "npm:7.24.7"
     "@bufbuild/buf": "npm:1.30.0"
-    "@bufbuild/protobuf": "npm:1.8.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
     "@bufbuild/protoc-gen-es": "npm:1.8.0"
     "@commitlint/cli": "npm:17.7.1"
     "@commitlint/config-conventional": "npm:17.7.0"
@@ -9635,13 +9795,13 @@ __metadata:
     "@types/adm-zip": "npm:0.5.0"
     "@types/benchmark": "npm:2.1.5"
     "@types/debug": "npm:4.1.12"
-    "@types/fs-extra": "npm:9.0.13"
+    "@types/fs-extra": "npm:11.0.4"
     "@types/jest": "npm:29.5.3"
     "@types/node": "npm:18.11.9"
     "@types/node-fetch": "npm:2.6.4"
     "@types/tape": "npm:4.13.4"
     "@types/tape-promise": "npm:4.0.1"
-    "@types/uuid": "npm:9.0.8"
+    "@types/uuid": "npm:10.0.0"
     "@types/yargs": "npm:17.0.24"
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
@@ -9651,10 +9811,10 @@ __metadata:
     cpy-cli: "npm:4.2.0"
     cross-env: "npm:7.0.3"
     crypto-browserify: "npm:3.12.0"
-    cspell: "npm:5.21.2"
+    cspell: "npm:8.10.4"
     debug: "npm:4.3.5"
     del: "npm:7.1.0"
-    del-cli: "npm:4.0.1"
+    del-cli: "npm:5.1.0"
     depcheck: "npm:1.4.7"
     es-main: "npm:1.2.0"
     eslint: "npm:8.57.0"
@@ -9666,7 +9826,7 @@ __metadata:
     eslint-plugin-promise: "npm:6.1.1"
     eslint-plugin-standard: "npm:5.0.0"
     fast-safe-stringify: "npm:2.1.1"
-    fs-extra: "npm:10.1.0"
+    fs-extra: "npm:11.2.0"
     globby: "npm:12.2.0"
     google-protobuf: "npm:3.21.2"
     grpc-tools: "npm:1.12.4"
@@ -12504,6 +12664,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/api@npm:^1.4.0":
+  version: 1.9.0
+  resolution: "@opentelemetry/api@npm:1.9.0"
+  checksum: 10/a607f0eef971893c4f2ee2a4c2069aade6ec3e84e2a1f5c2aac19f65c5d9eeea41aa72db917c1029faafdd71789a1a040bdc18f40d63690e22ccae5d7070f194
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts-upgradeable@npm:4.9.6":
   version: 4.9.6
   resolution: "@openzeppelin/contracts-upgradeable@npm:4.9.6"
@@ -15331,22 +15498,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:11.0.3":
-  version: 11.0.3
-  resolution: "@types/fs-extra@npm:11.0.3"
+"@types/fs-extra@npm:11.0.4":
+  version: 11.0.4
+  resolution: "@types/fs-extra@npm:11.0.4"
   dependencies:
     "@types/jsonfile": "npm:*"
     "@types/node": "npm:*"
-  checksum: 10/da06cafdfed66ac695fd1a6a152c66bd28c1731bcf27f7640136d6b8165bfe5995109ee0bb2e830d30e49d9f26f889c901de4bacce644963dc538ed92a280e90
-  languageName: node
-  linkType: hard
-
-"@types/fs-extra@npm:9.0.13":
-  version: 9.0.13
-  resolution: "@types/fs-extra@npm:9.0.13"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/ac545e377248039c596ef27d9f277b813507ebdd95d05f32fe7e9c67eb1ed567dafb4ba59f5fdcb6601dd7fd396ff9ba24f8c122e89cef096cdc17987c50a7fa
+  checksum: 10/acc4c1eb0cde7b1f23f3fe6eb080a14832d8fa9dc1761aa444c5e2f0f6b6fa657ed46ebae32fb580a6700fc921b6165ce8ac3e3ba030c3dd15f10ad4dd4cae98
   languageName: node
   linkType: hard
 
@@ -16441,17 +16599,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:9.0.6":
-  version: 9.0.6
-  resolution: "@types/uuid@npm:9.0.6"
-  checksum: 10/739dcb2e620ff097fa916edeab455eb75640c4883a850784fdb15b32f67b719e05275c6d6419bb6da11350d26bd14ed05ba5e992ff228411cdd98cbc772d71ef
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:9.0.8":
-  version: 9.0.8
-  resolution: "@types/uuid@npm:9.0.8"
-  checksum: 10/b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
+"@types/uuid@npm:10.0.0":
+  version: 10.0.0
+  resolution: "@types/uuid@npm:10.0.0"
+  checksum: 10/e3958f8b0fe551c86c14431f5940c3470127293280830684154b91dc7eb3514aeb79fe3216968833cf79d4d1c67f580f054b5be2cd562bebf4f728913e73e944
   languageName: node
   linkType: hard
 
@@ -19808,6 +19959,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"braces@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "braces@npm:3.0.3"
+  dependencies:
+    fill-range: "npm:^7.1.1"
+  checksum: 10/fad11a0d4697a27162840b02b1fad249c1683cbc510cd5bf1a471f2f8085c046d41094308c577a50a03a579dd99d5a6b3724c4b5e8b14df2c4443844cfcda2c6
+  languageName: node
+  linkType: hard
+
 "brorand@npm:^1.0.1, brorand@npm:^1.1.0":
   version: 1.1.0
   resolution: "brorand@npm:1.1.0"
@@ -20843,6 +21003,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chalk-template@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "chalk-template@npm:1.1.0"
+  dependencies:
+    chalk: "npm:^5.2.0"
+  checksum: 10/868aae8d4e7556ad2f35de4e04fe65dbe1ea6c5c80ad783f1c156d0a5c33f444c6814f49cbb68fe348c78e99daf2bcf566b47ad7e13603e4691ca78b2f422824
+  languageName: node
+  linkType: hard
+
 "chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.1, chalk@npm:^4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
@@ -20887,7 +21056,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^5.3.0":
+"chalk@npm:^5.2.0, chalk@npm:^5.3.0":
   version: 5.3.0
   resolution: "chalk@npm:5.3.0"
   checksum: 10/6373caaab21bd64c405bfc4bd9672b145647fc9482657b5ea1d549b3b2765054e9d3d928870cdf764fb4aad67555f5061538ff247b8310f110c5c888d92397ea
@@ -21677,6 +21846,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "commander@npm:12.1.0"
+  checksum: 10/cdaeb672d979816853a4eed7f1310a9319e8b976172485c2a6b437ed0db0a389a44cfb222bfbde772781efa9f215bdd1b936f80d6b249485b465c6cb906e1f93
+  languageName: node
+  linkType: hard
+
 "commander@npm:^2.12.1, commander@npm:^2.13.0, commander@npm:^2.15.0, commander@npm:^2.19.0, commander@npm:^2.20.0, commander@npm:^2.20.3, commander@npm:^2.8.1, commander@npm:^2.9.0":
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
@@ -21705,13 +21881,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^9.2.0":
-  version: 9.5.0
-  resolution: "commander@npm:9.5.0"
-  checksum: 10/41c49b3d0f94a1fbeb0463c85b13f15aa15a9e0b4d5e10a49c0a1d58d4489b549d62262b052ae0aa6cfda53299bee487bfe337825df15e342114dde543f82906
-  languageName: node
-  linkType: hard
-
 "commander@npm:~2.1.0":
   version: 2.1.0
   resolution: "commander@npm:2.1.0"
@@ -21719,16 +21888,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"comment-json@npm:^4.2.2":
-  version: 4.2.2
-  resolution: "comment-json@npm:4.2.2"
+"comment-json@npm:^4.2.4":
+  version: 4.2.4
+  resolution: "comment-json@npm:4.2.4"
   dependencies:
     array-timsort: "npm:^1.0.3"
     core-util-is: "npm:^1.0.3"
     esprima: "npm:^4.0.1"
     has-own-prop: "npm:^2.0.0"
     repeat-string: "npm:^1.6.1"
-  checksum: 10/3cdcfbfa80c70fec3865c6609073e56b9b66499c46ffcd6b90fb8a9d957460bc9e3b6c7f4e9b81200180cf9491d80b338249c930c35628b4dfee5e27b6f5d0a6
+  checksum: 10/b39109b318cbad9c8d991aebdcb1835542338b4e1c03a3d00ec72eab2e13045589c071943cb238443b9e1595800e6f82318e08aeba516d38571d7c146c58a38e
   languageName: node
   linkType: hard
 
@@ -22737,94 +22906,144 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cspell-gitignore@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "cspell-gitignore@npm:5.21.2"
+"cspell-config-lib@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-config-lib@npm:8.10.4"
   dependencies:
-    cspell-glob: "npm:^5.21.2"
-    find-up: "npm:^5.0.0"
+    "@cspell/cspell-types": "npm:8.10.4"
+    comment-json: "npm:^4.2.4"
+    yaml: "npm:^2.4.5"
+  checksum: 10/dfe86bb6325666913665106749163482413e9bf754e53405dbf87a8add4979db7f8db7865bc7a2c35ee51614984e00e26a9fbd93396cca73600e3b48a733a76b
+  languageName: node
+  linkType: hard
+
+"cspell-dictionary@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-dictionary@npm:8.10.4"
+  dependencies:
+    "@cspell/cspell-pipe": "npm:8.10.4"
+    "@cspell/cspell-types": "npm:8.10.4"
+    cspell-trie-lib: "npm:8.10.4"
+    fast-equals: "npm:^5.0.1"
+    gensequence: "npm:^7.0.0"
+  checksum: 10/2919fa4396d89ea31f7f132258a85bbc8611f30a85a511e3f151e413c4223cdce09f4102de2e59409c6c43ec963856b0f46176e5aff756023c7a40ae91300388
+  languageName: node
+  linkType: hard
+
+"cspell-gitignore@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-gitignore@npm:8.10.4"
+  dependencies:
+    "@cspell/url": "npm:8.10.4"
+    cspell-glob: "npm:8.10.4"
+    cspell-io: "npm:8.10.4"
+    find-up-simple: "npm:^1.0.0"
   bin:
-    cspell-gitignore: bin.js
-  checksum: 10/add60044cedeedd4b19985d63908c384cf304c7da92dc89e5b491f96a525cb4b7280a84dc70b677b7db4489e71e85c4ab0664e3ace17e31ab6972a53b797b54f
+    cspell-gitignore: bin.mjs
+  checksum: 10/d88f4cbd4f78475b71a9aae586907a097a6cf35a80e7b54448c59e134ea5d2506b7c6cc752ed35cc3ccd6bd517de7cf899aee9d4208bbbd38e7205b8bf89920b
   languageName: node
   linkType: hard
 
-"cspell-glob@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "cspell-glob@npm:5.21.2"
+"cspell-glob@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-glob@npm:8.10.4"
   dependencies:
-    micromatch: "npm:^4.0.5"
-  checksum: 10/5cfd9b7eafa7c23078635b0736aa1571c247101ec767faafbf6ca01b5d44001212315685c4cf5804b58959a641d681415f7f4c758973784b85cb294cf1278df6
+    "@cspell/url": "npm:8.10.4"
+    micromatch: "npm:^4.0.7"
+  checksum: 10/5d4891bd4b8ab49f68b6791c575d98ec61ab7c87a0d729789c2e9612ed3fe7332f4c9b953270119864e8e32589cd8a5e45695dabfe64d4196e1c1364f1330486
   languageName: node
   linkType: hard
 
-"cspell-io@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "cspell-io@npm:5.21.2"
-  checksum: 10/f6f4758f29f40ebe3a965a1b6bdc800bda71d4ac3eb7260b3e59df244a838351defc456d74c453ddd461f4691af2886d7d3145a884fc4b7a11323c49943f7b5f
-  languageName: node
-  linkType: hard
-
-"cspell-lib@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "cspell-lib@npm:5.21.2"
+"cspell-grammar@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-grammar@npm:8.10.4"
   dependencies:
-    "@cspell/cspell-bundled-dicts": "npm:^5.21.2"
-    "@cspell/cspell-pipe": "npm:^5.21.2"
-    "@cspell/cspell-types": "npm:^5.21.2"
+    "@cspell/cspell-pipe": "npm:8.10.4"
+    "@cspell/cspell-types": "npm:8.10.4"
+  bin:
+    cspell-grammar: bin.mjs
+  checksum: 10/f84cc9eb0bb1df57bca4301d47a02c6841da8981fd93b015223543052c0fb92aa1ab3348bc2f901c7ee12d14b4328579cff02429c042f08ea1af5371f68a605a
+  languageName: node
+  linkType: hard
+
+"cspell-io@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-io@npm:8.10.4"
+  dependencies:
+    "@cspell/cspell-service-bus": "npm:8.10.4"
+    "@cspell/url": "npm:8.10.4"
+  checksum: 10/0fcd4263bef3fea7f01059381d28a17030e8e31f8677dc6f5fc438e1ef73ac1e1aa996040b13f17798adb6c943a26f80b75ce25d2dda96c8dcf5fcb4e4a9c0c8
+  languageName: node
+  linkType: hard
+
+"cspell-lib@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-lib@npm:8.10.4"
+  dependencies:
+    "@cspell/cspell-bundled-dicts": "npm:8.10.4"
+    "@cspell/cspell-pipe": "npm:8.10.4"
+    "@cspell/cspell-resolver": "npm:8.10.4"
+    "@cspell/cspell-types": "npm:8.10.4"
+    "@cspell/dynamic-import": "npm:8.10.4"
+    "@cspell/strong-weak-map": "npm:8.10.4"
+    "@cspell/url": "npm:8.10.4"
     clear-module: "npm:^4.1.2"
-    comment-json: "npm:^4.2.2"
-    configstore: "npm:^5.0.1"
-    cosmiconfig: "npm:^7.0.1"
-    cspell-glob: "npm:^5.21.2"
-    cspell-io: "npm:^5.21.2"
-    cspell-trie-lib: "npm:^5.21.2"
-    fast-equals: "npm:^3.0.2"
-    find-up: "npm:^5.0.0"
-    fs-extra: "npm:^10.1.0"
-    gensequence: "npm:^3.1.1"
+    comment-json: "npm:^4.2.4"
+    cspell-config-lib: "npm:8.10.4"
+    cspell-dictionary: "npm:8.10.4"
+    cspell-glob: "npm:8.10.4"
+    cspell-grammar: "npm:8.10.4"
+    cspell-io: "npm:8.10.4"
+    cspell-trie-lib: "npm:8.10.4"
+    env-paths: "npm:^3.0.0"
+    fast-equals: "npm:^5.0.1"
+    gensequence: "npm:^7.0.0"
     import-fresh: "npm:^3.3.0"
     resolve-from: "npm:^5.0.0"
-    resolve-global: "npm:^1.0.0"
-    vscode-languageserver-textdocument: "npm:^1.0.4"
-    vscode-uri: "npm:^3.0.3"
-  checksum: 10/83bdee5275d6991680debeb0ed4f7902e7fa92aa00f13504eea2857eacea2299ece410dd68f4529606917fe228f109c3d2ef77ff7e9122a5a7cb4cf77a36bf92
+    vscode-languageserver-textdocument: "npm:^1.0.11"
+    vscode-uri: "npm:^3.0.8"
+    xdg-basedir: "npm:^5.1.0"
+  checksum: 10/bee2de73af7fc3913af79729040e767ecd251ba1ce1e569d841da9a42245e80aa363af496f2d585aacf3baa8ec8299de41f29db7b75c8f62eb45bade09e72077
   languageName: node
   linkType: hard
 
-"cspell-trie-lib@npm:^5.21.2":
-  version: 5.21.2
-  resolution: "cspell-trie-lib@npm:5.21.2"
+"cspell-trie-lib@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell-trie-lib@npm:8.10.4"
   dependencies:
-    "@cspell/cspell-pipe": "npm:^5.21.2"
-    fs-extra: "npm:^10.1.0"
-    gensequence: "npm:^3.1.1"
-  checksum: 10/fa75c6ec821f307f875bdc14379eb115a2451edbb49eef297f7ed5b9953a394813aa80ff948d8c182e40a0383c9cb23fc4868edbd95da6671fac5b7e91d1c657
+    "@cspell/cspell-pipe": "npm:8.10.4"
+    "@cspell/cspell-types": "npm:8.10.4"
+    gensequence: "npm:^7.0.0"
+  checksum: 10/283d3bcdcf746e9f80178054f821876c80bfeb9ec5be825dcf2bf38f0a5a5e6b04bed8d90da45a774c31b0adc20e77ce16e28044232c5f371fe5782fa554e5cd
   languageName: node
   linkType: hard
 
-"cspell@npm:5.21.2":
-  version: 5.21.2
-  resolution: "cspell@npm:5.21.2"
+"cspell@npm:8.10.4":
+  version: 8.10.4
+  resolution: "cspell@npm:8.10.4"
   dependencies:
-    "@cspell/cspell-pipe": "npm:^5.21.2"
-    chalk: "npm:^4.1.2"
-    commander: "npm:^9.2.0"
-    cspell-gitignore: "npm:^5.21.2"
-    cspell-glob: "npm:^5.21.2"
-    cspell-lib: "npm:^5.21.2"
+    "@cspell/cspell-json-reporter": "npm:8.10.4"
+    "@cspell/cspell-pipe": "npm:8.10.4"
+    "@cspell/cspell-types": "npm:8.10.4"
+    "@cspell/dynamic-import": "npm:8.10.4"
+    chalk: "npm:^5.3.0"
+    chalk-template: "npm:^1.1.0"
+    commander: "npm:^12.1.0"
+    cspell-gitignore: "npm:8.10.4"
+    cspell-glob: "npm:8.10.4"
+    cspell-io: "npm:8.10.4"
+    cspell-lib: "npm:8.10.4"
+    fast-glob: "npm:^3.3.2"
     fast-json-stable-stringify: "npm:^2.1.0"
-    file-entry-cache: "npm:^6.0.1"
-    fs-extra: "npm:^10.1.0"
-    get-stdin: "npm:^8.0.0"
-    glob: "npm:^8.0.3"
-    imurmurhash: "npm:^0.1.4"
-    semver: "npm:^7.3.7"
-    strip-ansi: "npm:^6.0.1"
-    vscode-uri: "npm:^3.0.3"
+    file-entry-cache: "npm:^8.0.0"
+    get-stdin: "npm:^9.0.0"
+    semver: "npm:^7.6.2"
+    strip-ansi: "npm:^7.1.0"
+    vscode-uri: "npm:^3.0.8"
   bin:
-    cspell: bin.js
-  checksum: 10/d52781547663cbac9e89b6cc3ad37b2a357a6860f1b3f4483c0b30c3d1017341fe34e9e9f6c75c2efc18ddb74ba5033f3ede5c30ff58a1fa2a7dd0bf2bf9bf09
+    cspell: bin.mjs
+    cspell-esm: bin.mjs
+  checksum: 10/2bf80e744c131b191acb184e679dc66991bb4f96587e3290907f5cda224f4c8beb3b406379fe7cc127319385e126fb09cdd060f76bfa2cabfb5dd5a78d43b5aa
   languageName: node
   linkType: hard
 
@@ -23835,20 +24054,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"del-cli@npm:4.0.1":
-  version: 4.0.1
-  resolution: "del-cli@npm:4.0.1"
+"del-cli@npm:5.1.0":
+  version: 5.1.0
+  resolution: "del-cli@npm:5.1.0"
   dependencies:
-    del: "npm:^6.0.0"
-    meow: "npm:^10.1.0"
+    del: "npm:^7.1.0"
+    meow: "npm:^10.1.3"
   bin:
     del: cli.js
     del-cli: cli.js
-  checksum: 10/bcc505ebaacf16c19fba37dd8b9f3cda0dbab0dc4cb8c4a022fb4c232ef6cd96e4fe87e4f0e0a476dd899611f18b3e72e8dde8681886af3571e20454ec5106da
+  checksum: 10/b52b7ce997a5f1591fb420c0931ef24e71cee80788a7750704903f6e82fc846375466bb991655e2ad7234d237a9e8a90545e2ab1d728fba5ad9e67573500b084
   languageName: node
   linkType: hard
 
-"del@npm:7.1.0":
+"del@npm:7.1.0, del@npm:^7.1.0":
   version: 7.1.0
   resolution: "del@npm:7.1.0"
   dependencies:
@@ -23861,22 +24080,6 @@ __metadata:
     rimraf: "npm:^3.0.2"
     slash: "npm:^4.0.0"
   checksum: 10/93527e78e95125809ff20a112814b00648ed64af204be1a565862698060c9ec8f5c5fe1a4866725acfde9b0da6423f4b7a7642c1d38cd4b05cbeb643a7b089e3
-  languageName: node
-  linkType: hard
-
-"del@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "del@npm:6.0.0"
-  dependencies:
-    globby: "npm:^11.0.1"
-    graceful-fs: "npm:^4.2.4"
-    is-glob: "npm:^4.0.1"
-    is-path-cwd: "npm:^2.2.0"
-    is-path-inside: "npm:^3.0.2"
-    p-map: "npm:^4.0.0"
-    rimraf: "npm:^3.0.2"
-    slash: "npm:^3.0.0"
-  checksum: 10/5742891627e91aaf62385714025233f4664da28bc55b6ab825649dcdea4691fed3cf329a2b1913fd2d2612e693e99e08a03c84cac7f36ef54bacac9390520192
   languageName: node
   linkType: hard
 
@@ -24908,6 +25111,13 @@ __metadata:
   version: 2.2.1
   resolution: "env-paths@npm:2.2.1"
   checksum: 10/65b5df55a8bab92229ab2b40dad3b387fad24613263d103a97f91c9fe43ceb21965cd3392b1ccb5d77088021e525c4e0481adb309625d0cb94ade1d1fb8dc17e
+  languageName: node
+  linkType: hard
+
+"env-paths@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "env-paths@npm:3.0.0"
+  checksum: 10/b2b0a0d0d9931a13d279c22ed94d78648a1cc5f408f05d47ff3e0c1616f0aa0c38fb33deec5e5be50497225d500607d57f9c8652c4d39c2f2b7608cd45768128
   languageName: node
   linkType: hard
 
@@ -27660,10 +27870,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-equals@npm:^3.0.2":
-  version: 3.0.3
-  resolution: "fast-equals@npm:3.0.3"
-  checksum: 10/a2ec1125da3bb42f751a74dc2a29111d06a2039a2fc8a39e48d5408de966354d33475deee85c41224a2782837699910e8b401def74296442e796486d3a4df6c0
+"fast-equals@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "fast-equals@npm:5.0.1"
+  checksum: 10/9dc1ef767903600e5694a89a787782fc3a4f56cc04d235afc13616c848c33563b8f415b1c6a248b2a236424f624aa1a7513f46b7fa69590a640e7784f1296bce
   languageName: node
   linkType: hard
 
@@ -27959,6 +28169,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-entry-cache@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "file-entry-cache@npm:8.0.0"
+  dependencies:
+    flat-cache: "npm:^4.0.0"
+  checksum: 10/afe55c4de4e0d226a23c1eae62a7219aafb390859122608a89fa4df6addf55c7fd3f1a2da6f5b41e7cdff496e4cf28bbd215d53eab5c817afa96d2b40c81bfb0
+  languageName: node
+  linkType: hard
+
 "file-loader@npm:^6.2.0":
   version: 6.2.0
   resolution: "file-loader@npm:6.2.0"
@@ -28056,6 +28275,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fill-range@npm:^7.1.1":
+  version: 7.1.1
+  resolution: "fill-range@npm:7.1.1"
+  dependencies:
+    to-regex-range: "npm:^5.0.1"
+  checksum: 10/a7095cb39e5bc32fada2aa7c7249d3f6b01bd1ce461a61b0adabacccabd9198500c6fb1f68a7c851a657e273fce2233ba869638897f3d7ed2e87a2d89b4436ea
+  languageName: node
+  linkType: hard
+
 "filter-obj@npm:^1.1.0":
   version: 1.1.0
   resolution: "filter-obj@npm:1.1.0"
@@ -28143,6 +28371,13 @@ __metadata:
   version: 1.1.0
   resolution: "find-root@npm:1.1.0"
   checksum: 10/caa799c976a14925ba7f31ca1a226fe73d3aa270f4f1b623fcfeb1c6e263111db4beb807d8acd31bd4d48d44c343b93688a9288dfbccca27463c36a0301b0bb9
+  languageName: node
+  linkType: hard
+
+"find-up-simple@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "find-up-simple@npm:1.0.0"
+  checksum: 10/91c3d51c1111b5eb4e6e6d71d21438f6571a37a69dc288d4222b98996756e2f472fa5393a4dddb5e1a84929405d87e86f4bdce798ba84ee513b79854960ec140
   languageName: node
   linkType: hard
 
@@ -28245,6 +28480,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flat-cache@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "flat-cache@npm:4.0.1"
+  dependencies:
+    flatted: "npm:^3.2.9"
+    keyv: "npm:^4.5.4"
+  checksum: 10/58ce851d9045fffc7871ce2bd718bc485ad7e777bf748c054904b87c351ff1080c2c11da00788d78738bfb51b71e4d5ea12d13b98eb36e3358851ffe495b62dc
+  languageName: node
+  linkType: hard
+
 "flat@npm:^5.0.2":
   version: 5.0.2
   resolution: "flat@npm:5.0.2"
@@ -28265,6 +28510,13 @@ __metadata:
   version: 3.2.7
   resolution: "flatted@npm:3.2.7"
   checksum: 10/427633049d55bdb80201c68f7eb1cbd533e03eac541f97d3aecab8c5526f12a20ccecaeede08b57503e772c769e7f8680b37e8d482d1e5f8d7e2194687f9ea35
+  languageName: node
+  linkType: hard
+
+"flatted@npm:^3.2.9":
+  version: 3.3.1
+  resolution: "flatted@npm:3.3.1"
+  checksum: 10/7b8376061d5be6e0d3658bbab8bde587647f68797cf6bfeae9dea0e5137d9f27547ab92aaff3512dd9d1299086a6d61be98e9d48a56d17531b634f77faadbc49
   languageName: node
   linkType: hard
 
@@ -28552,7 +28804,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:10.1.0, fs-extra@npm:^10.1.0":
+"fs-extra@npm:10.1.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
   dependencies:
@@ -28560,17 +28812,6 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: 10/05ce2c3b59049bcb7b52001acd000e44b3c4af4ec1f8839f383ef41ec0048e3cfa7fd8a637b1bddfefad319145db89be91f4b7c1db2908205d38bf91e7d1d3b7
-  languageName: node
-  linkType: hard
-
-"fs-extra@npm:11.1.1, fs-extra@npm:^11.0.0":
-  version: 11.1.1
-  resolution: "fs-extra@npm:11.1.1"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: 10/c4e9fabf9762a70d1403316b7faa899f3d3303c8afa765b891c2210fdeba368461e04ae1203920b64ef6a7d066a39ab8cef2160b5ce8d1011bb4368688cd9bb7
   languageName: node
   linkType: hard
 
@@ -28606,6 +28847,17 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: 10/81c8f5668f8c00a94c22910c7deadbb5a68621a36efa64cc483bcb6e96c74a1e86bb1ed338855c54ec8ed778c54762e187912d668a59bffc06d1f0c1ef3b26c4
+  languageName: node
+  linkType: hard
+
+"fs-extra@npm:^11.0.0":
+  version: 11.1.1
+  resolution: "fs-extra@npm:11.1.1"
+  dependencies:
+    graceful-fs: "npm:^4.2.0"
+    jsonfile: "npm:^6.0.1"
+    universalify: "npm:^2.0.0"
+  checksum: 10/c4e9fabf9762a70d1403316b7faa899f3d3303c8afa765b891c2210fdeba368461e04ae1203920b64ef6a7d066a39ab8cef2160b5ce8d1011bb4368688cd9bb7
   languageName: node
   linkType: hard
 
@@ -28934,10 +29186,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gensequence@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "gensequence@npm:3.1.1"
-  checksum: 10/0048eb181173d4f61d4a2e4850c3f4056c2c98f16213750ec2b3805e8cca7e5a32a83469a534dd2cbb55afdedf62981dd92d5df9cbea5f5efaa29d9018395e67
+"gensequence@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "gensequence@npm:7.0.0"
+  checksum: 10/22e404384349b17952e4102a3dd3a9476772a6fc8f05e36885b489406f710c1fe2ec3c0687a1da554ccd845ce1ab7e418a867d3a1b4cf86cda2f5a7ce4f33bc4
   languageName: node
   linkType: hard
 
@@ -29081,10 +29333,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-stdin@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "get-stdin@npm:8.0.0"
-  checksum: 10/40128b6cd25781ddbd233344f1a1e4006d4284906191ed0a7d55ec2c1a3e44d650f280b2c9eeab79c03ac3037da80257476c0e4e5af38ddfb902d6ff06282d77
+"get-stdin@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "get-stdin@npm:9.0.0"
+  checksum: 10/5972bc34d05932b45512c8e2d67b040f1c1ca8afb95c56cbc480985f2d761b7e37fe90dc8abd22527f062cc5639a6930ff346e9952ae4c11a2d4275869459594
   languageName: node
   linkType: hard
 
@@ -29433,19 +29685,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^8.0.3":
-  version: 8.1.0
-  resolution: "glob@npm:8.1.0"
-  dependencies:
-    fs.realpath: "npm:^1.0.0"
-    inflight: "npm:^1.0.4"
-    inherits: "npm:2"
-    minimatch: "npm:^5.0.1"
-    once: "npm:^1.3.0"
-  checksum: 10/9aab1c75eb087c35dbc41d1f742e51d0507aa2b14c910d96fb8287107a10a22f4bbdce26fc0a3da4c69a20f7b26d62f1640b346a4f6e6becfff47f335bb1dc5e
-  languageName: node
-  linkType: hard
-
 "glob@npm:^9.3.0, glob@npm:^9.3.1":
   version: 9.3.4
   resolution: "glob@npm:9.3.4"
@@ -29455,6 +29694,15 @@ __metadata:
     minipass: "npm:^4.2.4"
     path-scurry: "npm:^1.6.1"
   checksum: 10/6943df605ece77a1669145306500fb1421c51bf66b23a40e79dab676532d0954fa49256142ed7d47fd043dd97bb1841e1be475752b483d64448ccd913f25f928
+  languageName: node
+  linkType: hard
+
+"global-directory@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "global-directory@npm:4.0.1"
+  dependencies:
+    ini: "npm:4.1.1"
+  checksum: 10/5b4df24438a4e5f21e43fbdd9e54f5e12bb48dce01a0a83b415d8052ce91be2d3a97e0c8f98a535e69649b2190036155e9f0f7d3c62f9318f31bdc3fd4f235f5
   languageName: node
   linkType: hard
 
@@ -29592,7 +29840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globby@npm:^11.0.1, globby@npm:^11.0.4, globby@npm:^11.1.0":
+"globby@npm:^11.0.4, globby@npm:^11.1.0":
   version: 11.1.0
   resolution: "globby@npm:11.1.0"
   dependencies:
@@ -31070,6 +31318,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"import-meta-resolve@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "import-meta-resolve@npm:4.1.0"
+  checksum: 10/40162f67eb406c8d5d49266206ef12ff07b54f5fad8cfd806db9efe3a055958e9969be51d6efaf82e34b8bea6758113dcc17bb79ff148292a4badcabc3472f22
+  languageName: node
+  linkType: hard
+
 "imurmurhash@npm:^0.1.4":
   version: 0.1.4
   resolution: "imurmurhash@npm:0.1.4"
@@ -32189,13 +32444,6 @@ __metadata:
   version: 0.1.2
   resolution: "is-object@npm:0.1.2"
   checksum: 10/c4425bcd69a86c6de77f4b047eee80922d37f7406fedbcf0d8b2384406d07266e77266badc6b2dc00ed0b3fea4ca26b300af1bec49ca2004a01a4f8846a1c239
-  languageName: node
-  linkType: hard
-
-"is-path-cwd@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "is-path-cwd@npm:2.2.0"
-  checksum: 10/46a840921bb8cc0dc7b5b423a14220e7db338072a4495743a8230533ce78812dc152548c86f4b828411fe98c5451959f07cf841c6a19f611e46600bd699e8048
   languageName: node
   linkType: hard
 
@@ -34819,7 +35067,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^4.0.0":
+"keyv@npm:^4.0.0, keyv@npm:^4.5.4":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
   dependencies:
@@ -36894,7 +37142,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"meow@npm:^10.0.0, meow@npm:^10.1.0, meow@npm:^10.1.2":
+"meow@npm:^10.0.0, meow@npm:^10.1.2":
   version: 10.1.2
   resolution: "meow@npm:10.1.2"
   dependencies:
@@ -36911,6 +37159,26 @@ __metadata:
     type-fest: "npm:^1.2.2"
     yargs-parser: "npm:^20.2.9"
   checksum: 10/b7cf32ac7d858e9d5e55ba70768f0d13c71be6d6167c1000ce795e4963be5fdddd6bbc6958bb1b392149140dd6c07409cd8a394d297cdbfcc45d428f2c102292
+  languageName: node
+  linkType: hard
+
+"meow@npm:^10.1.3":
+  version: 10.1.5
+  resolution: "meow@npm:10.1.5"
+  dependencies:
+    "@types/minimist": "npm:^1.2.2"
+    camelcase-keys: "npm:^7.0.0"
+    decamelize: "npm:^5.0.0"
+    decamelize-keys: "npm:^1.1.0"
+    hard-rejection: "npm:^2.1.0"
+    minimist-options: "npm:4.1.0"
+    normalize-package-data: "npm:^3.0.2"
+    read-pkg-up: "npm:^8.0.0"
+    redent: "npm:^4.0.0"
+    trim-newlines: "npm:^4.0.2"
+    type-fest: "npm:^1.2.2"
+    yargs-parser: "npm:^20.2.9"
+  checksum: 10/4d6d4c233b9405bace4fd6c60db0b5806d7186a047852ddce0748e56a57c75d4fef3ab2603a480bd74595e4e8e3a47b932d737397a62e043da1d3187f1240ff4
   languageName: node
   linkType: hard
 
@@ -37095,6 +37363,16 @@ __metadata:
     braces: "npm:^3.0.2"
     picomatch: "npm:^2.3.1"
   checksum: 10/a749888789fc15cac0e03273844dbd749f9f8e8d64e70c564bcf06a033129554c789bb9e30d7566d7ff6596611a08e58ac12cf2a05f6e3c9c47c50c4c7e12fa2
+  languageName: node
+  linkType: hard
+
+"micromatch@npm:^4.0.7":
+  version: 4.0.7
+  resolution: "micromatch@npm:4.0.7"
+  dependencies:
+    braces: "npm:^3.0.3"
+    picomatch: "npm:^2.3.1"
+  checksum: 10/a11ed1cb67dcbbe9a5fc02c4062cf8bb0157d73bf86956003af8dcfdf9b287f9e15ec0f6d6925ff6b8b5b496202335e497b01de4d95ef6cf06411bc5e5c474a0
   languageName: node
   linkType: hard
 
@@ -42487,21 +42765,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prom-client@npm:13.1.0":
-  version: 13.1.0
-  resolution: "prom-client@npm:13.1.0"
+"prom-client@npm:15.1.3":
+  version: 15.1.3
+  resolution: "prom-client@npm:15.1.3"
   dependencies:
+    "@opentelemetry/api": "npm:^1.4.0"
     tdigest: "npm:^0.1.1"
-  checksum: 10/07f990a703fed7be724fcf04e5e4e1722e45ecea0d53b8c75fd6f48163412a1ce001150b6bf1b064eed95c3ad5e844f1e2ad99428bb2d7e79b837dd9325e5b88
-  languageName: node
-  linkType: hard
-
-"prom-client@npm:13.2.0":
-  version: 13.2.0
-  resolution: "prom-client@npm:13.2.0"
-  dependencies:
-    tdigest: "npm:^0.1.1"
-  checksum: 10/46df22a933f35dc60480ef7139c2ea0f315a7f4b3018e9ac045572999a1c2ee92978ef0bfb124c111159718d98d8093de59b81bb3f6fd499f3d0ce576a987703
+  checksum: 10/eba75e15ab896845d39359e3a4d6f7913ea05339b3122d8dde8c8c374669ad1a1d1ab2694ab2101c420bd98086a564e4f2a18aa29018fc14a4732e57c1c19aec
   languageName: node
   linkType: hard
 
@@ -50230,6 +50500,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:10.0.0, uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "uuid@npm:10.0.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
+  languageName: node
+  linkType: hard
+
 "uuid@npm:2.0.1":
   version: 2.0.1
   resolution: "uuid@npm:2.0.1"
@@ -50255,30 +50534,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:9.0.1, uuid@npm:^9.0.0, uuid@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "uuid@npm:9.0.1"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10/9d0b6adb72b736e36f2b1b53da0d559125ba3e39d913b6072f6f033e0c87835b414f0836b45bcfaf2bdf698f92297fea1c3cc19b0b258bc182c9c43cc0fab9f2
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "uuid@npm:10.0.0"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
-  languageName: node
-  linkType: hard
-
 "uuid@npm:^3.3.2, uuid@npm:^3.3.3":
   version: 3.4.0
   resolution: "uuid@npm:3.4.0"
   bin:
     uuid: ./bin/uuid
   checksum: 10/4f2b86432b04cc7c73a0dd1bcf11f1fc18349d65d2e4e32dd0fc658909329a1e0cc9244aa93f34c0cccfdd5ae1af60a149251a5f420ec3ac4223a3dab198fb2e
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^9.0.0, uuid@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10/9d0b6adb72b736e36f2b1b53da0d559125ba3e39d913b6072f6f033e0c87835b414f0836b45bcfaf2bdf698f92297fea1c3cc19b0b258bc182c9c43cc0fab9f2
   languageName: node
   linkType: hard
 
@@ -50502,17 +50772,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vscode-languageserver-textdocument@npm:^1.0.4":
-  version: 1.0.10
-  resolution: "vscode-languageserver-textdocument@npm:1.0.10"
-  checksum: 10/4edf7d190fccf1f0b8c2e3fe0e7a783844df22cf5ed66ff1a30854131a012b748b59c3e478a65e9471fbd8b7da18c668e5f0251aed6c9543399cbc5e71afd84b
+"vscode-languageserver-textdocument@npm:^1.0.11":
+  version: 1.0.11
+  resolution: "vscode-languageserver-textdocument@npm:1.0.11"
+  checksum: 10/6096d2a85570e819e01ff406de7c88c48211e6874c6fc71df92193aa8b5aadf40591e44f033d634a95d04975d7aad29049d3eccab617ca41c189ae325aadb913
   languageName: node
   linkType: hard
 
-"vscode-uri@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "vscode-uri@npm:3.0.3"
-  checksum: 10/3e1fb422d613a751e1656e3586d11103b8e4e25df4380d33857aebaae448751a6d2d9aa68af1bb5d57cad97750181e007fbfd914f161831aa188a6bbcc4968e4
+"vscode-uri@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "vscode-uri@npm:3.0.8"
+  checksum: 10/e882d6b679e0d053cbc042893c0951a135d899a192b62cd07f0a8924f11ae722067a8d6b1b5b147034becf57faf9fff9fb543b17b749fd0f17db1f54f783f07c
   languageName: node
   linkType: hard
 
@@ -54068,6 +54338,13 @@ __metadata:
   version: 4.0.0
   resolution: "xdg-basedir@npm:4.0.0"
   checksum: 10/0073d5b59a37224ed3a5ac0dd2ec1d36f09c49f0afd769008a6e9cd3cd666bd6317bd1c7ce2eab47e1de285a286bad11a9b038196413cd753b79770361855f3c
+  languageName: node
+  linkType: hard
+
+"xdg-basedir@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "xdg-basedir@npm:5.1.0"
+  checksum: 10/b60e8a2c663ccb1dac77c2d913f3b96de48dafbfa083657171d3d50e10820b8a04bb4edfe9f00808c8c20e5f5355e1927bea9029f03136e29265cb98291e1fea
   languageName: node
   linkType: hard
 
