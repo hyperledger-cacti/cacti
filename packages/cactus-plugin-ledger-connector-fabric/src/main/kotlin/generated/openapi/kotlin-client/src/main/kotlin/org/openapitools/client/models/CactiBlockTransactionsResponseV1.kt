@@ -15,7 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.WatchBlocksCactusTransactionsEventV1
+import org.openapitools.client.models.CactiBlockTransactionEventV1
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -23,15 +23,15 @@ import com.squareup.moshi.JsonClass
 /**
  * Custom response containing block transactions summary. Compatible with legacy fabric-socketio connector monitoring.
  *
- * @param cactusTransactionsEvents List of transactions summary
+ * @param cactiTransactionsEvents List of transactions summary
  */
 
 
-data class WatchBlocksCactusTransactionsResponseV1 (
+data class CactiBlockTransactionsResponseV1 (
 
     /* List of transactions summary */
-    @Json(name = "cactusTransactionsEvents")
-    val cactusTransactionsEvents: kotlin.collections.List<WatchBlocksCactusTransactionsEventV1>
+    @Json(name = "cactiTransactionsEvents")
+    val cactiTransactionsEvents: kotlin.collections.List<CactiBlockTransactionEventV1>
 
 )
 

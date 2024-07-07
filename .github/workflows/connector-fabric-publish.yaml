@@ -1,12 +1,8 @@
 name: connector-besu-publish
 
 on:
-  push:
-    # Publish `main` as Docker `latest` image.
-    branches:
-      - main
-
     # Publish `v1.2.3` tags as releases.
+  push:
     tags:
       - v*
 

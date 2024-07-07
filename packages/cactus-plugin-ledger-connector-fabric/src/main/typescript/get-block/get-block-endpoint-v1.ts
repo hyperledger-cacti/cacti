@@ -6,7 +6,6 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
-  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -15,7 +14,10 @@ import {
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import OAS from "../../json/openapi.json";
@@ -88,11 +90,8 @@ export class GetBlockEndpointV1 implements IWebServiceEndpoint {
     try {
       res.status(200).send(await this.opts.connector.getBlock(req.body));
     } catch (error) {
-      this.log.error(`Crash while serving ${fnTag}`, error);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: safeStringifyException(error),
-      });
+      const errorMsg = `Crash while serving ${fnTag}`;
+      handleRestEndpointException({ errorMsg, log: this.log, error, res });
     }
   }
 }

@@ -60,8 +60,8 @@ const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 
 // Log settings
-const testLogLevel: LogLevelDesc = "TRACE"; // default: info
-const sutLogLevel: LogLevelDesc = "TRACE"; // default: info
+const testLogLevel: LogLevelDesc = "info"; // default: info
+const sutLogLevel: LogLevelDesc = "info"; // default: info
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -384,22 +384,22 @@ describe("watchBlocksV1 of fabric connector tests", () => {
   });
 
   /**
-   * Check Cactus custom transactions summary block monitoring.
+   * Check Cacti custom transactions summary block monitoring.
    */
-  test("Monitoring with type CactusTransactions returns transactions summary", async () => {
+  test("Monitoring with type CactiTransactions returns transactions summary", async () => {
     const monitorPromise = testWatchBlock(
-      "CactusTransactionsTest",
-      WatchBlocksListenerTypeV1.CactusTransactions,
+      "CactiTransactionsTest",
+      WatchBlocksListenerTypeV1.CactiTransactions,
       (event) => {
         expect(event).toBeTruthy();
 
-        if (!("cactusTransactionsEvents" in event)) {
+        if (!("cactiTransactionsEvents" in event)) {
           throw new Error(
             `Unexpected response from the connector: ${JSON.stringify(event)}`,
           );
         }
 
-        const eventData = event.cactusTransactionsEvents;
+        const eventData = event.cactiTransactionsEvents;
         expect(eventData.length).toBeGreaterThan(0);
         expect(eventData[0].chaincodeId).toBeTruthy();
         expect(eventData[0].transactionId).toBeTruthy();
@@ -411,9 +411,66 @@ describe("watchBlocksV1 of fabric connector tests", () => {
     await monitorPromise;
   });
 
+  /**
+   * Check Cacti custom full block summary block monitoring.
+   */
+  test("Monitoring with type CactiFullBlock returns block summary", async () => {
+    const monitorPromise = testWatchBlock(
+      "CactiFullBlockTest",
+      WatchBlocksListenerTypeV1.CactiFullBlock,
+      (event) => {
+        expect(event).toBeTruthy();
+
+        if (!("cactiFullEvents" in event)) {
+          throw new Error(
+            `Unexpected response from the connector: ${JSON.stringify(event)}`,
+          );
+        }
+
+        const cactiFullBlock = event.cactiFullEvents;
+
+        // Check block fields
+        expect(cactiFullBlock).toBeTruthy();
+        expect(cactiFullBlock.blockNumber).toBeDefined();
+        expect(cactiFullBlock.blockHash).toBeTruthy();
+        expect(cactiFullBlock.previousBlockHash).toBeTruthy();
+        expect(cactiFullBlock.transactionCount).toBeDefined();
+
+        // Check transaction fields
+        for (const tx of cactiFullBlock.cactiTransactionsEvents) {
+          expect(tx.hash).toBeTruthy();
+          expect(tx.channelId).toBeTruthy();
+          expect(tx.timestamp).toBeTruthy();
+          expect(tx.transactionType).toBeTruthy();
+          expect(tx.protocolVersion).not.toBeUndefined();
+          expect(tx.epoch).not.toBeUndefined();
+
+          // Check transaction actions fields
+          for (const action of tx.actions) {
+            expect(action.functionName).toBeTruthy();
+            expect(action.functionArgs).toBeTruthy();
+            expect(action.functionArgs.length).toEqual(5);
+            expect(action.chaincodeId).toBeTruthy();
+            expect(action.creator.mspid).toBeTruthy();
+            expect(action.creator.cert).toBeTruthy();
+
+            // Check transaction action endorsement fields
+            for (const endorsement of action.endorsements) {
+              expect(endorsement.signature).toBeTruthy();
+              expect(endorsement.signer.mspid).toBeTruthy();
+              expect(endorsement.signer.cert).toBeTruthy();
+            }
+          }
+        }
+      },
+    );
+
+    await monitorPromise;
+  });
+
   test("Invalid WatchBlocksListenerTypeV1 value gets knocked down", async () => {
     const monitorPromise = testWatchBlock(
-      "CactusTransactionsTest",
+      "CactiInvalidTest",
       "Some_INVALID_WatchBlocksListenerTypeV1" as WatchBlocksListenerTypeV1,
       () => undefined, // will never reach this because it is meant to error out
       false,

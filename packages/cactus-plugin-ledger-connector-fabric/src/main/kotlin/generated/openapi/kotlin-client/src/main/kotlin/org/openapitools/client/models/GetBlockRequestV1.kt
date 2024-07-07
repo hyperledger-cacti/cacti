@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 import org.openapitools.client.models.GatewayOptions
 import org.openapitools.client.models.GetBlockRequestV1Query
+import org.openapitools.client.models.GetBlockResponseTypeV1
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -28,7 +29,7 @@ import com.squareup.moshi.JsonClass
  * @param gatewayOptions 
  * @param query 
  * @param connectionChannelName Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used
- * @param skipDecode If true, encoded buffer will be returned. Otherwise, entire block object is returned.
+ * @param responseType 
  */
 
 
@@ -48,9 +49,8 @@ data class GetBlockRequestV1 (
     @Json(name = "connectionChannelName")
     val connectionChannelName: kotlin.String? = null,
 
-    /* If true, encoded buffer will be returned. Otherwise, entire block object is returned. */
-    @Json(name = "skipDecode")
-    val skipDecode: kotlin.Boolean? = false
+    @Json(name = "responseType")
+    val responseType: GetBlockResponseTypeV1? = GetBlockResponseTypeV1.Full
 
 )
 

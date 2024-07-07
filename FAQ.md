@@ -13,6 +13,7 @@
 - [11. HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?](#11-http-requests-sent-with-postmancurletc-hang-if-im-debugging-a-test-case-with-vscode-why)
 - [12. How do I run test cases with my own ledger images?](#12-how-do-i-run-test-cases-with-my-own-ledger-images)
 - [13. How do I re-run a single job in the CI through the GitHub UI?](#13-how-do-i-re-run-a-single-job-in-the-ci-through-the-github-ui)
+- [14. How to fix the script configure, stuck at `RequestError: connect ETIMEOUT 2606:4700:6810:223:443` (or similar ports)?](#14-how-to-fix-the-script-configure-stuck-at-requesterror-connect-etimeout-260647006810223443-or-similar-ports)
 
 ## 1. What are the minimum and recommended hardware specs? Do you have a cool story about this?
 
@@ -207,3 +208,35 @@ become visible if you hover over the button with your cursor.
 You can also use the refresh icon button on the top right of the screen to achieve
 the same result:
 ![pull-request-ci-workflow-details-page-2.png](./docs/assets/ci-single-job-re-run-tutorial/pull-request-ci-workflow-details-page-2.png)
+
+
+## 14. How to fix the script configure, stuck at `RequestError: connect ETIMEOUT 2606:4700:6810:223:443` (or similar ports)?
+
+If you are having errors while running the configure script, similar to this:
+
+```
+YN0001: | RequestError: connect ETIMEOUT 2606:4700:6810:223:443
+at ClientRequest.<anonymous> (/home/ubuntu/cacti/.yarn/releases/yarn-4.1.0.cjs:195:14340)
+at Object.onceWrapper (node:events:632:26)
+at ClientRequest.emit (node:events:529:35)
+at o.emit (/home/ubuntu/cacti/.yarn/releases/yarn-4.1.0.cjs:190:90286)
+at TLSSocket.socketErrorListener (node:events:501:9)
+at TLSSocket.emit (node:events:517:28)
+at emitErrorNT (node:internal/streams/destroy:151:8)
+at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+.
+.
+```
+
+  *Warning*: The below mentioned changes affect how ipv6 is handled in the entire system and can affect other applications.
+
+Sometimes the IPv6 defaults can lead to npm registry being undiscoverable. To fix this issue (tested on Ubuntu 22.04.4), one can safely disable IPv6 defaults. One such way (via a different configuration file) to achieve this is:
+1. Create a file `/etc/sysctl.d/60-ipv6-disable.conf`
+2. Add the following contents to the file 
+   
+  ```
+    net.ipv6.conf.all.disable_ipv6 = 1
+    net.ipv6.conf.default.disable_ipv6 = 1
+    net.ipv6.conf.lo.disable_ipv6 = 1
+  ```
+1. Start the service: `service procps start`

@@ -20,9 +20,9 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Response type from WatchBlocks. 'Cactus*' are custom views, others correspond to fabric SDK call.
+ * Response type from WatchBlocks. 'Cacti*' are custom views, others correspond to fabric SDK call.
  *
- * Values: Filtered,Full,Private,CactusTransactions
+ * Values: Filtered,Full,Private,CactiTransactions,CactiFullBlock
  */
 
 @JsonClass(generateAdapter = false)
@@ -37,8 +37,11 @@ enum class WatchBlocksListenerTypeV1(val value: kotlin.String) {
     @Json(name = "private")
     Private("private"),
 
-    @Json(name = "cactus:transactions")
-    CactusTransactions("cactus:transactions");
+    @Json(name = "cacti:transactions")
+    CactiTransactions("cacti:transactions"),
+
+    @Json(name = "cacti:full-block")
+    CactiFullBlock("cacti:full-block");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use

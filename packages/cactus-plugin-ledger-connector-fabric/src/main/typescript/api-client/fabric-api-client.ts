@@ -15,8 +15,8 @@ import {
   WatchBlocksOptionsV1,
   WatchBlocksResponseV1,
   WatchBlocksDelegatedSignOptionsV1,
-  WatchBlocksCactusTransactionsResponseV1,
-  WatchBlocksCactusTransactionsEventV1,
+  CactiBlockTransactionsResponseV1,
+  CactiBlockTransactionEventV1,
 } from "../generated/openapi/typescript-axios";
 import { Configuration } from "../generated/openapi/typescript-axios/configuration";
 
@@ -181,56 +181,54 @@ export class FabricApiClient
    * @warning: Remember to use timeout mechanism on production
    *
    * @param txId transactionId to wait for.
-   * @param monitorObservable Block observable in CactusTransactions mode (important - other mode will not work!)
-   * @returns `WatchBlocksCactusTransactionsEventV1` of specified transaction.
+   * @param monitorObservable Block observable in CactiTransactions mode (important - other mode will not work!)
+   * @returns `CactiBlockTransactionEventV1` of specified transaction.
    */
   public async waitForTransactionCommit(
     txId: string,
-    monitorObservable: Observable<WatchBlocksCactusTransactionsResponseV1>,
+    monitorObservable: Observable<CactiBlockTransactionsResponseV1>,
   ) {
     this.log.info("waitForTransactionCommit()", txId);
 
-    return new Promise<WatchBlocksCactusTransactionsEventV1>(
-      (resolve, reject) => {
-        const subscription = monitorObservable.subscribe({
-          next: (event) => {
-            try {
-              this.log.debug(
-                "waitForTransactionCommit() Received event:",
-                JSON.stringify(event),
-              );
-              if (!("cactusTransactionsEvents" in event)) {
-                throw new Error("Invalid event type received!");
-              }
+    return new Promise<CactiBlockTransactionEventV1>((resolve, reject) => {
+      const subscription = monitorObservable.subscribe({
+        next: (event) => {
+          try {
+            this.log.debug(
+              "waitForTransactionCommit() Received event:",
+              JSON.stringify(event),
+            );
+            if (!("cactiTransactionsEvents" in event)) {
+              throw new Error("Invalid event type received!");
+            }
 
-              const foundTransaction = event.cactusTransactionsEvents.find(
-                (tx) => tx.transactionId === txId,
-              );
-              if (foundTransaction) {
-                this.log.info(
-                  "waitForTransactionCommit() Found transaction with txId",
-                  txId,
-                );
-                subscription.unsubscribe();
-                resolve(foundTransaction);
-              }
-            } catch (err) {
-              this.log.error(
-                "waitForTransactionCommit() event check error:",
-                err,
+            const foundTransaction = event.cactiTransactionsEvents.find(
+              (tx) => tx.transactionId === txId,
+            );
+            if (foundTransaction) {
+              this.log.info(
+                "waitForTransactionCommit() Found transaction with txId",
+                txId,
               );
               subscription.unsubscribe();
-              reject(err);
+              resolve(foundTransaction);
             }
-          },
-          error: (err) => {
-            this.log.error("waitForTransactionCommit() error:", err);
+          } catch (err) {
+            this.log.error(
+              "waitForTransactionCommit() event check error:",
+              err,
+            );
             subscription.unsubscribe();
             reject(err);
-          },
-        });
-      },
-    );
+          }
+        },
+        error: (err) => {
+          this.log.error("waitForTransactionCommit() error:", err);
+          subscription.unsubscribe();
+          reject(err);
+        },
+      });
+    });
   }
 
   /**

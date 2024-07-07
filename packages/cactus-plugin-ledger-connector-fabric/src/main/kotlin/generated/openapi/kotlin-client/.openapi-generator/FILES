@@ -21,6 +21,10 @@ src/main/kotlin/org/openapitools/client/infrastructure/ResponseExtensions.kt
 src/main/kotlin/org/openapitools/client/infrastructure/Serializer.kt
 src/main/kotlin/org/openapitools/client/infrastructure/URIAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/UUIDAdapter.kt
+src/main/kotlin/org/openapitools/client/models/CactiBlockFullEventV1.kt
+src/main/kotlin/org/openapitools/client/models/CactiBlockFullResponseV1.kt
+src/main/kotlin/org/openapitools/client/models/CactiBlockTransactionEventV1.kt
+src/main/kotlin/org/openapitools/client/models/CactiBlockTransactionsResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/ChainCodeLanguageRuntime.kt
 src/main/kotlin/org/openapitools/client/models/ChainCodeLifeCycleCommandResponses.kt
 src/main/kotlin/org/openapitools/client/models/ChainCodeProgrammingLanguage.kt
@@ -36,10 +40,15 @@ src/main/kotlin/org/openapitools/client/models/DeployContractV1Response.kt
 src/main/kotlin/org/openapitools/client/models/DeploymentTargetOrgFabric2x.kt
 src/main/kotlin/org/openapitools/client/models/DeploymentTargetOrganization.kt
 src/main/kotlin/org/openapitools/client/models/ErrorExceptionResponseV1.kt
+src/main/kotlin/org/openapitools/client/models/FabricCertificateIdentityV1.kt
 src/main/kotlin/org/openapitools/client/models/FabricContractInvocationType.kt
 src/main/kotlin/org/openapitools/client/models/FabricSigningCredential.kt
 src/main/kotlin/org/openapitools/client/models/FabricSigningCredentialType.kt
+src/main/kotlin/org/openapitools/client/models/FabricX509CertificateV1.kt
 src/main/kotlin/org/openapitools/client/models/FileBase64.kt
+src/main/kotlin/org/openapitools/client/models/FullBlockTransactionActionV1.kt
+src/main/kotlin/org/openapitools/client/models/FullBlockTransactionEndorsementV1.kt
+src/main/kotlin/org/openapitools/client/models/FullBlockTransactionEventV1.kt
 src/main/kotlin/org/openapitools/client/models/GatewayDiscoveryOptions.kt
 src/main/kotlin/org/openapitools/client/models/GatewayEventHandlerOptions.kt
 src/main/kotlin/org/openapitools/client/models/GatewayOptions.kt
@@ -49,7 +58,10 @@ src/main/kotlin/org/openapitools/client/models/GetBlockRequestV1Query.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockRequestV1QueryBlockHash.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockResponseDecodedV1.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockResponseEncodedV1.kt
+src/main/kotlin/org/openapitools/client/models/GetBlockResponseTypeV1.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockResponseV1.kt
+src/main/kotlin/org/openapitools/client/models/GetChainInfoRequestV1.kt
+src/main/kotlin/org/openapitools/client/models/GetChainInfoResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/GetTransactionReceiptResponse.kt
 src/main/kotlin/org/openapitools/client/models/RunDelegatedSignTransactionRequest.kt
 src/main/kotlin/org/openapitools/client/models/RunTransactionRequest.kt
@@ -61,8 +73,6 @@ src/main/kotlin/org/openapitools/client/models/TransactReceiptTransactionCreator
 src/main/kotlin/org/openapitools/client/models/TransactReceiptTransactionEndorsement.kt
 src/main/kotlin/org/openapitools/client/models/VaultTransitKey.kt
 src/main/kotlin/org/openapitools/client/models/WatchBlocksCactusErrorResponseV1.kt
-src/main/kotlin/org/openapitools/client/models/WatchBlocksCactusTransactionsEventV1.kt
-src/main/kotlin/org/openapitools/client/models/WatchBlocksCactusTransactionsResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/WatchBlocksDelegatedSignOptionsV1.kt
 src/main/kotlin/org/openapitools/client/models/WatchBlocksFilteredResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/WatchBlocksFullResponseV1.kt

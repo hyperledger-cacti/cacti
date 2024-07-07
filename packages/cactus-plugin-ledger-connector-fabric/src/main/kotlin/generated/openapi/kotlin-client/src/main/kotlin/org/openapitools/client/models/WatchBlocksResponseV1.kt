@@ -15,9 +15,11 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.CactiBlockFullEventV1
+import org.openapitools.client.models.CactiBlockFullResponseV1
+import org.openapitools.client.models.CactiBlockTransactionEventV1
+import org.openapitools.client.models.CactiBlockTransactionsResponseV1
 import org.openapitools.client.models.WatchBlocksCactusErrorResponseV1
-import org.openapitools.client.models.WatchBlocksCactusTransactionsEventV1
-import org.openapitools.client.models.WatchBlocksCactusTransactionsResponseV1
 import org.openapitools.client.models.WatchBlocksFilteredResponseV1
 import org.openapitools.client.models.WatchBlocksFullResponseV1
 import org.openapitools.client.models.WatchBlocksPrivateResponseV1
@@ -28,7 +30,8 @@ import com.squareup.moshi.JsonClass
 /**
  * Response block from WatchBlocks endpoint. Depends on 'type' passed in subscription options.
  *
- * @param cactusTransactionsEvents List of transactions summary
+ * @param cactiTransactionsEvents List of transactions summary
+ * @param cactiFullEvents 
  * @param fullBlock Full commited block.
  * @param filteredBlock Filtered commited block.
  * @param privateBlock Private commited block.
@@ -40,8 +43,11 @@ import com.squareup.moshi.JsonClass
 data class WatchBlocksResponseV1 (
 
     /* List of transactions summary */
-    @Json(name = "cactusTransactionsEvents")
-    val cactusTransactionsEvents: kotlin.collections.List<WatchBlocksCactusTransactionsEventV1>,
+    @Json(name = "cactiTransactionsEvents")
+    val cactiTransactionsEvents: kotlin.collections.List<CactiBlockTransactionEventV1>,
+
+    @Json(name = "cactiFullEvents")
+    val cactiFullEvents: CactiBlockFullEventV1,
 
     /* Full commited block. */
     @Json(name = "fullBlock")

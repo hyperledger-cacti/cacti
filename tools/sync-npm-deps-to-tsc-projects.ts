@@ -40,6 +40,12 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
   const globbyOptions: GlobbyOptions = {
     cwd: PROJECT_DIR,
     absolute: true,
+    ignore: [
+      "**/packages/cacti-plugin-weaver-driver-fabric/**",
+      "**/weaver/common/protos-js/**",
+      "**/weaver/samples/besu/simpleasset/**",
+      "**/weaver/samples/besu/simplestate/**",
+    ], // Follow-up issue regarding these hardcoded paths (https://github.com/hyperledger/cacti/issues/3366)
   };
   const pkgJsonPaths = await globby(pkgJsonGlobPatterns, globbyOptions);
   console.log(`Package paths (${pkgJsonPaths.length}): `, pkgJsonPaths);
@@ -70,7 +76,7 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
 
     const pkg = await fs.readJson(pkgJsonPath);
 
-    const deps = Object.keys(pkg.dependencies).filter((it) =>
+    const deps = Object.keys(pkg.dependencies || {}).filter((it) =>
       it.startsWith("@hyperledger/cactus-"),
     );
 

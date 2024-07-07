@@ -12,5 +12,5 @@
 // because jsdoc3 generator seems to not able to find them in the api.js module
 // likely due to that module containing multiple classes
 
-module.exports.AssetManager = require("./src/AssetManager.js");
-module.exports.HashFunctions = require("./src/HashFunctions.js");
+module.exports.AssetManager = require("./build/src/AssetManager.js");
+module.exports.HashFunctions = require("./build/src/HashFunctions.js");

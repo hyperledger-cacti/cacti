@@ -4,11 +4,10 @@ env:
   NODEJS_VERSION: v18.18.2
 
 on:
+  # Publish `v1.2.3` tags as releases.
   push:
-    branches: [main, dev]
-
-  pull_request:
-    branches: [main, dev]
+    tags:
+      - v*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

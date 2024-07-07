@@ -1,3 +1,5 @@
+import Long from "long";
+
 /**
  * Check if provided variable is a function. Throws otherwise.
  * To be used with unsafe `require()` imports from fabric SDK packages.
@@ -28,4 +30,26 @@ export function asBuffer(bytes: Uint8Array | null | undefined): Buffer {
   }
 
   return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength); // Create a Buffer view to avoid copying
+}
+
+export type FabricLong = {
+  low: number;
+  hight: number | undefined;
+  unsigned: boolean | undefined;
+};
+
+/**
+ * Convert Long value returned by some low-level fabric API to regular number.
+ *
+ * @param longNumberObject Long object (with low and hight fields)
+ *
+ * @returns number
+ */
+export function fabricLongToNumber(longNumberObject: FabricLong) {
+  const longValue = new Long(
+    longNumberObject.low,
+    longNumberObject.hight,
+    longNumberObject.unsigned,
+  );
+  return longValue.toNumber();
 }

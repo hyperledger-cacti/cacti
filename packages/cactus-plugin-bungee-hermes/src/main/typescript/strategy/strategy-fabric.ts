@@ -4,6 +4,7 @@ import {
   Configuration,
   FabricContractInvocationType,
   RunTransactionRequest,
+  GetBlockResponseTypeV1,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { NetworkDetails, ObtainLedgerStrategy } from "./obtain-ledger-strategy";
 import {
@@ -170,7 +171,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       query: {
         transactionId: txId,
       },
-      skipDecode: false,
+      type: GetBlockResponseTypeV1.Full,
     };
 
     const getBlockResponse = await api.getBlockV1(getBlockReq);

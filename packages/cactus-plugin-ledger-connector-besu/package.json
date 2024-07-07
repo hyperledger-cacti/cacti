@@ -101,7 +101,7 @@
     "npm-run-all2": "6.1.2",
     "protobufjs": "7.2.5",
     "socket.io": "4.6.2",
-    "tsx": "4.7.0",
+    "tsx": "4.16.2",
     "uuid": "9.0.1",
     "web3-core": "1.6.1",
     "web3-eth": "1.6.1"

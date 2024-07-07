@@ -59,8 +59,8 @@ import {
   FabricApiClient,
   signProposal,
   WatchBlocksListenerTypeV1,
-  WatchBlocksCactusTransactionsResponseV1,
   FabricSigningCredential,
+  CactiBlockTransactionsResponseV1,
 } from "../../../../main/typescript/public-api";
 import { Observable } from "rxjs";
 
@@ -296,11 +296,11 @@ describe("Delegated signing tests", () => {
     const committedTx = await apiClient.waitForTransactionCommit(
       txId,
       apiClient.watchBlocksDelegatedSignV1({
-        type: WatchBlocksListenerTypeV1.CactusTransactions,
+        type: WatchBlocksListenerTypeV1.CactiTransactions,
         signerCertificate: adminIdentity.credentials.certificate,
         signerMspID: adminIdentity.mspId,
         channelName: ledgerChannelName,
-      }) as Observable<WatchBlocksCactusTransactionsResponseV1>,
+      }) as Observable<CactiBlockTransactionsResponseV1>,
     );
     mockSignCallback.mockClear();
     return committedTx;
