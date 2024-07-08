@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1720220779352,
+  "lastUpdate": 1720440474397,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -76,6 +76,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.55%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "997035216694fe335215b8a3586488ac8c12447f",
+          "message": "build: bump uuid@10.0.0 fs-extra@11.2.0 @bufbuild/protobuf@1.10.0\n\nBREAKING CHANGE: Renamed classes to fix typos in their name: `PluginFactoryPersistanceFabric`\nThis is being done in this pull request because for some reason (that I still don't understand)\nthe spell checker started failing on these only in the context of this pull request.\nThe typos were present on the main branch already somehow having passed spellchecking earlier\nand every other time since then.\n\nAnd also\n- prom-clien@15.1.3\n- del-cli@5.1.0\n- cspell@8.10.4\n- del-cli@5.1.0\n\nQuality of life improvements and also hoping to get rid of a few of the\nvulnerable dependency versions we have in the codebase according to\ndependabot.\n\nMore similar changes are coming in with further upgrades but I want to\navoid making bigger changes in one go so that it's easier to hunt down\nbugs later if something only gets discovered after we've merged a bunch\nof these.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-07-08T04:51:04-07:00",
+          "tree_id": "09917fd3cdc559e67444db22e83c10256f8936e7",
+          "url": "https://github.com/hyperledger/cacti/commit/997035216694fe335215b8a3586488ac8c12447f"
+        },
+        "date": 1720440472861,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 584,
+            "range": "±1.70%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 352,
+            "range": "±1.04%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
