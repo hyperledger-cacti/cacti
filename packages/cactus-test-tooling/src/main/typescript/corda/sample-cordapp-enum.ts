@@ -83,13 +83,10 @@ export const SAMPLE_CORDAPP_DATA = Object.freeze({
   [SampleCordappEnum.BASIC_FLOW]: {
     rootDir: "/samples-kotlin/Basic/flow-database-access/",
     cordappDirPartyA:
-      "/samples-kotlin/Basic/flow-database-access/build/nodes/ParticipantA/cordapps",
-    cordappDirPartyB:
-      "/samples-kotlin/Basic/flow-database-access/build/nodes/ParticipantB/cordapps",
-    cordappDirPartyC:
-      "/samples-kotlin/Basic/flow-database-access/build/nodes/ParticipantC/cordapps",
-    cordappDirNotary:
-      "/samples-kotlin/Basic/flow-database-access/build/nodes/Notary/cordapps",
+      "/samples-kotlin/Basic/flow-database-access/build/nodes/PartyA/cordapps",
+    cordappDirPartyB: "-",
+    cordappDirPartyC: "-",
+    cordappDirNotary: "-",
     jars: [
       {
         jarRelativePath: "workflows/build/libs/workflows-0.1.jar",
