@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Hyperledger Cactus Plugin - Block Fabrick PErsistance
+ * Hyperledger Cactus Plugin - Block Fabrick Persistence
  * Scrap fabric ledger into database. Needs administrative privileges.
  *
  * The version of the OpenAPI document: 2.0.0-rc.2
