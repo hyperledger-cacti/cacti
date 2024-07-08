@@ -570,7 +570,11 @@ full name of the container image otherwise referred to as `cactus-corda-connecto
 From the project root:
 
 ```sh
-DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -t cccs
+DOCKER_BUILDKIT=1 docker build \
+  ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ \
+  --progress=plain \
+  --tag cccs \
+  --tag "ghcr.io/hyperledger/cactus-connector-corda-server:$(date +%F)-$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)-$(git rev-parse --short HEAD)"
 ```
 
 ## Scan The Locally Built Container Image for Vulnerabilities with Trivy

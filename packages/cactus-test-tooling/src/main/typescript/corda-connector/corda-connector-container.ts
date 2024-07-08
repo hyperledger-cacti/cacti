@@ -17,8 +17,9 @@ import { Containers } from "../common/containers";
  * Provides default options for Corda connector server
  */
 const DEFAULTS = Object.freeze({
-  imageVersion: "2021-03-01-7e07b5b",
-  imageName: "petermetz/cactus-connector-corda-server",
+  imageVersion:
+    "2024-07-09-test-connector-corda-fix-flow-database-access-v4-8-37919dc84",
+  imageName: "ghcr.io/hyperledger/cactus-connector-corda-server",
   apiPort: 8080,
   envVars: [],
 });
@@ -120,7 +121,9 @@ export class CordaConnectorContainer {
             [`${this.apiPort}/tcp`]: {}, // REST API HTTP port
             [`9001/tcp`]: {}, // SupervisorD Web UI
           },
-          PublishAllPorts: true,
+          HostConfig: {
+            PublishAllPorts: true,
+          },
           Env: this.envVars,
         },
         {},

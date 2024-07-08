@@ -145,7 +145,9 @@ export class CordaTestLedger implements ITestLedger {
             [`${this.rpcPortC}/tcp`]: {}, // corda PartyC RPC
             "22/tcp": {}, // ssh server
           },
-          PublishAllPorts: true,
+          HostConfig: {
+            PublishAllPorts: true,
+          },
           // TODO: this can be removed once the new docker image is published and
           // specified as the default one to be used by the tests.
           // Healthcheck: {
