@@ -8,7 +8,7 @@ WORKDIR /kotlin-spring/
 RUN gradle build
 WORKDIR /
 
-FROM openjdk:8u275-jre-slim-buster
+FROM openjdk:24-slim-bookworm
 
 ARG APP=/usr/src/app
 ENV APP=/usr/src/app
