@@ -1,3 +1,6 @@
+import static org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+
 buildscript { //properties that you need to build the project
 
     Properties constants = new Properties()
@@ -14,7 +17,15 @@ buildscript { //properties that you need to build the project
         quasar_version = constants.getProperty("quasarVersion")
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
+        corda_shell_version = constants.getProperty("cordaShellVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
+
+        testJvmArgs = ['--add-opens', 'java.base/java.time=ALL-UNNAMED', '--add-opens', 'java.base/java.io=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.net=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.nio=ALL-UNNAMED', '--add-opens', 'java.base/java.lang.invoke=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.security.cert=ALL-UNNAMED', '--add-opens', 'java.base/java.security=ALL-UNNAMED',
+                       '--add-opens', 'java.base/javax.net.ssl=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+                       '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED', '--add-opens', 'java.sql/java.sql=ALL-UNNAMED',]
     }
 
     repositories {
@@ -32,21 +43,17 @@ buildscript { //properties that you need to build the project
 }
 
 allprojects { //Properties that you need to compile your project (The application)
-    apply plugin: 'kotlin'
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url 'https://download.corda.net/maven/corda' }
-        maven { url 'https://jitpack.io' }
-    }
+    apply from: "${rootProject.projectDir}/../repositories.gradle"
+    apply plugin: 'org.jetbrains.kotlin.jvm'
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-        kotlinOptions {
-            languageVersion = "1.2"
-            apiVersion = "1.2"
-            jvmTarget = "1.8"
+        compilerOptions {
+            languageVersion = KOTLIN_1_9
+            apiVersion = KOTLIN_1_9
+            jvmTarget = JVM_17
             javaParameters = true   // Useful for reflection.
+            freeCompilerArgs = ['-Xjvm-default=all-compatibility']
+            allWarningsAsErrors = true
         }
     }
 
@@ -69,19 +76,24 @@ sourceSets {
     }
 }
 
-//Module dependencis
+//Module dependencies
 dependencies {
     // Corda dependencies.
-    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
-    cordaRuntime "$corda_release_group:corda-node-api:$corda_release_version"
-    cordaRuntime "$corda_release_group:corda:$corda_release_version"
+    cordaBootstrapper "$corda_release_group:corda-node-api:$corda_release_version"
+    corda "$corda_release_group:corda:$corda_release_version"
 
     // CorDapp dependencies.
     cordapp project(":workflows")
 
-    cordaCompile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
-    cordaCompile "org.apache.logging.log4j:log4j-web:${log4j_version}"
-    cordaCompile "org.slf4j:jul-to-slf4j:$slf4j_version"
+    cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaProvided "org.apache.logging.log4j:log4j-slf4j2-impl:${log4j_version}"
+    cordaProvided "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    cordaProvided "org.slf4j:jul-to-slf4j:$slf4j_version"
+    cordaDriver "net.corda:corda-shell:$corda_shell_version"
+}
+
+cordapp {
+    targetPlatformVersion corda_platform_version.toInteger()
 }
 
 task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
@@ -90,48 +102,28 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
             deploy = false
         }
         cordapp project(':workflows')
-        rpcUsers = [[ user: "user1", "password": "password", "permissions": ["ALL"]]]
-        runSchemaMigration = true
+        runSchemaMigration = true //This configuration is for any CorDapps with custom schema, We will leave this as true to avoid
+        //problems for developers who are not familiar with Corda. If you are not using custom schemas, you can change
+        //it to false for quicker project compiling time.
     }
     node {
-        name "O=Notary,L=London,C=GB"
-        notary = [validating: false]
-        p2pPort 10002
+        name "O=PartyA,L=London,C=GB"
+        p2pPort 10005
         rpcSettings {
-            useSsl false
-            standAloneBroker false
-            address "0.0.0.0:10003"
-            adminAddress "0.0.0.0:10103"
+            address("0.0.0.0:10006")
+            adminAddress("0.0.0.0:10046")
         }
-    }
-    node {
-        name "O=ParticipantA,L=London,C=GB"
-        p2pPort 10007
-        rpcSettings {
-            useSsl false
-            standAloneBroker false
-            address "0.0.0.0:10008"
-            adminAddress "0.0.0.0:10108"
-        }
-    }
-    node {
-        name "O=ParticipantB,L=New York,C=US"
-        p2pPort 10010
-        rpcSettings {
-            useSsl false
-            standAloneBroker false
-            address "0.0.0.0:10011"
-            adminAddress "0.0.0.0:10111"
-        }
-    }
-    node {
-        name "O=ParticipantC,L=Paris,C=FR"
-        p2pPort 10013
-        rpcSettings {
-            useSsl false
-            standAloneBroker false
-            address "0.0.0.0:10014"
-            adminAddress "0.0.0.0:10114"
-        }
+        rpcUsers = [[user: "user1", "password": "test", "permissions": [
+                "StartFlow.com.flowdb.AddTokenValueFlow",
+                "StartFlow.com.flowdb.UpdateTokenValueFlow",
+                "StartFlow.com.flowdb.QueryTokenValueFlow",
+                // Without this, the connector cannot connect - fails with the error logs below"
+                // Permission Exception establishing connection: User not authorized to perform RPC call public abstract net.corda.core.node.NodeInfo net.corda.core.messaging.CordaRPCOps.nodeInfo() with target []'
+                "InvokeRpc.nodeInfo",
+
+                // net.corda.client.rpc.PermissionException: User not authorized to perform RPC call public abstract java.util.List net.corda.core.messaging.CordaRPCOps.registeredFlows() with target []
+                "InvokeRpc.registeredFlows",
+                "InvokeRpc.startFlowDynamic"
+        ]]]
     }
 }

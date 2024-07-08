@@ -1,38 +1,25 @@
 FROM docker:24.0.2-dind
 
-ARG SAMPLES_KOTLIN_SHA=30fd841dd035934bae75ab8910da3b6e3d5d6ee7
-ARG SAMPLES_KOTLIN_FLOWDB_SUB_DIR_PATH="./Basic/flow-database-access/"
-ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8
-
 WORKDIR /
 
-RUN apk update
-
-# Install dependencies of Docker Compose
-RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
-
-# Install git so we can check out the kotlin-samples repo of Corda
-RUN apk add --no-cache git
-
-# Fabric Samples needs bash, sh is not good enough here
-RUN apk add --no-cache bash
-
-# Need curl to run healthchecks
-RUN apk add --no-cache curl
-
-# The file binary is used to inspect exectubles when debugging container image issues
-RUN apk add --no-cache file
-
-RUN apk add --no-cache openjdk8
-
-# Need gradle to execute the corda sample app setup commands
-RUN apk add --no-cache gradle
+# Delete openssh packages to avoid conflicting with versions that Alpine ships with
+# py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make: Dependencies of Docker Compose
+# git: so we can check out the kotlin-samples repo of Corda
+# curl: to run healthchecks
+# file: binary is used to inspect exectubles when debugging container image issues
+# augeas: - need it for editing config files
+RUN apk del openssh* && apk update && apk add --no-cache \
+    py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make \
+    git \
+    bash \
+    curl \ 
+    file \ 
+    augeas \
+    openssh \
+    openjdk17
 
 ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
 RUN mkdir -p $CACTUS_CFG_PATH
-
-# OpenSSH - need to have it so we can shell in and install/instantiate contracts and troubleshoot
-RUN apk add --no-cache openssh augeas
 
 # Configure the OpenSSH server we just installed
 RUN augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile ".ssh/authorized_keys /etc/authorized_keys/%u"'
@@ -59,13 +46,18 @@ RUN cp $CACTUS_CFG_PATH/corda-aio-image.pub ~/.ssh/authorized_keys
 # RUN cat /root-password.txt | chpasswd
 RUN echo "root:root" | chpasswd
 
+ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8
 RUN curl https://download.corda.net/maven/corda-releases/net/corda/corda-tools-shell-cli/${CORDA_TOOLS_SHELL_CLI_VERSION}/corda-tools-shell-cli-${CORDA_TOOLS_SHELL_CLI_VERSION}-all.jar --output /corda-tools-shell-cli-all.jar
 # This is what makes the "corda-shell" alias avaialble on the terminal
 RUN java -jar /corda-tools-shell-cli-all.jar install-shell-extensions
 
 RUN git clone https://github.com/corda/samples-kotlin.git
 WORKDIR /samples-kotlin
+
+ARG SAMPLES_KOTLIN_SHA=b7f814b2d6d57c654716ac572a307c3868dacf6d
 RUN git checkout ${SAMPLES_KOTLIN_SHA}
+
+ARG SAMPLES_KOTLIN_FLOWDB_SUB_DIR_PATH="./Basic/flow-database-access/"
 
 COPY build.gradle /samples-kotlin/${SAMPLES_KOTLIN_FLOWDB_SUB_DIR_PATH}/build.gradle
 
@@ -105,15 +97,10 @@ EXPOSE 7005 7006 7007 7008
 
 COPY supervisord.conf /etc/supervisord.conf
 COPY run-party-a-server.sh /
-COPY run-party-b-server.sh /
-COPY run-party-c-server.sh /
 COPY run-party-a-node.sh /
-COPY run-party-b-node.sh /
-COPY run-party-c-node.sh /
-COPY run-notary-node.sh /
 COPY healthcheck.sh /
 
-# By default we only run the absolute minimum which is a single party's node.
+# By default we only run the absolute minimum which is a single node.
 # For more complex tests everything else can also be enabled via the env vars
 # below so that if needed there is 2 parties, a notary and a dedicated web server
 # for all 3 of those nodes.
@@ -121,15 +108,7 @@ COPY healthcheck.sh /
 ENV PARTY_A_NODE_ENABLED="true"
 ENV PARTY_A_WEB_SRV_ENABLED="false"
 
-ENV PARTY_B_NODE_ENABLED="true"
-ENV PARTY_B_WEB_SRV_ENABLED="false"
-
-ENV PARTY_C_NODE_ENABLED="true"
-ENV PARTY_C_WEB_SRV_ENABLED="false"
-
-ENV NOTARY_NODE_ENABLED="true"
-
-# Extend the parent image's entrypoint
+# Extend the entrypoint of the image
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
