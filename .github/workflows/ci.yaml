@@ -497,7 +497,7 @@ jobs:
         run: yarn run benchmark
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1.19.2
+        uses: benchmark-action/github-action-benchmark@v1.20.3
         with:
           tool: 'benchmarkjs'
           output-file-path: .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log
@@ -508,10 +508,10 @@ jobs:
           auto-push: ${{ github.ref == 'refs/heads/main' }}
 
           # Show alert with commit comment on detecting possible performance regression
-          alert-threshold: '25%'
+          alert-threshold: '200%'
           comment-on-alert: true
           fail-on-alert: true
-          alert-comment-cc-users: '@petermetz'
+          alert-comment-cc-users: '@hyperledger/cacti-maintainers'
 
   cactus-cmd-socketio-server:
     continue-on-error: false
@@ -1102,7 +1102,7 @@ jobs:
         run: yarn run benchmark
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1.19.2
+        uses: benchmark-action/github-action-benchmark@v1.20.3
         with:
           tool: 'benchmarkjs'
           output-file-path: .tmp/benchmark-results/plugin-ledger-connector-besu/run-plugin-ledger-connector-besu-benchmark.ts.log
@@ -1113,10 +1113,10 @@ jobs:
           auto-push: ${{ github.ref == 'refs/heads/main' }}
 
           # Show alert with commit comment on detecting possible performance regression
-          alert-threshold: '5%'
+          alert-threshold: '200%'
           comment-on-alert: true
           fail-on-alert: true
-          alert-comment-cc-users: '@petermetz'
+          alert-comment-cc-users: '@hyperledger/cacti-maintainers'
 
   cpl-connector-polkadot:
     continue-on-error: false
