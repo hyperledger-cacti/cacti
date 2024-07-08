@@ -44,6 +44,7 @@ export {
   createJvmCordaX500Name,
 } from "./jvm/serde/factory/create-jvm-corda-x500-name";
 
+export { createJvmInt } from "./jvm/serde/factory/create-jvm-int";
 export { createJvmLong } from "./jvm/serde/factory/create-jvm-long";
 export { createJvmCurrency } from "./jvm/serde/factory/create-jvm-currency";
 
