@@ -13,7 +13,7 @@ import { ApiClient } from "@hyperledger/cactus-api-client";
 import { BambooHarvest } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
-import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
+import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 import { isBambooHarvest } from "../is-bamboo-harvest";
 
 @Component({
@@ -31,7 +31,7 @@ export class BambooHarvestDetailPage implements OnInit {
     private readonly baseClient: ApiClient,
     public readonly modalController: ModalController,
     public readonly formBuilder: UntypedFormBuilder,
-    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
+    @Inject(XDAI_BESU_DEMO_LEDGER_ID) private readonly xdaiBesuLedgerId: string,
   ) {
     this.log = LoggerProvider.getOrCreate({ label: "BambooHarvestDetailPage" });
   }

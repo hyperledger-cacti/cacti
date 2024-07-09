@@ -17,7 +17,7 @@ import {
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
+import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 
 import { AuthConfig } from "../../common/auth-config";
 
@@ -37,7 +37,7 @@ export class BookshelfDetailPage implements OnInit {
 
   constructor(
     private readonly baseClient: ApiClient,
-    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
+    @Inject(XDAI_BESU_DEMO_LEDGER_ID) private readonly xdaiBesuLedgerId: string,
     public readonly modalController: ModalController,
     public readonly formBuilder: UntypedFormBuilder,
   ) {
@@ -56,7 +56,7 @@ export class BookshelfDetailPage implements OnInit {
     this.log.debug("component initialized.", this.bookshelf);
 
     this._supplyChainApi = await this.baseClient.ofLedger(
-      this.quorumLedgerId,
+      this.xdaiBesuLedgerId,
       SupplyChainApi,
       {
         baseOptions: {

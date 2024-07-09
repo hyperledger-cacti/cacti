@@ -70,7 +70,7 @@ test("Supply chain backend API calls can be executed", async (t: Test) => {
   });
 
   // Node A => Besu
-  // Node B => Quorum
+  // Node B => Xdai Besu
   // Node C => Fabric v2.5.6
   const startResult = await app.start();
   const { apiServerA, apiServerB, apiServerC } = startResult;
@@ -102,7 +102,7 @@ test("Supply chain backend API calls can be executed", async (t: Test) => {
   t.true(metricsResF.status < 300, "metricsResF.status < 300 true OK");
 
   const metricsResQ = await xdaiApiClient.getPrometheusMetricsV1();
-  t.ok(metricsResQ, "quorum metrics res truthy OK");
+  t.ok(metricsResQ, "xdai besu metrics res truthy OK");
   t.true(metricsResQ.status > 199, "metricsResQ.status > 199 true OK");
   t.true(metricsResQ.status < 300, "metricsResQ.status < 300 true OK");
 

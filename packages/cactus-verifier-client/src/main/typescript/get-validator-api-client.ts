@@ -14,10 +14,6 @@ import type {
   BesuApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import type {
-  QuorumApiClient,
-  QuorumApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-quorum";
-import type {
   EthereumApiClient,
   EthereumApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
@@ -56,10 +52,6 @@ export type ClientApiConfig = {
   BESU_2X: {
     in: BesuApiClientOptions;
     out: BesuApiClient;
-  };
-  QUORUM_2X: {
-    in: QuorumApiClientOptions;
-    out: QuorumApiClient;
   };
   ETH_1X: {
     in: EthereumApiClientOptions;
@@ -105,11 +97,6 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
     case "BESU_2X":
       const besuPackage = require("@hyperledger/cactus-plugin-ledger-connector-besu");
       return new besuPackage.BesuApiClient(options as BesuApiClientOptions);
-    case "QUORUM_2X":
-      const quorumPackage = require("@hyperledger/cactus-plugin-ledger-connector-quorum");
-      return new quorumPackage.QuorumApiClient(
-        options as QuorumApiClientOptions,
-      );
     case "ETH_1X":
       const ethereumPackage = require("@hyperledger/cactus-plugin-ledger-connector-ethereum");
       return new ethereumPackage.EthereumApiClient(

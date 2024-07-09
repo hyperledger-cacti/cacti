@@ -52,7 +52,6 @@
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-rc.2",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.2",
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.0.0-rc.2",
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-rc.2",
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.0.0-rc.2",
     "jest-extended": "4.0.1",
     "rxjs": "7.8.1"
@@ -64,7 +63,6 @@
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.x",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.x",
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.x",
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.x",
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.x"
   },
   "peerDependenciesMeta": {
@@ -81,9 +79,6 @@
       "optional": true
     },
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": {
-      "optional": true
-    },
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": {
       "optional": true
     },
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": {

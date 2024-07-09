@@ -34,9 +34,6 @@
       "path": "../cactus-plugin-consortium-manual/tsconfig.json"
     },
     {
-      "path": "../cactus-plugin-ledger-connector-quorum/tsconfig.json"
-    },
-    {
       "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]

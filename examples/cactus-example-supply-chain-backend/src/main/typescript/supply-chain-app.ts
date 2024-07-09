@@ -218,8 +218,11 @@ export class SupplyChainApp {
 
     const besuAccount = await this.ledgers.besu.createEthTestAccount();
     await this.keychain.set(besuAccount.address, besuAccount.privateKey);
-    const quorumAccount = await this.ledgers.xdaiBesu.createEthTestAccount();
-    await this.keychain.set(quorumAccount.address, quorumAccount.privateKey);
+    const xdaiBesuAccount = await this.ledgers.xdaiBesu.createEthTestAccount();
+    await this.keychain.set(
+      xdaiBesuAccount.address,
+      xdaiBesuAccount.privateKey,
+    );
 
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
@@ -252,7 +255,7 @@ export class SupplyChainApp {
       basePath: nodeApiHostA,
       baseOptions,
     });
-    const quorumConfig = new Configuration({
+    const xdaiBesuConfig = new Configuration({
       basePath: nodeApiHostB,
       baseOptions,
     });
@@ -262,7 +265,7 @@ export class SupplyChainApp {
     });
 
     const besuApiClient = new BesuApi(besuConfig);
-    const xdaiApiClient = new XdaiApi(quorumConfig);
+    const xdaiApiClient = new XdaiApi(xdaiBesuConfig);
     const fabricApiClient = new FabricApi(fabricConfig);
 
     const keyPairA = await generateKeyPair("ES256K");
@@ -359,7 +362,7 @@ export class SupplyChainApp {
           xdaiApiClient,
           fabricApiClient,
           web3SigningCredential: {
-            keychainEntryKey: quorumAccount.address,
+            keychainEntryKey: xdaiBesuAccount.address,
             keychainId: this.keychain.getKeychainId(),
             type: Web3SigningCredentialType.CactusKeychainRef,
           },
@@ -368,14 +371,14 @@ export class SupplyChainApp {
       ],
     });
 
-    const quorumConnector = new PluginLedgerConnectorXdai({
+    const xdaiConnector = new PluginLedgerConnectorXdai({
       instanceId: "PluginLedgerConnectorXdai_B",
       rpcApiHttpHost: rpcApiHostB,
       logLevel: this.options.logLevel,
       pluginRegistry: registryB,
     });
 
-    registryB.add(quorumConnector);
+    registryB.add(xdaiConnector);
 
     const apiServerB = await this.startNode(httpApiB, httpGuiB, registryB);
 
@@ -529,8 +532,8 @@ export class SupplyChainApp {
     };
 
     const ledger2: Ledger = {
-      id: "QuorumDemoLedger",
-      ledgerType: LedgerType.Quorum2X,
+      id: "XdaiBesuDemoLedger",
+      ledgerType: LedgerType.Besu2X,
     };
 
     cactusNodeB.ledgerIds.push(ledger2.id);

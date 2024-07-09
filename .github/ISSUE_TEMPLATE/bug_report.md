@@ -60,7 +60,7 @@ commit hash if you are directly working with code from the git repository.
 
 **Hyperledger Cactus Plugins/Connectors Used**
 
- - Which DLT connectors are you using (Fabric, Quorum, Corda, Besu, etc.)
+ - Which DLT connectors are you using (Fabric, Corda, Besu, etc.)
 
 **Additional context**
 

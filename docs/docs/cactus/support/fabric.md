@@ -123,6 +123,6 @@ Fabric 2.2.0
 ✅ [test](https://github.com/hyperledger/cactus/blob/v0.4.1/packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-endpoint-v1.test.ts)
 
 
-[Previous](corda.md "Corda Support") [Next](quorum.md "Quorum Support")
+[Previous](corda.md "Corda Support") [Next](xdai.md "xDai Support")
 
 * * *

@@ -14,18 +14,6 @@ export {
 } from "./besu/besu-mp-test-ledger";
 
 export {
-  QuorumTestLedger,
-  IQuorumTestLedgerConstructorOptions,
-  QUORUM_TEST_LEDGER_DEFAULT_OPTIONS,
-  QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
-} from "./quorum/quorum-test-ledger";
-
-export {
-  QuorumMultiPartyTestLedger,
-  IQuorumMultiPartyTestLedgerOptions,
-} from "./quorum/quorum-mp-test-ledger";
-
-export {
   CordaTestLedger,
   ICordaTestLedgerConstructorOptions,
   CORDA_TEST_LEDGER_DEFAULT_OPTIONS,
@@ -34,7 +22,6 @@ export {
 
 export { ICordappJarFile } from "./corda/cordapp-jar-file";
 
-export * from "./quorum/i-quorum-genesis-options";
 export {
   Containers,
   IPruneDockerResourcesRequest,

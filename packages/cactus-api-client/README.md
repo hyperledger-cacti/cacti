@@ -19,7 +19,6 @@ plugin such as the API clients of the
 * [**Besu Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu/src/main/typescript/generated/openapi/typescript-axios)
 * [**Corda Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-corda/src/main/typescript/generated/openapi/typescript-axios)
 * [**Fabric Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios)
-* [**Quorum Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-quorum/src/main/typescript/generated/openapi/typescript-axios)
 * [**API Server** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-cmd-api-server/src/main/typescript/generated/openapi/typescript-axios)
 * [**Vault Keychain Plugin** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-keychain-vault/src/main/typescript/generated/openapi/typescript-axios)
 
@@ -54,7 +53,7 @@ import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
-import { DefaultApi as QuorumApi } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 const mainFn = async () => {
   const ledgerId = "theIdOfYourLedgerInTheConsortiumDatabase";
@@ -69,7 +68,7 @@ const mainFn = async () => {
 
   // This client is now configured to point to a node that has a connector to
   // the ledger referenced by `ledgerId`
-  const apiClient = await mainApiClient.ofLedger(ledgerId, QuorumApi);
+  const apiClient = await mainApiClient.ofLedger(ledgerId, BesuApi);
 
   // Use the client to perform any supported operation on the ledger
 };
@@ -86,7 +85,7 @@ import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
-import { DefaultApi as QuorumApi } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 const mainFn = async () => {
   const ledgerId = "theIdOfYourLedgerInTheConsortiumDatabase";
@@ -96,7 +95,7 @@ const mainFn = async () => {
 
   // This client is now configured to point to a node that has a connector to
   // the ledger referenced by `ledgerId`
-  const apiClient = await mainApiClient.ofLedger(ledgerId, QuorumApi);
+  const apiClient = await mainApiClient.ofLedger(ledgerId, BesuApi);
 }
 
 mainFn();
@@ -111,7 +110,7 @@ import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
-import { DefaultApi as QuorumApi } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 const mainFn = async () => {
   const nodeApiHost = "https://my-node.cactus.example.com";
@@ -119,7 +118,7 @@ const mainFn = async () => {
   const mainApiClient = new ApiClient({ basePath: nodeApiHost });
 
   // This client is now configured to point to a node that has a connector to the ledger of your choice
-  const apiClient = await mainApiClient.extendWith(QuorumApi);
+  const apiClient = await mainApiClient.extendWith(BesuApi);
 }
 
 mainFn();
