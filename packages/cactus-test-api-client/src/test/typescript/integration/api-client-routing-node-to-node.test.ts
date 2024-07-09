@@ -22,13 +22,14 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
-  DefaultApi as QuorumApi,
-  PluginLedgerConnectorQuorum,
+  DefaultApi as BesuApi,
+  PluginLedgerConnectorBesu,
+  ReceiptType,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import {
   pruneDockerAllIfGithubAction,
-  QuorumTestLedger,
+  BesuTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 
@@ -36,6 +37,7 @@ import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,
 } from "@hyperledger/cactus-plugin-consortium-manual";
+import { Account } from "web3-core";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "Routes to correct node based on ledger ID";
@@ -44,8 +46,8 @@ const testCase2 = "ApiClient #1 Routes based on Ledger ID #1";
 const testCase3 = "ApiClient #1 Routes based on Ledger ID #2";
 
 describe(testCase, () => {
-  const quorumTestLedger1 = new QuorumTestLedger();
-  const quorumTestLedger2 = new QuorumTestLedger();
+  const besuTestLedger1 = new BesuTestLedger();
+  const besuTestLedger2 = new BesuTestLedger();
   let consortiumDatabase: ConsortiumDatabase;
   let mainApiClient: ApiClient;
 
@@ -60,14 +62,15 @@ describe(testCase, () => {
 
   let apiServer1: ApiServer;
   let apiServer2: ApiServer;
+  let testEthAccount1: Account;
 
   const ledger1: Ledger = {
     id: "my_cool_ledger_that_i_want_to_transact_on",
-    ledgerType: LedgerType.Quorum2X,
+    ledgerType: LedgerType.Besu2X,
   };
   const ledger2: Ledger = {
     id: "other_ledger_that_is_just_taking_up_space",
-    ledgerType: LedgerType.Quorum2X,
+    ledgerType: LedgerType.Besu2X,
   };
 
   beforeAll(async () => {
@@ -75,11 +78,11 @@ describe(testCase, () => {
     await expect(pruning).resolves.toBeTruthy;
   });
 
-  //scope just for the awaits
-  // test(testCase, async (t: Test) => {
   beforeAll(async () => {
-    await quorumTestLedger1.start();
-    await quorumTestLedger2.start();
+    await besuTestLedger1.start();
+    await besuTestLedger2.start();
+
+    testEthAccount1 = await besuTestLedger1.createEthTestAccount();
 
     httpServer1 = await Servers.startOnPreferredPort(4050);
     addressInfo1 = httpServer1.address() as AddressInfo;
@@ -152,35 +155,33 @@ describe(testCase, () => {
   });
 
   afterAll(async () => {
-    await quorumTestLedger1.stop();
-    await quorumTestLedger1.destroy();
-    await quorumTestLedger2.stop();
-    await quorumTestLedger2.destroy();
+    await besuTestLedger1.stop();
+    await besuTestLedger1.destroy();
+    await besuTestLedger2.stop();
+    await besuTestLedger2.destroy();
     await apiServer1.shutdown();
     await apiServer2.shutdown();
     await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   test(testCase1, async () => {
-    const rpcApiHttpHost1 = await quorumTestLedger1.getRpcApiHttpHost();
+    const rpcApiHttpHost1 = await besuTestLedger1.getRpcApiHttpHost();
+    const rpcApiWsHost1 = await besuTestLedger1.getRpcApiWsHost();
 
-    const { alloc } = await quorumTestLedger1.getGenesisJsObject();
+    initialFundsAccount1 = besuTestLedger1.getGenesisAccountPubKey();
 
-    initialFundsAccount1 = Object.keys(alloc).find(
-      (addr) => parseInt(alloc[addr].balance, 10) > 10e7,
-    ) as string;
+    const rpcApiHttpHost2 = await besuTestLedger2.getRpcApiHttpHost();
+    const rpcApiWsHost2 = await besuTestLedger2.getRpcApiWsHost();
 
-    const rpcApiHttpHost2 = await quorumTestLedger2.getRpcApiHttpHost();
-    initialFundsAccount2 = Object.keys(alloc).find(
-      (addr) => parseInt(alloc[addr].balance, 10) > 10e7,
-    ) as string;
+    initialFundsAccount2 = besuTestLedger2.getGenesisAccountPubKey();
 
     {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
-      const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
+      const pluginBesuConnector = new PluginLedgerConnectorBesu({
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost1,
+        rpcApiWsHost: rpcApiWsHost1,
         logLevel,
         pluginRegistry: new PluginRegistry(),
       });
@@ -210,7 +211,7 @@ describe(testCase, () => {
         await configService.newExampleConfigConvict(apiServerOptions);
 
       pluginRegistry.add(pluginConsortiumManual);
-      pluginRegistry.add(pluginQuorumConnector);
+      pluginRegistry.add(pluginBesuConnector);
 
       apiServer1 = new ApiServer({
         httpServerApi: httpServer1,
@@ -224,10 +225,10 @@ describe(testCase, () => {
     {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
-      const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
-        privateUrl: rpcApiHttpHost2,
+      const pluginBesuConnector = new PluginLedgerConnectorBesu({
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost2,
+        rpcApiWsHost: rpcApiWsHost2,
         logLevel,
         pluginRegistry: new PluginRegistry(),
       });
@@ -258,7 +259,7 @@ describe(testCase, () => {
         await configService.newExampleConfigConvict(apiServerOptions);
 
       pluginRegistry.add(pluginConsortiumManual);
-      pluginRegistry.add(pluginQuorumConnector);
+      pluginRegistry.add(pluginBesuConnector);
 
       apiServer2 = new ApiServer({
         httpServerApi: httpServer2,
@@ -272,18 +273,23 @@ describe(testCase, () => {
     }
   });
   test(testCase2, async () => {
-    const apiClient1 = await mainApiClient.ofLedger(ledger1.id, QuorumApi, {});
+    const apiClient1 = await mainApiClient.ofLedger(ledger1.id, BesuApi, {});
     const testAccount1 = new Web3().eth.accounts.create(uuidV4());
     const res = await apiClient1.runTransactionV1({
       transactionConfig: {
         from: initialFundsAccount1,
         to: testAccount1.address,
         value: 10e6,
+        gas: 1000000,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NodeTxPoolAck,
       },
       web3SigningCredential: {
-        ethAccount: initialFundsAccount1,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        ethAccount: testEthAccount1.address,
+        secret: testEthAccount1.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
 
@@ -293,18 +299,23 @@ describe(testCase, () => {
   });
 
   test(testCase3, async () => {
-    const apiClient2 = await mainApiClient.ofLedger(ledger2.id, QuorumApi, {});
+    const apiClient2 = await mainApiClient.ofLedger(ledger2.id, BesuApi, {});
     const testAccount2 = new Web3().eth.accounts.create(uuidV4());
     const res = await apiClient2.runTransactionV1({
       transactionConfig: {
         from: initialFundsAccount2,
         to: testAccount2.address,
         value: 10e6,
+        gas: 1000000,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NodeTxPoolAck,
       },
       web3SigningCredential: {
         ethAccount: initialFundsAccount2,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        secret: besuTestLedger2.getGenesisAccountPrivKey(),
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     expect(res).toBeTruthy();

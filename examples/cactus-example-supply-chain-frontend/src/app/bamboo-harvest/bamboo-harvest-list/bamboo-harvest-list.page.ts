@@ -7,7 +7,7 @@ import {
   DefaultApi as SupplyChainApi,
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
-import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
+import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 import { BambooHarvestDetailPage } from "../bamboo-harvest-detail/bamboo-harvest-detail.page";
 import { ModalController } from "@ionic/angular";
 
@@ -26,7 +26,7 @@ export class BambooHarvestListPage implements OnInit {
   constructor(
     private readonly baseClient: ApiClient,
     private readonly modalController: ModalController,
-    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
+    @Inject(XDAI_BESU_DEMO_LEDGER_ID) private readonly xdaiBesuLedgerId: string,
   ) {
     this.bambooHarvests = [];
     this.log = LoggerProvider.getOrCreate({ label: "BambooHarvestListPage" });
@@ -42,7 +42,7 @@ export class BambooHarvestListPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this._supplyChainApi = await this.baseClient.ofLedger(
-      this.quorumLedgerId,
+      this.xdaiBesuLedgerId,
       SupplyChainApi,
       {
         baseOptions: {

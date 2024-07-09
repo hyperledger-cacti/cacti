@@ -22,7 +22,7 @@ import com.squareup.moshi.JsonClass
 /**
  * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
  *
- * Values: bESU1X,bESU2X,bURROW0X,cORDA4X,fABRIC2,qUORUM2X,sAWTOOTH1X
+ * Values: bESU1X,bESU2X,bURROW0X,cORDA4X,fABRIC2,sAWTOOTH1X
  */
 
 @JsonClass(generateAdapter = false)
@@ -42,9 +42,6 @@ enum class LedgerType(val value: kotlin.String) {
 
     @Json(name = "FABRIC_2")
     fABRIC2("FABRIC_2"),
-
-    @Json(name = "QUORUM_2X")
-    qUORUM2X("QUORUM_2X"),
 
     @Json(name = "SAWTOOTH_1X")
     sAWTOOTH1X("SAWTOOTH_1X");

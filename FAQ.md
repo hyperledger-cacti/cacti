@@ -178,9 +178,9 @@ this.fabric = new FabricTestLedgerV1({
 });
 ```
 
-Quorum
+Besu
 ```
-this.quorum = new QuorumTestLedger({
+this.besu = new BesuTestLedger({
   containerImageName: "*your image name*",
   containerImageVersion: "*your image tag*",
   ...

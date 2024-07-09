@@ -9187,48 +9187,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-ledger-connector-quorum@npm:2.0.0-rc.2, @hyperledger/cactus-plugin-ledger-connector-quorum@workspace:packages/cactus-plugin-ledger-connector-quorum":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-ledger-connector-quorum@workspace:packages/cactus-plugin-ledger-connector-quorum"
-  dependencies:
-    "@hyperledger/cactus-common": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-core": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
-    "@types/body-parser": "npm:1.19.4"
-    "@types/express": "npm:4.17.21"
-    "@types/http-errors": "npm:2.0.4"
-    "@types/minimist": "npm:1.2.2"
-    "@types/sanitize-html": "npm:2.9.5"
-    "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.2"
-    body-parser: "npm:1.20.2"
-    chalk: "npm:4.1.2"
-    ethers: "npm:6.8.1"
-    express: "npm:4.19.2"
-    http-errors-enhanced-cjs: "npm:2.0.0"
-    minimist: "npm:1.2.8"
-    prom-client: "npm:15.1.3"
-    run-time-error-cjs: "npm:1.4.0"
-    rxjs: "npm:7.8.1"
-    sanitize-html: "npm:2.12.1"
-    socket.io: "npm:4.6.2"
-    socket.io-client-fixed-types: "npm:4.5.4"
-    typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
-    web3: "npm:1.6.1"
-    web3-core: "npm:1.6.1"
-    web3-core-helpers: "npm:1.6.1"
-    web3-eth: "npm:1.6.1"
-    web3-eth-contract: "npm:1.6.1"
-    web3-utils: "npm:1.6.1"
-    web3js-quorum: "npm:22.4.0"
-  bin:
-    cacti-quorum-connector-status: dist/lib/scripts/get-quorum-connector-status.js
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-ledger-connector-sawtooth@npm:2.0.0-rc.2, @hyperledger/cactus-plugin-ledger-connector-sawtooth@workspace:packages/cactus-plugin-ledger-connector-sawtooth":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-sawtooth@workspace:packages/cactus-plugin-ledger-connector-sawtooth"
@@ -9437,7 +9395,7 @@ __metadata:
     "@hyperledger/cactus-core": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "npm:2.0.0-rc.2"
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
     "@types/uuid": "npm:10.0.0"
     jose: "npm:4.15.5"
@@ -9609,30 +9567,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-test-plugin-ledger-connector-quorum@workspace:packages/cactus-test-plugin-ledger-connector-quorum":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-test-plugin-ledger-connector-quorum@workspace:packages/cactus-test-plugin-ledger-connector-quorum"
-  dependencies:
-    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-common": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-core": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-core-api": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-verifier-client": "npm:2.0.0-rc.2"
-    "@types/convict": "npm:6.1.1"
-    "@types/lodash": "npm:4.14.195"
-    "@types/uuid": "npm:10.0.0"
-    convict: "npm:6.2.4"
-    lodash: "npm:4.17.21"
-    uuid: "npm:10.0.0"
-    web3: "npm:1.6.1"
-    web3-core-helpers: "npm:1.6.1"
-    web3-utils: "npm:1.6.1"
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-test-tooling@npm:2.0.0-rc.2, @hyperledger/cactus-test-tooling@workspace:packages/cactus-test-tooling":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-test-tooling@workspace:packages/cactus-test-tooling"
@@ -9724,7 +9658,6 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": "npm:2.0.0-rc.2"
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "npm:2.0.0-rc.2"
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "npm:2.0.0-rc.2"
     jest-extended: "npm:4.0.1"
     rxjs: "npm:7.8.1"
@@ -9735,7 +9668,6 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.x
     "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.x
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": 2.x
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": 2.x
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": 2.x
   peerDependenciesMeta:
     "@hyperledger/cactus-plugin-ledger-connector-besu":
@@ -9747,8 +9679,6 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-fabric":
       optional: true
     "@hyperledger/cactus-plugin-ledger-connector-iroha2":
-      optional: true
-    "@hyperledger/cactus-plugin-ledger-connector-quorum":
       optional: true
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth":
       optional: true
@@ -30887,13 +30817,6 @@ __metadata:
   version: 1.2.7
   resolution: "http-deceiver@npm:1.2.7"
   checksum: 10/9ae293b0acbfad6ed45d52c1f85f58ab062465872fd9079c80d78c6527634002d73c2a9d8c0296cc12d178a0b689bb5291d9979aad3ce71ab17a7517588adbf7
-  languageName: node
-  linkType: hard
-
-"http-errors-enhanced-cjs@npm:2.0.0":
-  version: 2.0.0
-  resolution: "http-errors-enhanced-cjs@npm:2.0.0"
-  checksum: 10/f84a7d366575b9d15ee09ea1f406e60f877231602ac1559691a59fb7ffd5244a9d11658ca60f8607fafd05fc058079a37e9f0b24c00437d912135781c8f8b5ce
   languageName: node
   linkType: hard
 

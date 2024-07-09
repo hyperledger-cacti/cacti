@@ -410,18 +410,14 @@ Open the `.vscode/template.launch.json` file and either copy it with a name of `
 
 If you are working on a new ledger connector you’ll need an `all-in-one` docker image as well, which will allow the expected level of test automation. If your chosen ledger’s maintainers provide an adequate docker image, then you might not need to develop this yourself, but this is rarely the case so YMMV.
 
-To see an existing set of examples for `besu` and `quorum` images take a peek at the `tools/docker/besu-all-in-one` and `tools/docker/quorum-all-in-one` folders. These produce the `ghcr.io/hyperledger/cactus-besu-all-in-one` and `ghcr.io/hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are used in the test cases that are written for the specific ledger connector plugins at:
+To see an existing set of examples for `besu` and `corda` images take a peek at the `tools/docker/besu-all-in-one` and `tools/docker/corda-all-in-one` folders. These produce the `ghcr.io/hyperledger/cactus-besu-all-in-one` and `ghcr.io/hyperledger/cactus-corda-all-in-one` images respectively. Both of these are used in the test cases that are written for the specific ledger connector plugins at:
 
-*   `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
-    
 *   `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts`
     
 
 The specific classes that utilize the `all-in-one` images can be found in the `test-tooling` package under these paths:
 
 *   `packages/cactus-test-tooling/src/main/typescript/besu/besu-test-ledger.ts`
-    
-*   `packages/cactus-test-tooling/src/main/typescript/quorum/quorum-test-ledger.ts`
     
 
 #### Test Automation of Ledger Plugins
@@ -432,7 +428,7 @@ The only difference between a ledger connector plugin test case and any unit tes
 
 As a generic best practice, the test cases should never re-use any `all-in-one` ledger container for the execution of multiple test cases because that will almost surely lead to flaky/unstable test cases over the long run and needless complexity, ordering dependencies and so on. It is recommended that if you have two test cases for a ledger connector plugin, they both pull up a newly created container from scratch, execute the test scenario and then tear down and delete the container completely.
 
-An example for a ledger connector plugin and it’s test automation implemented the way it is explained above: `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
+An example for a ledger connector plugin and it’s test automation implemented the way it is explained above: `packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/grpc-services/connector-besu-grpc-services.test.ts`
 
 > This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is how the test case is set up to begin with.
 
@@ -446,23 +442,11 @@ chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-ap
 
 You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):
 
-npx tap \--ts \--timeout\=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts
+```sh
+yarn jest packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/grpc-services/connector-besu-grpc-services.test.ts
+```
 
 You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob patterns can be observed in the root directory’s `package.json` file which has npm scripts for executing all tests with a single command (the CI script uses these):
-
-"test:all": "tap --ts --jobs=1 --timeout=600 \\"packages/cactus-\*/src/test/typescript/{unit,integration}/\\"",
-"test:unit": "tap --ts --timeout=600 \\"packages/cactus-\*/src/test/typescript/unit/\\"",
-"test:integration": "tap --ts --jobs=1 --timeout=600 \\"packages/cactus-\*/src/test/typescript/integration/\\""
-
-Following a similar pattern if you have a specific folder where your test cases are, you can run everything in that folder by specifying the appropriate glob patterns (asterisks and double asterisks as necessary depending on the folder being a flat structure or with sub-directories and tests nested deep within them).
-
-For example this can work as well:
-
-\# Starting from the project root
-cd packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum
-npx tap \--ts \--jobs\=1 \--timeout\=600 \\"./\\"
-
-> Be aware that glob patterns need quoting in some operating system’s shell environments and not necessarily on others. In the npm scripts Cactus uses we quote all of them to ensure a wider shell compatibility.
 
 ### Building the API Client(S)
 

@@ -525,7 +525,6 @@ export const LedgerType = {
     Burrow0X: 'BURROW_0X',
     Corda4X: 'CORDA_4X',
     Fabric2: 'FABRIC_2',
-    Quorum2X: 'QUORUM_2X',
     Sawtooth1X: 'SAWTOOTH_1X'
 } as const;
 

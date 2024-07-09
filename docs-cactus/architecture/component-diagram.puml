@@ -31,10 +31,6 @@ frame "Hyperledger Cactus" as 1cactus {
       ConnectorFabric ..> 3connector : <<implements>>
     }
 
-    package "ConnectorQuorum" as 2connectorquorum <<package>> {
-      ConnectorQuorum ..> 3connector: <<implements>>
-    }
-
     package "ConnectorCorda" as 2connectorcorda <<package>> {
       ConnectorCorda ..> 3connector : <<implements>>
     }

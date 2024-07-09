@@ -16,7 +16,6 @@ Cacti is built on a modular architecture and supports extensions through the plu
 * Hyperledger Sawtooth
 * R3 Corda
 * Go-Ethereum
-* Quorum
 * Xdai
 
 Client libraries and examples are provided in the following languages: JavaScript/TypeScript, Golang, Java/Kotlin, Solidity.

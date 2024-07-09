@@ -112,7 +112,7 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
       const { callOutput } = data;
 
       const rows = BambooHarvestConverter.ofSolidityStructList(callOutput);
-      this.log.debug(`apiV1QuorumInvokeContract() => %o`, data);
+      this.log.debug(`apiClient.invokeContractV1() => %o`, data);
 
       const body = { data: rows };
       res.status(200);
