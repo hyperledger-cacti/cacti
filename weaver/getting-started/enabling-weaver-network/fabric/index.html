@@ -9,7 +9,7 @@
 <link href="../overview/" rel="prev"/>
 <link href="../corda/" rel="next"/>
 <link href="../../../../images/HL_Cacti_Logo_Colorreverse.svg" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-9.5.27" name="generator"/>
+<meta content="mkdocs-1.6.0, mkdocs-material-9.5.28" name="generator"/>
 <title>Hyperledger Fabric - Using and Developing with Hyperledger Cacti</title>
 <link href="../../../../assets/stylesheets/main.6543a935.min.css" rel="stylesheet"/>
 <link href="../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
@@ -2062,7 +2062,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 <li><code>docker-compose.yaml</code>: This specifies the properties of the relay container. You can use the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/docker-compose.yaml">file in the repository</a> verbatim.</li>
 </ul>
 <p>To start the relay server, navigate to the folder containing the above files and run the following:
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-29-1" id="__codelineno-29-1" name="__codelineno-29-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>relay-server
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-29-1" id="__codelineno-29-1" name="__codelineno-29-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>relay-server
 </code></pre></div></p>
 <h4 id="launch-driver">Launch Driver<a class="headerlink" href="#launch-driver" title="Permanent link">¶</a></h4>
 <p>You need to run one or more drivers through which your relay can interact with your Fabric network. Here we provide instructions to run one Fabric driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Fabric network, like private data collections.)</p>
@@ -2097,7 +2097,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 <li><strong>Enabling TLS</strong>:<ul>
 <li>You can make your driver accept TLS connections by specifying <code>DRIVER_TLS</code> as <code>true</code> and specifying a TLS certificate file path and private key file path in <code>DRIVER_TLS_CERT_PATH</code> and <code>DRIVER_TLS_KEY_PATH</code> respectively. The same certificate should be specified in this driver's definition in the <code>drivers</code> section in the <code>config.toml</code> file of your relay in the <code>tlsca_cert_path</code> property (see the earlier section on relay configuration).</li>
 <li>To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in <code>RELAY_TLSCA_CERT_PATH</code> (currently only one certificate can be configured) and set <code>RELAY_TLS</code> to <code>true</code>. This CA certificate should match the one specified in the <code>cert_path</code> property in the relay's <code>config.toml</code> file (see the earlier section on relay configuration):</li>
-<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/fabric-driver/credentials</code> folder in the Fabric Driver container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">docker-compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>DRIVER_TLS_CERT_PATH</code>, <code>DRIVER_TLS_KEY_PATH</code>, and <code>RELAY_TLSCA_CERT_PATH</code> variables.</li>
+<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/fabric-driver/credentials</code> folder in the Fabric Driver container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">docker compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>DRIVER_TLS_CERT_PATH</code>, <code>DRIVER_TLS_KEY_PATH</code>, and <code>RELAY_TLSCA_CERT_PATH</code> variables.</li>
 </ul>
 </li>
 </ul>
@@ -2123,7 +2123,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 <li>As in the <code>.env</code> configuration, you should pick an organization for the driver to associate with. The <code>admin</code> section specifies the registrar name and password (this should be familiar to any Fabric network administrator) used to enroll clients. Default values of <code>admin</code> and <code>adminpw</code> are specified above as examples, which you should replace with the right values configured in your network organization's CA.</li>
 <li><code>&lt;affiliation&gt;</code> should be what's specified in your organization's Fabric CA server configuration. The default is <code>org1.department1</code>, but you should look up the appropriate value from the CA server's configuration file.</li>
 <li><code>&lt;msp-id&gt;</code> should be set to the (or an) MSP ID of the selected organization.</li>
-<li><code>&lt;ca-service-endpoint&gt;</code> should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name.</li>
+<li><code>&lt;ca-service-endpoint&gt;</code> should be set to the CA server's endpoint. If you launched your CA server as a container from a docker compose file, this should be set to the container's service name.</li>
 </ul>
 </li>
 </ul>
@@ -2143,7 +2143,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 <li><code>docker-compose.yaml</code>: This specifies the properties of the driver container. You can use the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">file in the repository</a> verbatim.</li>
 </ul>
 <p>To start the driver, navigate to the folder containing the above files and run the following:
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-32-1" id="__codelineno-32-1" name="__codelineno-32-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-32-1" id="__codelineno-32-1" name="__codelineno-32-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div></p>
 <h4 id="launch-iin-agents">Launch IIN Agents<a class="headerlink" href="#launch-iin-agents" title="Permanent link">¶</a></h4>
 <p>You need to run one IIN Agent for each organization in the Fabric network channel you are enabling Weaver in. This agent runs a protocol with other organizations' agents and with targeted foreign networks' agents to sync and record foreign networks' memberships to the channel ledger.</p>
@@ -2254,7 +2254,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 <li><code>EXTERNAL_NETWORK</code>: Set to the network <a href="https://docs.docker.com/compose/networking/">name</a> of your Fabric network.</li>
 <li><strong>Enabling TLS</strong>:<ul>
 <li>Make your IIN Agent accept TLS connections by specifying <code>IIN_AGENT_TLS</code> as <code>true</code> and specifying a TLS certificate file path and private key file path in <code>IIN_AGENT_TLS_CERT_PATH</code> and <code>IIN_AGENT_TLS_KEY_PATH</code> respectively. The same certificate should be specified in this agent's JSON object in another agent's <code>dnsconfig.json</code> file under the appropriate security domain and IIN Agent ID scope.</li>
-<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/opt/iinagent/credentials</code> folder in the IIN Agent container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml">docker-compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>IIN_AGENT_TLS_CERT_PATH</code> and <code>IIN_AGENT_TLS_KEY_PATH</code> variables respectively.</li>
+<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/opt/iinagent/credentials</code> folder in the IIN Agent container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml">docker compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>IIN_AGENT_TLS_CERT_PATH</code> and <code>IIN_AGENT_TLS_KEY_PATH</code> variables respectively.</li>
 </ul>
 </li>
 </ul>
@@ -2264,7 +2264,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 </li>
 </ul>
 <p>Now to start the IIN agent, navigate to the folder containing the above files and run the following:
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-37-1" id="__codelineno-37-1" name="__codelineno-37-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-37-1" id="__codelineno-37-1" name="__codelineno-37-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div></p>
 <p>Repeat the above steps to launch an IIN Agent for every other organization on your channnel, i.e., create similar configuration files in an organization-specific folder. Make sure you:</p>
 <ul>
@@ -2393,7 +2393,7 @@ By default, the TLS is set to false in <code>interopFlow</code>, i.e. disabled. 
 <div class="md-dialog__inner md-typeset"></div>
 </div>
 <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
-<script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+<script src="../../../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
 <script>document$.subscribe(() => {
             window.update_swagger_ui_iframe_height = function (id) {
                 var iFrameID = document.getElementById(id);

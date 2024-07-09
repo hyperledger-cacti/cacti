@@ -9,7 +9,7 @@
 <link href="../fabric/" rel="prev"/>
 <link href="../besu/" rel="next"/>
 <link href="../../../../images/HL_Cacti_Logo_Colorreverse.svg" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-9.5.27" name="generator"/>
+<meta content="mkdocs-1.6.0, mkdocs-material-9.5.28" name="generator"/>
 <title>Corda - Using and Developing with Hyperledger Cacti</title>
 <link href="../../../../assets/stylesheets/main.6543a935.min.css" rel="stylesheet"/>
 <link href="../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
@@ -1979,7 +1979,7 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <li><code>docker-compose.yaml</code>: This specifies the properties of the relay container. You can use the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/docker-compose.yaml">file in the repository</a> verbatim.</li>
 </ul>
 <p>To start the relay server, navigate to the folder containing the above files and run the following:
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-19-1" id="__codelineno-19-1" name="__codelineno-19-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>relay-server
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-19-1" id="__codelineno-19-1" name="__codelineno-19-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>relay-server
 </code></pre></div></p>
 <h4 id="launch-driver">Launch Driver<a class="headerlink" href="#launch-driver" title="Permanent link">¶</a></h4>
 <p>You need to run one or more drivers through which your relay can interact with your Corda network. Here we provide instructions to run one Corda driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Corda network.)</p>
@@ -2011,7 +2011,7 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <li><strong>Enabling TLS</strong>:<ul>
 <li>You can make your driver accept TLS connections by specifying <code>DRIVER_TLS</code> as <code>true</code> and specifying a TLS certificate file path and private key file path in <code>DRIVER_TLS_CERT_PATH</code> and <code>DRIVER_TLS_KEY_PATH</code> respectively. The same certificate should be specified in this driver's definition in the <code>drivers</code> section in the <code>config.toml</code> file of your relay in the <code>tlsca_cert_path</code> property (see the earlier section on relay configuration).</li>
 <li>To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in <code>RELAY_TLSCA_CERT_PATH</code> (currently only one certificate can be configured) and set <code>RELAY_TLS</code> to <code>true</code>. This CA certificate should match the one specified in the <code>cert_path</code> property in the relay's <code>config.toml</code> file (see the earlier section on relay configuration):</li>
-<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/corda-driver/credentials</code> folder in the Fabric Driver container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">docker-compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>DRIVER_TLS_CERT_PATH</code>, <code>DRIVER_TLS_KEY_PATH</code>, and <code>RELAY_TLSCA_CERT_PATH</code> variables.</li>
+<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/corda-driver/credentials</code> folder in the Fabric Driver container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">docker compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>DRIVER_TLS_CERT_PATH</code>, <code>DRIVER_TLS_KEY_PATH</code>, and <code>RELAY_TLSCA_CERT_PATH</code> variables.</li>
 </ul>
 </li>
 </ul>
@@ -2021,7 +2021,7 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 </li>
 </ul>
 <p>To start the driver, navigate to the folder containing the above files and run the following:
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-21-1" id="__codelineno-21-1" name="__codelineno-21-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-21-1" id="__codelineno-21-1" name="__codelineno-21-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div></p>
 <h4 id="vault-initialization">Vault Initialization<a class="headerlink" href="#vault-initialization" title="Permanent link">¶</a></h4>
 <p>To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the <a href="https://github.com/hyperledger/cacti/packages/1856827">Corda SDK</a> (<code>org.hyperledger.cacti.weaver.sdk.corda.weaver-sdk-corda</code>):</p>
@@ -2175,7 +2175,7 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <div class="md-dialog__inner md-typeset"></div>
 </div>
 <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
-<script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+<script src="../../../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
 <script>document$.subscribe(() => {
             window.update_swagger_ui_iframe_height = function (id) {
                 var iFrameID = document.getElementById(id);
