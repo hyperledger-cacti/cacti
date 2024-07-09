@@ -13,6 +13,8 @@
   - [1.5 Monitoring new blocks (WatchBlocks)](#15-monitoring-new-blocks-watchblocks)
     - [1.5.1 Example](#151-example)
     - [1.5.2 Listener Type](#152-listener-type)
+      - [Original](#original)
+      - [Cacti (custom)](#cacti-custom)
   - [1.6 Delegated Signature](#16-delegated-signature)
     - [1.6.1 Example](#161-example)
 - [2. Architecture](#2-architecture)
@@ -585,7 +587,7 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
     - targets: ['{host}:{port}']
 ```
 
-Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
+Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, `packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-endpoint-v1.test.ts`) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
 `Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
