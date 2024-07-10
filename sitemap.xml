@@ -156,22 +156,12 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://hyperledger.github.io/cacti/cactus/packages/cactus-plugin-ledger-connector-quorum/</loc>
-         <lastmod>2024-07-10</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://hyperledger.github.io/cacti/cactus/packages/cactus-test-api-client/</loc>
          <lastmod>2024-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hyperledger.github.io/cacti/cactus/packages/cactus-test-cmd-api-server/</loc>
-         <lastmod>2024-07-10</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://hyperledger.github.io/cacti/cactus/packages/cactus-test-plugin-ledger-connector-quorum/</loc>
          <lastmod>2024-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -192,11 +182,6 @@
     </url>
     <url>
          <loc>https://hyperledger.github.io/cacti/cactus/support/fabric/</loc>
-         <lastmod>2024-07-10</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://hyperledger.github.io/cacti/cactus/support/quorum/</loc>
          <lastmod>2024-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -397,11 +382,6 @@
     </url>
     <url>
          <loc>https://hyperledger.github.io/cacti/references/openapi/cactus-plugin-ledger-connector-polkadot_openapi/</loc>
-         <lastmod>2024-07-10</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://hyperledger.github.io/cacti/references/openapi/cactus-plugin-ledger-connector-quorum_openapi/</loc>
          <lastmod>2024-07-10</lastmod>
          <changefreq>daily</changefreq>
     </url>

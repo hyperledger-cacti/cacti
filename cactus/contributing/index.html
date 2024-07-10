@@ -639,13 +639,6 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../packages/cactus-plugin-ledger-connector-quorum/">
-<span class="md-ellipsis">
-    Connector Quorum
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
 <a class="md-nav__link" href="../packages/cactus-test-api-client/">
 <span class="md-ellipsis">
     Test Api Client
@@ -656,13 +649,6 @@
 <a class="md-nav__link" href="../packages/cactus-test-cmd-api-server/">
 <span class="md-ellipsis">
     Test CMD Api Server
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../packages/cactus-test-plugin-ledger-connector-quorum/">
-<span class="md-ellipsis">
-    Test Connector Quorum
   </span>
 </a>
 </li>
@@ -722,13 +708,6 @@
 <a class="md-nav__link" href="../support/iroha.md">
 <span class="md-ellipsis">
     Hyperledger Iroha
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../support/quorum/">
-<span class="md-ellipsis">
-    Quorum
   </span>
 </a>
 </li>
@@ -2037,29 +2016,19 @@ import * as publicApi from "../../../main/typescript/public-api";</p>
 </blockquote>
 <h3 id="all-in-one-docker-images-for-ledger-connector-plugins">All-In-One Docker Images for Ledger Connector Plugins<a class="headerlink" href="#all-in-one-docker-images-for-ledger-connector-plugins" title="Permanent link">¶</a></h3>
 <p>If you are working on a new ledger connector you’ll need an <code>all-in-one</code> docker image as well, which will allow the expected level of test automation. If your chosen ledger’s maintainers provide an adequate docker image, then you might not need to develop this yourself, but this is rarely the case so YMMV.</p>
-<p>To see an existing set of examples for <code>besu</code> and <code>quorum</code> images take a peek at the <code>tools/docker/besu-all-in-one</code> and <code>tools/docker/quorum-all-in-one</code> folders. These produce the <code>ghcr.io/hyperledger/cactus-besu-all-in-one</code> and <code>ghcr.io/hyperledger/cactus-quorum-all-in-one</code> images respectively. Both of these are used in the test cases that are written for the specific ledger connector plugins at:</p>
+<p>To see an existing set of examples for <code>besu</code> and <code>corda</code> images take a peek at the <code>tools/docker/besu-all-in-one</code> and <code>tools/docker/corda-all-in-one</code> folders. These produce the <code>ghcr.io/hyperledger/cactus-besu-all-in-one</code> and <code>ghcr.io/hyperledger/cactus-corda-all-in-one</code> images respectively. Both of these are used in the test cases that are written for the specific ledger connector plugins at:</p>
 <ul>
-<li>
-<p><code>packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts</code></p>
-</li>
-<li>
-<p><code>packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts</code></p>
-</li>
+<li><code>packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts</code></li>
 </ul>
 <p>The specific classes that utilize the <code>all-in-one</code> images can be found in the <code>test-tooling</code> package under these paths:</p>
 <ul>
-<li>
-<p><code>packages/cactus-test-tooling/src/main/typescript/besu/besu-test-ledger.ts</code></p>
-</li>
-<li>
-<p><code>packages/cactus-test-tooling/src/main/typescript/quorum/quorum-test-ledger.ts</code></p>
-</li>
+<li><code>packages/cactus-test-tooling/src/main/typescript/besu/besu-test-ledger.ts</code></li>
 </ul>
 <h4 id="test-automation-of-ledger-plugins">Test Automation of Ledger Plugins<a class="headerlink" href="#test-automation-of-ledger-plugins" title="Permanent link">¶</a></h4>
 <p>Ledger plugin tests are written the same way as any other test (which is difficult to achieve, but we thrive to get it done).</p>
 <p>The only difference between a ledger connector plugin test case and any unit test is that the ledger connector plugin’s test case will pull up a docker container from one of the <code>all-in-one</code> images that we maintain as part of Cactus and then use that <code>all-in-one-*</code> container to verify things such as the ability of the ledger connector plugin to deploy a contract to said ledger.</p>
 <p>As a generic best practice, the test cases should never re-use any <code>all-in-one</code> ledger container for the execution of multiple test cases because that will almost surely lead to flaky/unstable test cases over the long run and needless complexity, ordering dependencies and so on. It is recommended that if you have two test cases for a ledger connector plugin, they both pull up a newly created container from scratch, execute the test scenario and then tear down and delete the container completely.</p>
-<p>An example for a ledger connector plugin and it’s test automation implemented the way it is explained above: <code>packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts</code></p>
+<p>An example for a ledger connector plugin and it’s test automation implemented the way it is explained above: <code>packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/grpc-services/connector-besu-grpc-services.test.ts</code></p>
 <blockquote>
 <p>This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is how the test case is set up to begin with.</p>
 </blockquote>
@@ -2068,19 +2037,9 @@ import * as publicApi from "../../../main/typescript/public-api";</p>
 <p>chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js</p>
 <p>./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json</p>
 <p>You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):</p>
-<p>npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>yarn<span class="w"> </span>jest<span class="w"> </span>packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/grpc-services/connector-besu-grpc-services.test.ts
+</code></pre></div>
 <p>You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob patterns can be observed in the root directory’s <code>package.json</code> file which has npm scripts for executing all tests with a single command (the CI script uses these):</p>
-<p>"test:all": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
-"test:unit": "tap --ts --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
-"test:integration": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/integration/\""</p>
-<p>Following a similar pattern if you have a specific folder where your test cases are, you can run everything in that folder by specifying the appropriate glob patterns (asterisks and double asterisks as necessary depending on the folder being a flat structure or with sub-directories and tests nested deep within them).</p>
-<p>For example this can work as well:</p>
-<p># Starting from the project root
-cd packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum
-npx tap --ts --jobs=1 --timeout=600 \"./\"</p>
-<blockquote>
-<p>Be aware that glob patterns need quoting in some operating system’s shell environments and not necessarily on others. In the npm scripts Cactus uses we quote all of them to ensure a wider shell compatibility.</p>
-</blockquote>
 <h3 id="building-the-api-clients">Building the API Client(S)<a class="headerlink" href="#building-the-api-clients" title="Permanent link">¶</a></h3>
 <p>You do not need to do anything special to have the API Client sources generated and compiled. It is all part of the <code>npm run build:dev:backend</code> task which you can run yourself or as part of the CI script (<code>./tools/ci.sh</code>).</p>
 <p>The API client code is automatically generated from the respective <code>openapi.json</code> file of each package that exposes ay web serices (REST/SocketIO/gRPC/etc.) and can be dependend on by other packages where applicable. There’s a dedicated <code>@hyperledger/cactus-api-client</code> package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations.</p>
