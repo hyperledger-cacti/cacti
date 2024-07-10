@@ -186,6 +186,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://hyperledger.github.io/cacti/cactus/support/substrate/</loc>
+         <lastmod>2024-07-10</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://hyperledger.github.io/cacti/cactus/support/xdai/</loc>
          <lastmod>2024-07-10</lastmod>
          <changefreq>daily</changefreq>
