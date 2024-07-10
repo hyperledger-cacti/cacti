@@ -10,7 +10,7 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import { Containers } from "../public-api";
+import { Containers } from "../common/containers";
 import EventEmitter from "events";
 import { SupportedImageVersions } from "./supported-image-versions";
 import { Network } from "./network";

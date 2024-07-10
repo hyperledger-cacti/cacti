@@ -4,7 +4,7 @@
  * organization.
  * @see https://github.com/corda/samples-kotlin
  */
-export const enum SampleCordappEnum {
+export enum SampleCordappEnum {
   ADVANCED_OBLIGATION = "ADVANCED_OBLIGATION",
   ADVANCED_NEGOTIATION = "ADVANCED_NEGOTIATION",
   BASIC_CORDAPP = "BASIC_CORDAPP",
