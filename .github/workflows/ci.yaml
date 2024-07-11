@@ -1132,6 +1132,7 @@ jobs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
     env:
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
