@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1720631218859,
+  "lastUpdate": 1720669721648,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -36,6 +36,44 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 361,
             "range": "±1.54%",
+            "unit": "ops/sec",
+            "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "f75d60e158e7290e57b9b80546e7ba955020305f",
+          "message": "test(test-tooling): fix circular deps, sample-cordapp const enum export\n\n1. This issue started out from the SampleCordappEnum problem where in\nsome test cases it was being undefined instead of the actual string values\nthat are defined for it's properties.\n2. Suggestions on the internet said that if your enum is undefined after\nimporting it then it's most likely a circular dependency problem.\n3. So on that clue, I added a script that checks the entire project for\nTypescript circular dependencies and fixed one that was present in the\ntest-tooling package (there hundreds more in other packages...)\n4. Ultimately though this did not help with the original issue which was\nsolved by simply removing the \"const\" modifier from the enum's declaration.\nThis way the compiled .js sources retain the actual values defined for the\nenum instead of the compiler completely eliminating them.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-07-10T20:31:31-07:00",
+          "tree_id": "63ad349b07abbfa445f8df52f3ca572757c93994",
+          "url": "https://github.com/hyperledger/cacti/commit/f75d60e158e7290e57b9b80546e7ba955020305f"
+        },
+        "date": 1720669718548,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 590,
+            "range": "±1.92%",
+            "unit": "ops/sec",
+            "extra": "179 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 361,
+            "range": "±1.57%",
             "unit": "ops/sec",
             "extra": "181 samples"
           }
