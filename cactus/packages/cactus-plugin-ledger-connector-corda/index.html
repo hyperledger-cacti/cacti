@@ -2058,7 +2058,8 @@ const apiClient = new CordaApi({ basePath: apiUrl });</p>
   scrape_interval: 5s
   static_configs:
     - targets: ['{host}:{port}']</p>
-<p>Here the <code>host:port</code> is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts) exposes it over <code>0.0.0.0</code> and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL) <code>Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics</code></p>
+<p>Here the <code>host:port</code> is where the prometheus exporter metrics are exposed. An example URL for metric would be something like this:
+<code>http://localhost:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics</code></p>
 <p>Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file. On the prometheus graphical interface (defaulted to <a href="http://localhost:9090">http://localhost:9090</a>), choose <strong>Graph</strong> from the menu bar, then select the <strong>Console</strong> tab. From the <strong>Insert metric at cursor</strong> drop down, select <strong>cactus_corda_total_tx_count</strong> and click <strong>execute</strong></p>
 <h3 id="helper-code">Helper code<a class="headerlink" href="#helper-code" title="Permanent link">¶</a></h3>
 <h4 id="responsetypets">response.type.ts<a class="headerlink" href="#responsetypets" title="Permanent link">¶</a></h4>
