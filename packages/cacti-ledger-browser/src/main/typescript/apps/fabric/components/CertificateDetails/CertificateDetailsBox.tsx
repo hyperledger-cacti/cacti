@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { styled } from "@mui/material/styles";
 
-import { FabricCertificate } from "../../fabric-supabase-types";
+import { FabricCertificate } from "../../supabase-types";
 import StackedRowItems from "../../../../components/ui/StackedRowItems";
 
 const ListHeaderTypography = styled(Typography)(({ theme }) => ({

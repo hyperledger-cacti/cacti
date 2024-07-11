@@ -1,5 +1,10 @@
-import ethereumGuiConfig from "../apps/eth";
-import fabricAppConfig from "../apps/fabric";
-import { AppConfig } from "./types/app";
+import ethBrowserAppDefinition from "../apps/eth";
+import fabricBrowserAppDefinition from "../apps/fabric";
+import { AppDefinition } from "./types/app";
 
-export const appConfig: AppConfig[] = [ethereumGuiConfig, fabricAppConfig];
+const config = new Map<string, AppDefinition>([
+  ["ethereumPersistenceBrowser", ethBrowserAppDefinition],
+  ["fabricPersistenceBrowser", fabricBrowserAppDefinition],
+]);
+
+export default config;

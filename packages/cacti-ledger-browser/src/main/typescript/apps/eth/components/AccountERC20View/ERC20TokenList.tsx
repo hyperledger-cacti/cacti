@@ -14,8 +14,8 @@ import TableHead from "@mui/material/TableHead";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { useNotification } from "../../../../common/context/NotificationContext";
-import { TokenERC20 } from "../../../../common/supabase-types";
 import { ethAllERC20TokensByAccount } from "../../queries";
+import { TokenERC20 } from "../../supabase-types";
 
 const StyledHeaderCell = styled(TableCell)(({ theme }) => ({
   color: theme.palette.primary.main,

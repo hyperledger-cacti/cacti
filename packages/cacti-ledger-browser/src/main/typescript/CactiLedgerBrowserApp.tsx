@@ -1,28 +1,37 @@
-import { useRoutes, BrowserRouter, RouteObject } from "react-router-dom";
+import {
+  useRoutes,
+  BrowserRouter,
+  RouteObject,
+  Outlet,
+} from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
+import CircularProgress from "@mui/material/CircularProgress";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
 import HeaderBar from "./components/Layout/HeaderBar";
 import HomePage from "./pages/home/HomePage";
-import { AppConfig, AppListEntry } from "./common/types/app";
+import { AppInstance, AppListEntry } from "./common/types/app";
 import { patchAppRoutePath } from "./common/utils";
 import { NotificationProvider } from "./common/context/NotificationContext";
-
-type AppConfigProps = {
-  appConfig: AppConfig[];
-};
+import { guiAppConfig } from "./common/queries";
+import createApplications from "./common/createApplications";
+import ConnectionFailedDialog from "./components/ConnectionFailedDialog/ConnectionFailedDialog";
 
 /**
  * Get list of all apps from the config
  */
-function getAppList(appConfig: AppConfig[]) {
+function getAppList(appConfig: AppInstance[]) {
   const appList: AppListEntry[] = appConfig.map((app) => {
     return {
-      path: app.options.path,
+      path: app.path,
       name: app.appName,
     };
   });
@@ -38,17 +47,17 @@ function getAppList(appConfig: AppConfig[]) {
 /**
  * Create header bar for each app based on app menuEntries field in config.
  */
-function getHeaderBarRoutes(appConfig: AppConfig[]) {
+function getHeaderBarRoutes(appConfig: AppInstance[]) {
   const appList = getAppList(appConfig);
 
   const headerRoutesConfig = appConfig.map((app) => {
     return {
-      key: app.options.path,
-      path: `${app.options.path}/*`,
+      key: app.path,
+      path: `${app.path}/*`,
       element: (
         <HeaderBar
           appList={appList}
-          path={app.options.path}
+          path={app.path}
           menuEntries={app.menuEntries}
         />
       ),
@@ -65,15 +74,16 @@ function getHeaderBarRoutes(appConfig: AppConfig[]) {
 /**
  * Create content routes
  */
-function getContentRoutes(appConfig: AppConfig[]) {
+function getContentRoutes(appConfig: AppInstance[]) {
   const appRoutes: RouteObject[] = appConfig.map((app) => {
     return {
-      key: app.options.path,
-      path: app.options.path,
+      key: app.path,
+      path: app.path,
+      element: <Outlet context={app.options} />,
       children: app.routes.map((route) => {
         return {
           key: route.path,
-          path: patchAppRoutePath(app.options.path, route.path),
+          path: patchAppRoutePath(app.path, route.path),
           element: route.element,
           children: route.children,
         };
@@ -84,7 +94,7 @@ function getContentRoutes(appConfig: AppConfig[]) {
   // Include landing / welcome page
   appRoutes.push({
     index: true,
-    element: <HomePage />,
+    element: <HomePage appConfig={appConfig} />,
   });
 
   return useRoutes([
@@ -96,17 +106,35 @@ function getContentRoutes(appConfig: AppConfig[]) {
   ]);
 }
 
-const App: React.FC<AppConfigProps> = ({ appConfig }) => {
+function App() {
+  const { isError, isPending, data } = useQuery(guiAppConfig());
+
+  if (isError) {
+    return <ConnectionFailedDialog />;
+  }
+
+  const appConfig = createApplications(data);
+
   const headerRoutes = getHeaderBarRoutes(appConfig);
   const contentRoutes = getContentRoutes(appConfig);
 
   return (
     <div>
+      {isPending && (
+        <CircularProgress
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            zIndex: 9999,
+          }}
+        />
+      )}
       {headerRoutes}
       {contentRoutes}
     </div>
   );
-};
+}
 
 // MUI Theme
 const theme = createTheme(themeOptions);
@@ -114,20 +142,18 @@ const theme = createTheme(themeOptions);
 // React Query client
 const queryClient = new QueryClient();
 
-const CactiLedgerBrowserApp: React.FC<AppConfigProps> = ({ appConfig }) => {
+export default function CactiLedgerBrowserApp() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <CssBaseline />
-            <App appConfig={appConfig} />
+            <App />
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </NotificationProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
-};
-
-export default CactiLedgerBrowserApp;
+}

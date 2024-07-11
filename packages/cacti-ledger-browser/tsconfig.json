@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
     "composite": true,
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",

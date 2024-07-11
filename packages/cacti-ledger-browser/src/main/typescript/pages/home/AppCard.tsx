@@ -12,7 +12,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-import { AppConfig, AppStatus } from "../../common/types/app";
+import { AppInstance, AppStatus } from "../../common/types/app";
+import ConfigureApp from "../configure-app/ConfigureApp";
 
 type StatusTextProps = {
   status: AppStatus;
@@ -73,8 +74,36 @@ function StatusDialogButton({ statusComponent }: StatusDialogButtonProps) {
   );
 }
 
+type ConfigureDialogButtonProps = {
+  appInstanceId: string;
+};
+
+function ConfigureDialogButton({ appInstanceId }: ConfigureDialogButtonProps) {
+  const [openDialog, setOpenDialog] = React.useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpenDialog(true)}>Configure</Button>
+      <Dialog
+        fullWidth
+        maxWidth="xl"
+        onClose={() => setOpenDialog(false)}
+        open={openDialog}
+      >
+        <DialogTitle color="primary">Configure Application</DialogTitle>
+        <DialogContent>
+          <ConfigureApp
+            appInstanceId={appInstanceId}
+            handleDone={() => setOpenDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 type AppCardProps = {
-  appConfig: AppConfig;
+  appConfig: AppInstance;
 };
 
 /**
@@ -98,7 +127,7 @@ export default function AppCard({ appConfig }: AppCardProps) {
     >
       <CardActionArea
         onClick={() => {
-          navigate(appConfig.options.path);
+          navigate(appConfig.path);
         }}
       >
         <CardContent
@@ -108,15 +137,13 @@ export default function AppCard({ appConfig }: AppCardProps) {
           }}
         >
           <Typography variant="h5" component="div" color="secondary.main">
-            {appConfig.options.instanceName}
+            {appConfig.instanceName}
           </Typography>
           <Typography sx={{ mb: 1.5 }} color="text.secondary">
             {appConfig.appName}
           </Typography>
-          {appConfig.options.description && (
-            <Typography sx={{ mb: 1.5 }}>
-              {appConfig.options.description}
-            </Typography>
+          {appConfig.description && (
+            <Typography sx={{ mb: 1.5 }}>{appConfig.description}</Typography>
           )}
           <Typography>
             Initialized:{" "}
@@ -144,6 +171,7 @@ export default function AppCard({ appConfig }: AppCardProps) {
           borderColor: theme.palette.primary.main,
         }}
       >
+        <ConfigureDialogButton appInstanceId={appConfig.id} />
         <StatusDialogButton statusComponent={appConfig.StatusComponent} />
       </CardActions>
     </Card>

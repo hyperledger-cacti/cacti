@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 
-import { FabricTransaction } from "../../fabric-supabase-types";
+import { FabricTransaction } from "../../supabase-types";
 import ShortenedTypography from "../../../../components/ui/ShortenedTypography";
 import StackedRowItems from "../../../../components/ui/StackedRowItems";
 
