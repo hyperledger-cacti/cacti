@@ -41,8 +41,6 @@ jobs:
       plugin-ledger-connector-stellar-changed: ${{ steps.changes.outputs.plugin-ledger-connector-stellar-changed }}
       plugin-htlc-coordinator-besu-changed: ${{ steps.changes.outputs.plugin-htlc-coordinator-besu-changed }}
       test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
-      ghcr-corda-all-in-one-obligation-changed: ${{ steps.changes.outputs.ghcr-corda-all-in-one-obligation-changed }}
-      ghcr-corda-all-in-one-changed: ${{ steps.changes.outputs.ghcr-corda-all-in-one-changed }}
       ghcr-dev-container-vscode-changed: ${{ steps.changes.outputs.ghcr-dev-container-vscode-changed }}
     runs-on: ubuntu-22.04
     steps:
@@ -137,14 +135,6 @@ jobs:
               - './packages/cactus-test-tooling/**'
               - './packages/cactus-common/**'
               # - './.github/workflows/ci.yaml'
-
-            ghcr-corda-all-in-one-obligation-changed:
-              - './tools/docker/corda-all-in-one/**'
-              # - './.github/workflows/ci.yaml'
-
-            ghcr-corda-all-in-one-changed:
-            - './tools/docker/corda-all-in-one/**'
-            # - './.github/workflows/ci.yaml'
 
             ghcr-dev-container-vscode-changed:
               - './.devcontainer/**'
@@ -1146,7 +1136,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8-express.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
+        --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
@@ -2200,32 +2190,13 @@ jobs:
           ignore-unfixed: false
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-  ghcr-corda-all-in-one:
-    runs-on: ubuntu-22.04
-    needs:
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.ghcr-corda-all-in-one-changed == 'true'
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: ghcr.io/hyperledger/cactus-corda-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
-
   ghcr-corda-all-in-one-flowdb:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
-  ghcr-corda-all-in-one-obligation:
-    runs-on: ubuntu-22.04
-    needs:
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.ghcr-corda-all-in-one-obligation-changed == 'true'
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile -t cactus-corda-all-in-one-obligation
-  
+
   ghcr-dev-container-vscode:
     runs-on: ubuntu-22.04
     needs:
