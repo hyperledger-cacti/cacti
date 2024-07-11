@@ -3,9 +3,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 
-import { TokenERC20 } from "../../../../common/supabase-types";
 import ERC20TokenList from "./ERC20TokenList";
 import ERC20TokenDetails from "./ERC20TokenDetails";
+import { TokenERC20 } from "../../supabase-types";
 
 export type AccountERC20ViewProps = {
   accountAddress: string;

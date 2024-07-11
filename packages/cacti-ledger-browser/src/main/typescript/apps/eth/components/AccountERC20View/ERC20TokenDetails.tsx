@@ -7,12 +7,12 @@ import Typography from "@mui/material/Typography";
 import Skeleton from "@mui/material/Skeleton";
 
 import { ethERC20TokenHistory } from "../../queries";
-import { TokenERC20 } from "../../../../common/supabase-types";
 import ShortenedTypography from "../../../../components/ui/ShortenedTypography";
 import { useNotification } from "../../../../common/context/NotificationContext";
 import ERC20BalanceHistoryChart from "./ERC20BalanceHistoryChart";
 import ERC20BalanceHistoryTable from "./ERC20BalanceHistoryTable";
 import { createBalanceHistoryList } from "./balanceHistory";
+import { TokenERC20 } from "../../supabase-types";
 
 function TokenDetailsPlaceholder() {
   return (

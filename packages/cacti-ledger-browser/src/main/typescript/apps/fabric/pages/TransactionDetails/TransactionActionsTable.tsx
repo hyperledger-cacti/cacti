@@ -19,7 +19,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import { fabricTransactionActions } from "../../queries";
-import { FabricTransactionAction } from "../../fabric-supabase-types";
+import { FabricTransactionAction } from "../../supabase-types";
 import {
   StyledTableCellHeader,
   StyledTableCell,

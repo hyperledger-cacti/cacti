@@ -1,4 +1,4 @@
-import { TokenHistoryItem20 } from "../../../../common/supabase-types";
+import { TokenHistoryItem20 } from "../../supabase-types";
 
 export type BalanceHistoryListData = {
   created_at: string;

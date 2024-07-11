@@ -14,8 +14,8 @@ import Typography from "@mui/material/Typography";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
-import { TokenHistoryItem20 } from "../../../../common/supabase-types";
 import ShortenedTypography from "../../../../components/ui/ShortenedTypography";
+import { TokenHistoryItem20 } from "../../supabase-types";
 
 const StyledHeaderCell = styled(TableCell)(({ theme }) => ({
   color: theme.palette.primary.main,

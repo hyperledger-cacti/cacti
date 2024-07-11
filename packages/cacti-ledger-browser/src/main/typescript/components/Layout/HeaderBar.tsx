@@ -7,13 +7,13 @@ import IconButton from "@mui/material/IconButton";
 import AppsIcon from "@mui/icons-material/Apps";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
-import { AppConfigMenuEntry, AppListEntry } from "../../common/types/app";
+import { AppInstanceMenuEntry, AppListEntry } from "../../common/types/app";
 import { patchAppRoutePath } from "../../common/utils";
 
 type HeaderBarProps = {
   appList: AppListEntry[];
   path?: string;
-  menuEntries?: AppConfigMenuEntry[];
+  menuEntries?: AppInstanceMenuEntry[];
 };
 
 const HeaderBar: React.FC<HeaderBarProps> = ({ path, menuEntries }) => {

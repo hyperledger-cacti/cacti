@@ -1,10 +1,15 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import { appConfig } from "../../common/config";
+import { AppInstance } from "../../common/types/app";
 import AppCard from "./AppCard";
+import AddApplicationPopupCard from "./AddApplicationPopupCard";
 
-export default function HomePage() {
+type HomePageProps = {
+  appConfig: AppInstance[];
+};
+
+export default function HomePage({ appConfig }: HomePageProps) {
   return (
     <Box>
       <Typography variant="h5" color="secondary">
@@ -13,17 +18,13 @@ export default function HomePage() {
       <Box
         display="flex"
         flexWrap="wrap"
-        justifyContent="space-around"
+        justifyContent="space-between"
         gap={5}
         padding={5}
       >
+        <AddApplicationPopupCard />
         {appConfig.map((a) => {
-          return (
-            <AppCard
-              key={`${a.appName}_${a.options.instanceName}`}
-              appConfig={a}
-            />
-          );
+          return <AppCard key={a.id} appConfig={a} />;
         })}
       </Box>
     </Box>

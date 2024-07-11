@@ -54,6 +54,7 @@ cactus-openapi-spec-*.json
 build/
 .gradle/
 site/
+.env
 
 .build-cache/*.tsbuildinfo
 
