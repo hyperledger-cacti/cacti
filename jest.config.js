@@ -16,7 +16,6 @@ module.exports = {
   ],
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [
-    `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8-express.test.ts`,
     `./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/manual/geth-alchemy-integration-manual-check.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts`,
@@ -29,11 +28,6 @@ module.exports = {
     `./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/refund-endpoint.test.ts`,
     `./packages/cactus-test-cmd-api-server/src/test/typescript/integration/plugin-import-with-npm-install-version-selection.test.ts`,
     `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
-    `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.7.test.ts`,
-    `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.7.test.ts`,
-    `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.8.test.ts`,
-    `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts`,
-    `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8.test.ts`,
     `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts`,
     `./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts`,
     `./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-keychain-google-sm.test.ts`,
