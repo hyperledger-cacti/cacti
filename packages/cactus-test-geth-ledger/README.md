@@ -65,7 +65,7 @@ npx jest cactus-test-geth-ledger
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 

@@ -2528,25 +2528,6 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
-  ghcr-connector-besu:
-    needs:
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-besu-changed == 'true'
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: ghcr.io/hyperledger/cactus-connector-besu
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile -t cactus-connector-besu
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-connector-besu
-        uses: aquasecurity/trivy-action@0.19.0
-        with:
-          image-ref: 'cactus-connector-besu'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: false
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
   ghcr-connector-corda-server:
     runs-on: ubuntu-22.04
     needs:
@@ -2562,26 +2543,6 @@ jobs:
         uses: aquasecurity/trivy-action@0.19.0
         with:
           image-ref: 'cactus-connector-corda-server'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: false
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-  ghcr-connector-fabric:
-    runs-on: ubuntu-22.04
-    needs:
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
-
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: ghcr.io/hyperledger/cactus-connector-fabric
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile -t cactus-connector-fabric
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
-        name: Run Trivy vulnerability scan for cactus-connector-fabric
-        uses: aquasecurity/trivy-action@0.19.0
-        with:
-          image-ref: 'cactus-connector-fabric'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: false

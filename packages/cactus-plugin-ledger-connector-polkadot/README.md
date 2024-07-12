@@ -9,8 +9,7 @@
 - [2. Architecture](#2-architecture)
   - [2.1. run-transaction-endpoint](#21-run-transaction-endpoint)
 - [3. Containerization](#3-containerization)
-  - [3.1. Building/running the container image locally](#31-buildingrunning-the-container-image-locally)
-  - [3.2. Running the container](#32-running-the-container)
+  - [3.1. Running the container](#31-running-the-container)
 - [4. Prometheus Exporter](#4-prometheus-exporter)
   - [4.1. Usage Prometheus](#41-usage-prometheus)
   - [4.2. Prometheus Integration](#42-prometheus-integration)
@@ -124,68 +123,20 @@ The above diagram shows transactSigned() method being called by the transact() m
 
 
 ## 3. Containerization
-### 3.1. Building/running the container image locally
 
-In the Cactus project root say:
-
-```sh
-DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-plugin-ledger-connector-polkadot/Dockerfile . -t cplcb
-```
-
-Build with a specific version of the npm package:
-```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=latest -f ./packages/cactus-plugin-ledger-connector-polkadot/Dockerfile . -t cplcb
-```
-
-### 3.2. Running the container
+### 3.1. Running the container
 
 Launch container with plugin configuration as an **environment variable**:
 
-```sh
-docker run \
-  --rm \
-  --publish 3000:3000 \
-  --publish 4000:4000 \
-  --env AUTHORIZATION_PROTOCOL='NONE' \
-  --env AUTHORIZATION_CONFIG_JSON='{}' \
-  --env GRPC_TLS_ENABLED=false \
-  cplcb \
-  node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
-  --env PLUGINS='[{"packageName": "cactus-plugin-ledger-connector-polkadot", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"wsProviderUrl":"ws://127.0.0.1:9944", "instanceId": "some-unique-polkadot-connector-instance-id"}}]'
-```
+> FIXME
 
 Launch container with plugin configuration as a **CLI argument**:
-```sh
-docker run \
-  --rm \
-  --publish 3000:3000 \
-  --publish 4000:4000 \
-  --publish 5000:5000 \
-  --env AUTHORIZATION_PROTOCOL='NONE' \
-  --env AUTHORIZATION_CONFIG_JSON='{}' \
-  --env GRPC_TLS_ENABLED=false \
-  cplcb \
-    node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
-    --plugins='[{"packageName": "cactus-plugin-ledger-connector-polkadot", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"wsProviderUrl":"ws://127.0.0.1:9944", "instanceId": "some-unique-polkadot-connector-instance-id"}}]'
-```
+
+> FIXME
 
 Launch container with **configuration file** mounted from host machine:
-```sh
 
-echo '[{"packageName": "cactus-plugin-ledger-connector-polkadot", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"wsProviderUrl":"ws://127.0.0.1:9944", "instanceId": "some-unique-polkadot-connector-instance-id"}}]' > cactus.json
-
-docker run \
-  --rm \
-  --publish 3000:3000 \
-  --publish 4000:4000 \
-  --env AUTHORIZATION_PROTOCOL='NONE' \
-  --env AUTHORIZATION_CONFIG_JSON='{}' \
-  --env GRPC_TLS_ENABLED=false \
-  --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
-  cplcb \
-    node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
-    --config-file=/cactus.json
-```
+> FIXME
 
 ## 4. Prometheus Exporter
 
@@ -231,7 +182,7 @@ This file lists all the Prometheus metrics and what they are used for.
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## 6. License
 

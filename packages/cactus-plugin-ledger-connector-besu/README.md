@@ -128,19 +128,6 @@ Call example to deploy a private contract:
 > Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP) 
 
 
-### Building/running the container image locally
-
-In the Cactus project root say:
-
-```sh
-DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile . -t cplcb
-```
-
-Build with a specific version of the npm package:
-```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=1.0.0 -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile . -t cplcb
-```
-
 #### Running the container
 
 Launch container with plugin configuration as an **environment variable**:
@@ -152,10 +139,16 @@ docker run \
   --env AUTHORIZATION_PROTOCOL='NONE' \
   --env AUTHORIZATION_CONFIG_JSON='{}' \
   --env GRPC_TLS_ENABLED=false \
-  cplcb \
-  node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
-  --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
-  cplcb
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
+  node index.js \
+  --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]'
 ```
 
 Launch container with plugin configuration as a **CLI argument**:
@@ -163,25 +156,46 @@ Launch container with plugin configuration as a **CLI argument**:
 docker run \
   --rm \
   --publish 3000:3000 \
-   --publish 4000:4000 \
-  cplcb \
-    ./node_modules/.bin/cactusapi \
+  --publish 4000:4000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
+  node index.js \
     --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 ```sh
+echo '{"plugins": [{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]}' > .cacti-config.json
+```
 
-echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]' > cactus.json
-
+```sh
 docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
-  --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
-  cplcb \
-    ./node_modules/.bin/cactusapi \
-    --config-file=/cactus.json
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  --mount type=bind,source="$(pwd)"/.cacti-config.json,target=/.cacti-config.json \
+  ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
+    node index.js \
+    --config-file=/.cacti-config.json
 ```
 
 #### Testing API calls with the container
@@ -196,21 +210,29 @@ docker run \
   --publish 0.0.0.0:8888:8888/tcp \
   --publish 0.0.0.0:9001:9001/tcp \
   --publish 0.0.0.0:9545:9545/tcp \
-  ghcr.io/hyperledger/cactus-besu-all-in-one:2022-05-12-2330a96
+  ghcr.io/hyperledger/cactus-besu-all-in-one:2024-07-04-8c030ae
 ```
 
-**Terminal Window 2 (Cactus API Server)**
+**Terminal Window 2 (Cacti API Server)**
 ```sh
 docker run \
-  --network host \
+  --network=host \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --env AUTHORIZATION_PROTOCOL='NONE' \
   --env AUTHORIZATION_CONFIG_JSON='{}' \
   --env GRPC_TLS_ENABLED=false \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
-  cplcb
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
+  node index.js \
+  --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]'
 ```
 
 **Terminal Window 3 (curl - replace eth accounts as needed)**
@@ -312,7 +334,7 @@ npm run test:plugin-ledger-connector-besu
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 
