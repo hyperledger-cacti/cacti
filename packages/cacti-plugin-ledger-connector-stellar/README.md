@@ -150,20 +150,6 @@ const res = await connector.runSorobanTransaction({
 });
 ```
 
-### Building/running the container image locally
-
-In the Cacti project root say:
-
-```sh
-DOCKER_BUILDKIT=1 docker build -f ./packages/cacti-plugin-ledger-connector-stellar/Dockerfile . --tag cplcs --tag cacti-plugin-ledger-connector-stellar
-```
-
-Build with a specific version of the npm package:
-
-```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=2.0.0-rc.2 -f ./packages/cacti-plugin-ledger-connector-stellar/Dockerfile . --tag cplcs --tag cacti-plugin-ledger-connector-stellar
-```
-
 #### Running the container
 
 Launch container with plugin configuration as an **environment variable**:
@@ -173,9 +159,23 @@ docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id"}}]' \
-  cplcs
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  --env PLUGINS='[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id", "networkConfig": {}}}]' \
+  ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255
 ```
+
+> Notice that in the command above we've left the `networkConfig` parameter as
+> an empty object. If you'd like the Stellar connector plugin to connect to
+> a specific ledger then fill out the details of `networkConfig` accordingly.
 
 Launch container with plugin configuration as a **CLI argument**:
 
@@ -183,26 +183,47 @@ Launch container with plugin configuration as a **CLI argument**:
 docker run \
   --rm \
   --publish 3000:3000 \
-   --publish 4000:4000 \
-  cplcs \
-    ./node_modules/.bin/cactusapi \
-    --plugins='[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id"}}]'
+  --publish 4000:4000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
+    node index.js \
+    --plugins='[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "networkConfig":{}, "instanceId": "some-unique-stellar-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 
 ```sh
+echo '{"plugins": [{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "networkConfig":{}, "instanceId": "some-unique-stellar-connector-instance-id"}}]}' > .cacti-config.json
+```
 
-echo '[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id"}}]' > cactus.json
-
+```sh
 docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
-  --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
-  cplcs \
-    ./node_modules/.bin/cactusapi \
-    --config-file=/cactus.json
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=INFO \
+  --mount type=bind,source="$(pwd)"/.cacti-config.json,target=/.cacti-config.json \
+  cas \
+    node index.js \
+    --config-file=/.cacti-config.json
 ```
 
 #### Testing API calls with the container
@@ -293,7 +314,7 @@ yarn jest packages/cacti-plugin-ledger-connector-stellar/
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 

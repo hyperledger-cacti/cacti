@@ -1,3 +1,4 @@
+.cacti-config.json
 .config.json
 .nyc_output/
 dist/

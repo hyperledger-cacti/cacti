@@ -152,7 +152,7 @@ npx jest cactus-plugin-fabric-persistence-block
 
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ### Quick plugin project walkthrough
 

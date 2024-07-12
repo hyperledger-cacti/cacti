@@ -64,7 +64,7 @@ psql "postgres://postgres.DB_NAME:DB_PASS@aws-0-eu-central-1.pooler.supabase.com
 
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 

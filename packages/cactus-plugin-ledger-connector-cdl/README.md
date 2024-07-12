@@ -8,13 +8,23 @@ This plugin provides `Cacti` a way to interact with Fujitsu CDL networks. Using 
 
 ## Summary
 
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [ApiClient](#apiclient)
-- [Runing the tests](#running-the-tests)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+- [`@hyperledger/cactus-plugin-ledger-connector-cdl`](#hyperledgercactus-plugin-ledger-connector-cdl)
+  - [Summary](#summary)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+  - [Usage](#usage)
+    - [Configuration](#configuration)
+      - [Connector Setup](#connector-setup)
+      - [Gateway Setup](#gateway-setup)
+    - [Connector Methods](#connector-methods)
+      - [Methods](#methods)
+  - [ApiClient](#apiclient)
+    - [REST Functions](#rest-functions)
+  - [Running the tests](#running-the-tests)
+    - [Manual Tests](#manual-tests)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Acknowledgments](#acknowledgments)
 
 ## Getting Started
 
@@ -116,25 +126,11 @@ npx jest cactus-plugin-ledger-connector-cdl
   - `npx tsc`
   - `npx jest dist/lib/test/typescript/manual/cdl-connector-manual.test.js`
 
-### Building/running the container image locally
-
-In the Cactus project root say:
-
-```sh
-DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-plugin-ledger-connector-cdl/Dockerfile . -t CDL_connector
-```
-
-Build with a specific version of the npm package:
-
-```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=0.4.1 -f ./packages/cactus-plugin-ledger-connector-cdl/Dockerfile . -t CDL_connector
-```
-
 ## Contributing
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 

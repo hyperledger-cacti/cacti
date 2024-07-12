@@ -7,13 +7,19 @@ This plugin provides `Cacti` a way to interact with Sawtooth networks. Using thi
 
 ## Summary
 
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [SawtoothApiClient](#sawtoothapiclient)
-- [Runing the tests](#running-the-tests)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+- [`@hyperledger/cactus-plugin-ledger-connector-sawtooth`](#hyperledgercactus-plugin-ledger-connector-sawtooth)
+  - [Summary](#summary)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+  - [Usage](#usage)
+  - [SawtoothApiClient](#sawtoothapiclient)
+    - [REST Functions](#rest-functions)
+    - [Asynchronous Functions (socket.io)](#asynchronous-functions-socketio)
+  - [Running the tests](#running-the-tests)
+      - [Running the container](#running-the-container)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Acknowledgments](#acknowledgments)
 
 ## Getting Started
 
@@ -74,70 +80,35 @@ To check that all has been installed correctly and that the plugin has no errors
 npx jest cactus-plugin-ledger-connector-sawtooth
 ```
 
-### Building/running the container image locally
-
-In the Cactus project root say:
-
-```sh
-DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-plugin-ledger-connector-sawtooth/Dockerfile . -t cplcb
-```
-
-Build with a specific version of the npm package:
-
-```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=0.4.1 -f ./packages/cactus-plugin-ledger-connector-sawtooth/Dockerfile . -t cplcb
-```
-
 #### Running the container
 
 Launch container with plugin configuration as an **environment variable**:
 
 ```sh
-docker run \
-  --rm \
-  --publish 3000:3000 \
-  --publish 4000:4000 \
-  --env AUTHORIZATION_PROTOCOL='NONE' \
-  --env AUTHORIZATION_CONFIG_JSON='{}' \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-sawtooth", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-sawtooth-connector-instance-id"}}]' \
-  cplcb
+# FIXME
 ```
 
 Launch container with plugin configuration as a **CLI argument**:
 
 ```sh
-docker run \
-  --rm \
-  --publish 3000:3000 \
-   --publish 4000:4000 \
-  cplcb \
-    ./node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
-    --authorization-protocol='NONE' \
-    --authorization-config-json='{}' \
-    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-sawtooth", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-sawtooth-connector-instance-id"}}]'
+# FIXME
 ```
 
 Launch container with **configuration file** mounted from host machine:
 
 ```sh
+# FIXME
+```
 
-echo '{"authorizationProtocol":"NONE","authorizationConfigJson":{},"plugins":[{"packageName":"@hyperledger/cactus-plugin-ledger-connector-sawtooth","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"rpcApiHttpHost":"http://localhost:8545","instanceId":"some-unique-sawtooth-connector-instance-id"}}]}' > cactus.json
-
-docker run \
-  --rm \
-  --publish 3000:3000 \
-  --publish 4000:4000 \
-  --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
-  cplcb \
-    ./node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
-    --config-file=/cactus.json
+```sh
+# FIXME
 ```
 
 ## Contributing
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 
