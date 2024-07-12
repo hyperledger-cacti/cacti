@@ -70,6 +70,13 @@ import {
 import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { DiscoveryOptions } from "fabric-network";
 
+/**
+ * The log pattern message that will be printed on stdout when the
+ * Supply Chain Application finished booting (it can take a long time).
+ */
+export const SUPPLY_CHAIN_APP_OK_LOG_MSG_PATTERN =
+  "Cacti API Server - REST API reachable at:";
+
 export interface ISupplyChainAppOptions {
   disableSignalHandlers?: true;
   logLevel?: LogLevelDesc;
@@ -633,7 +640,7 @@ export class SupplyChainApp {
     await apiServer.start();
 
     const restApiUrl = `http://127.0.0.1:${properties.apiPort}`;
-    this.log.info("Cacti API Server - REST API reachable at: %s", restApiUrl);
+    this.log.info("%s: %s", SUPPLY_CHAIN_APP_OK_LOG_MSG_PATTERN, restApiUrl);
 
     const guiUrl = `http://127.0.0.1:${properties.cockpitPort}`;
     this.log.info("SupplyChainApp Web GUI - reachable at: %s", guiUrl);

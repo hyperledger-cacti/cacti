@@ -2280,6 +2280,8 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: ./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/openapi/openapi-validation.test.ts
       TAPE_TEST_RUNNER_DISABLED: false
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpt-consortium-manual
+      JEST_TEST_CODE_COVERAGE_ENABLED: true
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:

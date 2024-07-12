@@ -6,6 +6,7 @@ import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import * as publicApi from "../../../main/typescript/public-api";
+import { SUPPLY_CHAIN_APP_OK_LOG_MSG_PATTERN } from "../../../main/typescript/public-api";
 
 const testCase = "SupplyChainApp can launch via root package.json script";
 const logLevel: LogLevelDesc = "TRACE";
@@ -91,7 +92,7 @@ test(testCase, async (t: Test) => {
   const logs = [];
   for await (const data of child.stdout) {
     console.log(`[child]: ${data}`);
-    if (data.includes("Cactus API reachable http")) {
+    if (data.includes(SUPPLY_CHAIN_APP_OK_LOG_MSG_PATTERN)) {
       console.log("Sending kill signal to child process...");
       apiIsHealthy = true;
       const killedOK = child.kill("SIGKILL");
