@@ -1,12 +1,16 @@
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { Gateway } from "fabric-network";
+import { common } from "fabric-protos";
+// BlockDecoder is not exported in ts definition so we need to use legacy import.
+const { BlockDecoder } = require("fabric-common");
+
 import {
   GetTransactionReceiptResponse,
   TransactReceiptTransactionEndorsement,
   TransactReceiptTransactionCreator,
   TransactReceiptBlockMetaData,
 } from "../generated/openapi/typescript-axios";
-import { common } from "fabric-protos";
+
 import { querySystemChainCode } from "./query-system-chain-code";
 
 export interface IGetTransactionReceiptByTxIDOptions {
@@ -38,18 +42,17 @@ export async function getTransactionReceiptByTxID(
     gateway,
     connectionChannelName: req.channelName,
   };
-  const block: common.Block = await querySystemChainCode(
+  const blockBuffer = await querySystemChainCode(
     queryConfig,
     "GetBlockByTxID",
     paramChannelName,
     reqTxID,
   );
 
-  if (block instanceof Buffer) {
-    throw new Error(
-      "Unexpected encoded response from querySystemChainCode::GetBlockByTxID()",
-    );
-  }
+  // Since commit 8c030ae9e739a28ff0900f7af27ec0fbbb4b7ff9 we have to manually
+  // decode the protocol buffer block data because the querySystemChainCode()
+  // does not do it for us by default anymore.
+  const block: common.Block = BlockDecoder.decode(blockBuffer);
 
   const blockJson = JSON.parse(JSON.stringify(block));
 
