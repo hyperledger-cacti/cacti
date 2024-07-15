@@ -84,13 +84,13 @@ export class GetRawTransactionEndpoint implements IWebServiceEndpoint {
     return this;
   }
 
-  handleRequest(req: Request, res: Response): void {
+  async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     const reqBody = req.body;
     try {
-      const resBody = this.opts.connector.rawTransaction(reqBody);
+      const resBody = await this.opts.connector.rawTransaction(reqBody);
       res.json(resBody);
     } catch (ex) {
       const errorMsg = `${reqTag} ${fnTag} Failed to get Raw Transaction:`;

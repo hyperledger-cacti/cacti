@@ -1,11 +1,12 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 import { Express } from "express";
-import { ApiPromise, Keyring } from "@polkadot/api";
-import { WsProvider } from "@polkadot/rpc-provider/ws";
-import { WeightV2 } from "@polkadot/types/interfaces";
-import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
-import { isHex, stringCamelCase } from "@polkadot/util";
+import {
+  BadRequestError,
+  InternalServerError,
+  ServiceUnavailableError,
+} from "http-errors-enhanced-cjs";
+
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import {
   GetPrometheusMetricsEndpoint,
@@ -36,6 +37,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  newRex,
 } from "@hyperledger/cactus-common";
 import { promisify } from "util";
 import {
@@ -87,7 +89,6 @@ import {
   IInvokeContractEndpointOptions,
   InvokeContractEndpoint,
 } from "./web-services/invoke-contract-endpoint";
-import createHttpError from "http-errors";
 
 export interface IPluginLedgerConnectorPolkadotOptions
   extends ICactusPluginOptions {
@@ -114,8 +115,8 @@ export class PluginLedgerConnectorPolkadot
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly pluginRegistry: PluginRegistry;
-  public wsProvider: WsProvider | undefined;
-  public api: ApiPromise | undefined;
+  public wsProvider: unknown;
+  public api?: unknown;
   public prometheusExporter: PrometheusExporter;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private autoConnect: false | number | undefined;
@@ -153,17 +154,7 @@ export class PluginLedgerConnectorPolkadot
     if (opts.autoConnect) {
       this.autoConnect = 1;
     }
-    this.setProvider(opts.wsProviderUrl);
     this.prometheusExporter.startMetricsCollection();
-  }
-
-  public setProvider(wsProviderUrl: string): void {
-    try {
-      this.wsProvider = new WsProvider(wsProviderUrl, this.autoConnect);
-    } catch (err) {
-      const errorMessage = `Could not create wsProvider. InnerException: + ${err}`;
-      throw createHttpError[500](errorMessage);
-    }
   }
 
   public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
@@ -273,11 +264,25 @@ export class PluginLedgerConnectorPolkadot
   }
 
   public async onPluginInit(): Promise<void> {
+    const { WsProvider } = await import("@polkadot/rpc-provider");
+    const { ApiPromise } = await import("@polkadot/api");
     try {
+      this.wsProvider = new WsProvider(
+        this.opts.wsProviderUrl,
+        this.autoConnect,
+      );
+    } catch (ex: unknown) {
+      const rex = newRex(`Could not create WsProvider. Inner exception:`, ex);
+      throw new InternalServerError(rex.toJSON());
+    }
+    try {
+      if (!(this.wsProvider instanceof WsProvider)) {
+        throw new InternalServerError("this.wsProvider was not a WsProvider");
+      }
       this.api = await ApiPromise.create({ provider: this.wsProvider });
-    } catch (err) {
-      const errorMessage = `Could not create API. InnerException: + ${err}`;
-      throw createHttpError[500](errorMessage);
+    } catch (ex: unknown) {
+      const rex = newRex(`Could not create API. Inner exception:`, ex);
+      throw new InternalServerError(rex.toJSON());
     }
   }
 
@@ -292,24 +297,34 @@ export class PluginLedgerConnectorPolkadot
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
-  public rawTransaction(req: RawTransactionRequest): RawTransactionResponse {
-    const fnTag = `${this.className}#rawTx()`;
+  public async rawTransaction(
+    req: RawTransactionRequest,
+  ): Promise<RawTransactionResponse> {
+    const fnTag = `${this.className}#rawTransaction()`;
     Checks.truthy(req, `${fnTag} req`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new InternalServerError(`${fnTag} this.api is falsy.`);
+    }
+    const { ApiPromise } = await import("@polkadot/api");
+    if (!(this.api instanceof ApiPromise)) {
+      throw new InternalServerError("this.api was not instanceof ApiPromise");
     }
     try {
       const accountAddress = req.to;
       const transferValue = req.value;
-      const rawTransaction = this.api.tx.balances.transferAllowDeath(
+
+      this.log.debug("%s transferAllowDeath %s, %d", fnTag, req.to, req.value);
+
+      const rawTx = this.api.tx.balances.transferAllowDeath(
         accountAddress,
         transferValue,
       );
+
+      this.log.debug("%s transferAllowDeath rawTx=%o", rawTx.toHuman());
+
       const responseContainer = {
         response_data: {
-          rawTransaction: rawTransaction.toHex(),
+          rawTransaction: rawTx.toHex(),
         },
         succeeded: true,
         message: "obtainRawTransaction",
@@ -319,12 +334,11 @@ export class PluginLedgerConnectorPolkadot
       const response: RawTransactionResponse = {
         responseContainer: responseContainer,
       };
+      this.log.debug("%s res %o", fnTag, response);
       return response;
-    } catch (err) {
-      const errorMessage =
-        `${fnTag} Obtaining raw transaction has failed. ` +
-        `InnerException: ${err}`;
-      throw createHttpError[500](errorMessage);
+    } catch (ex: unknown) {
+      const rex = newRex(`${fnTag} Obtaining raw transaction has failed:`, ex);
+      throw new InternalServerError(rex.toJSON());
     }
   }
 
@@ -334,13 +348,16 @@ export class PluginLedgerConnectorPolkadot
     const fnTag = `${this.className}#signTx()`;
     Checks.truthy(req, `${fnTag} req`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new ServiceUnavailableError("Substrate Node connection is down.");
     }
     try {
+      const { Keyring } = await import("@polkadot/api");
       const keyring = new Keyring({ type: "sr25519" });
       const accountPair = keyring.createFromUri(req.mnemonic);
+      const { ApiPromise } = await import("@polkadot/api");
+      if (!(this.api instanceof ApiPromise)) {
+        throw new InternalServerError("this.api was not instanceof ApiPromise");
+      }
       const deserializedRawTransaction = this.api.tx(req.rawTransaction);
       const signedTransaction = await deserializedRawTransaction.signAsync(
         accountPair,
@@ -352,11 +369,10 @@ export class PluginLedgerConnectorPolkadot
         signedTransaction: serializedSignedTransaction,
       };
       return response;
-    } catch (err) {
-      const errorMessage =
-        `${fnTag} signing raw transaction has failed. ` +
-        `InnerException: ${err}`;
-      throw createHttpError[500](errorMessage);
+    } catch (ex: unknown) {
+      const errorMsg = `${fnTag} signing raw Polkadot transaction failed.`;
+      const rex = newRex(errorMsg, ex);
+      throw new InternalServerError(rex.toJSON());
     }
   }
 
@@ -380,7 +396,7 @@ export class PluginLedgerConnectorPolkadot
             `${fnTag} Expected pre-signed raw transaction ` +
             ` since signing credential is specified as` +
             `Web3SigningCredentialType.NONE`;
-          throw createHttpError[400](errorMessage);
+          throw new BadRequestError(errorMessage);
         }
       }
       default: {
@@ -388,7 +404,7 @@ export class PluginLedgerConnectorPolkadot
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
           `Supported ones are: ` +
           `${Object.values(Web3SigningCredentialType).join(";")}`;
-        throw createHttpError[400](errorMessage);
+        throw new BadRequestError(errorMessage);
       }
     }
   }
@@ -423,19 +439,20 @@ export class PluginLedgerConnectorPolkadot
     const fnTag = `${this.className}#transactMnemonicString()`;
     Checks.truthy(req, `${fnTag} req`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new BadRequestError(`Connection to Substrate Node is down.`);
+    }
+    const { ApiPromise } = await import("@polkadot/api");
+    if (!(this.api instanceof ApiPromise)) {
+      throw new InternalServerError("this.api was not instanceof ApiPromise");
     }
     const { transactionConfig, web3SigningCredential } = req;
     const { mnemonic } =
       web3SigningCredential as Web3SigningCredentialMnemonicString;
     if (!mnemonic) {
-      throw createHttpError[400](
-        `cannot perform transaction without mnemonic string`,
-      );
+      throw new BadRequestError(`Need mnemonic string for transaction`);
     }
     let success = false;
+    const { Keyring } = await import("@polkadot/api");
     const keyring = new Keyring({ type: "sr25519" });
     const accountPair = keyring.createFromUri(mnemonic);
     const accountAddress = transactionConfig.to;
@@ -444,34 +461,40 @@ export class PluginLedgerConnectorPolkadot
       success: boolean;
       transactionHash: string;
       blockhash: string;
-    }>((resolve, reject) => {
+    }>(async (resolve, reject) => {
       if (!this.api) {
-        reject("transaction not successful");
-        throw createHttpError[400](
-          `The operation has failed because the API is not connected to Substrate Node`,
+        reject(
+          new ServiceUnavailableError(`Connection to Substrate Node down.`),
         );
+      }
+      if (!(this.api instanceof ApiPromise)) {
+        throw new InternalServerError("this.api was not instanceof ApiPromise");
       }
       this.api.tx.balances
         .transferAllowDeath(accountAddress, transferValue)
-        .signAndSend(accountPair, ({ status, txHash, dispatchError }) => {
-          if (!this.api) {
-            throw createHttpError[400](
-              `The operation has failed because the API is not connected to Substrate Node`,
-            );
-          }
+        .signAndSend(accountPair, async ({ status, txHash, dispatchError }) => {
           if (status.isInBlock) {
             if (dispatchError) {
-              reject("transaction not successful");
+              reject(
+                new ServiceUnavailableError(
+                  `Connection to Substrate Node down.`,
+                ),
+              );
               if (dispatchError.isModule) {
+                if (!(this.api instanceof ApiPromise)) {
+                  throw new InternalServerError(
+                    "this.api was not instanceof ApiPromise",
+                  );
+                }
                 const decoded = this.api.registry.findMetaError(
                   dispatchError.asModule,
                 );
                 const { docs, name, section } = decoded;
-                throw createHttpError[400](
+                throw new BadRequestError(
                   `${section}.${name}: ${docs.join(" ")}`,
                 );
               } else {
-                throw createHttpError[400](dispatchError.toString());
+                throw new BadRequestError(dispatchError.toString());
               }
             }
             this.prometheusExporter.addCurrentTransaction();
@@ -500,6 +523,10 @@ export class PluginLedgerConnectorPolkadot
       req.transactionConfig.transferSubmittable,
       `${fnTag}:req.transactionConfig.transferSubmittable`,
     );
+    const { ApiPromise } = await import("@polkadot/api");
+    if (!(this.api instanceof ApiPromise)) {
+      throw new InternalServerError("this.api was not instanceof ApiPromise");
+    }
     const signedTx = req.transactionConfig.transferSubmittable as string;
 
     this.log.debug(
@@ -508,32 +535,31 @@ export class PluginLedgerConnectorPolkadot
     let success = false;
     Checks.truthy(req, `${fnTag} req`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new ServiceUnavailableError(`Connection to Substrate Node down.`);
     }
     const deserializedTransaction = this.api.tx(signedTx);
     const signature = deserializedTransaction.signature.toHex();
     if (!signature) {
-      throw createHttpError[400](`${fnTag} Transaction is not signed.`);
+      throw new BadRequestError(`${fnTag} Transaction is not signed.`);
     }
 
+    const { isHex } = await import("@polkadot/util");
     if (!isHex(signature)) {
-      throw createHttpError[400](
-        `${fnTag} Transaction signature is not valid.`,
-      );
+      throw new BadRequestError(`${fnTag} Transaction signature is not valid.`);
     }
 
     const txResult = await new Promise<{
       success: boolean;
       transactionHash: string;
       blockhash: string;
-    }>((resolve, reject) => {
+    }>(async (resolve, reject) => {
       if (!this.api) {
-        reject("transaction not successful");
-        throw createHttpError[400](
-          `The operation has failed because the API is not connected to Substrate Node`,
+        reject(
+          new ServiceUnavailableError(`Connection to Substrate Node down.`),
         );
+      }
+      if (!(this.api instanceof ApiPromise)) {
+        throw new InternalServerError("this.api was not instanceof ApiPromise");
       }
       this.api.rpc.author.submitAndWatchExtrinsic(
         deserializedTransaction,
@@ -546,9 +572,8 @@ export class PluginLedgerConnectorPolkadot
               transactionHash: hash.toHex(),
             });
           } else {
-            reject("transaction not successful");
             const errorMessage = `transaction not submitted with status: ${type}`;
-            throw new createHttpError[400](errorMessage);
+            reject(new BadRequestError(errorMessage));
           }
         },
       );
@@ -566,7 +591,7 @@ export class PluginLedgerConnectorPolkadot
     web3SigningCredential: Web3SigningCredential,
   ): Promise<string> {
     if (isWeb3SigningCredentialNone(web3SigningCredential)) {
-      throw createHttpError[400](
+      throw new BadRequestError(
         `${fnTag} Cannot ${type} contract with pre-signed TX`,
       );
     }
@@ -577,7 +602,7 @@ export class PluginLedgerConnectorPolkadot
       mnemonic = Credential.mnemonic;
       if (!mnemonic) {
         const errorMessage = `${fnTag} Cannot ${type} contract without mnemonic string.`;
-        throw createHttpError[400](errorMessage);
+        throw new BadRequestError(errorMessage);
       }
       return mnemonic;
     } else if (isWeb3SigningCredentialCactusRef(web3SigningCredential)) {
@@ -586,7 +611,7 @@ export class PluginLedgerConnectorPolkadot
       const { keychainEntryKey, keychainId } = Credential;
       if (!keychainId || !keychainEntryKey) {
         const errorMessage = `${fnTag} Cannot ${type} contract without keychainId and the keychainEntryKey.`;
-        throw createHttpError[400](errorMessage);
+        throw new BadRequestError(errorMessage);
       }
       // locate the keychain plugin that has access to the keychain backend
       // denoted by the keychainID from the request.
@@ -596,7 +621,7 @@ export class PluginLedgerConnectorPolkadot
         const errorMessage =
           `${fnTag} The plugin registry does not contain` +
           ` a keychain plugin for ID:"${keychainId}"`;
-        throw createHttpError[400](errorMessage);
+        throw new BadRequestError(errorMessage);
       }
       // Now use the found keychain plugin to actually perform the lookup of
       // the private key that we need to run the transaction.
@@ -605,7 +630,7 @@ export class PluginLedgerConnectorPolkadot
         const errorMessage =
           `${fnTag} Cannot ${type} contract because` +
           `the mnemonic string does not exist on the keychain`;
-        throw new createHttpError[400](errorMessage);
+        throw new BadRequestError(errorMessage);
       }
       return mnemonic;
     } else {
@@ -613,7 +638,7 @@ export class PluginLedgerConnectorPolkadot
         `${fnTag} Unrecognized Web3SigningCredentialType: ` +
         `Supported ones are: ` +
         `${Object.values(Web3SigningCredentialType).join(";")}`;
-      throw createHttpError[400](errorMessage);
+      throw new BadRequestError(errorMessage);
     }
   }
 
@@ -624,9 +649,11 @@ export class PluginLedgerConnectorPolkadot
     const fnTag = `${this.className}#deployContract()`;
     Checks.truthy(req, `${fnTag} req`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new ServiceUnavailableError(`Connection to Substrate Node down.`);
+    }
+    const { ApiPromise } = await import("@polkadot/api");
+    if (!(this.api instanceof ApiPromise)) {
+      throw new InternalServerError("this.api was not instanceof ApiPromise");
     }
     const mnemonic = await this.getMnemonicStringFromWeb3SigningCredential(
       fnTag,
@@ -634,6 +661,7 @@ export class PluginLedgerConnectorPolkadot
       req.web3SigningCredential,
     );
     let success = false;
+    const { CodePromise, Abi } = await import("@polkadot/api-contract");
     const contractAbi = new Abi(
       req.metadata,
       this.api.registry.getChainProperties(),
@@ -643,17 +671,20 @@ export class PluginLedgerConnectorPolkadot
       contractAbi,
       Buffer.from(req.wasm, "base64"),
     );
-    const gasLimit: WeightV2 = this.api.registry.createType("WeightV2", {
+    const gasLimit: unknown = this.api.registry.createType("WeightV2", {
       refTime: req.gasLimit.refTime,
       proofSize: req.gasLimit.proofSize,
     });
+    const { Keyring } = await import("@polkadot/api");
+    const { stringCamelCase } = await import("@polkadot/util");
+
     const keyring = new Keyring({ type: "sr25519" });
     const accountPair = keyring.createFromUri(mnemonic);
     const params = req.params ?? [];
     const constructorMethod = req.constructorMethod ?? "new";
     const tx = contractCode.tx[stringCamelCase(constructorMethod)](
       {
-        gasLimit,
+        gasLimit: gasLimit as string, // FIXME
         storageDepositLimit: req.storageDepositLimit,
         salt: req.salt,
         value: req.balance,
@@ -670,24 +701,24 @@ export class PluginLedgerConnectorPolkadot
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         ({ contract, status, dispatchError }) => {
-          if (!this.api) {
-            throw createHttpError[400](
-              `The operation has failed because the API is not connected to Substrate Node`,
-            );
-          }
           if (status.isInBlock || status.isFinalized) {
             if (dispatchError) {
-              reject("deployment not successful");
+              reject(new BadRequestError("deployment not successful"));
               if (dispatchError.isModule) {
+                if (!(this.api instanceof ApiPromise)) {
+                  throw new InternalServerError(
+                    "this.api was not instanceof ApiPromise",
+                  );
+                }
                 const decoded = this.api.registry.findMetaError(
                   dispatchError.asModule,
                 );
                 const { docs, name, section } = decoded;
-                throw createHttpError[400](
+                throw new BadRequestError(
                   `${section}.${name}: ${docs.join(" ")}`,
                 );
               } else {
-                throw createHttpError[400](dispatchError.toString());
+                throw new BadRequestError(dispatchError.toString());
               }
             }
             this.prometheusExporter.addCurrentTransaction();
@@ -708,10 +739,14 @@ export class PluginLedgerConnectorPolkadot
   }
 
   public async isSafeToCallContractMethod(
-    abi: Abi,
+    abi: unknown,
     name: string,
   ): Promise<boolean> {
     Checks.truthy(abi, `${this.className}#isSafeToCallContractMethod():abi`);
+    const { Abi } = await import("@polkadot/api-contract");
+    if (!(abi instanceof Abi)) {
+      throw new Error("Expected abi arg as instanceof Abi");
+    }
     Checks.truthy(
       abi.messages,
       `${this.className}#isSafeToCallContractMethod():abi.messages`,
@@ -731,21 +766,25 @@ export class PluginLedgerConnectorPolkadot
     const fnTag = `${this.className}#invokeContract()`;
     Checks.truthy(req, `${fnTag} req`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new ServiceUnavailableError(`Connection to Substrate Node down.`);
     }
+    const { ApiPromise } = await import("@polkadot/api");
+    if (!(this.api instanceof ApiPromise)) {
+      throw new InternalServerError("this.api was not instanceof ApiPromise");
+    }
+    const { Abi, ContractPromise } = await import("@polkadot/api-contract");
     const contractAbi = new Abi(
       req.metadata,
       this.api.registry.getChainProperties(),
     );
+    const { stringCamelCase } = await import("@polkadot/util");
     const methodName = stringCamelCase(req.methodName);
     const isSafeToCall = await this.isSafeToCallContractMethod(
       contractAbi,
       methodName,
     );
     if (!isSafeToCall) {
-      throw createHttpError[400](
+      throw new BadRequestError(
         `Invalid method name provided in request. ${req.methodName} does not exist on the contract abi.messages object's "method" property.`,
       );
     }
@@ -754,7 +793,7 @@ export class PluginLedgerConnectorPolkadot
       req.metadata,
       req.contractAddress,
     );
-    const gasLimit: WeightV2 = this.api.registry.createType("WeightV2", {
+    const gasLimit: unknown = this.api.registry.createType("WeightV2", {
       refTime: req.gasLimit.refTime,
       proofSize: req.gasLimit.proofSize,
     });
@@ -764,7 +803,7 @@ export class PluginLedgerConnectorPolkadot
       const query = contract.query[methodName](
         req.accountAddress,
         {
-          gasLimit,
+          gasLimit: gasLimit as string, // FIXME,
           storageDepositLimit: req.storageDepositLimit,
           value: req.balance,
         },
@@ -779,13 +818,14 @@ export class PluginLedgerConnectorPolkadot
         "invoke",
         req.web3SigningCredential,
       );
+      const { Keyring } = await import("@polkadot/api");
       const keyring = new Keyring({ type: "sr25519" });
       const accountPair = keyring.createFromUri(mnemonic);
       let success = false;
       const params = req.params ?? [];
       const tx = contract.tx[methodName](
         {
-          gasLimit,
+          gasLimit: gasLimit as string, // FIXME
           storageDepositLimit: req.storageDepositLimit,
           value: req.balance,
         },
@@ -798,23 +838,26 @@ export class PluginLedgerConnectorPolkadot
       }>((resolve, reject) => {
         tx.signAndSend(accountPair, ({ status, txHash, dispatchError }) => {
           if (!this.api) {
-            throw createHttpError[400](
-              `The operation has failed because the API is not connected to Substrate Node`,
-            );
+            throw new ServiceUnavailableError(`Substrate node connection down`);
           }
           if (status.isInBlock || status.isFinalized) {
             if (dispatchError) {
               reject("TX not successful");
               if (dispatchError.isModule) {
+                if (!(this.api instanceof ApiPromise)) {
+                  throw new InternalServerError(
+                    "this.api was not instanceof ApiPromise",
+                  );
+                }
                 const decoded = this.api.registry.findMetaError(
                   dispatchError.asModule,
                 );
                 const { docs, name, section } = decoded;
-                throw createHttpError[400](
+                throw new BadRequestError(
                   `${section}.${name}: ${docs.join(" ")}`,
                 );
               } else {
-                throw createHttpError[400](dispatchError.toString());
+                throw new BadRequestError(dispatchError.toString());
               }
             }
             this.prometheusExporter.addCurrentTransaction();
@@ -831,7 +874,7 @@ export class PluginLedgerConnectorPolkadot
       const blockHash = txResult.blockHash;
       return { success, txHash, blockHash };
     } else {
-      throw createHttpError[400](
+      throw new BadRequestError(
         `${fnTag} Unsupported invocation type ${req.invocationType}`,
       );
     }
@@ -842,16 +885,14 @@ export class PluginLedgerConnectorPolkadot
   }
 
   public async getPrometheusExporterMetrics(): Promise<string> {
-    const fnTag = `${this.className}#getPrometheusExporterMetrics()`;
+    const fn = `${this.className}#getPrometheusExporterMetrics()`;
     try {
       const res: string = await this.prometheusExporter.getPrometheusMetrics();
       this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
       return res;
-    } catch (err) {
-      throw createHttpError[500](
-        `${fnTag} Obtaining Prometheus Exporter Metrics has failed. ` +
-          `InnerException: ${err}`,
-      );
+    } catch (ex: unknown) {
+      const rex = newRex(`${fn} Failed to get Prometheus exporter metrics`, ex);
+      throw new InternalServerError(rex.toJSON());
     }
   }
 
@@ -863,17 +904,20 @@ export class PluginLedgerConnectorPolkadot
     Checks.truthy(req, `${fnTag} req`);
     this.log.info(`getTxFee`);
     if (!this.api) {
-      throw createHttpError[400](
-        `The operation has failed because the API is not connected to Substrate Node`,
-      );
+      throw new ServiceUnavailableError(`Substrate node connection down`);
     }
     const accountAddress = req.accountAddress;
     const transactionExpiration = (req.transactionExpiration as number) || 50;
+    const { ApiPromise } = await import("@polkadot/api");
+    if (!(this.api instanceof ApiPromise)) {
+      throw new InternalServerError("this.api was not instanceof ApiPromise");
+    }
     try {
       const signedBlock = await this.api.rpc.chain.getBlock();
       const nonce = (await this.api.derive.balances.account(accountAddress))
         .accountNonce;
       const blockHash = signedBlock.block.header.hash;
+
       const era = this.api.createType("ExtrinsicEra", {
         current: signedBlock.block.header.number,
         period: transactionExpiration,
@@ -897,17 +941,21 @@ export class PluginLedgerConnectorPolkadot
       };
 
       return response;
-    } catch (err) {
-      throw createHttpError[500](
-        `${fnTag} Obtaining info for this transaction has failed. ` +
-          `InnerException: ${err}`,
-      );
+    } catch (ex: unknown) {
+      const rex = newRex(`${fnTag} Obtaining info for transaction failed.`, ex);
+      throw new InternalServerError(rex.toJSON());
     }
   }
 
   public async shutdownConnectionToSubstrate(): Promise<void> {
     try {
       if (this.api) {
+        const { ApiPromise } = await import("@polkadot/api");
+        if (!(this.api instanceof ApiPromise)) {
+          throw new InternalServerError(
+            "this.api was not instanceof ApiPromise",
+          );
+        }
         this.log.info("Shutting down connection to substrate...");
         this.api.disconnect();
       } else {
@@ -915,11 +963,10 @@ export class PluginLedgerConnectorPolkadot
           "Trying to shutdown connection to substrate, but no connection is available",
         );
       }
-    } catch (err) {
-      this.log.error("Could not disconnect from Substrate Ledger");
-      throw createHttpError[500](
-        `Could not disconnect from Substrate Ledger. InnerException: ${err} `,
-      );
+    } catch (ex: unknown) {
+      this.log.error("Could not disconnect from Substrate Ledger:", ex);
+      const rex = newRex("Could not disconnect from Substrate Ledger", ex);
+      throw new InternalServerError(rex.toJSON());
     }
   }
 }

@@ -1,13 +1,19 @@
+import { AddressInfo } from "net";
+import http from "http";
+import "jest-extended";
+import { v4 as uuidv4 } from "uuid";
+import express from "express";
+
 import {
   IListenOptions,
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
-import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main/typescript/substrate-test-ledger/substrate-test-ledger";
-import { v4 as uuidv4 } from "uuid";
+import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import express from "express";
-import http from "http";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+
 import {
   PluginLedgerConnectorPolkadot,
   IPluginLedgerConnectorPolkadotOptions,
@@ -15,23 +21,17 @@ import {
   Web3SigningCredentialType,
   PluginFactoryLedgerConnector,
 } from "../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { AddressInfo } from "net";
-import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
-import { Keyring } from "@polkadot/api";
 import { K_CACTUS_POLKADOT_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
-import "jest-extended";
+import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main/typescript/substrate-test-ledger/substrate-test-ledger";
 
-const testCase = "transact through all available methods";
-describe(testCase, () => {
+describe("PluginLedgerConnectorPolkadot", () => {
   const logLevel: LogLevelDesc = "TRACE";
 
   const DEFAULT_WSPROVIDER = "ws://127.0.0.1:9944";
   const instanceId = "test-polkadot-connector";
   const ledgerOptions = {
     publishAllPorts: false,
-    logLevel: logLevel,
+    logLevel: "INFO" as LogLevelDesc,
     emitContainerLogs: true,
   };
   const ledger = new SubstrateTestLedger(ledgerOptions);
@@ -54,15 +54,19 @@ describe(testCase, () => {
     const pruning = pruneDockerAllIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
+
   afterAll(async () => {
     await ledger.stop();
     await plugin.shutdownConnectionToSubstrate();
   });
+
   afterAll(async () => {
     const pruning = pruneDockerAllIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
+
   afterAll(async () => await Servers.shutdown(server));
+
   beforeAll(async () => {
     const ledgerContainer = await ledger.start();
     expect(ledgerContainer).toBeTruthy();
@@ -77,6 +81,7 @@ describe(testCase, () => {
       backend: new Map([[keychainEntryKey, keychainEntryValue]]),
       logLevel,
     });
+
     const connectorOptions: IPluginLedgerConnectorPolkadotOptions = {
       logLevel: logLevel,
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -104,7 +109,10 @@ describe(testCase, () => {
     await plugin.registerWebServices(expressApp);
     await plugin.getOrCreateWebServices();
   });
+
   test("transact using pre-signed transaction", async () => {
+    const { Keyring } = await import("@polkadot/api");
+
     const keyring = new Keyring({ type: "sr25519" });
     const alicePair = keyring.createFromUri("//Alice");
     const bobPair = keyring.createFromUri("//Bob");
@@ -143,7 +151,7 @@ describe(testCase, () => {
     const signedTransactionResponse = await apiClient.signRawTransaction({
       rawTransaction: rawTransaction,
       mnemonic: "//Alice",
-      signingOptions: signingOptions,
+      signingOptions,
     });
     expect(signedTransactionResponse.data.success).toBeTrue();
     expect(signedTransactionResponse.data.signedTransaction).toBeTruthy();
@@ -163,6 +171,8 @@ describe(testCase, () => {
   });
 
   test("transact by omiting mnemonic string", async () => {
+    const { Keyring } = await import("@polkadot/api");
+
     const keyring = new Keyring({ type: "sr25519" });
     const bobPair = keyring.createFromUri("//Bob");
     const TransactionDetails = apiClient.runTransaction({
@@ -181,7 +191,10 @@ describe(testCase, () => {
       400,
     );
   });
+
   test("transact using passing mnemonic string", async () => {
+    const { Keyring } = await import("@polkadot/api");
+
     const keyring = new Keyring({ type: "sr25519" });
     const bobPair = keyring.createFromUri("//Bob");
     const TransactionDetails = await apiClient.runTransaction({
@@ -201,7 +214,10 @@ describe(testCase, () => {
     expect(transactionResponse.txHash).toBeTruthy();
     expect(transactionResponse.blockHash).toBeTruthy();
   });
+
   test("transact using passing cactus keychain ref", async () => {
+    const { Keyring } = await import("@polkadot/api");
+
     const keyring = new Keyring({ type: "sr25519" });
     const bobPair = keyring.createFromUri("//Bob");
     const TransactionDetails = await apiClient.runTransaction({
