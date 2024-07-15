@@ -1407,6 +1407,8 @@ jobs:
       JEST_TEST_PATTERN: packages/cacti-plugin-ledger-connector-stellar/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_RUNNER_DISABLED: true
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-stellar
+      JEST_TEST_CODE_COVERAGE_ENABLED: true
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}

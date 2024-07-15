@@ -76,7 +76,7 @@
     "fs-extra": "11.2.0",
     "internal-ip": "6.2.0",
     "is-port-reachable": "3.0.0",
-    "joi": "17.9.1",
+    "joi": "17.13.3",
     "js-yaml": "4.1.0",
     "keycloak-admin": "1.14.22",
     "lodash": "4.17.21",

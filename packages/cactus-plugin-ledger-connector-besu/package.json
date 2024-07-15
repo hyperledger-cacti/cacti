@@ -67,7 +67,7 @@
     "google-protobuf": "3.21.2",
     "http-errors": "2.0.0",
     "http-errors-enhanced-cjs": "2.0.1",
-    "joi": "17.9.1",
+    "joi": "17.13.3",
     "openapi-types": "12.1.3",
     "prom-client": "15.1.3",
     "run-time-error-cjs": "1.4.0",

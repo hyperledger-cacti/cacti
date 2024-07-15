@@ -8918,7 +8918,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hapi/topo@npm:^5.0.0":
+"@hapi/hoek@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "@hapi/hoek@npm:9.3.0"
+  checksum: 10/ad83a223787749f3873bce42bd32a9a19673765bf3edece0a427e138859ff729469e68d5fdf9ff6bbee6fb0c8e21bab61415afa4584f527cfc40b59ea1957e70
+  languageName: node
+  linkType: hard
+
+"@hapi/topo@npm:^5.1.0":
   version: 5.1.0
   resolution: "@hapi/topo@npm:5.1.0"
   dependencies:
@@ -9093,7 +9100,7 @@ __metadata:
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     http-errors-enhanced-cjs: "npm:2.0.1"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
@@ -9974,7 +9981,7 @@ __metadata:
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
     fast-safe-stringify: "npm:2.1.1"
-    joi: "npm:14.3.1"
+    joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -9998,7 +10005,7 @@ __metadata:
     "@types/express": "npm:4.17.21"
     axios: "npm:1.6.0"
     express: "npm:4.19.2"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
   languageName: unknown
@@ -10022,7 +10029,7 @@ __metadata:
     ethers: "npm:6.3.0"
     express: "npm:4.19.2"
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
     web3js-quorum: "npm:22.4.0"
@@ -10233,7 +10240,7 @@ __metadata:
     grpc_tools_node_protoc_ts: "npm:5.3.3"
     http-errors: "npm:2.0.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     key-encoder: "npm:2.0.3"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
@@ -10292,7 +10299,7 @@ __metadata:
     express: "npm:4.19.2"
     express-openapi-validator: "npm:5.0.4"
     internal-ip: "npm:6.2.0"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     node-ssh: "npm:13.1.0"
     prom-client: "npm:15.1.3"
     rxjs: "npm:7.8.1"
@@ -10487,7 +10494,7 @@ __metadata:
     "@polkadot/util": "npm:12.6.2"
     "@types/express": "npm:4.17.21"
     "@types/http-errors": "npm:2.0.4"
-    "@types/joi": "npm:14.3.4"
+    "@types/joi": "npm:17.2.3"
     "@types/multer": "npm:1.4.7"
     "@types/ssh2": "npm:0.5.44"
     "@types/supertest": "npm:2.0.11"
@@ -10501,7 +10508,7 @@ __metadata:
     fs-extra: "npm:11.2.0"
     http-errors: "npm:2.0.0"
     http-status-codes: "npm:2.1.4"
-    joi: "npm:14.3.1"
+    joi: "npm:17.13.3"
     multer: "npm:1.4.2"
     ngo: "npm:2.6.2"
     openapi-types: "npm:12.1.3"
@@ -10577,7 +10584,7 @@ __metadata:
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -10928,7 +10935,7 @@ __metadata:
     fs-extra: "npm:11.2.0"
     internal-ip: "npm:6.2.0"
     is-port-reachable: "npm:3.0.0"
-    joi: "npm:17.9.1"
+    joi: "npm:17.13.3"
     js-yaml: "npm:4.1.0"
     keycloak-admin: "npm:1.14.22"
     lodash: "npm:4.17.21"
@@ -15161,12 +15168,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sideway/address@npm:^4.1.3":
-  version: 4.1.4
-  resolution: "@sideway/address@npm:4.1.4"
+"@sideway/address@npm:^4.1.5":
+  version: 4.1.5
+  resolution: "@sideway/address@npm:4.1.5"
   dependencies:
     "@hapi/hoek": "npm:^9.0.0"
-  checksum: 10/48c422bd2d1d1c7bff7e834f395b870a66862125e9f2302f50c781a33e9f4b2b004b4db0003b232899e71c5f649d39f34aa6702a55947145708d7689ae323cc5
+  checksum: 10/c4c73ac0339504f34e016d3a687118e7ddf197c1c968579572123b67b230be84caa705f0f634efdfdde7f2e07a6e0224b3c70665dc420d8bc95bf400cfc4c998
   languageName: node
   linkType: hard
 
@@ -17121,10 +17128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/joi@npm:14.3.4":
-  version: 14.3.4
-  resolution: "@types/joi@npm:14.3.4"
-  checksum: 10/f37d83cb2e84919caaccc65bb2b752eecdc323a8d466059beb437a51747ca32cdecc6b8720cb7a42248c25c217edd6ceea1fce8e6aeb47d44d7ad32de652a049
+"@types/joi@npm:17.2.3":
+  version: 17.2.3
+  resolution: "@types/joi@npm:17.2.3"
+  dependencies:
+    joi: "npm:*"
+  checksum: 10/f26d0132b4e16d667176a0dce52a013fce1557a9d7a7b68c67e1bdb1ca470a221e638f2ad4566ca8fcfad544ca0845f6e241b3e86cb387ffee07910bad1147bb
   languageName: node
   linkType: hard
 
@@ -32277,13 +32286,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hoek@npm:6.x.x":
-  version: 6.1.3
-  resolution: "hoek@npm:6.1.3"
-  checksum: 10/eb038b7fc48135822763b76163b4de0baa77827df508e12bdd9ae5bfcae388926a22b552dc7be234ed3cca0f71a1f61c98c5f14cb4f3900c260905074af1c5cf
-  languageName: node
-  linkType: hard
-
 "hoist-non-react-statics@npm:^3.3.1":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
@@ -34493,15 +34495,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"isemail@npm:3.x.x":
-  version: 3.2.0
-  resolution: "isemail@npm:3.2.0"
-  dependencies:
-    punycode: "npm:2.x.x"
-  checksum: 10/1a94cc2bb47f0dbc316faaab06610abbe55da5d01f0e154ef414ba331e101e848de34a30d7a5da3ab645b922281fc098c81a8be6d928b85a8f3d1289c952e8bc
-  languageName: node
-  linkType: hard
-
 "isexe@npm:^2.0.0":
   version: 2.0.0
   resolution: "isexe@npm:2.0.0"
@@ -36067,27 +36060,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:14.3.1":
-  version: 14.3.1
-  resolution: "joi@npm:14.3.1"
+"joi@npm:*, joi@npm:17.13.3":
+  version: 17.13.3
+  resolution: "joi@npm:17.13.3"
   dependencies:
-    hoek: "npm:6.x.x"
-    isemail: "npm:3.x.x"
-    topo: "npm:3.x.x"
-  checksum: 10/91ab75602343ec3eedb1a24bf120a291e2f2654757b4b90e49bf0a03db1cc27398a9104b18924aafb739c0b35f79db7393670d9603e4630a812b604a3767fd18
-  languageName: node
-  linkType: hard
-
-"joi@npm:17.9.1":
-  version: 17.9.1
-  resolution: "joi@npm:17.9.1"
-  dependencies:
-    "@hapi/hoek": "npm:^9.0.0"
-    "@hapi/topo": "npm:^5.0.0"
-    "@sideway/address": "npm:^4.1.3"
+    "@hapi/hoek": "npm:^9.3.0"
+    "@hapi/topo": "npm:^5.1.0"
+    "@sideway/address": "npm:^4.1.5"
     "@sideway/formula": "npm:^3.0.1"
     "@sideway/pinpoint": "npm:^2.0.0"
-  checksum: 10/2ffc81be5b88b123b715df2dd52adcc5333ba995d9dc36c4179572fa459831bbdaa25b32f75654342bbe18c04931125c4fa44445f46341369598993550e4db76
+  checksum: 10/4c150db0c820c3a52f4a55c82c1fc5e144a5b5f4da9ffebc7339a15469d1a447ebb427ced446efcb9709ab56bd71a06c4c67c9381bc1b9f9ae63fc7c89209bdf
   languageName: node
   linkType: hard
 
@@ -44920,7 +44902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"punycode@npm:2.x.x, punycode@npm:^2.0.0, punycode@npm:^2.1.0, punycode@npm:^2.1.1":
+"punycode@npm:^2.0.0, punycode@npm:^2.1.0, punycode@npm:^2.1.1":
   version: 2.1.1
   resolution: "punycode@npm:2.1.1"
   checksum: 10/939daa010c2cacebdb060c40ecb52fef0a739324a66f7fffe0f94353a1ee83e3b455e9032054c4a0c4977b0a28e27086f2171c392832b59a01bd948fd8e20914
@@ -50898,15 +50880,6 @@ __metadata:
   version: 3.0.0
   resolution: "toml@npm:3.0.0"
   checksum: 10/cfef0966868d552bd02e741f30945a611f70841b7cddb07ea2b17441fe32543985bc0a7c0dcf7971af26fcaf8a17712a485d911f46bfe28644536e9a71a2bd09
-  languageName: node
-  linkType: hard
-
-"topo@npm:3.x.x":
-  version: 3.0.3
-  resolution: "topo@npm:3.0.3"
-  dependencies:
-    hoek: "npm:6.x.x"
-  checksum: 10/98caec35d0fe9b9d1ef740c5fd26082fdefa06b567b2e314fe1a93282c5570abfe9ca0692bdfd38d3930be509e891e732dbbbae12d8724db037e7887acd41cd2
   languageName: node
   linkType: hard
 
