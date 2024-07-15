@@ -2599,6 +2599,13 @@ jobs:
       - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
 
+  ghcr-daml-all-in-one:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: ghcr.io/hyperledger/daml-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/daml-all-in-one/ -f ./tools/docker/daml-all-in-one/Dockerfile
+
   ghcr-keychain-vault-server:
     runs-on: ubuntu-22.04
     steps:
