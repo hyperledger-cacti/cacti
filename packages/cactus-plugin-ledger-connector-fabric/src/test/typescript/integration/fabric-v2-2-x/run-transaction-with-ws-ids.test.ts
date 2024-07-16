@@ -61,20 +61,20 @@ describe("PluginLedgerConnectorFabric", () => {
       logLevel,
     });
 
-    await ledger.start({ omitPull: false });
-
     wsTestContainer = new WsTestServer({});
     await wsTestContainer.start();
+
+    const ci = await Containers.getById(wsTestContainer.containerId);
+    const wsIpAddr = await internalIpV4();
+    const hostPort = await Containers.getPublicPort(WS_IDENTITY_HTTP_PORT, ci);
+
+    await ledger.start({ omitPull: false });
 
     const connectionProfile = await ledger.getConnectionProfileOrg1();
     expect(connectionProfile).toBeTruthy();
 
     const keychainInstanceId = uuidv4();
     keychainId = uuidv4();
-
-    const ci = await Containers.getById(wsTestContainer.containerId);
-    const wsIpAddr = await internalIpV4();
-    const hostPort = await Containers.getPublicPort(WS_IDENTITY_HTTP_PORT, ci);
 
     const wsUrl = `http://${wsIpAddr}:${hostPort}`;
 
