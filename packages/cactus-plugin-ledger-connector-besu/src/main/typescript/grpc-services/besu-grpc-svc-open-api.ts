@@ -73,6 +73,20 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
     });
   }
 
+  public DeployContractSolBytecodeNoKeychainV1(
+    call: ServerUnaryCall<
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeNoKeychainV1Request,
+      deploy_contract_solidity_bytecode_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB
+    >,
+    callback: sendUnaryData<deploy_contract_solidity_bytecode_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>,
+  ): void {
+    return callback({
+      message: "Status.UNIMPLEMENTED",
+      code: status.UNIMPLEMENTED,
+      details: "Service endpoint not yet implemented.",
+    });
+  }
+
   public GetBalanceV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBalanceV1Request,

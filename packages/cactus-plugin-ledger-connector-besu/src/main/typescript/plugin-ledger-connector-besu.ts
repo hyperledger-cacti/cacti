@@ -1,12 +1,7 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-import { setTimeout } from "timers/promises";
-
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
 import type { Express } from "express";
 import { Optional } from "typescript-optional";
-import createHttpError from "http-errors";
 
 import OAS from "../json/openapi.json";
 
@@ -16,11 +11,10 @@ import type { WebsocketProvider } from "web3-core";
 import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
-import type { TransactionReceipt } from "web3-eth";
 import {
   GetBalanceV1Request,
   GetBalanceV1Response,
-  Web3TransactionReceipt,
+  DeployContractSolidityBytecodeNoKeychainV1Request,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -56,10 +50,10 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
+import { DeployContractSolidityBytecodeNoKeychainEndpoint } from "./web-services/deploy-contract-solidity-bytecode-no-keychain-endpoint";
 
 import {
   WatchBlocksV1,
-  ConsistencyStrategy,
   DeployContractSolidityBytecodeV1Request,
   DeployContractSolidityBytecodeV1Response,
   EthContractInvocationType,
@@ -107,6 +101,15 @@ import * as besu_grpc_svc_streams from "./generated/proto/protoc-gen-ts/services
 import { BesuGrpcSvcOpenApi } from "./grpc-services/besu-grpc-svc-open-api";
 import { BesuGrpcSvcStreams } from "./grpc-services/besu-grpc-svc-streams";
 import { getBlockV1Http } from "./impl/get-block-v1/get-block-v1-http";
+import { transactV1Impl } from "./impl/transact-v1/transact-v1-impl";
+import {
+  IDeployContractV1KeychainResponse,
+  deployContractV1Keychain,
+} from "./impl/deploy-contract-v1/deploy-contract-v1-keychain";
+import {
+  IDeployContractV1NoKeychainResponse,
+  deployContractV1NoKeychain,
+} from "./impl/deploy-contract-v1/deploy-contract-v1-no-keychain";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -144,7 +147,6 @@ export class PluginLedgerConnectorBesu
   } = {};
 
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private httpServer: Server | SecureServer | null = null;
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorBesu";
 
@@ -278,6 +280,13 @@ export class PluginLedgerConnectorBesu
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const endpoint = new DeployContractSolidityBytecodeEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new DeployContractSolidityBytecodeNoKeychainEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -610,365 +619,55 @@ export class PluginLedgerConnectorBesu
   public async transact(
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transact()`;
-
-    switch (req.web3SigningCredential.type) {
-      // Web3SigningCredentialType.GETHKEYCHAINPASSWORD is removed as Hyperledger Besu doesn't support the PERSONAL api
-      // for --rpc-http-api as per the discussion mentioned here
-      // https://chat.hyperledger.org/channel/besu-contributors?msg=GqQXfW3k79ygRtx5Q
-      case Web3SigningCredentialType.CactusKeychainRef: {
-        return this.transactCactusKeychainRef(req);
-      }
-      case Web3SigningCredentialType.PrivateKeyHex: {
-        return this.transactPrivateKey(req);
-      }
-      case Web3SigningCredentialType.None: {
-        if (req.transactionConfig.rawTransaction) {
-          return this.transactSigned(req);
-        } else {
-          throw new Error(
-            `${fnTag} Expected pre-signed raw transaction ` +
-              ` since signing credential is specified as` +
-              `Web3SigningCredentialType.NONE`,
-          );
-        }
-      }
-      default: {
-        throw new Error(
-          `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-            `${req.web3SigningCredential.type} Supported ones are: ` +
-            `${Object.values(Web3SigningCredentialType).join(";")}`,
-        );
-      }
-    }
-  }
-
-  public async transactSigned(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactSigned()`;
-
-    Checks.truthy(req.consistencyStrategy, `${fnTag}:req.consistencyStrategy`);
-    Checks.truthy(
-      req.transactionConfig.rawTransaction,
-      `${fnTag}:req.transactionConfig.rawTransaction`,
-    );
-    const rawTx = req.transactionConfig.rawTransaction as string;
-
-    this.log.debug("Starting web3.eth.sendSignedTransaction(rawTransaction) ");
-
-    const txPoolReceipt = await this.web3.eth.sendSignedTransaction(rawTx);
-
-    return this.getTxReceipt(req, txPoolReceipt);
-  }
-
-  public async getTxReceipt(
-    request: RunTransactionRequest,
-    txPoolReceipt: TransactionReceipt,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#getTxReceipt()`;
-
-    this.log.debug("Received preliminary receipt from Besu node.");
-
-    if (txPoolReceipt instanceof Error) {
-      this.log.debug(`${fnTag} sendSignedTransaction failed`, txPoolReceipt);
-      throw txPoolReceipt;
-    }
-    this.prometheusExporter.addCurrentTransaction();
-
-    if (
-      request.consistencyStrategy.receiptType === ReceiptType.NodeTxPoolAck &&
-      request.consistencyStrategy.blockConfirmations > 0
-    ) {
-      throw new Error(
-        `${fnTag} Conflicting parameters for consistency` +
-          ` strategy: Cannot wait for >0 block confirmations AND only wait ` +
-          ` for the tx pool ACK at the same time.`,
-      );
-    }
-
-    switch (request.consistencyStrategy.receiptType) {
-      case ReceiptType.NodeTxPoolAck:
-        return { transactionReceipt: txPoolReceipt };
-      case ReceiptType.LedgerBlockAck:
-        this.log.debug("Starting poll for ledger TX receipt ...");
-        const txHash = txPoolReceipt.transactionHash;
-        const { consistencyStrategy } = request;
-        const ledgerReceipt = await this.pollForTxReceipt(
-          txHash,
-          consistencyStrategy,
-        );
-        this.log.debug(
-          "Finished poll for ledger TX receipt: %o",
-          ledgerReceipt,
-        );
-        return { transactionReceipt: ledgerReceipt };
-      default:
-        throw new Error(
-          `${fnTag} Unrecognized ReceiptType: ${request.consistencyStrategy.receiptType}`,
-        );
-    }
-  }
-
-  public async transactPrivate(options: any): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactPrivate()`;
-
-    if (!this.web3Quorum) {
-      throw new Error(`${fnTag} Web3 EEA client not initialized.`);
-    }
-
-    const txHash =
-      await this.web3Quorum.priv.generateAndSendRawTransaction(options);
-
-    if (!txHash) {
-      throw new Error(`${fnTag} eea.sendRawTransaction provided no tx hash.`);
-    }
-    return this.getPrivateTxReceipt(options.privateFrom, txHash);
-  }
-
-  public async getPrivateTxReceipt(
-    privateFrom: string,
-    txHash: string,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#getPrivateTxReceipt()`;
-
-    if (!this.web3Quorum) {
-      throw new Error(`${fnTag} Web3 Quorum client not initialized.`);
-    }
-
-    const txPoolReceipt =
-      await this.web3Quorum.priv.waitForTransactionReceipt(txHash);
-    if (!txPoolReceipt) {
-      throw new RuntimeError(`priv.getTransactionReceipt provided no receipt.`);
-    }
-
-    return {
-      transactionReceipt: txPoolReceipt as unknown as Web3TransactionReceipt,
+    const ctx = {
+      prometheusExporter: this.prometheusExporter,
+      pluginRegistry: this.pluginRegistry,
+      logLevel: this.logLevel,
+      web3: this.web3,
     };
-  }
-
-  public async transactPrivateKey(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactPrivateKey()`;
-    const { transactionConfig, web3SigningCredential } = req;
-    const { secret } =
-      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
-
-    // Run transaction to EEA client here if private transaction
-
-    if (req.privateTransactionConfig) {
-      const options = {
-        nonce: transactionConfig.nonce,
-        gasPrice: transactionConfig.gasPrice,
-        gasLimit: transactionConfig.gas,
-        to: transactionConfig.to,
-        value: transactionConfig.value,
-        data: transactionConfig.data,
-        privateKey: secret,
-        privateFrom: req.privateTransactionConfig.privateFrom,
-        privateFor: req.privateTransactionConfig.privateFor,
-        restriction: "restricted",
-      };
-
-      return this.transactPrivate(options);
-    }
-
-    const signedTx = await this.web3.eth.accounts.signTransaction(
-      transactionConfig,
-      secret,
-    );
-
-    if (signedTx.rawTransaction) {
-      req.transactionConfig.rawTransaction = signedTx.rawTransaction;
-      return this.transactSigned(req);
-    } else {
-      throw new Error(
-        `${fnTag} Failed to sign eth transaction. ` +
-          `signedTransaction.rawTransaction is blank after .signTransaction().`,
-      );
-    }
-  }
-
-  public async transactCactusKeychainRef(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactCactusKeychainRef()`;
-    const {
-      transactionConfig,
-      web3SigningCredential,
-      privateTransactionConfig,
-    } = req;
-    const { ethAccount, keychainEntryKey, keychainId } =
-      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
-
-    // locate the keychain plugin that has access to the keychain backend
-    // denoted by the keychainID from the request.
-    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(keychainId);
-
-    Checks.truthy(keychainPlugin, `${fnTag} keychain for ID:"${keychainId}"`);
-
-    // Now use the found keychain plugin to actually perform the lookup of
-    // the private key that we need to run the transaction.
-    const privateKeyHex = await keychainPlugin?.get(keychainEntryKey);
-
-    return this.transactPrivateKey({
-      privateTransactionConfig,
-      transactionConfig,
-      web3SigningCredential: {
-        ethAccount,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-        secret: privateKeyHex,
-      },
-      consistencyStrategy: {
-        blockConfirmations: 0,
-        receiptType: ReceiptType.NodeTxPoolAck,
-        timeoutMs: 60000,
-      },
-    });
-  }
-
-  public async pollForTxReceipt(
-    txHash: string,
-    consistencyStrategy: ConsistencyStrategy,
-  ): Promise<TransactionReceipt> {
-    const fnTag = `${this.className}#pollForTxReceipt()`;
-    let txReceipt;
-    let timedOut = false;
-    let tries = 0;
-    let confirmationCount = 0;
-    const timeoutMs = consistencyStrategy.timeoutMs || Number.MAX_SAFE_INTEGER;
-    const startedAt = new Date();
-
-    do {
-      const now = Date.now();
-      const elapsedTime = now - startedAt.getTime();
-      timedOut = now >= startedAt.getTime() + timeoutMs;
-      this.log.debug("%s tries=%n elapsedMs=%n", fnTag, tries, elapsedTime);
-      if (tries > 0) {
-        await setTimeout(1000);
-      }
-      tries++;
-      if (timedOut) {
-        break;
-      }
-
-      txReceipt = await this.web3.eth.getTransactionReceipt(txHash);
-      if (!txReceipt) {
-        continue;
-      }
-
-      const latestBlockNo = await this.web3.eth.getBlockNumber();
-      confirmationCount = latestBlockNo - txReceipt.blockNumber;
-    } while (confirmationCount >= consistencyStrategy.blockConfirmations);
-
-    if (!txReceipt) {
-      throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
-    }
-    return txReceipt;
+    const runTransactionResponse = transactV1Impl(ctx, req);
+    return runTransactionResponse;
   }
 
   public async deployContract(
     req: DeployContractSolidityBytecodeV1Request,
   ): Promise<DeployContractSolidityBytecodeV1Response> {
-    const fnTag = `${this.className}#deployContract()`;
-    Checks.truthy(req, `${fnTag} req`);
-    if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
-      throw createHttpError[400](
-        `${fnTag} Cannot deploy contract with pre-signed TX`,
-      );
-    }
-    const { keychainId, contractName } = req;
-    if (!keychainId || !req.contractName) {
-      const errorMessage = `${fnTag} Cannot deploy contract without keychainId and the contractName.`;
-      throw createHttpError[400](errorMessage);
-    }
-
-    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(keychainId);
-
-    if (!keychainPlugin) {
-      const errorMessage =
-        `${fnTag} The plugin registry does not contain` +
-        ` a keychain plugin for ID:"${req.keychainId}"`;
-      throw createHttpError[400](errorMessage);
-    }
-
-    if (!keychainPlugin.has(contractName)) {
-      const errorMessage =
-        `${fnTag} Cannot create an instance of the contract instance because` +
-        `the contractName in the request does not exist on the keychain`;
-      throw new createHttpError[400](errorMessage);
-    }
-
-    const networkId = await this.web3.eth.net.getId();
-
-    const tmpContract = new this.web3.eth.Contract(req.contractAbi);
-    const deployment = tmpContract.deploy({
-      data: req.bytecode,
-      arguments: req.constructorArgs,
-    });
-
-    const abi = deployment.encodeABI();
-    const data = abi.startsWith("0x") ? abi : `0x${abi}`;
-    this.log.debug(`Deploying "${req.contractName}" with data %o`, data);
-
-    const web3SigningCredential = req.web3SigningCredential as
-      | Web3SigningCredentialPrivateKeyHex
-      | Web3SigningCredentialCactusKeychainRef;
-
-    const runTxResponse = await this.transact({
-      transactionConfig: {
-        data,
-        from: web3SigningCredential.ethAccount,
-        gas: req.gas,
-        gasPrice: req.gasPrice,
-      },
-      consistencyStrategy: {
-        blockConfirmations: 0,
-        receiptType: ReceiptType.NodeTxPoolAck,
-        timeoutMs: req.timeoutMs || 60000,
-      },
-      web3SigningCredential,
-      privateTransactionConfig: req.privateTransactionConfig,
-    });
-
-    const keychainHasContract = await keychainPlugin.has(contractName);
-
-    if (!keychainHasContract) {
-      const errorMessage =
-        `${fnTag} Cannot create an instance of the contract instance because` +
-        `the contractName in the request does not exist on the keychain`;
-      throw new createHttpError[400](errorMessage);
-    }
-
-    this.log.debug(`Keychain has the contract, updating networks...`);
-
-    const { transactionReceipt: receipt } = runTxResponse;
-    const { status, contractAddress } = receipt;
-
-    if (status && contractAddress) {
-      const networkInfo = { address: contractAddress };
-      const contractStr = await keychainPlugin.get(contractName);
-      const contractJSON = JSON.parse(contractStr);
-      this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
-      const contract = new this.web3.eth.Contract(
-        contractJSON.abi,
-        contractAddress,
-      );
-      this.contracts[contractName] = contract;
-
-      const network = { [networkId]: networkInfo };
-      contractJSON.networks = network;
-
-      await keychainPlugin.set(contractName, JSON.stringify(contractJSON));
-    }
-
-    // creating solidity byte code response
-    const deployResponse: DeployContractSolidityBytecodeV1Response = {
-      transactionReceipt: runTxResponse.transactionReceipt,
+    const ctx = {
+      pluginRegistry: this.pluginRegistry,
+      prometheusExporter: this.prometheusExporter,
+      web3: this.web3,
+      logLevel: this.logLevel,
     };
 
-    return deployResponse;
+    const deployContractV1KeychainResponse: IDeployContractV1KeychainResponse =
+      await deployContractV1Keychain(ctx, req);
+    if (
+      deployContractV1KeychainResponse.status &&
+      deployContractV1KeychainResponse.contractAddress &&
+      deployContractV1KeychainResponse.contract
+    ) {
+      this.contracts[deployContractV1KeychainResponse.contractName] =
+        deployContractV1KeychainResponse.contract;
+    }
+    return deployContractV1KeychainResponse.deployResponse;
+  }
+
+  public async deployContractNoKeychain(
+    req: DeployContractSolidityBytecodeNoKeychainV1Request,
+  ): Promise<DeployContractSolidityBytecodeV1Response> {
+    const ctx = {
+      pluginRegistry: this.pluginRegistry,
+      prometheusExporter: this.prometheusExporter,
+      web3: this.web3,
+      logLevel: this.logLevel,
+    };
+    const deployContractV1NoKeychainResponse: IDeployContractV1NoKeychainResponse =
+      await deployContractV1NoKeychain(ctx, req);
+    if (deployContractV1NoKeychainResponse.contractJsonString) {
+      this.contracts[deployContractV1NoKeychainResponse.contractName] =
+        deployContractV1NoKeychainResponse.contract;
+    }
+    return deployContractV1NoKeychainResponse.deployResponse;
   }
 
   public async signTransaction(
