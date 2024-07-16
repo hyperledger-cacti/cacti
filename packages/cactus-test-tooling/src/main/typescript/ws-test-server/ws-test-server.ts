@@ -94,12 +94,12 @@ export class WsTestServer {
           // to docker container's IP addresses directly...
           // https://stackoverflow.com/a/39217691
           PublishAllPorts: true,
-          /*Env: [`WS_IDENTITY_PATH=${WS_IDENTITY_PATH}`, ...this.envVars],
+          /*Env: [`WS_IDENTITY_PATH=${WS_IDENTITY_PATH}`, ...this.envVars],*/
           HostConfig: {
             // NetworkMode: "host",
-            CapAdd: ["IPC_LOCK"],
+            // CapAdd: ["IPC_LOCK"],
             PublishAllPorts: true,
-          },*/
+          },
           //Healthcheck: {
           //  Test: ["CMD-SHELL", "wget -O- http://127.0.0.1:8200/v1/sys/health"],
           //  Interval: 100 * 1000000,
