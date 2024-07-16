@@ -93,7 +93,7 @@ describe("PluginLedgerConnectorBesu", () => {
         emitContainerLogs: false,
       });
       infrastructureElements.push(ledger);
-      await ledger.start(true);
+      await ledger.start();
       keys = await ledger.getKeys();
     }
 

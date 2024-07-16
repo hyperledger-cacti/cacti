@@ -761,6 +761,73 @@
           }
         }
       },
+      "DeployContractSolidityBytecodeNoKeychainV1Request": {
+        "type": "object",
+        "required": [
+          "contractName",
+          "contractAbi",
+          "contractJson",
+          "bytecode",
+          "web3SigningCredential",
+          "keychainId",
+          "constructorArgs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "contractName": {
+            "type": "string",
+            "description": "The contract name for retrieve the contracts json on the keychain.",
+            "minLength": 1,
+            "maxLength": 100,
+            "nullable": false
+          },
+          "contractAbi": {
+            "description": "The application binary interface of the solidity contract",
+            "type": "array",
+            "items": {},
+            "nullable": false
+          },
+          "contractJSONString": {
+            "description": "For use when not using keychain, pass the contract in as this string variable",
+            "nullable": false,
+            "type": "string"
+          },
+          "constructorArgs": {
+            "type": "array",
+            "items": {},
+            "default": []
+          },
+          "web3SigningCredential": {
+            "$ref": "#/components/schemas/Web3SigningCredential",
+            "nullable": false
+          },
+          "bytecode": {
+            "type": "string",
+            "nullable": false,
+            "minLength": 1,
+            "maxLength": 24576,
+            "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+          },
+          "gas": {
+            "type": "number",
+            "nullable": false
+          },
+          "gasPrice": {
+            "type": "string",
+            "nullable": false
+          },
+          "timeoutMs": {
+            "type": "number",
+            "description": "The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.",
+            "minimum": 0,
+            "default": 60000,
+            "nullable": false
+          },
+          "privateTransactionConfig": {
+            "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
+          }
+        }
+      },
       "DeployContractSolidityBytecodeV1Response": {
         "type": "object",
         "required": ["transactionReceipt"],
@@ -998,6 +1065,40 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain"
+          }
+        },
+        "operationId": "deployContractSolBytecodeNoKeychainV1",
+        "summary": "Deploys the bytecode of a Solidity contract without the need of keychain",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployContractSolidityBytecodeNoKeychainV1Request"
               }
             }
           }
