@@ -222,19 +222,19 @@ describe("Query system chain methods and endpoints tests", () => {
    * Can be reused throughout the tests.
    *
    * @param query how to find requested block
-   * @param type response type requested
+   * @param responseType response type requested
    *
    * @returns block object / block buffer
    */
   async function getBlock(
     query: GetBlockRequestV1Query,
-    type: GetBlockResponseTypeV1 = GetBlockResponseTypeV1.Full,
+    responseType: GetBlockResponseTypeV1 = GetBlockResponseTypeV1.Full,
   ): Promise<any> {
     const getBlockReq = {
       channelName: ledgerChannelName,
       gatewayOptions,
       query,
-      type,
+      responseType,
     };
 
     const getBlockResponse = await apiClient.getBlockV1(getBlockReq);
@@ -248,7 +248,7 @@ describe("Query system chain methods and endpoints tests", () => {
     expect(getBlockResponse.status).toEqual(200);
     expect(getBlockResponse.data).toBeTruthy();
 
-    switch (type) {
+    switch (responseType) {
       case GetBlockResponseTypeV1.Full:
         if (!("decodedBlock" in getBlockResponse.data)) {
           throw new Error(
@@ -283,7 +283,7 @@ describe("Query system chain methods and endpoints tests", () => {
         return getBlockResponse.data.cactiFullEvents;
       default:
         // Will not compile if any type was not handled by above switch.
-        const unknownType: never = type;
+        const unknownType: never = responseType;
         const validTypes = Object.keys(GetBlockResponseTypeV1).join(";");
         const errorMessage = `Unknown get block response type '${unknownType}'. Accepted types for GetBlockResponseTypeV1 are: [${validTypes}]`;
         throw new Error(errorMessage);
