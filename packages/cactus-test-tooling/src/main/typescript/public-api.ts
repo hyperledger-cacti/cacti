@@ -194,3 +194,20 @@ export {
   FABRIC_25_LTS_FABRIC_SAMPLES__ORDERER_TLS_ROOTCERT_FILE_ORG_2,
   IFabricOrgEnvInfo,
 } from "./fabric/fabric-samples-env-constants";
+
+export {
+  IBuildContainerImageRequest,
+  buildContainerImage,
+} from "./common/build-container-image";
+
+export {
+  IBuildImageConnectorCordaServerRequest,
+  IBuildImageConnectorCordaServerResponse,
+  buildImageConnectorCordaServer,
+} from "./corda/build-image-connector-corda-server";
+
+export {
+  IBuildImageCordaAllInOneV412Request,
+  IBuildImageCordaAllInOneV412Response,
+  buildImageCordaAllInOneV412,
+} from "./corda/build-image-corda-all-in-one-v4-12";
