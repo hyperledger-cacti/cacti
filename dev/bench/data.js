@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1721140523362,
+  "lastUpdate": 1721248243237,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -38,6 +38,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.19%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "87f5f609d738becc33e0bcc5232498a95e4c00d2",
+          "message": "test(test-tooling): fix WS identity server port publish configuration\n\n1. The hostconfig portion of the container start configuration was not\nbeing set up correctly which made it so that the exposed ports were not\npublished on randomized ports like they were supposed to.\n2. This caused  the `fabric-v2-2-x/run-transaction-with-ws-ids.test.ts`\ntest to fail because it couldn't map the container port to a host machine\nport.\n3. Setting up the ws-test-server.ts class so that it does map the ports\nto the host machine solved the issue.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-07-17T13:15:43-07:00",
+          "tree_id": "0dfd34409fd8b89fcce8ab242479cc60ee4ce58b",
+          "url": "https://github.com/hyperledger/cacti/commit/87f5f609d738becc33e0bcc5232498a95e4c00d2"
+        },
+        "date": 1721248241128,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 607,
+            "range": "±1.79%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 364,
+            "range": "±1.41%",
+            "unit": "ops/sec",
+            "extra": "181 samples"
           }
         ]
       }
