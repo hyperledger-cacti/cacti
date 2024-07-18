@@ -1,9 +1,7 @@
 # `@hyperledger/cactus-plugin-persistence-fabric`
 
-This plugin allows `Cacti` to persist Fabric Block general data and basic information about transactions into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
+This plugin allows `Cacti` to persist Hyperledger Fabric data into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
 Data in the database can later be analyzed and viewed in a GUI tool.
-GUI tool is in project root directory of Cacti project in GUI folder. cacti/packages/cacti-ledger-browser
-
 
 ## Summary
 
@@ -17,9 +15,9 @@ GUI tool is in project root directory of Cacti project in GUI folder. cacti/pack
 
 ## Remarks
 
-- This plugin was only tested with small test ledgers. Running it to synchronize with old ledgers will take a lot of time.
+- This plugin was only tested with small Fabric ledgers. Running it to archive and monitor large ledgers is not recommended yet.
 - For now, the database schema is not considered public and can change over time (i.e., writing own application that reads data directly from the database is discouraged).
-- All the methods must be called directly on the plugin instance for now.
+- Only `status` endpoint is available, all the methods must be called directly on the plugin instance for now.
 
 ## Getting Started
 
@@ -35,64 +33,87 @@ yarn run configure
 
 ### Usage
 
-Instantiate a new `PluginPersistenceFabrickBlock` instance:
+Instantiate a new `PluginPersistenceFabric` instance:
 
 ```typescript
-import { PluginPersistenceFabric } from "../../../main/typescript/plugin-fabric-persistence-block";
+import { PluginPersistenceFabric } from "@hyperledger/cactus-plugin-persistence-fabric";
 import { v4 as uuidv4 } from "uuid";
 
-PluginInstance = new PluginPersistenceFabric({
-  gatewayOptions,
+const persistencePlugin = new PluginPersistenceFabric({
   apiClient,
-  logLevel: testLogLevel,
-  instanceId: uuidv4(),
-  connectionString:
-    "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
+  logLevel: "info",
+  instanceId,
+  connectionString: "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",,
+  channelName: "mychannel",
+  gatewayOptions: {
+    identity: signingCredential.keychainRef,
+    wallet: {
+      keychain: signingCredential,
+    },
+  },
 });
 
 // Initialize the connection to the DB
-PluginInstance.onPluginInit();
+await persistencePlugin.onPluginInit();
 ```
 
-Alternatively, import `PluginPersistenceFabric` from the plugin package and use it to create a plugin.
+Alternatively, import `PluginFactoryLedgerPersistence` from the plugin package and use it to create a plugin.
 
 ```typescript
-import { PluginPersistenceFabric } from "@hyperledger/plugin-fabric-persistence-block";
+import { PluginFactoryLedgerPersistence } from "@hyperledger/cactus-plugin-persistence-fabric";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 
-const factory = new PluginFactoryPersistenceFabricBlock({
+const factory = new PluginFactoryLedgerPersistence({
   pluginImportType: PluginImportType.Local,
 });
 
 const persistencePlugin = await factory.create({
-  instanceId: uuidv4(),
-  apiClient: new SocketIOApiClient(apiConfigOptions),
+  apiClient,
   logLevel: "info",
-  connectionString:
-    "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
+  instanceId,
+  connectionString: "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",,
+  channelName: "mychannel",
+  gatewayOptions: {
+    identity: signingCredential.keychainRef,
+    wallet: {
+      keychain: signingCredential,
+    },
+  },
 });
 
 // Initialize the connection to the DB
-persistencePlugin.onPluginInit();
+await persistencePlugin.onPluginInit();
 ```
 
-onPluginInit it also creates database structure if this is first time run
+You can use the persistent plugin to synchronize ledger state with the database. Here is a sample script that starts monitoring for new blocks:
 
-// Start synchronization with ledger.
-// To synchronize ledger
-
-you individually
+```typescript
+// Start monitoring new blocks.
+// Entire ledger is synchronized first with the DB (`syncAll` is called) so this operation can take a while on large ledgers!
+persistencePlugin.startMonitor((err) => {
+  reject(err);
+});
 
 // Show current status of the plugin
-PluginInstance.getStatus();
-
+persistencePlugin.getStatus();
 ```
 
+> See [plugin integration tests](./src/test/typescript/integration) for complete usage examples.
 
+### Building/running the container image locally
+
+In the Cacti project root say:
+
+```sh
+DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-persistence-fabric/ -f ./packages/cactus-plugin-persistence-fabric/Dockerfile -t cactus-plugin-persistence-fabric
 ```
 
 ## Endpoints
+
+### StatusV1 (`/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status`)
+
+- Returns status of the plugin (latest block read, failed blocks, is monitor running, etc...)
 
 ### Plugin Methods
 
@@ -110,42 +131,28 @@ PluginInstance.getStatus();
 
 - Get status report of this instance of persistence plugin.
 
-#### `constinousBlocksSynchronization`
+#### `startMonitor`
 
-- Start the block synchronization process. New blocks from the ledger will be parsed and pushed to the database.
+- Start the block monitoring process. New blocks from the ledger will be parsed and pushed to the database.
 
-#### `continueBlocksSynchronization`
+#### `stopMonitor`
 
-- Start the block synchronization process. New blocks from the ledger will be parsed and pushed to the database. Should be used periodically.
+- Stop the block monitoring process.
 
-#### `changeSynchronization`
+#### `syncFailedBlocks`
 
-- Stop the block synchronization process.
+- Walk through all the blocks that could not be synchronized with the DB for some reasons and try pushing them again.
 
-#### `whichBlocksAreMissingInDdSimple`
+#### `syncAll`
 
-- Walk through all the blocks that could not be synchronized with the DB for some reasons and list them
-
-#### `synchronizeOnlyMissedBlocks`
-
-- Walk through all the blocks that are listed as not be synchronized with the DB for some reasons and try push them into DB from ledger.
-- can try many times to use this
-
-### `setLastBlockConsidered`
-
-- set the last block in ledger which we consider valid by our party and synchronize only to this point in ledger
-  If some blocks above this number are already in database they will not be removed.
-
-#### `initialBlocksSynchronization`
-
-- Synchronize entire first N number of blocks of ledger state with the database. It is a good start and easy to check if everything is correctly set.
+- Synchronize entire ledger state with the database.
 
 ## Running the tests
 
-To run all the tests for this persistence fabric plugin to ensure it's working correctly execute the following from the root of the `cactus` project:
+To run all the tests for this persistence plugin to ensure it's working correctly execute the following from the root of the `cactus` project:
 
 ```sh
-npx jest cactus-plugin-fabric-persistence-block
+npx jest cactus-plugin-persistence-fabric
 ```
 
 ## Contributing
@@ -156,23 +163,19 @@ Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ### Quick plugin project walkthrough
 
-#### ./src/main/json/contract_abi
-
-- Contains reference token ABIs used to call and identify token transfers.
-
 #### `./src/main/json/openapi.json`
 
 - Contains OpenAPI definition.
 
 #### `./src/main/sql/schema.sql`
 
-- Database schema for Ethereum data.
+- Database schema for Fabric data.
 
 #### `./src/main/typescript/web-services`
 
-- Folder that contains web service endpoint definitions if present.
+- Folder that contains web service endpoint definitions.
 
-#### `./plugin-fabric-persistence-block`
+#### `./plugin-persistence-fabric`
 
 - Main persistent plugin logic file
 
