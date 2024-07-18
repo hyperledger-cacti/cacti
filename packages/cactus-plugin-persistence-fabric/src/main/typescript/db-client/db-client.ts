@@ -2,35 +2,47 @@
  * Client class to communicate with PostgreSQL database.
  */
 
+import fs from "fs";
+import path from "path";
+import { Client as PostgresClient } from "pg";
+
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-
-//   import { Database as DatabaseSchemaType } from "./database.types";
-//   import { getRuntimeErrorCause } from "../utils";
-
-import fs from "fs";
-import path from "path";
-import { Client as PostgresClient, QueryResult } from "pg";
 import {
-  InsertBlockDataEntryInterface,
-  InsertBlockDetailsInterface,
-  InsertBlockTransactionEntryInterface,
-  InsertDetailedTransactionEntryInterface,
-} from "../types";
-// import { RuntimeError } from "run-time-error-cjs";
+  CactiBlockFullEventV1,
+  FabricX509CertificateV1,
+  FullBlockTransactionActionV1,
+  FullBlockTransactionEndorsementV1,
+  FullBlockTransactionEventV1,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios/api";
+import { Database as DatabaseSchemaType } from "./database.types";
+
+//////////////////////////////////
+// Helper Types
+//////////////////////////////////
+
+type PublicSchemaTables = DatabaseSchemaType["public"]["Tables"];
+type PluginStatusRowType = PublicSchemaTables["plugin_status"]["Row"];
+
+type SchemaTables = DatabaseSchemaType["fabric"]["Tables"];
+type SchemaFunctions = DatabaseSchemaType["fabric"]["Functions"];
+type BlockRowType = SchemaTables["block"]["Row"];
+type CertificateRowType = SchemaTables["certificate"]["Row"];
+type GetMissingRowsInRangeReturnType =
+  SchemaFunctions["get_missing_blocks_in_range"]["Returns"];
+
+//////////////////////////////////
+// PostgresDatabaseClient
+//////////////////////////////////
 
 export interface PostgresDatabaseClientOptions {
   connectionString: string;
   logLevel: LogLevelDesc;
 }
-
-//////////////////////////////////
-// PostgresDatabaseClient
-//////////////////////////////////
 
 /**
  * Client class to communicate with PostgreSQL database.
@@ -38,7 +50,6 @@ export interface PostgresDatabaseClientOptions {
  *
  * @todo Use pg connection pool
  */
-
 export default class PostgresDatabaseClient {
   private log: Logger;
   public static readonly CLASS_NAME = "PostgresDatabaseClient";
@@ -63,18 +74,6 @@ export default class PostgresDatabaseClient {
   }
 
   /**
-   * Internal method that throws if postgres client is not connected yet.
-   */
-
-  private assertConnected(): void {
-    if (!this.isConnected) {
-      throw new Error(
-        `${PostgresDatabaseClient.CLASS_NAME} method called before connecting to the DB!`,
-      );
-    }
-  }
-
-  /**
    * Connect to a PostgreSQL database using connection string from the constructor.
    */
   public async connect(): Promise<void> {
@@ -92,7 +91,15 @@ export default class PostgresDatabaseClient {
     this.isConnected = false;
   }
 
-  public async getPluginStatus(pluginName: string): Promise<any> {
+  /**
+   * Read status of persistence plugin with specified name.
+   *
+   * @param pluginName name of the persistence plugin
+   * @returns status row
+   */
+  public async getPluginStatus(
+    pluginName: string,
+  ): Promise<PluginStatusRowType> {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
@@ -109,6 +116,13 @@ export default class PostgresDatabaseClient {
     return queryResponse.rows[0];
   }
 
+  /**
+   * Initialize / update entry for specific persistence plugin in the database.
+   * Create database schema for fabric data if it was not created yet.
+   *
+   * @param pluginName name of the persistence plugin
+   * @param instanceId instance id of the persistence plugin
+   */
   public async initializePlugin(
     pluginName: string,
     instanceId: string,
@@ -167,119 +181,320 @@ export default class PostgresDatabaseClient {
     );
   }
 
-  public async insertBlockDataEntry(
-    block: InsertBlockDataEntryInterface,
-  ): Promise<QueryResult> {
-    this.assertConnected();
-
-    const insertResponse = await this.client.query(
-      `INSERT INTO public.fabric_blocks_entry("id", "block_num", "block_data") VALUES ($1, $2, $3)`,
-      [block.fabric_block_id, block.fabric_block_num, block.fabric_block_data],
-    );
-    this.log.info(
-      `Inserted ${insertResponse.rowCount} rows into table fabric_blocks_entry`,
-    );
-    return insertResponse;
+  /**
+   * Internal method that throws if postgres client is not connected yet.
+   */
+  private assertConnected(): void {
+    if (!this.isConnected) {
+      throw new Error(
+        `${PostgresDatabaseClient.CLASS_NAME} method called before connecting to the DB!`,
+      );
+    }
   }
 
-  public async insertBlockDetails(
-    block: InsertBlockDetailsInterface,
-  ): Promise<QueryResult> {
-    this.assertConnected();
+  /**
+   * Convert certificate subject attributes to map, throw if string is invalid.
+   *
+   * @param attrString cert subject
+   *
+   * @returns Map of cert attributes
+   */
+  private certificateAttrsStringToMap(attrString: string): Map<string, string> {
+    return new Map(
+      attrString.split("\n").map((a) => {
+        const splitAttrs = a.split("=");
+        if (splitAttrs.length !== 2) {
+          throw new Error(
+            `Invalid certificate attribute string: ${attrString}`,
+          );
+        }
+        return splitAttrs as [string, string];
+      }),
+    );
+  }
 
-    const insertResponse = await this.client.query(
-      `INSERT INTO public.fabric_blocks("id", "block_number", "data_hash", "tx_count", "created_at", "prev_blockhash", "channel_id") VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+  /**
+   * Search for certificate object in database using it's serial number.
+   * If it's not found, insert.
+   *
+   * @param fabricCert fabric x.509 certificate
+   *
+   * @returns certificate ID in the DB.
+   */
+  private async insertCertificateIfNotExists(
+    fabricCert: FabricX509CertificateV1,
+  ): Promise<string> {
+    // Try fetching cert ID from the DB
+    const queryResponse = await this.client.query<CertificateRowType>(
+      "SELECT id FROM fabric.certificate WHERE serial_number = $1",
+      [fabricCert.serialNumber],
+    );
+
+    if (queryResponse.rows.length === 1) {
+      return queryResponse.rows[0].id;
+    }
+
+    // Insert certificate not existing in the database
+    const subjectAttrs = this.certificateAttrsStringToMap(fabricCert.subject);
+    const issuerAttrs = this.certificateAttrsStringToMap(fabricCert.issuer);
+
+    this.log.debug(
+      `Insert to fabric.certificate with serial number ${fabricCert.serialNumber})`,
+    );
+    const certInsertResponse = await this.client.query(
+      `INSERT INTO
+              fabric.certificate("serial_number", "subject_common_name", "subject_org_unit", "subject_org", "subject_locality",
+                "subject_state", "subject_country", "issuer_common_name", "issuer_org_unit", "issuer_org", "issuer_locality",
+                "issuer_state", "issuer_country", "subject_alt_name", "valid_from", "valid_to", "pem")
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+             RETURNING id;`,
       [
-        block.fabric_block_id,
-        block.fabric_blocknum,
-        block.fabric_datahash,
-        block.fabric_tx_count,
-        block.fabric_createdat,
-        block.fabric_prev_blockhash,
-        block.fabric_channel_id,
+        fabricCert.serialNumber,
+        subjectAttrs.get("CN") ?? "",
+        subjectAttrs.get("OU") ?? "",
+        subjectAttrs.get("O") ?? "",
+        subjectAttrs.get("L") ?? "",
+        subjectAttrs.get("ST") ?? "",
+        subjectAttrs.get("C") ?? "",
+        issuerAttrs.get("CN") ?? "",
+        issuerAttrs.get("OU") ?? "",
+        issuerAttrs.get("O") ?? "",
+        issuerAttrs.get("L") ?? "",
+        issuerAttrs.get("ST") ?? "",
+        issuerAttrs.get("C") ?? "",
+        fabricCert.subjectAltName,
+        fabricCert.validFrom,
+        fabricCert.validTo,
+        fabricCert.pem,
       ],
     );
-    this.log.info(
-      `Inserted ${insertResponse.rowCount} rows into table fabric_blocks`,
-    );
 
-    return insertResponse;
+    if (certInsertResponse.rowCount !== 1) {
+      throw new Error(
+        `Certificate with serial number ${fabricCert.serialNumber} was not inserted into the DB`,
+      );
+    }
+
+    return certInsertResponse.rows[0].id;
   }
 
-  public async insertBlockTransactionEntry(
-    transactions: InsertBlockTransactionEntryInterface,
-  ): Promise<QueryResult> {
-    this.assertConnected();
+  /**
+   * Insert data to block table.
+   */
+  private async insertToBlockTable(
+    block: CactiBlockFullEventV1,
+  ): Promise<string> {
+    this.log.debug(
+      `Insert to fabric.block #${block.blockNumber} (${block.blockHash})`,
+    );
+    const blockInsertResponse = await this.client.query(
+      `INSERT INTO fabric.block("number", "hash", "transaction_count")
+         VALUES ($1, $2, $3)
+         RETURNING id;`,
+      [block.blockNumber, block.blockHash, block.transactionCount],
+    );
+    if (blockInsertResponse.rowCount !== 1) {
+      throw new Error(
+        `Block ${block.blockNumber} was not inserted into the DB`,
+      );
+    }
 
-    const insertResponse: QueryResult = await this.client.query(
-      `INSERT INTO public.fabric_transactions_entry("id", "block_id", "transaction_data") VALUES ($1, $2, $3)`,
+    return blockInsertResponse.rows[0].id;
+  }
+
+  /**
+   * Insert data to transaction table.
+   */
+  private async insertToTransactionTable(
+    tx: FullBlockTransactionEventV1,
+    blockId: string,
+    blockNumber: number,
+  ): Promise<string> {
+    this.log.debug(`Insert to fabric.transaction with hash ${tx.hash})`);
+
+    const txInsertResponse = await this.client.query(
+      `INSERT INTO
+          fabric.transaction("hash", "timestamp", "type", "epoch", "channel_id", "protocol_version", "block_id", "block_number")
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id;`,
       [
-        transactions.transaction_id,
-        transactions.fabric_block_id,
-        transactions.fabric_transaction_data,
+        tx.hash,
+        tx.timestamp,
+        tx.transactionType,
+        tx.epoch,
+        tx.channelId,
+        tx.protocolVersion,
+        blockId,
+        blockNumber,
       ],
     );
-    this.log.info(
-      `Inserted ${insertResponse.rowCount} rows into table fabric_transactions_entry`,
-    );
-    return insertResponse;
+    if (txInsertResponse.rowCount !== 1) {
+      throw new Error(`Transaction ${tx.hash} was not inserted into the DB`);
+    }
+
+    return txInsertResponse.rows[0].id;
   }
 
-  public async insertDetailedTransactionEntry(
-    transactions: InsertDetailedTransactionEntryInterface,
-  ): Promise<QueryResult> {
-    this.assertConnected();
+  /**
+   * Insert data to transaction_action table.
+   */
+  private async insertToTransactionActionTable(
+    action: FullBlockTransactionActionV1,
+    txId: string,
+  ): Promise<string> {
+    const creatorCertId = await this.insertCertificateIfNotExists(
+      action.creator.cert,
+    );
 
-    const insertResponse = await this.client.query(
-      `INSERT INTO public.fabric_transactions( "block_number","block_id", "transaction_id", "created_at", "chaincode_name", "status", "creator_msp_id", "endorser_msp_id", "chaincode_id", "type", "read_set", "write_set", "channel_id", "payload_extension", "creator_id_bytes", "creator_nonce", "chaincode_proposal_input", "tx_response", "payload_proposal_hash", "endorser_id_bytes", "endorser_signature") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
+    this.log.debug("Insert to fabric.transaction_action");
+    const txActionInsertResponse = await this.client.query(
+      `INSERT INTO
+          fabric.transaction_action("function_name", "function_args", "chaincode_id", "creator_msp_id", "creator_certificate_id", "transaction_id")
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id;`,
       [
-        // id integer BIGSERIAL, this should auto increment , total number of transactions counter
-        transactions.block_number,
-        transactions.block_id,
-        transactions.transaction_id,
-        transactions.createdat,
-        transactions.chaincodename,
-        transactions.status,
-        transactions.creator_msp_id,
-        transactions.endorser_msp_id,
-        transactions.chaincode_id,
-        transactions.type,
-        transactions.read_set,
-        transactions.write_set,
-        transactions.channel_id,
-        transactions.payload_extension,
-        transactions.creator_id_bytes,
-        transactions.creator_nonce,
-        transactions.chaincode_proposal_input,
-        transactions.tx_response,
-        transactions.payload_proposal_hash,
-        transactions.endorser_id_bytes,
-        transactions.endorser_signature,
+        action.functionName,
+        action.functionArgs
+          .map((a) => "0x" + Buffer.from(a).toString("hex"))
+          .join(","),
+        action.chaincodeId,
+        action.creator.mspid,
+        creatorCertId,
+        txId,
       ],
     );
-    this.log.info(
-      `Inserted ${insertResponse.rowCount} rows into table fabric_transactions_entry`,
-    );
-    return insertResponse;
+    if (txActionInsertResponse.rowCount !== 1) {
+      throw new Error("Transaction action was not inserted into the DB");
+    }
+
+    return txActionInsertResponse.rows[0].id;
   }
 
-  public async getMaxBlockNumber(): Promise<number> {
-    this.log.error("getMaxBlockNumber");
-    this.assertConnected();
-    const response = await this.client.query(
-      `select MAX(block_num) from public.fabric_blocks_entry`,
+  /**
+   * Insert data to transaction_action_endorsement table.
+   */
+  private async insertToTransactionActionEndorsementTable(
+    endorsement: FullBlockTransactionEndorsementV1,
+    txActionId: string,
+  ): Promise<void> {
+    const signerCertId = await this.insertCertificateIfNotExists(
+      endorsement.signer.cert,
     );
 
-    return +response.rows[0].max;
+    this.log.debug("Insert to fabric.transaction_action_endorsement");
+    const txActionEndorsementInsertResponse = await this.client.query(
+      `INSERT INTO
+                  fabric.transaction_action_endorsement("mspid", "signature", "certificate_id", "transaction_action_id")
+                 VALUES ($1, $2, $3, $4);`,
+      [
+        endorsement.signer.mspid,
+        endorsement.signature,
+        signerCertId,
+        txActionId,
+      ],
+    );
+    if (txActionEndorsementInsertResponse.rowCount !== 1) {
+      throw new Error(
+        "Transaction action endorsement was not inserted into the DB",
+      );
+    }
   }
 
-  public async isThisBlockInDB(block_num: number): Promise<QueryResult> {
+  /**
+   * Read block data. Throws if block was not found.
+   *
+   * @param blockNumber fabric block number
+   * @returns Block data.
+   */
+  public async getBlock(blockNumber: number): Promise<BlockRowType> {
     this.assertConnected();
-    const response = await this.client.query(
-      `select * from public.fabric_blocks_entry where block_num = $1`,
-      [block_num],
+
+    const queryResponse = await this.client.query<BlockRowType>(
+      "SELECT * FROM fabric.block WHERE number = $1",
+      [blockNumber],
     );
 
-    return response;
+    if (queryResponse.rows.length !== 1) {
+      throw new Error(`Could not read block #${blockNumber} from the DB`);
+    }
+
+    return queryResponse.rows[0];
+  }
+
+  /**
+   * Insert entire block data into the database (the block itself and transactions).
+   * Everything is committed in single atomic transaction (rollback on error).
+   * @param blockData new block data.
+   */
+  public async insertBlockData(block: CactiBlockFullEventV1): Promise<void> {
+    this.assertConnected();
+
+    this.log.debug("Insert block data, including transactions");
+
+    try {
+      await this.client.query("BEGIN");
+
+      const blockId = await this.insertToBlockTable(block);
+
+      for (const tx of block.cactiTransactionsEvents) {
+        // Insert transaction
+        const txId = await this.insertToTransactionTable(
+          tx,
+          blockId,
+          block.blockNumber,
+        );
+
+        for (const action of tx.actions) {
+          // Insert transaction actions
+          const txActionId = await this.insertToTransactionActionTable(
+            action,
+            txId,
+          );
+
+          for (const endorsement of action.endorsements) {
+            // Insert transaction action endorsements
+            await this.insertToTransactionActionEndorsementTable(
+              endorsement,
+              txActionId,
+            );
+          }
+        }
+      }
+
+      await this.client.query("COMMIT");
+    } catch (err: unknown) {
+      await this.client.query("ROLLBACK");
+      this.log.warn("insertBlockData() exception:", err);
+      throw new Error(
+        "Could not insert block data into the database - transaction reverted",
+      );
+    }
+  }
+
+  /**
+   * Compare committed block numbers with requested range, return list of blocks that are missing.
+   * @param startBlockNumber block to check from (including)
+   * @param endBlockNumber block to check to (including)
+   * @returns list of missing block numbers
+   */
+  public async getMissingBlocksInRange(
+    startBlockNumber: number,
+    endBlockNumber: number,
+  ): Promise<GetMissingRowsInRangeReturnType> {
+    Checks.truthy(
+      endBlockNumber >= startBlockNumber,
+      `getMissingBlocksInRange startBlockNumber larger than endBlockNumber`,
+    );
+    this.assertConnected();
+
+    const queryResponse = await this.client.query(
+      "SELECT * FROM fabric.get_missing_blocks_in_range($1, $2) as block_number",
+      [startBlockNumber, endBlockNumber],
+    );
+    this.log.debug(
+      `Found ${queryResponse.rowCount} missing blocks between ${startBlockNumber} and ${endBlockNumber}`,
+    );
+
+    return queryResponse.rows;
   }
 }

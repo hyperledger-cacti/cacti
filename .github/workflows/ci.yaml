@@ -12,7 +12,7 @@
 ---
 env:
   NODEJS_VERSION: v18.18.2
-  RUN_TRIVY_SCAN: true 
+  RUN_TRIVY_SCAN: true
   RUN_CODE_COVERAGE: true
 jobs:
   ActionLint:
@@ -422,8 +422,8 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-1
-          path: ./code-coverage-ts/**/ 
-          
+          path: ./code-coverage-ts/**/
+
   cactus-cmd-api-server:
     continue-on-error: false
     needs:
@@ -463,7 +463,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-2
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
       - name: build_ncc_bundle
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-cmd-api-server
@@ -553,7 +553,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-3
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cactus-common:
     continue-on-error: false
@@ -590,7 +590,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-4
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cactus-core:
     continue-on-error: false
@@ -624,7 +624,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-5
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cactus-core-api:
     continue-on-error: false
@@ -653,14 +653,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
- 
+
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-6
-          path: ./code-coverage-ts/**/ 
-  
+          path: ./code-coverage-ts/**/
+
   ce-carbon-accounting-backend:
     continue-on-error: false
     env:
@@ -694,7 +694,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-7
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   ce-carbon-accounting-business-logic-plugin:
     continue-on-error: false
@@ -728,7 +728,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-8
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   ce-carbon-accounting-frontend:
     continue-on-error: false
@@ -763,7 +763,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-9
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ce-supply-chain-backend:
     continue-on-error: false
     env:
@@ -799,7 +799,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-10
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   ce-supply-chain-business-logic-plugin:
     continue-on-error: false
@@ -833,7 +833,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-11
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   ce-supply-chain-frontend:
     continue-on-error: false
@@ -868,7 +868,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-12
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cp-consortium-manual:
     continue-on-error: false
@@ -902,7 +902,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-13
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cp-htlc-coordinator-besu:
     continue-on-error: false
@@ -933,12 +933,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-        if: ${{ env.RUN_CODE_COVERAGE == 'true' }}  
+        if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-14
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cp-htlc-eth-besu:
     continue-on-error: false
@@ -972,7 +972,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-15
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cp-htlc-eth-besu-erc20:
     continue-on-error: false
@@ -1006,7 +1006,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-16
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cp-keychain-aws-sm:
     continue-on-error: false
@@ -1041,7 +1041,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-17
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cp-keychain-azure-kv:
     continue-on-error: false
@@ -1076,7 +1076,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-18
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   cpk-google-sm:
     continue-on-error: false
@@ -1111,7 +1111,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-19
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpk-memory:
     continue-on-error: false
     env:
@@ -1144,7 +1144,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-20
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpk-memory-wasm:
     continue-on-error: false
     env:
@@ -1178,7 +1178,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-21
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpk-vault:
     continue-on-error: false
     env:
@@ -1212,7 +1212,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-22
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpl-connector-aries:
     continue-on-error: false
     needs:
@@ -1247,7 +1247,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-23
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpl-connector-besu:
     permissions: write-all
     continue-on-error: false
@@ -1286,7 +1286,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-24
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
       - name: Ensure .tmp Directory Exists
         run: mkdir -p .tmp/benchmark-results/plugin-ledger-connector-besu/
@@ -1354,7 +1354,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-25
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpl-connector-corda:
     continue-on-error: false
     needs:
@@ -1394,8 +1394,8 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-26
-          path: ./code-coverage-ts/**/ 
-  
+          path: ./code-coverage-ts/**/
+
   cpl-connector-stellar:
     continue-on-error: false
     needs:
@@ -1432,7 +1432,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-27
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   plc-fabric-0:
     needs:
@@ -1473,7 +1473,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-28
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   plc-fabric-1:
     needs:
@@ -1904,7 +1904,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-29
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cplc-iroha2:
     continue-on-error: false
     needs:
@@ -1940,7 +1940,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-30
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cplc-ethereum:
     continue-on-error: false
     needs:
@@ -1975,7 +1975,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-31
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cplc-sawtooth:
     continue-on-error: false
     env:
@@ -2007,7 +2007,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-32
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cplc-xdai:
     continue-on-error: false
     env:
@@ -2042,7 +2042,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-33
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cpp-ethereum:
     continue-on-error: false
     env:
@@ -2075,7 +2075,40 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-34
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
+  cpp-fabric:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-persistence-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpp-fabric
+      JEST_TEST_CODE_COVERAGE_ENABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4.1.1
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v4.0.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+        if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
+      - name: Upload coverage reports as artifacts
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: coverage-reports-cpp-fabric
+          path: ./code-coverage-ts/**/
   cp-object-store-ipfs:
     continue-on-error: false
     env:
@@ -2109,7 +2142,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-35
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   # cactus-plugin-satp-hermes:
   #   continue-on-error: false
   #   env:
@@ -2169,7 +2202,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-36
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ct-api-client:
     continue-on-error: false
     env:
@@ -2202,7 +2235,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-37
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
   ct-cmd-api-server:
     continue-on-error: false
@@ -2240,7 +2273,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-38
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ct-geth-ledger:
     continue-on-error: false
     env:
@@ -2273,7 +2306,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-39
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ctp-consortium-manual:
     continue-on-error: false
     env:
@@ -2307,7 +2340,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-40
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ctp-htlc-eth-besu:
     continue-on-error: false
     env:
@@ -2342,7 +2375,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-41
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -2384,7 +2417,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-42
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ctp-ledger-connector-besu:
     continue-on-error: false
     needs:
@@ -2407,7 +2440,7 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.1
-      
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@v4.0.1
@@ -2422,7 +2455,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-43
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ctp-ledger-connector-ethereum:
     continue-on-error: false
     env:
@@ -2454,7 +2487,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-44
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cactus-test-tooling:
     continue-on-error: false
     needs:
@@ -2492,7 +2525,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-45
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   cactus-verifier-client:
     continue-on-error: false
     env:
@@ -2525,7 +2558,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-46
-          path: ./code-coverage-ts/**/ 
+          path: ./code-coverage-ts/**/
   ghcr-besu-all-in-one:
     runs-on: ubuntu-22.04
     steps:
@@ -2589,7 +2622,7 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
-  
+
   ghcr-fabric2-all-in-one:
     runs-on: ubuntu-22.04
     steps:

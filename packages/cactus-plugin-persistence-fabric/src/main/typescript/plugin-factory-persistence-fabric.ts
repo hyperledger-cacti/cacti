@@ -7,7 +7,7 @@ import {
   PluginPersistenceFabric,
 } from "./plugin-persistence-fabric";
 
-export class PluginFactoryPersistenceFabric extends PluginFactory<
+export class PluginFactoryLedgerPersistence extends PluginFactory<
   PluginPersistenceFabric,
   IPluginPersistenceFabricOptions,
   IPluginFactoryOptions
