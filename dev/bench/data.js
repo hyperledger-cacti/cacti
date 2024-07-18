@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1721263379117,
+  "lastUpdate": 1721322600432,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -114,6 +114,44 @@ window.BENCHMARK_DATA = {
             "range": "±1.50%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "6ff8111c2534f71a5f623433eba59a610d84f4eb",
+          "message": "fix: address CVE-2022-24434, GHSA-wm7h-9275-46v2 caused by dicer\n\nThe process for this fix was to:\n1. `yarn why -R dicer`\n2. Then examine the output of that and see which dependencies are using\ndicer indirectly (transient dependencies)\n3. `yarn up multer --exact`\n4. `yarn up express-openapi-validator --exact`\n5. Profit, e.g. running `yarn why -R dicer` at this point shows that\ndicer has been eliminated from the dependency tree completely.\n\nhttps://github.com/hyperledger/cacti/security/dependabot/176\n\nWeaknesses\nCWE-248\n\nCVE ID\nCVE-2022-24434\n\nGHSA ID\nGHSA-wm7h-9275-46v2\n\nAlso sneaking in a test case hot-fix for\nbesu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts\nwhere the error message assertion broke down after a change in error\nhandling of the contract deployment endpoint.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-07-18T09:52:47-07:00",
+          "tree_id": "f790bf3fa1eb223c0d52d9f597d58f1a50090a32",
+          "url": "https://github.com/hyperledger/cacti/commit/6ff8111c2534f71a5f623433eba59a610d84f4eb"
+        },
+        "date": 1721322597660,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 610,
+            "range": "±1.66%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 373,
+            "range": "±1.38%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
