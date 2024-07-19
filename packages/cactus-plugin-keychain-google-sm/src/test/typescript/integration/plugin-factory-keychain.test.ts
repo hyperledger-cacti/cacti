@@ -1,14 +1,15 @@
+import "jest-extended";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import test, { Test } from "tape-promise/tape";
 import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain";
 import { PluginKeychainGoogleSm } from "../../../main/typescript/plugin-keychain-google-sm";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
-test("get,set,has,delete alters state as expected", async (t: Test) => {
+test("get,set,has,delete alters state as expected", async () => {
   const iPluginFactoryOptions: IPluginFactoryOptions = {
     pluginImportType: PluginImportType.Local,
   };
@@ -16,8 +17,8 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
   const pluginRegistry = new PluginRegistry();
   const iPluginKeychainGoogleSmOptions = {
     pluginRegistry,
-    instanceId: uuidv4(),
-    keychainId: uuidv4(),
+    instanceId: randomUUID(),
+    keychainId: randomUUID(),
     googleProfile: "true",
     googleRegion: "true",
     googleEndpoint: "true",
@@ -33,10 +34,5 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
     iPluginKeychainGoogleSmOptions,
   );
 
-  t.true(
-    pluginKeychainGoogleSm instanceof PluginKeychainGoogleSm,
-    "pluginImportType.Local results in pluginKeychainGoogleSm",
-  );
-
-  t.end();
+  expect(pluginKeychainGoogleSm instanceof PluginKeychainGoogleSm).toBeTrue();
 });

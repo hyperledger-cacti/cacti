@@ -1086,8 +1086,7 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpk-google-sm
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-keychain-google-sm.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:

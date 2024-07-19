@@ -1,5 +1,5 @@
-import test, { Test } from "tape-promise/tape";
-import { v4 as uuidv4 } from "uuid";
+import "jest-extended";
+import { randomUUID } from "node:crypto";
 import http from "http";
 import type { AddressInfo } from "net";
 import express from "express";
@@ -9,31 +9,44 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
+  hasKey,
 } from "@hyperledger/cactus-common";
-
+import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { DeleteKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
 import {
-  Configuration,
-  DefaultApi as KeychainGoogleSmApi,
-  DeleteKeychainEntryRequestV1,
   GetKeychainEntryRequestV1,
   HasKeychainEntryRequestV1,
-  IPluginKeychainGoogleSmOptions,
-  PluginKeychainGoogleSm,
   SetKeychainEntryRequestV1,
-} from "../../../../main/typescript/public-api";
+} from "@hyperledger/cactus-core-api";
+
+import { DefaultApi as KeychainGoogleSmApi } from "../../../../main/typescript/generated/openapi/typescript-axios/index";
+import { Configuration } from "../../../../main/typescript/generated/openapi/typescript-axios/index";
 
 import { SecretManagerServiceClientMock } from "../../mock/plugin-keychain-google-sm-mock";
 
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
+import {
+  IPluginKeychainGoogleSmOptions,
+  PluginKeychainGoogleSm,
+} from "../../../../main/typescript/plugin-keychain-google-sm";
 
 const logLevel: LogLevelDesc = "TRACE";
-const testCase = "Test cactus-plugin-keychain-azure-kv openapi validation";
 
-test(testCase, async (t: Test) => {
+describe("PluginKeychainGoogleSm", () => {
+  const key = `${randomUUID()}?${randomUUID()}`;
+  const value = randomUUID();
+
+  const fSet = "setKeychainEntryV1";
+  const fGet = "getKeychainEntryV1";
+  const fHas = "hasKeychainEntryV1";
+  const fDelete = "deleteKeychainEntryV1";
+  const cOk = "without bad request error";
+  const cWithoutParams = "not sending all required parameters";
+  const cInvalidParams = "sending invalid parameters";
+
   const options: IPluginKeychainGoogleSmOptions = {
-    instanceId: uuidv4(),
-    keychainId: uuidv4(),
+    instanceId: randomUUID(),
+    keychainId: randomUUID(),
     logLevel: logLevel,
     backend: new SecretManagerServiceClientMock({
       logLevel: logLevel,
@@ -49,141 +62,135 @@ test(testCase, async (t: Test) => {
     port: 0,
     server,
   };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-  const configuration = new Configuration({ basePath: apiHost });
-  const apiClient = new KeychainGoogleSmApi(configuration);
 
-  await installOpenapiValidationMiddleware({
-    logLevel,
-    app: expressApp,
-    apiSpec: OAS,
+  let apiClient: KeychainGoogleSmApi;
+
+  beforeAll(async () => {
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
+    const apiHost = `http://${address}:${port}`;
+    const configuration = new Configuration({ basePath: apiHost });
+    apiClient = new KeychainGoogleSmApi(configuration);
+
+    await installOpenapiValidationMiddleware({
+      logLevel,
+      app: expressApp,
+      apiSpec: OAS,
+    });
+
+    await plugin.getOrCreateWebServices();
+    await plugin.registerWebServices(expressApp);
   });
 
-  await plugin.getOrCreateWebServices();
-  await plugin.registerWebServices(expressApp);
+  afterAll(async () => await Servers.shutdown(server));
 
-  const key = `${uuidv4()}?${uuidv4()}`;
-  const value = uuidv4();
-
-  const fSet = "setKeychainEntryV1";
-  const fGet = "getKeychainEntryV1";
-  const fHas = "hasKeychainEntryV1";
-  const fDelete = "deleteKeychainEntryV1";
-  const cOk = "without bad request error";
-  const cWithoutParams = "not sending all required parameters";
-  const cInvalidParams = "sending invalid parameters";
-
-  test(`${testCase} - ${fSet} - ${cOk}`, async (t2: Test) => {
+  it(` ${fSet} - ${cOk}`, async () => {
     const res = await apiClient.setKeychainEntryV1({
       key,
       value,
     });
-    t2.equal(res.status, 200, `Endpoint ${fSet}: response.status === 200 OK`);
-    t2.end();
+    expect(res.status).toEqual(200);
   });
 
-  test(`${testCase} - ${fGet} - ${cOk}`, async (t2: Test) => {
+  it(` ${fGet} - ${cOk}`, async () => {
     const res = await apiClient.getKeychainEntryV1({ key });
-    t2.equal(res.status, 200, `Endpoint ${fGet}: response.status === 200 OK`);
-    t2.end();
+    expect(res.status).toEqual(200);
   });
 
-  test(`${testCase} - ${fHas} - ${cOk}`, async (t2: Test) => {
+  it(` ${fHas} - ${cOk}`, async () => {
     const res = await apiClient.hasKeychainEntryV1({ key });
-    t2.equal(res.status, 200, `Endpoint ${fHas}: response.status === 200 OK`);
-    t2.end();
+    expect(res.status).toEqual(200);
   });
 
-  test(`${testCase} - ${fDelete} - ${cOk}`, async (t2: Test) => {
+  it(` ${fDelete} - ${cOk}`, async () => {
     const res = await apiClient.deleteKeychainEntryV1({ key });
-    t2.equal(
-      res.status,
-      200,
-      `Endpoint ${fDelete}: response.status === 200 OK`,
-    );
-    t2.end();
+    expect(res.status).toEqual(200);
   });
 
-  test(`${testCase} - ${fSet} - ${cWithoutParams}`, async (t2: Test) => {
+  it(` ${fSet} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.setKeychainEntryV1({
         value,
-      } as any as SetKeychainEntryRequestV1);
+      } as unknown as SetKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSet} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("key")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fGet} - ${cWithoutParams}`, async (t2: Test) => {
+  it(` ${fGet} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.getKeychainEntryV1(
-        {} as any as GetKeychainEntryRequestV1,
+        {} as unknown as GetKeychainEntryRequestV1,
       );
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fGet} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("key")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fHas} - ${cWithoutParams}`, async (t2: Test) => {
+  it(` ${fHas} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.hasKeychainEntryV1(
-        {} as any as HasKeychainEntryRequestV1,
+        {} as unknown as HasKeychainEntryRequestV1,
       );
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fHas} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("key")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fDelete} - ${cWithoutParams}`, async (t2: Test) => {
+  it(` ${fDelete} - ${cWithoutParams}`, async () => {
     try {
       await apiClient.deleteKeychainEntryV1(
-        {} as any as DeleteKeychainEntryRequestV1,
+        {} as unknown as DeleteKeychainEntryRequestV1,
       );
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDelete} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("key")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fSet} - ${cInvalidParams}`, async (t2: Test) => {
+  it(` ${fSet} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.setKeychainEntryV1({
         key,
@@ -191,90 +198,84 @@ test(testCase, async (t: Test) => {
         fake: 4,
       } as any as SetKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSet} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("fake")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fGet} - ${cInvalidParams}`, async (t2: Test) => {
+  it(` ${fGet} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.getKeychainEntryV1({
         key,
         fake: 4,
-      } as any as GetKeychainEntryRequestV1);
+      } as unknown as GetKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fGet} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("fake")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fHas} - ${cInvalidParams}`, async (t2: Test) => {
+  it(` ${fHas} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.hasKeychainEntryV1({
         key,
         fake: 4,
-      } as any as HasKeychainEntryRequestV1);
+      } as unknown as HasKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fHas} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
+
+      expect(fields.includes("fake")).toBeTrue();
     }
-    t2.end();
   });
 
-  test(`${testCase} - ${fDelete} - ${cInvalidParams}`, async (t2: Test) => {
+  it(` ${fDelete} - ${cInvalidParams}`, async () => {
     try {
       await apiClient.deleteKeychainEntryV1({
         key,
         fake: 4,
-      } as any as DeleteKeychainEntryRequestV1);
+      } as unknown as DeleteKeychainEntryRequestV1);
     } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
-    }
-    t2.end();
-  });
+      expect(e.response.status).toEqual(400);
+      const fields = e.response.data.map((param: unknown) => {
+        if (!hasKey(param, "path")) {
+          throw new TypeError("Expected param.path to exist.");
+        }
+        if (typeof param.path !== "string") {
+          throw new TypeError("Expected param.path to be string");
+        }
+        return param.path.replace("/body/", "");
+      });
 
-  t.end();
+      expect(fields.includes("fake")).toBeTrue();
+    }
+  });
 });
