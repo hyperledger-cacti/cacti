@@ -6,7 +6,6 @@ This section contains the ledger supported versions for connectors in Hyperledge
 *   [Besu](support/besu.md)
 *   [Corda](support/corda.md)
 *   [Fabric](support/fabric.md)
-*   [Quorum](support/quorum.md)
 *   [xDai](support/xdai.md)
 *   [Substrate](support/substrate.md)
 
