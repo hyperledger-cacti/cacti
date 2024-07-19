@@ -1,10 +1,9 @@
-import DashFabric from "./pages/DashFabric/DashFabric";
-import TransactionsFabric from "./pages/TransactionsFabric/TransactionsFabric";
-import BlocksFabric from "./pages/BlocksFabric/BlocksFabric";
-import FabricTransaction from "./pages/FabricTransaction/FabricTransaction";
-import FabricBlock from "./pages/FabricBlock/FabricBlock";
-import { Outlet } from "react-router-dom";
 import { AppConfig } from "../../common/types/app";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Blocks from "./pages/Blocks/Blocks";
+import Transactions from "./pages/Transactions/Transactions";
+import { Outlet } from "react-router-dom";
+import TransactionDetails from "./pages/TransactionDetails/TransactionDetails";
 
 const fabricConfig: AppConfig = {
   name: "Fabric",
@@ -17,33 +16,27 @@ const fabricConfig: AppConfig = {
   ],
   routes: [
     {
-      element: <DashFabric />,
-    },
-    {
-      path: "transactions",
-      element: <TransactionsFabric />,
+      element: <Dashboard />,
     },
     {
       path: "blocks",
-      element: <BlocksFabric />,
+      element: <Blocks />,
     },
     {
-      path: "txn-details",
+      path: "transactions",
+      element: <Transactions />,
+    },
+    {
+      path: "transaction",
       element: <Outlet />,
       children: [
         {
-          path: ":id",
-          element: <FabricTransaction />,
-        },
-      ],
-    },
-    {
-      path: "block-details",
-      element: <Outlet />,
-      children: [
-        {
-          path: ":id",
-          element: <FabricBlock />,
+          path: ":hash",
+          element: (
+            <div>
+              <TransactionDetails />
+            </div>
+          ),
         },
       ],
     },
