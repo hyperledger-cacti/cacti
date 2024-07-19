@@ -1,8 +1,0 @@
-.details-card {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    border: 1px solid rgb(230, 224, 224);
-    border-radius: 10px;
-    padding: 1.5rem 2rem;
-}

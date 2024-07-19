@@ -21,6 +21,7 @@ import {
   tableCellHeight,
 } from "./StyledTableCell";
 import type { UITableListingPaginationActionProps } from "./UITableListingPaginationAction";
+import { ClickableTableRow } from "./ClickableTableRow";
 
 /**
  * Table column configuration entry
@@ -55,6 +56,7 @@ export interface UITableListingProps<T> {
   columns: string[];
   rowsPerPage: number;
   tableSize?: "small" | "medium";
+  onClick?: (row: Record<string, unknown>) => void;
 }
 
 function getKeyField(columnConfig: ColumnConfigType) {
@@ -83,6 +85,22 @@ function formatCellValue(config: ColumnConfigEntry, value: any) {
   return value;
 }
 
+function createTableRow(
+  row: Record<string, unknown>,
+  columns: string[],
+  columnConfig: ColumnConfigType,
+) {
+  return columns.map((colName) => {
+    const config = columnConfig[colName];
+    const value = row[config.field];
+    return (
+      <StyledTableCell key={`${row.number}-${colName}`}>
+        {formatCellValue(config, value)}
+      </StyledTableCell>
+    );
+  });
+}
+
 /**
  * UITableListing - Show table with paged data fetched from react-query.
  *
@@ -106,6 +124,7 @@ export default function UITableListing<
   columns,
   rowsPerPage,
   tableSize,
+  onClick,
 }: UITableListingProps<T>) {
   const [page, setPage] = React.useState(0);
   const { isError, isPending, data, error, refetch } = useQuery({
@@ -154,19 +173,24 @@ export default function UITableListing<
             </TableRow>
           </TableHead>
           <TableBody>
-            {displayData.map((row) => (
-              <TableRow key={row[getKeyField(columnConfig)]}>
-                {columns.map((colName) => {
-                  const config = columnConfig[colName];
-                  const value = row[config.field];
-                  return (
-                    <StyledTableCell key={`${row.number}-${colName}`}>
-                      {formatCellValue(config, value)}
-                    </StyledTableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
+            {displayData.map((row) => {
+              if (onClick) {
+                return (
+                  <ClickableTableRow
+                    key={row[getKeyField(columnConfig)]}
+                    onClick={() => onClick(row)}
+                  >
+                    {createTableRow(row, columns, columnConfig)}
+                  </ClickableTableRow>
+                );
+              } else {
+                return (
+                  <TableRow key={row[getKeyField(columnConfig)]}>
+                    {createTableRow(row, columns, columnConfig)}
+                  </TableRow>
+                );
+              }
+            })}
             {emptyRows > 0 && (
               <TableRow style={{ height: tableCellHeight * emptyRows }}>
                 <StyledTableCell colSpan={6} />
