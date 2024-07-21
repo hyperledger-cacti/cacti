@@ -922,3 +922,7 @@ github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.2 h1:f3BPQ7yj0
 github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.2/go.mod h1:AquykDDxS22prHjCilBzAQeioQ/BWTlla+FavMapGCY=
 github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-rc.2 h1:DZVND4Jh4lulH+Cmd5hKY2aM6Az8RoS+WaVY04FB0UI=
 github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-rc.2/go.mod h1:PicgOVOzGHcyJBoQsNOmUsrNG7AzLpMwu3tlkBk8OKY=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.3 h1:niQG/pUADBRo+o8Aa0C0fQxSnmT+icn6sMQVLPVWSQw=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.3/go.mod h1:AquykDDxS22prHjCilBzAQeioQ/BWTlla+FavMapGCY=
+github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-rc.3 h1:BFogfPwx9P1zRNDLirY6bbaoAehN4ikatmVCwypbdbw=
+github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-rc.3/go.mod h1:TX0mUWisdz9YZgPmz5yWQDj7Z56iXlh2SkuNr7TBwRY=

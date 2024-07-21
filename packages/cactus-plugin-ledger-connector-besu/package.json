@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-besu",
-  "version": "2.0.0-rc.2",
+  "version": "2.0.0-rc.3",
   "description": "Allows Cactus nodes to connect to a Besu ledger.",
   "keywords": [
     "Hyperledger",
@@ -59,9 +59,9 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "1.10.9",
-    "@hyperledger/cactus-common": "2.0.0-rc.2",
-    "@hyperledger/cactus-core": "2.0.0-rc.2",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.2",
+    "@hyperledger/cactus-common": "2.0.0-rc.3",
+    "@hyperledger/cactus-core": "2.0.0-rc.3",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.3",
     "axios": "1.7.2",
     "express": "4.19.2",
     "google-protobuf": "3.21.2",
@@ -82,8 +82,8 @@
     "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.2",
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.3",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.3",
     "@openapitools/openapi-generator-cli": "2.7.0",
     "@types/benchmark": "2.1.5",
     "@types/body-parser": "1.19.4",

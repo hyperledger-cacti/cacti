@@ -4,7 +4,7 @@
 
 directory=$(dirname $0)
 
-CACTI_VERSION=v2.0.0-rc.2
+CACTI_VERSION=v2.0.0-rc.3
 TMP_PATH=$PWD/../shared/tmp
 CHAINCODE_PATH=$PWD/../shared/chaincode
 rm -rf $CHAINCODE_PATH/interop

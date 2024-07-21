@@ -12,4 +12,4 @@ EXTRA_JVM_ARGS="--add-opens java.base/java.util=ALL-UNNAMED ${EXTRA_JVM_ARGS}"
 EXTRA_JVM_ARGS="--add-opens java.base/java.time=ALL-UNNAMED ${EXTRA_JVM_ARGS}"
 EXTRA_JVM_ARGS="--add-opens java.base/java.io=ALL-UNNAMED ${EXTRA_JVM_ARGS}"
 
-for i in 1 2 3; do java $EXTRA_JVM_ARGS -jar ${APP}/kotlin-spring/build/libs/cactus-connector-corda-server-2.0.0-rc.2.jar && break || sleep 5; done
+for i in 1 2 3; do java $EXTRA_JVM_ARGS -jar ${APP}/kotlin-spring/build/libs/cactus-connector-corda-server-2.0.0-rc.3.jar && break || sleep 5; done

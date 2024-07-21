@@ -1,6 +1,6 @@
 [package]
 name = "flipper"
-version = "0.1.0"
+version = "2.0.0-rc.3"
 authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 

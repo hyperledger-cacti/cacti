@@ -13,6 +13,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 * retire connector plugin specific container images, fix docs ([24b5888](https://github.com/hyperledger/cacti/commit/24b5888247d134ea417fc0e83dccc9826b4075f3))
 
+### Features
+
+* **fabric-connector:** add getChainInfo, improve getBlock output ([8c030ae](https://github.com/hyperledger/cacti/commit/8c030ae9e739a28ff0900f7af27ec0fbbb4b7ff9))
+* **persistence-fabric:** rewrite the plugin ([c867a9f](https://github.com/hyperledger/cacti/commit/c867a9f5ef084e4e6d7c6f5a641d1dd13f9ce233)), closes [#3298](https://github.com/hyperledger/cacti/issues/3298)
+
 ### BREAKING CHANGES
 
 * Container images are being deleted here and will also
@@ -71,14 +76,9 @@ bugs later if something only gets discovered after we've merged a bunch
 of these.
 
 Signed-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>
+* **fabric-connector:** It accepts `type` instead of `skipDecode` flag.
+- Move common block formatting logic to `cacti-block-formatters.ts`.
+- Add tests for new features. Move test common to quering `qscc` to single file
+  to increase CI speed.
 
-# [2.0.0-rc.2](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2024-07-03)
-
-**Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-sawtooth
-
-# [2.0.0-rc.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.2...v2.0.0-rc.1) (2024-06-14)
-
-### Features
-
-* **cactus-plugin-ledger-connector-aries:** add new connector plugin ([afef5ae](https://github.com/hyperledger/cacti/commit/afef5ae3e2f36bf7f25928ee75f82bc4800b3172)), closes [#2946](https://github.com/hyperledger/cacti/issues/2946)
-* **cactus-plugin-ledger-connector-sawtooth:** add new connector plugin ([e379504](https://github.com/hyperledger/cacti/commit/e37950403636a3fbc378fc7462b886294e6c7923))
+Signed-off-by: Michal Bajer <michal.bajer@fujitsu.com>

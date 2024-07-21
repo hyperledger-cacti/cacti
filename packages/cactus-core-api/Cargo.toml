@@ -1,6 +1,6 @@
 [package]
 name = "relay"
-version = "0.0.1"
+version = "2.0.0-rc.3"
 authors = ["Antony Targett <atargett@au1.ibm.com>", "Nick Waywood <nwaywood@au1.ibm.com>"]
 edition = "2021"
 
