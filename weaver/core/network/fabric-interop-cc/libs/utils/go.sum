@@ -159,3 +159,5 @@ github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.1 h1:WGnKcFCuU
 github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.1/go.mod h1:AquykDDxS22prHjCilBzAQeioQ/BWTlla+FavMapGCY=
 github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.2 h1:f3BPQ7yj09jttXBCZj5muQxNlaT294WlYDFkmSgWGsc=
 github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.2/go.mod h1:AquykDDxS22prHjCilBzAQeioQ/BWTlla+FavMapGCY=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.3 h1:niQG/pUADBRo+o8Aa0C0fQxSnmT+icn6sMQVLPVWSQw=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.3/go.mod h1:AquykDDxS22prHjCilBzAQeioQ/BWTlla+FavMapGCY=

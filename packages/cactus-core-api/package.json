@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core-api",
-  "version": "2.0.0-rc.2",
+  "version": "2.0.0-rc.3",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "keywords": [
     "Hyperledger",
@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "1.10.9",
-    "@hyperledger/cactus-common": "2.0.0-rc.2",
+    "@hyperledger/cactus-common": "2.0.0-rc.3",
     "axios": "1.7.2",
     "google-protobuf": "3.21.2"
   },
