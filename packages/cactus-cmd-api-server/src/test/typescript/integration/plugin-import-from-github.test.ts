@@ -1,86 +1,91 @@
-import path from "path";
-import test, { Test } from "tape-promise/tape";
-import { v4 as uuidv4 } from "uuid";
-import { readFile } from "fs/promises";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { randomUUID } from "node:crypto";
+import path from "node:path";
+import { readFile } from "node:fs/promises";
+
+import "jest-extended";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   PluginImportAction,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import {
-  ApiServer,
-  AuthorizationProtocol,
-  ConfigService,
-} from "../../../main/typescript/public-api";
+import { ConfigService } from "../../../main/typescript/config/config-service";
+import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
+import { ApiServer } from "../../../main/typescript/api-server";
 
-const logLevel: LogLevelDesc = "TRACE";
+describe("ApiServer", () => {
+  let apiServer: ApiServer;
 
-test("can install plugins at runtime with specified version based on imports", async (t: Test) => {
+  const logLevel: LogLevelDesc = "INFO";
+
+  const log = LoggerProvider.getOrCreate({
+    label: "plugin-import-from-github.test.ts",
+    level: logLevel,
+  });
+
   const pluginsPath = path.join(
     __dirname,
     "../../../../../../", // walk back up to the project root
     ".tmp/test/test-cmd-api-server/plugin-import-from-github_test/", // the dir path from the root
-    uuidv4(), // then a random directory to ensure proper isolation
+    randomUUID(), // then a random directory to ensure proper isolation
   );
   const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
-
   const configService = new ConfigService();
 
-  const apiServerOptions = await configService.newExampleConfig();
-  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
-  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-  apiServerOptions.configFile = "";
-  apiServerOptions.apiCorsDomainCsv = "*";
-  apiServerOptions.apiPort = 0;
-  apiServerOptions.cockpitPort = 0;
-  apiServerOptions.grpcPort = 0;
-  apiServerOptions.crpcPort = 0;
-  apiServerOptions.apiTlsEnabled = false;
-  apiServerOptions.plugins = [
-    {
-      packageName: "@hyperledger/cactus-dummy-package",
-      type: PluginImportType.Local,
-      action: PluginImportAction.Install,
-      options: {
-        instanceId: uuidv4(),
-        keychainId: uuidv4(),
-        logLevel,
-        packageSrc:
-          "https://gitpkg.now.sh/hyperledger/cactus/packages/cactus-cmd-api-server/src/test/resources/cactus-dummy-package?main",
-      },
-    },
-  ];
-  const config = await configService.newExampleConfigConvict(apiServerOptions);
-
-  const apiServer = new ApiServer({
-    config: config.getProperties(),
+  afterAll(async () => {
+    await apiServer.shutdown();
   });
 
-  const startResponse = apiServer.start();
-  await t.doesNotReject(
-    startResponse,
-    "failed to start API server with dynamic plugin imports configured for it...",
-  );
-  t.ok(startResponse, "startResponse truthy OK");
+  it("can install plugins at runtime from GitHub", async () => {
+    const apiSrvOpts = await configService.newExampleConfig();
+    apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
+    apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiSrvOpts.configFile = "";
+    apiSrvOpts.apiCorsDomainCsv = "*";
+    apiSrvOpts.apiPort = 0;
+    apiSrvOpts.cockpitPort = 0;
+    apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
+    apiSrvOpts.apiTlsEnabled = false;
+    apiSrvOpts.plugins = [
+      {
+        packageName: "@hyperledger/cactus-dummy-package",
+        type: PluginImportType.Local,
+        action: PluginImportAction.Install,
+        options: {
+          instanceId: randomUUID(),
+          keychainId: randomUUID(),
+          logLevel,
+          packageSrc:
+            "https://gitpkg.now.sh/hyperledger/cactus/packages/cactus-cmd-api-server/src/test/resources/cactus-dummy-package?main",
+        },
+      },
+    ];
+    const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
-  const packageFilePath = path.join(
-    pluginsPath,
-    apiServerOptions.plugins[0].options.instanceId,
-    "node_modules",
-    `${apiServerOptions.plugins[0].packageName}`,
-    "package.json",
-  );
+    apiServer = new ApiServer({
+      config: config.getProperties(),
+    });
 
-  const pkgJsonStr = await readFile(packageFilePath, "utf-8");
-  const { name, version } = JSON.parse(pkgJsonStr);
+    const startPromise = apiServer.start();
+    await expect(startPromise).toResolve();
+    await expect(startPromise).toBeTruthy();
+    await expect((await startPromise).addressInfoApi).toBeTruthy();
+    await expect((await startPromise).addressInfoCrpc).toBeTruthy();
+    await expect((await startPromise).addressInfoGrpc).toBeTruthy();
 
-  t.comment(name);
-  t.comment(version);
-  t.strictEquals(
-    name,
-    apiServerOptions.plugins[0].packageName,
-    `Package name strictly equal to ${apiServerOptions.plugins[0].packageName}`,
-  );
+    const packageFilePath = path.join(
+      pluginsPath,
+      apiSrvOpts.plugins[0].options.instanceId,
+      "node_modules",
+      `${apiSrvOpts.plugins[0].packageName}`,
+      "package.json",
+    );
 
-  test.onFinish(() => apiServer.shutdown());
+    const pkgJsonStr = await readFile(packageFilePath, "utf-8");
+    const { name, version } = JSON.parse(pkgJsonStr);
+
+    log.debug("installed package name on file-system:", name);
+    log.debug("installed package version on file-system:", version);
+    expect(name).toEqual(apiSrvOpts.plugins[0].packageName);
+  });
 });
