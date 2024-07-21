@@ -79,14 +79,9 @@ export class CactusKeychainVaultServer {
         [],
         {
           Env: this.envVars,
-          PublishAllPorts: true,
-          // HostConfig: {
-          //   // This is a workaround needed for macOS which has issues with routing
-          //   // to docker container's IP addresses directly...
-          //   // https://stackoverflow.com/a/39217691
-          //   PublishAllPorts: true,
-          //   // NetworkMode: "host",
-          // },
+          HostConfig: {
+            PublishAllPorts: true,
+          },
         },
         {},
         (err: unknown) => {

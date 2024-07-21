@@ -1,47 +1,48 @@
-import path from "path";
-import test, { Test } from "tape-promise/tape";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+import "jest-extended";
+import lmify from "lmify";
+import fs from "fs-extra";
+
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   PluginImportAction,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import {
-  ApiServer,
-  AuthorizationProtocol,
-  ConfigService,
-} from "../../../main/typescript/public-api";
-import lmify from "lmify";
-import fs from "fs-extra";
-import { readFile } from "fs/promises";
 
-const logLevel: LogLevelDesc = "TRACE";
+import { ConfigService } from "../../../main/typescript/config/config-service";
+import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
+import { ApiServer } from "../../../main/typescript/api-server";
 
-test("can instantiate plugins at runtime without install them", async (t: Test) => {
-  test("if plugin is not already installed and we set action to instantiate, server starting will fail", async (t2: Test) => {
+describe("ApiServer", () => {
+  const logLevel: LogLevelDesc = "INFO";
+  const instanceId = randomUUID();
+  const keychainId = randomUUID();
+
+  it("checks for invalid case of PluginImportAction.Instantiate and PluginImportType.Local", async () => {
     const pluginsPath = path.join(
       __dirname,
       "../../../../../../", // walk back up to the project root
       ".tmp/test/cmd-api-server/plugin-import-without-install/", // the dir path from the root
-      uuidv4(), // then a random directory to ensure proper isolation
+      randomUUID(), // then a random directory to ensure proper isolation
     );
     const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
     const configService = new ConfigService();
 
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = 0;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.crpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
+    const apiSrvOpts = await configService.newExampleConfig();
+    apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
+    apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiSrvOpts.configFile = "";
+    apiSrvOpts.apiCorsDomainCsv = "*";
+    apiSrvOpts.apiPort = 0;
+    apiSrvOpts.cockpitPort = 0;
+    apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
+    apiSrvOpts.apiTlsEnabled = false;
 
-    const instanceId = uuidv4();
-    const keychainId = uuidv4();
     const plugin = {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
@@ -54,45 +55,55 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
       },
     };
 
-    apiServerOptions.plugins = [plugin];
+    apiSrvOpts.plugins = [plugin];
 
-    const config =
-      await configService.newExampleConfigConvict(apiServerOptions);
+    const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
     const apiServer = new ApiServer({
       config: config.getProperties(),
     });
 
-    await t2.rejects(apiServer.start());
-
-    t2.end();
+    await expect(apiServer.start()).rejects.toThrowError(
+      expect.toSatisfy((x) => {
+        expect(x).toBeObject();
+        expect(x).toMatchObject({
+          toJSON: expect.toBeFunction(),
+        });
+        const xAsJsonString = JSON.stringify(x.toJSON());
+        return (
+          xAsJsonString.includes("MODULE_NOT_FOUND") &&
+          xAsJsonString.includes("Failed to init PluginRegistry") &&
+          xAsJsonString.includes("Failed to start ApiServer")
+        );
+      }),
+    );
   });
 
-  test("if plugin is already installed and we send a different version, it keeps using plugin installed before call apiServer", async (t2: Test) => {
+  test("if plugin is already installed and we send a different version, it keeps using plugin installed before call apiServer", async () => {
     const pluginsPath = path.join(
       __dirname,
       "../../../../../../", // walk back up to the project root
       ".tmp/test/cmd-api-server/plugin-import-without-install/", // the dir path from the root
-      uuidv4(), // then a random directory to ensure proper isolation
+      randomUUID(), // then a random directory to ensure proper isolation
     );
     const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
     const configService = new ConfigService();
 
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = 0;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.crpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
+    const apiSrvOpts = await configService.newExampleConfig();
+    apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
+    apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiSrvOpts.configFile = "";
+    apiSrvOpts.apiCorsDomainCsv = "*";
+    apiSrvOpts.apiPort = 0;
+    apiSrvOpts.cockpitPort = 0;
+    apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
+    apiSrvOpts.apiTlsEnabled = false;
 
     const versionToSendServer = "0.7.0";
-    const instanceId = uuidv4();
-    const keychainId = uuidv4();
+    const instanceId = randomUUID();
+    const keychainId = randomUUID();
     const plugin = {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
@@ -104,7 +115,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
         version: versionToSendServer,
       },
     };
-    apiServerOptions.plugins = [plugin];
+    apiSrvOpts.plugins = [plugin];
 
     const pluginPackageDir = path.join(pluginsPath, instanceId);
     const versionToInstall = "0.10.0";
@@ -123,20 +134,17 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
       `--prefix=${pluginPackageDir}`,
       // "--ignore-workspace-root-check",
     ]);
-    t2.equal(out.exitCode, 0, "Plugin installed correctly");
+    expect(out.exitCode).toEqual(0);
 
     const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
+      apiSrvOpts,
       true,
     );
     const apiServer = new ApiServer({
       config: config.getProperties(),
     });
 
-    await t2.doesNotReject(
-      apiServer.start(),
-      "apiServer was starting instantiating a plugin previously installed",
-    );
+    await expect(apiServer.start()).toResolve();
 
     const packageFilePath = path.join(
       pluginsPath,
@@ -149,53 +157,44 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
     const pkgJsonStr = await readFile(packageFilePath, "utf-8");
     const { version } = JSON.parse(pkgJsonStr);
 
-    t2.strictEquals(
-      version,
-      versionToInstall,
-      "apiServer did not overwrite package",
-    );
+    expect(version).toEqual(versionToInstall);
 
     const pluginsCount = apiServer.getPluginImportsCount();
-    t2.equal(pluginsCount, 1, "apiServer instantiated 1 plugin");
+    expect(pluginsCount).toEqual(1);
 
-    await t2.doesNotReject(
-      apiServer.shutdown(),
-      "apiServer was stopped instantiating a plugin previously installed",
-    );
-
-    t2.end();
+    await expect(apiServer.shutdown()).toResolve();
   });
 
-  test("if we send action as Installation, apiServer will install the plugin", async (t2: Test) => {
+  test("if we send action as Installation, apiServer will install the plugin", async () => {
     const pluginsPath = path.join(
       __dirname,
       "../../../../../../", // walk back up to the project root
       ".tmp/test/cmd-api-server/plugin-import-without-install/", // the dir path from the root
-      uuidv4(), // then a random directory to ensure proper isolation
+      randomUUID(), // then a random directory to ensure proper isolation
     );
     const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
     const configService = new ConfigService();
 
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = 0;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.crpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
+    const apiSrvOpts = await configService.newExampleConfig();
+    apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
+    apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiSrvOpts.configFile = "";
+    apiSrvOpts.apiCorsDomainCsv = "*";
+    apiSrvOpts.apiPort = 0;
+    apiSrvOpts.cockpitPort = 0;
+    apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
+    apiSrvOpts.apiTlsEnabled = false;
     const versionToInstall = "0.8.0";
-    apiServerOptions.plugins = [
+    apiSrvOpts.plugins = [
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
-          instanceId: uuidv4(),
-          keychainId: uuidv4(),
+          instanceId: randomUUID(),
+          keychainId: randomUUID(),
           logLevel,
           version: versionToInstall,
         },
@@ -203,7 +202,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
     ];
 
     const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
+      apiSrvOpts,
       true,
     );
 
@@ -211,35 +210,24 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
       config: config.getProperties(),
     });
 
-    await t2.doesNotReject(
-      apiServer.start(),
-      "apiServer was starting instantiating a plugin previously installed",
-    );
+    await expect(apiServer.start()).toResolve();
 
     const packageFilePath = path.join(
       pluginsPath,
-      apiServerOptions.plugins[0].options.instanceId,
+      apiSrvOpts.plugins[0].options.instanceId,
       "node_modules",
-      `${apiServerOptions.plugins[0].packageName}`,
+      `${apiSrvOpts.plugins[0].packageName}`,
       "package.json",
     );
 
     const pkgJsonStr = await readFile(packageFilePath, "utf-8");
     const { version } = JSON.parse(pkgJsonStr);
 
-    t2.strictEquals(
-      version,
-      versionToInstall,
-      "apiServer installed the package",
-    );
+    expect(version).toEqual(versionToInstall);
 
     const pluginsCount = apiServer.getPluginImportsCount();
-    t2.equal(pluginsCount, 1, "apiServer instantiated 1 plugin");
+    expect(pluginsCount).toEqual(1);
 
-    await t2.doesNotReject(apiServer.shutdown(), "apiServer was stopped");
-
-    t2.end();
+    await expect(apiServer.shutdown()).toResolve();
   });
-
-  t.end();
 });
