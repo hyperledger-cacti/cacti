@@ -9071,6 +9071,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cacti-plugin-consortium-static@workspace:packages/cacti-plugin-consortium-static":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cacti-plugin-consortium-static@workspace:packages/cacti-plugin-consortium-static"
+  dependencies:
+    "@hyperledger/cactus-api-client": "npm:2.0.0-rc.3"
+    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-rc.3"
+    "@hyperledger/cactus-common": "npm:2.0.0-rc.3"
+    "@hyperledger/cactus-core": "npm:2.0.0-rc.3"
+    "@hyperledger/cactus-core-api": "npm:2.0.0-rc.3"
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.0.0-rc.3"
+    "@hyperledger/cactus-test-tooling": "npm:2.0.0-rc.3"
+    "@types/express": "npm:4.17.21"
+    "@types/json-stable-stringify": "npm:1.0.33"
+    "@types/uuid": "npm:10.0.0"
+    axios: "npm:1.6.0"
+    body-parser: "npm:1.20.2"
+    express: "npm:4.19.2"
+    http-errors-enhanced-cjs: "npm:2.0.1"
+    jose: "npm:4.15.5"
+    merkletreejs: "npm:0.4.0"
+    prom-client: "npm:15.1.3"
+    safe-stable-stringify: "npm:2.4.3"
+    typescript-optional: "npm:2.0.1"
+    uuid: "npm:10.0.0"
+    web3: "npm:1.6.1"
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/cacti-plugin-ledger-connector-stellar@workspace:packages/cacti-plugin-ledger-connector-stellar":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-plugin-ledger-connector-stellar@workspace:packages/cacti-plugin-ledger-connector-stellar"
@@ -38834,6 +38862,19 @@ __metadata:
     treeify: "npm:^1.1.0"
     web3-utils: "npm:^1.3.4"
   checksum: 10/a93520ef768648d1e4ebd175182bd3d304270b8eb0700df5be99395fb3ad8805407bdaf3231d13b1649e87de799aa06d71c616db047ad039025764eb23b02244
+  languageName: node
+  linkType: hard
+
+"merkletreejs@npm:0.4.0":
+  version: 0.4.0
+  resolution: "merkletreejs@npm:0.4.0"
+  dependencies:
+    bignumber.js: "npm:^9.0.1"
+    buffer-reverse: "npm:^1.0.1"
+    crypto-js: "npm:^4.2.0"
+    treeify: "npm:^1.1.0"
+    web3-utils: "npm:^1.3.4"
+  checksum: 10/ebf8bd2ebb42b7f489c8da8ed39e230fa131c0a5b23a2e3be667a0589671df118f996b73d44e5b83f2c70a3c956515328386e94b2841cd279033eca8caf71aee
   languageName: node
   linkType: hard
 
