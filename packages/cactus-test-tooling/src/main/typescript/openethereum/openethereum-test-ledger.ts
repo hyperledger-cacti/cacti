@@ -233,7 +233,7 @@ export class OpenEthereumTestLedger {
    */
   public async newEthPersonalAccount(
     seedMoney = 10e8,
-    password = "test",
+    password: string,
   ): Promise<string> {
     const account = await this.web3.eth.personal.newAccount(password);
 
