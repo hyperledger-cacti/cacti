@@ -2205,7 +2205,6 @@ jobs:
         with:
           name: coverage-reports-37
           path: ./code-coverage-ts/**/
-
   ct-cmd-api-server:
     continue-on-error: false
     needs:
@@ -2527,6 +2526,39 @@ jobs:
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-46
+          path: ./code-coverage-ts/**/
+  cp-consortium-static:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      JEST_TEST_PATTERN: packages/cacti-plugin-consortium-static/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-static
+      JEST_TEST_CODE_COVERAGE_ENABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4.1.7
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v4.0.2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+        if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
+      - name: Upload coverage reports as artifacts
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: coverage-reports-47
           path: ./code-coverage-ts/**/
   ghcr-besu-all-in-one:
     runs-on: ubuntu-22.04

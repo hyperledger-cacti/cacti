@@ -83,6 +83,7 @@ export class ApiClient extends BaseAPI {
     ledgerOrId: string | Ledger,
     ctor: new (configuration?: Configuration) => T,
     ctorArgs: Record<string, unknown>,
+    consortiumDbProvider?: IAsyncProvider<ConsortiumDatabase>,
   ): Promise<ApiClient & T>;
   /**
    * Constructs a new `ApiClient` object that is tied to whichever Cactus node

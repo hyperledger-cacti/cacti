@@ -29,6 +29,9 @@
       "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json"
     },
     {
+      "path": "./packages/cacti-plugin-consortium-static/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-plugin-htlc-eth-besu/tsconfig.json"
     },
     {
