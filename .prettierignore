@@ -8,6 +8,7 @@ packages/core
 packages/connection-chain
 contribs/
 **/src/main/typescript/generated/**
+weaver/common/protos-js/**/*_pb.js
 
 # TODO: Send a PR that moves these generated code files under a sub-directory 
 # that is called "generated" so that the default ignore pattern above matches it

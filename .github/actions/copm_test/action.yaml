@@ -1,0 +1,36 @@
+name: 'Copm Test'
+description: "common setup steps for the weaver network needed to run copm tests"
+runs:
+  using: "composite"
+  steps:
+    - name: Use Node.js ${{ env.NODEJS_VERSION }}
+      uses: actions/setup-node@v4.0.2
+      with:
+        node-version: ${{ env.NODEJS_VERSION }}
+    - id: yarn-cache
+      name: Restore Yarn Cache
+      uses: actions/cache@v4.0.1
+      with:
+        key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+        path: ./.yarn/
+        restore-keys: |
+          ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+    - name: Get Latest Relay Dependencies
+      shell: bash
+      run: |
+        make protos-local
+        cargo update -p nom
+        cargo update -p lexical-core
+      working-directory: weaver/core/relay
+    - name: Use Protoc 3.15
+      shell: bash
+      run: |
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
+      # PROTOS
+    - name: Build local weaver dependencies
+      run: make setup --trace
+      shell: bash
+      working-directory: packages/cacti-plugin-copm-fabric

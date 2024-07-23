@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "./build",
+        "allowJs": true,
+        "target": "es5",
+        "esModuleInterop": true,
+        "module": "commonjs"
+    },
+    "include": ["common/*","corda/*","driver/*","fabric/*","identity/*","msp/*","networks/*","peer/*","relay/*"],
+    "exclude": ["node_modules","build"],
+    "skipLibCheck": true,        
+    "resolveJsonModule": true
+}
