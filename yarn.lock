@@ -8987,6 +8987,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hyperledger-cacti/cacti-copm-core@npm:2.0.0, @hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core"
+  dependencies:
+    "@bufbuild/buf": "npm:1.30.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
+    "@bufbuild/protoc-gen-es": "npm:1.8.0"
+    "@connectrpc/connect": "npm:1.4.0"
+    "@connectrpc/connect-node": "npm:1.4.0"
+    "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
+    "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0"
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@openapitools/openapi-generator-cli": "npm:2.7.0"
+  languageName: unknown
+  linkType: soft
+
+"@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric"
+  dependencies:
+    "@bufbuild/buf": "npm:1.30.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
+    "@bufbuild/protoc-gen-es": "npm:1.8.0"
+    "@connectrpc/connect": "npm:1.4.0"
+    "@connectrpc/connect-node": "npm:1.4.0"
+    "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
+    "@hyperledger-cacti/cacti-copm-core": "npm:2.0.0"
+    "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0"
+    "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0"
+    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0"
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@hyperledger/cactus-core": "npm:2.0.0"
+    "@hyperledger/cactus-core-api": "npm:2.0.0"
+    "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0"
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.0.0"
+    "@hyperledger/cactus-test-tooling": "npm:2.0.0"
+    "@openapitools/openapi-generator-cli": "npm:2.7.0"
+    fabric-ca-client: "npm:2.2.20"
+    fabric-common: "npm:2.2.20"
+    fabric-network: "npm:2.2.20"
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/anoncreds-nodejs@npm:0.2.0":
   version: 0.2.0
   resolution: "@hyperledger/anoncreds-nodejs@npm:0.2.0"
@@ -9298,6 +9341,7 @@ __metadata:
   dependencies:
     "@grpc/grpc-js": "npm:1.11.3"
     "@grpc/proto-loader": "npm:0.7.13"
+    "@types/node": "npm:18.19.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
@@ -17461,6 +17505,15 @@ __metadata:
   version: 18.15.13
   resolution: "@types/node@npm:18.15.13"
   checksum: 10/b9bbe923573797ef7c5fd2641a6793489e25d9369c32aeadcaa5c7c175c85b42eb12d6fe173f6781ab6f42eaa1ebd9576a419eeaa2a1ec810094adb8adaa9a54
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:18.19.0":
+  version: 18.19.0
+  resolution: "@types/node@npm:18.19.0"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10/dfaf489b31098d5184aa6ce07fec9619d05b2c953a319b23b0f46e4c901b9996d87da8c193ea388488119ccc8e79ce228d769b7a59077ac6645aa86c826b56cd
   languageName: node
   linkType: hard
 
@@ -52198,6 +52251,13 @@ __metadata:
   version: 2.0.5
   resolution: "undefsafe@npm:2.0.5"
   checksum: 10/f42ab3b5770fedd4ada175fc1b2eb775b78f609156f7c389106aafd231bfc210813ee49f54483d7191d7b76e483bc7f537b5d92d19ded27156baf57592eb02cc
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: 10/0097779d94bc0fd26f0418b3a05472410408877279141ded2bd449167be1aed7ea5b76f756562cb3586a07f251b90799bab22d9019ceba49c037c76445f7cddd
   languageName: node
   linkType: hard
 

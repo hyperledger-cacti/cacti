@@ -5,6 +5,7 @@ examples/cactus-example-carbon-accounting-frontend/www/
 examples/cactus-example-supply-chain-frontend/www/
 weaver/core/identity-management/iin-agent/out/
 weaver/common/protos-js/build/
+weaver/common/protos-js/**/*_pb.js
 
 **/src/main/typescript/generated/proto/**
 **/src/main/typescript/generated/wasm-pack/**
@@ -30,6 +31,7 @@ weaver/common/policy-dsl/parser/PolicyListener.js
 weaver/common/policy-dsl/parser/PolicyParser.js
 weaver/common/policy-dsl/test/MyErrorListener.js
 weaver/common/policy-dsl/test/MyParseTreeVisitor.js
+weaver/common/protos-js/driver/driver_grpc_pb.js
 weaver/core/drivers/fabric-driver/server/dbConnector.ts
 weaver/core/drivers/fabric-driver/server/events.ts
 weaver/core/drivers/fabric-driver/server/fabric-code.ts
