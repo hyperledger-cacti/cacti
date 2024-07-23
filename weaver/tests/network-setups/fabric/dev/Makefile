@@ -27,22 +27,22 @@ start-interop-local: start-interop-network1-local start-interop-network2-local
 
 .PHONY: start-network1
 start-network1:	.fabric-setup artifacts-network1 setup-cc
-	./network.sh up createChannel -ca -nw network1 -p $(PROFILE)
+	./network.sh up createChannel -ca -nw network1 -p $(PROFILE)  -i $(FABRIC_VERSION) -cai $(FABRIC_CA_VERSION)
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1 -p $(PROFILE)
 
 .PHONY: start-network1-local
 start-network1-local: .fabric-setup artifacts-network1 setup-cc-local
-	./network.sh up createChannel -ca -nw network1 -p $(PROFILE)
+	./network.sh up createChannel -ca -nw network1 -p $(PROFILE)  -i $(FABRIC_VERSION) -cai $(FABRIC_CA_VERSION)
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1 -p $(PROFILE)
 
 .PHONY: start-network2
 start-network2: .fabric-setup artifacts-network2 setup-cc
-	./network.sh up createChannel -ca -nw network2 -p $(PROFILE)
+	./network.sh up createChannel -ca -nw network2 -p $(PROFILE) -i $(FABRIC_VERSION) -cai $(FABRIC_CA_VERSION)
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2 -p $(PROFILE)
 
 .PHONY: start-network2-local
 start-network2-local: .fabric-setup artifacts-network2 setup-cc-local
-	./network.sh up createChannel -ca -nw network2 -p $(PROFILE)
+	./network.sh up createChannel -ca -nw network2 -p $(PROFILE) -i $(FABRIC_VERSION) -cai $(FABRIC_CA_VERSION)
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2 -p $(PROFILE)
 
 .PHONY: start-interop-network1

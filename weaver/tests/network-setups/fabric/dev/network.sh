@@ -12,6 +12,8 @@
 #
 # prepending $PWD/../bin to PATH to ensure we are picking up the correct binaries
 # this may be commented out to resolve installed version of tools if desired
+set -e
+
 export PATH=${PWD}/bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=$NW_CFG_PATH/configtx
 export VERBOSE=false
@@ -39,6 +41,7 @@ function printHelp() {
   echo "    -l <language> - the programming language of the chaincode to deploy: go (default), java, javascript, typescript"
   echo "    -v <version>  - chaincode version. Must be a round number, 1, 2, 3, etc"
   echo "    -i <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
+  echo "    -cai <imagetag> - the tag to be used to launch the certificat authority network (defaults to \"latest\")"
   echo "    -verbose - verbose mode"
   echo "  network.sh -h (print this message)"
   echo
@@ -123,14 +126,12 @@ function checkPrereqs() {
   fi
 
   for UNSUPPORTED_VERSION in $BLACKLISTED_VERSIONS; do
-    echo "$LOCAL_VERSION" | grep -q $UNSUPPORTED_VERSION
-    if [ $? -eq 0 ]; then
+    if [[ $LOCAL_VERSION =~ $UNSUPPORTED_VERSION ]]; then
       echo "ERROR! Local Fabric binary version of $LOCAL_VERSION does not match the versions supported by the test network."
       exit 1
     fi
 
-    echo "$DOCKER_IMAGE_VERSION" | grep -q $UNSUPPORTED_VERSION
-    if [ $? -eq 0 ]; then
+    if [[ $DOCKER_IMAGE_VERSION =~ $UNSUPPORTED_VERSION ]]; then
       echo "ERROR! Fabric Docker image version of $DOCKER_IMAGE_VERSION does not match the versions supported by the test network."
       exit 1
     fi
@@ -253,7 +254,7 @@ function createOrgs() {
     envsubst < docker/docker-compose-ca.yaml > docker/docker-compose-ca.real.yaml
     COMPOSE_FILE_CA=docker/docker-compose-ca.real.yaml
 
-    IMAGE_TAG=$IMAGETAG docker compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
+    docker compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
 
     . $NW_CFG_PATH/fabric-ca/registerEnroll.sh
 
@@ -359,7 +360,7 @@ function networkUp() {
     envsubst < docker.env > docker.real.env
     envsubst < docker/docker-compose-ca.yaml > docker/docker-compose-ca.real.yaml
     COMPOSE_FILE_CA=docker/docker-compose-ca.real.yaml
-    IMAGE_TAG=$IMAGETAG docker compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
+    docker compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
   fi
 
   envsubst < docker/docker-compose-test-net.yaml > docker/docker-compose-test-net.real.yaml
@@ -375,7 +376,7 @@ function networkUp() {
   echo "NW config path.. : "$NW_CFG_PATH
   cat docker.env
   envsubst < docker.env > docker.real.env
-  IMAGE_TAG=$IMAGETAG NW_CFG_PATH=$NW_CFG_PATH docker compose ${COMPOSE_FILES} --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
+  NW_CFG_PATH=$NW_CFG_PATH docker compose ${COMPOSE_FILES} --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
 
   docker ps -a
   if [ $? -ne 0 ]; then
@@ -488,6 +489,8 @@ CC_SRC_LANGUAGE=golang
 VERSION=1
 # default image tag
 IMAGETAG="latest"
+# default ca image tag
+CAIMAGETAG="latest"
 # default database
 DATABASE="leveldb"
 # default chaincode
@@ -519,9 +522,6 @@ export N2_PEER_ORG1_PORT=${N2_PEER_ORG1_PORT:-9051}
 export N2_PEER_ORG2_PORT=${N2_PEER_ORG2_PORT:-9061}
 
 export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
-export IMAGE_TAG=$IMAGE_TAG
-
-
 
 # Parse commandline args
 
@@ -599,6 +599,10 @@ while [[ $# -ge 1 ]] ; do
     IMAGETAG="$2"
     shift
     ;;
+  -cai )
+    CAIMAGETAG="$2"
+    shift
+    ;;
   -verbose )
     VERBOSE=true
     shift
@@ -622,6 +626,9 @@ while [[ $# -ge 1 ]] ; do
   esac
   shift
 done
+
+export IMAGE_TAG=${IMAGETAG}
+export CA_IMAGE_TAG=${CAIMAGETAG}
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 APP_ROOT=${APP_ROOT:-"${SCRIPT_PATH}/../.."}
@@ -738,7 +745,7 @@ if [ $ROLE == "network1" ]; then
   . network1.env
   echo "FABRIC_CFG_PATH = $FABRIC_CFG_PATH"
   echo "NW_CFG_PATH" = $NW_CFG_PATH
-  rm docker.env
+  rm -f docker.env
   cat base.env network1.env > network1.tmp.env
   echo "APP_ROOT=${APP_ROOT}" | cat - network1.tmp.env >  docker.env
 elif [ $ROLE == "network2" ]; then
@@ -749,7 +756,7 @@ elif [ $ROLE == "network2" ]; then
   . network2.env
   echo "FABRIC_CFG_PATH = $FABRIC_CFG_PATH"
   echo "NW_CFG_PATH" = $NW_CFG_PATH
-  rm docker.env
+  rm -f docker.env
   cat base.env network2.env > network2.tmp.env
   echo "APP_ROOT=${APP_ROOT}" | cat - network2.tmp.env >  docker.env
 else
