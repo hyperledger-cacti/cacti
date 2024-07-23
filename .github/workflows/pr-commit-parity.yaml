@@ -1,0 +1,25 @@
+---
+name: PR - Commit Parity
+'on':
+  pull_request:
+    branches:
+      - main
+      - dev
+      - petermetz/**
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  pr-commit-parity:
+    name: PR and Commit messages Parity
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - name: Use Node.js v18.18.2
+      uses: actions/setup-node@v4.0.2
+      with:
+        node-version: v18.19.0
+    - name: Execute pr-commit-parity script
+      run: node tools/pr-commit-parity.js ${{ github.event.pull_request.url }}
