@@ -20,6 +20,7 @@ import {
 import { ExecuteGetStatus } from "./admin/get-status-handler-service";
 import { ISATPManagerOptions, SATPManager } from "../gol/satp-manager";
 import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
+import { SATPBridgesManager } from "../gol/satp-bridges-manager";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -27,6 +28,7 @@ export interface BLODispatcherOptions {
   instanceId: string;
   orchestrator: GatewayOrchestrator;
   signer: JsObjectSigner;
+  bridgesManager: SATPBridgesManager;
 }
 
 export class BLODispatcher {
@@ -36,6 +38,7 @@ export class BLODispatcher {
   private readonly instanceId: string;
   private manager: SATPManager;
   private orchestrator: GatewayOrchestrator;
+  private bridgeManager: SATPBridgesManager;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -50,11 +53,14 @@ export class BLODispatcher {
     const signer = options.signer;
     const ourGateway = this.orchestrator.ourGateway;
 
+    this.bridgeManager = options.bridgesManager;
+
     const SATPManagerOpts: ISATPManagerOptions = {
       logLevel: "DEBUG",
       instanceId: ourGateway!.id,
       signer: signer,
       supportedDLTs: this.orchestrator.supportedDLTs,
+      bridgeManager: this.bridgeManager,
     };
 
     this.manager = new SATPManager(SATPManagerOpts);
