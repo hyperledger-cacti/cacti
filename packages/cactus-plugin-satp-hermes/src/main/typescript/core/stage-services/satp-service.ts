@@ -4,6 +4,7 @@ import {
   LoggerProvider,
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
+import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
 
 export enum SATPServiceType {
   Server,
@@ -16,6 +17,7 @@ export type ISATPServiceOptions = {
   loggerOptions: ILoggerOptions;
   signer: JsObjectSigner;
   serviceType: SATPServiceType;
+  bridgeManager?: SATPBridgesManager;
 };
 
 export type ISATPServerServiceOptions = ISATPServiceOptions;

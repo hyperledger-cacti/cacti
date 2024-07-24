@@ -1,9 +1,4 @@
-import {
-  ILoggerOptions,
-  JsObjectSigner,
-  LogLevelDesc,
-  Logger,
-} from "@hyperledger/cactus-common";
+import { ILoggerOptions } from "@hyperledger/cactus-common";
 import { SupportedChain } from "../core/types";
 import { ConnectRouter } from "@connectrpc/connect";
 import { SATPSession } from "../core/satp-session";
@@ -20,6 +15,7 @@ import {
 export interface SATPHandler {
   setupRouter(router: ConnectRouter): void;
   getHandlerIdentifier(): string;
+  getSessionId(): string;
 }
 
 export interface SATPHandlerOptions {

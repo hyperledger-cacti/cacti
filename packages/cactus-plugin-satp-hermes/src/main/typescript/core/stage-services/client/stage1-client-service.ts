@@ -30,6 +30,7 @@ import {
   ISATPClientServiceOptions,
   ISATPServiceOptions,
 } from "../satp-service";
+import { ACCEPTANCE } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";
@@ -49,12 +50,12 @@ export class Stage1ClientService extends SATPService {
   }
 
   async transferProposalRequest(
-    sessionID: string,
     session: SATPSession,
     supportedDLTs: SupportedChain[],
   ): Promise<void | TransferProposalRequestMessage> {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferProposalRequest...`);
 
     const sessionData = session.getSessionData();
 
@@ -209,8 +210,9 @@ export class Stage1ClientService extends SATPService {
   ): Promise<void | TransferCommenceRequestMessage> {
     const stepTag = `transferCommenceRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferCommenceRequest...`);
 
-    if (!response || !response.common) {
+    if (response.common == undefined) {
       throw new Error("Response or response.common is undefined");
     }
 
@@ -225,11 +227,17 @@ export class Stage1ClientService extends SATPService {
     commonBody.messageType = MessageType.TRANSFER_COMMENCE_REQUEST;
     commonBody.sequenceNumber = response.common.sequenceNumber + BigInt(1);
 
-    //todo check when reject
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.INIT_RECEIPT,
-    );
+    if (sessionData.acceptance == ACCEPTANCE.ACCEPTANCE_ACCEPTED) {
+      commonBody.hashPreviousMessage = getMessageHash(
+        sessionData,
+        MessageType.INIT_RECEIPT,
+      );
+    } else if (sessionData.acceptance == ACCEPTANCE.ACCEPTANCE_CONDITIONAL) {
+      commonBody.hashPreviousMessage = getMessageHash(
+        sessionData,
+        MessageType.INIT_REJECT,
+      );
+    }
 
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
@@ -242,7 +250,15 @@ export class Stage1ClientService extends SATPService {
     transferCommenceRequestMessage.hashTransferInitClaims =
       sessionData.hashTransferInitClaims;
 
-    // transferCommenceRequestMessage.clientTransferNumber = sessionData.clientTransferNumber;
+    if (sessionData.transferContextId != undefined) {
+      transferCommenceRequestMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
+    if (sessionData.clientTransferNumber != undefined) {
+      transferCommenceRequestMessage.clientTransferNumber =
+        sessionData.clientTransferNumber;
+    }
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, JSON.stringify(transferCommenceRequestMessage)),
@@ -281,6 +297,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<boolean> {
     const stepTag = `checkTransferProposalReceiptMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferProposalReceiptMessage...`);
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message has no satp common body`);
     }
@@ -293,8 +310,6 @@ export class Stage1ClientService extends SATPService {
     ) {
       throw new Error(`${fnTag}, satp common body is missing required fields`);
     }
-
-    // const sessionId = response.common.sessionId;
 
     const sessionData = session.getSessionData();
 
@@ -368,6 +383,15 @@ export class Stage1ClientService extends SATPService {
     }
 
     if (
+      sessionData.transferContextId != undefined &&
+      response.common.transferContextId != sessionData.transferContextId
+    ) {
+      throw new Error(
+        `${fnTag}, TransferProposalReceipt transferContextId mismatch or not received`,
+      );
+    }
+
+    if (
       response.common.messageType == MessageType.INIT_REJECT &&
       response.transferCounterClaims == undefined
     ) {
@@ -386,13 +410,13 @@ export class Stage1ClientService extends SATPService {
         return true;
       } else {
         this.Log.info(
-          `TransferProposalReceipt proposedTransferClaims were rejected`,
+          `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
         );
         sessionData.completed = true;
         return false;
       }
     }
-    this.Log.info(`TransferProposalReceipt passed all checks.`);
+    this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
     return true;
   }
 

@@ -19,7 +19,6 @@ import {
 import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   TimestampType,
-  createSessionData,
   getMessageHash,
   getMessageTimestamp,
   saveHash,
@@ -57,6 +56,7 @@ export class Stage1ServerService extends SATPService {
   ): Promise<void | TransferProposalReceiptMessage> {
     const stepTag = `transferProposalResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferProposalResponse...`);
 
     if (
       request.common == undefined ||
@@ -140,6 +140,11 @@ export class Stage1ServerService extends SATPService {
     }
     */
 
+    if (sessionData.transferContextId != undefined) {
+      transferProposalReceiptMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, JSON.stringify(transferProposalReceiptMessage)),
     );
@@ -174,6 +179,7 @@ export class Stage1ServerService extends SATPService {
   ): Promise<void | TransferCommenceResponseMessage> {
     const stepTag = `transferCommenceResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferCommenceResponse...`);
 
     if (request.common == undefined) {
       throw new Error(
@@ -214,6 +220,16 @@ export class Stage1ServerService extends SATPService {
     const transferCommenceResponseMessage =
       new TransferCommenceResponseMessage();
     transferCommenceResponseMessage.common = commonBody;
+
+    if (sessionData.transferContextId != undefined) {
+      transferCommenceResponseMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
+    if (sessionData.serverTransferNumber != undefined) {
+      transferCommenceResponseMessage.serverTransferNumber =
+        sessionData.serverTransferNumber;
+    }
 
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
@@ -256,18 +272,32 @@ export class Stage1ServerService extends SATPService {
   ): Promise<SessionData> {
     const stepTag = `checkTransferProposalRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferProposalRequestMessage...`);
+
+    if (session == undefined) {
+      throw new Error(`${fnTag}, session is undefined`);
+    }
+    const sessionData = session.getSessionData();
+
+    if (request.common == undefined) {
+      throw new Error(
+        `${fnTag}, message satp common body is missing or is missing required fields`,
+      );
+    }
+
+    if (sessionData == undefined) {
+      throw new Error(
+        `${fnTag}, session data not found for session id ${request.common.sessionId}`,
+      );
+    }
 
     if (
       request.common == undefined ||
       request.common.version == undefined ||
       request.common.messageType == undefined ||
       request.common.sessionId == undefined ||
-      // request.common.transferContextId == undefined ||
       request.common.sequenceNumber == undefined ||
       request.common.resourceUrl == undefined ||
-      // request.common.actionResponse == undefined ||
-      // request.common.payloadProfile == undefined ||
-      // request.common.applicationProfile == undefined ||
       request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
       request.common.serverGatewayPubkey == undefined
@@ -321,25 +351,33 @@ export class Stage1ServerService extends SATPService {
 
     this.Log.info(`TransferProposalRequest passed all checks.`);
 
-    const sessionData = createSessionData(
-      request.common.sessionId,
-      request.common.version,
-      request.transferInitClaims.digitalAssetId,
-      request.transferInitClaims.senderGatewayNetworkId,
-      request.transferInitClaims.recipientGatewayNetworkId,
-      request.transferInitClaims.originatorPubkey,
-      request.transferInitClaims.beneficiaryPubkey,
-      request.transferInitClaims.senderGatewayOwnerId,
-      request.transferInitClaims.receiverGatewayOwnerId,
-      request.transferInitClaims.clientGatewayPubkey,
-      request.transferInitClaims.serverGatewayPubkey,
-      request.networkCapabilities.signatureAlgorithm,
-      request.networkCapabilities.lockType,
-      request.networkCapabilities.lockExpirationTime,
-      request.networkCapabilities.credentialProfile,
-      request.networkCapabilities.loggingProfile,
-      request.networkCapabilities.accessControlProfile,
-    );
+    sessionData.version = request.common.version;
+    sessionData.digitalAssetId = request.transferInitClaims.digitalAssetId;
+    sessionData.originatorPubkey = request.transferInitClaims.originatorPubkey;
+    sessionData.beneficiaryPubkey =
+      request.transferInitClaims.beneficiaryPubkey;
+    sessionData.senderGatewayNetworkId =
+      request.transferInitClaims.senderGatewayNetworkId;
+    sessionData.recipientGatewayNetworkId =
+      request.transferInitClaims.recipientGatewayNetworkId;
+    sessionData.clientGatewayPubkey =
+      request.transferInitClaims.clientGatewayPubkey;
+    sessionData.serverGatewayPubkey =
+      request.transferInitClaims.serverGatewayPubkey;
+    sessionData.receiverGatewayOwnerId =
+      request.transferInitClaims.receiverGatewayOwnerId;
+    sessionData.senderGatewayOwnerId =
+      request.transferInitClaims.senderGatewayOwnerId;
+    sessionData.signatureAlgorithm =
+      request.networkCapabilities.signatureAlgorithm;
+    sessionData.lockType = request.networkCapabilities.lockType;
+    sessionData.lockExpirationTime =
+      request.networkCapabilities.lockExpirationTime;
+    sessionData.credentialProfile =
+      request.networkCapabilities.credentialProfile;
+    sessionData.loggingProfile = request.networkCapabilities.loggingProfile;
+    sessionData.accessControlProfile =
+      request.networkCapabilities.accessControlProfile;
 
     this.Log.info(`Session data created for session id ${sessionData.id}`);
     if (!this.checkTransferClaims(request.transferInitClaims)) {
@@ -360,15 +398,13 @@ export class Stage1ServerService extends SATPService {
       request.common.version == undefined ||
       request.common.messageType == undefined ||
       request.common.sessionId == undefined ||
-      // request.common.transferContextId == undefined ||
       request.common.sequenceNumber == undefined ||
       request.common.resourceUrl == undefined ||
-      // request.common.actionResponse == undefined ||
-      // request.common.payloadProfile == undefined ||
-      // request.common.applicationProfile == undefined ||
       request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
-      request.common.serverGatewayPubkey == undefined
+      request.common.serverGatewayPubkey == undefined ||
+      request.common.hashPreviousMessage == undefined ||
+      request.common.signature == undefined
     ) {
       throw new Error(
         `${fnTag}, message satp common body is missing or is missing required fields`,
@@ -466,7 +502,23 @@ export class Stage1ServerService extends SATPService {
       );
     }
 
-    this.Log.info(`TransferCommenceRequest passed all checks.`);
+    if (
+      sessionData.transferContextId != undefined &&
+      request.common.transferContextId != sessionData.transferContextId
+    ) {
+      throw new Error(
+        `${fnTag}, TransferCommenceRequest message transfer context id does not match the one that was sent`,
+      );
+    }
+
+    if (request.clientTransferNumber != undefined) {
+      this.Log.info(
+        `${fnTag}, Optional variable loaded: clientTransferNumber...`,
+      );
+      sessionData.clientTransferNumber = request.clientTransferNumber;
+    }
+
+    this.Log.info(`${fnTag}, TransferCommenceRequest passed all checks.`);
     return sessionData;
   }
 

@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
-import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, History, LockAssertionClaim, LockAssertionFormat, LockType, MintAssertionClaims, MintAssertionClaimsFormat, PayloadProfile, Permissions, SignatureAlgorithm, SubsequentCalls, TransferClaimsFormat } from "./message_pb.js";
+import { AssetProfile, AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, History, LockAssertionClaim, LockAssertionClaimFormat, LockType, MintAssertionClaim, MintAssertionClaimFormat, PayloadProfile, Permissions, SignatureAlgorithm, SubsequentCalls, TransferClaims, TransferClaimsFormat } from "./message_pb.js";
 
 /**
  * @generated from enum cacti.satp.v02.common.ACCEPTANCE
@@ -183,134 +183,159 @@ export class SessionData extends Message<SessionData> {
   hashTransferInitClaims = "";
 
   /**
-   * @generated from field: string proposed_transfer_init_claims = 30;
+   * @generated from field: cacti.satp.v02.common.TransferClaims transfer_init_claims = 30;
+   */
+  transferInitClaims?: TransferClaims;
+
+  /**
+   * @generated from field: string proposed_transfer_init_claims = 31;
    */
   proposedTransferInitClaims = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.SignatureAlgorithm signature_algorithm = 31;
+   * @generated from field: cacti.satp.v02.common.SignatureAlgorithm signature_algorithm = 32;
    */
   signatureAlgorithm = SignatureAlgorithm.UNSPECIFIED;
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockType lock_type = 32;
+   * @generated from field: cacti.satp.v02.common.LockType lock_type = 33;
    */
   lockType = LockType.UNSPECIFIED;
 
   /**
-   * @generated from field: uint64 lock_expiration_time = 33;
+   * @generated from field: uint64 lock_expiration_time = 34;
    */
   lockExpirationTime = protoInt64.zero;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Permissions permissions = 34;
+   * @generated from field: cacti.satp.v02.common.Permissions permissions = 35;
    */
   permissions?: Permissions;
 
   /**
-   * @generated from field: string developer_urn = 35;
+   * @generated from field: string developer_urn = 36;
    */
   developerUrn = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.CredentialProfile credential_profile = 36;
+   * @generated from field: cacti.satp.v02.common.CredentialProfile credential_profile = 37;
    */
   credentialProfile = CredentialProfile.UNSPECIFIED;
 
   /**
-   * @generated from field: cacti.satp.v02.common.SubsequentCalls subsequent_calls = 37;
+   * @generated from field: cacti.satp.v02.common.SubsequentCalls subsequent_calls = 38;
    */
   subsequentCalls?: SubsequentCalls;
 
   /**
-   * @generated from field: repeated cacti.satp.v02.common.History history = 38;
+   * @generated from field: repeated cacti.satp.v02.common.History history = 39;
    */
   history: History[] = [];
 
   /**
-   * @generated from field: bool multiple_claims_allowed = 39;
+   * @generated from field: bool multiple_claims_allowed = 40;
    */
   multipleClaimsAllowed = false;
 
   /**
-   * @generated from field: bool multiple_cancels_allowed = 40;
+   * @generated from field: bool multiple_cancels_allowed = 41;
    */
   multipleCancelsAllowed = false;
 
   /**
-   * @generated from field: string last_message_received_timestamp = 41;
+   * @generated from field: string last_message_received_timestamp = 42;
    */
   lastMessageReceivedTimestamp = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.MessageStagesTimestamps processed_timestamps = 42;
+   * @generated from field: cacti.satp.v02.common.MessageStagesTimestamps processed_timestamps = 43;
    */
   processedTimestamps?: MessageStagesTimestamps;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MessageStagesTimestamps received_timestamps = 43;
+   * @generated from field: cacti.satp.v02.common.MessageStagesTimestamps received_timestamps = 44;
    */
   receivedTimestamps?: MessageStagesTimestamps;
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 44;
+   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 45;
    */
-  lockAssertionClaim?: LockAssertionClaim;
+  lockAssertionClaim = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockAssertionFormat lock_assertion_format = 45;
+   * @generated from field: cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 46;
    */
-  lockAssertionFormat?: LockAssertionFormat;
+  lockAssertionClaimFormat?: LockAssertionClaimFormat;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 46;
+   * @generated from field: cacti.satp.v02.common.MintAssertionClaim mint_assertion_claim = 47;
    */
-  mintAssertionClaims?: MintAssertionClaims;
+  mintAssertionClaim?: MintAssertionClaim;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 47;
+   * @generated from field: cacti.satp.v02.common.MintAssertionClaimFormat mint_assertion_claim_format = 48;
    */
-  mintAssertionClaimsFormat?: MintAssertionClaimsFormat;
+  mintAssertionClaimFormat?: MintAssertionClaimFormat;
 
   /**
-   * @generated from field: cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 48;
+   * @generated from field: cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 49;
    */
-  burnAssertionClaim?: BurnAssertionClaim;
+  burnAssertionClaim = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 49;
+   * @generated from field: cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 50;
    */
   burnAssertionClaimFormat?: BurnAssertionClaimFormat;
 
   /**
-   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 50;
+   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 51;
    */
-  assignmentAssertionClaim?: AssignmentAssertionClaim;
+  assignmentAssertionClaim = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 51;
+   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 52;
    */
   assignmentAssertionClaimFormat?: AssignmentAssertionClaimFormat;
 
   /**
-   * @generated from field: bool completed = 52;
+   * @generated from field: bool completed = 53;
    */
   completed = false;
 
   /**
-   * @generated from field: cacti.satp.v02.common.ACCEPTANCE acceptance = 53;
+   * @generated from field: cacti.satp.v02.common.ACCEPTANCE acceptance = 54;
    */
   acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
 
   /**
-   * @generated from field: string last_message_hash = 54;
+   * @generated from field: string last_message_hash = 55;
    */
   lastMessageHash = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.TransferClaimsFormat transfer_claims_format = 55;
+   * @generated from field: cacti.satp.v02.common.TransferClaimsFormat transfer_claims_format = 56;
    */
   transferClaimsFormat?: TransferClaimsFormat;
+
+  /**
+   * @generated from field: string client_transfer_number = 57;
+   */
+  clientTransferNumber = "";
+
+  /**
+   * @generated from field: string server_transfer_number = 58;
+   */
+  serverTransferNumber = "";
+
+  /**
+   * @generated from field: string lock_assertion_expiration = 59;
+   */
+  lockAssertionExpiration = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.AssetProfile asset_profile = 60;
+   */
+  assetProfile?: AssetProfile;
 
   constructor(data?: PartialMessage<SessionData>) {
     super();
@@ -349,32 +374,37 @@ export class SessionData extends Message<SessionData> {
     { no: 27, name: "sender_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 28, name: "receiver_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 29, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 30, name: "proposed_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 31, name: "signature_algorithm", kind: "enum", T: proto3.getEnumType(SignatureAlgorithm) },
-    { no: 32, name: "lock_type", kind: "enum", T: proto3.getEnumType(LockType) },
-    { no: 33, name: "lock_expiration_time", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 34, name: "permissions", kind: "message", T: Permissions },
-    { no: 35, name: "developer_urn", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 36, name: "credential_profile", kind: "enum", T: proto3.getEnumType(CredentialProfile) },
-    { no: 37, name: "subsequent_calls", kind: "message", T: SubsequentCalls },
-    { no: 38, name: "history", kind: "message", T: History, repeated: true },
-    { no: 39, name: "multiple_claims_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 40, name: "multiple_cancels_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 41, name: "last_message_received_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 42, name: "processed_timestamps", kind: "message", T: MessageStagesTimestamps },
-    { no: 43, name: "received_timestamps", kind: "message", T: MessageStagesTimestamps },
-    { no: 44, name: "lock_assertion_claim", kind: "message", T: LockAssertionClaim },
-    { no: 45, name: "lock_assertion_format", kind: "message", T: LockAssertionFormat },
-    { no: 46, name: "mint_assertion_claims", kind: "message", T: MintAssertionClaims },
-    { no: 47, name: "mint_assertion_claims_format", kind: "message", T: MintAssertionClaimsFormat },
-    { no: 48, name: "burn_assertion_claim", kind: "message", T: BurnAssertionClaim },
-    { no: 49, name: "burn_assertion_claim_format", kind: "message", T: BurnAssertionClaimFormat },
-    { no: 50, name: "assignment_assertion_claim", kind: "message", T: AssignmentAssertionClaim },
-    { no: 51, name: "assignment_assertion_claim_format", kind: "message", T: AssignmentAssertionClaimFormat },
-    { no: 52, name: "completed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 53, name: "acceptance", kind: "enum", T: proto3.getEnumType(ACCEPTANCE) },
-    { no: 54, name: "last_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 55, name: "transfer_claims_format", kind: "message", T: TransferClaimsFormat },
+    { no: 30, name: "transfer_init_claims", kind: "message", T: TransferClaims },
+    { no: 31, name: "proposed_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 32, name: "signature_algorithm", kind: "enum", T: proto3.getEnumType(SignatureAlgorithm) },
+    { no: 33, name: "lock_type", kind: "enum", T: proto3.getEnumType(LockType) },
+    { no: 34, name: "lock_expiration_time", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 35, name: "permissions", kind: "message", T: Permissions },
+    { no: 36, name: "developer_urn", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 37, name: "credential_profile", kind: "enum", T: proto3.getEnumType(CredentialProfile) },
+    { no: 38, name: "subsequent_calls", kind: "message", T: SubsequentCalls },
+    { no: 39, name: "history", kind: "message", T: History, repeated: true },
+    { no: 40, name: "multiple_claims_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 41, name: "multiple_cancels_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 42, name: "last_message_received_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 43, name: "processed_timestamps", kind: "message", T: MessageStagesTimestamps },
+    { no: 44, name: "received_timestamps", kind: "message", T: MessageStagesTimestamps },
+    { no: 45, name: "lock_assertion_claim", kind: "message", T: LockAssertionClaim },
+    { no: 46, name: "lock_assertion_claim_format", kind: "message", T: LockAssertionClaimFormat },
+    { no: 47, name: "mint_assertion_claim", kind: "message", T: MintAssertionClaim },
+    { no: 48, name: "mint_assertion_claim_format", kind: "message", T: MintAssertionClaimFormat },
+    { no: 49, name: "burn_assertion_claim", kind: "message", T: BurnAssertionClaim },
+    { no: 50, name: "burn_assertion_claim_format", kind: "message", T: BurnAssertionClaimFormat },
+    { no: 51, name: "assignment_assertion_claim", kind: "message", T: AssignmentAssertionClaim },
+    { no: 52, name: "assignment_assertion_claim_format", kind: "message", T: AssignmentAssertionClaimFormat },
+    { no: 53, name: "completed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 54, name: "acceptance", kind: "enum", T: proto3.getEnumType(ACCEPTANCE) },
+    { no: 55, name: "last_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 56, name: "transfer_claims_format", kind: "message", T: TransferClaimsFormat },
+    { no: 57, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 58, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 59, name: "lock_assertion_expiration", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 60, name: "asset_profile", kind: "message", T: AssetProfile },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {
