@@ -3,7 +3,7 @@ import {
   StatusRequest,
   StatusResponse,
   Transact200ResponseStatusResponseOriginChain,
-} from "../../generated/gateway-client/typescript-axios";
+} from "../../generated/gateway-client/typescript-axios/api";
 import { Logger } from "@hyperledger/cactus-common";
 
 export async function ExecuteGetStatus(
