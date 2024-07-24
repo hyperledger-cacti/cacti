@@ -28,6 +28,7 @@ message TransferCommenceRequestMessage {
 
 message TransferCommenceResponseMessage {
   cacti.satp.v02.common.CommonSatp common = 1;
+  string server_transfer_number = 2;
 }
   
 service SatpStage1Service {
