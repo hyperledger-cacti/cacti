@@ -32,6 +32,26 @@ export function verifySignature(
   return true;
 }
 
+export async function storeProof(
+  gateway: SATPGateway,
+  localLog: LocalLog,
+): Promise<void> {
+  if (localLog.data == undefined) return;
+
+  localLog.key = getSatpLogKey(
+    localLog.sessionID,
+    localLog.type,
+    localLog.operation,
+  );
+  localLog.timestamp = Date.now().toString();
+
+  await storeInDatabase(gateway, localLog);
+
+  const hash = SHA256(localLog.data).toString();
+
+  await storeRemoteLog(gateway, localLog.key, hash);
+}
+
 export async function storeLog(
   gateway: SATPGateway,
   localLog: LocalLog,

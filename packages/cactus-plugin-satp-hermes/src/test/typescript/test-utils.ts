@@ -1,9 +1,9 @@
 import { Logger } from "@hyperledger/cactus-common";
 import {
-  Configuration,
   AdminApi,
   TransactionApi,
-} from "../../main/typescript/generated/gateway-client/typescript-axios";
+} from "../../main/typescript/generated/gateway-client/typescript-axios/api";
+import { Configuration } from "../../main/typescript/generated/gateway-client/typescript-axios";
 //import { Api } from "@bufbuild/protobuf";
 
 export function createClient(
