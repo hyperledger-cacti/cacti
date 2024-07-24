@@ -34,11 +34,23 @@ export class Stage1SATPHandler implements SATPHandler {
     return Stage1SATPHandler.CLASS_NAME;
   }
 
-  async TransferProposalImplementation(
+  getSessionId(): string {
+    return this.session.getSessionData().id;
+  }
+
+  public get Log(): Logger {
+    return this.logger;
+  }
+
+  private async TransferProposalImplementation(
     req: TransferProposalRequestMessage,
+    context: HandlerContext,
   ): Promise<TransferProposalReceiptMessage> {
+    const stepTag = `TransferProposalImplementation()`;
+    const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     try {
-      console.log("Received TransferProposalRequest", req);
+      this.Log.debug(`${fnTag}, Transfer Proposal...`);
+      this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
       const sessionData =
         await this.serverService.checkTransferProposalRequestMessage(
           req,
@@ -49,21 +61,27 @@ export class Stage1SATPHandler implements SATPHandler {
         req,
         this.session,
       );
-      console.log("message", message);
-      console.log("Returning response", sessionData);
-      const response = new TransferProposalReceiptMessage();
-      return response;
+      this.Log.debug(`${fnTag}, Returning response: ${message}`);
+      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
+
+      if (!message) {
+        throw new Error(`${fnTag}, Failed to create TransferProposalReceipt`);
+      }
+      return message;
     } catch (error) {
-      console.error("Error handling TransferProposalRequest:", error);
-      throw new Error("Failed to process TransferProposalRequest");
+      throw new Error(`${fnTag}, Failed to process TransferProposal ${error}`);
     }
   }
 
-  async TransferCommenceImplementation(
+  private async TransferCommenceImplementation(
     req: TransferCommenceRequestMessage,
+    context: HandlerContext,
   ): Promise<TransferCommenceResponseMessage> {
+    const stepTag = `TransferProposalImplementation()`;
+    const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     try {
-      console.log("Received TransferCommenceRequest", req);
+      this.Log.debug(`${fnTag}, Transfer Commence...`);
+      this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
       const sessionData =
         await this.serverService.checkTransferCommenceRequestMessage(
           req,
@@ -73,13 +91,17 @@ export class Stage1SATPHandler implements SATPHandler {
         req,
         this.session,
       );
-      console.log("Returning response", message);
-      console.log("Returning response", sessionData);
-      const response = new TransferProposalReceiptMessage();
-      return response;
+      this.Log.debug(`${fnTag}, Returning response: ${message}`);
+      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
+
+      if (!message) {
+        throw new Error(`${fnTag}, Failed to create TransferCommenceResponse`);
+      }
+      return message;
     } catch (error) {
-      console.error("Error handling TransferCommenceRequest:", error);
-      throw new Error("Failed to process TransferCommenceRequest");
+      throw new Error(
+        `${fnTag}, Failed to process TransferCommenceRequest ${error}`,
+      );
     }
   }
 
@@ -88,5 +110,61 @@ export class Stage1SATPHandler implements SATPHandler {
       transferProposal: this.TransferProposalImplementation,
       transferCommence: this.TransferCommenceImplementation,
     });
+  }
+
+  //client side
+  public async TransferProposalRequest(): Promise<TransferProposalRequestMessage> {
+    const stepTag = `TransferProposalRequest()`;
+    const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    try {
+      this.Log.debug(`${fnTag}, Transfer Proposal Request...`);
+      const requestTransferProposal =
+        await this.clientService.transferProposalRequest(
+          this.session,
+          this.supportedDLTs,
+        );
+
+      if (!requestTransferProposal) {
+        throw new Error(`${fnTag}, Failed to create TransferProposalRequest`);
+      }
+      return requestTransferProposal;
+    } catch (error) {
+      throw new Error(
+        `${fnTag}, Failed to process TransferProposalRequest ${error}`,
+      );
+    }
+  }
+
+  //client side
+  public async TransferCommenceRequest(
+    response: TransferProposalReceiptMessage,
+  ): Promise<TransferCommenceRequestMessage> {
+    const stepTag = `TransferProposalRequest()`;
+    const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    try {
+      this.Log.debug(`${fnTag}, Transfer Commence Request...`);
+      this.Log.debug(`${fnTag}, Response: ${response}`);
+
+      await this.clientService.checkTransferProposalReceiptMessage(
+        response,
+        this.session,
+      );
+
+      const requestTransferCommence =
+        await this.clientService.transferCommenceRequest(
+          response,
+          this.session,
+        );
+
+      if (!requestTransferCommence) {
+        throw new Error(`${fnTag}, Failed to create TransferCommenceRequest`);
+      }
+
+      return requestTransferCommence;
+    } catch (error) {
+      throw new Error(
+        `${fnTag}, Failed to process TransferCommenceRequest ${error}`,
+      );
+    }
   }
 }

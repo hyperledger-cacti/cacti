@@ -187,6 +187,11 @@ export class TransferCommenceResponseMessage extends Message<TransferCommenceRes
    */
   common?: CommonSatp;
 
+  /**
+   * @generated from field: string server_transfer_number = 2;
+   */
+  serverTransferNumber = "";
+
   constructor(data?: PartialMessage<TransferCommenceResponseMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -196,6 +201,7 @@ export class TransferCommenceResponseMessage extends Message<TransferCommenceRes
   static readonly typeName = "cacti.satp.v02.TransferCommenceResponseMessage";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
+    { no: 2, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferCommenceResponseMessage {
