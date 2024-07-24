@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CommonSatp, MintAssertionClaims, MintAssertionClaimsFormat } from "./common/message_pb.js";
+import { AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CommonSatp, MintAssertionClaim, MintAssertionClaimFormat } from "./common/message_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.CommitPreparationRequestMessage
@@ -66,14 +66,14 @@ export class CommitReadyResponseMessage extends Message<CommitReadyResponseMessa
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 2;
+   * @generated from field: cacti.satp.v02.common.MintAssertionClaim mint_assertion_claim = 2;
    */
-  mintAssertionClaims?: MintAssertionClaims;
+  mintAssertionClaim?: MintAssertionClaim;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 3;
+   * @generated from field: cacti.satp.v02.common.MintAssertionClaimFormat mint_assertion_claim_format = 3;
    */
-  mintAssertionClaimsFormat?: MintAssertionClaimsFormat;
+  mintAssertionClaimFormat?: MintAssertionClaimFormat;
 
   /**
    * @generated from field: string server_transfer_number = 4;
@@ -94,8 +94,8 @@ export class CommitReadyResponseMessage extends Message<CommitReadyResponseMessa
   static readonly typeName = "cacti.satp.v02.CommitReadyResponseMessage";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
-    { no: 2, name: "mint_assertion_claims", kind: "message", T: MintAssertionClaims },
-    { no: 3, name: "mint_assertion_claims_format", kind: "message", T: MintAssertionClaimsFormat },
+    { no: 2, name: "mint_assertion_claim", kind: "message", T: MintAssertionClaim },
+    { no: 3, name: "mint_assertion_claim_format", kind: "message", T: MintAssertionClaimFormat },
     { no: 4, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
