@@ -1,0 +1,3 @@
+[profile.default]
+solc-version = "0.8.20"
+evm-version = "paris"

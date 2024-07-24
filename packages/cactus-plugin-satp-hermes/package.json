@@ -31,6 +31,10 @@
     {
       "name": "Rafael Belchior",
       "url": "https://github.com/RafaelAPB"
+    },
+    {
+      "name": "Carlos Amaro",
+      "url": "https://github.com/LordKubaya"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -46,8 +50,12 @@
     "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/json/openapi-blo-bundled.json -r -t json",
     "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r -t yaml",
     "codegen": "run-p 'codegen:*'",
+    "codegen:abi": "yarn forge:all && abi-types-generator './src/solidity/generated/satp-wrapper.sol/SATPWrapperContract.json' --output='./src/main/typescript/generated'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "npm run generate-proto",
+    "forge": "forge build ./src/solidity/*.sol --out ./src/solidity/generated",
+    "forge:all": "run-p 'forge' 'forge:test'",
+    "forge:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
     "generate-proto": "cd src/main/proto && buf generate --template buf.gen.yaml --config buf.yaml --verbose",
     "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g go -o ./src/main/go/generated/gateway-client --additional-properties=packageName=generated,generateInterfaces=true,packageVersion=v0.0.1,moduleName=github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated --git-user-id hyperledger  --git-repo-id cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated",
@@ -80,11 +88,15 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "crypto-js": "4.2.0",
+    "ethers": "^6.13.1",
     "express": "4.17.2",
     "fabric-network": "2.2.19",
     "fs-extra": "11.2.0",
+    "hardhat": "2.22.5",
     "knex": "2.4.0",
     "kubo-rpc-client": "3.0.1",
+    "npm-run-all": "4.1.5",
+    "openzeppelin-solidity": "3.4.2",
     "secp256k1": "4.0.3",
     "socket.io": "4.6.2",
     "sqlite3": "5.1.5",
@@ -97,6 +109,7 @@
   "devDependencies": {
     "@apidevtools/swagger-cli": "4.0.4",
     "@bufbuild/buf": "1.29.0",
+    "@bufbuild/protobuf": "1.7.2",
     "@bufbuild/protoc-gen-es": "1.8.0",
     "@quobix/vacuum": "^0.9.10",
     "@types/body-parser": "1.19.4",
