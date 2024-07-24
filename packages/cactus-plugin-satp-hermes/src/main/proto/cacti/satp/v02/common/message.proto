@@ -36,6 +36,8 @@ message TransferClaims {
     string receiver_gateway_owner_id = 12;
     uint32 max_retries = 13;
     uint64 max_timeout = 14;
+    string amount_from_originator = 15;
+    string amount_to_beneficiary = 16;
 }
 
 message TransferClaimsFormat {
@@ -192,23 +194,12 @@ enum Error {
     ERROR_MESSAGE_OUT_OF_SEQUENCE = 11;
 }
 
-message LockAssertionClaim {
+
+message LockAssertionClaimFormat {
 
 }
 
-message LockAssertionFormat {
-
-}
-
-message MintAssertionClaims {
-
-}
-
-message MintAssertionClaimsFormat {
-
-}
-
-message BurnAssertionClaim {
+message MintAssertionClaimFormat {
 
 }
 
@@ -216,11 +207,27 @@ message BurnAssertionClaimFormat {
 
 }
 
-message AssignmentAssertionClaim {
+message AssignmentAssertionClaimFormat {
 
 }
 
-message AssignmentAssertionClaimFormat {
+message LockAssertionClaim {
+    string receipt = 1;
+    string signature = 2;
+}
 
+message MintAssertionClaim {
+    string receipt = 1;
+    string signature = 2;
+}
+
+message BurnAssertionClaim {
+    string receipt = 1;
+    string signature = 2;
+}
+
+message AssignmentAssertionClaim {
+    string receipt = 1;
+    string signature = 2;
 }
 

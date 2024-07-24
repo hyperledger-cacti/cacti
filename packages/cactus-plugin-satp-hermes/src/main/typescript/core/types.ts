@@ -1,9 +1,7 @@
-import { JsObjectSigner, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
 import { BLODispatcher } from "../blo/dispatcher";
 import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
-import { createConnectTransport } from "@connectrpc/connect-node";
-import { SATPManager } from "../gol/satp-manager";
 import { SATPSession } from "./satp-session";
 import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
 import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
@@ -83,6 +81,12 @@ export interface SATPGatewayConfig {
   enableOpenAPI?: boolean;
   validationOptions?: ValidatorOptions;
 }
+
+// export interface SATPBridgeConfig {
+//   logLevel?: LogLevelDesc;
+//   network: NetworkBridge;
+// }
+
 export type Immutable<T> = {
   readonly [K in keyof T]: Immutable<T[K]>;
 };
