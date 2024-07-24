@@ -76,6 +76,22 @@ export class Snapshot {
     this.stateBins = stateBins;
   }
 
+  public selectStates(states: string[]): void {
+    const stateBins: State[] = [];
+    for (const state of this.stateBins) {
+      if (states.includes(state.getId())) {
+        stateBins.push(state);
+      }
+    }
+    this.stateBins = stateBins;
+  }
+
+  public filterTransaction(stateId: string, transaction: string): void {
+    this.selectStates([stateId]);
+    const state = this.stateBins[0];
+    state.selectTransactions([transaction]);
+  }
+
   public getSnapshotJson(): string {
     const snapshotJson = {
       id: this.id,
