@@ -1,234 +1,253 @@
-// import {
-//   JsObjectSigner,
-//   Logger,
-//   LoggerProvider,
-// } from "@hyperledger/cactus-common";
-// import {
-//   LockAssertionReceiptMessage,
-//   LockAssertionRequestMessage,
-// } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
-// import { SATPGateway } from "../../../plugin-satp-hermes-gateway";
-// import { SATP_VERSION } from "../../constants";
-// import {
-//   CommonSatp,
-//   MessageType,
-// } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-// import { SessionData } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
-// import {
-//   bufArray2HexStr,
-//   getHash,
-//   sign,
-//   storeLog,
-//   verifySignature,
-// } from "../../../gateway-utils";
-// import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
-// import {
-//   SATPService,
-//   ISATPServerServiceOptions,
-//   SATPServiceType,
-// } from "../../../types/satp-protocol";
-// import { SATPSession } from "../../../core/satp-session";
-// export class Stage2ServerService implements SATPService {
-//   public static readonly CLASS_NAME = "server-service";
-//   public static readonly SATP_STAGE = "stage-2";
-//   public static readonly SERVICE_TYPE = SATPServiceType.Server;
+import {
+  LockAssertionReceiptMessage,
+  LockAssertionRequestMessage,
+} from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
+import { SATP_VERSION } from "../../constants";
+import {
+  CommonSatp,
+  MessageType,
+} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SessionData } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import {
+  bufArray2HexStr,
+  getHash,
+  sign,
+  verifySignature,
+} from "../../../gateway-utils";
+import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
+import {
+  SATPService,
+  SATPServiceType,
+  ISATPServerServiceOptions,
+  ISATPServiceOptions,
+} from "../satp-service";
+import { SATPSession } from "../../../core/satp-session";
+export class Stage2ServerService extends SATPService {
+  public static readonly SATP_STAGE = "2";
+  public static readonly SERVICE_TYPE = SATPServiceType.Server;
 
-//   private _log: Logger;
-//   private signer: JsObjectSigner;
+  constructor(ops: ISATPServerServiceOptions) {
+    const commonOptions: ISATPServiceOptions = {
+      stage: Stage2ServerService.SATP_STAGE,
+      loggerOptions: ops.loggerOptions,
+      serviceName: ops.serviceName,
+      signer: ops.signer,
+      serviceType: Stage2ServerService.SERVICE_TYPE,
+    };
+    super(commonOptions);
+  }
 
-//   constructor(ops: ISATPServerServiceOptions) {
-//     const level = ops.logLevel || "INFO";
-//     const label = this.getServiceIdentifier();
-//     this._log = LoggerProvider.getOrCreate({ level, label });
-//     this.signer = ops.signer;
-//   }
+  async lockAssertionResponse(
+    request: LockAssertionRequestMessage,
+    session: SATPSession,
+  ): Promise<void | LockAssertionReceiptMessage> {
+    const stepTag = `lockAssertionResponse()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, lockAssertionResponse...`);
 
-//   public get className(): string {
-//     return Stage2ServerService.CLASS_NAME;
-//   }
+    if (request.common == undefined) {
+      throw new Error(`${fnTag}, message common body is missing`);
+    }
 
-//   public get stage(): string {
-//     return Stage2ServerService.SATP_STAGE;
-//   }
+    const sessionData = session.getSessionData();
 
-//   public get log(): Logger {
-//     return this._log;
-//   }
+    if (sessionData == undefined) {
+      throw new Error(
+        `${fnTag}, session data not found for session id ${request.common.sessionId}`,
+      );
+    }
 
-//   public get serviceType(): SATPServiceType {
-//     return SATPServiceType.Server;
-//   }
+    saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
 
-//   public getServiceIdentifier(): string {
-//     return `${this.className}#${this.serviceType}`;
-//   }
+    const commonBody = new CommonSatp();
+    commonBody.version = SATP_VERSION;
+    commonBody.messageType = MessageType.ASSERTION_RECEIPT;
+    commonBody.sequenceNumber = request.common.sequenceNumber + BigInt(1);
+    commonBody.hashPreviousMessage = getMessageHash(
+      sessionData,
+      MessageType.LOCK_ASSERT,
+    );
+    commonBody.sessionId = request.common.sessionId;
+    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
+    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
 
-//   async lockAssertionResponse(
-//     request: LockAssertionRequestMessage,
-//     session: SATPSession,
-//   ): Promise<void | LockAssertionReceiptMessage> {
-//     const fnTag = `${this.className}#lockAssertionResponse()`;
+    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
-//     if (request.common == undefined) {
-//       throw new Error(`${fnTag}, message common body is missing`);
-//     }
+    const lockAssertionReceiptMessage = new LockAssertionReceiptMessage();
+    lockAssertionReceiptMessage.common = commonBody;
 
-//     const sessionData = session.getSessionData();
+    if (sessionData.transferContextId != undefined) {
+      lockAssertionReceiptMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
 
-//     if (sessionData == undefined) {
-//       throw new Error(
-//         `${fnTag}, session data not found for session id ${request.common.sessionId}`,
-//       );
-//     }
+    if (sessionData.serverTransferNumber != undefined) {
+      lockAssertionReceiptMessage.serverTransferNumber =
+        sessionData.serverTransferNumber;
+    }
 
-//     saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, JSON.stringify(lockAssertionReceiptMessage)),
+    );
 
-//     const commonBody = new CommonSatp();
-//     commonBody.version = SATP_VERSION;
-//     commonBody.messageType = MessageType.ASSERTION_RECEIPT;
-//     commonBody.sequenceNumber = request.common.sequenceNumber + BigInt(1);
-//     commonBody.hashPreviousMessage = getMessageHash(
-//       sessionData,
-//       MessageType.LOCK_ASSERT,
-//     );
-//     commonBody.sessionId = request.common.sessionId;
-//     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-//     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
+    lockAssertionReceiptMessage.common.signature = messageSignature;
 
-//     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+    saveSignature(sessionData, MessageType.ASSERTION_RECEIPT, messageSignature);
 
-//     const lockAssertionReceiptMessage = new LockAssertionReceiptMessage();
-//     lockAssertionReceiptMessage.common = commonBody;
+    saveHash(
+      sessionData,
+      MessageType.ASSERTION_RECEIPT,
+      getHash(lockAssertionReceiptMessage),
+    );
 
-//     const messageSignature = bufArray2HexStr(
-//       sign(this.signer, JSON.stringify(lockAssertionReceiptMessage)),
-//     );
+    /*
+    await storeLog(gateway, {
+      sessionID: sessionData.id,
+      type: "lockAssertionResponse",
+      operation: "lock",
+      data: JSON.stringify(sessionData),
+    });
+    */
 
-//     lockAssertionReceiptMessage.common.signature = messageSignature;
+    this.Log.info(`${fnTag}, sending LockAssertionResponseMessage...`);
 
-//     saveSignature(sessionData, MessageType.ASSERTION_RECEIPT, messageSignature);
+    return lockAssertionReceiptMessage;
+  }
 
-//     saveHash(
-//       sessionData,
-//       MessageType.ASSERTION_RECEIPT,
-//       getHash(lockAssertionReceiptMessage),
-//     );
+  async checkLockAssertionRequestMessage(
+    request: LockAssertionRequestMessage,
+    session: SATPSession,
+  ): Promise<SessionData> {
+    const stepTag = `checkLockAssertionRequestMessage()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkLockAssertionRequestMessage...`);
 
-//     /*
-//     await storeLog(gateway, {
-//       sessionID: sessionData.id,
-//       type: "lockAssertionResponse",
-//       operation: "lock",
-//       data: JSON.stringify(sessionData),
-//     });
-//     */
+    if (
+      request.common == undefined ||
+      request.common.version == undefined ||
+      request.common.messageType == undefined ||
+      request.common.sessionId == undefined ||
+      request.common.sequenceNumber == undefined ||
+      request.common.resourceUrl == undefined ||
+      request.common.signature == undefined ||
+      request.common.clientGatewayPubkey == undefined ||
+      request.common.serverGatewayPubkey == undefined ||
+      request.common.hashPreviousMessage == undefined
+    ) {
+      throw new Error(
+        `${fnTag}, message satp common body is missing or is missing required fields`,
+      );
+    }
 
-//     this.log.info(`${fnTag}, sending LockAssertionResponseMessage...`);
+    if (request.common.version != SATP_VERSION) {
+      throw new Error(`${fnTag}, unsupported SATP version`);
+    }
 
-//     return lockAssertionReceiptMessage;
-//   }
+    const sessionData = session.getSessionData();
 
-//   async checkLockAssertionRequestMessage(
-//     request: LockAssertionRequestMessage,
-//     session: SATPSession,
-//   ): Promise<SessionData> {
-//     const fnTag = `${this.className}#checkLockAssertionRequestMessage()`;
+    if (sessionData == undefined) {
+      throw new Error(
+        `${fnTag}, session data not found for session id ${request.common.sessionId}`,
+      );
+    }
 
-//     if (
-//       request.common == undefined ||
-//       request.common.version == undefined ||
-//       request.common.messageType == undefined ||
-//       request.common.sessionId == undefined ||
-//       // request.common.transferContextId == undefined ||
-//       request.common.sequenceNumber == undefined ||
-//       request.common.resourceUrl == undefined ||
-//       // request.common.actionrequest == undefined ||
-//       // request.common.payloadProfile == undefined ||
-//       // request.common.applicationProfile == undefined ||
-//       request.common.signature == undefined ||
-//       request.common.clientGatewayPubkey == undefined ||
-//       request.common.serverGatewayPubkey == undefined
-//     ) {
-//       throw new Error(
-//         `${fnTag}, message satp common body is missing or is missing required fields`,
-//       );
-//     }
+    if (
+      sessionData.serverGatewayPubkey == undefined ||
+      sessionData.lastSequenceNumber == undefined
+    ) {
+      throw new Error(`${fnTag}, session data was not load correctly`);
+    }
 
-//     if (request.common.version != SATP_VERSION) {
-//       throw new Error(`${fnTag}, unsupported SATP version`);
-//     }
+    if (request.common.serverGatewayPubkey != sessionData.serverGatewayPubkey) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest serverIdentity public key does not match the one that was sent`,
+      );
+    }
 
-//     const sessionData = session.getSessionData();
+    if (request.common.clientGatewayPubkey != sessionData.clientGatewayPubkey) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest clientIdentity public key does not match the one that was sent`,
+      );
+    }
 
-//     if (sessionData == undefined) {
-//       throw new Error(
-//         `${fnTag}, session data not found for session id ${request.common.sessionId}`,
-//       );
-//     }
+    if (
+      !verifySignature(
+        this.Signer,
+        request.common,
+        request.common.serverGatewayPubkey,
+      )
+    ) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest message signature verification failed`,
+      );
+    }
 
-//     if (
-//       sessionData.serverGatewayPubkey == undefined ||
-//       sessionData.lastSequenceNumber == undefined
-//     ) {
-//       throw new Error(`${fnTag}, session data was not load correctly`);
-//     }
+    if (request.common.messageType != MessageType.LOCK_ASSERT) {
+      throw new Error(`${fnTag}, wrong message type for LockAssertionRequest`);
+    }
 
-//     if (request.common.serverGatewayPubkey != sessionData.serverGatewayPubkey) {
-//       throw new Error(
-//         `${fnTag}, LockAssertionRequest serverIdentity public key does not match the one that was sent`,
-//       );
-//     }
+    if (
+      request.common.sequenceNumber !=
+      sessionData.lastSequenceNumber + BigInt(1)
+    ) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest Message sequence number is wrong`,
+      );
+    }
 
-//     if (request.common.clientGatewayPubkey != sessionData.clientGatewayPubkey) {
-//       throw new Error(
-//         `${fnTag}, LockAssertionRequest clientIdentity public key does not match the one that was sent`,
-//       );
-//     }
+    if (
+      request.common.hashPreviousMessage !=
+      getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
+    ) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest previous message hash does not match the one that was sent`,
+      );
+    }
 
-//     if (
-//       !verifySignature(
-//         this.signer,
-//         request.common,
-//         request.common.serverGatewayPubkey,
-//       )
-//     ) {
-//       throw new Error(
-//         `${fnTag}, LockAssertionRequest message signature verification failed`,
-//       );
-//     }
+    if (request.lockAssertionClaim == undefined) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest lockAssertionClaim is missing`,
+      );
+    }
 
-//     if (request.common.messageType != MessageType.LOCK_ASSERT) {
-//       throw new Error(`${fnTag}, wrong message type for LockAssertionRequest`);
-//     }
+    sessionData.lockAssertionClaim = request.lockAssertionClaim;
 
-//     if (
-//       request.common.sequenceNumber !=
-//       sessionData.lastSequenceNumber + BigInt(1)
-//     ) {
-//       throw new Error(
-//         `${fnTag}, LockAssertionRequest Message sequence number is wrong`,
-//       );
-//     }
+    if (request.lockAssertionClaimFormat == undefined) {
+      throw new Error(
+        `${fnTag},  LockAssertionRequest lockAssertionFormat is missing`,
+      );
+    }
 
-//     if (
-//       request.common.hashPreviousMessage !=
-//       getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
-//     ) {
-//       throw new Error(
-//         `${fnTag}, LockAssertionRequest previous message hash does not match the one that was sent`,
-//       );
-//     }
+    sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat;
 
-//     if (
-//       request.lockAssertionFormat == undefined ||
-//       request.lockAssertionClaim == undefined
-//     ) {
-//       throw new Error(
-//         `${fnTag},  LockAssertionRequest lockAssertionFormat or lockAssertionClaim is missing`,
-//       );
-//     }
+    if (request.lockAssertionExpiration == undefined) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest lockAssertionExpiration is missing`,
+      );
+    }
 
-//     this.log.info(`LockAssertionRequest passed all checks.`);
-//     return sessionData;
-//   }
-// }
+    sessionData.lockAssertionExpiration = request.lockAssertionExpiration; //todo check if expired
+
+    if (
+      sessionData.transferContextId != undefined &&
+      request.common.transferContextId != sessionData.transferContextId
+    ) {
+      throw new Error(
+        `${fnTag}, LockAssertionRequest transferContextId does not match the one that was sent`,
+      );
+    }
+
+    if (
+      sessionData.clientTransferNumber != undefined &&
+      request.clientTransferNumber != sessionData.clientTransferNumber
+    ) {
+      // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+      this.Log.info(
+        `${fnTag}, LockAssertionRequest clientTransferNumber does not match the one that was sent`,
+      );
+    }
+
+    this.Log.info(`${fnTag}, LockAssertionRequest passed all checks.`);
+    return sessionData;
+  }
+}
