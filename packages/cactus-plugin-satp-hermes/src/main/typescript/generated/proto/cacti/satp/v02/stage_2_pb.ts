@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { CommonSatp, LockAssertionClaim, LockAssertionFormat } from "./common/message_pb.js";
+import { CommonSatp, LockAssertionClaim, LockAssertionClaimFormat } from "./common/message_pb.js";
 
 /**
  * @generated from message cacti.satp.v02.LockAssertionRequestMessage
@@ -17,14 +17,14 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 2;
+   * @generated from field: string lock_assertion_claim = 2;
    */
-  lockAssertionClaim?: LockAssertionClaim;
+  lockAssertionClaim = "";
 
   /**
-   * @generated from field: cacti.satp.v02.common.LockAssertionFormat lock_assertion_format = 3;
+   * @generated from field: cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 3;
    */
-  lockAssertionFormat?: LockAssertionFormat;
+  lockAssertionClaimFormat?: LockAssertionClaimFormat;
 
   /**
    * @generated from field: string lock_assertion_expiration = 4;
@@ -51,7 +51,7 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
     { no: 2, name: "lock_assertion_claim", kind: "message", T: LockAssertionClaim },
-    { no: 3, name: "lock_assertion_format", kind: "message", T: LockAssertionFormat },
+    { no: 3, name: "lock_assertion_claim_format", kind: "message", T: LockAssertionClaimFormat },
     { no: 4, name: "lock_assertion_expiration", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
