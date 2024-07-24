@@ -1,9 +1,7 @@
-import { JsObjectSigner, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
 import { BLODispatcher } from "../blo/dispatcher";
-import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
-import { createConnectTransport } from "@connectrpc/connect-node";
-import { SATPManager } from "../gol/satp-manager";
+import { ISignerKeyPairs } from "@hyperledger/cactus-common/dist/lib/main/typescript/signer-key-pairs";
 import { SATPSession } from "./satp-session";
 import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
 import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
@@ -24,6 +22,7 @@ export type SATPServiceClient =
   | typeof SatpStage1Service
   | typeof SatpStage2Service
   | typeof SatpStage3Service;
+import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 
 export enum CurrentDrafts {
   Core = "Core",
@@ -83,6 +82,12 @@ export interface SATPGatewayConfig {
   enableOpenAPI?: boolean;
   validationOptions?: ValidatorOptions;
 }
+
+// export interface SATPBridgeConfig {
+//   logLevel?: LogLevelDesc;
+//   network: NetworkBridge;
+// }
+
 export type Immutable<T> = {
   readonly [K in keyof T]: Immutable<T[K]>;
 };
@@ -111,4 +116,8 @@ export interface RemoteLog {
   hash: string;
   signature: string;
   signerPubKey: string;
+}
+
+export interface SATPBridgeConfig {
+  network: NetworkBridge;
 }
