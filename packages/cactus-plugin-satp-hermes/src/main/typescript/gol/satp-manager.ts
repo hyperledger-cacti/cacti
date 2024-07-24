@@ -8,13 +8,13 @@ import {
 
 import { Stage1SATPHandler } from "../core/stage-handlers/stage1-handler";
 import { Stage1ServerService } from "../core/stage-services/server/stage1-server-service";
-// import { Stage2ServerService } from "../core/stage-services/server/stage2-server-service";
-// import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
+import { Stage2ServerService } from "../core/stage-services/server/stage2-server-service";
+import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../core/satp-session";
 import { SupportedChain } from "../core/types";
 import { Stage1ClientService } from "../core/stage-services/client/stage1-client-service";
-// import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
-// import { Stage3ClientService } from "../core/stage-services/client/stage3-client-service";
+import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
+import { Stage3ClientService } from "../core/stage-services/client/stage3-client-service";
 import {
   SATPService,
   SATPHandler,
@@ -22,6 +22,9 @@ import {
   SATPHandlerOptions,
 } from "../types/satp-protocol";
 import { ISATPServiceOptions } from "../core/stage-services/satp-service";
+import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
+import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
+import { SATPBridgesManager } from "./satp-bridges-manager";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -29,6 +32,7 @@ export interface ISATPManagerOptions {
   sessions?: Map<string, SATPSession>;
   signer: JsObjectSigner;
   supportedDLTs: SupportedChain[];
+  bridgeManager: SATPBridgesManager;
 }
 
 export class SATPManager {
@@ -39,9 +43,13 @@ export class SATPManager {
   private signer: JsObjectSigner;
   public supportedDLTs: SupportedChain[] = [];
   private sessions: Map<string, SATPSession>;
+  private handlers: SATPHandler[] = [];
+
+  private readonly bridgeManager: SATPBridgesManager;
 
   private readonly satpServices: SATPService[] = [];
-  private readonly satpHandlers: SATPHandler[] = [];
+  private readonly satpHandlers: Map<string, Map<string, SATPHandler>> =
+    new Map();
 
   constructor(public readonly options: ISATPManagerOptions) {
     const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
@@ -54,15 +62,23 @@ export class SATPManager {
     this.logger.info(`Instantiated ${this.className} OK`);
     this.supportedDLTs = options.supportedDLTs;
     this.signer = options.signer;
+    this.bridgeManager = options.bridgeManager;
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
       Stage1SATPHandler,
-      // Stage2SATPHandler,
-      // Stage3SATPHandler,
+      Stage2SATPHandler,
+      Stage3SATPHandler,
     ];
 
-    const serviceClasses = [Stage1ServerService, Stage1ClientService];
+    const serviceClasses = [
+      Stage1ServerService,
+      Stage1ClientService,
+      Stage2ServerService,
+      Stage2ClientService,
+      Stage3ServerService,
+      Stage3ClientService,
+    ];
 
     const serviceOptions = this.initializeServiceOptions(
       serviceClasses,
@@ -83,8 +99,18 @@ export class SATPManager {
       level,
     );
 
-    const handlers = this.initializeHandlers(handlersClasses, handlersOptions);
-    this.satpHandlers = handlers;
+    this.handlers = this.initializeHandlers(handlersClasses, handlersOptions);
+
+    for (const handler of this.handlers) {
+      const sessionId = mockSession.getSessionData().id;
+      const handlerMap = this.satpHandlers.get(sessionId);
+      if (handlerMap == undefined) {
+        this.satpHandlers.set(sessionId, new Map());
+      }
+      this.satpHandlers
+        .get(sessionId)
+        ?.set(handler.getHandlerIdentifier(), handler);
+    }
   }
 
   public getServiceByStage(
@@ -126,6 +152,12 @@ export class SATPManager {
     return this.supportedDLTs;
   }
 
+  public getSATPHandlers(
+    sessionId: string,
+  ): Map<string, SATPHandler> | undefined {
+    return this.satpHandlers.get(sessionId);
+  }
+
   public getOrCreateSession(
     sessionId?: string,
     contextID?: string,
@@ -155,7 +187,7 @@ export class SATPManager {
       return this.endpoints;
     }
 
-    this.endpoints = this.satpHandlers;
+    this.endpoints = this.handlers;
     return this.endpoints;
   }
 
@@ -175,6 +207,7 @@ export class SATPManager {
       serviceName: `Service-${index}`,
       serviceType:
         index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
+      bridgeManager: this.bridgeManager,
     }));
   }
 
