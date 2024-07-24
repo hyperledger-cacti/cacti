@@ -519,6 +519,16 @@ export class TransferClaims extends Message<TransferClaims> {
    */
   maxTimeout = protoInt64.zero;
 
+  /**
+   * @generated from field: string amount_from_originator = 15;
+   */
+  amountFromOriginator = "";
+
+  /**
+   * @generated from field: string amount_to_beneficiary = 16;
+   */
+  amountToBeneficiary = "";
+
   constructor(data?: PartialMessage<TransferClaims>) {
     super();
     proto3.util.initPartial(data, this);
@@ -541,6 +551,8 @@ export class TransferClaims extends Message<TransferClaims> {
     { no: 12, name: "receiver_gateway_owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "max_retries", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 14, name: "max_timeout", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 15, name: "amount_from_originator", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "amount_to_beneficiary", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferClaims {
@@ -1258,157 +1270,64 @@ export class Payload extends Message<Payload> {
 }
 
 /**
- * @generated from message cacti.satp.v02.common.LockAssertionClaim
+ * @generated from message cacti.satp.v02.common.LockAssertionClaimFormat
  */
-export class LockAssertionClaim extends Message<LockAssertionClaim> {
-  constructor(data?: PartialMessage<LockAssertionClaim>) {
+export class LockAssertionClaimFormat extends Message<LockAssertionClaimFormat> {
+  constructor(data?: PartialMessage<LockAssertionClaimFormat>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.LockAssertionClaim";
+  static readonly typeName = "cacti.satp.v02.common.LockAssertionClaimFormat";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionClaim {
-    return new LockAssertionClaim().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionClaimFormat {
+    return new LockAssertionClaimFormat().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssertionClaim {
-    return new LockAssertionClaim().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssertionClaimFormat {
+    return new LockAssertionClaimFormat().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssertionClaim {
-    return new LockAssertionClaim().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssertionClaimFormat {
+    return new LockAssertionClaimFormat().fromJsonString(jsonString, options);
   }
 
-  static equals(a: LockAssertionClaim | PlainMessage<LockAssertionClaim> | undefined, b: LockAssertionClaim | PlainMessage<LockAssertionClaim> | undefined): boolean {
-    return proto3.util.equals(LockAssertionClaim, a, b);
+  static equals(a: LockAssertionClaimFormat | PlainMessage<LockAssertionClaimFormat> | undefined, b: LockAssertionClaimFormat | PlainMessage<LockAssertionClaimFormat> | undefined): boolean {
+    return proto3.util.equals(LockAssertionClaimFormat, a, b);
   }
 }
 
 /**
- * @generated from message cacti.satp.v02.common.LockAssertionFormat
+ * @generated from message cacti.satp.v02.common.MintAssertionClaimFormat
  */
-export class LockAssertionFormat extends Message<LockAssertionFormat> {
-  constructor(data?: PartialMessage<LockAssertionFormat>) {
+export class MintAssertionClaimFormat extends Message<MintAssertionClaimFormat> {
+  constructor(data?: PartialMessage<MintAssertionClaimFormat>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.LockAssertionFormat";
+  static readonly typeName = "cacti.satp.v02.common.MintAssertionClaimFormat";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionFormat {
-    return new LockAssertionFormat().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaimFormat {
+    return new MintAssertionClaimFormat().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssertionFormat {
-    return new LockAssertionFormat().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MintAssertionClaimFormat {
+    return new MintAssertionClaimFormat().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssertionFormat {
-    return new LockAssertionFormat().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MintAssertionClaimFormat {
+    return new MintAssertionClaimFormat().fromJsonString(jsonString, options);
   }
 
-  static equals(a: LockAssertionFormat | PlainMessage<LockAssertionFormat> | undefined, b: LockAssertionFormat | PlainMessage<LockAssertionFormat> | undefined): boolean {
-    return proto3.util.equals(LockAssertionFormat, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.MintAssertionClaims
- */
-export class MintAssertionClaims extends Message<MintAssertionClaims> {
-  constructor(data?: PartialMessage<MintAssertionClaims>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.MintAssertionClaims";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaims {
-    return new MintAssertionClaims().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MintAssertionClaims {
-    return new MintAssertionClaims().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MintAssertionClaims {
-    return new MintAssertionClaims().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: MintAssertionClaims | PlainMessage<MintAssertionClaims> | undefined, b: MintAssertionClaims | PlainMessage<MintAssertionClaims> | undefined): boolean {
-    return proto3.util.equals(MintAssertionClaims, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.MintAssertionClaimsFormat
- */
-export class MintAssertionClaimsFormat extends Message<MintAssertionClaimsFormat> {
-  constructor(data?: PartialMessage<MintAssertionClaimsFormat>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.MintAssertionClaimsFormat";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaimsFormat {
-    return new MintAssertionClaimsFormat().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MintAssertionClaimsFormat {
-    return new MintAssertionClaimsFormat().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MintAssertionClaimsFormat {
-    return new MintAssertionClaimsFormat().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: MintAssertionClaimsFormat | PlainMessage<MintAssertionClaimsFormat> | undefined, b: MintAssertionClaimsFormat | PlainMessage<MintAssertionClaimsFormat> | undefined): boolean {
-    return proto3.util.equals(MintAssertionClaimsFormat, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.common.BurnAssertionClaim
- */
-export class BurnAssertionClaim extends Message<BurnAssertionClaim> {
-  constructor(data?: PartialMessage<BurnAssertionClaim>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.BurnAssertionClaim";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BurnAssertionClaim {
-    return new BurnAssertionClaim().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BurnAssertionClaim {
-    return new BurnAssertionClaim().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BurnAssertionClaim {
-    return new BurnAssertionClaim().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: BurnAssertionClaim | PlainMessage<BurnAssertionClaim> | undefined, b: BurnAssertionClaim | PlainMessage<BurnAssertionClaim> | undefined): boolean {
-    return proto3.util.equals(BurnAssertionClaim, a, b);
+  static equals(a: MintAssertionClaimFormat | PlainMessage<MintAssertionClaimFormat> | undefined, b: MintAssertionClaimFormat | PlainMessage<MintAssertionClaimFormat> | undefined): boolean {
+    return proto3.util.equals(MintAssertionClaimFormat, a, b);
   }
 }
 
@@ -1444,37 +1363,6 @@ export class BurnAssertionClaimFormat extends Message<BurnAssertionClaimFormat> 
 }
 
 /**
- * @generated from message cacti.satp.v02.common.AssignmentAssertionClaim
- */
-export class AssignmentAssertionClaim extends Message<AssignmentAssertionClaim> {
-  constructor(data?: PartialMessage<AssignmentAssertionClaim>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.common.AssignmentAssertionClaim";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssignmentAssertionClaim {
-    return new AssignmentAssertionClaim().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssignmentAssertionClaim {
-    return new AssignmentAssertionClaim().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssignmentAssertionClaim {
-    return new AssignmentAssertionClaim().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined, b: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined): boolean {
-    return proto3.util.equals(AssignmentAssertionClaim, a, b);
-  }
-}
-
-/**
  * @generated from message cacti.satp.v02.common.AssignmentAssertionClaimFormat
  */
 export class AssignmentAssertionClaimFormat extends Message<AssignmentAssertionClaimFormat> {
@@ -1502,6 +1390,178 @@ export class AssignmentAssertionClaimFormat extends Message<AssignmentAssertionC
 
   static equals(a: AssignmentAssertionClaimFormat | PlainMessage<AssignmentAssertionClaimFormat> | undefined, b: AssignmentAssertionClaimFormat | PlainMessage<AssignmentAssertionClaimFormat> | undefined): boolean {
     return proto3.util.equals(AssignmentAssertionClaimFormat, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.LockAssertionClaim
+ */
+export class LockAssertionClaim extends Message<LockAssertionClaim> {
+  /**
+   * @generated from field: string receipt = 1;
+   */
+  receipt = "";
+
+  /**
+   * @generated from field: string signature = 2;
+   */
+  signature = "";
+
+  constructor(data?: PartialMessage<LockAssertionClaim>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.LockAssertionClaim";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionClaim {
+    return new LockAssertionClaim().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssertionClaim {
+    return new LockAssertionClaim().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssertionClaim {
+    return new LockAssertionClaim().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LockAssertionClaim | PlainMessage<LockAssertionClaim> | undefined, b: LockAssertionClaim | PlainMessage<LockAssertionClaim> | undefined): boolean {
+    return proto3.util.equals(LockAssertionClaim, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.MintAssertionClaim
+ */
+export class MintAssertionClaim extends Message<MintAssertionClaim> {
+  /**
+   * @generated from field: string receipt = 1;
+   */
+  receipt = "";
+
+  /**
+   * @generated from field: string signature = 2;
+   */
+  signature = "";
+
+  constructor(data?: PartialMessage<MintAssertionClaim>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.MintAssertionClaim";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaim {
+    return new MintAssertionClaim().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MintAssertionClaim {
+    return new MintAssertionClaim().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MintAssertionClaim {
+    return new MintAssertionClaim().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MintAssertionClaim | PlainMessage<MintAssertionClaim> | undefined, b: MintAssertionClaim | PlainMessage<MintAssertionClaim> | undefined): boolean {
+    return proto3.util.equals(MintAssertionClaim, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.BurnAssertionClaim
+ */
+export class BurnAssertionClaim extends Message<BurnAssertionClaim> {
+  /**
+   * @generated from field: string receipt = 1;
+   */
+  receipt = "";
+
+  /**
+   * @generated from field: string signature = 2;
+   */
+  signature = "";
+
+  constructor(data?: PartialMessage<BurnAssertionClaim>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.BurnAssertionClaim";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BurnAssertionClaim {
+    return new BurnAssertionClaim().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BurnAssertionClaim {
+    return new BurnAssertionClaim().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BurnAssertionClaim {
+    return new BurnAssertionClaim().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BurnAssertionClaim | PlainMessage<BurnAssertionClaim> | undefined, b: BurnAssertionClaim | PlainMessage<BurnAssertionClaim> | undefined): boolean {
+    return proto3.util.equals(BurnAssertionClaim, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.AssignmentAssertionClaim
+ */
+export class AssignmentAssertionClaim extends Message<AssignmentAssertionClaim> {
+  /**
+   * @generated from field: string receipt = 1;
+   */
+  receipt = "";
+
+  /**
+   * @generated from field: string signature = 2;
+   */
+  signature = "";
+
+  constructor(data?: PartialMessage<AssignmentAssertionClaim>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.AssignmentAssertionClaim";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssignmentAssertionClaim {
+    return new AssignmentAssertionClaim().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssignmentAssertionClaim {
+    return new AssignmentAssertionClaim().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssignmentAssertionClaim {
+    return new AssignmentAssertionClaim().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined, b: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined): boolean {
+    return proto3.util.equals(AssignmentAssertionClaim, a, b);
   }
 }
 
