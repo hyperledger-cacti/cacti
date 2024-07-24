@@ -127,9 +127,9 @@ export class CommitFinalAssertionRequestMessage extends Message<CommitFinalAsser
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 2;
+   * @generated from field: string burn_assertion_claim = 2;
    */
-  burnAssertionClaim?: BurnAssertionClaim;
+  burnAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 3;
@@ -155,7 +155,7 @@ export class CommitFinalAssertionRequestMessage extends Message<CommitFinalAsser
   static readonly typeName = "cacti.satp.v02.CommitFinalAssertionRequestMessage";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
-    { no: 2, name: "burn_assertion_claim", kind: "message", T: BurnAssertionClaim },
+    { no: 2, name: "burn_assertion_claim", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "burn_assertion_claim_format", kind: "message", T: BurnAssertionClaimFormat },
     { no: 4, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -188,9 +188,9 @@ export class CommitFinalAcknowledgementReceiptResponseMessage extends Message<Co
   common?: CommonSatp;
 
   /**
-   * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 2;
+   * @generated from field: string assignment_assertion_claim = 2;
    */
-  assignmentAssertionClaim?: AssignmentAssertionClaim;
+  assignmentAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 3;
@@ -216,7 +216,7 @@ export class CommitFinalAcknowledgementReceiptResponseMessage extends Message<Co
   static readonly typeName = "cacti.satp.v02.CommitFinalAcknowledgementReceiptResponseMessage";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
-    { no: 2, name: "assignment_assertion_claim", kind: "message", T: AssignmentAssertionClaim },
+    { no: 2, name: "assignment_assertion_claim", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "assignment_assertion_claim_format", kind: "message", T: AssignmentAssertionClaimFormat },
     { no: 4, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
