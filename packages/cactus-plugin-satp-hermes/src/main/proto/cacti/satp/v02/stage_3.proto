@@ -13,8 +13,8 @@ message CommitPreparationRequestMessage {
 
 message CommitReadyResponseMessage {
   cacti.satp.v02.common.CommonSatp common = 1;
-  cacti.satp.v02.common.MintAssertionClaims mint_assertion_claims = 2;
-  cacti.satp.v02.common.MintAssertionClaimsFormat mint_assertion_claims_format = 3;
+  cacti.satp.v02.common.MintAssertionClaim mint_assertion_claim = 2;
+  cacti.satp.v02.common.MintAssertionClaimFormat mint_assertion_claim_format = 3;
   string server_transfer_number = 4;
   string server_signature = 5;
 }
