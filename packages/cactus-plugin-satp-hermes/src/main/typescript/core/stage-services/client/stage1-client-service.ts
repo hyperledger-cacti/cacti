@@ -49,12 +49,12 @@ export class Stage1ClientService extends SATPService {
   }
 
   async transferProposalRequest(
-    sessionID: string,
     session: SATPSession,
     supportedDLTs: SupportedChain[],
   ): Promise<void | TransferProposalRequestMessage> {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferProposalRequest...`);
 
     const sessionData = session.getSessionData();
 
@@ -209,6 +209,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<void | TransferCommenceRequestMessage> {
     const stepTag = `transferCommenceRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, transferCommenceRequest...`);
 
     if (!response || !response.common) {
       throw new Error("Response or response.common is undefined");
@@ -281,6 +282,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<boolean> {
     const stepTag = `checkTransferProposalReceiptMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, checkTransferProposalReceiptMessage...`);
     if (response.common == undefined) {
       throw new Error(`${fnTag}, message has no satp common body`);
     }
@@ -386,13 +388,13 @@ export class Stage1ClientService extends SATPService {
         return true;
       } else {
         this.Log.info(
-          `TransferProposalReceipt proposedTransferClaims were rejected`,
+          `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
         );
         sessionData.completed = true;
         return false;
       }
     }
-    this.Log.info(`TransferProposalReceipt passed all checks.`);
+    this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
     return true;
   }
 
