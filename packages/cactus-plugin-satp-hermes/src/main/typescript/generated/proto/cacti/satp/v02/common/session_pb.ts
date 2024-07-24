@@ -260,7 +260,7 @@ export class SessionData extends Message<SessionData> {
   /**
    * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 45;
    */
-  lockAssertionClaim?: LockAssertionClaim;
+  lockAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 46;
@@ -280,7 +280,7 @@ export class SessionData extends Message<SessionData> {
   /**
    * @generated from field: cacti.satp.v02.common.BurnAssertionClaim burn_assertion_claim = 49;
    */
-  burnAssertionClaim?: BurnAssertionClaim;
+  burnAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 50;
@@ -290,7 +290,7 @@ export class SessionData extends Message<SessionData> {
   /**
    * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 51;
    */
-  assignmentAssertionClaim?: AssignmentAssertionClaim;
+  assignmentAssertionClaim = "";
 
   /**
    * @generated from field: cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 52;

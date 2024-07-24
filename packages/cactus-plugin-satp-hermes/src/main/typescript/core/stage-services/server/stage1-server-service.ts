@@ -140,6 +140,11 @@ export class Stage1ServerService extends SATPService {
     }
     */
 
+    if (sessionData.transferContextId != undefined) {
+      transferProposalReceiptMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, JSON.stringify(transferProposalReceiptMessage)),
     );
@@ -216,6 +221,16 @@ export class Stage1ServerService extends SATPService {
       new TransferCommenceResponseMessage();
     transferCommenceResponseMessage.common = commonBody;
 
+    if (sessionData.transferContextId != undefined) {
+      transferCommenceResponseMessage.common.transferContextId =
+        sessionData.transferContextId;
+    }
+
+    if (sessionData.serverTransferNumber != undefined) {
+      transferCommenceResponseMessage.serverTransferNumber =
+        sessionData.serverTransferNumber;
+    }
+
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
     const messageSignature = bufArray2HexStr(
@@ -281,12 +296,8 @@ export class Stage1ServerService extends SATPService {
       request.common.version == undefined ||
       request.common.messageType == undefined ||
       request.common.sessionId == undefined ||
-      // request.common.transferContextId == undefined ||
       request.common.sequenceNumber == undefined ||
       request.common.resourceUrl == undefined ||
-      // request.common.actionResponse == undefined ||
-      // request.common.payloadProfile == undefined ||
-      // request.common.applicationProfile == undefined ||
       request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
       request.common.serverGatewayPubkey == undefined
@@ -387,15 +398,13 @@ export class Stage1ServerService extends SATPService {
       request.common.version == undefined ||
       request.common.messageType == undefined ||
       request.common.sessionId == undefined ||
-      // request.common.transferContextId == undefined ||
       request.common.sequenceNumber == undefined ||
       request.common.resourceUrl == undefined ||
-      // request.common.actionResponse == undefined ||
-      // request.common.payloadProfile == undefined ||
-      // request.common.applicationProfile == undefined ||
       request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
-      request.common.serverGatewayPubkey == undefined
+      request.common.serverGatewayPubkey == undefined ||
+      request.common.hashPreviousMessage == undefined ||
+      request.common.signature == undefined
     ) {
       throw new Error(
         `${fnTag}, message satp common body is missing or is missing required fields`,
