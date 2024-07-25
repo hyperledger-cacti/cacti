@@ -1,0 +1,14 @@
+.travis.yml
+README.md
+api/openapi.yaml
+api_default.go
+client.go
+configuration.go
+go.mod
+go.sum
+model_get_consortium_jws_response.go
+model_get_node_jws_response.go
+model_jws_general.go
+model_jws_recipient.go
+response.go
+utils.go

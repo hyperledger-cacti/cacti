@@ -45,10 +45,11 @@
   "scripts": {
     "benchmark": "tsx ./src/test/typescript/benchmark/run-cmd-api-server-benchmark.ts .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log",
     "build:bundle": "ncc build ./dist/lib/main/typescript/cmd/cactus-api.js --minify --out=./dist/bundle/ncc/",
-    "codegen": "run-s 'codegen:*'",
+    "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "run-s proto:openapi proto:protoc-gen-ts",
     "generate-sdk": "run-s 'generate-sdk:*'",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "proto:openapi": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --additional-properties=packageName=org.hyperledger.cactus.cmd_api_server -o ./src/main/proto/generated/openapi/ -t=./src/main/openapi-generator/templates/protobuf-schema/",
