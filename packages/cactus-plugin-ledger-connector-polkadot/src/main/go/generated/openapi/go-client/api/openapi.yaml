@@ -1,0 +1,700 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Polkadot parachain
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Connector Polkadot
+  version: 2.0.0-rc.3
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetrics
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info:
+    post:
+      operationId: getTransactionInfo
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionInfoRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionInfoResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: Get the necessary Transaction Info for a account
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction:
+    post:
+      operationId: getRawTransaction
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RawTransactionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RawTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: Get raw unsigned transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction:
+    post:
+      operationId: signRawTransaction
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRawTransactionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignRawTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: sign the raw transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction:
+    post:
+      operationId: runTransaction
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTransactionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: Executes a transaction on a Polkadot ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink:
+    post:
+      operationId: deployContractInk
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractInkRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractInkResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: Deploys the ink! contract
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract:
+    post:
+      operationId: invokeContract
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeContractRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponse'
+          description: Internal Server Error
+      summary: Invokes a contract on a polkadot ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract
+components:
+  schemas:
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    TransactionInfoRequest:
+      additionalProperties: false
+      example:
+        transactionExpiration: 0.8008281904610115
+        accountAddress: accountAddress
+      properties:
+        accountAddress:
+          nullable: false
+          type: string
+        transactionExpiration:
+          nullable: true
+          type: number
+      required:
+      - accountAddress
+      - transactionExpiration
+      type: object
+    TransactionInfoResponseData:
+      additionalProperties: false
+      example:
+        blockHash: "{}"
+        era: "{}"
+        nonce: "{}"
+      properties:
+        nonce:
+          nullable: false
+          type: object
+        blockHash:
+          nullable: false
+          type: object
+        era:
+          nullable: true
+          type: object
+      required:
+      - blockHash
+      - era
+      - nonce
+      type: object
+    TransactionInfoResponse:
+      additionalProperties: false
+      example:
+        responseContainer:
+          response_data:
+            blockHash: "{}"
+            era: "{}"
+            nonce: "{}"
+          message: message
+          error: error
+          succeeded: true
+      properties:
+        responseContainer:
+          $ref: '#/components/schemas/TransactionInfoResponse_responseContainer'
+      required:
+      - responseContainer
+      type: object
+    RawTransactionRequest:
+      additionalProperties: false
+      example:
+        to: to
+        value: 0.8008281904610115
+      properties:
+        to:
+          nullable: false
+          type: string
+        value:
+          nullable: false
+          type: number
+      required:
+      - to
+      - value
+      type: object
+    RawTransactionResponseData:
+      additionalProperties: false
+      example:
+        rawTransaction: rawTransaction
+      properties:
+        rawTransaction:
+          nullable: false
+          type: string
+      required:
+      - rawTransaction
+      type: object
+    RawTransactionResponse:
+      additionalProperties: false
+      example:
+        responseContainer:
+          response_data:
+            rawTransaction: rawTransaction
+          message: message
+          error: error
+          succeeded: true
+      properties:
+        responseContainer:
+          $ref: '#/components/schemas/RawTransactionResponse_responseContainer'
+      required:
+      - responseContainer
+      type: object
+    SignRawTransactionRequest:
+      additionalProperties: false
+      example:
+        rawTransaction: rawTransaction
+        signingOptions: "{}"
+        mnemonic: mnemonic
+      properties:
+        rawTransaction:
+          nullable: false
+          type: string
+        mnemonic:
+          nullable: false
+          type: string
+        signingOptions:
+          nullable: false
+          type: object
+      required:
+      - mnemonic
+      - rawTransaction
+      type: object
+    SignRawTransactionResponse:
+      additionalProperties: false
+      example:
+        signedTransaction: signedTransaction
+        success: true
+      properties:
+        success:
+          nullable: false
+          type: boolean
+        signedTransaction:
+          nullable: false
+          type: string
+      required:
+      - signedTransaction
+      - success
+      type: object
+    web3SigningCredential:
+      discriminator:
+        propertyName: type
+      example:
+        type: null
+      oneOf:
+      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
+      - $ref: '#/components/schemas/Web3SigningCredentialMnemonicString'
+      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialCactusKeychainRef:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        keychainEntryKey:
+          description: The key to use when looking up the the keychain entry holding
+            the secret pointed to by the  keychainEntryKey parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+        keychainId:
+          description: The keychain ID to use when looking up the the keychain plugin
+            instance that will be used to retrieve the secret pointed to by the keychainEntryKey
+            parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - keychainEntryKey
+      - keychainId
+      - type
+      type: object
+    Web3SigningCredentialMnemonicString:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        mnemonic:
+          description: The Polkadot account's seed phrase for signing transaction
+          nullable: false
+          type: string
+      required:
+      - mnemonic
+      - type
+      type: object
+    Web3SigningCredentialNone:
+      description: Using this denotes that there is no signing required because the
+        transaction is pre-signed.
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialType:
+      enum:
+      - CACTUS_KEYCHAIN_REF
+      - MNEMONIC_STRING
+      - NONE
+      type: string
+    PolkadotTransactionConfig:
+      additionalProperties: true
+      example:
+        transferSubmittable: null
+        to: null
+        value: null
+      properties:
+        transferSubmittable:
+          $ref: '#/components/schemas/PolkadotTransactionConfig_transferSubmittable'
+        to:
+          $ref: '#/components/schemas/PolkadotTransactionConfig_transferSubmittable'
+        value:
+          $ref: '#/components/schemas/PolkadotTransactionConfig_value'
+      type: object
+    RunTransactionRequest:
+      additionalProperties: false
+      example:
+        transactionConfig:
+          transferSubmittable: null
+          to: null
+          value: null
+        web3SigningCredential:
+          type: null
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/web3SigningCredential'
+        transactionConfig:
+          $ref: '#/components/schemas/PolkadotTransactionConfig'
+      required:
+      - transactionConfig
+      - web3SigningCredential
+      type: object
+    RunTransactionResponse:
+      additionalProperties: false
+      example:
+        blockHash: blockHash
+        success: true
+        txHash: txHash
+      properties:
+        success:
+          nullable: false
+          type: boolean
+        txHash:
+          nullable: false
+          type: string
+        blockHash:
+          nullable: false
+          type: string
+      required:
+      - success
+      type: object
+    DeployContractInkRequest:
+      additionalProperties: false
+      example:
+        gasLimit:
+          refTime: 0
+          proofSize: 0
+        metadata: null
+        wasm: wasm
+        salt: null
+        balance: null
+        web3SigningCredential:
+          type: null
+        storageDepositLimit: null
+        params:
+        - ""
+        - ""
+        constructorMethod: null
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/web3SigningCredential'
+        wasm:
+          description: raw wasm for the compiled contract in base64 format
+          format: byte
+          nullable: false
+          type: string
+        constructorMethod:
+          $ref: '#/components/schemas/PolkadotTransactionConfig_transferSubmittable'
+        metadata:
+          $ref: '#/components/schemas/PolkadotTransactionConfig_transferSubmittable'
+        gasLimit:
+          $ref: '#/components/schemas/DeployContractInkRequest_gasLimit'
+        storageDepositLimit:
+          $ref: '#/components/schemas/DeployContractInkRequest_storageDepositLimit'
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            deployed
+          items: {}
+          type: array
+        balance:
+          $ref: '#/components/schemas/DeployContractInkRequest_balance'
+        salt:
+          $ref: '#/components/schemas/DeployContractInkRequest_salt'
+      required:
+      - gasLimit
+      - metadata
+      - wasm
+      - web3SigningCredential
+      type: object
+    DeployContractInkResponse:
+      additionalProperties: false
+      example:
+        success: true
+        contractAddress: contractAddress
+      properties:
+        success:
+          nullable: false
+          type: boolean
+        contractAddress:
+          nullable: false
+          type: string
+      required:
+      - success
+      type: object
+    PolkadotContractInvocationType:
+      enum:
+      - SEND
+      - QUERY
+      type: string
+    InvokeContractRequest:
+      additionalProperties: false
+      example:
+        invocationType: null
+        gasLimit:
+          refTime: 0
+          proofSize: 0
+        metadata: null
+        balance: null
+        accountAddress: accountAddress
+        web3SigningCredential:
+          type: null
+        contractAddress: contractAddress
+        methodName: methodName
+        storageDepositLimit: null
+        params:
+        - ""
+        - ""
+      properties:
+        invocationType:
+          $ref: '#/components/schemas/PolkadotContractInvocationType'
+        accountAddress:
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/web3SigningCredential'
+        metadata:
+          $ref: '#/components/schemas/PolkadotTransactionConfig_transferSubmittable'
+        contractAddress:
+          nullable: false
+          type: string
+        methodName:
+          description: The name of the contract method to invoke.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        gasLimit:
+          $ref: '#/components/schemas/DeployContractInkRequest_gasLimit'
+        storageDepositLimit:
+          $ref: '#/components/schemas/DeployContractInkRequest_storageDepositLimit'
+        balance:
+          $ref: '#/components/schemas/DeployContractInkRequest_balance'
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            invoked
+          items: {}
+          type: array
+      required:
+      - accountAddress
+      - contractAddress
+      - gasLimit
+      - invocationType
+      - metadata
+      - methodName
+      - web3SigningCredential
+      type: object
+    InvokeContractResponse:
+      example:
+        blockHash: blockHash
+        callOutput: ""
+        success: true
+        txHash: txHash
+      properties:
+        callOutput: {}
+        success:
+          nullable: false
+          type: boolean
+        txHash:
+          nullable: false
+          type: string
+        blockHash:
+          nullable: false
+          type: string
+      required:
+      - success
+      type: object
+    ErrorExceptionResponse:
+      description: Error response from the connector.
+      properties:
+        message:
+          description: Short error description message.
+          nullable: false
+          type: string
+        error:
+          description: Detailed error information.
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    TransactionInfoResponse_responseContainer:
+      additionalProperties: false
+      example:
+        response_data:
+          blockHash: "{}"
+          era: "{}"
+          nonce: "{}"
+        message: message
+        error: error
+        succeeded: true
+      properties:
+        response_data:
+          $ref: '#/components/schemas/TransactionInfoResponseData'
+        succeeded:
+          nullable: false
+          type: boolean
+        message:
+          nullable: false
+          type: string
+        error:
+          nullable: true
+          type: string
+      required:
+      - error
+      - message
+      - response_data
+      - succeeded
+      type: object
+    RawTransactionResponse_responseContainer:
+      additionalProperties: false
+      example:
+        response_data:
+          rawTransaction: rawTransaction
+        message: message
+        error: error
+        succeeded: true
+      properties:
+        response_data:
+          $ref: '#/components/schemas/RawTransactionResponseData'
+        succeeded:
+          nullable: false
+          type: boolean
+        message:
+          nullable: false
+          type: string
+        error:
+          nullable: true
+          type: string
+      required:
+      - error
+      - message
+      - response_data
+      - succeeded
+      type: object
+    PolkadotTransactionConfig_transferSubmittable:
+      oneOf:
+      - type: string
+    PolkadotTransactionConfig_value:
+      oneOf:
+      - type: number
+    DeployContractInkRequest_gasLimit:
+      example:
+        refTime: 0
+        proofSize: 0
+      properties:
+        refTime:
+          minimum: 0
+          type: integer
+        proofSize:
+          minimum: 0
+          type: integer
+      required:
+      - proofSize
+      - refTime
+      type: object
+    DeployContractInkRequest_storageDepositLimit:
+      nullable: true
+      oneOf:
+      - type: string
+      - minimum: 0
+        type: integer
+    DeployContractInkRequest_balance:
+      oneOf:
+      - type: string
+      - minimum: 0
+        type: integer
+    DeployContractInkRequest_salt:
+      nullable: true
+      oneOf:
+      - type: string

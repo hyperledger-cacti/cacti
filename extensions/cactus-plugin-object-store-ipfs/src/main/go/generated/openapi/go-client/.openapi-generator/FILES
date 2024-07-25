@@ -1,0 +1,16 @@
+.travis.yml
+README.md
+api/openapi.yaml
+api_default.go
+client.go
+configuration.go
+go.mod
+go.sum
+model_get_object_request_v1.go
+model_get_object_response_v1.go
+model_has_object_request_v1.go
+model_has_object_response_v1.go
+model_set_object_request_v1.go
+model_set_object_response_v1.go
+response.go
+utils.go

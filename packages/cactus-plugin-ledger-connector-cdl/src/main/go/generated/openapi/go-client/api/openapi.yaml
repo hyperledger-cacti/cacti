@@ -1,0 +1,498 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on Fujitsu CDL service.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cacti Plugin - Connector CDL
+  version: 2.0.0-rc.3
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data:
+    post:
+      operationId: registerHistoryDataV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterHistoryDataRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterHistoryDataV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Register new data trail on CDL
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage:
+    post:
+      operationId: getLineageV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetLineageRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLineageResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Get lineage trail from CDL.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header:
+    post:
+      operationId: searchLineageByHeaderV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchLineageRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchLineageResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Search lineage using header fields.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata:
+    post:
+      operationId: searchLineageByGlobalDataV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchLineageRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchLineageResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Search lineage using global data fields.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata
+components:
+  schemas:
+    GetLineageOptionDirectionV1:
+      enum:
+      - backward
+      - forward
+      - both
+      type: string
+      x-enum-varnames:
+      - Backward
+      - Forward
+      - Both
+    SearchLineageTypeV1:
+      enum:
+      - exactmatch
+      - partialmatch
+      - regexpmatch
+      type: string
+      x-enum-varnames:
+      - ExactMatch
+      - PartialMatch
+      - RegexMatch
+    GatewayConfigurationV1:
+      properties:
+        url:
+          description: Gateway URL
+          nullable: false
+          type: string
+        userAgent:
+          description: Value of User-Agent header sent to CDL (to identify this client)
+          nullable: false
+          type: string
+        skipCertCheck:
+          default: false
+          description: Set to true to ignore self-signed and other rejected certificates
+          nullable: false
+          type: boolean
+        caPath:
+          description: CA of CDL API gateway server in PEM format to use
+          nullable: false
+          type: string
+        serverName:
+          description: Overwrite server name from cdlApiGateway.url to match one specified
+            in CA
+          nullable: false
+          type: string
+      required:
+      - url
+      type: object
+    AuthInfoAccessTokenV1:
+      properties:
+        accessToken:
+          nullable: false
+          type: string
+        trustAgentId:
+          nullable: false
+          type: string
+      required:
+      - accessToken
+      - trustAgentId
+      type: object
+    AuthInfoSubscriptionKeyV1:
+      properties:
+        subscriptionKey:
+          nullable: false
+          type: string
+        trustAgentId:
+          nullable: false
+          type: string
+        trustAgentRole:
+          nullable: false
+          type: string
+        trustUserId:
+          nullable: false
+          type: string
+        trustUserRole:
+          nullable: false
+          type: string
+      required:
+      - subscriptionKey
+      - trustAgentId
+      - trustAgentRole
+      - trustUserId
+      - trustUserRole
+      type: object
+    AuthInfoV1:
+      oneOf:
+      - $ref: '#/components/schemas/AuthInfoAccessTokenV1'
+      - $ref: '#/components/schemas/AuthInfoSubscriptionKeyV1'
+      type: object
+    EventLineageV1:
+      description: CDL event linage information (used to identify related events)
+      example:
+        cdl:NextEventIdList:
+        - ""
+        - ""
+        cdl:DataModelMode: ""
+        cdl:EventId: ""
+        cdl:PreviousEventIdList:
+        - ""
+        - ""
+        cdl:LineageId: ""
+        cdl:DataRegistrationTimeStamp: ""
+        cdl:DataModelVersion: ""
+      properties:
+        cdl:EventId:
+          nullable: false
+          type: ' string'
+        cdl:LineageId:
+          nullable: false
+          type: ' string'
+        cdl:DataModelMode:
+          nullable: false
+          type: ' string'
+        cdl:DataModelVersion:
+          nullable: false
+          type: ' string'
+        cdl:DataRegistrationTimeStamp:
+          nullable: false
+          type: ' string'
+        cdl:NextEventIdList:
+          items:
+            nullable: false
+            type: ' string'
+          type: array
+        cdl:PreviousEventIdList:
+          items:
+            nullable: false
+            type: ' string'
+          type: array
+      required:
+      - cdl:DataModelMode
+      - cdl:DataModelVersion
+      - cdl:DataRegistrationTimeStamp
+      - cdl:EventId
+      - cdl:LineageId
+      - cdl:NextEventIdList
+      - cdl:PreviousEventIdList
+      type: object
+    TrailEventDetailsV1:
+      description: Details of newly created CDL event.
+      example:
+        cdl:Event: ""
+        cdl:Lineage:
+          cdl:NextEventIdList:
+          - ""
+          - ""
+          cdl:DataModelMode: ""
+          cdl:EventId: ""
+          cdl:PreviousEventIdList:
+          - ""
+          - ""
+          cdl:LineageId: ""
+          cdl:DataRegistrationTimeStamp: ""
+          cdl:DataModelVersion: ""
+        cdl:Verification: ""
+        cdl:Tags: ""
+      properties:
+        cdl:Event:
+          nullable: false
+        cdl:Lineage:
+          $ref: '#/components/schemas/EventLineageV1'
+        cdl:Tags:
+          nullable: false
+        cdl:Verification:
+          nullable: false
+      required:
+      - cdl:Lineage
+      - cdl:Tags
+      - cdl:Verification
+      type: object
+    CDLCommonResponseV1:
+      properties:
+        detail:
+          nullable: false
+        result:
+          nullable: false
+          type: ' string'
+      required:
+      - result
+      type: object
+    RegisterHistoryDataRequestV1:
+      example:
+        eventId: eventId
+        lineageId: lineageId
+        properties: ""
+        authInfo: null
+        tags: ""
+      properties:
+        authInfo:
+          $ref: '#/components/schemas/AuthInfoV1'
+        eventId:
+          nullable: false
+          type: string
+        lineageId:
+          nullable: false
+          type: string
+        tags:
+          nullable: false
+        properties:
+          nullable: false
+      required:
+      - authInfo
+      type: object
+    RegisterHistoryDataV1Response:
+      example:
+        result: ""
+        detail:
+          cdl:Event: ""
+          cdl:Lineage:
+            cdl:NextEventIdList:
+            - ""
+            - ""
+            cdl:DataModelMode: ""
+            cdl:EventId: ""
+            cdl:PreviousEventIdList:
+            - ""
+            - ""
+            cdl:LineageId: ""
+            cdl:DataRegistrationTimeStamp: ""
+            cdl:DataModelVersion: ""
+          cdl:Verification: ""
+          cdl:Tags: ""
+      properties:
+        detail:
+          $ref: '#/components/schemas/TrailEventDetailsV1'
+        result:
+          nullable: false
+          type: ' string'
+      required:
+      - detail
+      - result
+      type: object
+    GetLineageRequestV1:
+      example:
+        eventId: eventId
+        depth: "-1"
+        authInfo: null
+        direction: null
+      properties:
+        authInfo:
+          $ref: '#/components/schemas/AuthInfoV1'
+        eventId:
+          nullable: false
+          type: string
+        direction:
+          $ref: '#/components/schemas/GetLineageOptionDirectionV1'
+        depth:
+          default: "-1"
+          nullable: false
+          type: string
+      required:
+      - authInfo
+      - eventId
+      type: object
+    GetLineageResponseV1:
+      example:
+        result: ""
+        detail:
+        - cdl:Event: ""
+          cdl:Lineage:
+            cdl:NextEventIdList:
+            - ""
+            - ""
+            cdl:DataModelMode: ""
+            cdl:EventId: ""
+            cdl:PreviousEventIdList:
+            - ""
+            - ""
+            cdl:LineageId: ""
+            cdl:DataRegistrationTimeStamp: ""
+            cdl:DataModelVersion: ""
+          cdl:Verification: ""
+          cdl:Tags: ""
+        - cdl:Event: ""
+          cdl:Lineage:
+            cdl:NextEventIdList:
+            - ""
+            - ""
+            cdl:DataModelMode: ""
+            cdl:EventId: ""
+            cdl:PreviousEventIdList:
+            - ""
+            - ""
+            cdl:LineageId: ""
+            cdl:DataRegistrationTimeStamp: ""
+            cdl:DataModelVersion: ""
+          cdl:Verification: ""
+          cdl:Tags: ""
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/TrailEventDetailsV1'
+          type: array
+        result:
+          nullable: false
+          type: ' string'
+      required:
+      - detail
+      - result
+      type: object
+    SearchLineageRequestV1:
+      example:
+        searchType: null
+        fields: ""
+        authInfo: null
+      properties:
+        authInfo:
+          $ref: '#/components/schemas/AuthInfoV1'
+        searchType:
+          $ref: '#/components/schemas/SearchLineageTypeV1'
+        fields:
+          nullable: false
+      required:
+      - authInfo
+      - fields
+      - searchType
+      type: object
+    SearchLineageResponseV1:
+      example:
+        result: ""
+        detail:
+        - cdl:Event: ""
+          cdl:Lineage:
+            cdl:NextEventIdList:
+            - ""
+            - ""
+            cdl:DataModelMode: ""
+            cdl:EventId: ""
+            cdl:PreviousEventIdList:
+            - ""
+            - ""
+            cdl:LineageId: ""
+            cdl:DataRegistrationTimeStamp: ""
+            cdl:DataModelVersion: ""
+          cdl:Verification: ""
+          cdl:Tags: ""
+        - cdl:Event: ""
+          cdl:Lineage:
+            cdl:NextEventIdList:
+            - ""
+            - ""
+            cdl:DataModelMode: ""
+            cdl:EventId: ""
+            cdl:PreviousEventIdList:
+            - ""
+            - ""
+            cdl:LineageId: ""
+            cdl:DataRegistrationTimeStamp: ""
+            cdl:DataModelVersion: ""
+          cdl:Verification: ""
+          cdl:Tags: ""
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/TrailEventDetailsV1'
+          type: array
+        result:
+          nullable: false
+          type: ' string'
+      required:
+      - detail
+      - result
+      type: object
+    ErrorExceptionResponseV1:
+      description: Error response from the connector.
+      properties:
+        message:
+          description: Short error description message.
+          nullable: false
+          type: string
+        error:
+          description: Detailed error information.
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object

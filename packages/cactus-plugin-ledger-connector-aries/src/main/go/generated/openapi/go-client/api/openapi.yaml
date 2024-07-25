@@ -1,0 +1,651 @@
+openapi: 3.0.3
+info:
+  description: Can communicate with other Aries agents and Cacti Aries connectors
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cacti Plugin - Connector Aries
+  version: 2.0.0-rc.3
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-agents:
+    post:
+      operationId: getAgentsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAgentsV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionV1Response'
+          description: Internal Server Error
+      summary: Get all Aries agents configured in this connector plugin.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-agents
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections:
+    post:
+      operationId: getConnectionsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetConnectionsV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConnectionsV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionV1Response'
+          description: Internal Server Error
+      summary: Get all connections of given aries agent.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/create-new-connection-invitation:
+    post:
+      operationId: createNewConnectionInvitationV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNewConnectionInvitationV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateNewConnectionInvitationV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionV1Response'
+          description: Internal Server Error
+      summary: Create new aries agent invitation that other agents can use to connect.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/create-new-connection-invitation
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/accept-invitation:
+    post:
+      operationId: acceptInvitationV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitationV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptInvitationV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionV1Response'
+          description: Internal Server Error
+      summary: Connect to another agent using it's invitation URL
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/accept-invitation
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/request-proof:
+    post:
+      operationId: requestProofV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestProofV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AriesProofExchangeRecordV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionV1Response'
+          description: Internal Server Error
+      summary: Request proof matching provided requriements from connected peer agent.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/request-proof
+components:
+  schemas:
+    WatchConnectionStateV1:
+      description: Websocket requests for monitoring connection change events.
+      enum:
+      - org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Subscribe
+      - org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Next
+      - org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Error
+      - org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchConnectionStateOptionsV1:
+      description: Options passed when monitoring connection change events.
+      properties:
+        agentName:
+          description: Aries agent label that will also be used as wallet id.
+          nullable: false
+          type: string
+      required:
+      - agentName
+      type: object
+    WatchConnectionStateProgressV1:
+      description: Values pushed on each connection state change.
+      properties:
+        connectionRecord:
+          $ref: '#/components/schemas/AgentConnectionRecordV1'
+        previousState:
+          nullable: true
+          type: string
+      required:
+      - connectionRecord
+      - previousState
+      type: object
+    WatchProofStateV1:
+      description: Websocket requests for monitoring proof state change events.
+      enum:
+      - org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Subscribe
+      - org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Next
+      - org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Error
+      - org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchProofStateOptionsV1:
+      description: Options passed when monitoring proof state change events.
+      properties:
+        agentName:
+          description: Aries agent label that will also be used as wallet id.
+          nullable: false
+          type: string
+      required:
+      - agentName
+      type: object
+    WatchProofStateProgressV1:
+      description: Values pushed on each proof state change.
+      properties:
+        proofRecord:
+          $ref: '#/components/schemas/AriesProofExchangeRecordV1'
+        previousState:
+          nullable: true
+          type: string
+      required:
+      - previousState
+      - proofRecord
+      type: object
+    CactiAcceptPolicyV1:
+      description: Credential / Proof requests acceptance policies for Aries agent
+      enum:
+      - always
+      - contentApproved
+      - never
+      type: string
+      x-enum-varnames:
+      - Always
+      - ContentApproved
+      - Never
+    CactiProofRequestAttributeV1:
+      description: Credential attribute checks to be performed by a proof request.
+      example:
+        name: name
+        isValueEqual: ""
+        isCredentialDefinitionIdEqual: ""
+      properties:
+        name:
+          description: Attribute name.
+          nullable: false
+          type: string
+        isValueEqual:
+          description: Check if attribute has specified value
+          nullable: false
+        isCredentialDefinitionIdEqual:
+          description: Check if credentialDefinitionId has specified value
+          nullable: false
+      required:
+      - name
+      type: object
+    AriesProofExchangeRecordV1:
+      additionalProperties: true
+      description: Proof exchange record from Aries framework (simplified)
+      example:
+        threadId: threadId
+        isVerified: true
+        errorMessage: errorMessage
+        connectionId: connectionId
+        protocolVersion: protocolVersion
+        id: id
+        state: state
+      properties:
+        id:
+          nullable: false
+          type: string
+        connectionId:
+          nullable: false
+          type: string
+        threadId:
+          nullable: false
+          type: string
+        state:
+          nullable: false
+          type: string
+        protocolVersion:
+          nullable: false
+          type: string
+        isVerified:
+          nullable: false
+          type: boolean
+        errorMessage:
+          nullable: false
+          type: string
+      required:
+      - id
+      - protocolVersion
+      - state
+      - threadId
+      type: object
+    AriesIndyVdrPoolConfigV1:
+      description: Indy VDR network configuration
+      properties:
+        genesisTransactions:
+          description: Indy genesis transactions.
+          nullable: false
+          type: string
+        isProduction:
+          description: Flag to specify whether this is production or development ledger.
+          nullable: false
+          type: boolean
+        indyNamespace:
+          description: Indy namespace
+          nullable: false
+          type: string
+        connectOnStartup:
+          description: Connect to the ledger on startup flag
+          nullable: false
+          type: boolean
+      required:
+      - genesisTransactions
+      - indyNamespace
+      - isProduction
+      type: object
+    AriesAgentConfigV1:
+      description: Aries agent configuration to be setup and used by the connector.
+      properties:
+        name:
+          description: Aries agent label that will also be used as wallet id.
+          nullable: false
+          type: string
+        walletKey:
+          description: Wallet private key - do not share with anyone.
+          nullable: false
+          type: string
+        walletPath:
+          description: "Path to wallet sqlite database to use. If not provided, the\
+            \ connector default path and agent name will be used."
+          nullable: false
+          type: string
+        indyNetworks:
+          items:
+            $ref: '#/components/schemas/AriesIndyVdrPoolConfigV1'
+          nullable: false
+          type: array
+        inboundUrl:
+          default: undefined
+          description: Inbound endpoint URL for this agent. Must be unique for this
+            connector. Must contain port.
+          example: http://127.0.0.1:1234
+          nullable: false
+          type: string
+        autoAcceptConnections:
+          default: false
+          description: Flag to accept new connection by default
+          nullable: false
+          type: boolean
+        autoAcceptCredentials:
+          $ref: '#/components/schemas/CactiAcceptPolicyV1'
+        autoAcceptProofs:
+          $ref: '#/components/schemas/CactiAcceptPolicyV1'
+      required:
+      - indyNetworks
+      - name
+      - walletKey
+      type: object
+    AriesAgentSummaryV1:
+      description: Summary of an Aries Agent configured in the connector.
+      example:
+        isAgentInitialized: true
+        isWalletInitialized: true
+        endpoints:
+        - endpoints
+        - endpoints
+        isWalletProvisioned: true
+        name: name
+        walletConfig:
+          id: id
+          type: type
+      properties:
+        name:
+          description: Aries label of an agent
+          nullable: false
+          type: string
+        isAgentInitialized:
+          description: True when Aries agent has been initialized properly.
+          nullable: false
+          type: boolean
+        isWalletInitialized:
+          description: True when this agents wallet has been initialized properly.
+          nullable: false
+          type: boolean
+        isWalletProvisioned:
+          description: True when this agents wallet has been provisioned properly.
+          nullable: false
+          type: boolean
+        walletConfig:
+          $ref: '#/components/schemas/AriesAgentSummaryV1_walletConfig'
+        endpoints:
+          description: Aries agent endpoints configured
+          items:
+            nullable: false
+            type: string
+          nullable: false
+          type: array
+      required:
+      - endpoints
+      - isAgentInitialized
+      - isWalletInitialized
+      - isWalletProvisioned
+      - name
+      - walletConfig
+      type: object
+    AgentConnectionsFilterV1:
+      description: Fields that can be used to filter agent connection list.
+      example:
+        threadId: threadId
+        role: role
+        theirDid: theirDid
+        invitationDid: invitationDid
+        outOfBandId: outOfBandId
+        state: state
+        did: did
+      properties:
+        did:
+          nullable: false
+          type: string
+        invitationDid:
+          nullable: false
+          type: string
+        outOfBandId:
+          nullable: false
+          type: string
+        role:
+          nullable: false
+          type: string
+        state:
+          nullable: false
+          type: string
+        theirDid:
+          nullable: false
+          type: string
+        threadId:
+          nullable: false
+          type: string
+      type: object
+    AgentConnectionRecordV1:
+      additionalProperties: true
+      description: Aries agent connection information.
+      example:
+        threadId: threadId
+        role: role
+        theirDid: theirDid
+        theirLabel: theirLabel
+        isReady: true
+        errorMessage: errorMessage
+        alias: alias
+        invitationDid: invitationDid
+        outOfBandId: outOfBandId
+        state: state
+        did: did
+      properties:
+        state:
+          nullable: false
+          type: string
+        role:
+          nullable: false
+          type: string
+        isReady:
+          nullable: false
+          type: boolean
+        did:
+          nullable: false
+          type: string
+        theirDid:
+          nullable: false
+          type: string
+        theirLabel:
+          nullable: false
+          type: string
+        alias:
+          nullable: false
+          type: string
+        threadId:
+          nullable: false
+          type: string
+        errorMessage:
+          nullable: false
+          type: string
+        outOfBandId:
+          nullable: false
+          type: string
+        invitationDid:
+          nullable: false
+          type: string
+      required:
+      - isReady
+      - role
+      - state
+      type: object
+    GetConnectionsV1Request:
+      description: Request for GetConnections endpoint.
+      example:
+        filter:
+          threadId: threadId
+          role: role
+          theirDid: theirDid
+          invitationDid: invitationDid
+          outOfBandId: outOfBandId
+          state: state
+          did: did
+        agentName: agentName
+      properties:
+        agentName:
+          nullable: false
+          type: string
+        filter:
+          $ref: '#/components/schemas/AgentConnectionsFilterV1'
+      required:
+      - agentName
+      type: object
+    GetConnectionsV1Response:
+      default: []
+      description: Response for GetConnections endpoint.
+      items:
+        $ref: '#/components/schemas/AgentConnectionRecordV1'
+      type: array
+    GetAgentsV1Response:
+      default: []
+      description: Response for GetAgents endpoint.
+      items:
+        $ref: '#/components/schemas/AriesAgentSummaryV1'
+      type: array
+    CreateNewConnectionInvitationV1Request:
+      description: Request for CreateNewConnectionInvitation endpoint.
+      example:
+        invitationDomain: invitationDomain
+        agentName: agentName
+      properties:
+        agentName:
+          description: Aries label of an agent to use to generate an invitation
+          nullable: false
+          type: string
+        invitationDomain:
+          description: "Invitation URL domain to use. If not specified, then connector\
+            \ default domain will be used"
+          nullable: false
+          type: string
+      required:
+      - agentName
+      type: object
+    CreateNewConnectionInvitationV1Response:
+      description: Response for CreateNewConnectionInvitation endpoint.
+      example:
+        invitationUrl: invitationUrl
+        outOfBandId: outOfBandId
+      properties:
+        invitationUrl:
+          description: Invitation URL that can be used by another aries agent to connect
+            to us.
+          nullable: false
+          type: string
+        outOfBandId:
+          description: ID that can be used to track status of the connection
+          nullable: false
+          type: string
+      required:
+      - invitationUrl
+      - outOfBandId
+      type: object
+    AcceptInvitationV1Request:
+      description: Request for AcceptInvitation endpoint.
+      example:
+        invitationUrl: invitationUrl
+        agentName: agentName
+      properties:
+        agentName:
+          description: Aries label of an agent to be used to connect using URL
+          nullable: false
+          type: string
+        invitationUrl:
+          description: Invitation URL generated by another aries agent.
+          nullable: false
+          type: string
+      required:
+      - agentName
+      - invitationUrl
+      type: object
+    AcceptInvitationV1Response:
+      description: Response for AcceptInvitation endpoint.
+      example:
+        outOfBandId: outOfBandId
+      properties:
+        outOfBandId:
+          description: ID that can be used to track status of the connection
+          nullable: false
+          type: string
+      required:
+      - outOfBandId
+      type: object
+    RequestProofV1Request:
+      description: Request for RequestProof endpoint.
+      example:
+        agentName: agentName
+        connectionId: connectionId
+        proofAttributes:
+        - name: name
+          isValueEqual: ""
+          isCredentialDefinitionIdEqual: ""
+        - name: name
+          isValueEqual: ""
+          isCredentialDefinitionIdEqual: ""
+      properties:
+        agentName:
+          description: Aries label of an agent to be used to connect using URL
+          nullable: false
+          type: string
+        connectionId:
+          description: Peer connection ID from which we want to request a proof.
+          nullable: false
+          type: string
+        proofAttributes:
+          items:
+            $ref: '#/components/schemas/CactiProofRequestAttributeV1'
+          nullable: false
+          type: array
+      required:
+      - agentName
+      - connectionId
+      - proofAttributes
+      type: object
+    ErrorExceptionV1Response:
+      description: Error response from the connector.
+      properties:
+        message:
+          description: Short error description message.
+          nullable: false
+          type: string
+        error:
+          description: Detailed error information.
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    AriesAgentSummaryV1_walletConfig:
+      example:
+        id: id
+        type: type
+      nullable: false
+      properties:
+        id:
+          description: Wallet entry ID
+          nullable: false
+          type: string
+        type:
+          description: Wallet storage type
+          nullable: false
+          type: string
+      required:
+      - id
+      - type
+      type: object

@@ -3,6 +3,7 @@
 **/.gitignore
 **/generated/openapi/kotlin-client/docs/**
 **/generated/openapi/kotlin-client/gradle/**
+<<<<<<< HEAD
 **/generated/**/.openapi-generator-ignore
 
 # TODO: Figure out a better way to generalize these ignore patterns that are
@@ -11,3 +12,7 @@ packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-
 packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/build.gradle.kts
 packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/Application.kt
 packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/test/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCordaTest.kt
+=======
+**/generated/openapi/go-client/docs/**
+**/generated/**/.openapi-generator-ignore
+>>>>>>> 5f00f4fc1 (build(api-client): generate go client)
