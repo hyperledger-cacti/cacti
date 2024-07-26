@@ -11004,7 +11004,9 @@ __metadata:
     "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.7"
+    bignumber.js: "npm:9.1.2"
+    bn.js: "npm:5.2.1"
     body-parser: "npm:1.20.3"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
@@ -21656,6 +21658,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bignumber.js@npm:9.1.2, bignumber.js@npm:^9.1.2":
+  version: 9.1.2
+  resolution: "bignumber.js@npm:9.1.2"
+  checksum: 10/d89b8800a987225d2c00dcbf8a69dc08e92aa0880157c851c287b307d31ceb2fc2acb0c62c3e3a3d42b6c5fcae9b004035f13eb4386e56d529d7edac18d5c9d8
+  languageName: node
+  linkType: hard
+
 "bignumber.js@npm:^7.2.1":
   version: 7.2.1
   resolution: "bignumber.js@npm:7.2.1"
@@ -21667,13 +21676,6 @@ __metadata:
   version: 9.0.2
   resolution: "bignumber.js@npm:9.0.2"
   checksum: 10/d270e73abb79a9beffd1347139266c08b9c022f91c5613226ec16a3eba240fabcbc7c597bbecbb43300038c9d94e3674a269784feac0f5b17c8d0b2b17940798
-  languageName: node
-  linkType: hard
-
-"bignumber.js@npm:^9.1.2":
-  version: 9.1.2
-  resolution: "bignumber.js@npm:9.1.2"
-  checksum: 10/d89b8800a987225d2c00dcbf8a69dc08e92aa0880157c851c287b307d31ceb2fc2acb0c62c3e3a3d42b6c5fcae9b004035f13eb4386e56d529d7edac18d5c9d8
   languageName: node
   linkType: hard
 
@@ -28700,6 +28702,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ethers@npm:6.13.1":
+  version: 6.13.1
+  resolution: "ethers@npm:6.13.1"
+  dependencies:
+    "@adraffy/ens-normalize": "npm:1.10.1"
+    "@noble/curves": "npm:1.2.0"
+    "@noble/hashes": "npm:1.3.2"
+    "@types/node": "npm:18.15.13"
+    aes-js: "npm:4.0.0-beta.5"
+    tslib: "npm:2.4.0"
+    ws: "npm:8.17.1"
+  checksum: 10/efc3e8d4d13101cad01823ba524dad797a23f60088ca9f8677bd6dbfad5087e4187ede121e43aa0758d704525976f935860c5d5d27183a4247deaccf7cf19950
+  languageName: node
+  linkType: hard
+
+"ethers@npm:6.3.0":
+  version: 6.3.0
+  resolution: "ethers@npm:6.3.0"
+  dependencies:
+    "@adraffy/ens-normalize": "npm:1.9.0"
+    "@noble/hashes": "npm:1.1.2"
+    "@noble/secp256k1": "npm:1.7.1"
+    aes-js: "npm:4.0.0-beta.3"
+    tslib: "npm:2.4.0"
+    ws: "npm:8.5.0"
+  checksum: 10/45c88344be8a8503ddb498a33a9baec6953809bdc6d424b9e02fe47b2530106f285020e3158857493779fa6b73eb4eec24547a0cb4d65501bf5218400d0a90e0
+  languageName: node
+  linkType: hard
+
 "ethers@npm:6.8.1":
   version: 6.8.1
   resolution: "ethers@npm:6.8.1"
@@ -28767,21 +28798,6 @@ __metadata:
     "@ethersproject/web": "npm:5.7.1"
     "@ethersproject/wordlists": "npm:5.7.0"
   checksum: 10/227dfa88a2547c799c0c3c9e92e5e246dd11342f4b495198b3ae7c942d5bf81d3970fcef3fbac974a9125d62939b2d94f3c0458464e702209b839a8e6e615028
-  languageName: node
-  linkType: hard
-
-"ethers@npm:^6.13.1":
-  version: 6.13.3
-  resolution: "ethers@npm:6.13.3"
-  dependencies:
-    "@adraffy/ens-normalize": "npm:1.10.1"
-    "@noble/curves": "npm:1.2.0"
-    "@noble/hashes": "npm:1.3.2"
-    "@types/node": "npm:18.15.13"
-    aes-js: "npm:4.0.0-beta.5"
-    tslib: "npm:2.4.0"
-    ws: "npm:8.17.1"
-  checksum: 10/a3b11a5bd97269f2aa5e5cb844642a84fe139a188fd3c0d7d0c4c7b4958d56286e84c14cd41d1c53bd5dff8bf1060c73bd7a9bde8313f8a994d94881f4010037
   languageName: node
   linkType: hard
 
