@@ -76,7 +76,7 @@
             "watch": "tsc --build --watch",
             "forge": "forge build ./src/solidity/*.sol --out ./src/solidity/generated",
             "forge:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
-            "forge:all": "run-p 'forge' 'forge:test'"
+            "forge:all": "run-s 'forge' 'forge:test'"
   },
   "jest": {
             "moduleNameMapper": {
@@ -89,7 +89,7 @@
             "@connectrpc/connect-node": "1.5.0",
             "@connectrpc/protoc-gen-connect-es": "1.5.0",
             "@foundry-rs/hardhat-forge": "^0.1.17",
-            "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.2",
+            "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.6",
             "@hyperledger/cactus-common": "2.0.0-rc.6",
             "@hyperledger/cactus-core": "2.0.0-rc.6",
             "@hyperledger/cactus-core-api": "2.0.0-rc.6",
