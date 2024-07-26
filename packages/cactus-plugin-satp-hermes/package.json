@@ -76,7 +76,7 @@
                     "watch": "tsc --build --watch",
                     "forge": "forge build ./src/solidity/*.sol --out ./src/solidity/generated",
                     "forge:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
-                    "forge:all": "run-p 'forge' 'forge:test'"
+                    "forge:all": "run-s 'forge' 'forge:test'"
           },
           "jest": {
                     "moduleNameMapper": {
