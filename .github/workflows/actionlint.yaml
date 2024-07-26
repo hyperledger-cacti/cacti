@@ -46,14 +46,34 @@ jobs:
     # npm ERR! this command with --force or --legacy-peer-deps
     # npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
     - name: wipe_non_yaml_sources
-      run: rm -rf packages/ examples/ extensions/ package.json .github/workflows/test_weaver*.yaml .github/workflows/weaver_deploy*.yml weaver/
+      run: rm -rf packages/ examples/ extensions/ package.json weaver/
+
+    # We need to exclude these from the linting process for now because these files have 
+    # hundreds of linter errors that we didn't yet have time to fix. Once the errors are fixed
+    # we can add the files.
+    - name: Set env.CACTI_ACTIONLINT_FILES_TO_LINT
+      id: set_env_cacti_actionlint_files_to_lint
+      run: |
+          echo "CACTI_ACTIONLINT_FILES_TO_LINT=$(find .github/workflows/ -name "*.yml" -o -name "*.yaml" ! -name "*weaver*" -exec echo -n '{},' \;)" >> "$GITHUB_ENV"
+
+    - name: Print env.CACTI_ACTIONLINT_FILES_TO_LINT
+      id: print_env_cacti_actionlint_files_to_lint
+      run: |
+          echo "${{ env.CACTI_ACTIONLINT_FILES_TO_LINT }}" 
+
+    - name: Print Line-byLine env.CACTI_ACTIONLINT_FILES_TO_LINT
+      id: print_line_by_line_env_cacti_actionlint_files_to_lint
+      run: |
+          echo "${{ env.CACTI_ACTIONLINT_FILES_TO_LINT }}" | tr ',' '\n'
 
     - name: actionlint
       id: actionlint
-      uses: raven-actions/actionlint@v1.0.3
+      uses: raven-actions/actionlint@v2.0.0
       with:
-        version: 1.6.27
+        version: 1.7.1
         cache: true
+        files: ${{ env.CACTI_ACTIONLINT_FILES_TO_LINT }}
+        flags: "--verbose"
 
     - name: actionlint_summary
       if: ${{ steps.actionlint.outputs.exit-code != 0 }} # example usage, do echo only when actionlint action failed
