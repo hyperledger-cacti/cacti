@@ -9,11 +9,7 @@ import {
   ReceiptType,
 } from "../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import {
-  K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
-  K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
-  OpenEthereumTestLedger,
-} from "@hyperledger/cactus-test-tooling";
+import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
@@ -21,7 +17,16 @@ import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 test("deploys contract via .json file", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
-  const xdaiTestLedger = new OpenEthereumTestLedger({});
+  const xdaiTestLedger = new BesuTestLedger({});
+  const containerImageVersion = "2021-08-24--feat-1244";
+  const containerImageName =
+    "ghcr.io/hyperledger/cactus-besu-21-1-6-all-in-one";
+  const besuOptions = { containerImageName, containerImageVersion };
+  const besuTestLedger = new BesuTestLedger(besuOptions);
+  const besuKeyPair = {
+    privateKey: besuTestLedger.getGenesisAccountPrivKey(),
+  };
+  const firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
   await xdaiTestLedger.start();
 
   test.onFinish(async () => {
@@ -30,9 +35,6 @@ test("deploys contract via .json file", async (t: Test) => {
   });
 
   const rpcApiHttpHost = await xdaiTestLedger.getRpcApiHttpHost();
-
-  const whalePubKey = K_DEV_WHALE_ACCOUNT_PUBLIC_KEY;
-  const whalePrivKey = K_DEV_WHALE_ACCOUNT_PRIVATE_KEY;
 
   const web3 = new Web3(rpcApiHttpHost);
   const testEthAccount = web3.eth.accounts.create(uuidv4());
@@ -63,8 +65,8 @@ test("deploys contract via .json file", async (t: Test) => {
 
   await connector.transact({
     web3SigningCredential: {
-      ethAccount: whalePubKey,
-      secret: whalePrivKey,
+      ethAccount: firstHighNetWorthAccount,
+      secret: besuKeyPair.privateKey,
       type: Web3SigningCredentialType.PrivateKeyHex,
     },
     consistencyStrategy: {
@@ -72,7 +74,7 @@ test("deploys contract via .json file", async (t: Test) => {
       receiptType: ReceiptType.NodeTxPoolAck,
     },
     transactionConfig: {
-      from: whalePubKey,
+      from: firstHighNetWorthAccount,
       to: testEthAccount.address,
       value: 10e9,
       gas: 1000000,
@@ -89,8 +91,8 @@ test("deploys contract via .json file", async (t: Test) => {
     const deployOut = await connector.deployContractJsonObject({
       constructorArgs: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       gas: 1000000,
@@ -118,8 +120,8 @@ test("deploys contract via .json file", async (t: Test) => {
       methodName: "sayHello",
       params: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       contractJSON: HelloWorldContractJson,
