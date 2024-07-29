@@ -11,9 +11,7 @@ import {
 } from "../../../main/typescript/public-api";
 import {
   Containers,
-  K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
-  K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
-  OpenEthereumTestLedger,
+  BesuTestLedger,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -45,8 +43,16 @@ test(testCase, async (t: Test) => {
     await Containers.logDiagnostics({ logLevel });
   });
 
-  const ledger = new OpenEthereumTestLedger({ logLevel });
-
+  const ledger = new BesuTestLedger({ logLevel });
+  const containerImageVersion = "2021-08-24--feat-1244";
+  const containerImageName =
+    "ghcr.io/hyperledger/cactus-besu-21-1-6-all-in-one";
+  const besuOptions = { containerImageName, containerImageVersion };
+  const besuTestLedger = new BesuTestLedger(besuOptions);
+  const besuKeyPair = {
+    privateKey: besuTestLedger.getGenesisAccountPrivKey(),
+  };
+  const firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
@@ -55,9 +61,6 @@ test(testCase, async (t: Test) => {
   await ledger.start();
 
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
-
-  const whalePubKey = K_DEV_WHALE_ACCOUNT_PUBLIC_KEY;
-  const whalePrivKey = K_DEV_WHALE_ACCOUNT_PRIVATE_KEY;
 
   const web3 = new Web3(rpcApiHttpHost);
   const testEthAccount = web3.eth.accounts.create(uuidv4());
@@ -92,12 +95,12 @@ test(testCase, async (t: Test) => {
 
   await connector.transact({
     web3SigningCredential: {
-      ethAccount: whalePubKey,
-      secret: whalePrivKey,
+      ethAccount: firstHighNetWorthAccount,
+      secret: besuKeyPair.privateKey,
       type: Web3SigningCredentialType.PrivateKeyHex,
     },
     transactionConfig: {
-      from: whalePubKey,
+      from: firstHighNetWorthAccount,
       to: testEthAccount.address,
       value: 10e9,
       gas: 1000000,
@@ -118,8 +121,8 @@ test(testCase, async (t: Test) => {
   test("deploys contract via .json file", async (t2: Test) => {
     const deployOut = await connector.deployContractJsonObject({
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       gas: 1000000,
@@ -147,8 +150,8 @@ test(testCase, async (t: Test) => {
       methodName: "sayHello",
       params: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       gas: 1000000,

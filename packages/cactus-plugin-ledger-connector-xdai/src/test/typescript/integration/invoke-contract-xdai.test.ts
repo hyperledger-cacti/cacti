@@ -11,24 +11,27 @@ import {
   ReceiptType,
 } from "../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import {
-  K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
-  K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
-  OpenEthereumTestLedger,
-} from "@hyperledger/cactus-test-tooling";
+import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "TRACE";
-let xdaiTestLedger: OpenEthereumTestLedger;
+let xdaiTestLedger: BesuTestLedger;
 const testCase = "Xdai Ledger Connector Plugin";
 describe(testCase, () => {
+  const containerImageVersion = "2021-08-24--feat-1244";
+  const containerImageName =
+    "ghcr.io/hyperledger/cactus-besu-21-1-6-all-in-one";
+  const besuOptions = { containerImageName, containerImageVersion };
+  const besuTestLedger = new BesuTestLedger(besuOptions);
+  const besuKeyPair = {
+    privateKey: besuTestLedger.getGenesisAccountPrivKey(),
+  };
+  let firstHighNetWorthAccount: string;
   let contractAddress: string;
   const contractName = "HelloWorld";
-  const whalePubKey = K_DEV_WHALE_ACCOUNT_PUBLIC_KEY;
-  const whalePrivKey = K_DEV_WHALE_ACCOUNT_PRIVATE_KEY;
   let keychainPlugin: PluginKeychainMemory;
   let connector: PluginLedgerConnectorXdai;
   let web3: Web3;
@@ -37,7 +40,7 @@ describe(testCase, () => {
   let keychainEntryValue: string, rpcApiHttpHost: string;
 
   beforeAll(async () => {
-    xdaiTestLedger = new OpenEthereumTestLedger({});
+    xdaiTestLedger = new BesuTestLedger({});
   });
 
   afterAll(async () => {
@@ -46,6 +49,7 @@ describe(testCase, () => {
   });
   beforeAll(async () => {
     await xdaiTestLedger.start();
+    firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
     rpcApiHttpHost = await xdaiTestLedger.getRpcApiHttpHost();
     expect(rpcApiHttpHost).toBeString();
 
@@ -82,8 +86,8 @@ describe(testCase, () => {
 
     await connector.transact({
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       consistencyStrategy: {
@@ -91,7 +95,7 @@ describe(testCase, () => {
         receiptType: ReceiptType.NodeTxPoolAck,
       },
       transactionConfig: {
-        from: whalePubKey,
+        from: firstHighNetWorthAccount,
         to: testEthAccount.address,
         value: 10e9,
         gas: 1000000,
@@ -110,8 +114,8 @@ describe(testCase, () => {
       // contractAbi: HelloWorldContractJson.abi,
       constructorArgs: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       // bytecode: HelloWorldContractJson.bytecode,
@@ -131,8 +135,8 @@ describe(testCase, () => {
       methodName: "sayHello",
       params: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
@@ -205,7 +209,7 @@ describe(testCase, () => {
       });
       fail("invalid nonce should have thrown");
     } catch (error: any) {
-      expect(error.message).toContain("Transaction nonce is too low.");
+      expect(error.message).toContain("Nonce too low");
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
@@ -303,9 +307,7 @@ describe(testCase, () => {
       });
       fail("invalid nonce should have thrown");
     } catch (error: any) {
-      expect(error.message).toContain(
-        "Transaction with the same hash was already imported",
-      );
+      expect(error.message).toContain("Nonce too low");
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,

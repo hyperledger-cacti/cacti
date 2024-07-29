@@ -14,9 +14,7 @@ import {
 } from "../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
-  K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
-  K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
-  OpenEthereumTestLedger,
+  BesuTestLedger,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -36,11 +34,17 @@ import { K_CACTUS_XDAI_TOTAL_TX_COUNT } from "../../../main/typescript/prometheu
 const testCase = "deploys contract via .json file";
 describe(testCase, () => {
   const logLevel: LogLevelDesc = "TRACE";
-  const ledger = new OpenEthereumTestLedger({ logLevel });
+  const ledger = new BesuTestLedger({ logLevel });
+  const containerImageVersion = "2021-08-24--feat-1244";
+  const containerImageName =
+    "ghcr.io/hyperledger/cactus-besu-21-1-6-all-in-one";
+  const besuOptions = { containerImageName, containerImageVersion };
+  const besuTestLedger = new BesuTestLedger(besuOptions);
+  const besuKeyPair = {
+    privateKey: besuTestLedger.getGenesisAccountPrivKey(),
+  };
   const contractName = "HelloWorld";
   const expressApp = express();
-  const whalePubKey = K_DEV_WHALE_ACCOUNT_PUBLIC_KEY;
-  const whalePrivKey = K_DEV_WHALE_ACCOUNT_PRIVATE_KEY;
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   let addressInfo,
@@ -52,6 +56,7 @@ describe(testCase, () => {
     apiHost: string,
     web3: Web3,
     factory: PluginFactoryLedgerConnector,
+    firstHighNetWorthAccount: string,
     testEthAccount: Account,
     keychainEntryKey: string,
     keychainEntryValue: string,
@@ -60,6 +65,7 @@ describe(testCase, () => {
     apiClient: XdaiApi;
 
   beforeAll(async () => {
+    firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
     const pruning = pruneDockerAllIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
@@ -125,12 +131,12 @@ describe(testCase, () => {
 
     await connector.transact({
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       transactionConfig: {
-        from: whalePubKey,
+        from: firstHighNetWorthAccount,
         to: testEthAccount.address,
         value: 10e9,
         gas: 1000000,
@@ -154,8 +160,8 @@ describe(testCase, () => {
       // contractAbi: HelloWorldContractJson.abi,
       constructorArgs: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       gas: 1000000,
@@ -174,8 +180,8 @@ describe(testCase, () => {
       methodName: "sayHello",
       params: [],
       web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
