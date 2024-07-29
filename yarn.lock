@@ -10553,6 +10553,7 @@ __metadata:
   resolution: "@hyperledger/cactus-plugin-persistence-ethereum@workspace:packages/cactus-plugin-persistence-ethereum"
   dependencies:
     "@ethersproject/abi": "npm:5.7.0"
+    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-rc.3"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.3"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.3"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.3"

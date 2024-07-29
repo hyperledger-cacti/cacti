@@ -1003,7 +1003,6 @@ components:
       - $ref: '#/components/schemas/ContractJsonDefinition'
       - $ref: '#/components/schemas/ContractKeychainDefinition'
     InvokeContractV1Request_contract:
-      nullable: false
       oneOf:
       - $ref: '#/components/schemas/DeployedContractJsonDefinition'
       - $ref: '#/components/schemas/ContractKeychainDefinition'
