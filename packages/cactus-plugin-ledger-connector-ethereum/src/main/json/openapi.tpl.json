@@ -210,8 +210,7 @@
             "type": "string"
           },
           "gasConfig": {
-            "$ref": "#/components/schemas/GasTransactionConfig",
-            "nullable": false
+            "$ref": "#/components/schemas/GasTransactionConfig"
           }
         }
       },
@@ -365,8 +364,7 @@
         "additionalProperties": false,
         "properties": {
           "contractJSON": {
-            "$ref": "#/components/schemas/ContractJSON",
-            "nullable": false
+            "$ref": "#/components/schemas/ContractJSON"
           }
         }
       },
@@ -376,8 +374,7 @@
         "additionalProperties": false,
         "properties": {
           "contractJSON": {
-            "$ref": "#/components/schemas/ContractJSON",
-            "nullable": false
+            "$ref": "#/components/schemas/ContractJSON"
           },
           "contractAddress": {
             "type": "string",
@@ -412,12 +409,10 @@
         "additionalProperties": false,
         "properties": {
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential",
-            "nullable": false
+            "$ref": "#/components/schemas/Web3SigningCredential"
           },
           "transactionConfig": {
-            "$ref": "#/components/schemas/EthereumTransactionConfig",
-            "nullable": false
+            "$ref": "#/components/schemas/EthereumTransactionConfig"
           },
           "timeoutMs": {
             "type": "number",
@@ -443,18 +438,15 @@
         "additionalProperties": false,
         "properties": {
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential",
-            "nullable": false
+            "$ref": "#/components/schemas/Web3SigningCredential"
           },
           "contract": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ContractJsonDefinition",
-                "description": "Send contract ABI directly in the request."
+                "$ref": "#/components/schemas/ContractJsonDefinition"
               },
               {
-                "$ref": "#/components/schemas/ContractKeychainDefinition",
-                "description": "Read contract definition from the keychain plugin."
+                "$ref": "#/components/schemas/ContractKeychainDefinition"
               }
             ],
             "nullable": false
@@ -466,8 +458,7 @@
             "items": {}
           },
           "gasConfig": {
-            "$ref": "#/components/schemas/GasTransactionConfig",
-            "nullable": false
+            "$ref": "#/components/schemas/GasTransactionConfig"
           },
           "value": {
             "type": "string",
@@ -484,15 +475,12 @@
           "contract": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/DeployedContractJsonDefinition",
-                "description": "Send contract ABI and address directly in the request."
+                "$ref": "#/components/schemas/DeployedContractJsonDefinition"
               },
               {
-                "$ref": "#/components/schemas/ContractKeychainDefinition",
-                "description": "Read contract definition from the keychain plugin."
+                "$ref": "#/components/schemas/ContractKeychainDefinition"
               }
-            ],
-            "nullable": false
+            ]
           },
           "methodName": {
             "description": "The name of the contract method to invoke.",
@@ -508,17 +496,13 @@
             "items": {}
           },
           "invocationType": {
-            "$ref": "#/components/schemas/EthContractInvocationType",
-            "nullable": false,
-            "description": "Indicates wether it is a CALL or a SEND type of  invocation where only SEND ends up creating an actual transaction on the ledger."
+            "$ref": "#/components/schemas/EthContractInvocationType"
           },
           "web3SigningCredential": {
-            "$ref": "#/components/schemas/Web3SigningCredential",
-            "nullable": false
+            "$ref": "#/components/schemas/Web3SigningCredential"
           },
           "gasConfig": {
-            "$ref": "#/components/schemas/GasTransactionConfig",
-            "nullable": false
+            "$ref": "#/components/schemas/GasTransactionConfig"
           },
           "value": {
             "type": "string"
@@ -599,7 +583,6 @@
             "type": "string"
           },
           "invocationType": {
-            "description": "Contract invocation method to be performed (send, call, etc...)",
             "$ref": "#/components/schemas/EthContractInvocationWeb3Method"
           },
           "invocationParams": {

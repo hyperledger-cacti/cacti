@@ -25,7 +25,7 @@ docker-compose build && docker-compose up -d
 
 ```bash
 # Build
-DOCKER_BUILDKIT=1 docker build ./tools/docker/geth-all-in-one/ -t cactus_geth_all_in_one
+docker build ./tools/docker/geth-all-in-one/ -t cactus_geth_all_in_one
 
 # Run
 docker run --rm --name geth_aio_testnet --detach -p 8545:8545 -p 8546:8546 cactus_geth_all_in_one

@@ -20,6 +20,9 @@
       "path": "../cactus-core-api/tsconfig.json"
     },
     {
+      "path": "../cactus-cmd-api-server/tsconfig.json"
+    },
+    {
       "path": "../cactus-test-tooling/tsconfig.json"
     },
     {

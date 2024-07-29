@@ -26,10 +26,62 @@ Clone the git repository on your local machine. Follow these instructions that w
 
 ### Prerequisites
 
+#### Build
+
 In the root of the project, execute the command to install and build the dependencies. It will also build this persistence plugin:
 
 ```sh
 yarn run configure
+```
+
+#### Ethereum Ledger and Connector
+
+This plugin requires a running Ethereum ledger that you want to persist to a database. For testing purposes, you can use our [test geth-all-in-one Docker image](../../tools/docker/geth-all-in-one/README.md). Make sure you have the JSON-RPC WS address ready.
+
+Once you have an Ethereum ledger ready, you need to start the [Ethereum Cacti Connector](../cactus-plugin-ledger-connector-ethereum/README.md). We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts](./src/test/typescript/manual).
+
+#### Supabase Instance
+
+You need a running Supabase instance to serve as a database backend for this plugin.
+
+### Setup Tutorials
+
+We've created some sample scripts to help you get started quickly. All the steps have detailed comments on it so you can quickly understand the code.
+
+#### Sample Setup
+
+Location: [./src/test/typescript/manual/sample-setup.ts](./src/test/typescript/manual/sample-setup.ts)
+
+This sample script can be used to set up `ApiServer` with the Ethereum connector and persistence plugins to monitor and store ledger data in a database. You need to have a ledger running before executing this script. You can add custom code (e.g., to specify tokens to be monitored) after the comment `CUSTOM CODE GOES HERE !!!!` in the script file.
+
+By default, the script will try to use a localhost Ethereum ledger (`ws://127.0.0.1:8546`) and our `supabase-all-in-one` instance running on localhost.
+
+```shell
+npm run sample-setup
+```
+
+Custom ledger and supabase can be set with environment variables `ETHEREUM_RPC_WS_HOST` and `SUPABASE_CONNECTION_STRING`:
+
+```shell
+ETHEREUM_RPC_WS_HOST=ws://127.0.0.1:8546 SUPABASE_CONNECTION_STRING=postgresql://postgres:your-super-secret-and-long-postgres-password@127.0.0.1:5432/postgres npm run sample-setup
+```
+
+#### Complete Sample Scenario
+
+Location: [./src/test/typescript/manual/common-setup-methods](./src/test/typescript/manual/common-setup-methods)
+
+This script starts the test Ethereum ledger for you, deploys a sample ERC721 contract, and mints some tokens. Then it synchronizes everything to a database and monitors for all new blocks. This script can also be used for manual, end-to-end tests of a plugin.
+
+By default, the script will try to use our `supabase-all-in-one` instance running on localhost.
+
+```shell
+npm run complete-sample-scenario
+```
+
+Custom supabase can be set with environment variable `SUPABASE_CONNECTION_STRING`:
+
+```shell
+SUPABASE_CONNECTION_STRING=postgresql://postgres:your-super-secret-and-long-postgres-password@127.0.0.1:5432/postgres npm run complete-sample-scenario
 ```
 
 ### Usage
@@ -41,29 +93,6 @@ import { PluginPersistenceEthereum } from "@hyperledger/cactus-plugin-persistenc
 import { v4 as uuidv4 } from "uuid";
 
 const persistencePlugin = new PluginPersistenceEthereum({
-  instanceId: uuidv4(),
-  apiClient: new EthereumApiClient(apiConfigOptions),
-  logLevel: "info",
-  connectionString:
-    "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
-});
-
-// Initialize the connection to the DB
-await persistencePlugin.onPluginInit();
-```
-
-Alternatively, import `PluginFactoryLedgerPersistence` from the plugin package and use it to create a plugin.
-
-```typescript
-import { PluginFactoryLedgerPersistence } from "@hyperledger/cactus-plugin-persistence-ethereum";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
-import { v4 as uuidv4 } from "uuid";
-
-const factory = new PluginFactoryLedgerPersistence({
-  pluginImportType: PluginImportType.Local,
-});
-
-const persistencePlugin = await factory.create({
   instanceId: uuidv4(),
   apiClient: new EthereumApiClient(apiConfigOptions),
   logLevel: "info",
