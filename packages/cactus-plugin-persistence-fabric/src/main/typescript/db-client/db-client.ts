@@ -200,15 +200,18 @@ export default class PostgresDatabaseClient {
    * @returns Map of cert attributes
    */
   private certificateAttrsStringToMap(attrString: string): Map<string, string> {
+    const separatorSplitRegex = new RegExp(`[/,+;\n]`);
+
     return new Map(
-      attrString.split("\n").map((a) => {
+      attrString.split(separatorSplitRegex).map((a) => {
         const splitAttrs = a.split("=");
         if (splitAttrs.length !== 2) {
           throw new Error(
             `Invalid certificate attribute string: ${attrString}`,
           );
         }
-        return splitAttrs as [string, string];
+        const [key, value] = splitAttrs;
+        return [key.trim(), value.trim()];
       }),
     );
   }

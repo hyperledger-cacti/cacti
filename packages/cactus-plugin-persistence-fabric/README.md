@@ -25,10 +25,80 @@ Clone the git repository on your local machine. Follow these instructions that w
 
 ### Prerequisites
 
+#### Build
+
 In the root of the project, execute the command to install and build the dependencies. It will also build this persistence plugin:
 
 ```sh
 yarn run configure
+```
+
+#### Hyperledger Fabric Ledger and Connector
+
+This plugin requires a running Hyperledger Fabric ledger that you want to persist to a database. For testing purposes, you can use our [test fabric-all-in-one Docker image](../../tools/docker/fabric-all-in-one/README.md). To access the ledger you'll need your organization connection profile JSON and a wallet containing registered identity. If you are using our `fabric-all-in-one` image, you can run our [asset-transfer-basic-utils scripts](../../tools/docker/fabric-all-in-one/asset-transfer-basic-utils/README.md) to fetch Org1 connection profile from a docker and register new user to a localhost wallet.
+
+```shell
+# Start the test ledger
+docker compose -f tools/docker/fabric-all-in-one/docker-compose-v2.x.yml up
+# Wait for it to start (status should become `healthy`)
+
+# Run asset-transfer-basic-utils scripts
+cd tools/docker/fabric-all-in-one/asset-transfer-basic-utils
+# Cleanup artifacts from previous runs
+rm -fr wallet/ connection.json
+# Fetch connection profile to `tools/docker/fabric-all-in-one/asset-transfer-basic-utils/connection.json`
+# Enroll user using wallet under `tools/docker/fabric-all-in-one/asset-transfer-basic-utils/wallet`
+npm install
+CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME=fabric_all_in_one_testnet_2x  ./setup.sh
+```
+
+Once you have an Fabric ledger ready, you need to start the [Ethereum Cacti Connector](../cactus-plugin-ledger-connector-fabric/README.md). We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts](./src/test/typescript/manual).
+
+#### Supabase Instance
+
+You need a running Supabase instance to serve as a database backend for this plugin.
+
+### Setup Tutorials
+
+We've created some sample scripts to help you get started quickly. All the steps have detailed comments on it so you can quickly understand the code.
+
+#### Sample Setup
+
+Location: [./src/test/typescript/manual/sample-setup.ts](./src/test/typescript/manual/sample-setup.ts)
+
+This sample script can be used to set up `ApiServer` with the Fabric connector and persistence plugins to monitor and store ledger data in a database. You need to have a ledger running before executing this script.
+
+To run the script you need to set the following environment variables:
+
+- `FABRIC_CONNECTION_PROFILE_PATH`: Full path to fabric ledger connection profile JSON file.
+- `FABRIC_CHANNEL_NAME`: Name of the channel we want to connect to (to store it's data).
+- `FABRIC_WALLET_PATH` : Full path to wallet containing our identity (that can connect and observe specified channel).
+- `FABRIC_WALLET_LABEL`: Name (label) of our identity in a wallet provided in FABRIC_WALLET_PATH
+
+By default, the script will try to use our `supabase-all-in-one` instance running on localhost. This can be adjusted by setting PostgreSQL connection string in `SUPABASE_CONNECTION_STRING` environment variable (optional).
+
+```shell
+# Example assumes fabric-all-in-one was used. Adjust the variables accordingly.
+FABRIC_CONNECTION_PROFILE_PATH=/home/cactus/tools/docker/fabric-all-in-one/asset-transfer-basic-utils/connection.json FABRIC_CHANNEL_NAME=mychannel FABRIC_WALLET_PATH=/home/cactus/tools/docker/fabric-all-in-one/asset-transfer-basic-utils/wallet FABRIC_WALLET_LABEL=appUser
+node ./dist/lib/test/typescript/manual/sample-setup.js
+```
+
+#### Complete Sample Scenario
+
+Location: [./src/test/typescript/manual/common-setup-methods](./src/test/typescript/manual/common-setup-methods)
+
+This script starts the test Hyperledger Fabric ledger for you and executes few transactions on a `basic` chaincode. Then, it synchronizes everything to a database and monitors for all new blocks. This script can also be used for manual, end-to-end tests of a plugin.
+
+By default, the script will try to use our `supabase-all-in-one` instance running on localhost.
+
+```shell
+npm run complete-sample-scenario
+```
+
+Custom supabase can be set with environment variable `SUPABASE_CONNECTION_STRING`:
+
+```shell
+SUPABASE_CONNECTION_STRING=postgresql://postgres:your-super-secret-and-long-postgres-password@127.0.0.1:5432/postgres npm run complete-sample-scenario
 ```
 
 ### Usage
@@ -40,38 +110,9 @@ import { PluginPersistenceFabric } from "@hyperledger/cactus-plugin-persistence-
 import { v4 as uuidv4 } from "uuid";
 
 const persistencePlugin = new PluginPersistenceFabric({
-  apiClient,
+  apiClient: new FabricApiClient(apiConfigOptions),
   logLevel: "info",
-  instanceId,
-  connectionString: "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",,
-  channelName: "mychannel",
-  gatewayOptions: {
-    identity: signingCredential.keychainRef,
-    wallet: {
-      keychain: signingCredential,
-    },
-  },
-});
-
-// Initialize the connection to the DB
-await persistencePlugin.onPluginInit();
-```
-
-Alternatively, import `PluginFactoryLedgerPersistence` from the plugin package and use it to create a plugin.
-
-```typescript
-import { PluginFactoryLedgerPersistence } from "@hyperledger/cactus-plugin-persistence-fabric";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
-import { v4 as uuidv4 } from "uuid";
-
-const factory = new PluginFactoryLedgerPersistence({
-  pluginImportType: PluginImportType.Local,
-});
-
-const persistencePlugin = await factory.create({
-  apiClient,
-  logLevel: "info",
-  instanceId,
+  instanceId: "my-instance",
   connectionString: "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",,
   channelName: "mychannel",
   gatewayOptions: {
