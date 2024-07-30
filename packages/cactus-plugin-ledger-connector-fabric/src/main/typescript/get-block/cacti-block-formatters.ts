@@ -79,7 +79,7 @@ export function formatCactiFullBlockResponse(
       const transaction = payload.data;
 
       const transactionActions: FullBlockTransactionActionV1[] = [];
-      for (const action of transaction.actions) {
+      for (const action of transaction.actions ?? []) {
         const actionPayload = action.payload;
         const proposalPayload = actionPayload.chaincode_proposal_payload;
         const invocationSpec = proposalPayload.input;

@@ -112,10 +112,8 @@ ALTER TABLE fabric.transaction OWNER TO postgres;
 
 ALTER TABLE ONLY fabric.transaction
     ADD CONSTRAINT transaction_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY fabric.transaction
-    ADD CONSTRAINT transaction_hash_key UNIQUE (hash);
 
-CREATE UNIQUE INDEX transaction_hash_unique_idx ON fabric.transaction USING btree (hash);
+CREATE INDEX transaction_hash_idx ON fabric.transaction (hash);
 --
 -- Name: transaction_action; Type: TABLE; Schema: fabric; Owner: postgres
 --

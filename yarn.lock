@@ -10585,6 +10585,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-persistence-fabric@workspace:packages/cactus-plugin-persistence-fabric"
   dependencies:
+    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-rc.3"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.3"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.3"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.3"
@@ -10598,6 +10599,7 @@ __metadata:
     axios: "npm:1.7.2"
     body-parser: "npm:1.20.2"
     express: "npm:4.19.2"
+    fabric-network: "npm:2.5.0-snapshot.23"
     jest-extended: "npm:4.0.1"
     pg: "npm:8.8.0"
     run-time-error-cjs: "npm:1.4.0"

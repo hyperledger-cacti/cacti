@@ -33,7 +33,7 @@ function main()
     tar -cC '/etc/hyperledger/fabric/fabric-couchdb/' . | docker load
     tar -cC '/etc/couchdb/' . | docker load
 
-    /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -b -s
+    /install-fabric.sh --fabric-version ${FABRIC_VERSION} --ca-version ${CA_VERSION} binary samples
 
     cd /fabric-samples/test-network/
     echo "[FabricAIO] >>> pulling up test network..."
