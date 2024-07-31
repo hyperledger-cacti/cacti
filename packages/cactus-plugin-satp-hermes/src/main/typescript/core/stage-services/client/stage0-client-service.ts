@@ -56,7 +56,7 @@ export class Stage0ClientService extends SATPService {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
-    const sessionData = session.getSessionData();
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined || !checkSessionData(sessionData)) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
@@ -180,7 +180,7 @@ export class Stage0ClientService extends SATPService {
       sign(this.Signer, JSON.stringify(transferProposalRequestMessage)),
     );
 
-    transferProposalRequestMessage.common.signature = messageSignature;
+    transferProposalRequestMessage.clientSignature = messageSignature;
 
     saveSignature(sessionData, MessageType.INIT_PROPOSAL, messageSignature);
 
@@ -214,7 +214,7 @@ export class Stage0ClientService extends SATPService {
       throw new Error("Response or response.common is undefined");
     }
 
-    const sessionData = session.getSessionData();
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined) {
       throw new Error("Session data not loaded successfully");
@@ -248,7 +248,7 @@ export class Stage0ClientService extends SATPService {
       sign(this.Signer, JSON.stringify(transferCommenceRequestMessage)),
     );
 
-    transferCommenceRequestMessage.common.signature = messageSignature;
+    transferCommenceRequestMessage.clientSignature = messageSignature;
 
     saveSignature(
       sessionData,
@@ -296,7 +296,7 @@ export class Stage0ClientService extends SATPService {
 
     // const sessionId = response.common.sessionId;
 
-    const sessionData = session.getSessionData();
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
