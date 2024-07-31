@@ -123,10 +123,9 @@ message CommonSatp {
     PayloadProfile payload_profile = 11;
     Payload payload = 13;
     string payload_hash = 14;
-    string signature = 15;
-    string client_gateway_pubkey = 16;
-    string server_gateway_pubkey = 17;
-    string hash_previous_message = 18;
+    string client_gateway_pubkey = 15;
+    string server_gateway_pubkey = 16;
+    string hash_previous_message = 17;
 }
 
 message ActionResponse {
