@@ -27,6 +27,23 @@ import {
 import { SATPSession } from "../../satp-session";
 import { LockAssertionReceiptMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import {
+  HashMissMatch,
+  MessageTypeMissMatch,
+  MissingAssignmentAssertionClaim,
+  MissingBridgeManager,
+  MissingBurnAssertionClaim,
+  MissingClientGatewayPubkey,
+  MissingMintAssertionClaim,
+  MissingSatpCommonBody,
+  MissingServerGatewayPubkey,
+  SATPVersionUnsupported,
+  SequenceNumberMissMatch,
+  SessionDataNotLoadedCorrectly,
+  SessionUndefined,
+  SignatureVerificationFailed,
+  TransferContextIdMissMatch,
+} from "../errors";
 
 export class Stage3ClientService extends SATPService {
   public static readonly SATP_STAGE = "3";
@@ -46,9 +63,7 @@ export class Stage3ClientService extends SATPService {
     super(commonOptions);
 
     if (ops.bridgeManager == undefined) {
-      throw new Error(
-        `${this.getServiceIdentifier()}#constructor(), bridgeManager is missing`,
-      );
+      throw MissingBridgeManager(`${this.getServiceIdentifier()}#constructor`);
     }
     this.bridgeManager = ops.bridgeManager;
   }
@@ -61,24 +76,25 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, CommitPreparation...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(fnTag);
     }
 
-    const sessionData = session.getSessionData();
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
+      throw SessionDataNotLoadedCorrectly(fnTag);
     }
 
-    saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(fnTag);
+    }
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.COMMIT_PREPARE;
-    commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
+    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
+      response.common.sequenceNumber + BigInt(1);
     commonBody.hashPreviousMessage = getMessageHash(
       sessionData,
       MessageType.ASSERTION_RECEIPT,
@@ -86,8 +102,6 @@ export class Stage3ClientService extends SATPService {
     commonBody.sessionId = response.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
     const commitPreparationRequestMessage =
       new CommitPreparationRequestMessage();
@@ -107,7 +121,7 @@ export class Stage3ClientService extends SATPService {
       sign(this.Signer, JSON.stringify(commitPreparationRequestMessage)),
     );
 
-    commitPreparationRequestMessage.common.signature = messageSignature;
+    commitPreparationRequestMessage.clientSignature = messageSignature;
 
     saveSignature(sessionData, MessageType.COMMIT_PREPARE, messageSignature);
 
@@ -139,25 +153,25 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, CommitFinalAssertion...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(fnTag);
     }
 
-    const sessionData = session.getSessionData();
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
+      throw SessionDataNotLoadedCorrectly(fnTag);
     }
 
-    saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(fnTag);
+    }
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.COMMIT_FINAL;
-    commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-
+    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
+      response.common.sequenceNumber + BigInt(1);
     commonBody.hashPreviousMessage = getMessageHash(
       sessionData,
       MessageType.COMMIT_READY,
@@ -167,11 +181,13 @@ export class Stage3ClientService extends SATPService {
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
 
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
-
     const commitFinalAssertionRequestMessage =
       new CommitFinalAssertionRequestMessage();
     commitFinalAssertionRequestMessage.common = commonBody;
+
+    if (sessionData.burnAssertionClaim == undefined) {
+      throw MissingBurnAssertionClaim(fnTag);
+    }
 
     commitFinalAssertionRequestMessage.burnAssertionClaim =
       sessionData.burnAssertionClaim;
@@ -195,7 +211,7 @@ export class Stage3ClientService extends SATPService {
       sign(this.Signer, JSON.stringify(commitFinalAssertionRequestMessage)),
     );
 
-    commitFinalAssertionRequestMessage.common.signature = messageSignature;
+    commitFinalAssertionRequestMessage.clientSignature = messageSignature;
 
     saveSignature(sessionData, MessageType.COMMIT_FINAL, messageSignature);
 
@@ -226,24 +242,25 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, TransferComplete...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(fnTag);
     }
 
-    const sessionData = session.getSessionData();
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
-      );
+      throw SessionDataNotLoadedCorrectly(fnTag);
     }
 
-    saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(fnTag);
+    }
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.COMMIT_TRANSFER_COMPLETE;
-    commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
+    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
+      response.common.sequenceNumber + BigInt(1);
 
     commonBody.hashPreviousMessage = getMessageHash(
       sessionData,
@@ -253,8 +270,6 @@ export class Stage3ClientService extends SATPService {
     commonBody.sessionId = response.common.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
     const transferCompleteRequestMessage = new TransferCompleteRequestMessage();
     transferCompleteRequestMessage.common = commonBody;
@@ -278,7 +293,7 @@ export class Stage3ClientService extends SATPService {
       sign(this.Signer, JSON.stringify(transferCompleteRequestMessage)),
     );
 
-    transferCompleteRequestMessage.common.signature = messageSignature;
+    transferCompleteRequestMessage.clientSignature = messageSignature;
 
     saveSignature(
       sessionData,
@@ -314,32 +329,37 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, CheckLockAssertionReceiptMessage...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(fnTag);
     }
 
-    if (response.common.version != SATP_VERSION) {
-      throw new Error(`${fnTag}, message version is not ${SATP_VERSION}`);
-    }
-
-    if (response.common.messageType != MessageType.ASSERTION_RECEIPT) {
-      throw new Error(`${fnTag}, message type is not ASSERTION_RECEIPT`);
-    }
-
-    const sessionData = session.getSessionData();
-
-    if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
-    }
+    const sessionData = session.getClientSessionData();
 
     if (
+      sessionData == undefined ||
       sessionData.lastSequenceNumber == undefined ||
       sessionData.version == undefined
     ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
+      throw SessionDataNotLoadedCorrectly(fnTag);
+    }
+
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(fnTag);
+    }
+
+    if (response.common.version != SATP_VERSION) {
+      throw SATPVersionUnsupported(
+        fnTag,
+        response.common.version,
+        SATP_VERSION,
+      );
+    }
+
+    if (response.common.messageType != MessageType.ASSERTION_RECEIPT) {
+      throw MessageTypeMissMatch(
+        fnTag,
+        response.common.messageType.toString(),
+        MessageType.ASSERTION_RECEIPT.toString(),
       );
     }
 
@@ -347,43 +367,55 @@ export class Stage3ClientService extends SATPService {
       sessionData.lastSequenceNumber + BigInt(1) !=
       response.common.sequenceNumber
     ) {
-      throw new Error(`${fnTag}, sequenceNumber does not match`);
+      throw SequenceNumberMissMatch(
+        fnTag,
+        response.common.sequenceNumber,
+        sessionData.lastSequenceNumber + BigInt(1),
+      );
     }
 
     if (
       response.common.hashPreviousMessage !=
       getMessageHash(sessionData, MessageType.LOCK_ASSERT)
     ) {
-      throw new Error(`${fnTag}, hashPreviousMessage does not match`);
+      throw HashMissMatch(
+        fnTag,
+        response.common.hashPreviousMessage,
+        getMessageHash(sessionData, MessageType.LOCK_ASSERT),
+      );
     }
 
     if (
       sessionData.clientGatewayPubkey != response.common.clientGatewayPubkey
     ) {
-      throw new Error(`${fnTag}, clientGatewayPubkey does not match`);
+      throw MissingClientGatewayPubkey(fnTag);
     }
 
     if (
       sessionData.serverGatewayPubkey != response.common.serverGatewayPubkey
     ) {
-      throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
+      throw MissingClientGatewayPubkey(fnTag);
     }
 
     if (
       !verifySignature(
         this.Signer,
-        response.common,
+        response,
         response.common.serverGatewayPubkey,
       )
     ) {
-      throw new Error(`${fnTag}, message signature verification failed`);
+      throw SignatureVerificationFailed(fnTag);
     }
 
     if (
       sessionData.transferContextId != undefined &&
       response.common.transferContextId != sessionData.transferContextId
     ) {
-      throw new Error(`${fnTag}, transferContextId does not match`);
+      throw TransferContextIdMissMatch(
+        fnTag,
+        response.common.transferContextId,
+        sessionData.transferContextId,
+      );
     }
 
     if (
@@ -397,13 +429,6 @@ export class Stage3ClientService extends SATPService {
     }
 
     if (
-      sessionData.transferContextId != undefined &&
-      response.common.transferContextId != sessionData.transferContextId
-    ) {
-      throw new Error(`${fnTag}, transferContextId does not match`);
-    }
-
-    if (
       sessionData.serverTransferNumber != undefined &&
       response.serverTransferNumber != sessionData.serverTransferNumber
     ) {
@@ -412,6 +437,8 @@ export class Stage3ClientService extends SATPService {
         `${fnTag}, serverTransferNumber does not match the one that was sent`,
       );
     }
+
+    saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
 
     this.Log.info(`${fnTag}, LockAssertionReceiptMessage passed all checks.`);
   }
@@ -424,32 +451,37 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, CommitReadyResponse...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(fnTag);
     }
 
-    if (response.common.version != SATP_VERSION) {
-      throw new Error(`${fnTag}, message version is not ${SATP_VERSION}`);
-    }
-
-    if (response.common.messageType != MessageType.COMMIT_READY) {
-      throw new Error(`${fnTag}, message type is not COMMIT_READY`);
-    }
-
-    const sessionData = session.getSessionData();
-
-    if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
-    }
+    const sessionData = session.getClientSessionData();
 
     if (
+      sessionData == undefined ||
       sessionData.lastSequenceNumber == undefined ||
       sessionData.version == undefined
     ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
+      throw SessionDataNotLoadedCorrectly(fnTag);
+    }
+
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(fnTag);
+    }
+
+    if (response.common.version != SATP_VERSION) {
+      throw SATPVersionUnsupported(
+        fnTag,
+        response.common.version,
+        SATP_VERSION,
+      );
+    }
+
+    if (response.common.messageType != MessageType.COMMIT_READY) {
+      throw MessageTypeMissMatch(
+        fnTag,
+        response.common.messageType.toString(),
+        MessageType.COMMIT_READY.toString(),
       );
     }
 
@@ -457,36 +489,44 @@ export class Stage3ClientService extends SATPService {
       sessionData.lastSequenceNumber + BigInt(1) !=
       response.common.sequenceNumber
     ) {
-      throw new Error(`${fnTag}, sequenceNumber does not match`);
+      throw SequenceNumberMissMatch(
+        fnTag,
+        response.common.sequenceNumber,
+        sessionData.lastSequenceNumber + BigInt(1),
+      );
     }
 
     if (
       response.common.hashPreviousMessage !=
       getMessageHash(sessionData, MessageType.COMMIT_PREPARE)
     ) {
-      throw new Error(`${fnTag}, hashPreviousMessage does not match`);
+      throw HashMissMatch(
+        fnTag,
+        response.common.hashPreviousMessage,
+        getMessageHash(sessionData, MessageType.COMMIT_PREPARE),
+      );
     }
 
     if (
       sessionData.clientGatewayPubkey != response.common.clientGatewayPubkey
     ) {
-      throw new Error(`${fnTag}, clientGatewayPubkey does not match`);
+      throw MissingClientGatewayPubkey(fnTag);
     }
 
     if (
       sessionData.serverGatewayPubkey != response.common.serverGatewayPubkey
     ) {
-      throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
+      throw MissingServerGatewayPubkey(fnTag);
     }
 
     if (
       !verifySignature(
         this.Signer,
-        response.common,
+        response,
         response.common.serverGatewayPubkey,
       )
     ) {
-      throw new Error(`${fnTag}, message signature verification failed`);
+      throw SignatureVerificationFailed(fnTag);
     }
 
     if (response.mintAssertionClaimFormat != undefined) {
@@ -499,7 +539,7 @@ export class Stage3ClientService extends SATPService {
 
     if (response.mintAssertionClaim == undefined) {
       //todo
-      throw new Error(`${fnTag}, mintAssertionClaims is missing`);
+      throw MissingMintAssertionClaim(fnTag);
     }
 
     sessionData.mintAssertionClaim = response.mintAssertionClaim;
@@ -508,7 +548,11 @@ export class Stage3ClientService extends SATPService {
       sessionData.transferContextId != undefined &&
       response.common.transferContextId != sessionData.transferContextId
     ) {
-      throw new Error(`${fnTag}, transferContextId does not match`);
+      throw TransferContextIdMissMatch(
+        fnTag,
+        response.common.transferContextId,
+        sessionData.transferContextId,
+      );
     }
 
     if (
@@ -521,6 +565,8 @@ export class Stage3ClientService extends SATPService {
       );
     }
 
+    saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
+
     this.Log.info(`${fnTag}, CommitReadyResponseMessage passed all checks.`);
   }
 
@@ -532,32 +578,37 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, CommitFinalAcknowledgementReceipt...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(fnTag);
     }
 
-    if (response.common.version != SATP_VERSION) {
-      throw new Error(`${fnTag}, message version is not ${SATP_VERSION}`);
-    }
-
-    if (response.common.messageType != MessageType.ACK_COMMIT_FINAL) {
-      throw new Error(`${fnTag}, message type is not ACK_COMMIT_FINAL`);
-    }
-
-    const sessionData = session.getSessionData();
-
-    if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
-    }
+    const sessionData = session.getClientSessionData();
 
     if (
+      sessionData == undefined ||
       sessionData.lastSequenceNumber == undefined ||
       sessionData.version == undefined
     ) {
-      throw new Error(
-        `${fnTag}, session data not loaded correctly ${response.common.sessionId}`,
+      throw SessionDataNotLoadedCorrectly(fnTag);
+    }
+
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(fnTag);
+    }
+
+    if (response.common.version != SATP_VERSION) {
+      throw SATPVersionUnsupported(
+        fnTag,
+        response.common.version,
+        SATP_VERSION,
+      );
+    }
+
+    if (response.common.messageType != MessageType.ACK_COMMIT_FINAL) {
+      throw MessageTypeMissMatch(
+        fnTag,
+        response.common.messageType.toString(),
+        MessageType.ACK_COMMIT_FINAL.toString(),
       );
     }
 
@@ -565,47 +616,59 @@ export class Stage3ClientService extends SATPService {
       sessionData.lastSequenceNumber + BigInt(1) !=
       response.common.sequenceNumber
     ) {
-      throw new Error(`${fnTag}, sequenceNumber does not match`);
+      throw SequenceNumberMissMatch(
+        fnTag,
+        response.common.sequenceNumber,
+        sessionData.lastSequenceNumber + BigInt(1),
+      );
     }
 
     if (
       response.common.hashPreviousMessage !=
       getMessageHash(sessionData, MessageType.COMMIT_FINAL)
     ) {
-      throw new Error(`${fnTag}, hashPreviousMessage does not match`);
+      throw HashMissMatch(
+        fnTag,
+        response.common.hashPreviousMessage,
+        getMessageHash(sessionData, MessageType.COMMIT_FINAL),
+      );
     }
 
     if (
       sessionData.clientGatewayPubkey != response.common.clientGatewayPubkey
     ) {
-      throw new Error(`${fnTag}, clientGatewayPubkey does not match`);
+      throw MissingClientGatewayPubkey(fnTag);
     }
 
     if (
       sessionData.serverGatewayPubkey != response.common.serverGatewayPubkey
     ) {
-      throw new Error(`${fnTag}, serverGatewayPubkey does not match`);
+      throw MissingServerGatewayPubkey(fnTag);
     }
 
     if (
       !verifySignature(
         this.Signer,
-        response.common,
+        response,
         response.common.serverGatewayPubkey,
       )
     ) {
-      throw new Error(`${fnTag}, message signature verification failed`);
+      throw SignatureVerificationFailed(fnTag);
     }
 
     if (
       sessionData.transferContextId != undefined &&
       response.common.transferContextId != sessionData.transferContextId
     ) {
-      throw new Error(`${fnTag}, transferContextId does not match`);
+      throw TransferContextIdMissMatch(
+        fnTag,
+        response.common.transferContextId,
+        sessionData.transferContextId,
+      );
     }
 
     if (response.assignmentAssertionClaim == undefined) {
-      throw new Error(`${fnTag}, assignmentAssertionClaim is missing`);
+      throw MissingAssignmentAssertionClaim(fnTag);
     }
 
     sessionData.assignmentAssertionClaim = response.assignmentAssertionClaim;
@@ -628,6 +691,8 @@ export class Stage3ClientService extends SATPService {
       );
     }
 
+    saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
+
     this.Log.info(
       `${fnTag}, CommitFinalAcknowledgementReceiptResponseMessage passed all checks.`,
     );
@@ -638,7 +703,10 @@ export class Stage3ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     try {
       this.Log.debug(`${fnTag}, Burning Asset...`);
-      const sessionData = session.getSessionData();
+      const sessionData = session.getClientSessionData();
+      if (sessionData == undefined) {
+        throw new Error(`${fnTag}, Session data is missing`);
+      }
       const assetId = sessionData.transferInitClaims?.digitalAssetId;
       const amount = sessionData.transferInitClaims?.amountFromOriginator;
 
@@ -647,18 +715,18 @@ export class Stage3ClientService extends SATPService {
         throw new Error(`${fnTag}, Asset ID is missing`);
       }
 
-      // const bridge = this.bridgeManager.getBridge(
-      //   sessionData.senderGatewayNetworkId,
-      // );
+      const bridge = this.bridgeManager.getBridge(
+        sessionData.senderGatewayNetworkId,
+      );
 
-      // sessionData.burnAssertionClaim = new BurnAssertionClaim();
-      // sessionData.burnAssertionClaim.receipt = await bridge.burnAsset(
-      //   assetId,
-      //   Number(amount),
-      // );
-      // sessionData.burnAssertionClaim.signature = bufArray2HexStr(
-      //   sign(this.Signer, sessionData.burnAssertionClaim.receipt),
-      // );
+      sessionData.burnAssertionClaim = new BurnAssertionClaim();
+      sessionData.burnAssertionClaim.receipt = await bridge.burnAsset(
+        assetId,
+        Number(amount),
+      );
+      sessionData.burnAssertionClaim.signature = bufArray2HexStr(
+        sign(this.Signer, sessionData.burnAssertionClaim.receipt),
+      );
     } catch (error) {
       throw new Error(`${fnTag}, Failed to process Burn Asset ${error}`);
     }

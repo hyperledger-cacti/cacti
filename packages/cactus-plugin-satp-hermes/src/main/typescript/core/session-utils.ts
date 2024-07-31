@@ -25,6 +25,11 @@ export enum TimestampType {
   RECEIVED = "RECEIVED",
 }
 
+export enum SessionType {
+  SERVER = "SERVER",
+  CLIENT = "CLIENT",
+}
+
 export function createSessionData(
   id: string,
   version: string,

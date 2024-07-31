@@ -17,14 +17,14 @@ import { Stage3ClientService } from "../stage-services/client/stage3-client-serv
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = "Stage3SATPHandler";
-  private session: SATPSession;
+  private sessions: Map<string, SATPSession>;
   private clientService: Stage3ClientService;
   private serverService: Stage3ServerService;
   private supportedDLTs: SupportedChain[];
   private logger: Logger;
 
   constructor(ops: SATPHandlerOptions) {
-    this.session = ops.session;
+    this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage3ServerService;
     this.clientService = ops.clientService as Stage3ClientService;
     this.supportedDLTs = ops.supportedDLTs;
@@ -36,8 +36,8 @@ export class Stage3SATPHandler implements SATPHandler {
     return Stage3SATPHandler.CLASS_NAME;
   }
 
-  getSessionId(): string {
-    return this.session.getSessionData().id;
+  getHandlerSessions(): string[] {
+    return Array.from(this.sessions.keys());
   }
 
   public get Log(): Logger {
@@ -53,15 +53,25 @@ export class Stage3SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Commit Preparation...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
+
+      if (!req.common?.sessionId) {
+        throw new Error(`${fnTag}, Session Id not found`);
+      }
+
+      const session = this.sessions.get(req.common?.sessionId);
+      if (!session) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
       const sessionData =
         await this.serverService.checkCommitPreparationRequestMessage(
           req,
-          this.session,
+          session,
         );
 
-      await this.serverService.mintAsset(this.session);
+      await this.serverService.mintAsset(session);
 
-      const message = await this.serverService.commitReady(req, this.session);
+      const message = await this.serverService.commitReady(req, session);
 
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
       this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
@@ -84,18 +94,28 @@ export class Stage3SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Commit Final Assertion...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
+
+      if (!req.common?.sessionId) {
+        throw new Error(`${fnTag}, Session Id not found`);
+      }
+
+      const session = this.sessions.get(req.common?.sessionId);
+      if (!session) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
       const sessionData =
         await this.serverService.checkCommitFinalAssertionRequestMessage(
           req,
-          this.session,
+          session,
         );
 
-      await this.serverService.assignAsset(this.session);
+      await this.serverService.assignAsset(session);
 
       const message =
         await this.serverService.commitFinalAcknowledgementReceiptResponse(
           req,
-          this.session,
+          session,
         );
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
       this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
@@ -118,10 +138,20 @@ export class Stage3SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Transfer Complete...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
+
+      if (!req.common?.sessionId) {
+        throw new Error(`${fnTag}, Session Id not found`);
+      }
+
+      const session = this.sessions.get(req.common?.sessionId);
+      if (!session) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
       const sessionData =
         await this.serverService.checkTransferCompleteRequestMessage(
           req,
-          this.session,
+          session,
         );
 
       this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
@@ -152,14 +182,24 @@ export class Stage3SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Commit Preparation Request...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
+
+      if (!response.common?.sessionId) {
+        throw new Error(`${fnTag}, Session Id not found`);
+      }
+
+      const session = this.sessions.get(response.common?.sessionId);
+      if (!session) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
       await this.clientService.checkCommitReadyResponseMessage(
         response,
-        this.session,
+        session,
       );
 
       const request = await this.clientService.commitPreparation(
         response,
-        this.session,
+        session,
       );
 
       if (!request) {
@@ -181,16 +221,26 @@ export class Stage3SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Commit Preparation Request...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
+
+      if (!response.common?.sessionId) {
+        throw new Error(`${fnTag}, Session Id not found`);
+      }
+
+      const session = this.sessions.get(response.common?.sessionId);
+      if (!session) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
       await this.clientService.checkCommitReadyResponseMessage(
         response,
-        this.session,
+        session,
       );
 
-      await this.clientService.burnAsset(this.session);
+      await this.clientService.burnAsset(session);
 
       const request = await this.clientService.commitFinalAssertion(
         response,
-        this.session,
+        session,
       );
 
       if (!request) {
@@ -214,14 +264,24 @@ export class Stage3SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Transfer Complete Request...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
+
+      if (!response.common?.sessionId) {
+        throw new Error(`${fnTag}, Session Id not found`);
+      }
+
+      const session = this.sessions.get(response.common?.sessionId);
+      if (!session) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
       await this.clientService.checkCommitFinalAcknowledgementReceiptResponseMessage(
         response,
-        this.session,
+        session,
       );
 
       const request = await this.clientService.transferComplete(
         response,
-        this.session,
+        session,
       );
 
       if (!request) {

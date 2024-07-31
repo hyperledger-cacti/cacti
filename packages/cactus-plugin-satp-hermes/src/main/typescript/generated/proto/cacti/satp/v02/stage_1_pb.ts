@@ -41,6 +41,11 @@ export class TransferProposalRequestMessage extends Message<TransferProposalRequ
    */
   multipleCancelsAllowed = false;
 
+  /**
+   * @generated from field: string client_signature = 7;
+   */
+  clientSignature = "";
+
   constructor(data?: PartialMessage<TransferProposalRequestMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -55,6 +60,7 @@ export class TransferProposalRequestMessage extends Message<TransferProposalRequ
     { no: 4, name: "network_capabilities", kind: "message", T: NetworkCapabilities },
     { no: 5, name: "multiple_claims_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "multiple_cancels_allowed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalRequestMessage {
@@ -98,6 +104,11 @@ export class TransferProposalReceiptMessage extends Message<TransferProposalRece
    */
   timestamp = "";
 
+  /**
+   * @generated from field: string server_signature = 5;
+   */
+  serverSignature = "";
+
   constructor(data?: PartialMessage<TransferProposalReceiptMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -110,6 +121,7 @@ export class TransferProposalReceiptMessage extends Message<TransferProposalRece
     { no: 2, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "transfer_counter_claims", kind: "message", T: TransferClaims },
     { no: 4, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalReceiptMessage {
@@ -148,6 +160,11 @@ export class TransferCommenceRequestMessage extends Message<TransferCommenceRequ
    */
   clientTransferNumber = "";
 
+  /**
+   * @generated from field: string client_signature = 4;
+   */
+  clientSignature = "";
+
   constructor(data?: PartialMessage<TransferCommenceRequestMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -159,6 +176,7 @@ export class TransferCommenceRequestMessage extends Message<TransferCommenceRequ
     { no: 1, name: "common", kind: "message", T: CommonSatp },
     { no: 2, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferCommenceRequestMessage {
@@ -192,6 +210,11 @@ export class TransferCommenceResponseMessage extends Message<TransferCommenceRes
    */
   serverTransferNumber = "";
 
+  /**
+   * @generated from field: string server_signature = 3;
+   */
+  serverSignature = "";
+
   constructor(data?: PartialMessage<TransferCommenceResponseMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -202,6 +225,7 @@ export class TransferCommenceResponseMessage extends Message<TransferCommenceRes
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "common", kind: "message", T: CommonSatp },
     { no: 2, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferCommenceResponseMessage {

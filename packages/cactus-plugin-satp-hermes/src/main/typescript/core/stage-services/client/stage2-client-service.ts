@@ -3,6 +3,7 @@ import { SATP_VERSION } from "../../constants";
 import {
   CommonSatp,
   LockAssertionClaim,
+  LockAssertionClaimFormat,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LockAssertionRequestMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
@@ -21,6 +22,23 @@ import {
 } from "../satp-service";
 import { ISATPServiceOptions } from "../satp-service";
 import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import {
+  HashMissMatch,
+  MessageTypeMissMatch,
+  MissingBridgeManager,
+  MissingClientGatewayPubkey,
+  MissingLockAssertionClaim,
+  MissingLockAssertionClaimFormat,
+  MissingLockAssertionExpiration,
+  MissingSatpCommonBody,
+  MissingServerGatewayPubkey,
+  SATPVersionUnsupported,
+  SequenceNumberMissMatch,
+  SessionDataNotLoadedCorrectly,
+  SessionUndefined,
+  SignatureVerificationFailed,
+  TransferContextIdMissMatch,
+} from "../errors";
 
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
@@ -40,9 +58,7 @@ export class Stage2ClientService extends SATPService {
     super(commonOptions);
 
     if (ops.bridgeManager == undefined) {
-      throw new Error(
-        `${this.getServiceIdentifier()}#constructor(), bridgeManager is missing`,
-      );
+      throw MissingBridgeManager(`${this.getServiceIdentifier()}#constructor`);
     }
     this.bridgeManager = ops.bridgeManager;
   }
@@ -55,24 +71,25 @@ export class Stage2ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, lockAssertionRequest...`);
 
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message common body is missing`);
+    if (session == undefined) {
+      throw SessionUndefined(`${fnTag}`);
     }
 
-    const sessionData = session.getSessionData();
+    if (response.common == undefined) {
+      throw MissingSatpCommonBody(`${fnTag}`);
+    }
+
+    const sessionData = session.getClientSessionData();
 
     if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
+      throw SessionDataNotLoadedCorrectly(`${fnTag}`);
     }
-
-    saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
 
     const commonBody = new CommonSatp();
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.LOCK_ASSERT;
-    commonBody.sequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
+    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
+      response.common.sequenceNumber + BigInt(1);
 
     commonBody.hashPreviousMessage = getMessageHash(
       sessionData,
@@ -83,15 +100,26 @@ export class Stage2ClientService extends SATPService {
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
 
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
-
     const lockAssertionRequestMessage = new LockAssertionRequestMessage();
     lockAssertionRequestMessage.common = commonBody;
 
+    if (sessionData.lockAssertionClaim == undefined) {
+      throw MissingLockAssertionClaim(fnTag);
+    }
     lockAssertionRequestMessage.lockAssertionClaim =
       sessionData.lockAssertionClaim;
+
+    if (sessionData.lockAssertionClaimFormat == undefined) {
+      throw MissingLockAssertionClaimFormat(fnTag);
+    }
     lockAssertionRequestMessage.lockAssertionClaimFormat =
       sessionData.lockAssertionClaimFormat;
+    if (sessionData.lockAssertionExpiration == undefined) {
+      throw MissingLockAssertionExpiration(fnTag);
+    }
+
+    lockAssertionRequestMessage.lockAssertionExpiration =
+      sessionData.lockAssertionExpiration;
 
     if (sessionData.transferContextId != undefined) {
       lockAssertionRequestMessage.common.transferContextId =
@@ -106,7 +134,7 @@ export class Stage2ClientService extends SATPService {
       sign(this.Signer, JSON.stringify(lockAssertionRequestMessage)),
     );
 
-    lockAssertionRequestMessage.common.signature = messageSignature;
+    lockAssertionRequestMessage.clientSignature = messageSignature;
 
     saveSignature(sessionData, MessageType.LOCK_ASSERT, messageSignature);
 
@@ -144,84 +172,78 @@ export class Stage2ClientService extends SATPService {
       response.common.sessionId == undefined ||
       response.common.sequenceNumber == undefined ||
       response.common.resourceUrl == undefined ||
-      response.common.signature == undefined ||
+      response.serverSignature == undefined ||
       response.common.clientGatewayPubkey == undefined ||
       response.common.serverGatewayPubkey == undefined ||
       response.common.hashPreviousMessage == undefined
     ) {
-      throw new Error(
-        `${fnTag}, message satp common body is missing or is missing required fields`,
-      );
+      throw MissingSatpCommonBody(fnTag);
     }
 
     if (response.common.version != SATP_VERSION) {
-      throw new Error(`${fnTag}, unsupported SATP version`);
-    }
-
-    const sessionData = session.getSessionData();
-
-    if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
+      throw SATPVersionUnsupported(
+        fnTag,
+        response.common.version,
+        SATP_VERSION,
       );
     }
 
-    if (
-      sessionData.serverGatewayPubkey == undefined ||
-      sessionData.lastSequenceNumber == undefined
-    ) {
-      throw new Error(`${fnTag}, session data was not load correctly`);
+    const sessionData = session.getClientSessionData();
+
+    if (sessionData == undefined) {
+      throw SessionDataNotLoadedCorrectly(fnTag);
     }
 
     if (
       response.common.serverGatewayPubkey != sessionData.serverGatewayPubkey
     ) {
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse serverIdentity public key does not match the one that was sent`,
-      );
+      throw MissingServerGatewayPubkey(fnTag);
     }
 
     if (
       response.common.clientGatewayPubkey != sessionData.clientGatewayPubkey
     ) {
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse clientIdentity public key does not match the one that was sent`,
-      );
+      throw MissingClientGatewayPubkey(fnTag);
     }
 
     if (
       !verifySignature(
         this.Signer,
-        response.common,
+        response,
         response.common.serverGatewayPubkey,
       )
     ) {
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse message signature verification failed`,
-      );
+      throw SignatureVerificationFailed(fnTag);
     }
 
     if (response.common.messageType != MessageType.TRANSFER_COMMENCE_RESPONSE) {
-      throw new Error(
-        `${fnTag}, wrong message type for TransferCommenceResponse `,
+      throw MessageTypeMissMatch(
+        fnTag,
+        response.common.messageType.toString(),
+        MessageType.TRANSFER_COMMENCE_RESPONSE.toString(),
       );
     }
 
     if (
+      sessionData.lastSequenceNumber == undefined ||
       response.common.sequenceNumber !=
-      sessionData.lastSequenceNumber + BigInt(1)
+        sessionData.lastSequenceNumber + BigInt(1)
     ) {
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse sequence number is wrong`,
+      throw SequenceNumberMissMatch(
+        fnTag,
+        response.common.sequenceNumber,
+        sessionData.lastSequenceNumber,
       );
     }
 
     if (
       response.common.hashPreviousMessage !=
-      getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
+      getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_REQUEST)
     ) {
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse previous message hash does not match the one that was sent`,
+      throw HashMissMatch(
+        fnTag,
+        response.common.hashPreviousMessage,
+        getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_REQUEST),
       );
     }
 
@@ -229,8 +251,10 @@ export class Stage2ClientService extends SATPService {
       sessionData.transferContextId != undefined &&
       response.common.transferContextId != sessionData.transferContextId
     ) {
-      throw new Error(
-        `${fnTag}, transferContextId does not match the one that was sent`,
+      throw TransferContextIdMissMatch(
+        fnTag,
+        response.common.transferContextId,
+        sessionData.transferContextId,
       );
     }
 
@@ -241,6 +265,12 @@ export class Stage2ClientService extends SATPService {
       sessionData.serverTransferNumber = response.serverTransferNumber;
     }
 
+    saveHash(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_RESPONSE,
+      getHash(response),
+    );
+
     this.Log.info(`${fnTag}, TransferCommenceResponse passed all checks.`);
   }
 
@@ -249,7 +279,10 @@ export class Stage2ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     try {
       this.Log.info(`${fnTag}, Locking Asset...`);
-      const sessionData = session.getSessionData();
+      const sessionData = session.getClientSessionData();
+      if (sessionData == undefined) {
+        throw SessionDataNotLoadedCorrectly(fnTag);
+      }
       const assetId = sessionData.transferInitClaims?.digitalAssetId;
       const amount = sessionData.transferInitClaims?.amountFromOriginator;
 
@@ -258,19 +291,23 @@ export class Stage2ClientService extends SATPService {
         throw new Error(`${fnTag}, Asset ID is missing`);
       }
 
-      // const bridge = this.bridgeManager.getBridge(
-      //   sessionData.senderGatewayNetworkId,
-      // );
+      const bridge = this.bridgeManager.getBridge(
+        sessionData.senderGatewayNetworkId,
+      );
 
-      // sessionData.lockAssertionClaim = new LockAssertionClaim();
-      // sessionData.lockAssertionClaim.receipt = await bridge.lockAsset(
-      //   assetId,
-      //   Number(amount),
-      // );
+      sessionData.lockAssertionClaim = new LockAssertionClaim();
+      sessionData.lockAssertionClaim.receipt = await bridge.lockAsset(
+        assetId,
+        Number(amount),
+      );
 
-      // sessionData.lockAssertionClaim.signature = bufArray2HexStr(
-      //   sign(this.Signer, sessionData.lockAssertionClaim.receipt),
-      // );
+      sessionData.lockAssertionClaimFormat = new LockAssertionClaimFormat();
+
+      sessionData.lockAssertionExpiration = BigInt(99999999999); //todo implement
+
+      sessionData.lockAssertionClaim.signature = bufArray2HexStr(
+        sign(this.Signer, sessionData.lockAssertionClaim.receipt),
+      );
     } catch (error) {
       throw new Error(`${fnTag}, Failed to process Lock Asset ${error}`);
     }

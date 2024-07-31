@@ -206,11 +206,12 @@ beforeAll(async () => {
     pluginBungeeHermesOptions = {
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidv4(),
-      //pluginRegistry: new PluginRegistry(),
+      pluginRegistry: new PluginRegistry(),
       logLevel,
     };
 
     besuConfig = {
+      network: "BESU",
       keychainId: keychainPlugin2.getKeychainId(),
       signingCredential: {
         ethAccount: bridgeEthAccount.address,
@@ -222,7 +223,6 @@ beforeAll(async () => {
       options: besuOptions,
       bungeeOptions: pluginBungeeHermesOptions,
       gas: 9999999999999,
-      logLevel,
     };
 
     const giveRoleRes = await testing_connector.invokeContract({

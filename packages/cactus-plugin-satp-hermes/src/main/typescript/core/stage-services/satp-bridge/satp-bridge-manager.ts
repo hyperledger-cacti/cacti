@@ -5,7 +5,7 @@ import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPBridgeConfig } from "../../types";
 import { Asset } from "./types/asset";
 
-export class SatpBridgeManager implements BridgeManager {
+export class SATPBridgeManager implements BridgeManager {
   public static readonly CLASS_NAME = "FabricBridgeManager";
 
   private _log: Logger;
@@ -15,9 +15,8 @@ export class SatpBridgeManager implements BridgeManager {
   }
 
   constructor(private config: SATPBridgeConfig) {
-    const level = "INFO";
-    const label = SatpBridgeManager.CLASS_NAME;
-    this._log = LoggerProvider.getOrCreate({ level, label });
+    const label = SATPBridgeManager.CLASS_NAME;
+    this._log = LoggerProvider.getOrCreate({ level: config.logLevel, label });
   }
 
   public async wrapAsset(asset: Asset): Promise<string> {
@@ -58,7 +57,7 @@ export class SatpBridgeManager implements BridgeManager {
   }
 
   public get className(): string {
-    return SatpBridgeManager.CLASS_NAME;
+    return SATPBridgeManager.CLASS_NAME;
   }
 
   public async lockAsset(assetId: string, amount: number): Promise<string> {

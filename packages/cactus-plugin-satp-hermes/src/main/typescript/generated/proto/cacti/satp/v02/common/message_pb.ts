@@ -1030,22 +1030,17 @@ export class CommonSatp extends Message<CommonSatp> {
   payloadHash = "";
 
   /**
-   * @generated from field: string signature = 15;
-   */
-  signature = "";
-
-  /**
-   * @generated from field: string client_gateway_pubkey = 16;
+   * @generated from field: string client_gateway_pubkey = 15;
    */
   clientGatewayPubkey = "";
 
   /**
-   * @generated from field: string server_gateway_pubkey = 17;
+   * @generated from field: string server_gateway_pubkey = 16;
    */
   serverGatewayPubkey = "";
 
   /**
-   * @generated from field: string hash_previous_message = 18;
+   * @generated from field: string hash_previous_message = 17;
    */
   hashPreviousMessage = "";
 
@@ -1068,10 +1063,9 @@ export class CommonSatp extends Message<CommonSatp> {
     { no: 11, name: "payload_profile", kind: "message", T: PayloadProfile },
     { no: 13, name: "payload", kind: "message", T: Payload },
     { no: 14, name: "payload_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 15, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "client_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 17, name: "server_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 18, name: "hash_previous_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 15, name: "client_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "server_gateway_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "hash_previous_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CommonSatp {

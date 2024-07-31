@@ -66,7 +66,7 @@ export class Stage0ServerService extends SATPService {
     if (session == undefined) {
       throw new Error(`${fnTag}, session is undefined`);
     }
-    const sessionData = session.getSessionData();
+    const sessionData = session.getServerSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -74,11 +74,11 @@ export class Stage0ServerService extends SATPService {
       );
     }
 
-    saveSignature(
-      sessionData,
-      MessageType.PRE_INIT_PROPOSAL,
-      request.context.signature,
-    );
+    // saveSignature(
+    //   sessionData,
+    //   MessageType.PRE_INIT_PROPOSAL,
+    //   request.context.signature,
+    // );
 
     sessionData.sourceLedgerAssetId =
       request.transferClaims.verifiedOriginatorEntityId;
@@ -119,7 +119,7 @@ export class Stage0ServerService extends SATPService {
       sign(this.Signer, JSON.stringify(preTransferProposalReceiptMessage)),
     );
 
-    preTransferProposalReceiptMessage.context.signature = messageSignature;
+    // preTransferProposalReceiptMessage.context.signature = messageSignature;
 
     saveSignature(sessionData, commonBody.messageType, messageSignature);
 
@@ -161,7 +161,7 @@ export class Stage0ServerService extends SATPService {
     if (session == undefined) {
       throw new Error(`${fnTag}, session is undefined`);
     }
-    const sessionData = session.getSessionData();
+    const sessionData = session.getServerSessionData();
 
     if (sessionData == undefined) {
       throw new Error(
@@ -198,7 +198,7 @@ export class Stage0ServerService extends SATPService {
       sign(this.Signer, JSON.stringify(preTransferCommenceResponseMessage)),
     );
 
-    preTransferCommenceResponseMessage.common.signature = messageSignature;
+    // preTransferCommenceResponseMessage.common.signature = messageSignature;
 
     saveSignature(
       sessionData,
@@ -245,7 +245,7 @@ export class Stage0ServerService extends SATPService {
       // request.context.actionResponse == undefined ||
       // request.context.payloadProfile == undefined ||
       // request.context.applicationProfile == undefined ||
-      request.context.signature == undefined ||
+      // request.context.signature == undefined ||
       request.context.clientGatewayPubkey == undefined ||
       request.context.serverGatewayPubkey == undefined
     ) {
@@ -282,8 +282,8 @@ export class Stage0ServerService extends SATPService {
       );
     }
 
-    const senderId = request.transferClaims
-      .senderGatewayNetworkId as SupportedChain;
+    // const senderId = request.transferClaims
+    //   .senderGatewayNetworkId as SupportedChain;
 
     this.Log.info(`TransferProposalRequest passed all checks.`);
 
@@ -311,7 +311,7 @@ export class Stage0ServerService extends SATPService {
       // request.common.actionResponse == undefined ||
       // request.common.payloadProfile == undefined ||
       // request.common.applicationProfile == undefined ||
-      request.common.signature == undefined ||
+      // request.common.signature == undefined ||
       request.common.clientGatewayPubkey == undefined ||
       request.common.serverGatewayPubkey == undefined
     ) {
@@ -327,7 +327,7 @@ export class Stage0ServerService extends SATPService {
     if (session == undefined) {
       throw new Error(`${fnTag}, session is undefined`);
     }
-    const sessionData = session.getSessionData();
+    const sessionData = session.getServerSessionData();
 
     if (sessionData == undefined) {
       throw new Error(

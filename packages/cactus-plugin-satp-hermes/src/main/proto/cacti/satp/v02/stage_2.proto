@@ -10,7 +10,7 @@ message LockAssertionRequestMessage {
   cacti.satp.v02.common.CommonSatp common = 1;
   cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 2;
   cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 3;
-  string lock_assertion_expiration = 4;
+  uint64 lock_assertion_expiration = 4;
   string client_transfer_number = 5;
   string client_signature = 6;
 }

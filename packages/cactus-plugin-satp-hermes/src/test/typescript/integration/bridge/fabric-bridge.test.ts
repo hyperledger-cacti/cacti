@@ -629,7 +629,7 @@ beforeAll(async () => {
     pluginBungeeFabricOptions = {
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       instanceId: uuidv4(),
-      //pluginRegistry: new PluginRegistry(),
+      pluginRegistry: new PluginRegistry(),
       logLevel,
     };
 
@@ -651,12 +651,12 @@ beforeAll(async () => {
     };
 
     fabricConfig = {
+      network: "FABRIC",
       signingCredential: bridgeFabricSigningCredential,
       channelName: fabricChannelName,
       contractName: satpWrapperContractName,
       options: pluginOptionsFabricBridge,
       bungeeOptions: pluginBungeeFabricOptions,
-      logLevel,
     } as FabricConfig;
 
     // networkDetails = {

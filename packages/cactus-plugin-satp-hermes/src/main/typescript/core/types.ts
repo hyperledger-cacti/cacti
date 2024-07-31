@@ -124,4 +124,5 @@ export interface RemoteLog {
 
 export interface SATPBridgeConfig {
   network: NetworkBridge;
+  logLevel?: LogLevelDesc;
 }

@@ -15,11 +15,11 @@ import {
 export interface SATPHandler {
   setupRouter(router: ConnectRouter): void;
   getHandlerIdentifier(): string;
-  getSessionId(): string;
+  getHandlerSessions(): string[];
 }
 
 export interface SATPHandlerOptions {
-  session: SATPSession;
+  sessions: Map<string, SATPSession>;
   serverService: SATPService;
   clientService: SATPService;
   supportedDLTs: SupportedChain[];

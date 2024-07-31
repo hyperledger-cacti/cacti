@@ -126,7 +126,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const bridgesManagerOptions: ISATPBridgesOptions = {
       logLevel: this.config.logLevel,
       supportedDLTs: this.config.gid!.supportedDLTs,
-      // networks: [], //todo add networks
+      networks: [], //todo add networks
     };
 
     if (this.config.gid) {
