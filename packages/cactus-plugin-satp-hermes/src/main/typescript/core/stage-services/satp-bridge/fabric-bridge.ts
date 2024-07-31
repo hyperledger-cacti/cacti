@@ -33,12 +33,13 @@ export class FabricBridge implements NetworkBridge {
   options: IPluginLedgerConnectorFabricOptions;
   config: FabricConfig;
 
-  constructor(fabricConfig: FabricConfig, level: LogLevelDesc) {
+  constructor(fabricConfig: FabricConfig, level?: LogLevelDesc) {
     this.config = fabricConfig;
     this.options = fabricConfig.options;
     this.connector = new PluginLedgerConnectorFabric(fabricConfig.options);
     this.bungee = new PluginBungeeHermes(fabricConfig.bungeeOptions);
-    this.bungee.addStrategy(this.network, new StrategyFabric("INFO"));
+    level = level || "INFO";
+    this.bungee.addStrategy(this.network, new StrategyFabric(level));
     this.log = LoggerProvider.getOrCreate({
       label: StrategyFabric.CLASS_NAME,
       level,
