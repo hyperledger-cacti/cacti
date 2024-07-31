@@ -7,8 +7,8 @@ import {
 import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
 
 export enum SATPServiceType {
-  Server,
-  Client,
+  Server = "Server",
+  Client = "Client",
 }
 
 export type ISATPServiceOptions = {
