@@ -53,13 +53,11 @@ export class SenderSATPProtocol {
       httpVersion: "1.1",
     });
 
-    const handlers = this.satpManager.getSATPHandlers(
-      session.getSessionData().id,
-    );
+    const handlers = this.satpManager.getSATPHandlers(session.getSessionId());
 
     if (!handlers) {
       throw new Error(
-        `No handlers found for session ${session.getSessionData().id}`,
+        `No handlers found for session ${session.getSessionId()}`,
       );
     }
 
@@ -71,7 +69,7 @@ export class SenderSATPProtocol {
 
     const requestTransferProposal = await (
       satpHandlers.get("Stage1SATPHandler") as Stage1SATPHandler
-    ).TransferProposalRequest();
+    ).TransferProposalRequest(session.getSessionId());
 
     if (!requestTransferProposal) {
       throw new Error(`Failed to create TransferProposalRequest`);
