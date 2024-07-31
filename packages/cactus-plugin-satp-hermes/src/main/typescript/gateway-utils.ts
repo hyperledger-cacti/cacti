@@ -17,19 +17,37 @@ export function verifySignature(
   obj: any,
   pubKey: string,
 ): boolean {
-  const sourceSignature = new Uint8Array(Buffer.from(obj.signature, "hex"));
-  const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+  const copy = JSON.parse(JSON.stringify(obj));
 
-  const signature = obj.signature;
-  obj.signature = "";
-  if (
-    !objectSigner.verify(JSON.stringify(obj), sourceSignature, sourcePubkey)
-  ) {
-    return false;
+  if (copy.clientSignature) {
+    const sourceSignature = new Uint8Array(
+      Buffer.from(copy.clientSignature, "hex"),
+    );
+    const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+
+    copy.clientSignature = "";
+    if (
+      !objectSigner.verify(JSON.stringify(copy), sourceSignature, sourcePubkey)
+    ) {
+      return false;
+    }
+    return true;
+  } else if (copy.serverSignature) {
+    const sourceSignature = new Uint8Array(
+      Buffer.from(copy.serverSignature, "hex"),
+    );
+    const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+
+    copy.serverSignature = "";
+    if (
+      !objectSigner.verify(JSON.stringify(copy), sourceSignature, sourcePubkey)
+    ) {
+      return false;
+    }
+    return true;
+  } else {
+    throw new Error("No signature found in the object");
   }
-
-  obj.signature = signature;
-  return true;
 }
 
 export async function storeProof(
