@@ -13,7 +13,11 @@ import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
 import { PrivacyPolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/generated/openapi/typescript-axios";
 import { BesuAsset, getVarTypes } from "./types/besu-asset";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import { InteractionsRequest } from "../../../generated/SATPWrapperContract";
 import { getInteractionType } from "./types/asset";
 import { InteractionData } from "./types/interact";
@@ -35,17 +39,17 @@ export class BesuBridge implements NetworkBridge {
   private options: IPluginLedgerConnectorBesuOptions;
   private config: BesuConfig;
 
-  constructor(besuConfig: BesuConfig) {
+  constructor(besuConfig: BesuConfig, level?: LogLevelDesc) {
     this.config = besuConfig;
     this.options = besuConfig.options;
-    const level = this.config.logLevel || "INFO";
     const label = BesuBridge.CLASS_NAME;
 
+    level = level || "INFO";
     this.log = LoggerProvider.getOrCreate({ label, level });
 
     this.connector = new PluginLedgerConnectorBesu(besuConfig.options);
     this.bungee = new PluginBungeeHermes(besuConfig.bungeeOptions);
-    this.bungee.addStrategy(this.network, new StrategyBesu("INFO"));
+    this.bungee.addStrategy(this.network, new StrategyBesu(level));
   }
 
   public async wrapAsset(asset: BesuAsset): Promise<TransactionResponse> {

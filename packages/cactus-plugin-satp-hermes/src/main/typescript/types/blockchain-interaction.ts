@@ -9,22 +9,23 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 // inject gateway, get connectors
 export type SATPLedgerConnector = string;
 
 // TODO Define lock interfaces and strategy pattern for locking (as function of locking blockchain) (see what smart contract implementations return)
 
-export interface FabricConfig {
+export interface NetworkConfig {
+  network: string;
+}
+export interface FabricConfig extends NetworkConfig {
   signingCredential: FabricSigningCredential;
   channelName: string;
   contractName: string;
   options: IPluginLedgerConnectorFabricOptions;
   bungeeOptions: IPluginBungeeHermesOptions;
-  logLevel?: LogLevelDesc;
 }
-export interface BesuConfig {
+export interface BesuConfig extends NetworkConfig {
   keychainId: string;
   signingCredential: Web3SigningCredential;
   contractName: string;
@@ -32,7 +33,6 @@ export interface BesuConfig {
   gas: number;
   options: IPluginLedgerConnectorBesuOptions;
   bungeeOptions: IPluginBungeeHermesOptions;
-  logLevel?: LogLevelDesc;
 }
 
 export interface TransactionResponse {
