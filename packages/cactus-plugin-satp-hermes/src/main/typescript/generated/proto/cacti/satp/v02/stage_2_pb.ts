@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { CommonSatp, LockAssertionClaim, LockAssertionClaimFormat } from "./common/message_pb.js";
 
 /**
@@ -17,9 +17,9 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
   common?: CommonSatp;
 
   /**
-   * @generated from field: string lock_assertion_claim = 2;
+   * @generated from field: cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 2;
    */
-  lockAssertionClaim = "";
+  lockAssertionClaim?: LockAssertionClaim;
 
   /**
    * @generated from field: cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 3;
@@ -27,9 +27,9 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
   lockAssertionClaimFormat?: LockAssertionClaimFormat;
 
   /**
-   * @generated from field: string lock_assertion_expiration = 4;
+   * @generated from field: uint64 lock_assertion_expiration = 4;
    */
-  lockAssertionExpiration = "";
+  lockAssertionExpiration = protoInt64.zero;
 
   /**
    * @generated from field: string client_transfer_number = 5;
@@ -52,7 +52,7 @@ export class LockAssertionRequestMessage extends Message<LockAssertionRequestMes
     { no: 1, name: "common", kind: "message", T: CommonSatp },
     { no: 2, name: "lock_assertion_claim", kind: "message", T: LockAssertionClaim },
     { no: 3, name: "lock_assertion_claim_format", kind: "message", T: LockAssertionClaimFormat },
-    { no: 4, name: "lock_assertion_expiration", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "lock_assertion_expiration", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 5, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
