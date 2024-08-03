@@ -1013,8 +1013,8 @@ jobs:
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-keychain-aws-sm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-keychain-aws-sm.test.ts}'
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts}'
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-keychain-aws-sm
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: false

@@ -145,7 +145,7 @@ describe("PluginKeychainAwsSm", () => {
     try {
       await apiClient.setKeychainEntryV1({
         value,
-      } as any as SetKeychainEntryRequestV1);
+      } as SetKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -157,9 +157,7 @@ describe("PluginKeychainAwsSm", () => {
 
   test(`${testCase} - ${fGet} - ${cWithoutParams}`, async () => {
     try {
-      await apiClient.getKeychainEntryV1(
-        {} as any as GetKeychainEntryRequestV1,
-      );
+      await apiClient.getKeychainEntryV1({} as GetKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -171,9 +169,7 @@ describe("PluginKeychainAwsSm", () => {
 
   test(`${testCase} - ${fHas} - ${cWithoutParams}`, async () => {
     try {
-      await apiClient.hasKeychainEntryV1(
-        {} as any as HasKeychainEntryRequestV1,
-      );
+      await apiClient.hasKeychainEntryV1({} as HasKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -185,9 +181,7 @@ describe("PluginKeychainAwsSm", () => {
 
   test(`${testCase} - ${fDelete} - ${cWithoutParams}`, async () => {
     try {
-      await apiClient.deleteKeychainEntryV1(
-        {} as any as DeleteKeychainEntryRequestV1,
-      );
+      await apiClient.deleteKeychainEntryV1({} as DeleteKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -203,7 +197,7 @@ describe("PluginKeychainAwsSm", () => {
         key,
         value,
         fake: 4,
-      } as any as SetKeychainEntryRequestV1);
+      } as SetKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -218,7 +212,7 @@ describe("PluginKeychainAwsSm", () => {
       await apiClient.getKeychainEntryV1({
         key,
         fake: 4,
-      } as any as GetKeychainEntryRequestV1);
+      } as GetKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -233,7 +227,7 @@ describe("PluginKeychainAwsSm", () => {
       await apiClient.hasKeychainEntryV1({
         key,
         fake: 4,
-      } as any as HasKeychainEntryRequestV1);
+      } as HasKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
@@ -248,7 +242,7 @@ describe("PluginKeychainAwsSm", () => {
       await apiClient.deleteKeychainEntryV1({
         key,
         fake: 4,
-      } as any as DeleteKeychainEntryRequestV1);
+      } as DeleteKeychainEntryRequestV1);
     } catch (e) {
       expect(e.response.status).toBe(400);
       const fields = e.response.data.map((param: any) =>
