@@ -1,76 +1,87 @@
-import test, { Test } from "tape-promise/tape";
-
-import express from "express";
-import bodyParser from "body-parser";
+import fs from "fs";
+import path from "path";
+import os from "os";
 import http from "http";
 import { AddressInfo } from "net";
+import { v4 as uuidv4 } from "uuid";
 
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
-
+import "jest-extended";
+import express from "express";
+import bodyParser from "body-parser";
 import { v4 as internalIpV4 } from "internal-ip";
+
+import {
+  IListenOptions,
+  LoggerProvider,
+  Servers,
+} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import {
+  installOpenapiValidationMiddleware,
+  PluginRegistry,
+} from "@hyperledger/cactus-core";
+
 import {
   Containers,
   LocalStackContainer,
   K_DEFAULT_LOCALSTACK_HTTP_PORT,
 } from "@hyperledger/cactus-test-tooling";
 
-import { v4 as uuidv4 } from "uuid";
-
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-
+import OAS from "../../../main/json/openapi.json";
 import {
   IPluginKeychainAwsSmOptions,
   PluginKeychainAwsSm,
   AwsCredentialType,
-} from "../../../main/typescript/public-api";
-
+} from "../../../main/typescript/plugin-keychain-aws-sm";
 import {
   DefaultApi as KeychainAwsSmApi,
   Configuration,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
-
 import { K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
-
-import fs from "fs";
-import path from "path";
-import os from "os";
-import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "TRACE";
 
-test("get,set,has,delete alters state as expected", async (t: Test) => {
-  const localStackContainer = new LocalStackContainer({
-    logLevel: logLevel,
+describe("PluginKeychainAwsSm", () => {
+  const key = uuidv4();
+  const value = uuidv4();
+  const keychainId = uuidv4();
+  const instanceId = uuidv4();
+  const log = LoggerProvider.getOrCreate({
+    label: "plugin-keychain-aws-sm.test.ts",
+    level: logLevel,
   });
-  await localStackContainer.start();
+  let apiHost: string;
+  let localStackContainer: LocalStackContainer;
+  let localstackHost: string;
+  let tmpDirPath: string;
+  let plugin: PluginKeychainAwsSm;
+  let expressApp: express.Express;
+  let server: http.Server;
+  let apiClient: KeychainAwsSmApi;
 
-  const ci = await Containers.getById(localStackContainer.containerId);
-  const localstackIpAddr = await internalIpV4();
-  const hostPort = await Containers.getPublicPort(
-    K_DEFAULT_LOCALSTACK_HTTP_PORT,
-    ci,
-  );
-  const localstackHost = `http://${localstackIpAddr}:${hostPort}`;
+  beforeAll(async () => {
+    localStackContainer = new LocalStackContainer({ logLevel: logLevel });
+    await localStackContainer.start();
 
-  test.onFinish(async () => {
-    await localStackContainer.stop();
-    await localStackContainer.destroy();
-  });
+    const ci = await Containers.getById(localStackContainer.containerId);
+    const localstackIpAddr = await internalIpV4();
+    const hostPort = await Containers.getPublicPort(
+      K_DEFAULT_LOCALSTACK_HTTP_PORT,
+      ci,
+    );
+    localstackHost = `http://${localstackIpAddr}:${hostPort}`;
+    log.info("LocalStack host: %s", localstackHost);
 
-  // Using awsCredentialType: AwsCredentialType.FromAwsCredentialFile
-  {
-    // Create aws credential file in a local directory
-    let tmpDirPath = "tmpDirPath";
-    tmpDirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), "cactus-"));
+    tmpDirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), "cacti-"));
     await fs.promises.writeFile(
       `${tmpDirPath}/credentials`,
       "[default]\naws_secret_access_key = test\naws_access_key_id = test",
       "utf-8",
     );
 
-    const options1: IPluginKeychainAwsSmOptions = {
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
+    const options: IPluginKeychainAwsSmOptions = {
+      instanceId,
+      keychainId,
       pluginRegistry: new PluginRegistry({}),
       awsEndpoint: localstackHost,
       awsRegion: "us-east-1",
@@ -79,65 +90,94 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
       awsCredentialFilePath: `${tmpDirPath}/credentials`,
       logLevel: logLevel,
     };
-    const plugin1 = new PluginKeychainAwsSm(options1);
+    plugin = new PluginKeychainAwsSm(options);
 
-    const expressApp = express();
+    expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
+    server = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
       port: 0,
       server,
     };
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
     const { address, port } = addressInfo;
-    const apiHost = `http://${address}:${port}`;
-    t.comment(
-      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics`,
-    );
-    const config = new Configuration({ basePath: apiHost });
-    const apiClient = new KeychainAwsSmApi(config);
+    apiHost = `http://${address}:${port}`;
 
-    await plugin1.registerWebServices(expressApp);
+    const apiConfig = new Configuration({ basePath: apiHost });
+    apiClient = new KeychainAwsSmApi(apiConfig);
 
-    t.equal(plugin1.getKeychainId(), options1.keychainId, "Keychain ID set OK");
-    t.equal(plugin1.getInstanceId(), options1.instanceId, "Instance ID set OK");
-
-    const key = uuidv4();
-    const value = uuidv4();
-
-    //const hasPrior1 = await plugin1.has(key1);
-    //t.false(hasPrior1, "hasPrior1 === false OK");
-
-    const res1 = await apiClient.hasKeychainEntryV1({ key });
-    t.true(res1.status >= 200, "res1.status >= 200 OK");
-    t.true(res1.status < 300, "res1.status < 300");
-
-    t.ok(res1.data, "res1.data truthy OK");
-    t.false(res1.data.isPresent, "res1.data.isPresent === false OK");
-    t.ok(res1.data.checkedAt, "res1.data.checkedAt truthy OK");
-    t.equal(res1.data.key, key, "res1.data.key === key OK");
-
-    const res2 = await apiClient.setKeychainEntryV1({
-      key: key,
-      value: value,
+    await installOpenapiValidationMiddleware({
+      logLevel,
+      app: expressApp,
+      apiSpec: OAS,
     });
-    t.true(res2.status >= 200, "res2.status >= 200 OK");
-    t.true(res2.status < 300, "res2.status < 300 OK");
-    t.notOk(res2.data, "res2.data truthy OK");
 
-    const res3 = await apiClient.hasKeychainEntryV1({ key });
-    t.true(res3.status >= 200, "res3.status >= 200 OK");
-    t.true(res3.status < 300, "res3.status < 300 OK");
-    t.ok(res3.data, "res3.data truthy OK");
-    t.true(res3.data.isPresent, "res3.data.isPresent === true OK");
-    t.ok(res3.data.checkedAt, "res3.data.checkedAt truthy OK");
-    t.equal(res3.data.key, key, "res3.data.key === key OK");
+    await plugin.getOrCreateWebServices();
+    await plugin.registerWebServices(expressApp);
+  });
 
+  afterAll(async () => {
+    await Servers.shutdown(server);
+    await localStackContainer.stop();
+    await localStackContainer.destroy();
+    fs.promises.rm(tmpDirPath, { recursive: true, force: true });
+  });
+
+  test("get,set,has,delete alters state as expected", async () => {
+    // Using awsCredentialType: AwsCredentialType.FromAwsCredentialFile
     {
-      const res = await apiClient.getPrometheusMetricsV1();
-      const promMetricsOutput =
+      // Create aws credential file in a local directory
+      let tmpDirPath = "tmpDirPath";
+      tmpDirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), "cactus-"));
+      await fs.promises.writeFile(
+        `${tmpDirPath}/credentials`,
+        "[default]\naws_secret_access_key = test\naws_access_key_id = test",
+        "utf-8",
+      );
+
+      const metricsPath =
+        OAS.paths[
+          "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics"
+        ].get["x-hyperledger-cacti"].http.path;
+      const metricsUrl = `${apiHost}${metricsPath}`;
+
+      log.debug(`Metrics URL: ${metricsUrl}`);
+
+      await plugin.registerWebServices(expressApp);
+
+      expect(plugin.getKeychainId()).toEqual(keychainId);
+      expect(plugin.getInstanceId()).toEqual(instanceId);
+
+      const res1 = await apiClient.hasKeychainEntryV1({ key });
+      expect(res1.status).toBeGreaterThanOrEqual(200);
+      expect(res1.status).toBeLessThan(300);
+      expect(res1.data).toBeTruthy();
+      expect(res1.data).not.toBeEmptyObject();
+      expect(res1.data.isPresent).toBeFalse();
+      expect(res1.data.checkedAt).toBeTruthy();
+      expect(res1.data.key).toEqual(key);
+
+      const res2 = await apiClient.setKeychainEntryV1({
+        key: key,
+        value: value,
+      });
+      expect(res2.status).toBeGreaterThanOrEqual(200);
+      expect(res2.status).toBeLessThan(300);
+      expect(res2.data).toBeFalsy();
+
+      const res3 = await apiClient.hasKeychainEntryV1({ key });
+
+      expect(res3.status).toBeGreaterThanOrEqual(200);
+      expect(res3.status).toBeLessThan(300);
+      expect(res3.data).toBeTruthy();
+      expect(res3.data).not.toBeEmptyObject();
+      expect(res3.data.isPresent).toBeTrue();
+      expect(res3.data.checkedAt).toBeTruthy();
+      expect(res3.data.key).toEqual(key);
+
+      const res3_5 = await apiClient.getPrometheusMetricsV1();
+      const metricsData1 =
         "# HELP " +
         K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
         " The number of keys that were set in the backing Aws Secret Manager deployment via this specific keychain plugin instance\n" +
@@ -148,39 +188,40 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
         '{type="' +
         K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
         '"} 1';
-      t.ok(res);
-      t.ok(res.data);
-      t.equal(res.status, 200);
-      t.true(
-        res.data.includes(promMetricsOutput),
-        "Total Key Count 1 recorded as expected. RESULT OK",
-      );
-    }
 
-    const res4 = await apiClient.getKeychainEntryV1({
-      key: key,
-    });
-    t.true(res4.status >= 200, "res4.status >= 200 OK");
-    t.true(res4.status < 300, "res4.status < 300 OK");
-    t.ok(res4.data, "res4.data truthy OK");
-    t.equal(res4.data.value, value, "res4.data.value === value OK");
+      expect(res3_5.status).toBeGreaterThanOrEqual(200);
+      expect(res3_5.status).toBeLessThan(300);
+      expect(res3_5.data).toBeTruthy();
+      expect(res3_5.data).toMatch(metricsData1);
 
-    const res5 = await apiClient.deleteKeychainEntryV1({ key });
-    t.true(res5.status >= 200, "res5.status >= 200 OK");
-    t.true(res5.status < 300, "res5.status < 300 OK");
-    t.notOk(res5.data, "res5.data falsy OK");
+      const res4 = await apiClient.getKeychainEntryV1({
+        key: key,
+      });
 
-    const res6 = await apiClient.hasKeychainEntryV1({ key });
-    t.true(res6.status >= 200, "res6.status >= 200 OK");
-    t.true(res6.status < 300, "res6.status < 300 OK");
-    t.ok(res6.data, "res6.data truthy OK");
-    t.false(res6.data.isPresent, "res6.data.isPresent === false OK");
-    t.ok(res6.data.checkedAt, "res6.data.checkedAt truthy OK");
-    t.equal(res6.data.key, key, "res6.data.key === key OK");
+      expect(res4.status).toBeGreaterThanOrEqual(200);
+      expect(res4.status).toBeLessThan(300);
+      expect(res4.data).toBeTruthy();
+      expect(res4.data).not.toBeEmptyObject();
+      expect(res4.data.value).toEqual(value);
 
-    {
-      const res = await apiClient.getPrometheusMetricsV1();
-      const promMetricsOutput =
+      const res5 = await apiClient.deleteKeychainEntryV1({ key });
+
+      expect(res5.status).toBeGreaterThanOrEqual(200);
+      expect(res5.status).toBeLessThan(300);
+      expect(res5.data).toBeFalsy();
+
+      const res6 = await apiClient.hasKeychainEntryV1({ key });
+
+      expect(res6.status).toBeGreaterThanOrEqual(200);
+      expect(res6.status).toBeLessThan(300);
+      expect(res6.data).toBeTruthy();
+      expect(res6.data).not.toBeEmptyObject();
+      expect(res6.data.isPresent).toBeFalse();
+      expect(res6.data.checkedAt).toBeTruthy();
+      expect(res6.data.key).toEqual(key);
+
+      const res7 = await apiClient.getPrometheusMetricsV1();
+      const metricsData2 =
         "# HELP " +
         K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
         " The number of keys that were set in the backing Aws Secret Manager deployment via this specific keychain plugin instance\n" +
@@ -191,33 +232,20 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
         '{type="' +
         K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
         '"} 0';
-      t.ok(res);
-      t.ok(res.data);
-      t.equal(res.status, 200);
-      t.true(
-        res.data.includes(promMetricsOutput),
-        "Total Key Count 0 recorded as expected. RESULT OK",
-      );
-    }
+      expect(res7.status).toBeGreaterThanOrEqual(200);
+      expect(res7.status).toBeLessThan(300);
+      expect(res7.data).toBeTruthy();
+      expect(res7.data).toMatch(metricsData2);
 
-    try {
-      await apiClient.getKeychainEntryV1({ key });
-      t.fail(
-        "Failing because getKeychainEntryV1 did not throw when called with non-existent key.",
-      );
-    } catch (ex) {
-      t.ok(ex, "res7 -> ex truthy");
-      const res7 = ex.response;
-      t.equal(res7.status, 404, "res7.status === 404 OK");
-      t.ok(res7.data, "res7.data truthy OK");
-      t.ok(res7.data.error, "res7.data.error truthy OK");
-      t.equal(typeof res7.data.error, "string", "res7.data.error truthy OK");
-      t.true(
-        res7.data.error.includes(`${key} secret not found`),
-        "res7.data.error contains legible error message about missing key OK",
-      );
+      const deletionOfNonExistentKey = apiClient.getKeychainEntryV1({ key });
+      await expect(deletionOfNonExistentKey).rejects.toMatchObject({
+        response: expect.objectContaining({
+          status: 404,
+          data: expect.objectContaining({
+            error: expect.stringContaining(key),
+          }),
+        }),
+      });
     }
-  }
-
-  t.end();
+  });
 });
