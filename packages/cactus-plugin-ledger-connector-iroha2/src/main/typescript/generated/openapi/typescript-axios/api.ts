@@ -661,6 +661,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrometheusMetricsV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/get-prometheus-exporter-metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
          * @param {QueryRequestV1} [queryRequestV1] 
          * @param {*} [options] Override http request option.
@@ -750,6 +780,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPrometheusMetricsV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
          * @param {QueryRequestV1} [queryRequestV1] 
          * @param {*} [options] Override http request option.
@@ -792,6 +832,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrometheusMetricsV1(options?: any): AxiosPromise<string> {
+            return localVarFp.getPrometheusMetricsV1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
          * @param {QueryRequestV1} [queryRequestV1] 
          * @param {*} [options] Override http request option.
@@ -830,6 +879,17 @@ export class DefaultApi extends BaseAPI {
      */
     public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get the Prometheus Metrics
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPrometheusMetricsV1(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

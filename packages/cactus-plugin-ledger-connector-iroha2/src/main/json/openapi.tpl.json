@@ -488,6 +488,10 @@
           }
         }
       },
+      "PrometheusExporterMetricsResponse": {
+        "type": "string",
+        "nullable": false
+      },
       "GenerateTransactionRequestV1": {
         "type": "object",
         "description": "Request for generating transaction or query payload that can be signed on the client side.",
@@ -616,6 +620,31 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/get-prometheus-exporter-metrics": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/get-prometheus-exporter-metrics"
+          }
+        },
+        "operationId": "getPrometheusMetricsV1",
+        "summary": "Get the Prometheus Metrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
                 }
               }
             }

@@ -34,6 +34,7 @@ import {
   generateTestIrohaCredentials,
 } from "../test-helpers/iroha2-env-setup";
 import { addRandomSuffix } from "../test-helpers/utils";
+import { K_CACTUS_IROHA2_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
 
 setCrypto(crypto);
 
@@ -392,5 +393,25 @@ describe("Setup and basic endpoint tests", () => {
         baseConfig: env.defaultBaseConfig,
       }),
     ).toReject();
+  });
+
+  test("get prometheus exporter metrics", async () => {
+    const res = await env.apiClient.getPrometheusMetricsV1();
+    const promMetricsOutput =
+      "# HELP " +
+      K_CACTUS_IROHA2_TOTAL_TX_COUNT +
+      " Total transactions executed\n" +
+      "# TYPE " +
+      K_CACTUS_IROHA2_TOTAL_TX_COUNT +
+      " gauge\n" +
+      K_CACTUS_IROHA2_TOTAL_TX_COUNT +
+      '{type="' +
+      K_CACTUS_IROHA2_TOTAL_TX_COUNT +
+      '"} 6';
+
+    expect(res).toBeTruthy();
+    expect(res.data).toBeTruthy();
+    expect(res.status).toEqual(200);
+    expect(res.data.includes(promMetricsOutput)).toBeTrue();
   });
 });

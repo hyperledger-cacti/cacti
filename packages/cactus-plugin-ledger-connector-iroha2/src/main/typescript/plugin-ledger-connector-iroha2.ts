@@ -64,6 +64,12 @@ import { CactusIrohaV2QueryClient } from "./cactus-iroha-sdk-wrapper/query";
 import { LengthOf, stringifyBigIntReplacer } from "./utils";
 import { createAccountId } from "./cactus-iroha-sdk-wrapper/data-factories";
 
+import {
+  GetPrometheusExporterMetricsEndpointV1,
+  IGetPrometheusExporterMetricsEndpointV1Options,
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+
 /**
  * Input options for PluginLedgerConnectorIroha2.
  */
@@ -72,6 +78,7 @@ export interface IPluginLedgerConnectorIroha2Options
   pluginRegistry: PluginRegistry;
   logLevel?: LogLevelDesc;
   defaultConfig?: Iroha2BaseConfig;
+  prometheusExporter?: PrometheusExporter;
 }
 
 /**
@@ -84,6 +91,7 @@ export class PluginLedgerConnectorIroha2
     IPluginWebService
 {
   private readonly instanceId: string;
+  public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly defaultConfig: Iroha2BaseConfig | undefined;
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -101,6 +109,16 @@ export class PluginLedgerConnectorIroha2
     this.log = LoggerProvider.getOrCreate({ level, label: this.className });
 
     this.instanceId = options.instanceId;
+
+    this.prometheusExporter =
+      options.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+
+    this.prometheusExporter.startMetricsCollection();
 
     this.defaultConfig = options.defaultConfig;
     // Remove proto in case we use merge method vulnerable to proto pollution
@@ -131,6 +149,16 @@ export class PluginLedgerConnectorIroha2
    */
   public getOpenApiSpec(): unknown {
     return OAS;
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
   }
 
   /**
@@ -265,6 +293,15 @@ export class PluginLedgerConnectorIroha2
         logLevel: this.options.logLevel,
       }),
     ];
+
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        connector: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
 
     this.endpoints = endpoints;
     return endpoints;
@@ -589,7 +626,6 @@ export class PluginLedgerConnectorIroha2
     if (!reqParams) {
       return undefined;
     }
-
     return {
       ttl: reqParams.ttl ? BigInt(reqParams.ttl) : undefined,
       creationTime: reqParams.creationTime
@@ -615,6 +651,7 @@ export class PluginLedgerConnectorIroha2
       if (req.transaction) {
         this.processInstructionsRequests(client, req.transaction.instruction);
         return await client.send(
+          this.prometheusExporter,
           this.tryParseTransactionParams(req.transaction.params),
           req.waitForCommit,
         );
@@ -625,6 +662,7 @@ export class PluginLedgerConnectorIroha2
         return await client.sendSignedPayload(
           transactionBinary,
           req.waitForCommit,
+          this.prometheusExporter,
         );
       } else {
         const eMsg =

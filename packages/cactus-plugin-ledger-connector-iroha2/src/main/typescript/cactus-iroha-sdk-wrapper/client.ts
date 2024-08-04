@@ -76,6 +76,7 @@ import {
   Iroha2BaseConfigTorii,
 } from "../generated/openapi/typescript-axios";
 import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider";
+import { PrometheusExporter } from "../prometheus-exporter/prometheus-exporter";
 
 setCrypto(crypto);
 
@@ -792,6 +793,7 @@ export class CactusIrohaV2Client {
    * @returns `TransactResponseV1`
    */
   public async send(
+    prometheusExporter: PrometheusExporter,
     txParams?: TransactionPayloadParameters,
     waitForCommit = false,
   ): Promise<TransactResponseV1> {
@@ -820,6 +822,9 @@ export class CactusIrohaV2Client {
       this.prerequisitesProvider.getApiHttpProperties(),
       signedTx,
     );
+    // counter will increase here
+    prometheusExporter.addCurrentTransaction();
+
     this.clear();
 
     if (statusPromise) {
@@ -843,6 +848,7 @@ export class CactusIrohaV2Client {
   public async sendSignedPayload(
     signedPayload: VersionedSignedTransaction | ArrayBufferView,
     waitForCommit = false,
+    prometheusExporter: PrometheusExporter,
   ): Promise<TransactResponseV1> {
     Checks.truthy(signedPayload, "sendSigned arg signedPayload");
 
@@ -853,16 +859,25 @@ export class CactusIrohaV2Client {
     const hash = computeTransactionHash(signedPayload.as("V1").payload);
     if (waitForCommit) {
       const statusPromise = this.waitForTransactionStatus(hash);
+
       await Torii.submit(
         this.prerequisitesProvider.getApiHttpProperties(),
         signedPayload,
       );
+
+      // counter will increase here
+      prometheusExporter.addCurrentTransaction();
+
       return await statusPromise;
     } else {
       await Torii.submit(
         this.prerequisitesProvider.getApiHttpProperties(),
         signedPayload,
       );
+
+      // counter will increase here
+      prometheusExporter.addCurrentTransaction();
+
       return {
         hash: bytesToHex([...hash]),
         status: TransactionStatusV1.Submitted,
