@@ -11049,7 +11049,7 @@ __metadata:
     "@types/benchmark": "npm:2.1.5"
     "@types/debug": "npm:4.1.12"
     "@types/fs-extra": "npm:11.0.4"
-    "@types/jest": "npm:29.5.3"
+    "@types/jest": "npm:^29.5.12"
     "@types/madge": "npm:5.0.3"
     "@types/node": "npm:18.11.9"
     "@types/node-fetch": "npm:2.6.4"
@@ -17114,6 +17114,16 @@ __metadata:
     jest-matcher-utils: "npm:^27.0.0"
     pretty-format: "npm:^27.0.0"
   checksum: 10/8608696fbdea81bc9a600d1c5aeb290063357eaa55c0174e7db15087c4f483113b35f8b4c4ae364d2632cfed15a4dd674786254826b946c896de5612c8cb1a26
+  languageName: node
+  linkType: hard
+
+"@types/jest@npm:^29.5.12":
+  version: 29.5.12
+  resolution: "@types/jest@npm:29.5.12"
+  dependencies:
+    expect: "npm:^29.0.0"
+    pretty-format: "npm:^29.0.0"
+  checksum: 10/312e8dcf92cdd5a5847d6426f0940829bca6fe6b5a917248f3d7f7ef5d85c9ce78ef05e47d2bbabc40d41a930e0e36db2d443d2610a9e3db9062da2d5c904211
   languageName: node
   linkType: hard
 
