@@ -74,9 +74,6 @@
       "path": "./packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-ledger-connector-cdl/tsconfig.json"
     },
     {

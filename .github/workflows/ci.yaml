@@ -1870,40 +1870,6 @@ jobs:
       - run: npm run configure
       - run: yarn jest ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts
 
-  cplc-go-ethereum-socketio:
-    continue-on-error: false
-    env:
-      DEV_BUILD_DISABLED: false
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cplc-go-ethereum-socketio
-      JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
-
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-      - run: ./tools/ci.sh
-        if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
-      - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
-        with:
-          name: coverage-reports-29
-          path: ./code-coverage-ts/**/
   cplc-iroha2:
     continue-on-error: false
     needs:

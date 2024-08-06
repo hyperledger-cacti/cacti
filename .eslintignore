@@ -23,13 +23,6 @@ packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier.ts
 packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierFactory.ts
 packages/cactus-cmd-socketio-server/src/test/typescript/unit/Verifier.test.ts
 
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/main/typescript/common/core/app.ts
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/main/typescript/common/core/bin/www.ts
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/main/typescript/connector/template/ServerMonitorPlugin_template.ts
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/main/typescript/connector/template/ServerPlugin_template.ts
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/test/typescript/unit-test/validatorDriver_getNonceHex.ts
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/test/typescript/unit-test/validatorDriver_sendRawTransaction.ts
-packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/test/typescript/unit-test/validatorDriver_transferNumericAsset.ts
 packages/cactus-plugin-ledger-connector-tcs-huawei-socketio/src/main/typescript/common/core/app.ts
 packages/cactus-plugin-ledger-connector-tcs-huawei-socketio/src/main/typescript/connector/ServerMonitorPlugin.ts
 

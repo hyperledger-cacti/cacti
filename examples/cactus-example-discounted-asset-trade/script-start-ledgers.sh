@@ -113,14 +113,6 @@ function start_ethereum_testnet() {
     popd
 }
 
-function copy_ethereum_validator_config() {
-    echo ">> copy_ethereum_validator_config()"
-    cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-go-ethereum-socketio/sample-config/* \
-        "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/"
-    generate_certificate "GoEthereumCactusValidator" "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/CA/"
-    echo ">> copy_ethereum_validator_config() done."
-}
-
 function start_indy_testnet() {
     echo ">> start_indy_testnet()"
     pushd "${ROOT_DIR}/tools/docker/indy-all-in-one"
@@ -164,7 +156,6 @@ function start_ledgers() {
     # Start Ethereum
     mkdir -p "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio"
     start_ethereum_testnet
-    copy_ethereum_validator_config
 
     # Start Indy
     start_indy_testnet

@@ -13,7 +13,6 @@ This package provides `Verifier` and `VerifierFactory` components that can be us
 | IROHA_2X               | cactus-plugin-ledger-connector-iroha2           |
 | FABRIC_2X              | cactus-plugin-ledger-connector-fabric           |
 | SAWTOOTH_1X            | cactus-plugin-ledger-connector-sawtooth         |
-| legacy-socketio        | cactus-plugin-ledger-connector-go-ethereum-socketio |
 
 ## VerifierFactory
 - Used to create single verifier per ledger based on pre-defined configuration.
@@ -31,16 +30,6 @@ import {
 // Create VerifierFactory configuration that should describe all validators we want to connect to.
 // This can be read from a file or typed manually, the config is a superset of cactus-cmd-socketio-server ledger plugin config.
 const ledgerPluginInfo: VerifierFactoryConfig = [
-    {
-        validatorID: "some_legacy_connector",    // required
-        validatorType: "legacy-socketio",        // required - see table above for supported validator types
-        validatorURL: "https://localhost:9999",  // legacy-socketio specific config
-        validatorKeyPath: "./keysUr7d10R.crt",   // legacy-socketio specific config
-        ledgerInfo: {                            // optional
-            ledgerAbstract: "My legacy Ledger",
-        },
-        apiInfo: [],                             // optional
-    },
     {
         validatorID: "besu_openapi_connector", // required
         validatorType: "BESU_2X",              // required - see table above for supported validator types

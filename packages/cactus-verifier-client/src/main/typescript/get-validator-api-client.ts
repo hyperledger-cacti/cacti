@@ -6,10 +6,6 @@
  */
 
 import type {
-  SocketIOApiClient,
-  SocketIOApiClientOptions,
-} from "@hyperledger/cactus-api-client";
-import type {
   BesuApiClient,
   BesuApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
@@ -41,10 +37,6 @@ import type {
  * @warning Remember to keep this list updated to have new ApiClients visible in VerifierFactory interface.
  */
 export type ClientApiConfig = {
-  "legacy-socketio": {
-    in: SocketIOApiClientOptions;
-    out: SocketIOApiClient;
-  };
   BESU_1X: {
     in: BesuApiClientOptions;
     out: BesuApiClient;
@@ -87,14 +79,9 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
   options: ClientApiConfig[K]["in"],
 ): Promise<ClientApiConfig[K]["out"]> {
   switch (validatorType) {
-    case "legacy-socketio":
-      // TODO - replace with dynamic imports once ESM is supported
-      const apiClientPackage = require("@hyperledger/cactus-api-client");
-      return new apiClientPackage.SocketIOApiClient(
-        options as SocketIOApiClientOptions,
-      );
     case "BESU_1X":
     case "BESU_2X":
+      // TODO - replace with dynamic imports once ESM is supported
       const besuPackage = require("@hyperledger/cactus-plugin-ledger-connector-besu");
       return new besuPackage.BesuApiClient(options as BesuApiClientOptions);
     case "ETH_1X":
