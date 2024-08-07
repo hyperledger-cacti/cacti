@@ -312,22 +312,24 @@ describe("HTLC Coordinator Besu", () => {
       gas: estimatedGas,
     };
 
-    try {
-      await htlcCoordinatorBesuApiClient.withdrawCounterpartyV1(
-        withdrawCounterparty,
-      );
-    } catch (exp: unknown) {
-      log.debug("Caught error as expected: %o", exp);
-      if (axios.isAxiosError(exp) && exp.response) {
-        log.debug("Caught response: %o", exp.response.data);
-        const revertReason = exp.response.data.cause.receipt.revertReason;
-        const regExp = new RegExp(/0e494e56414c49445f5345435245540/);
-        expect(revertReason).toMatch(regExp);
-        // t.match(revertReason, regExp, rejectMsg);
-      } else {
-        throw exp;
+await expect(
+  htlcCoordinatorBesuApiClient.withdrawCounterpartyV1(withdrawCounterparty)
+).rejects.toThrowErrorMatchingSnapshot();
+
+await expect(
+  htlcCoordinatorBesuApiClient.withdrawCounterpartyV1(withdrawCounterparty)
+).rejects.toThrow(expect.objectContaining({
+  response: {
+    data: {
+      cause: {
+        receipt: {
+          revertReason: expect.stringMatching(/0e494e56414c49445f5345435245540/)
+        }
       }
     }
+  }
+}));
+
 
     const responseFinalBalanceReceiver = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,
