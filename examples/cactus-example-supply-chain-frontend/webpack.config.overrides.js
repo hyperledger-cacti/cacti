@@ -2,7 +2,7 @@
 module.exports = {
   externals: {
     "@fidm/x509": "@fidm/x509",
-    "@grpc/grpc-js": "1.10.3",
+    "@grpc/grpc-js": "1.11.1",
     "@grpc/proto-loader": "@grpc/proto-loader",
     busboy: "busboy",
     child_process: "child_process",
