@@ -98,7 +98,7 @@ func (o *GetLineageRequestV1) SetEventId(v string) {
 
 // GetDirection returns the Direction field value if set, zero value otherwise.
 func (o *GetLineageRequestV1) GetDirection() GetLineageOptionDirectionV1 {
-	if o == nil || isNil(o.Direction) {
+	if o == nil || IsNil(o.Direction) {
 		var ret GetLineageOptionDirectionV1
 		return ret
 	}
@@ -108,7 +108,7 @@ func (o *GetLineageRequestV1) GetDirection() GetLineageOptionDirectionV1 {
 // GetDirectionOk returns a tuple with the Direction field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GetLineageRequestV1) GetDirectionOk() (*GetLineageOptionDirectionV1, bool) {
-	if o == nil || isNil(o.Direction) {
+	if o == nil || IsNil(o.Direction) {
 		return nil, false
 	}
 	return o.Direction, true
@@ -116,7 +116,7 @@ func (o *GetLineageRequestV1) GetDirectionOk() (*GetLineageOptionDirectionV1, bo
 
 // HasDirection returns a boolean if a field has been set.
 func (o *GetLineageRequestV1) HasDirection() bool {
-	if o != nil && !isNil(o.Direction) {
+	if o != nil && !IsNil(o.Direction) {
 		return true
 	}
 
@@ -130,7 +130,7 @@ func (o *GetLineageRequestV1) SetDirection(v GetLineageOptionDirectionV1) {
 
 // GetDepth returns the Depth field value if set, zero value otherwise.
 func (o *GetLineageRequestV1) GetDepth() string {
-	if o == nil || isNil(o.Depth) {
+	if o == nil || IsNil(o.Depth) {
 		var ret string
 		return ret
 	}
@@ -140,7 +140,7 @@ func (o *GetLineageRequestV1) GetDepth() string {
 // GetDepthOk returns a tuple with the Depth field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GetLineageRequestV1) GetDepthOk() (*string, bool) {
-	if o == nil || isNil(o.Depth) {
+	if o == nil || IsNil(o.Depth) {
 		return nil, false
 	}
 	return o.Depth, true
@@ -148,7 +148,7 @@ func (o *GetLineageRequestV1) GetDepthOk() (*string, bool) {
 
 // HasDepth returns a boolean if a field has been set.
 func (o *GetLineageRequestV1) HasDepth() bool {
-	if o != nil && !isNil(o.Depth) {
+	if o != nil && !IsNil(o.Depth) {
 		return true
 	}
 
@@ -172,10 +172,10 @@ func (o GetLineageRequestV1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["authInfo"] = o.AuthInfo
 	toSerialize["eventId"] = o.EventId
-	if !isNil(o.Direction) {
+	if !IsNil(o.Direction) {
 		toSerialize["direction"] = o.Direction
 	}
-	if !isNil(o.Depth) {
+	if !IsNil(o.Depth) {
 		toSerialize["depth"] = o.Depth
 	}
 	return toSerialize, nil

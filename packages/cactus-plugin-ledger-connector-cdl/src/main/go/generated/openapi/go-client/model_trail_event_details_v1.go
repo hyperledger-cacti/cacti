@@ -58,7 +58,7 @@ func (o *TrailEventDetailsV1) GetCdlEvent() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TrailEventDetailsV1) GetCdlEventOk() (*interface{}, bool) {
-	if o == nil || isNil(o.CdlEvent) {
+	if o == nil || IsNil(o.CdlEvent) {
 		return nil, false
 	}
 	return &o.CdlEvent, true
@@ -66,7 +66,7 @@ func (o *TrailEventDetailsV1) GetCdlEventOk() (*interface{}, bool) {
 
 // HasCdlEvent returns a boolean if a field has been set.
 func (o *TrailEventDetailsV1) HasCdlEvent() bool {
-	if o != nil && isNil(o.CdlEvent) {
+	if o != nil && IsNil(o.CdlEvent) {
 		return true
 	}
 
@@ -117,7 +117,7 @@ func (o *TrailEventDetailsV1) GetCdlTags() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TrailEventDetailsV1) GetCdlTagsOk() (*interface{}, bool) {
-	if o == nil || isNil(o.CdlTags) {
+	if o == nil || IsNil(o.CdlTags) {
 		return nil, false
 	}
 	return &o.CdlTags, true
@@ -143,7 +143,7 @@ func (o *TrailEventDetailsV1) GetCdlVerification() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TrailEventDetailsV1) GetCdlVerificationOk() (*interface{}, bool) {
-	if o == nil || isNil(o.CdlVerification) {
+	if o == nil || IsNil(o.CdlVerification) {
 		return nil, false
 	}
 	return &o.CdlVerification, true

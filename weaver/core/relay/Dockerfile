@@ -20,13 +20,13 @@ COPY . /opt/relay
 
 # Build OpenSSL
 
-ENV SSL_VERSION=1.1.1w
+ENV SSL_VERSION=3.0.14
     # https://www.openssl.org/source/openssl-1.1.1w.tar.gz
 RUN ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm && \
     ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic && \
     ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
 RUN mkdir /musl && \
-    curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
+    curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -LO && \
     tar zxvf openssl-$SSL_VERSION.tar.gz && \
     cd openssl-$SSL_VERSION/ && \
     CC="musl-gcc -fPIE -pie" ./Configure no-shared no-async --prefix=/musl --openssldir=/musl/ssl linux-x86_64 && \
