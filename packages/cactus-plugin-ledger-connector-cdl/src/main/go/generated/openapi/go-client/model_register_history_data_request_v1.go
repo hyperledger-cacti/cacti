@@ -70,7 +70,7 @@ func (o *RegisterHistoryDataRequestV1) SetAuthInfo(v AuthInfoV1) {
 
 // GetEventId returns the EventId field value if set, zero value otherwise.
 func (o *RegisterHistoryDataRequestV1) GetEventId() string {
-	if o == nil || isNil(o.EventId) {
+	if o == nil || IsNil(o.EventId) {
 		var ret string
 		return ret
 	}
@@ -80,7 +80,7 @@ func (o *RegisterHistoryDataRequestV1) GetEventId() string {
 // GetEventIdOk returns a tuple with the EventId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RegisterHistoryDataRequestV1) GetEventIdOk() (*string, bool) {
-	if o == nil || isNil(o.EventId) {
+	if o == nil || IsNil(o.EventId) {
 		return nil, false
 	}
 	return o.EventId, true
@@ -88,7 +88,7 @@ func (o *RegisterHistoryDataRequestV1) GetEventIdOk() (*string, bool) {
 
 // HasEventId returns a boolean if a field has been set.
 func (o *RegisterHistoryDataRequestV1) HasEventId() bool {
-	if o != nil && !isNil(o.EventId) {
+	if o != nil && !IsNil(o.EventId) {
 		return true
 	}
 
@@ -102,7 +102,7 @@ func (o *RegisterHistoryDataRequestV1) SetEventId(v string) {
 
 // GetLineageId returns the LineageId field value if set, zero value otherwise.
 func (o *RegisterHistoryDataRequestV1) GetLineageId() string {
-	if o == nil || isNil(o.LineageId) {
+	if o == nil || IsNil(o.LineageId) {
 		var ret string
 		return ret
 	}
@@ -112,7 +112,7 @@ func (o *RegisterHistoryDataRequestV1) GetLineageId() string {
 // GetLineageIdOk returns a tuple with the LineageId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RegisterHistoryDataRequestV1) GetLineageIdOk() (*string, bool) {
-	if o == nil || isNil(o.LineageId) {
+	if o == nil || IsNil(o.LineageId) {
 		return nil, false
 	}
 	return o.LineageId, true
@@ -120,7 +120,7 @@ func (o *RegisterHistoryDataRequestV1) GetLineageIdOk() (*string, bool) {
 
 // HasLineageId returns a boolean if a field has been set.
 func (o *RegisterHistoryDataRequestV1) HasLineageId() bool {
-	if o != nil && !isNil(o.LineageId) {
+	if o != nil && !IsNil(o.LineageId) {
 		return true
 	}
 
@@ -145,7 +145,7 @@ func (o *RegisterHistoryDataRequestV1) GetTags() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *RegisterHistoryDataRequestV1) GetTagsOk() (*interface{}, bool) {
-	if o == nil || isNil(o.Tags) {
+	if o == nil || IsNil(o.Tags) {
 		return nil, false
 	}
 	return &o.Tags, true
@@ -153,7 +153,7 @@ func (o *RegisterHistoryDataRequestV1) GetTagsOk() (*interface{}, bool) {
 
 // HasTags returns a boolean if a field has been set.
 func (o *RegisterHistoryDataRequestV1) HasTags() bool {
-	if o != nil && isNil(o.Tags) {
+	if o != nil && IsNil(o.Tags) {
 		return true
 	}
 
@@ -178,7 +178,7 @@ func (o *RegisterHistoryDataRequestV1) GetProperties() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *RegisterHistoryDataRequestV1) GetPropertiesOk() (*interface{}, bool) {
-	if o == nil || isNil(o.Properties) {
+	if o == nil || IsNil(o.Properties) {
 		return nil, false
 	}
 	return &o.Properties, true
@@ -186,7 +186,7 @@ func (o *RegisterHistoryDataRequestV1) GetPropertiesOk() (*interface{}, bool) {
 
 // HasProperties returns a boolean if a field has been set.
 func (o *RegisterHistoryDataRequestV1) HasProperties() bool {
-	if o != nil && isNil(o.Properties) {
+	if o != nil && IsNil(o.Properties) {
 		return true
 	}
 
@@ -209,10 +209,10 @@ func (o RegisterHistoryDataRequestV1) MarshalJSON() ([]byte, error) {
 func (o RegisterHistoryDataRequestV1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["authInfo"] = o.AuthInfo
-	if !isNil(o.EventId) {
+	if !IsNil(o.EventId) {
 		toSerialize["eventId"] = o.EventId
 	}
-	if !isNil(o.LineageId) {
+	if !IsNil(o.LineageId) {
 		toSerialize["lineageId"] = o.LineageId
 	}
 	if o.Tags != nil {

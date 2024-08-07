@@ -79,7 +79,7 @@ func (o *GatewayConfigurationV1) SetUrl(v string) {
 
 // GetUserAgent returns the UserAgent field value if set, zero value otherwise.
 func (o *GatewayConfigurationV1) GetUserAgent() string {
-	if o == nil || isNil(o.UserAgent) {
+	if o == nil || IsNil(o.UserAgent) {
 		var ret string
 		return ret
 	}
@@ -89,7 +89,7 @@ func (o *GatewayConfigurationV1) GetUserAgent() string {
 // GetUserAgentOk returns a tuple with the UserAgent field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GatewayConfigurationV1) GetUserAgentOk() (*string, bool) {
-	if o == nil || isNil(o.UserAgent) {
+	if o == nil || IsNil(o.UserAgent) {
 		return nil, false
 	}
 	return o.UserAgent, true
@@ -97,7 +97,7 @@ func (o *GatewayConfigurationV1) GetUserAgentOk() (*string, bool) {
 
 // HasUserAgent returns a boolean if a field has been set.
 func (o *GatewayConfigurationV1) HasUserAgent() bool {
-	if o != nil && !isNil(o.UserAgent) {
+	if o != nil && !IsNil(o.UserAgent) {
 		return true
 	}
 
@@ -111,7 +111,7 @@ func (o *GatewayConfigurationV1) SetUserAgent(v string) {
 
 // GetSkipCertCheck returns the SkipCertCheck field value if set, zero value otherwise.
 func (o *GatewayConfigurationV1) GetSkipCertCheck() bool {
-	if o == nil || isNil(o.SkipCertCheck) {
+	if o == nil || IsNil(o.SkipCertCheck) {
 		var ret bool
 		return ret
 	}
@@ -121,7 +121,7 @@ func (o *GatewayConfigurationV1) GetSkipCertCheck() bool {
 // GetSkipCertCheckOk returns a tuple with the SkipCertCheck field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GatewayConfigurationV1) GetSkipCertCheckOk() (*bool, bool) {
-	if o == nil || isNil(o.SkipCertCheck) {
+	if o == nil || IsNil(o.SkipCertCheck) {
 		return nil, false
 	}
 	return o.SkipCertCheck, true
@@ -129,7 +129,7 @@ func (o *GatewayConfigurationV1) GetSkipCertCheckOk() (*bool, bool) {
 
 // HasSkipCertCheck returns a boolean if a field has been set.
 func (o *GatewayConfigurationV1) HasSkipCertCheck() bool {
-	if o != nil && !isNil(o.SkipCertCheck) {
+	if o != nil && !IsNil(o.SkipCertCheck) {
 		return true
 	}
 
@@ -143,7 +143,7 @@ func (o *GatewayConfigurationV1) SetSkipCertCheck(v bool) {
 
 // GetCaPath returns the CaPath field value if set, zero value otherwise.
 func (o *GatewayConfigurationV1) GetCaPath() string {
-	if o == nil || isNil(o.CaPath) {
+	if o == nil || IsNil(o.CaPath) {
 		var ret string
 		return ret
 	}
@@ -153,7 +153,7 @@ func (o *GatewayConfigurationV1) GetCaPath() string {
 // GetCaPathOk returns a tuple with the CaPath field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GatewayConfigurationV1) GetCaPathOk() (*string, bool) {
-	if o == nil || isNil(o.CaPath) {
+	if o == nil || IsNil(o.CaPath) {
 		return nil, false
 	}
 	return o.CaPath, true
@@ -161,7 +161,7 @@ func (o *GatewayConfigurationV1) GetCaPathOk() (*string, bool) {
 
 // HasCaPath returns a boolean if a field has been set.
 func (o *GatewayConfigurationV1) HasCaPath() bool {
-	if o != nil && !isNil(o.CaPath) {
+	if o != nil && !IsNil(o.CaPath) {
 		return true
 	}
 
@@ -175,7 +175,7 @@ func (o *GatewayConfigurationV1) SetCaPath(v string) {
 
 // GetServerName returns the ServerName field value if set, zero value otherwise.
 func (o *GatewayConfigurationV1) GetServerName() string {
-	if o == nil || isNil(o.ServerName) {
+	if o == nil || IsNil(o.ServerName) {
 		var ret string
 		return ret
 	}
@@ -185,7 +185,7 @@ func (o *GatewayConfigurationV1) GetServerName() string {
 // GetServerNameOk returns a tuple with the ServerName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GatewayConfigurationV1) GetServerNameOk() (*string, bool) {
-	if o == nil || isNil(o.ServerName) {
+	if o == nil || IsNil(o.ServerName) {
 		return nil, false
 	}
 	return o.ServerName, true
@@ -193,7 +193,7 @@ func (o *GatewayConfigurationV1) GetServerNameOk() (*string, bool) {
 
 // HasServerName returns a boolean if a field has been set.
 func (o *GatewayConfigurationV1) HasServerName() bool {
-	if o != nil && !isNil(o.ServerName) {
+	if o != nil && !IsNil(o.ServerName) {
 		return true
 	}
 
@@ -216,16 +216,16 @@ func (o GatewayConfigurationV1) MarshalJSON() ([]byte, error) {
 func (o GatewayConfigurationV1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["url"] = o.Url
-	if !isNil(o.UserAgent) {
+	if !IsNil(o.UserAgent) {
 		toSerialize["userAgent"] = o.UserAgent
 	}
-	if !isNil(o.SkipCertCheck) {
+	if !IsNil(o.SkipCertCheck) {
 		toSerialize["skipCertCheck"] = o.SkipCertCheck
 	}
-	if !isNil(o.CaPath) {
+	if !IsNil(o.CaPath) {
 		toSerialize["caPath"] = o.CaPath
 	}
-	if !isNil(o.ServerName) {
+	if !IsNil(o.ServerName) {
 		toSerialize["serverName"] = o.ServerName
 	}
 	return toSerialize, nil

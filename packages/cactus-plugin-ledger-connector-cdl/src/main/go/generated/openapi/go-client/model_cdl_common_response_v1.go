@@ -54,7 +54,7 @@ func (o *CDLCommonResponseV1) GetDetail() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CDLCommonResponseV1) GetDetailOk() (*interface{}, bool) {
-	if o == nil || isNil(o.Detail) {
+	if o == nil || IsNil(o.Detail) {
 		return nil, false
 	}
 	return &o.Detail, true
@@ -62,7 +62,7 @@ func (o *CDLCommonResponseV1) GetDetailOk() (*interface{}, bool) {
 
 // HasDetail returns a boolean if a field has been set.
 func (o *CDLCommonResponseV1) HasDetail() bool {
-	if o != nil && isNil(o.Detail) {
+	if o != nil && IsNil(o.Detail) {
 		return true
 	}
 

@@ -2138,6 +2138,10 @@ jobs:
   cp-bungee-hermes:
     continue-on-error: false
     env:
+      # Otherwise it fails with: You are running out of disk space. 
+      # The runner will stop working when the machine runs out of disk space. 
+      # Free space left: 26 MB
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
