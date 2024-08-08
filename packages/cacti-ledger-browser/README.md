@@ -52,16 +52,6 @@ npm install
 - Execute `yarn run start` or `npm start` in this package directory.
 - The running application address: http://localhost:3001/ (can be changed in [Vite configuration](./vite.config.ts))
 
-#### Sample Data
-
-- To preview the GUI without running the persistence plugins you can use historic sample data located at `packages/cacti-ledger-browser/src/test/sql/sample-data.sql`.
-- Use `psql` tool to import it to your supabase postgres DB instance.
-- example:
-
-```bash
-psql "postgres://postgres.DB_NAME:DB_PASS@aws-0-eu-central-1.pooler.supabase.com:5432/postgres" -f src/test/sql/sample-data.sql
-```
-
 ## Contributing
 
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!

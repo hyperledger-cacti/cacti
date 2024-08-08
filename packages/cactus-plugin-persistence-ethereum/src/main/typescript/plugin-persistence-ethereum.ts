@@ -876,7 +876,7 @@ export class PluginPersistenceEthereum
     try {
       // Note: Use batching / synchronous loop if there are performance issues for large blocks.
       const transactions = await Promise.all(
-        block.transactions.map((tx) => this.parseBlockTransaction(tx)),
+        (block.transactions ?? []).map((tx) => this.parseBlockTransaction(tx)),
       );
 
       if (typeof block.timestamp === "string") {

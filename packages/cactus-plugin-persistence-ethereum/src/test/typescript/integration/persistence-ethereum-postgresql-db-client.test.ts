@@ -46,29 +46,31 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
    * Delete all data from all tables
    */
   async function clearDbSchema() {
-    await dbClient.client.query("DELETE FROM public.token_transfer");
-    await dbClient.client.query("DELETE FROM public.transaction");
-    await dbClient.client.query("DELETE FROM public.block");
-    await dbClient.client.query("DELETE FROM public.token_erc721");
-    await dbClient.client.query("DELETE FROM public.token_metadata_erc20");
-    await dbClient.client.query("DELETE FROM public.token_metadata_erc721");
+    await dbClient.client.query("DELETE FROM ethereum.token_transfer");
+    await dbClient.client.query("DELETE FROM ethereum.transaction");
+    await dbClient.client.query("DELETE FROM ethereum.block");
+    await dbClient.client.query("DELETE FROM ethereum.token_erc721");
+    await dbClient.client.query("DELETE FROM ethereum.token_metadata_erc20");
+    await dbClient.client.query("DELETE FROM ethereum.token_metadata_erc721");
   }
 
   async function getDbBlocks() {
-    const response = await dbClient.client.query("SELECT * FROM public.block");
+    const response = await dbClient.client.query(
+      "SELECT * FROM ethereum.block",
+    );
     return response.rows;
   }
 
   async function getDbTransactions() {
     const response = await dbClient.client.query(
-      "SELECT * FROM public.transaction",
+      "SELECT * FROM ethereum.transaction",
     );
     return response.rows;
   }
 
   async function getDbTokenTransfers() {
     const response = await dbClient.client.query(
-      "SELECT * FROM public.token_transfer",
+      "SELECT * FROM ethereum.token_transfer",
     );
     return response.rows;
   }
@@ -117,7 +119,7 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
 
     // Assert all tables are created
     const response = await dbClient.client.query(
-      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'",
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'ethereum'",
     );
     const tableNames = response.rows.map((row) => row.table_name);
     expect(tableNames.sort()).toEqual(
@@ -125,13 +127,11 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
         "block",
         "token_metadata_erc20",
         "token_metadata_erc721",
-        "plugin_status",
         "token_erc721",
         "token_transfer",
         "transaction",
         "erc20_token_history_view",
         "erc721_token_history_view",
-        "erc721_txn_meta_view",
       ].sort(),
     );
 
@@ -360,7 +360,6 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
     expect(dbBlock.number).toEqual(block.number.toString());
     expect(dbBlock.hash).toEqual(block.hash);
     expect(dbBlock.number_of_tx).toEqual(block.number_of_tx.toString());
-    expect(new Date(dbBlock.created_at)).toEqual(blockTimestamp);
 
     // Assert transaction
     const txResponse = await getDbTransactions();

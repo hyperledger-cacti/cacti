@@ -21,7 +21,7 @@ import { RuntimeError } from "run-time-error-cjs";
 // Helper Types
 //////////////////////////////////
 
-type SchemaTables = DatabaseSchemaType["public"]["Tables"];
+type SchemaTables = DatabaseSchemaType["ethereum"]["Tables"];
 type PluginStatusRowType = SchemaTables["plugin_status"]["Row"];
 type BlockRowType = SchemaTables["block"]["Row"];
 type BlockInsertType = SchemaTables["block"]["Insert"];
@@ -36,7 +36,7 @@ type TokenMetadataERC721RowType = SchemaTables["token_metadata_erc721"]["Row"];
 type TokenMetadataERC721InsertType =
   SchemaTables["token_metadata_erc721"]["Insert"];
 
-type SchemaFunctions = DatabaseSchemaType["public"]["Functions"];
+type SchemaFunctions = DatabaseSchemaType["ethereum"]["Functions"];
 type GetMissingBlocksInRangeReturnType =
   SchemaFunctions["get_missing_blocks_in_range"]["Returns"];
 
@@ -227,7 +227,7 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
-      "SELECT * FROM public.token_metadata_erc20",
+      "SELECT * FROM ethereum.token_metadata_erc20",
     );
     this.log.debug(
       `Received ${queryResponse.rowCount} rows from table token_metadata_erc20`,
@@ -246,7 +246,7 @@ export default class PostgresDatabaseClient {
 
     this.log.debug("Insert ERC20 token metadata:", token);
     const insertResponse = await this.client.query(
-      `INSERT INTO public.token_metadata_erc20("address", "name", "symbol", "total_supply") VALUES ($1, $2, $3, $4)`,
+      `INSERT INTO ethereum.token_metadata_erc20("address", "name", "symbol", "total_supply") VALUES ($1, $2, $3, $4)`,
       [token.address, token.name, token.symbol, token.total_supply],
     );
     this.log.info(
@@ -262,7 +262,7 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
-      "SELECT * FROM public.token_metadata_erc721",
+      "SELECT * FROM ethereum.token_metadata_erc721",
     );
     this.log.debug(
       `Received ${queryResponse.rowCount} rows from table token_metadata_erc721`,
@@ -281,7 +281,7 @@ export default class PostgresDatabaseClient {
 
     this.log.debug("Insert ERC721 token metadata:", token);
     const insertResponse = await this.client.query(
-      `INSERT INTO public.token_metadata_erc721("address", "name", "symbol") VALUES ($1, $2, $3)`,
+      `INSERT INTO ethereum.token_metadata_erc721("address", "name", "symbol") VALUES ($1, $2, $3)`,
       [token.address, token.name, token.symbol],
     );
     this.log.info(
@@ -298,7 +298,7 @@ export default class PostgresDatabaseClient {
 
     this.log.debug("Insert ERC721 token if not present yet:", token);
     const insertResponse = await this.client.query(
-      `INSERT INTO public.token_erc721("account_address", "token_address", "uri", "token_id")
+      `INSERT INTO ethereum.token_erc721("account_address", "token_address", "uri", "token_id")
        VALUES ($1, $2, $3, $4)
        ON CONFLICT ON CONSTRAINT token_erc721_contract_tokens_unique
        DO
@@ -319,7 +319,7 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
-      "SELECT * FROM public.token_erc20",
+      "SELECT * FROM ethereum.token_erc20",
     );
     this.log.debug(
       `Received ${queryResponse.rowCount} rows from table token_erc20`,
@@ -335,7 +335,7 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
-      "SELECT * FROM public.token_erc721",
+      "SELECT * FROM ethereum.token_erc721",
     );
     this.log.debug(
       `Received ${queryResponse.rowCount} rows from table token_erc721`,
@@ -350,9 +350,9 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     await this.client.query(
-      "REFRESH MATERIALIZED VIEW CONCURRENTLY public.token_erc20",
+      "REFRESH MATERIALIZED VIEW CONCURRENTLY ethereum.token_erc20",
     );
-    this.log.debug("Refreshing view public.token_erc20 done");
+    this.log.debug("Refreshing view ethereum.token_erc20 done");
   }
 
   /**
@@ -366,7 +366,7 @@ export default class PostgresDatabaseClient {
       fromBlockNumber,
     );
 
-    await this.client.query("CALL update_issued_erc721_tokens($1);", [
+    await this.client.query("CALL ethereum.update_issued_erc721_tokens($1);", [
       fromBlockNumber,
     ]);
     this.log.debug("Calling update_issued_erc721_tokens procedure done.");
@@ -382,7 +382,7 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
-      "SELECT * FROM public.block WHERE number = $1",
+      "SELECT * FROM ethereum.block WHERE number = $1",
       [blockNumber],
     );
 
@@ -412,7 +412,7 @@ export default class PostgresDatabaseClient {
 
       this.log.debug("Insert new block", block);
       const blockInsertResponse = await this.client.query(
-        `INSERT INTO public.block("number", "created_at", "hash", "number_of_tx")
+        `INSERT INTO ethereum.block("number", "created_at", "hash", "number_of_tx")
          VALUES ($1, $2, $3, $4)`,
         [block.number, block.created_at, block.hash, block.number_of_tx],
       );
@@ -424,7 +424,7 @@ export default class PostgresDatabaseClient {
         this.log.debug("Insert new transaction", tx);
         const txInsertResponse = await this.client.query(
           `INSERT INTO
-            public.transaction("index", "hash", "block_number", "from", "to", "eth_value", "method_signature", "method_name")
+            ethereum.transaction("index", "hash", "block_number", "from", "to", "eth_value", "method_signature", "method_name")
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
            RETURNING id;`,
           [
@@ -450,7 +450,7 @@ export default class PostgresDatabaseClient {
           this.log.debug("Insert new token transfer", transfer);
           const transInsertResponse = await this.client.query(
             `INSERT INTO
-              public.token_transfer("transaction_id", "sender", "recipient", "value")
+              ethereum.token_transfer("transaction_id", "sender", "recipient", "value")
              VALUES ($1, $2, $3, $4)`,
             [txId, transfer.sender, transfer.recipient, transfer.value],
           );
@@ -490,7 +490,7 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const queryResponse = await this.client.query(
-      "SELECT * FROM public.get_missing_blocks_in_range($1, $2) as block_number",
+      "SELECT * FROM ethereum.get_missing_blocks_in_range($1, $2) as block_number",
       [startBlockNumber, endBlockNumber],
     );
     this.log.debug(
