@@ -265,8 +265,8 @@ describe("PluginLedgerConnectorBesu", () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    try {
-      await connector.invokeContract({
+    await expect(
+      connector.invokeContract({
         contractName: HelloWorldContractJson.contractName,
         contractAbi: HelloWorldContractJson.abi,
         contractAddress,
@@ -280,19 +280,14 @@ describe("PluginLedgerConnectorBesu", () => {
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
         nonce: 1,
-      });
-      throw new Error("This operation should not have succeeded, but it did.");
-    } catch (ex: unknown) {
-      // 'Returned error: Nonce too low'
-      expect(ex).toHaveProperty(
-        "message",
-        expect.stringContaining("Nonce too low"),
-      );
-      expect(ex).toHaveProperty(
-        "stack",
-        expect.stringContaining("Nonce too low"),
-      );
-    }
+      }),
+    ).rejects.toThrowError(
+      expect.objectContaining({
+        message: expect.stringContaining("Nonce too low"),
+        stack: expect.stringContaining("Nonce too low"),
+      }),
+    );
+
     const req: InvokeContractV1Request = {
       contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
