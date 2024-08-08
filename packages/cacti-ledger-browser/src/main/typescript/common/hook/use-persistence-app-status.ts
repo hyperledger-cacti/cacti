@@ -1,7 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GetStatusResponse } from "../types/app";
-import { useNotification } from "../context/NotificationContext";
 import { persistencePluginStatus } from "../queries";
 
 /**
@@ -13,11 +12,9 @@ export function usePersistenceAppStatus(pluginName: string): GetStatusResponse {
   const { isError, isPending, data, error } = useQuery(
     persistencePluginStatus(pluginName),
   );
-  const { showNotification } = useNotification();
 
   React.useEffect(() => {
-    isError &&
-      showNotification(`Could get ${pluginName} status: ${error}`, "error");
+    isError && console.error(`Could get ${pluginName} status: ${error}`);
   }, [isError]);
 
   return {

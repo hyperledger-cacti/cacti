@@ -69,7 +69,7 @@
     "pg": "8.8.0",
     "run-time-error-cjs": "1.4.0",
     "uuid": "10.0.0",
-    "web3-utils": "4.2.1",
+    "web3-utils": "4.3.0",
     "web3-validator": "2.0.2"
   },
   "devDependencies": {

@@ -10576,7 +10576,7 @@ __metadata:
     uuid: "npm:10.0.0"
     web3: "npm:4.0.3"
     web3-eth-accounts: "npm:4.0.3"
-    web3-utils: "npm:4.2.1"
+    web3-utils: "npm:4.3.0"
     web3-validator: "npm:2.0.2"
   languageName: unknown
   linkType: soft

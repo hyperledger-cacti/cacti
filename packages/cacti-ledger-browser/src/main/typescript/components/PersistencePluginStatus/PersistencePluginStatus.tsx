@@ -6,7 +6,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import StackedRowItems from "../ui/StackedRowItems";
 import { persistencePluginStatus } from "../../common/queries";
-import { useNotification } from "../../common/context/NotificationContext";
 
 type DateTimeStringProps = {
   dateString: string | undefined;
@@ -31,11 +30,9 @@ export default function PersistencePluginStatus({
   const { isError, isPending, data, error } = useQuery(
     persistencePluginStatus(pluginName),
   );
-  const { showNotification } = useNotification();
 
   React.useEffect(() => {
-    isError &&
-      showNotification(`Could get ${pluginName} status: ${error}`, "error");
+    isError && console.error(`Could get ${pluginName} status: ${error}`);
   }, [isError]);
 
   return (
