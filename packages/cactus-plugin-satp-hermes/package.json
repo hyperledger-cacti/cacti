@@ -44,7 +44,7 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "run-p tsc codegen",
+    "build": "run-s codegen tsc",
     "build-proto": "buf build --path src/main/proto --verbose",
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/knex && cp -r ./src/knex/* ./dist/lib/knex",
     "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/json/openapi-blo-bundled.json -r -t json",
@@ -60,13 +60,14 @@
     "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g go -o ./src/main/go/generated/gateway-client --additional-properties=packageName=generated,generateInterfaces=true,packageVersion=v0.0.1,moduleName=github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated --git-user-id hyperledger  --git-repo-id cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated",
     "generate-sdk:typescript-axios-bol": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/gateway-client/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
+    "preinstall": "curl -L https://foundry.paradigm.xyz | bash && foundryup",
     "lint": "run-p 'lint:*'",
     "lint:eslint": "eslint './src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "lint:oapi": "vacuum lint -d -e ./src/main/yml/bol/openapi-blo-bundled.yml",
     "lint:protobuf": "buf lint --path src/main/proto --verbose",
     "start-gateway": "ts-node satp-gateway-cli.ts",
     "pretsc": "npm run generate-sdk",
-    "tsc": "tsc --project ./tsconfig.yml",
+    "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch"
   },
   "jest": {
