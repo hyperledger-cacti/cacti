@@ -1,6 +1,7 @@
 export {
   PluginLedgerConnectorCorda,
   IPluginLedgerConnectorCordaOptions,
+  CordaVersion,
 } from "./plugin-ledger-connector-corda";
 
 export * from "./generated/openapi/typescript-axios/index";

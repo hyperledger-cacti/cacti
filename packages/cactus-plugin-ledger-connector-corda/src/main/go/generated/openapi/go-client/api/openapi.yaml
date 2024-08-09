@@ -246,6 +246,107 @@ paths:
         http:
           verbLowerCase: get
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi:
+    get:
+      operationId: listCpiV1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListCpiV1Request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCpiV1Response'
+          description: OK
+      summary: List all CPIs uploaded to the cluster
+      x-hyperledger-cactus:
+        https:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow:
+    get:
+      operationId: listFlowV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetFlowCidV1Request'
+        description: This method gets the current status of the specified flow instance.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/FlowStatusV1Responses'
+          description: OK
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      summary: This method returns an array containing the statuses of all flows running
+        for a specified holding identity. An empty array is returned if there are
+        no flows running.
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid:
+    get:
+      operationId: getFlowV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetFlowCidV1Request'
+        description: This method gets the current status of the specified flow instance.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/GetFlowCidV1Response'
+          description: OK
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      summary: This method gets the current status of the specified flow instance.
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow:
+    post:
+      operationId: startFlowV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartFlowV1Request'
+        description: Request body for starting a flow
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartFlowV1Response'
+          description: OK
+      summary: This method starts a new instance for the specified flow for the specified
+        holding identity.
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow
 components:
   schemas:
     SHA256:
@@ -1404,6 +1505,303 @@ components:
       type: object
     VaultQueryV1Response:
       type: object
+    ListCpiV1Response:
+      example:
+        cpis:
+        - cpiFileFullChecksum: string
+          cpiFileChecksum: string
+          cpks:
+          - libraries:
+            - string
+            - string
+            id:
+              signerSummaryHash: string
+              name: string
+              version: string
+            mainBundle: string
+            type: string
+            hash: string
+            timestamp: 2022-06-24T10:15:30Z
+          - libraries:
+            - string
+            - string
+            id:
+              signerSummaryHash: string
+              name: string
+              version: string
+            mainBundle: string
+            type: string
+            hash: string
+            timestamp: 2022-06-24T10:15:30Z
+          groupPolicy: string
+          id:
+            signerSummaryHash: string
+            name: string
+            version: string
+          timestamp: 2022-06-24T10:15:30Z
+        - cpiFileFullChecksum: string
+          cpiFileChecksum: string
+          cpks:
+          - libraries:
+            - string
+            - string
+            id:
+              signerSummaryHash: string
+              name: string
+              version: string
+            mainBundle: string
+            type: string
+            hash: string
+            timestamp: 2022-06-24T10:15:30Z
+          - libraries:
+            - string
+            - string
+            id:
+              signerSummaryHash: string
+              name: string
+              version: string
+            mainBundle: string
+            type: string
+            hash: string
+            timestamp: 2022-06-24T10:15:30Z
+          groupPolicy: string
+          id:
+            signerSummaryHash: string
+            name: string
+            version: string
+          timestamp: 2022-06-24T10:15:30Z
+      properties:
+        cpis:
+          items:
+            $ref: '#/components/schemas/ListCpiV1Response_cpis_inner'
+          type: array
+      required:
+      - hash
+      - id
+      - libraries
+      - mainBundle
+      - timestamp
+      - type
+      type: object
+    ListCpiV1Request:
+      example:
+        rejectUnauthorized: true
+        password: password
+        username: username
+      properties:
+        username:
+          nullable: false
+          type: string
+        password:
+          nullable: false
+          type: string
+        rejectUnauthorized:
+          nullable: false
+          type: boolean
+      required:
+      - password
+      - rejectUnauthorized
+      - username
+    StartFlowV1Request:
+      description: This method starts a new instance for the specified flow for the
+        specified holding identity.
+      example:
+        rejectUnauthorized: true
+        holdingIDShortHash: holdingIDShortHash
+        password: password
+        requestBody:
+          numberOfRecords: numberOfRecords
+          otherMember: otherMember
+          chatName: chatName
+          message: message
+        clientRequestId: clientRequestId
+        flowClassName: flowClassName
+        username: username
+      properties:
+        username:
+          nullable: false
+          type: string
+        password:
+          nullable: false
+          type: string
+        rejectUnauthorized:
+          nullable: false
+          type: boolean
+        holdingIDShortHash:
+          nullable: false
+          type: string
+        clientRequestId:
+          nullable: false
+          type: string
+        flowClassName:
+          nullable: false
+          type: string
+        requestBody:
+          $ref: '#/components/schemas/StartFlowV1Request_requestBody'
+      required:
+      - clientRequestId
+      - flowClassName
+      - password
+      - rejectUnauthorized
+      - requestBody
+      - username
+      type: object
+    GetFlowCidV1Request:
+      description: This method gets the current status of the specified flow instance.
+      example:
+        rejectUnauthorized: true
+        holdingIDShortHash: holdingIDShortHash
+        password: password
+        clientRequestId: clientRequestId
+        username: username
+      properties:
+        username:
+          nullable: false
+          type: string
+        password:
+          nullable: false
+          type: string
+        rejectUnauthorized:
+          nullable: false
+          type: boolean
+        holdingIDShortHash:
+          nullable: false
+          type: string
+        clientRequestId:
+          nullable: false
+          type: string
+      required:
+      - password
+      - rejectUnauthorized
+      - username
+    GetFlowCidV1Response:
+      properties:
+        clientRequestId:
+          example: string
+          nullable: true
+          type: string
+        flowError:
+          $ref: '#/components/schemas/FlowV1Error'
+        flowId:
+          example: string
+          nullable: true
+          type: string
+        flowResult:
+          example: string
+          nullable: true
+          type: string
+        flowStatus:
+          example: string
+          nullable: false
+          type: string
+        holdingIDShortHash:
+          example: string
+          nullable: false
+          type: string
+        timestamp:
+          example: 2022-06-24T10:15:30Z
+          format: date-time
+          nullable: false
+          type: string
+      required:
+      - flowStatus
+      - holdingIDShortHash
+      - timestamp
+      type: object
+    FlowStatusV1Responses:
+      properties:
+        flowStatusResponses:
+          items:
+            $ref: '#/components/schemas/FlowStatusV1Responses_flowStatusResponses_inner'
+          type: array
+      required:
+      - flowStatus
+      - holdingIDShortHash
+      - timestamp
+      type: object
+    StartFlowV1Response:
+      example:
+        holdingIDShortHash: string
+        flowError:
+          message: string
+          type: string
+        clientRequestId: string
+        flowResult: string
+        flowStatus: string
+        flowId: string
+        timestamp: 2022-06-24T10:15:30Z
+      properties:
+        clientRequestId:
+          example: string
+          nullable: true
+          type: string
+        flowError:
+          $ref: '#/components/schemas/FlowV1Error'
+        flowId:
+          example: string
+          nullable: true
+          type: string
+        flowResult:
+          example: string
+          nullable: true
+          type: string
+        flowStatus:
+          example: string
+          nullable: false
+          type: string
+        holdingIDShortHash:
+          example: string
+          nullable: false
+          type: string
+        timestamp:
+          example: 2022-06-24T10:15:30Z
+          format: date-time
+          nullable: false
+          type: string
+      required:
+      - flowStatus
+      - holdingIDShortHash
+      - timestamp
+      type: object
+    CPIIDV1:
+      example:
+        signerSummaryHash: string
+        name: string
+        version: string
+      properties:
+        name:
+          example: string
+          nullable: false
+          type: string
+        signerSummaryHash:
+          example: string
+          nullable: true
+          type: string
+        version:
+          example: string
+          nullable: false
+          type: string
+      required:
+      - name
+      - version
+      type: object
+    FlowV1Error:
+      example:
+        message: string
+        type: string
+      properties:
+        message:
+          example: string
+          nullable: false
+          type: string
+        type:
+          example: string
+          nullable: false
+          type: string
+      required:
+      - message
+      - type
+      type: object
     GetMonitorTransactionsV1Response_tx_inner:
       example:
         data: data
@@ -1414,5 +1812,149 @@ components:
         data:
           maxItems: 10000000
           minItems: 0
+          type: string
+      type: object
+    ListCpiV1Response_cpis_inner_cpks_inner:
+      example:
+        libraries:
+        - string
+        - string
+        id:
+          signerSummaryHash: string
+          name: string
+          version: string
+        mainBundle: string
+        type: string
+        hash: string
+        timestamp: 2022-06-24T10:15:30Z
+      properties:
+        hash:
+          example: string
+          nullable: false
+          type: string
+        id:
+          $ref: '#/components/schemas/CPIIDV1'
+        libraries:
+          items:
+            example: string
+            nullable: false
+            type: string
+          type: array
+        mainBundle:
+          example: string
+          nullable: false
+          type: string
+        timestamp:
+          example: 2022-06-24T10:15:30Z
+          format: date-time
+          nullable: false
+          type: string
+        type:
+          example: string
+          nullable: false
+          type: string
+      type: object
+    ListCpiV1Response_cpis_inner:
+      example:
+        cpiFileFullChecksum: string
+        cpiFileChecksum: string
+        cpks:
+        - libraries:
+          - string
+          - string
+          id:
+            signerSummaryHash: string
+            name: string
+            version: string
+          mainBundle: string
+          type: string
+          hash: string
+          timestamp: 2022-06-24T10:15:30Z
+        - libraries:
+          - string
+          - string
+          id:
+            signerSummaryHash: string
+            name: string
+            version: string
+          mainBundle: string
+          type: string
+          hash: string
+          timestamp: 2022-06-24T10:15:30Z
+        groupPolicy: string
+        id:
+          signerSummaryHash: string
+          name: string
+          version: string
+        timestamp: 2022-06-24T10:15:30Z
+      properties:
+        cpiFileChecksum:
+          example: string
+          nullable: false
+          type: string
+        cpiFileFullChecksum:
+          example: string
+          nullable: false
+          type: string
+        cpks:
+          items:
+            $ref: '#/components/schemas/ListCpiV1Response_cpis_inner_cpks_inner'
+          type: array
+        groupPolicy:
+          example: string
+          nullable: true
+          type: string
+        id:
+          $ref: '#/components/schemas/CPIIDV1'
+        timestamp:
+          example: 2022-06-24T10:15:30Z
+          format: date-time
+          nullable: false
+          type: string
+      type: object
+    StartFlowV1Request_requestBody:
+      example:
+        numberOfRecords: numberOfRecords
+        otherMember: otherMember
+        chatName: chatName
+        message: message
+      properties:
+        chatName:
+          type: string
+        otherMember:
+          type: string
+        message:
+          type: string
+        numberOfRecords:
+          type: string
+      type: object
+    FlowStatusV1Responses_flowStatusResponses_inner:
+      properties:
+        clientRequestId:
+          example: string
+          nullable: true
+          type: string
+        flowError:
+          $ref: '#/components/schemas/FlowV1Error'
+        flowId:
+          example: string
+          nullable: true
+          type: string
+        flowResult:
+          example: string
+          nullable: true
+          type: string
+        flowStatus:
+          example: string
+          nullable: false
+          type: string
+        holdingIDShortHash:
+          example: string
+          nullable: false
+          type: string
+        timestamp:
+          example: 2022-06-24T10:15:30Z
+          format: date-time
+          nullable: false
           type: string
       type: object

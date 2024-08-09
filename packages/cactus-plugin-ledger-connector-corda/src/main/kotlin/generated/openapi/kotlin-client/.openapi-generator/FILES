@@ -21,6 +21,7 @@ src/main/kotlin/org/openapitools/client/infrastructure/ResponseExtensions.kt
 src/main/kotlin/org/openapitools/client/infrastructure/Serializer.kt
 src/main/kotlin/org/openapitools/client/infrastructure/URIAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/UUIDAdapter.kt
+src/main/kotlin/org/openapitools/client/models/CPIIDV1.kt
 src/main/kotlin/org/openapitools/client/models/ClearMonitorTransactionsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/ClearMonitorTransactionsV1Response.kt
 src/main/kotlin/org/openapitools/client/models/CordaNodeSshCredentials.kt
@@ -34,6 +35,11 @@ src/main/kotlin/org/openapitools/client/models/DeployContractJarsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/DiagnoseNodeV1Request.kt
 src/main/kotlin/org/openapitools/client/models/DiagnoseNodeV1Response.kt
 src/main/kotlin/org/openapitools/client/models/FlowInvocationType.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatusV1Responses.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatusV1ResponsesFlowStatusResponsesInner.kt
+src/main/kotlin/org/openapitools/client/models/FlowV1Error.kt
+src/main/kotlin/org/openapitools/client/models/GetFlowCidV1Request.kt
+src/main/kotlin/org/openapitools/client/models/GetFlowCidV1Response.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1Response.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1ResponseTxInner.kt
@@ -43,6 +49,10 @@ src/main/kotlin/org/openapitools/client/models/JarFile.kt
 src/main/kotlin/org/openapitools/client/models/JvmObject.kt
 src/main/kotlin/org/openapitools/client/models/JvmType.kt
 src/main/kotlin/org/openapitools/client/models/JvmTypeKind.kt
+src/main/kotlin/org/openapitools/client/models/ListCpiV1Request.kt
+src/main/kotlin/org/openapitools/client/models/ListCpiV1Response.kt
+src/main/kotlin/org/openapitools/client/models/ListCpiV1ResponseCpisInner.kt
+src/main/kotlin/org/openapitools/client/models/ListCpiV1ResponseCpisInnerCpksInner.kt
 src/main/kotlin/org/openapitools/client/models/ListFlowsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/ListFlowsV1Response.kt
 src/main/kotlin/org/openapitools/client/models/NetworkHostAndPort.kt
@@ -51,6 +61,9 @@ src/main/kotlin/org/openapitools/client/models/NodeInfo.kt
 src/main/kotlin/org/openapitools/client/models/Party.kt
 src/main/kotlin/org/openapitools/client/models/PublicKey.kt
 src/main/kotlin/org/openapitools/client/models/SHA256.kt
+src/main/kotlin/org/openapitools/client/models/StartFlowV1Request.kt
+src/main/kotlin/org/openapitools/client/models/StartFlowV1RequestRequestBody.kt
+src/main/kotlin/org/openapitools/client/models/StartFlowV1Response.kt
 src/main/kotlin/org/openapitools/client/models/StartMonitorV1Request.kt
 src/main/kotlin/org/openapitools/client/models/StartMonitorV1Response.kt
 src/main/kotlin/org/openapitools/client/models/StopMonitorV1Request.kt

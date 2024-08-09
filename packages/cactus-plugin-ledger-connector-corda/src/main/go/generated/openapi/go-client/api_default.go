@@ -349,6 +349,115 @@ func (a *DefaultApiService) DiagnoseNodeV1Execute(r ApiDiagnoseNodeV1Request) (*
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetFlowV1Request struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	getFlowCidV1Request *GetFlowCidV1Request
+}
+
+// This method gets the current status of the specified flow instance.
+func (r ApiGetFlowV1Request) GetFlowCidV1Request(getFlowCidV1Request GetFlowCidV1Request) ApiGetFlowV1Request {
+	r.getFlowCidV1Request = &getFlowCidV1Request
+	return r
+}
+
+func (r ApiGetFlowV1Request) Execute() (*GetFlowCidV1Response, *http.Response, error) {
+	return r.ApiService.GetFlowV1Execute(r)
+}
+
+/*
+GetFlowV1 This method gets the current status of the specified flow instance.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetFlowV1Request
+*/
+func (a *DefaultApiService) GetFlowV1(ctx context.Context) ApiGetFlowV1Request {
+	return ApiGetFlowV1Request{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return GetFlowCidV1Response
+func (a *DefaultApiService) GetFlowV1Execute(r ApiGetFlowV1Request) (*GetFlowCidV1Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *GetFlowCidV1Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetFlowV1")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.getFlowCidV1Request == nil {
+		return localVarReturnValue, nil, reportError("getFlowCidV1Request is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"text/plain"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.getFlowCidV1Request
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetMonitorTransactionsV1Request struct {
 	ctx context.Context
 	ApiService *DefaultApiService
@@ -656,6 +765,223 @@ func (a *DefaultApiService) InvokeContractV1Execute(r ApiInvokeContractV1Request
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiListCpiV1Request struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	listCpiV1Request *ListCpiV1Request
+}
+
+func (r ApiListCpiV1Request) ListCpiV1Request(listCpiV1Request ListCpiV1Request) ApiListCpiV1Request {
+	r.listCpiV1Request = &listCpiV1Request
+	return r
+}
+
+func (r ApiListCpiV1Request) Execute() (*ListCpiV1Response, *http.Response, error) {
+	return r.ApiService.ListCpiV1Execute(r)
+}
+
+/*
+ListCpiV1 List all CPIs uploaded to the cluster
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiListCpiV1Request
+*/
+func (a *DefaultApiService) ListCpiV1(ctx context.Context) ApiListCpiV1Request {
+	return ApiListCpiV1Request{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return ListCpiV1Response
+func (a *DefaultApiService) ListCpiV1Execute(r ApiListCpiV1Request) (*ListCpiV1Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ListCpiV1Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ListCpiV1")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.listCpiV1Request == nil {
+		return localVarReturnValue, nil, reportError("listCpiV1Request is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.listCpiV1Request
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListFlowV1Request struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	getFlowCidV1Request *GetFlowCidV1Request
+}
+
+// This method gets the current status of the specified flow instance.
+func (r ApiListFlowV1Request) GetFlowCidV1Request(getFlowCidV1Request GetFlowCidV1Request) ApiListFlowV1Request {
+	r.getFlowCidV1Request = &getFlowCidV1Request
+	return r
+}
+
+func (r ApiListFlowV1Request) Execute() (*FlowStatusV1Responses, *http.Response, error) {
+	return r.ApiService.ListFlowV1Execute(r)
+}
+
+/*
+ListFlowV1 This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiListFlowV1Request
+*/
+func (a *DefaultApiService) ListFlowV1(ctx context.Context) ApiListFlowV1Request {
+	return ApiListFlowV1Request{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return FlowStatusV1Responses
+func (a *DefaultApiService) ListFlowV1Execute(r ApiListFlowV1Request) (*FlowStatusV1Responses, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *FlowStatusV1Responses
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ListFlowV1")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.getFlowCidV1Request == nil {
+		return localVarReturnValue, nil, reportError("getFlowCidV1Request is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"text/plain"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.getFlowCidV1Request
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiListFlowsV1Request struct {
 	ctx context.Context
 	ApiService *DefaultApiService
@@ -833,6 +1159,115 @@ func (a *DefaultApiService) NetworkMapV1Execute(r ApiNetworkMapV1Request) ([]Nod
 	}
 	// body params
 	localVarPostBody = r.body
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiStartFlowV1Request struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	startFlowV1Request *StartFlowV1Request
+}
+
+// Request body for starting a flow
+func (r ApiStartFlowV1Request) StartFlowV1Request(startFlowV1Request StartFlowV1Request) ApiStartFlowV1Request {
+	r.startFlowV1Request = &startFlowV1Request
+	return r
+}
+
+func (r ApiStartFlowV1Request) Execute() (*StartFlowV1Response, *http.Response, error) {
+	return r.ApiService.StartFlowV1Execute(r)
+}
+
+/*
+StartFlowV1 This method starts a new instance for the specified flow for the specified holding identity.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiStartFlowV1Request
+*/
+func (a *DefaultApiService) StartFlowV1(ctx context.Context) ApiStartFlowV1Request {
+	return ApiStartFlowV1Request{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return StartFlowV1Response
+func (a *DefaultApiService) StartFlowV1Execute(r ApiStartFlowV1Request) (*StartFlowV1Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *StartFlowV1Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.StartFlowV1")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.startFlowV1Request == nil {
+		return localVarReturnValue, nil, reportError("startFlowV1Request is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.startFlowV1Request
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
