@@ -1,84 +1,81 @@
-FROM cruizba/ubuntu-dind:20.10.9
+FROM docker:20.10.3-dind
 
-WORKDIR /
+RUN apk update
+RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
 
-RUN apt update
-RUN apt -y upgrade
+# Need curl for healthchecks
+RUN apk add --no-cache curl
 
-# # Install git so we can check out the corda5-solarsystem-contracts-demo repo of Corda
-RUN apt install -y git
+# Need to run shell script run.sh for Corda CLI
+RUN apk add --no-cache bash
 
-# Need curl to run healthchecks
-RUN apt install -y curl
+# The file binary is used to inspect exectubles when debugging container image issues
+RUN apk add --no-cache file
+RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache tzdata
+RUN apk add --no-cache gnupg
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends openjdk-11-jdk
+#----------------- INSTALLING CORDA CDSE PREREQUISITES --------------------
+#--------------------------------------------------------------------------
 
-# jq is needed by the /download-frozen-image-v2.sh script to pre-fetch docker images without docker.
-RUN apt install -y jq
+# Installing Zulu17 JDK
+RUN wget -P /etc/apk/keys/ \
+https://cdn.azul.com/public_keys/alpine-signing@azul.com-5d5dc44c.rsa.pub
+RUN echo "https://repos.azul.com/zulu/alpine" | tee -a /etc/apk/repositories
+RUN apk update
+RUN apk add --no-cache zulu17-jdk
 
-# Get the utility script that can pre-fetch the container images without
-# a functioning Docker daemon available which we do not have at image build
-# time so have to resort to manually get the images instead of just saying
-# "docker pull my/cool-image..." etc.
-# The reason to jump trough these hoops is to avoid DockerHub rate limiting issues
-RUN curl -sSL https://raw.githubusercontent.com/moby/moby/dedf8528a51c6db40686ed6676e9486d1ed5f9c0/contrib/download-frozen-image-v2.sh > /download-frozen-image-v2.sh
-RUN chmod +x /download-frozen-image-v2.sh
-RUN mkdir -p /etc/corda/corda-dev/
-RUN /download-frozen-image-v2.sh /etc/corda/corda-dev/ corda/corda-dev:5.0.0-devpreview-1.0
+# ENV JAVA_HOME /usr/lib/jvm/zulu17-ca
+# ENV PATH $PATH:$JAVA_HOME/bin
 
-RUN curl https://download.corda.net/corda-cli/1.0.0-DevPreview/get-corda-cli.sh > /get-corda-cli.sh
-RUN chmod +x /get-corda-cli.sh
-RUN /get-corda-cli.sh
+# Installing Corda CLI
+RUN mkdir /platform-jars && \
+    wget -O /platform-jars/binary.tar.gz \
+    https://download.corda.net/c5-release-pack/f82c7008-3b72-48fb-8e25-5ca38a9483b1-5.1.0/platform-jars-5.1.0.tar.gz
 
-RUN curl https://download.corda.net/cordapp-builder/5.0.0-DevPreview-1.0/cordapp-builder-installer.jar --output /cordapp-builder-installer.jar
-RUN java -jar /cordapp-builder-installer.jar
+RUN cd /platform-jars/ && \
+    tar -xvzf binary.tar.gz && \
+    cp net/corda/cli/deployment/corda-cli-installer/5.1.0.0/corda-cli-installer-5.1.0.0.zip . && \
+    unzip corda-cli-installer-5.1.0.0.zip -d corda-cli-installer && \
+    corda-cli-installer/./install.sh
+ENV PATH="$PATH:~/.corda/cli"
 
-RUN git clone https://github.com/corda/corda5-solarsystem-contracts-demo.git
-WORKDIR /corda5-solarsystem-contracts-demo
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-# Placing the ARG here instead of the top may seem like bad form, but it has
-# better build performance this way when we change the ARG's value it will
-# not spend 5 to 10 minutes installing the OS level dependencies on the top of
-# the image definition file because the cached layers will be the same for those.
-ARG SOLARSYSTEM_DEMO_SHA=a3be5ad48d249be7f71c5f15074c874dc0d09b41
-RUN git checkout ${SOLARSYSTEM_DEMO_SHA}
+# Installing CORDA CDSE
+RUN apk add --no-cache git
+RUN git clone https://github.com/corda/CSDE-cordapp-template-kotlin.git
 
-RUN /root/bin/corda-cli/bin/corda-cli network config docker-compose solar-system
-RUN chmod +x gradlew
-RUN ./gradlew build
+RUN cd CSDE-cordapp-template-kotlin/ && \
+    git checkout release/corda-5-0 && \
+    sed -i 's/cordaNotaryPluginsVersion=5.0.0.0/cordaNotaryPluginsVersion=5.0.1.0/' gradle.properties && \
+    sed -i 's/combinedWorkerJarVersion=5.0.0.0/combinedWorkerJarVersion=5.0.1.0/' gradle.properties && \
+    sed -i 's/import static org.gradle.api.JavaVersion.VERSION_11/import static org.gradle.api.JavaVersion.VERSION_17/' build.gradle && \
+    sed -i 's/def javaVersion = VERSION_11/def javaVersion = VERSION_17/' build.gradle
 
-RUN /root/bin/corda-cli/bin/corda-cli network deploy -n solar-system -f solar-system.yaml > docker-compose.yaml
-
-RUN sed -i 's+corda/corda-dev:latest+corda/corda-dev:5.0.0-devpreview-1.0+g' /corda5-solarsystem-contracts-demo/docker-compose.yaml
-
-RUN /root/.local/lib/cordapp-builder/bin/cordapp-builder create --cpk contracts/build/libs/corda5-solar-system-contracts-demo-contracts-1.0-SNAPSHOT-cordapp.cpk --cpk workflows/build/libs/corda5-solar-system-contracts-demo-workflows-1.0-SNAPSHOT-cordapp.cpk -o solar-system.cpb
-
-# OpenSSH server
+RUN apk add --no-cache supervisor
+## TO FIX: Exposing the required ports 5005, 5432 and 8888 for CSDE
+## and 9001 for supervisor. Currently commented because of "--network host" being used to run the container
+# EXPOSE 5005
+# EXPOSE 5432
+# EXPOSE 8888
+# EXPOSE 9001
 EXPOSE 22
 
-# supervisord web ui/dashboard
-EXPOSE 9001
+COPY supervisord.conf /etc/supervisord.conf
 
-# earth-node RPC
-EXPOSE 12112
+COPY start-services.sh /start-services.sh
+RUN chmod +x /start-services.sh
 
-# mars-node RPC
-EXPOSE 12116
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /healthcheck.sh
 
-# pluto-node RPC
-EXPOSE 12119
+WORKDIR /CSDE-cordapp-template-kotlin/
 
-# notary-node RPC
-EXPOSE 12122
-
-COPY ./start-services.sh /start-services.sh
-
-COPY ./supervisor/ /etc/supervisor/conf.d/
+# Extend the parent image's entrypoint
+# https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script
 ENTRYPOINT ["/usr/bin/supervisord"]
-CMD ["--nodaemon"]
+CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
 
-# Add our healthcheck script that determines when do we consider the container healthy
-COPY healthcheck.sh /
-HEALTHCHECK --interval=2s --timeout=5s --start-period=30s --retries=180 CMD /healthcheck.sh
-#RUN ~/bin/corda-cli/bin/corda-cli package install -n solar-system solar-system.cpb
+HEALTHCHECK --interval=30s --timeout=60s --start-period=200s --retries=100 CMD /healthcheck.sh

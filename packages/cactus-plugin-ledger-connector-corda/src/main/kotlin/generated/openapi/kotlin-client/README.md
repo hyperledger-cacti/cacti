@@ -47,11 +47,15 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**clearMonitorTransactionsV1**](docs/DefaultApi.md#clearmonitortransactionsv1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions | Clear transactions from internal store so they'll not be available by GetMonitorTransactionsV1 anymore.
 *DefaultApi* | [**deployContractJarsV1**](docs/DefaultApi.md#deploycontractjarsv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars | Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
 *DefaultApi* | [**diagnoseNodeV1**](docs/DefaultApi.md#diagnosenodev1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node | 
+*DefaultApi* | [**getFlowV1**](docs/DefaultApi.md#getflowv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid | This method gets the current status of the specified flow instance.
 *DefaultApi* | [**getMonitorTransactionsV1**](docs/DefaultApi.md#getmonitortransactionsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions | Get transactions for monitored state classes.
 *DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 *DefaultApi* | [**invokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract | Invokes a contract on a Corda ledger (e.g. a flow)
+*DefaultApi* | [**listCpiV1**](docs/DefaultApi.md#listcpiv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi | List all CPIs uploaded to the cluster
+*DefaultApi* | [**listFlowV1**](docs/DefaultApi.md#listflowv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow | This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
 *DefaultApi* | [**listFlowsV1**](docs/DefaultApi.md#listflowsv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows | 
 *DefaultApi* | [**networkMapV1**](docs/DefaultApi.md#networkmapv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map | 
+*DefaultApi* | [**startFlowV1**](docs/DefaultApi.md#startflowv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow | This method starts a new instance for the specified flow for the specified holding identity.
 *DefaultApi* | [**startMonitorV1**](docs/DefaultApi.md#startmonitorv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor | Start monitoring corda changes (transactions) of given state class
 *DefaultApi* | [**stopMonitorV1**](docs/DefaultApi.md#stopmonitorv1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor | Stop monitoring corda changes (transactions) of given state class
 *DefaultApi* | [**vaultQueryV1**](docs/DefaultApi.md#vaultqueryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query | 
@@ -60,6 +64,7 @@ Class | Method | HTTP request | Description
 <a id="documentation-for-models"></a>
 ## Documentation for Models
 
+ - [org.openapitools.client.models.CPIIDV1](docs/CPIIDV1.md)
  - [org.openapitools.client.models.ClearMonitorTransactionsV1Request](docs/ClearMonitorTransactionsV1Request.md)
  - [org.openapitools.client.models.ClearMonitorTransactionsV1Response](docs/ClearMonitorTransactionsV1Response.md)
  - [org.openapitools.client.models.CordaNodeSshCredentials](docs/CordaNodeSshCredentials.md)
@@ -73,6 +78,11 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.DiagnoseNodeV1Request](docs/DiagnoseNodeV1Request.md)
  - [org.openapitools.client.models.DiagnoseNodeV1Response](docs/DiagnoseNodeV1Response.md)
  - [org.openapitools.client.models.FlowInvocationType](docs/FlowInvocationType.md)
+ - [org.openapitools.client.models.FlowStatusV1Responses](docs/FlowStatusV1Responses.md)
+ - [org.openapitools.client.models.FlowStatusV1ResponsesFlowStatusResponsesInner](docs/FlowStatusV1ResponsesFlowStatusResponsesInner.md)
+ - [org.openapitools.client.models.FlowV1Error](docs/FlowV1Error.md)
+ - [org.openapitools.client.models.GetFlowCidV1Request](docs/GetFlowCidV1Request.md)
+ - [org.openapitools.client.models.GetFlowCidV1Response](docs/GetFlowCidV1Response.md)
  - [org.openapitools.client.models.GetMonitorTransactionsV1Request](docs/GetMonitorTransactionsV1Request.md)
  - [org.openapitools.client.models.GetMonitorTransactionsV1Response](docs/GetMonitorTransactionsV1Response.md)
  - [org.openapitools.client.models.GetMonitorTransactionsV1ResponseTxInner](docs/GetMonitorTransactionsV1ResponseTxInner.md)
@@ -82,6 +92,10 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.JvmObject](docs/JvmObject.md)
  - [org.openapitools.client.models.JvmType](docs/JvmType.md)
  - [org.openapitools.client.models.JvmTypeKind](docs/JvmTypeKind.md)
+ - [org.openapitools.client.models.ListCpiV1Request](docs/ListCpiV1Request.md)
+ - [org.openapitools.client.models.ListCpiV1Response](docs/ListCpiV1Response.md)
+ - [org.openapitools.client.models.ListCpiV1ResponseCpisInner](docs/ListCpiV1ResponseCpisInner.md)
+ - [org.openapitools.client.models.ListCpiV1ResponseCpisInnerCpksInner](docs/ListCpiV1ResponseCpisInnerCpksInner.md)
  - [org.openapitools.client.models.ListFlowsV1Request](docs/ListFlowsV1Request.md)
  - [org.openapitools.client.models.ListFlowsV1Response](docs/ListFlowsV1Response.md)
  - [org.openapitools.client.models.NetworkHostAndPort](docs/NetworkHostAndPort.md)
@@ -90,6 +104,9 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.Party](docs/Party.md)
  - [org.openapitools.client.models.PublicKey](docs/PublicKey.md)
  - [org.openapitools.client.models.SHA256](docs/SHA256.md)
+ - [org.openapitools.client.models.StartFlowV1Request](docs/StartFlowV1Request.md)
+ - [org.openapitools.client.models.StartFlowV1RequestRequestBody](docs/StartFlowV1RequestRequestBody.md)
+ - [org.openapitools.client.models.StartFlowV1Response](docs/StartFlowV1Response.md)
  - [org.openapitools.client.models.StartMonitorV1Request](docs/StartMonitorV1Request.md)
  - [org.openapitools.client.models.StartMonitorV1Response](docs/StartMonitorV1Response.md)
  - [org.openapitools.client.models.StopMonitorV1Request](docs/StopMonitorV1Request.md)

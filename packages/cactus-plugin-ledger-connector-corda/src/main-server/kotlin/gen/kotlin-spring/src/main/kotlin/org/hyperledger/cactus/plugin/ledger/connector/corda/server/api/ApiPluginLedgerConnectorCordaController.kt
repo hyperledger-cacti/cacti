@@ -7,13 +7,20 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployC
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.FlowStatusV1Responses
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetFlowCidV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetFlowCidV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListCpiV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListCpiV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeInfo
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartFlowV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartFlowV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Request
@@ -82,6 +89,17 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
 
     @RequestMapping(
         method = [RequestMethod.GET],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid"],
+        produces = ["text/plain"],
+        consumes = ["application/json"]
+    )
+    fun getFlowV1( @Valid @RequestBody getFlowCidV1Request: GetFlowCidV1Request): ResponseEntity<GetFlowCidV1Response> {
+        return ResponseEntity(service.getFlowV1(getFlowCidV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @RequestMapping(
+        method = [RequestMethod.GET],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -113,6 +131,28 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
 
 
     @RequestMapping(
+        method = [RequestMethod.GET],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun listCpiV1( @Valid @RequestBody listCpiV1Request: ListCpiV1Request): ResponseEntity<ListCpiV1Response> {
+        return ResponseEntity(service.listCpiV1(listCpiV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @RequestMapping(
+        method = [RequestMethod.GET],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow"],
+        produces = ["text/plain"],
+        consumes = ["application/json"]
+    )
+    fun listFlowV1( @Valid @RequestBody getFlowCidV1Request: GetFlowCidV1Request): ResponseEntity<FlowStatusV1Responses> {
+        return ResponseEntity(service.listFlowV1(getFlowCidV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @RequestMapping(
         method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"],
         produces = ["application/json"],
@@ -131,6 +171,17 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     fun networkMapV1( @Valid @RequestBody(required = false) body: kotlin.Any?): ResponseEntity<List<NodeInfo>> {
         return ResponseEntity(service.networkMapV1(body), HttpStatus.valueOf(200))
+    }
+
+
+    @RequestMapping(
+        method = [RequestMethod.POST],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun startFlowV1( @Valid @RequestBody startFlowV1Request: StartFlowV1Request): ResponseEntity<StartFlowV1Response> {
+        return ResponseEntity(service.startFlowV1(startFlowV1Request), HttpStatus.valueOf(200))
     }
 
 

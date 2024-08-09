@@ -26,6 +26,31 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface CPIIDV1
+ */
+export interface CPIIDV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIIDV1
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIIDV1
+     */
+    'signerSummaryHash'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIIDV1
+     */
+    'version': string;
+}
+/**
+ * 
+ * @export
  * @interface ClearMonitorTransactionsV1Request
  */
 export interface ClearMonitorTransactionsV1Request {
@@ -376,6 +401,173 @@ export type FlowInvocationType = typeof FlowInvocationType[keyof typeof FlowInvo
 /**
  * 
  * @export
+ * @interface FlowStatusV1Responses
+ */
+export interface FlowStatusV1Responses {
+    /**
+     * 
+     * @type {Array<FlowStatusV1ResponsesFlowStatusResponsesInner>}
+     * @memberof FlowStatusV1Responses
+     */
+    'flowStatusResponses'?: Array<FlowStatusV1ResponsesFlowStatusResponsesInner>;
+}
+/**
+ * 
+ * @export
+ * @interface FlowStatusV1ResponsesFlowStatusResponsesInner
+ */
+export interface FlowStatusV1ResponsesFlowStatusResponsesInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'clientRequestId'?: string | null;
+    /**
+     * 
+     * @type {FlowV1Error}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'flowError'?: FlowV1Error;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'flowId'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'flowResult'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'flowStatus'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'holdingIDShortHash'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV1ResponsesFlowStatusResponsesInner
+     */
+    'timestamp'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface FlowV1Error
+ */
+export interface FlowV1Error {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowV1Error
+     */
+    'message': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowV1Error
+     */
+    'type': string;
+}
+/**
+ * This method gets the current status of the specified flow instance.
+ * @export
+ * @interface GetFlowCidV1Request
+ */
+export interface GetFlowCidV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Request
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Request
+     */
+    'password': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GetFlowCidV1Request
+     */
+    'rejectUnauthorized': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Request
+     */
+    'holdingIDShortHash'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Request
+     */
+    'clientRequestId'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetFlowCidV1Response
+ */
+export interface GetFlowCidV1Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Response
+     */
+    'clientRequestId'?: string | null;
+    /**
+     * 
+     * @type {FlowV1Error}
+     * @memberof GetFlowCidV1Response
+     */
+    'flowError'?: FlowV1Error;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Response
+     */
+    'flowId'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Response
+     */
+    'flowResult'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Response
+     */
+    'flowStatus': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Response
+     */
+    'holdingIDShortHash': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFlowCidV1Response
+     */
+    'timestamp': string;
+}
+/**
+ * 
+ * @export
  * @interface GetMonitorTransactionsV1Request
  */
 export interface GetMonitorTransactionsV1Request {
@@ -614,6 +806,130 @@ export type JvmTypeKind = typeof JvmTypeKind[keyof typeof JvmTypeKind];
 /**
  * 
  * @export
+ * @interface ListCpiV1Request
+ */
+export interface ListCpiV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1Request
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1Request
+     */
+    'password': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ListCpiV1Request
+     */
+    'rejectUnauthorized': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface ListCpiV1Response
+ */
+export interface ListCpiV1Response {
+    /**
+     * 
+     * @type {Array<ListCpiV1ResponseCpisInner>}
+     * @memberof ListCpiV1Response
+     */
+    'cpis'?: Array<ListCpiV1ResponseCpisInner>;
+}
+/**
+ * 
+ * @export
+ * @interface ListCpiV1ResponseCpisInner
+ */
+export interface ListCpiV1ResponseCpisInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInner
+     */
+    'cpiFileChecksum'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInner
+     */
+    'cpiFileFullChecksum'?: string;
+    /**
+     * 
+     * @type {Array<ListCpiV1ResponseCpisInnerCpksInner>}
+     * @memberof ListCpiV1ResponseCpisInner
+     */
+    'cpks'?: Array<ListCpiV1ResponseCpisInnerCpksInner>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInner
+     */
+    'groupPolicy'?: string | null;
+    /**
+     * 
+     * @type {CPIIDV1}
+     * @memberof ListCpiV1ResponseCpisInner
+     */
+    'id'?: CPIIDV1;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInner
+     */
+    'timestamp'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ListCpiV1ResponseCpisInnerCpksInner
+ */
+export interface ListCpiV1ResponseCpisInnerCpksInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInnerCpksInner
+     */
+    'hash'?: string;
+    /**
+     * 
+     * @type {CPIIDV1}
+     * @memberof ListCpiV1ResponseCpisInnerCpksInner
+     */
+    'id'?: CPIIDV1;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ListCpiV1ResponseCpisInnerCpksInner
+     */
+    'libraries'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInnerCpksInner
+     */
+    'mainBundle'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInnerCpksInner
+     */
+    'timestamp'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListCpiV1ResponseCpisInnerCpksInner
+     */
+    'type'?: string;
+}
+/**
+ * 
+ * @export
  * @interface ListFlowsV1Request
  */
 export interface ListFlowsV1Request {
@@ -798,6 +1114,135 @@ export interface SHA256 {
      * @memberof SHA256
      */
     'size': number;
+}
+/**
+ * This method starts a new instance for the specified flow for the specified holding identity.
+ * @export
+ * @interface StartFlowV1Request
+ */
+export interface StartFlowV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Request
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Request
+     */
+    'password': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof StartFlowV1Request
+     */
+    'rejectUnauthorized': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Request
+     */
+    'holdingIDShortHash'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Request
+     */
+    'clientRequestId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Request
+     */
+    'flowClassName': string;
+    /**
+     * 
+     * @type {StartFlowV1RequestRequestBody}
+     * @memberof StartFlowV1Request
+     */
+    'requestBody': StartFlowV1RequestRequestBody;
+}
+/**
+ * 
+ * @export
+ * @interface StartFlowV1RequestRequestBody
+ */
+export interface StartFlowV1RequestRequestBody {
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1RequestRequestBody
+     */
+    'chatName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1RequestRequestBody
+     */
+    'otherMember'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1RequestRequestBody
+     */
+    'message'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1RequestRequestBody
+     */
+    'numberOfRecords'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface StartFlowV1Response
+ */
+export interface StartFlowV1Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Response
+     */
+    'clientRequestId'?: string | null;
+    /**
+     * 
+     * @type {FlowV1Error}
+     * @memberof StartFlowV1Response
+     */
+    'flowError'?: FlowV1Error;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Response
+     */
+    'flowId'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Response
+     */
+    'flowResult'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Response
+     */
+    'flowStatus': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Response
+     */
+    'holdingIDShortHash': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV1Response
+     */
+    'timestamp': string;
 }
 /**
  * 
@@ -1017,6 +1462,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary This method gets the current status of the specified flow instance.
+         * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFlowV1: async (getFlowCidV1Request: GetFlowCidV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'getFlowCidV1Request' is not null or undefined
+            assertParamExists('getFlowV1', 'getFlowCidV1Request', getFlowCidV1Request)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getFlowCidV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get transactions for monitored state classes.
          * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1114,6 +1595,78 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary List all CPIs uploaded to the cluster
+         * @param {ListCpiV1Request} listCpiV1Request 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCpiV1: async (listCpiV1Request: ListCpiV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'listCpiV1Request' is not null or undefined
+            assertParamExists('listCpiV1', 'listCpiV1Request', listCpiV1Request)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(listCpiV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+         * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listFlowV1: async (getFlowCidV1Request: GetFlowCidV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'getFlowCidV1Request' is not null or undefined
+            assertParamExists('listFlowV1', 'getFlowCidV1Request', getFlowCidV1Request)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getFlowCidV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Responds with a list of the flows on the Corda node.
          * @param {ListFlowsV1Request} [listFlowsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1173,6 +1726,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary This method starts a new instance for the specified flow for the specified holding identity.
+         * @param {StartFlowV1Request} startFlowV1Request Request body for starting a flow
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startFlowV1: async (startFlowV1Request: StartFlowV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'startFlowV1Request' is not null or undefined
+            assertParamExists('startFlowV1', 'startFlowV1Request', startFlowV1Request)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(startFlowV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1324,6 +1913,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary This method gets the current status of the specified flow instance.
+         * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFlowV1(getFlowCidV1Request: GetFlowCidV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetFlowCidV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFlowV1(getFlowCidV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get transactions for monitored state classes.
          * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1355,6 +1955,28 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * 
+         * @summary List all CPIs uploaded to the cluster
+         * @param {ListCpiV1Request} listCpiV1Request 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listCpiV1(listCpiV1Request: ListCpiV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCpiV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCpiV1(listCpiV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+         * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listFlowV1(getFlowCidV1Request: GetFlowCidV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV1Responses>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listFlowV1(getFlowCidV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Responds with a list of the flows on the Corda node.
          * @param {ListFlowsV1Request} [listFlowsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1372,6 +1994,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async networkMapV1(body?: object, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<NodeInfo>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.networkMapV1(body, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary This method starts a new instance for the specified flow for the specified holding identity.
+         * @param {StartFlowV1Request} startFlowV1Request Request body for starting a flow
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async startFlowV1(startFlowV1Request: StartFlowV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StartFlowV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.startFlowV1(startFlowV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1447,6 +2080,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary This method gets the current status of the specified flow instance.
+         * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFlowV1(getFlowCidV1Request: GetFlowCidV1Request, options?: any): AxiosPromise<GetFlowCidV1Response> {
+            return localVarFp.getFlowV1(getFlowCidV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get transactions for monitored state classes.
          * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1475,6 +2118,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.invokeContractV1(invokeContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary List all CPIs uploaded to the cluster
+         * @param {ListCpiV1Request} listCpiV1Request 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCpiV1(listCpiV1Request: ListCpiV1Request, options?: any): AxiosPromise<ListCpiV1Response> {
+            return localVarFp.listCpiV1(listCpiV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+         * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listFlowV1(getFlowCidV1Request: GetFlowCidV1Request, options?: any): AxiosPromise<FlowStatusV1Responses> {
+            return localVarFp.listFlowV1(getFlowCidV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Responds with a list of the flows on the Corda node.
          * @param {ListFlowsV1Request} [listFlowsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1491,6 +2154,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         networkMapV1(body?: object, options?: any): AxiosPromise<Array<NodeInfo>> {
             return localVarFp.networkMapV1(body, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary This method starts a new instance for the specified flow for the specified holding identity.
+         * @param {StartFlowV1Request} startFlowV1Request Request body for starting a flow
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startFlowV1(startFlowV1Request: StartFlowV1Request, options?: any): AxiosPromise<StartFlowV1Response> {
+            return localVarFp.startFlowV1(startFlowV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1568,6 +2241,18 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
+     * @summary This method gets the current status of the specified flow instance.
+     * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getFlowV1(getFlowCidV1Request: GetFlowCidV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getFlowV1(getFlowCidV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get transactions for monitored state classes.
      * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
      * @param {*} [options] Override http request option.
@@ -1602,6 +2287,30 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
+     * 
+     * @summary List all CPIs uploaded to the cluster
+     * @param {ListCpiV1Request} listCpiV1Request 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listCpiV1(listCpiV1Request: ListCpiV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listCpiV1(listCpiV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * @param {GetFlowCidV1Request} getFlowCidV1Request This method gets the current status of the specified flow instance.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listFlowV1(getFlowCidV1Request: GetFlowCidV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listFlowV1(getFlowCidV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Responds with a list of the flows on the Corda node.
      * @param {ListFlowsV1Request} [listFlowsV1Request] 
      * @param {*} [options] Override http request option.
@@ -1621,6 +2330,18 @@ export class DefaultApi extends BaseAPI {
      */
     public networkMapV1(body?: object, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).networkMapV1(body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary This method starts a new instance for the specified flow for the specified holding identity.
+     * @param {StartFlowV1Request} startFlowV1Request Request body for starting a flow
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public startFlowV1(startFlowV1Request: StartFlowV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).startFlowV1(startFlowV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

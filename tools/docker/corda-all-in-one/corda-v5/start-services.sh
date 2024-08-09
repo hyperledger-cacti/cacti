@@ -1,11 +1,14 @@
 #!/bin/bash
+set -e
 
-# Load the cached container images into the Docker Daemon before launching
-# the Docker Compose network. This is the preferred workaround to synchronizing
-# different processes of a supervisord configuration
-tar -cC '/etc/corda/corda-dev/' . | docker load
+cd /CSDE-cordapp-template-kotlin/
+while true; do
+  echo "Waiting for startCorda to execute..."
+  if ./gradlew listVNodes | grep "X500"; then
+    echo "Starting v5NodeSetup...";
+    ./gradlew 5-vNodeSetup
+    break;
+  fi
+  sleep 5;
+done
 
-# Now that the images are cached **and** loaded to the daemon, we can start the
-# corda network via the docker-compose file and it will not need to download
-# anything from DockerHub (if it does, that's a bug)
-supervisorctl start corda5-solarsystem-contracts-demo-network
