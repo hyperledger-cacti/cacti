@@ -54,6 +54,7 @@
             "dist/*"
   ],
   "scripts": {
+                    "start-gateway": "ts-node satp-gateway-cli.ts",
             "build": "run-p tsc codegen",
             "build-proto": "buf build --path src/main/proto --verbose",
             "build:dev:backend:postbuild": "mkdir -p ./dist/lib/knex && cp -r ./src/knex/* ./dist/lib/knex",
@@ -105,6 +106,7 @@
             "class-transformer": "0.5.1",
             "class-validator": "0.14.1",
             "crypto-js": "4.2.0",
+                    "dotenv": "16.4.5",
             "ethers": "^6.13.1",
             "express": "4.17.2",
             "fabric-network": "2.2.19",
