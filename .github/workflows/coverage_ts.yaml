@@ -16,15 +16,15 @@
         if: ${{ github.event.workflow_run.conclusion == 'success' }}
         steps:
           - name: Check out repository
-            uses: actions/checkout@v4.1.1
+            uses: actions/checkout@v4.1.7
     
           - name: Set up Node.js
-            uses: actions/setup-node@v4.0.2
+            uses: actions/setup-node@v4.0.3
             with:
               node-version: ${{ env.NODEJS_VERSION }}
     
           - name: Restore Yarn Cache
-            uses: actions/cache@v4.0.1
+            uses: actions/cache@v4.0.2
             with:
               path: ./.yarn/
               key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}

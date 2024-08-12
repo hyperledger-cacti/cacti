@@ -25,12 +25,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Use Python 3.x
         uses: actions/setup-python@v4

@@ -30,7 +30,7 @@ jobs:
           && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
 
     - name: Checkout
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.7
       with:
         fetch-depth: 0
 
@@ -46,7 +46,7 @@ jobs:
         java-version: '8'
 
     - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
-      uses: actions/setup-node@v4.0.2
+      uses: actions/setup-node@v4.0.3
       with:
         node-version: ${{ env.NODEJS_VERSION }}
 

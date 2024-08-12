@@ -26,7 +26,7 @@ jobs:
       status: ${{ steps.changes.outputs.weaver_code_changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -45,7 +45,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
@@ -142,7 +142,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
@@ -238,7 +238,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
