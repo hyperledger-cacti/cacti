@@ -30,7 +30,7 @@ jobs:
       docs_changed: ${{ steps.changes.outputs.docs_changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -65,10 +65,10 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.1.7
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.0.2
+      uses: actions/setup-node@v4.0.3
       with:
         node-version: ${{ matrix.node-version }}
   
@@ -103,10 +103,10 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.1.7
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.0.2
+      uses: actions/setup-node@v4.0.3
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Use Python 3.x
         uses: actions/setup-python@v4

@@ -27,7 +27,7 @@ jobs:
       iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Build Image
         run: make build-server-local
@@ -80,10 +80,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Setup .npmrc
         run: |
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
@@ -161,7 +161,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Generate github.properties
         run: |
@@ -191,10 +191,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 

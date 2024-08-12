@@ -34,7 +34,7 @@ jobs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: Set output
         id: set-output
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
@@ -55,7 +55,7 @@ jobs:
       ghcr-dev-container-vscode-changed: ${{ steps.changes.outputs.ghcr-dev-container-vscode-changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -177,14 +177,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -208,13 +208,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -276,14 +276,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -347,13 +347,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -374,13 +374,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -402,14 +402,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -443,14 +443,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -494,7 +494,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           path: .tmp/benchmark-results/cmd-api-server/
           key: ${{ runner.os }}-benchmark
@@ -533,14 +533,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -570,14 +570,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -605,14 +605,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -639,14 +639,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -675,14 +675,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -709,14 +709,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -744,14 +744,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -780,14 +780,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -814,14 +814,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -849,14 +849,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -883,14 +883,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -919,14 +919,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -953,14 +953,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -987,14 +987,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1022,14 +1022,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1057,14 +1057,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1091,14 +1091,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1124,14 +1124,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1158,14 +1158,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1192,14 +1192,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1228,13 +1228,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1266,14 +1266,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1292,7 +1292,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v4.0.2
         with:
           path: .tmp/benchmark-results/plugin-ledger-connector-besu/
           key: ${{ runner.os }}-benchmark
@@ -1334,14 +1334,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1373,14 +1373,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1411,14 +1411,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1453,14 +1453,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1491,14 +1491,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1524,14 +1524,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1557,14 +1557,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1590,14 +1590,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1623,14 +1623,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1656,14 +1656,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1689,14 +1689,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1722,14 +1722,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1755,14 +1755,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1788,14 +1788,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1821,14 +1821,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1854,14 +1854,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1886,14 +1886,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1922,13 +1922,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1954,13 +1954,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1988,14 +1988,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2021,14 +2021,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2054,14 +2054,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2088,14 +2088,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2119,16 +2119,16 @@ jobs:
   #   runs-on: ubuntu-22.04
   #   steps:
   #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
-  #       uses: actions/setup-node@v4.0.2
+  #       uses: actions/setup-node@v4.0.3
   #       with:
   #         node-version: ${{ env.NODEJS_VERSION }}
-  #     - uses: actions/checkout@v4.1.1
+  #     - uses: actions/checkout@v4.1.7
   #     - id: yarn-cache-dir-path
   #       name: Get yarn cache directory path
   #       run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
   #     - id: yarn-cache
   #       name: Restore Yarn Cache
-  #       uses: actions/cache@v4.0.1
+  #       uses: actions/cache@v4.0.2
   #       with:
   #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
   #         path: ./.yarn/
@@ -2152,14 +2152,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2185,14 +2185,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2223,14 +2223,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2256,14 +2256,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2290,14 +2290,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2325,14 +2325,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2367,14 +2367,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2405,14 +2405,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2438,13 +2438,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2475,14 +2475,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2508,14 +2508,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2531,7 +2531,7 @@ jobs:
   ghcr-besu-all-in-one:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
   ghcr-connector-corda-server:
@@ -2541,7 +2541,7 @@ jobs:
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
 
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-connector-corda-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
       - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
@@ -2557,7 +2557,7 @@ jobs:
   ghcr-corda-all-in-one-flowdb:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
 
@@ -2570,10 +2570,10 @@ jobs:
       IMAGE_NAME: cacti-dev-container-vscode
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: npm_install_@devcontainers/cli@0.44.0
         run: npm install -g @devcontainers/cli@0.44.0
       - name: npx_yes_devcontainers_cli_build
@@ -2581,21 +2581,21 @@ jobs:
   ghcr-example-carbon-accounting:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
 
   ghcr-example-supply-chain-app:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
 
   ghcr-fabric2-all-in-one:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
 
@@ -2609,7 +2609,7 @@ jobs:
   ghcr-keychain-vault-server:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-keychain-vault-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
       - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
