@@ -177,33 +177,31 @@ describe("Aries connector setup tests", () => {
   test("Adding aries agent with invalid inbound url throws error", async () => {
     const agentName = `shouldThrow-${uuidV4()}`;
 
-    try {
-      await connector.addAriesAgent({
+    await expect(
+      connector.addAriesAgent({
         name: agentName,
         walletKey: agentName,
         indyNetworks: [fakeIndyNetworkConfig],
         inboundUrl: "foo",
-      });
-      expect("should throw!").toBe(0);
-    } catch (error) {
-      log.info(
-        "Adding aries agent with inbound url 'foo' throws error as expected",
-      );
-    }
+      }),
+    ).rejects.toThrow();
 
-    try {
-      await connector.addAriesAgent({
+    log.info(
+      "Adding aries agent with inbound url 'foo' throws error as expected",
+    );
+
+    await expect(
+      connector.addAriesAgent({
         name: agentName,
         walletKey: agentName,
         indyNetworks: [fakeIndyNetworkConfig],
         inboundUrl: "http://127.0.0.1",
-      });
-      expect("should throw!").toBe(0);
-    } catch (error) {
-      log.info(
-        "Adding aries agent without inbound url port throws error as expected",
-      );
-    }
+      }),
+    ).rejects.toThrow();
+
+    log.info(
+      "Adding aries agent without inbound url port throws error as expected",
+    );
 
     const allAgents = await connector.getAgents();
     expect(allAgents.length).toBe(0);
