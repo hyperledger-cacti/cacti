@@ -22,6 +22,7 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
+  LoggerProvider,
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
@@ -41,6 +42,11 @@ const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";
 
 describe("Running ethereum transactions with different gas configurations", () => {
+  const log = LoggerProvider.getOrCreate({
+    label: "geth-contract-deploy-and-invoke-using-keychain-v1.test.ts",
+    level: testLogLevel,
+  });
+
   let web3: InstanceType<typeof Web3>,
     addressInfo,
     address: string,
@@ -133,8 +139,8 @@ describe("Running ethereum transactions with different gas configurations", () =
       web3.utils.toWei(2, "gwei"),
     );
 
-    try {
-      await apiClient.runTransactionV1({
+    await expect(
+      apiClient.runTransactionV1({
         web3SigningCredential: {
           ethAccount: WHALE_ACCOUNT_ADDRESS,
           secret: "",
@@ -149,13 +155,10 @@ describe("Running ethereum transactions with different gas configurations", () =
             maxFeePerGas: maxFee,
           },
         },
-      });
-      fail(
-        "Expected runTransactionV1 with mixed config to fail but it succeeded.",
-      );
-    } catch (error) {
-      console.log("runTransactionV1 with mixed config failed as expected");
-    }
+      }),
+    ).rejects.toThrow();
+
+    log.info("runTransactionV1 with mixed config failed as expected");
 
     const balance = await web3.eth.getBalance(testEthAccount.address);
     expect(balance.toString()).toEqual("0");
