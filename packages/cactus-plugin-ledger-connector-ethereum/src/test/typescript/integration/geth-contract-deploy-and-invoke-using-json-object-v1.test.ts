@@ -24,6 +24,7 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
+  LoggerProvider,
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
@@ -50,6 +51,12 @@ const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";
 
 describe("Ethereum contract deploy and invoke using keychain tests", () => {
+  const logLevel: LogLevelDesc = "info";
+  const log = LoggerProvider.getOrCreate({
+    label: "geth-contract-deploy-and-invoke-using-json-object-v1.test.ts",
+    level: logLevel,
+  });
+
   const keychainEntryKey = uuidV4();
   let testEthAccount: {
       address: HexString;
@@ -227,24 +234,46 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("deployContract without contractJSON should fail", async () => {
-    try {
-      await apiClient.deployContract({
+    await expect(
+      apiClient.deployContract({
         contract: {} as ContractJsonDefinition,
         web3SigningCredential: {
           ethAccount: WHALE_ACCOUNT_ADDRESS,
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-      });
-      fail("Expected deployContract call to fail but it succeeded.");
-    } catch (error) {
-      console.log("deployContract failed as expected");
-    }
+      }),
+    ).rejects.toThrow();
+
+    log.info("deployContract failed as expected");
   });
 
   test("deployContract with additional parameters should fail", async () => {
-    try {
-      await apiClient.deployContract({
+    // this try-catch statement was not refactored because calling deployContract with additional parameters is actually not
+    // causing an error.
+
+    // try {
+    //   await apiClient.deployContract({
+    //     contract: {
+    //       contractJSON: HelloWorldContractJson,
+    //     },
+    //     web3SigningCredential: {
+    //       ethAccount: WHALE_ACCOUNT_ADDRESS,
+    //       secret: "",
+    //       type: Web3SigningCredentialType.GethKeychainPassword,
+    //     },
+    //     gas: 1000000,
+    //     fake: 4,
+    //   } as DeployContractV1Request);
+    //   //test is failing because "fail" is not defined. Without the fail statement, the test actually passes.
+    //   fail("Expected deployContract call to fail but it succeeded.");
+    // } catch (error) {
+    //   console.log("deployContract failed as expected");
+    // }
+
+    // have the left the original assertion above as a comment for additional context, this can be removed once this test is debugged. 
+    await expect(
+      apiClient.deployContract({
         contract: {
           contractJSON: HelloWorldContractJson,
         },
@@ -255,11 +284,11 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         },
         gas: 1000000,
         fake: 4,
-      } as DeployContractV1Request);
-      fail("Expected deployContract call to fail but it succeeded.");
-    } catch (error) {
-      console.log("deployContract failed as expected");
-    }
+      } as DeployContractV1Request)
+    ).rejects.toThrow();
+
+    log.info("deployContract failed as expected");
+    
   });
 
   //////////////////////////////////
@@ -285,8 +314,8 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
     expect(setNameOut).toBeTruthy();
     expect(setNameOut.data).toBeTruthy();
 
-    try {
-      await apiClient.invokeContractV1({
+    await expect(
+      apiClient.invokeContractV1({
         contract: {
           contractJSON: HelloWorldContractJson,
           contractAddress,
@@ -299,11 +328,8 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-      });
-      fail("Expected getContractInfoKeychain call to fail but it succeeded.");
-    } catch (error) {
-      expect(error).toBeTruthy();
-    }
+      }),
+    ).rejects.toBeTruthy();
 
     const getNameOut = await apiClient.invokeContractV1({
       contract: {
@@ -366,8 +392,8 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
     expect(setNameOut).toBeTruthy();
     expect(setNameOut.data).toBeTruthy();
 
-    try {
-      await apiClient.invokeContractV1({
+    await expect(
+      apiClient.invokeContractV1({
         contract: {
           contractJSON: HelloWorldContractJson,
           contractAddress,
@@ -383,11 +409,8 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
           secret: testEthAccount.privateKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
-      });
-      fail("Expected getContractInfoKeychain call to fail but it succeeded.");
-    } catch (error) {
-      expect(error).toBeTruthy();
-    }
+      }),
+    ).rejects.toBeTruthy();
 
     const invokeGetNameOut = await apiClient.invokeContractV1({
       contract: {
@@ -410,8 +433,8 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("invokeContractV1 without methodName should fail", async () => {
-    try {
-      await apiClient.invokeContractV1({
+    await expect(
+      apiClient.invokeContractV1({
         contract: {
           contractJSON: HelloWorldContractJson,
           contractAddress,
@@ -423,12 +446,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-      } as InvokeContractV1Request);
-      fail(
-        "Expected deployContractSolBytecodeV1 call to fail but it succeeded.",
-      );
-    } catch (error) {
-      console.log("deployContractSolBytecodeV1 failed as expected");
-    }
+      } as InvokeContractV1Request),
+    ).rejects.toThrow();
+
+    log.info("deployContractSolBytecodeV1 failed as expected");
   });
 });

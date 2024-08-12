@@ -167,43 +167,49 @@ describe("invokeRawWeb3EthMethod Tests", () => {
   });
 
   test("invokeRawWeb3EthMethod with missing arg throws error (getBlock)", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
-        methodName: "getBlock",
-      });
+    // did not refactor because the test is not failing.
+    // try {
+    //   const connectorResponse = connector.invokeRawWeb3EthMethod({
+    //     methodName: "getBlock",
+    //   });
 
-      await connectorResponse;
-      fail("Calling getBlock with missing argument should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    //   await connectorResponse;
+    //   //This test is actually passing, but the statement below is not being printed.
+    //   fail("Calling getBlock with missing argument should throw an error");
+    // } catch (err) {
+    //   expect(err).toBeTruthy();
+    // }
+
+    // have the left the original assertion above as a comment for additional context, this can be removed once this test is debugged. 
+    await expect(
+      connector.invokeRawWeb3EthMethod({
+        methodName: "getBlock",
+      })
+    ).rejects.toBeTruthy();
+    
   });
 
   test("invokeRawWeb3EthMethod with invalid arg throws error (getBlock)", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
+    await expect(
+      connector.invokeRawWeb3EthMethod({
         methodName: "getBlock",
         params: ["foo"],
-      });
+      }),
+    ).rejects.toThrow();
 
-      await connectorResponse;
-      fail("Calling getBlock with argument should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    log.info(
+      "Calling getBlock with an invalid argument threw an error as expected",
+    );
   });
 
   test("invokeRawWeb3EthMethod with non existing method throws error", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
+    await expect(
+      connector.invokeRawWeb3EthMethod({
         methodName: "foo",
         params: ["foo"],
-      });
+      }),
+    ).rejects.toThrow();
 
-      await connectorResponse;
-      fail("Calling non existing method should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    log.info("Calling non-existing method threw an error as expected");
   });
 });
