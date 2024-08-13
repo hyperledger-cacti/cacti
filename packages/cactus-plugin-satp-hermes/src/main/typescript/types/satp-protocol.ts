@@ -12,9 +12,16 @@ import {
  * Handlers implementing this interface must provide mechanisms to setup routes and handle
  * protocol-specific requests based on the stage they are designed for.
  */
+
+export enum SATPHandlerType {
+  STAGE0 = "Stage0SATPHandler",
+  STAGE1 = "Stage1SATPHandler",
+  STAGE2 = "Stage2SATPHandler",
+  STAGE3 = "Stage3SATPHandler",
+}
 export interface SATPHandler {
   setupRouter(router: ConnectRouter): void;
-  getHandlerIdentifier(): string;
+  getHandlerIdentifier(): SATPHandlerType;
   getHandlerSessions(): string[];
 }
 
@@ -24,5 +31,6 @@ export interface SATPHandlerOptions {
   clientService: SATPService;
   supportedDLTs: SupportedChain[];
   loggerOptions: ILoggerOptions;
+  stage: string;
 }
 export { SATPService, SATPServiceType };

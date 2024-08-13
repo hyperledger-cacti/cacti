@@ -87,6 +87,7 @@ export class GatewayOrchestrator {
   public get ourGateway(): GatewayIdentity {
     return this.localGateway;
   }
+
   async startupGatewayOrchestrator(): Promise<void> {
     if (this.counterPartyGateways.values.length === 0) {
       this.logger.info("No gateways to connect to");
@@ -94,6 +95,17 @@ export class GatewayOrchestrator {
     } else {
       this.connectToCounterPartyGateways();
     }
+  }
+
+  public getChannel(dlt: SupportedChain): GatewayChannel {
+    const channels = Array.from(this.channels.values());
+    const channel = channels.find((channel) => {
+      return channel.supportedDLTs.includes(dlt);
+    });
+    if (!channel) {
+      throw new Error(`No channel found for DLT ${dlt}`);
+    }
+    return channel;
   }
 
   public getChannels(): Map<string, GatewayChannel> {
@@ -192,20 +204,25 @@ export class GatewayOrchestrator {
 
   private createConnectClients(
     identity: GatewayIdentity,
-  ): PromiseConnectClient<SATPServiceClient>[] {
+  ): Map<string, PromiseConnectClient<SATPServiceClient>> {
     // one function for each client type; aggregate in array
     const transport = createConnectTransport({
       baseUrl: identity.address + ":" + identity.gatewayGrpcPort,
       httpVersion: "1.1",
     });
 
-    const stage0Client = this.createStage0ServiceClient(transport);
-    const stage1Client = this.createStage1ServiceClient(transport);
-    const stage2Client = this.createStage2ServiceClient(transport);
-    const stage3Client = this.createStage3ServiceClient(transport);
+    const clients: Map<
+      string,
+      PromiseConnectClient<SATPServiceClient>
+    > = new Map();
+
+    clients.set("0", this.createStage0ServiceClient(transport));
+    clients.set("1", this.createStage1ServiceClient(transport));
+    clients.set("2", this.createStage2ServiceClient(transport));
+    clients.set("3", this.createStage3ServiceClient(transport));
 
     // todo perform healthcheck on startup; should be in stage 0
-    return [stage0Client, stage1Client, stage2Client, stage3Client];
+    return clients;
   }
 
   private createStage0ServiceClient(

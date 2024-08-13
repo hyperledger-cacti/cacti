@@ -1,7 +1,11 @@
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPSession } from "../satp-session";
 import { Stage0ServerService } from "../stage-services/server/stage0-server-service";
-import { SATPHandler, SATPHandlerOptions } from "../../types/satp-protocol";
+import {
+  SATPHandler,
+  SATPHandlerOptions,
+  SATPHandlerType,
+} from "../../types/satp-protocol";
 import { ConnectRouter } from "@connectrpc/connect";
 import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_connect";
 import {
@@ -13,7 +17,7 @@ import {
 import { Stage0ClientService } from "../stage-services/client/stage0-client-service";
 
 export class Stage0SATPHandler implements SATPHandler {
-  public static readonly CLASS_NAME = "Stage0SATPHandler";
+  public static readonly CLASS_NAME = SATPHandlerType.STAGE0;
   private sessions: Map<string, SATPSession>;
   private serverService: Stage0ServerService;
   private clientService: Stage0ClientService;
@@ -29,7 +33,7 @@ export class Stage0SATPHandler implements SATPHandler {
     return Array.from(this.sessions.keys());
   }
 
-  getHandlerIdentifier(): string {
+  getHandlerIdentifier(): SATPHandlerType {
     return Stage0SATPHandler.CLASS_NAME;
   }
 

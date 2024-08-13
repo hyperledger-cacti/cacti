@@ -3,17 +3,26 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { PreTransferCommenceRequestMessage, PreTransferCommenceResponseMessage, PreTransferVerificationAndContextEstablishmentRequest, PreTransferVerificationAndContextEstablishmentResponse } from "./stage_0_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
+import { PreTransferCommenceRequestMessage, PreTransferCommenceResponseMessage, PreTransferVerificationAndContextEstablishmentRequest, PreTransferVerificationAndContextEstablishmentResponse, PublicKey } from "./stage_0_pb.js";
 
 /**
- * util RPCs
- *
  * @generated from service cacti.satp.v02.SatpStage0Service
  */
 export const SatpStage0Service = {
   typeName: "cacti.satp.v02.SatpStage0Service",
   methods: {
+    /**
+     * util RPCs
+     *
+     * @generated from rpc cacti.satp.v02.SatpStage0Service.GetPublicKey
+     */
+    getPublicKey: {
+      name: "GetPublicKey",
+      I: Empty,
+      O: PublicKey,
+      kind: MethodKind.Unary,
+    },
     /**
      * step RPCs
      *

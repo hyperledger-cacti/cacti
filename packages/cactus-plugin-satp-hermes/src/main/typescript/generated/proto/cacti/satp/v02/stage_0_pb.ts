@@ -256,3 +256,40 @@ export class PreTransferCommenceResponseMessage extends Message<PreTransferComme
   }
 }
 
+/**
+ * @generated from message cacti.satp.v02.PublicKey
+ */
+export class PublicKey extends Message<PublicKey> {
+  /**
+   * @generated from field: string public_key = 1;
+   */
+  publicKey = "";
+
+  constructor(data?: PartialMessage<PublicKey>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.PublicKey";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PublicKey {
+    return new PublicKey().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PublicKey {
+    return new PublicKey().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PublicKey {
+    return new PublicKey().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PublicKey | PlainMessage<PublicKey> | undefined, b: PublicKey | PlainMessage<PublicKey> | undefined): boolean {
+    return proto3.util.equals(PublicKey, a, b);
+  }
+}
+

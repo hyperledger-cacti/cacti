@@ -3,7 +3,11 @@ import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { SATPSession } from "../satp-session";
 import { SupportedChain } from "../types";
-import { SATPHandler, SATPHandlerOptions } from "../../types/satp-protocol";
+import {
+  SATPHandler,
+  SATPHandlerOptions,
+  SATPHandlerType,
+} from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   LockAssertionReceiptMessage,
@@ -12,7 +16,7 @@ import {
 import { Stage2ClientService } from "../stage-services/client/stage2-client-service";
 import { TransferCommenceResponseMessage } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
 export class Stage2SATPHandler implements SATPHandler {
-  public static readonly CLASS_NAME = "Stage2SATPHandler";
+  public static readonly CLASS_NAME = SATPHandlerType.STAGE2;
   private sessions: Map<string, SATPSession>;
   private serverService: Stage2ServerService;
   private clientService: Stage2ClientService;
@@ -32,7 +36,7 @@ export class Stage2SATPHandler implements SATPHandler {
     return this.logger;
   }
 
-  getHandlerIdentifier(): string {
+  getHandlerIdentifier(): SATPHandlerType {
     return Stage2SATPHandler.CLASS_NAME;
   }
 
