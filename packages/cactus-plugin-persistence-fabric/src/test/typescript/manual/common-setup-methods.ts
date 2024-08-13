@@ -142,6 +142,8 @@ export async function setupApiServer(
   cactusApiServerOptions.apiCorsDomainCsv = "*";
   cactusApiServerOptions.apiTlsEnabled = false;
   cactusApiServerOptions.apiPort = port;
+  cactusApiServerOptions.grpcPort = port + 1;
+  cactusApiServerOptions.crpcPort = port + 2;
   const config = await configService.newExampleConfigConvict(
     cactusApiServerOptions,
   );

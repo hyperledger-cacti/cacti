@@ -57,7 +57,7 @@ export default function ERC20BalanceHistoryChart({
           colors: [theme.palette.primary.main],
           xaxis: {
             type: "datetime",
-            categories: data?.map((txn) => new Date(txn.created_at).getTime()),
+            categories: data?.map((txn) => txn.created_at),
             labels: {
               format: "dd-MM-yyyy h:mm",
             },

@@ -359,3 +359,11 @@ ALTER FUNCTION ethereum.get_missing_blocks_in_range(integer, integer)
     OWNER TO postgres;
 
 GRANT EXECUTE ON PROCEDURE ethereum.update_issued_erc721_tokens(numeric) TO public;
+
+GRANT USAGE ON SCHEMA ethereum TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA ethereum TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA ethereum TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA ethereum TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ethereum GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ethereum GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ethereum GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;

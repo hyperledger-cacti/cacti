@@ -44,7 +44,7 @@ const fabricBrowserAppDefinition: AppDefinition = {
 
     return {
       id: app.id,
-      appName: "Hyperledger Fabric Browser",
+      appName: fabricBrowserAppDefinition.appName,
       instanceName: app.instance_name,
       description: app.description,
       path: app.path,
@@ -86,6 +86,8 @@ const fabricBrowserAppDefinition: AppDefinition = {
       StatusComponent: (
         <PersistencePluginStatus pluginName="PluginPersistenceFabric" />
       ),
+      appSetupGuideURL: fabricBrowserAppDefinition.appSetupGuideURL,
+      appDocumentationURL: fabricBrowserAppDefinition.appDocumentationURL,
     };
   },
 };

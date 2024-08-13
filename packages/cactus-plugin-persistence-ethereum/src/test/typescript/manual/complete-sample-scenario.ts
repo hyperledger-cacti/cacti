@@ -207,7 +207,7 @@ async function main() {
 
   // Set up the ApiServer with Ethereum Connector and Ethereum Persistence plugins.
   // It returns the persistence plugin, which we can use to run monitoring operations.
-  const persistence = await setupApiServer(9782, rpcApiWsHost);
+  const persistence = await setupApiServer(9530, rpcApiWsHost);
   console.log("Environment is running...");
 
   // Deploy an ERC721 contract to our test ledger and mint some tokens,

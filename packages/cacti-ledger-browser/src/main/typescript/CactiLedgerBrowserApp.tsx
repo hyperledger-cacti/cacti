@@ -18,7 +18,7 @@ import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
 import HeaderBar from "./components/Layout/HeaderBar";
 import HomePage from "./pages/home/HomePage";
-import { AppInstance, AppListEntry } from "./common/types/app";
+import { AppInstance } from "./common/types/app";
 import { patchAppRoutePath } from "./common/utils";
 import { NotificationProvider } from "./common/context/NotificationContext";
 import { guiAppConfig } from "./common/queries";
@@ -26,39 +26,18 @@ import createApplications from "./common/createApplications";
 import ConnectionFailedDialog from "./components/ConnectionFailedDialog/ConnectionFailedDialog";
 
 /**
- * Get list of all apps from the config
- */
-function getAppList(appConfig: AppInstance[]) {
-  const appList: AppListEntry[] = appConfig.map((app) => {
-    return {
-      path: app.path,
-      name: app.appName,
-    };
-  });
-
-  appList.unshift({
-    path: "/",
-    name: "Home",
-  });
-
-  return appList;
-}
-
-/**
  * Create header bar for each app based on app menuEntries field in config.
  */
 function getHeaderBarRoutes(appConfig: AppInstance[]) {
-  const appList = getAppList(appConfig);
-
   const headerRoutesConfig = appConfig.map((app) => {
     return {
       key: app.path,
       path: `${app.path}/*`,
       element: (
         <HeaderBar
-          appList={appList}
           path={app.path}
           menuEntries={app.menuEntries}
+          appDocumentationURL={app.appDocumentationURL}
         />
       ),
     };
@@ -66,7 +45,9 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
   headerRoutesConfig.push({
     key: "home",
     path: `*`,
-    element: <HeaderBar appList={appList} />,
+    element: (
+      <HeaderBar appDocumentationURL="https://github.com/hyperledger/cacti" />
+    ),
   });
   return useRoutes(headerRoutesConfig);
 }

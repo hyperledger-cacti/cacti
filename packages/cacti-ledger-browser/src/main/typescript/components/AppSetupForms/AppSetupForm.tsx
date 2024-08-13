@@ -2,6 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 
+const pathCheckRegex = /^\/[a-zA-Z][a-zA-Z0-9]*$/;
 const emptyFormHelperText = "Field can't be empty";
 const regularPathHelperText =
   "Path under which the plugin will be available, must be unique withing GUI.";
@@ -30,9 +31,7 @@ export default function AppSetupForm({
   const isInstanceNameEmptyError = !!!commonSetupValues.instanceName;
   const isDescriptionEmptyError = !!!commonSetupValues.description;
   const isPathEmptyError = !!!commonSetupValues.path;
-  const isPathInvalidError = !(
-    commonSetupValues.path.startsWith("/") && commonSetupValues.path.length > 1
-  );
+  const isPathInvalidError = !pathCheckRegex.test(commonSetupValues.path);
   let pathHelperText = regularPathHelperText;
   if (isPathEmptyError) {
     pathHelperText = emptyFormHelperText;
