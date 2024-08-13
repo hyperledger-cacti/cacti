@@ -61,6 +61,7 @@ export class BLODispatcher {
       signer: signer,
       supportedDLTs: this.orchestrator.supportedDLTs,
       bridgeManager: this.bridgeManager,
+      orquestrator: this.orchestrator,
     };
 
     this.manager = new SATPManager(SATPManagerOpts);
