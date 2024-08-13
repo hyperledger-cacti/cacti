@@ -23,11 +23,21 @@ import {
   SATPHandler,
   SATPServiceType,
   SATPHandlerOptions,
+  SATPHandlerType,
 } from "../types/satp-protocol";
 import { ISATPServiceOptions } from "../core/stage-services/satp-service";
 import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { SATPBridgesManager } from "./satp-bridges-manager";
+import { GatewayOrchestrator } from "./gateway-orchestrator";
+import { SessionData } from "../generated/proto/cacti/satp/v02/common/session_pb";
+//import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
+import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
+import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_connect";
+import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_connect";
+import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
+import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
+import { Empty } from "@bufbuild/protobuf";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -36,6 +46,7 @@ export interface ISATPManagerOptions {
   signer: JsObjectSigner;
   supportedDLTs: SupportedChain[];
   bridgeManager: SATPBridgesManager;
+  orquestrator: GatewayOrchestrator;
 }
 
 export class SATPManager {
@@ -46,13 +57,15 @@ export class SATPManager {
   private signer: JsObjectSigner;
   public supportedDLTs: SupportedChain[] = [];
   private sessions: Map<string, SATPSession>;
-  private handlers: SATPHandler[] = [];
+  private readonly satpServices: Map<
+    string,
+    Map<SATPServiceType, SATPService>
+  > = new Map();
+  private readonly satpHandlers: Map<SATPHandlerType, SATPHandler> = new Map();
 
-  private readonly bridgeManager: SATPBridgesManager;
+  private readonly bridgesManager: SATPBridgesManager;
 
-  private readonly satpServices: SATPService[] = [];
-  private readonly satpHandlers: Map<string, Map<string, SATPHandler>> =
-    new Map();
+  private readonly orquestrator: GatewayOrchestrator;
 
   constructor(public readonly options: ISATPManagerOptions) {
     const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
@@ -65,7 +78,8 @@ export class SATPManager {
     this.logger.info(`Instantiated ${this.className} OK`);
     this.supportedDLTs = options.supportedDLTs;
     this.signer = options.signer;
-    this.bridgeManager = options.bridgeManager;
+    this.bridgesManager = options.bridgeManager;
+    this.orquestrator = options.orquestrator;
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
@@ -91,9 +105,7 @@ export class SATPManager {
       level,
       label,
     );
-    this.satpServices = this.initializeServices(serviceClasses, serviceOptions);
-
-    const mockSession = this.getOrCreateSession();
+    this.initializeServices(serviceClasses, serviceOptions);
 
     if (serviceClasses.length % 2 !== 0) {
       throw new Error(
@@ -105,18 +117,7 @@ export class SATPManager {
       level,
     );
 
-    this.handlers = this.initializeHandlers(handlersClasses, handlersOptions);
-
-    for (const handler of this.handlers) {
-      const sessionId = mockSession.getSessionId();
-      const handlerMap = this.satpHandlers.get(sessionId);
-      if (handlerMap == undefined) {
-        this.satpHandlers.set(sessionId, new Map());
-      }
-      this.satpHandlers
-        .get(sessionId)
-        ?.set(handler.getHandlerIdentifier(), handler);
-    }
+    this.initializeHandlers(handlersClasses, handlersOptions);
   }
 
   public getServiceByStage(
@@ -127,10 +128,8 @@ export class SATPManager {
       throw new Error("Invalid stageId");
     }
 
-    const service = this.satpServices.find(
-      (service) =>
-        service.serviceType === serviceType && service.stage === stageId,
-    );
+    const service = this.satpServices.get(stageId)?.get(serviceType);
+
     if (service == undefined) {
       throw new Error(
         `Service not found for stageId=${stageId} and serviceType=${serviceType}`,
@@ -158,14 +157,8 @@ export class SATPManager {
     return this.supportedDLTs;
   }
 
-  public getSATPHandlers(
-    sessionId: string,
-  ): Map<string, SATPHandler> | undefined {
-    return this.satpHandlers.get(sessionId);
-  }
-
-  public getHandlers(): SATPHandler[] {
-    return this.handlers;
+  public getSATPHandler(type: SATPHandlerType): SATPHandler | undefined {
+    return this.satpHandlers.get(type);
   }
 
   public getOrCreateSession(
@@ -192,19 +185,6 @@ export class SATPManager {
     return session;
   }
 
-  getOrCreateServices() {
-    const fnTag = `${SATPManager.CLASS_NAME}#getOrCreateServices()`;
-    this.logger.info(
-      `${fnTag}, Registering gRPCservices on instanceId=${this.instanceId}`,
-    );
-    if (Array.isArray(this.endpoints)) {
-      return this.endpoints;
-    }
-
-    this.endpoints = this.handlers;
-    return this.endpoints;
-  }
-
   get StageHandlers() {
     throw new Error("Not implemented yet");
   }
@@ -214,6 +194,8 @@ export class SATPManager {
     logLevel: LogLevelDesc,
     label: string,
   ): ISATPServiceOptions[] {
+    const fnTag = `${SATPManager.CLASS_NAME}#initializeServiceOptions()`;
+    this.logger.info(`${fnTag}, Initializing services options...`);
     return serviceClasses.map((_, index) => ({
       signer: this.signer,
       stage: index.toString() as "0" | "1" | "2" | "3",
@@ -221,17 +203,41 @@ export class SATPManager {
       serviceName: `Service-${index}`,
       serviceType:
         index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
-      bridgeManager: this.bridgeManager,
+      bridgeManager: this.bridgesManager,
     }));
   }
 
   private initializeServices(
     serviceClasses: (new (options: ISATPServiceOptions) => SATPService)[],
     serviceOptions: ISATPServiceOptions[],
-  ): SATPService[] {
-    return serviceClasses.map(
-      (ServiceClass, index) => new ServiceClass(serviceOptions[index]),
-    );
+  ): void {
+    const fnTag = `${SATPManager.CLASS_NAME}#initializeServices()`;
+    this.logger.info(`${fnTag}, Initializing services...`);
+
+    if (serviceClasses.length === 0) {
+      throw new Error("No services provided");
+    }
+
+    if (serviceOptions.length === 0) {
+      throw new Error("No services options provided");
+    }
+
+    if (serviceClasses.length !== serviceOptions.length) {
+      throw new Error(
+        `Number of services classes and options do not match. Each service class needs an options object.\n \
+          Classes: ${serviceClasses.length}, Options: ${serviceOptions.length}`,
+      );
+    }
+
+    serviceClasses.forEach((ServiceClass, index) => {
+      const service = new ServiceClass(serviceOptions[index]);
+      if (!this.satpServices.has(service.stage)) {
+        this.satpServices.set(service.stage, new Map());
+      }
+      this.satpServices
+        .get(service.serviceType)
+        ?.set(service.serviceType, service);
+    });
   }
 
   private initializeHandlerOptions(
@@ -260,6 +266,7 @@ export class SATPManager {
           serverService: serverService,
           clientService: clientService,
           supportedDLTs: this.supportedDLTs,
+          stage: i.toString() as "0" | "1" | "2" | "3",
           loggerOptions: { level: level, label: `SATPHandler-Stage${i}` },
         };
         handlersOptions.push(handlerOptions);
@@ -274,10 +281,10 @@ export class SATPManager {
   private initializeHandlers(
     handlersClasses: (new (options: SATPHandlerOptions) => SATPHandler)[],
     handlersOptions: SATPHandlerOptions[],
-  ): SATPHandler[] {
+  ): void {
     const fnTag = `${SATPManager.CLASS_NAME}#initializeHandlers()`;
     this.logger.info(`${fnTag}, Initializing handlers...`);
-    const handlers: SATPHandler[] = [];
+
     if (handlersClasses.length === 0) {
       throw new Error("No handlers provided");
     }
@@ -297,10 +304,157 @@ export class SATPManager {
       if (index < handlersClasses.length) {
         const HandlerClass = handlersClasses[index];
         const handler = new HandlerClass(options);
-        handlers.push(handler);
+        this.satpHandlers.set(handler.getHandlerIdentifier(), handler);
       }
     });
+  }
 
-    return handlers;
+  public async initiateTransfer(session: SATPSession): Promise<void> {
+    const fnTag = `${SATPManager.CLASS_NAME}#initializeHandlers()`;
+    this.logger.info(`${fnTag}, Initiating Transfer`);
+    this.logger.debug(
+      `SessionData: ${JSON.stringify(session.getClientSessionData())}`,
+    );
+
+    if (!session.getClientSessionData()) {
+      throw new Error(`${fnTag}, Session not found`);
+    }
+
+    const channel = this.orquestrator.getChannel(
+      session.getClientSessionData()
+        ?.recipientGatewayNetworkId as SupportedChain,
+    );
+
+    if (!channel) {
+      throw new Error(`${fnTag}, Channel not found`);
+    }
+
+    const sessionData: SessionData =
+      session.getClientSessionData() as SessionData;
+
+    const clientSatpStage0: PromiseConnectClient<typeof SatpStage0Service> =
+      channel.clients.get("0") as PromiseConnectClient<
+        typeof SatpStage0Service
+      >;
+    const clientSatpStage1: PromiseConnectClient<typeof SatpStage1Service> =
+      channel.clients.get("1") as PromiseConnectClient<
+        typeof SatpStage1Service
+      >;
+    const clientSatpStage2: PromiseConnectClient<typeof SatpStage2Service> =
+      channel.clients.get("2") as PromiseConnectClient<
+        typeof SatpStage2Service
+      >;
+    const clientSatpStage3: PromiseConnectClient<typeof SatpStage3Service> =
+      channel.clients.get("3") as PromiseConnectClient<
+        typeof SatpStage3Service
+      >;
+
+    const serverGatewayPubkey = (await clientSatpStage0.getPublicKey(Empty))
+      .publicKey;
+
+    if (!serverGatewayPubkey) {
+      throw new Error(`${fnTag}, Failed to get serverGatewayPubkey`);
+    }
+
+    sessionData.serverGatewayPubkey = serverGatewayPubkey;
+
+    this.logger.info(`${fnTag}, Stage 0`);
+
+    const requestTransferProposal = await (
+      this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
+    ).TransferProposalRequest(session.getSessionId());
+
+    if (!requestTransferProposal) {
+      throw new Error(`${fnTag}, Failed to create TransferProposalRequest`);
+    }
+
+    const responseTransferProposal = await clientSatpStage1.transferProposal(
+      requestTransferProposal,
+    );
+
+    this.logger.info(
+      `${fnTag}, responseTransferProposal: ${JSON.stringify(responseTransferProposal)}`,
+    );
+
+    const requestTransferCommence = await (
+      this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
+    ).TransferCommenceRequest(responseTransferProposal);
+
+    if (!requestTransferCommence) {
+      throw new Error(`${fnTag}, Failed to create TransferCommenceRequest`);
+    }
+
+    const responseTransferCommence = await clientSatpStage1.transferCommence(
+      requestTransferCommence,
+    );
+
+    this.logger.info(
+      `${fnTag}, responseTransferCommence: ${JSON.stringify(responseTransferCommence)}`,
+    );
+
+    this.logger.info(`${fnTag}, Stage 1 completed`);
+
+    const requestLockAssertion = await (
+      this.getSATPHandler(SATPHandlerType.STAGE2) as Stage2SATPHandler
+    ).LockAssertionRequest(responseTransferCommence);
+
+    if (!requestLockAssertion) {
+      throw new Error(`${fnTag}, Failed to create LockAssertionRequest`);
+    }
+
+    const responseLockAssertion =
+      await clientSatpStage2.lockAssertion(requestLockAssertion);
+
+    this.logger.info(
+      `${fnTag}, responseLockAssertion: ${JSON.stringify(responseLockAssertion)}`,
+    );
+
+    this.logger.info(`${fnTag}, Stage 2 completed`);
+
+    const requestCommitPreparation = await (
+      this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+    ).CommitPreparationRequest(responseLockAssertion);
+
+    if (!requestCommitPreparation) {
+      throw new Error(`${fnTag}, Failed to create CommitPreparationRequest`);
+    }
+
+    const responseCommitPreparation = await clientSatpStage3.commitPreparation(
+      requestCommitPreparation,
+    );
+    this.logger.info(
+      `${fnTag}, responseCommitPreparation: ${JSON.stringify(responseCommitPreparation)}`,
+    );
+
+    const requestCommitFinalAssertion = await (
+      this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+    ).CommitFinalAssertionRequest(responseLockAssertion);
+
+    if (!requestCommitFinalAssertion) {
+      throw new Error(`${fnTag}, Failed to create CommitFinalAssertionRequest`);
+    }
+
+    const responseCommitFinalAssertion =
+      await clientSatpStage3.commitFinalAssertion(requestCommitFinalAssertion);
+    this.logger.info(
+      `${fnTag}, responseCommitFinalAssertion: ${JSON.stringify(responseCommitFinalAssertion)}`,
+    );
+
+    const RequestTransferComplete = await (
+      this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+    ).TransferCompleteRequest(responseCommitFinalAssertion);
+
+    if (!RequestTransferComplete) {
+      throw new Error(`${fnTag}, Failed to create TransferCompleteRequest`);
+    }
+
+    const responseTransferComplete = await clientSatpStage3.transferComplete(
+      RequestTransferComplete,
+    );
+    this.logger.info(
+      `${fnTag}, responseTransferComplete: ${JSON.stringify(responseTransferComplete)}`,
+    );
+
+    this.logger.info(`${fnTag}, Stage 3 completed`);
   }
 }
