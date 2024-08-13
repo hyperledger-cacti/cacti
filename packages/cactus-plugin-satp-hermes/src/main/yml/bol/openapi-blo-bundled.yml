@@ -54,6 +54,15 @@ paths:
               required:
                 - contextID
                 - mode
+                - fromDLTNetworkID
+                - toDLTNetworkID
+                - fromAmount
+                - fromToken
+                - toAmount
+                - toToken
+                - beneficiaryPubkey
+                - originatorPubkey
+                - bridgeContractOntology
               properties:
                 contextID:
                   type: string
@@ -86,6 +95,12 @@ paths:
                 toToken:
                   type: string
                   example: TOKEN2
+                beneficiaryPubkey:
+                  type: string
+                originatorPubkey:
+                  type: string
+                bridgeContractOntology:
+                  type: string
         required: true
       responses:
         '200':
@@ -2043,6 +2058,15 @@ components:
       required:
         - contextID
         - mode
+        - fromDLTNetworkID
+        - toDLTNetworkID
+        - fromAmount
+        - fromToken
+        - toAmount
+        - toToken
+        - beneficiaryPubkey
+        - originatorPubkey
+        - bridgeContractOntology
       properties:
         contextID:
           type: string
@@ -2075,6 +2099,12 @@ components:
         toToken:
           type: string
           example: TOKEN2
+        beneficiaryPubkey:
+          type: string
+        originatorPubkey:
+          type: string
+        bridgeContractOntology:
+          type: string
     TransactResponse:
       description: Response schema for a transaction request. Includes the session ID and the current status of the transaction.
       type: object

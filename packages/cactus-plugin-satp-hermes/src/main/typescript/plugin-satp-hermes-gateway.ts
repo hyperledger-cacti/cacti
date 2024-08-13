@@ -126,7 +126,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const bridgesManagerOptions: ISATPBridgesOptions = {
       logLevel: this.config.logLevel,
       supportedDLTs: this.config.gid!.supportedDLTs,
-      networks: [], //todo add networks
+      networks: options.bridgesConfig ? options.bridgesConfig : [],
     };
 
     if (this.config.gid) {
@@ -154,6 +154,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       orchestrator: this.gatewayOrchestrator,
       signer: this.signer,
       bridgesManager: this.bridgesManager,
+      pubKey: this.pubKey,
     };
 
     this.supportedDltIDs = this.config.gid!.supportedDLTs;
@@ -180,6 +181,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-satp-hermes`;
+  }
+
+  //for testing
+  public getBLODispatcher(): BLODispatcher | undefined {
+    return this.BLODispatcher;
   }
 
   public async onPluginInit(): Promise<unknown> {

@@ -44,6 +44,11 @@ export class FabricBridge implements NetworkBridge {
       label: StrategyFabric.CLASS_NAME,
       level,
     });
+    if (fabricConfig.fabricAssets) {
+      fabricConfig.fabricAssets.forEach(async (asset) => {
+        await this.wrapAsset(asset);
+      });
+    }
   }
   public async wrapAsset(asset: FabricAsset): Promise<TransactionResponse> {
     this.log.debug(`Wrapping Asset: ${asset.tokenId}`);

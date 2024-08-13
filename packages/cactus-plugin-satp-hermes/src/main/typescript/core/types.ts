@@ -11,6 +11,7 @@ import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/di
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 import { SATPServiceInstance } from "./stage-services/satp-service";
+import { NetworkConfig } from "../types/blockchain-interaction";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,
@@ -76,6 +77,7 @@ export interface SATPGatewayConfig {
   validationOptions?: ValidatorOptions;
   privacyPolicies?: IPrivacyPolicyValue[];
   mergePolicies?: IMergePolicyValue[];
+  bridgesConfig?: NetworkConfig[];
 }
 
 // export interface SATPBridgeConfig {

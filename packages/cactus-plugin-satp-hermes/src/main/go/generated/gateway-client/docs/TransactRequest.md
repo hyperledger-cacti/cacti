@@ -7,18 +7,20 @@ Name | Type | Description | Notes
 **ContextID** | **string** |  | 
 **Mode** | **string** |  | 
 **Payload** | Pointer to **string** |  | [optional] 
-**FromDLTNetworkID** | Pointer to **string** |  | [optional] 
-**ToDLTNetworkID** | Pointer to **string** |  | [optional] 
-**FromAmount** | Pointer to **string** |  | [optional] 
-**FromToken** | Pointer to **string** |  | [optional] 
-**ToAmount** | Pointer to **string** |  | [optional] 
-**ToToken** | Pointer to **string** |  | [optional] 
+**FromDLTNetworkID** | **string** |  | 
+**ToDLTNetworkID** | **string** |  | 
+**FromAmount** | **string** |  | 
+**FromToken** | **string** |  | 
+**ToAmount** | **string** |  | 
+**ToToken** | **string** |  | 
+**BeneficiaryPubkey** | **string** |  | 
+**OriginatorPubkey** | **string** |  | 
 
 ## Methods
 
 ### NewTransactRequest
 
-`func NewTransactRequest(contextID string, mode string, ) *TransactRequest`
+`func NewTransactRequest(contextID string, mode string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, fromToken string, toAmount string, toToken string, beneficiaryPubkey string, originatorPubkey string, ) *TransactRequest`
 
 NewTransactRequest instantiates a new TransactRequest object
 This constructor will assign default values to properties that have it defined,
@@ -117,11 +119,6 @@ and a boolean to check if the value has been set.
 
 SetFromDLTNetworkID sets FromDLTNetworkID field to given value.
 
-### HasFromDLTNetworkID
-
-`func (o *TransactRequest) HasFromDLTNetworkID() bool`
-
-HasFromDLTNetworkID returns a boolean if a field has been set.
 
 ### GetToDLTNetworkID
 
@@ -142,11 +139,6 @@ and a boolean to check if the value has been set.
 
 SetToDLTNetworkID sets ToDLTNetworkID field to given value.
 
-### HasToDLTNetworkID
-
-`func (o *TransactRequest) HasToDLTNetworkID() bool`
-
-HasToDLTNetworkID returns a boolean if a field has been set.
 
 ### GetFromAmount
 
@@ -167,11 +159,6 @@ and a boolean to check if the value has been set.
 
 SetFromAmount sets FromAmount field to given value.
 
-### HasFromAmount
-
-`func (o *TransactRequest) HasFromAmount() bool`
-
-HasFromAmount returns a boolean if a field has been set.
 
 ### GetFromToken
 
@@ -192,11 +179,6 @@ and a boolean to check if the value has been set.
 
 SetFromToken sets FromToken field to given value.
 
-### HasFromToken
-
-`func (o *TransactRequest) HasFromToken() bool`
-
-HasFromToken returns a boolean if a field has been set.
 
 ### GetToAmount
 
@@ -217,11 +199,6 @@ and a boolean to check if the value has been set.
 
 SetToAmount sets ToAmount field to given value.
 
-### HasToAmount
-
-`func (o *TransactRequest) HasToAmount() bool`
-
-HasToAmount returns a boolean if a field has been set.
 
 ### GetToToken
 
@@ -242,11 +219,46 @@ and a boolean to check if the value has been set.
 
 SetToToken sets ToToken field to given value.
 
-### HasToToken
 
-`func (o *TransactRequest) HasToToken() bool`
+### GetBeneficiaryPubkey
 
-HasToToken returns a boolean if a field has been set.
+`func (o *TransactRequest) GetBeneficiaryPubkey() string`
+
+GetBeneficiaryPubkey returns the BeneficiaryPubkey field if non-nil, zero value otherwise.
+
+### GetBeneficiaryPubkeyOk
+
+`func (o *TransactRequest) GetBeneficiaryPubkeyOk() (*string, bool)`
+
+GetBeneficiaryPubkeyOk returns a tuple with the BeneficiaryPubkey field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetBeneficiaryPubkey
+
+`func (o *TransactRequest) SetBeneficiaryPubkey(v string)`
+
+SetBeneficiaryPubkey sets BeneficiaryPubkey field to given value.
+
+
+### GetOriginatorPubkey
+
+`func (o *TransactRequest) GetOriginatorPubkey() string`
+
+GetOriginatorPubkey returns the OriginatorPubkey field if non-nil, zero value otherwise.
+
+### GetOriginatorPubkeyOk
+
+`func (o *TransactRequest) GetOriginatorPubkeyOk() (*string, bool)`
+
+GetOriginatorPubkeyOk returns a tuple with the OriginatorPubkey field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOriginatorPubkey
+
+`func (o *TransactRequest) SetOriginatorPubkey(v string)`
+
+SetOriginatorPubkey sets OriginatorPubkey field to given value.
+
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

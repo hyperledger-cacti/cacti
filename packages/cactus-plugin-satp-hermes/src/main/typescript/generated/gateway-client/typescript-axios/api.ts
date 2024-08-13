@@ -1856,37 +1856,55 @@ export interface TransactRequest {
      * @type {string}
      * @memberof TransactRequest
      */
-    'fromDLTNetworkID'?: string;
+    'fromDLTNetworkID': string;
     /**
      * 
      * @type {string}
      * @memberof TransactRequest
      */
-    'toDLTNetworkID'?: string;
+    'toDLTNetworkID': string;
     /**
      * 
      * @type {string}
      * @memberof TransactRequest
      */
-    'fromAmount'?: string;
+    'fromAmount': string;
     /**
      * 
      * @type {string}
      * @memberof TransactRequest
      */
-    'fromToken'?: string;
+    'fromToken': string;
     /**
      * 
      * @type {string}
      * @memberof TransactRequest
      */
-    'toAmount'?: string;
+    'toAmount': string;
     /**
      * 
      * @type {string}
      * @memberof TransactRequest
      */
-    'toToken'?: string;
+    'toToken': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactRequest
+     */
+    'beneficiaryPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactRequest
+     */
+    'originatorPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactRequest
+     */
+    'bridgeContractOntology': string;
 }
 
 export const TransactRequestModeEnum = {

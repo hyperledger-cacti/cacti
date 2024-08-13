@@ -337,6 +337,11 @@ export class SessionData extends Message<SessionData> {
    */
   assetProfile?: AssetProfile;
 
+  /**
+   * @generated from field: string bridge_contract_ontology = 61;
+   */
+  bridgeContractOntology = "";
+
   constructor(data?: PartialMessage<SessionData>) {
     super();
     proto3.util.initPartial(data, this);
@@ -405,6 +410,7 @@ export class SessionData extends Message<SessionData> {
     { no: 58, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 59, name: "lock_assertion_expiration", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 60, name: "asset_profile", kind: "message", T: AssetProfile },
+    { no: 61, name: "bridge_contract_ontology", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {

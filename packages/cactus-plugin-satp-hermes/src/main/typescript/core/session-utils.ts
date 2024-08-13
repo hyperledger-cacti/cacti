@@ -5,20 +5,10 @@ import {
   SignatureAlgorithm,
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  MessageStagesHashes,
-  MessageStagesSignatures,
   MessageStagesTimestamps,
   SessionData,
-  Stage1Hashes,
-  Stage1Signatures,
-  Stage1Timestamps,
-  Stage2Hashes,
-  Stage2Signatures,
-  Stage2Timestamps,
-  Stage3Hashes,
-  Stage3Signatures,
-  Stage3Timestamps,
 } from "../generated/proto/cacti/satp/v02/common/session_pb";
+import { SATPSession } from "./satp-session";
 
 export enum TimestampType {
   PROCESSED = "PROCESSED",
@@ -30,8 +20,8 @@ export enum SessionType {
   CLIENT = "CLIENT",
 }
 
-export function createSessionData(
-  id: string,
+export function populateClientSessionData(
+  session: SATPSession,
   version: string,
   digitalAssetId: string,
   originatorPubkey: string,
@@ -48,30 +38,13 @@ export function createSessionData(
   credentialProfile: CredentialProfile,
   loggingProfile: string,
   accessControlProfile: string,
-): SessionData {
-  const sessionData = new SessionData();
-  sessionData.processedTimestamps = new MessageStagesTimestamps();
-  sessionData.receivedTimestamps = new MessageStagesTimestamps();
-  sessionData.hashes = new MessageStagesHashes();
-  sessionData.signatures = new MessageStagesSignatures();
-
-  sessionData.processedTimestamps.stage1 = new Stage1Timestamps();
-  sessionData.processedTimestamps.stage2 = new Stage2Timestamps();
-  sessionData.processedTimestamps.stage3 = new Stage3Timestamps();
-
-  sessionData.receivedTimestamps.stage1 = new Stage1Timestamps();
-  sessionData.receivedTimestamps.stage2 = new Stage2Timestamps();
-  sessionData.receivedTimestamps.stage3 = new Stage3Timestamps();
-
-  sessionData.hashes.stage1 = new Stage1Hashes();
-  sessionData.hashes.stage2 = new Stage2Hashes();
-  sessionData.hashes.stage3 = new Stage3Hashes();
-
-  sessionData.signatures.stage1 = new Stage1Signatures();
-  sessionData.signatures.stage2 = new Stage2Signatures();
-  sessionData.signatures.stage3 = new Stage3Signatures();
-
-  sessionData.id = id;
+  bridgeContractOntology: string,
+): SATPSession {
+  const fn = "session_utils#populateClientSessionData";
+  const sessionData = session.getClientSessionData();
+  if (!sessionData) {
+    throw new Error(fn + ":Session Data is undefined");
+  }
   sessionData.version = version;
   sessionData.digitalAssetId = digitalAssetId;
   sessionData.originatorPubkey = originatorPubkey;
@@ -88,8 +61,9 @@ export function createSessionData(
   sessionData.credentialProfile = credentialProfile;
   sessionData.loggingProfile = loggingProfile;
   sessionData.accessControlProfile = accessControlProfile;
+  sessionData.bridgeContractOntology = bridgeContractOntology;
 
-  return sessionData;
+  return session;
 }
 export function saveTimestamp(
   session: SessionData | undefined,

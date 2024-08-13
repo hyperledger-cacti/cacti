@@ -58,7 +58,16 @@
                 "type": "object",
                 "required": [
                   "contextID",
-                  "mode"
+                  "mode",
+                  "fromDLTNetworkID",
+                  "toDLTNetworkID",
+                  "fromAmount",
+                  "fromToken",
+                  "toAmount",
+                  "toToken",
+                  "beneficiaryPubkey",
+                  "originatorPubkey",
+                  "bridgeContractOntology"
                 ],
                 "properties": {
                   "contextID": {
@@ -101,6 +110,15 @@
                   "toToken": {
                     "type": "string",
                     "example": "TOKEN2"
+                  },
+                  "beneficiaryPubkey": {
+                    "type": "string"
+                  },
+                  "originatorPubkey": {
+                    "type": "string"
+                  },
+                  "bridgeContractOntology": {
+                    "type": "string"
                   }
                 }
               }
@@ -2664,7 +2682,16 @@
         "type": "object",
         "required": [
           "contextID",
-          "mode"
+          "mode",
+          "fromDLTNetworkID",
+          "toDLTNetworkID",
+          "fromAmount",
+          "fromToken",
+          "toAmount",
+          "toToken",
+          "beneficiaryPubkey",
+          "originatorPubkey",
+          "bridgeContractOntology"
         ],
         "properties": {
           "contextID": {
@@ -2707,6 +2734,15 @@
           "toToken": {
             "type": "string",
             "example": "TOKEN2"
+          },
+          "beneficiaryPubkey": {
+            "type": "string"
+          },
+          "originatorPubkey": {
+            "type": "string"
+          },
+          "bridgeContractOntology": {
+            "type": "string"
           }
         }
       },

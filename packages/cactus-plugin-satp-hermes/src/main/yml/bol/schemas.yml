@@ -199,6 +199,15 @@ TransactRequest:
   required:
     - contextID
     - mode
+    - fromDLTNetworkID
+    - toDLTNetworkID
+    - fromAmount
+    - fromToken
+    - toAmount
+    - toToken
+    - beneficiaryPubkey
+    - originatorPubkey
+    - bridgeContractOntology
   properties:
     contextID:
       type: string
@@ -231,6 +240,12 @@ TransactRequest:
     toToken:
       type: string
       example: "TOKEN2"
+    beneficiaryPubkey:
+      type: string
+    originatorPubkey:
+      type: string
+    bridgeContractOntology:
+      type: string
 
 TransactResponse:
   description: "Response schema for a transaction request. Includes the session ID and the current status of the transaction."

@@ -114,6 +114,9 @@ export class GatewayOrchestrator {
   isSelfId(id: string): boolean {
     return id === this.localGateway.id;
   }
+  getSelfId(): string {
+    return this.localGateway.id;
+  }
 
   isInCounterPartyGateways(id: string): boolean {
     return this.counterPartyGateways.has(id);

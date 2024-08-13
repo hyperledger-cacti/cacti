@@ -598,9 +598,11 @@ components:
         \ about the source and destination DLT networks."
       example:
         mode: transfer
+        beneficiaryPubkey: beneficiaryPubkey
         payload: "{\"data\":\"example payload\"}"
         fromAmount: "100"
         toAmount: "95"
+        originatorPubkey: originatorPubkey
         contextID: 123e4567-e89b-12d3-a456-426614174000
         toDLTNetworkID: network2
         fromDLTNetworkID: network1
@@ -638,9 +640,21 @@ components:
         toToken:
           example: TOKEN2
           type: string
+        beneficiaryPubkey:
+          type: string
+        originatorPubkey:
+          type: string
       required:
+      - beneficiaryPubkey
       - contextID
+      - fromAmount
+      - fromDLTNetworkID
+      - fromToken
       - mode
+      - originatorPubkey
+      - toAmount
+      - toDLTNetworkID
+      - toToken
       type: object
     TransactResponse:
       description: Response schema for a transaction request. Includes the session
@@ -1217,9 +1231,21 @@ components:
         toToken:
           example: TOKEN2
           type: string
+        beneficiaryPubkey:
+          type: string
+        originatorPubkey:
+          type: string
       required:
+      - beneficiaryPubkey
       - contextID
+      - fromAmount
+      - fromDLTNetworkID
+      - fromToken
       - mode
+      - originatorPubkey
+      - toAmount
+      - toDLTNetworkID
+      - toToken
       type: object
     Transact_200_response_statusResponse_originChain:
       example:

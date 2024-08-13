@@ -24,7 +24,6 @@ import {
   SATPServiceType,
   SATPHandlerOptions,
   SATPHandlerType,
-  ISATPHandler,
   SATPHandlerInstance,
 } from "../types/satp-protocol";
 import {
@@ -50,6 +49,7 @@ export interface ISATPManagerOptions {
   instanceId: string;
   sessions?: Map<string, SATPSession>;
   signer: JsObjectSigner;
+  pubKey: string;
   supportedDLTs: SupportedChain[];
   bridgeManager: SATPBridgesManager;
   orquestrator: GatewayOrchestrator;
@@ -69,6 +69,7 @@ export class SATPManager {
     Map<SATPServiceType, SATPService>
   > = new Map();
   private readonly satpHandlers: Map<SATPHandlerType, SATPHandler> = new Map();
+  private _pubKey: string;
 
   private readonly bridgesManager: SATPBridgesManager;
 
@@ -87,6 +88,7 @@ export class SATPManager {
     this.signer = options.signer;
     this.bridgesManager = options.bridgeManager;
     this.orquestrator = options.orquestrator;
+    this._pubKey = options.pubKey;
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
@@ -125,6 +127,10 @@ export class SATPManager {
     );
 
     this.initializeHandlers(handlersClasses, handlersOptions);
+  }
+
+  public get pubKey(): string {
+    return this._pubKey;
   }
 
   public getServiceByStage(
@@ -340,7 +346,7 @@ export class SATPManager {
     if (!session.getClientSessionData()) {
       throw new Error(`${fnTag}, Session not found`);
     }
-
+    //maybe get a suitable gateway first.
     const channel = this.orquestrator.getChannel(
       session.getClientSessionData()
         ?.recipientGatewayNetworkId as SupportedChain,
@@ -352,6 +358,8 @@ export class SATPManager {
 
     const sessionData: SessionData =
       session.getClientSessionData() as SessionData;
+
+    sessionData.receiverGatewayOwnerId = channel.toGatewayID;
 
     const clientSatpStage0: PromiseConnectClient<typeof SatpStage0Service> =
       channel.clients.get("0") as PromiseConnectClient<
@@ -370,6 +378,7 @@ export class SATPManager {
         typeof SatpStage3Service
       >;
 
+    //TODO: implement GetPubKey service
     const serverGatewayPubkey = (await clientSatpStage0.getPublicKey(Empty))
       .publicKey;
 
