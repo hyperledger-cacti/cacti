@@ -10,13 +10,17 @@ import {
 import { Stage3ServerService } from "../stage-services/server/stage3-server-service";
 import { SATPSession } from "../satp-session";
 import { SupportedChain } from "../types";
-import { SATPHandler, SATPHandlerOptions } from "../../types/satp-protocol";
+import {
+  SATPHandler,
+  SATPHandlerOptions,
+  SATPHandlerType,
+} from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Empty } from "@bufbuild/protobuf";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
 
 export class Stage3SATPHandler implements SATPHandler {
-  public static readonly CLASS_NAME = "Stage3SATPHandler";
+  public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
   private sessions: Map<string, SATPSession>;
   private clientService: Stage3ClientService;
   private serverService: Stage3ServerService;
@@ -32,7 +36,7 @@ export class Stage3SATPHandler implements SATPHandler {
     this.logger.trace(`Initialized ${Stage3SATPHandler.CLASS_NAME}`);
   }
 
-  getHandlerIdentifier(): string {
+  getHandlerIdentifier(): SATPHandlerType {
     return Stage3SATPHandler.CLASS_NAME;
   }
 
