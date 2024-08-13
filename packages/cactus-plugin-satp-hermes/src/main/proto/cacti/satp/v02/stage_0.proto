@@ -3,6 +3,7 @@ syntax = "proto3";
 package cacti.satp.v02;
 
 import "cacti/satp/v02/common/message.proto";
+import "google/protobuf/empty.proto";
 
 message PrivacyPolicy {
   string name = 1;
@@ -31,8 +32,13 @@ message PreTransferCommenceRequestMessage {
 message PreTransferCommenceResponseMessage {
   cacti.satp.v02.common.CommonSatp common = 1;
 }
+
+message PublicKey {
+  string public_key = 1;
+}
 service SatpStage0Service {
   // util RPCs
+  rpc GetPublicKey(google.protobuf.Empty) returns (PublicKey) {};
 
   // step RPCs
   rpc PreTransferProposalClaims(PreTransferVerificationAndContextEstablishmentRequest) returns (PreTransferVerificationAndContextEstablishmentResponse) {};
