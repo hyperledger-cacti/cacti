@@ -6,9 +6,11 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import ListItemButton from "@mui/material/ListItemButton";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import config from "../../common/config";
 import { AppCategory, getAppCategoryConfig } from "../../common/app-category";
+import { isValidUrl } from "../../common/utils";
 
 export interface SelectAppViewProps {
   appCategory: string;
@@ -36,15 +38,26 @@ export default function SelectAppView({
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
         {apps.map(([appId, app]) => {
           return (
-            <ListItemButton onClick={() => handleAppSelected(appId)}>
-              <ListItemAvatar>
-                <Avatar>{categoryConfig.icon}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={app.appName}
-                secondary={app.defaultDescription}
-              />
-            </ListItemButton>
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <ListItemButton onClick={() => handleAppSelected(appId)}>
+                <ListItemAvatar>
+                  <Avatar>{categoryConfig.icon}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={app.appName}
+                  secondary={app.defaultDescription}
+                />
+              </ListItemButton>
+              <Button
+                disabled={!isValidUrl(app.appSetupGuideURL)}
+                endIcon={<OpenInNewIcon />}
+                size="large"
+                onClick={() => window.open(app.appSetupGuideURL, "_blank")}
+                sx={{ margin: 1, padding: 2 }}
+              >
+                Setup Guide
+              </Button>
+            </Box>
           );
         })}
       </List>

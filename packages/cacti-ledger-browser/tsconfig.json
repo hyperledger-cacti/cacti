@@ -10,6 +10,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "tsBuildInfoFile": "../../.build-cache/cacti-ledger-browser.tsbuildinfo",
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"

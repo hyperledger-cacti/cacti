@@ -69,7 +69,7 @@ async function main() {
   // Set up the ApiServer with Fabric Connector and Fabric Persistence plugins.
   // It returns the persistence plugin, which we can use to run monitoring operations.
   const { persistence } = await setupApiServer(
-    9781, // run at that port
+    9930, // run at that port
     FABRIC_CHANNEL_NAME,
     connectionProfile,
     userIdentity as any,

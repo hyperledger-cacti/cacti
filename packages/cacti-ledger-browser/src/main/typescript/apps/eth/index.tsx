@@ -42,7 +42,7 @@ const ethBrowserAppDefinition: AppDefinition = {
 
     return {
       id: app.id,
-      appName: "Ethereum Browser",
+      appName: ethBrowserAppDefinition.appName,
       instanceName: app.instance_name,
       description: app.description,
       path: app.path,
@@ -78,6 +78,8 @@ const ethBrowserAppDefinition: AppDefinition = {
       StatusComponent: (
         <PersistencePluginStatus pluginName="PluginPersistenceEthereum" />
       ),
+      appSetupGuideURL: ethBrowserAppDefinition.appSetupGuideURL,
+      appDocumentationURL: ethBrowserAppDefinition.appDocumentationURL,
     };
   },
 };

@@ -223,3 +223,11 @@ ALTER TABLE ONLY fabric.transaction
 
 ALTER TABLE ONLY fabric.transaction
     ADD CONSTRAINT transaction_block_number_fkey FOREIGN KEY (block_number) REFERENCES fabric.block(number);
+
+GRANT USAGE ON SCHEMA fabric TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA fabric TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA fabric TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA fabric TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA fabric GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA fabric GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA fabric GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;

@@ -114,6 +114,17 @@ nav:
       - Test Api Client: cactus/packages/cactus-test-api-client.md
       - Test CMD Api Server: cactus/packages/cactus-test-cmd-api-server.md
       - Test Tooling: cactus/packages/cactus-test-tooling.md
+    - Ledger Browser:
+      - Overview:  cactus/ledger-browser/overview.md
+      - Setup:  cactus/ledger-browser/setup.md
+      - Plugin Apps:
+        - App Patterns:  cactus/ledger-browser/plugin-apps/app-patterns.md
+        - Ethereum Browser:  cactus/ledger-browser/plugin-apps/ethereum-browser.md
+        - Hyperledger Fabric Browser:  cactus/ledger-browser/plugin-apps/fabric-browser.md
+      - Developer Guide:
+        - Overview:  cactus/ledger-browser/developer-guide/overview.md
+        - Architecture:  cactus/ledger-browser/developer-guide/architecture.md
+        - Tutorial:  cactus/ledger-browser/developer-guide/tutorial.md
     - Ledger Support:
       - Overview: cactus/support.md
       - Hyperledger Besu: cactus/support/besu.md

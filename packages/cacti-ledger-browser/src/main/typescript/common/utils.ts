@@ -15,3 +15,21 @@ export function patchAppRoutePath(appPath: string, routePath?: string) {
     return appPath;
   }
 }
+
+/**
+ * Returns true if provided url is defined and valid, returns false and
+ * writes error to `console.error` otherwise.
+ */
+export function isValidUrl(urlString?: string) {
+  if (!urlString) {
+    return false;
+  }
+
+  try {
+    new URL(urlString);
+    return true;
+  } catch (e) {
+    console.error(`Invalid URL provided: ${urlString}, error: ${e}`);
+    return false;
+  }
+}

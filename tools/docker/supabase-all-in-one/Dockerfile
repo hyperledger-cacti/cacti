@@ -37,6 +37,7 @@ FROM docker:25.0.5-dind
 ARG freeze_tmp_dir
 ENV FREEZE_TMP_DIR=$freeze_tmp_dir
 ENV APP_ROOT="/home/supabase/docker"
+ENV PGRST_DB_SCHEMAS="public, storage, graphql_public, fabric, ethereum"
 
 # Install package dependencies
 RUN apk update \
