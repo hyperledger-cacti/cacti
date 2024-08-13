@@ -55,7 +55,7 @@ export type GatewayChannel = {
   toGatewayID: string;
   sessions: Map<string, SATPSession>;
   supportedDLTs: SupportedChain[];
-  clients: PromiseConnectClient<SATPServiceClient>[];
+  clients: Map<string, PromiseConnectClient<SATPServiceClient>>;
 };
 
 export type Address =
