@@ -43,6 +43,7 @@ import {
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
+  public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
   private bridgeManager: SATPBridgesManager;
 
