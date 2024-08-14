@@ -28,7 +28,7 @@ Before starting, make sure you have the following software installed on your hos
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 2 or higher)
-- Golang: [sample instructions](https://golang.org/dl/) (Version 1.16 or higher)
+- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20 or higher)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 16 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)

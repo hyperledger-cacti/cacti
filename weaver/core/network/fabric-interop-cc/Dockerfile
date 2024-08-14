@@ -9,7 +9,7 @@ RUN cd /fabric-interop-cc/contracts/interop && CC=musl-gcc go build -o interop
 
 # Production ready image
 # Pass the binary to the prod image
-FROM alpine:3.11 as prod
+FROM alpine:3.11 AS prod
 
 RUN apk add libc6-compat libstdc++ zlib>1.2.11-r4 zlib-dev>1.2.11-r4
 COPY --from=build /fabric-interop-cc/contracts/interop/interop /app/interop
