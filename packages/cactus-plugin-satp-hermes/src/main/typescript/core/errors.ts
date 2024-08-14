@@ -1,8 +1,9 @@
-export class SATPError extends Error {
+export class SATPInternalError extends Error {
   constructor(
-    message: string,
+    public message: string,
+    // TODO internal error codes
     public code: number = 500,
-    public internalErrorId?: string,
+    public traceID?: string,
     public trace?: string,
   ) {
     super(message);
@@ -12,35 +13,37 @@ export class SATPError extends Error {
   }
 }
 
-export class BootstrapError extends SATPError {
-  constructor(internalErrorId?: string, trace?: string) {
+export class BootstrapError extends SATPInternalError {
+  constructor(traceID?: string, trace?: string) {
     super(
       "Bootstrap already called in this Gateway Manager",
       409,
-      internalErrorId,
+      traceID,
       trace,
     );
   }
 }
 
-export class NonExistantGatewayIdentity extends SATPError {
-  constructor(id: string, internalErrorId?: string, trace?: string) {
-    super(`Gateway with id ${id} does not exist`, 404, internalErrorId, trace);
+export class NonExistantGatewayIdentity extends SATPInternalError {
+  constructor(id: string, traceID?: string, trace?: string) {
+    super(`Gateway with id ${id} does not exist`, 404, traceID, trace);
   }
 }
 
-export class GetStatusError extends SATPError {
+export class GetStatusError extends SATPInternalError {
   constructor(
     sessionID: string,
     message: string,
-    internalErrorId?: string,
+    traceID?: string,
     trace?: string,
   ) {
     super(
       `Could not GetStatus at Session: with id ${sessionID}. Reason: ${message}`,
       400,
-      internalErrorId,
+      traceID,
       trace,
     );
   }
 }
+// TODO client-facing error logic, maps SATPInternalErrors to user friendly errors
+export class SATPError extends Error {}
