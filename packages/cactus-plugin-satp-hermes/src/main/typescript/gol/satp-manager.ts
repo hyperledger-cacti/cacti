@@ -24,8 +24,14 @@ import {
   SATPServiceType,
   SATPHandlerOptions,
   SATPHandlerType,
+  ISATPHandler,
+  SATPHandlerInstance,
 } from "../types/satp-protocol";
-import { ISATPServiceOptions } from "../core/stage-services/satp-service";
+import {
+  ISATPServiceOptions,
+  SATPServiceInstance,
+  SATPStagesV02,
+} from "../core/stage-services/satp-service";
 import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { SATPBridgesManager } from "./satp-bridges-manager";
@@ -57,6 +63,7 @@ export class SATPManager {
   private signer: JsObjectSigner;
   public supportedDLTs: SupportedChain[] = [];
   private sessions: Map<string, SATPSession>;
+  // maps stage to client/service and service class
   private readonly satpServices: Map<
     string,
     Map<SATPServiceType, SATPService>
@@ -83,21 +90,21 @@ export class SATPManager {
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
-      Stage0SATPHandler,
-      Stage1SATPHandler,
-      Stage2SATPHandler,
-      Stage3SATPHandler,
+      Stage0SATPHandler as unknown as SATPHandlerInstance,
+      Stage1SATPHandler as unknown as SATPHandlerInstance,
+      Stage2SATPHandler as unknown as SATPHandlerInstance,
+      Stage3SATPHandler as unknown as SATPHandlerInstance,
     ];
 
     const serviceClasses = [
-      Stage0ServerService,
-      Stage0ClientService,
-      Stage1ServerService,
-      Stage1ClientService,
-      Stage2ServerService,
-      Stage2ClientService,
-      Stage3ServerService,
-      Stage3ClientService,
+      Stage0ServerService as unknown as SATPServiceInstance,
+      Stage0ClientService as unknown as SATPServiceInstance,
+      Stage1ServerService as unknown as SATPServiceInstance,
+      Stage1ClientService as unknown as SATPServiceInstance,
+      Stage2ServerService as unknown as SATPServiceInstance,
+      Stage2ClientService as unknown as SATPServiceInstance,
+      Stage3ServerService as unknown as SATPServiceInstance,
+      Stage3ClientService as unknown as SATPServiceInstance,
     ];
 
     const serviceOptions = this.initializeServiceOptions(
@@ -122,17 +129,22 @@ export class SATPManager {
 
   public getServiceByStage(
     serviceType: SATPServiceType,
-    stageId: string,
+    stageID: string,
   ): SATPService {
-    if (isNaN(Number(stageId))) {
+    // we assume stages are numbers
+    if (isNaN(Number(stageID))) {
       throw new Error("Invalid stageId");
     }
 
-    const service = this.satpServices.get(stageId)?.get(serviceType);
+    if (!this.satpServices) {
+      throw new Error("No satp services defined");
+    }
+
+    const service = this.satpServices.get(stageID)?.get(serviceType);
 
     if (service == undefined) {
       throw new Error(
-        `Service not found for stageId=${stageId} and serviceType=${serviceType}`,
+        `Service not found for stageId=${stageID} and serviceType=${serviceType}`,
       );
     }
     return service;
@@ -190,25 +202,27 @@ export class SATPManager {
   }
 
   private initializeServiceOptions(
-    serviceClasses: (new (options: ISATPServiceOptions) => SATPService)[],
+    serviceClasses: SATPServiceInstance[],
     logLevel: LogLevelDesc,
     label: string,
   ): ISATPServiceOptions[] {
     const fnTag = `${SATPManager.CLASS_NAME}#initializeServiceOptions()`;
     this.logger.info(`${fnTag}, Initializing services options...`);
-    return serviceClasses.map((_, index) => ({
+    this.logger.info(
+      `Initializing ${serviceClasses.length} services options...`,
+    );
+    return serviceClasses.map((serviceClass) => ({
       signer: this.signer,
-      stage: index.toString() as "0" | "1" | "2" | "3",
+      stage: serviceClass.SATP_STAGE as SATPStagesV02,
       loggerOptions: { level: logLevel, label },
-      serviceName: `Service-${index}`,
-      serviceType:
-        index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
+      // we can pass whatever name we wish; in this case we are using the internal service name
+      serviceType: serviceClass.SERVICE_TYPE,
+      serviceName: serviceClass.SATP_SERVICE_INTERNAL_NAME,
       bridgeManager: this.bridgesManager,
     }));
   }
-
   private initializeServices(
-    serviceClasses: (new (options: ISATPServiceOptions) => SATPService)[],
+    serviceClasses: SATPServiceInstance[],
     serviceOptions: ISATPServiceOptions[],
   ): void {
     const fnTag = `${SATPManager.CLASS_NAME}#initializeServices()`;
@@ -232,33 +246,37 @@ export class SATPManager {
     serviceClasses.forEach((ServiceClass, index) => {
       const service = new ServiceClass(serviceOptions[index]);
       if (!this.satpServices.has(service.stage)) {
+        // initialize map
         this.satpServices.set(service.stage, new Map());
       }
-      this.satpServices
-        .get(service.serviceType)
-        ?.set(service.serviceType, service);
+      this.satpServices.get(service.stage)?.set(service.serviceType, service);
     });
   }
 
   private initializeHandlerOptions(
-    serviceClasses: (new (options: ISATPServiceOptions) => SATPService)[],
+    serviceClasses: SATPServiceInstance[],
     level: LogLevelDesc = "DEBUG",
   ): SATPHandlerOptions[] {
     const fnTag = `${SATPManager.CLASS_NAME}#initializeHandlerOptions()`;
     this.logger.info(`${fnTag}, Initializing handlers options...`);
 
     const handlersOptions: SATPHandlerOptions[] = [];
-
+    if (serviceClasses.length % 2 != 0) {
+      throw new Error(
+        "Error intializing handler options - a pair number of services are expected",
+      );
+    }
     try {
-      for (let i = 1; i <= serviceClasses.length / 2; i++) {
+      for (let i = 0; i <= serviceClasses.length / 2 - 1; i++) {
+        const serviceIndex = i.toString() as SATPStagesV02;
         const serverService = this.getServiceByStage(
           SATPServiceType.Server,
-          i.toString(),
+          serviceIndex,
         );
 
         const clientService = this.getServiceByStage(
           SATPServiceType.Client,
-          i.toString(),
+          serviceIndex,
         );
 
         const handlerOptions: SATPHandlerOptions = {
@@ -266,8 +284,11 @@ export class SATPManager {
           serverService: serverService,
           clientService: clientService,
           supportedDLTs: this.supportedDLTs,
-          stage: i.toString() as "0" | "1" | "2" | "3",
-          loggerOptions: { level: level, label: `SATPHandler-Stage${i}` },
+          stage: serviceIndex,
+          loggerOptions: {
+            level: level,
+            label: `SATPHandler-Stage${serviceIndex}`,
+          },
         };
         handlersOptions.push(handlerOptions);
       }
@@ -279,7 +300,7 @@ export class SATPManager {
   }
 
   private initializeHandlers(
-    handlersClasses: (new (options: SATPHandlerOptions) => SATPHandler)[],
+    handlersClasses: SATPHandlerInstance[],
     handlersOptions: SATPHandlerOptions[],
   ): void {
     const fnTag = `${SATPManager.CLASS_NAME}#initializeHandlers()`;
