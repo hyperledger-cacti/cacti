@@ -9,7 +9,10 @@ import {
   CommonSatp,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 // eslint-disable-next-line prettier/prettier
-import { ACCEPTANCE, SessionData } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import {
+  ACCEPTANCE,
+  SessionData,
+} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import { SATP_VERSION } from "../../constants";
 import {
   bufArray2HexStr,
@@ -52,6 +55,7 @@ import {
 export class Stage1ServerService extends SATPService {
   public static readonly SATP_STAGE = "1";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
+  public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
   constructor(ops: ISATPServerServiceOptions) {
     // for now stage1serverservice does not have any different options than the SATPService class

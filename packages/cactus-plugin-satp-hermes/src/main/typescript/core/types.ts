@@ -3,28 +3,19 @@ import { ValidatorOptions } from "class-validator";
 import { BLODispatcher } from "../blo/dispatcher";
 import { ISignerKeyPairs } from "@hyperledger/cactus-common/dist/lib/main/typescript/signer-key-pairs";
 import { SATPSession } from "./satp-session";
-import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
-import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
-import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_connect";
-import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_connect";
 import { ConnectRouter } from "@connectrpc/connect";
 import { SATPGateway } from "../plugin-satp-hermes-gateway";
 import { SATPService } from "../types/satp-protocol";
 import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
 import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
+import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
+import { SATPServiceInstance } from "./stage-services/satp-service";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,
   service: SATPService,
 ) => (router: ConnectRouter) => void;
-
-export type SATPServiceClient =
-  | typeof SatpStage0Service
-  | typeof SatpStage1Service
-  | typeof SatpStage2Service
-  | typeof SatpStage3Service;
-import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 
 export enum CurrentDrafts {
   Core = "Core",
@@ -55,7 +46,7 @@ export type GatewayChannel = {
   toGatewayID: string;
   sessions: Map<string, SATPSession>;
   supportedDLTs: SupportedChain[];
-  clients: Map<string, PromiseConnectClient<SATPServiceClient>>;
+  clients: Map<string, PromiseConnectClient<SATPServiceInstance>>;
 };
 
 export type Address =
@@ -126,3 +117,4 @@ export interface SATPBridgeConfig {
   network: NetworkBridge;
   logLevel?: LogLevelDesc;
 }
+export { SATPServiceInstance };

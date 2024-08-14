@@ -34,6 +34,7 @@ import {
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
+  public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
   constructor(ops: ISATPClientServiceOptions) {
     // for now stage1serverservice does not have any different options than the SATPService class

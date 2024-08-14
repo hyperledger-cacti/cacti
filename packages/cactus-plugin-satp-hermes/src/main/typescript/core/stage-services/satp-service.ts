@@ -5,20 +5,41 @@ import {
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
 import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_connect";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_connect";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_connect";
 
 export enum SATPServiceType {
   Server = "Server",
   Client = "Client",
 }
 
+export type SATPStagesV02 = "0" | "1" | "2" | "3";
+
 export type ISATPServiceOptions = {
   serviceName: string;
-  stage: "0" | "1" | "2" | "3";
+  stage: SATPStagesV02;
   loggerOptions: ILoggerOptions;
   signer: JsObjectSigner;
   serviceType: SATPServiceType;
   bridgeManager?: SATPBridgesManager;
 };
+
+export interface SATPServiceStatic {
+  new (options: ISATPServiceOptions): SATPService;
+  readonly SERVICE_TYPE: SATPServiceType;
+  readonly SATP_STAGE: string;
+  // service name serves as an internal, hardcoded service name. One can assign a more user-friendly service name via the SATPService constructor
+  readonly SATP_SERVICE_INTERNAL_NAME: string;
+  get ServiceType(): SATPServiceType;
+}
+
+export type SATPServiceInstance =
+  | (typeof SatpStage0Service & SATPServiceStatic)
+  | (typeof SatpStage1Service & SATPServiceStatic)
+  | (typeof SatpStage2Service & SATPServiceStatic)
+  | (typeof SatpStage3Service & SATPServiceStatic);
 
 export type ISATPServerServiceOptions = ISATPServiceOptions;
 

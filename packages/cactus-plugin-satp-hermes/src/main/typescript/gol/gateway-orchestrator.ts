@@ -10,7 +10,7 @@ import {
   GatewayIdentity,
   GatewayChannel,
   SupportedChain,
-  SATPServiceClient,
+  SATPServiceInstance,
 } from "../core/types";
 import {
   PromiseClient as PromiseConnectClient,
@@ -204,7 +204,7 @@ export class GatewayOrchestrator {
 
   private createConnectClients(
     identity: GatewayIdentity,
-  ): Map<string, PromiseConnectClient<SATPServiceClient>> {
+  ): Map<string, PromiseConnectClient<SATPServiceInstance>> {
     // one function for each client type; aggregate in array
     const transport = createConnectTransport({
       baseUrl: identity.address + ":" + identity.gatewayGrpcPort,
@@ -213,7 +213,7 @@ export class GatewayOrchestrator {
 
     const clients: Map<
       string,
-      PromiseConnectClient<SATPServiceClient>
+      PromiseConnectClient<SATPServiceInstance>
     > = new Map();
 
     clients.set("0", this.createStage0ServiceClient(transport));

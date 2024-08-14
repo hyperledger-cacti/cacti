@@ -24,7 +24,6 @@ import {
   saveHash,
   saveSignature,
 } from "../../session-utils";
-import { SupportedChain } from "../../types";
 import { SATPSession } from "../../../core/satp-session";
 import {
   SATPService,
@@ -36,6 +35,7 @@ import {
 export class Stage0ServerService extends SATPService {
   public static readonly SATP_STAGE = "0";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
+  public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
   constructor(ops: ISATPServerServiceOptions) {
     // for now stage0serverservice does not have any different options than the SATPService class
@@ -233,6 +233,9 @@ export class Stage0ServerService extends SATPService {
   ): Promise<SessionData | boolean> {
     const stepTag = `checkTransferProposalRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+
+    // todo use session;
+    session;
 
     if (
       request.context == undefined ||
