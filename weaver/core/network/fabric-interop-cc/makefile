@@ -15,7 +15,7 @@ list-names:
 	echo ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG)
 
 image:
-	(cd contracts/interop && make run-vendor)
+	(cd contracts/interop && make run-vendor && go mod tidy)
 	docker build --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) .
 
 check-if-tag-exists:
