@@ -1020,6 +1020,14 @@
           "transactionInputData": {},
           "callOutput": {}
         }
+      },
+      "BackingLedgerUnavailableError": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Backing Ledger Unavailable\n"
+          }
+        }
       }
     }
   },
@@ -1042,6 +1050,16 @@
               "application/json": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
@@ -1079,6 +1097,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
+                }
+              }
+            }
           }
         }
       }
@@ -1110,6 +1138,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
@@ -1147,6 +1185,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
+                }
+              }
+            }
           }
         }
       }
@@ -1178,6 +1226,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetBlockV1Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
@@ -1215,6 +1273,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
+                }
+              }
+            }
           }
         }
       }
@@ -1246,6 +1314,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetTransactionV1Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
@@ -1283,6 +1361,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
+                }
+              }
+            }
           }
         }
       }
@@ -1314,6 +1402,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InvokeContractV1Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
@@ -1356,6 +1454,16 @@
           },
           "404": {
             "description": "Not able to find the corresponding tranaction from the transaction hash"
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
+                }
+              }
+            }
           }
         }
       }
@@ -1378,6 +1486,16 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
@@ -1412,6 +1530,16 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/GetBesuRecordV1Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API is unable to reach the validator",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackingLedgerUnavailableError"
                 }
               }
             }
