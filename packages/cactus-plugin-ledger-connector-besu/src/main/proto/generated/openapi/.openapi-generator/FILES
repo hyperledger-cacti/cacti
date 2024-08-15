@@ -1,4 +1,5 @@
 README.md
+models/backing_ledger_unavailable_error_pb.proto
 models/besu_private_transaction_config_pb.proto
 models/besu_transaction_config_pb.proto
 models/besu_transaction_config_to_pb.proto

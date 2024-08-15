@@ -1,0 +1,13 @@
+diff --git a/lib/index.js b/lib/index.js
+index de2853c247b334e6b22cee42b3e597281c44efdc..787aecf6758228c092f1a3cd8097f64e76cc573d 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -344,7 +344,7 @@ function _handleTxPricing(_this, tx) {
+                             throw Error("Network doesn't support eip-1559");
+                         resolve({ gasPrice });
+                     }
+-                });
++                }).catch((ex) => reject(ex));
+             }
+         }
+         catch (error) {

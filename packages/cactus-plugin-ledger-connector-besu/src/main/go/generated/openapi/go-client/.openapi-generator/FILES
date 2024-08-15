@@ -6,6 +6,7 @@ client.go
 configuration.go
 go.mod
 go.sum
+model_backing_ledger_unavailable_error.go
 model_besu_private_transaction_config.go
 model_besu_transaction_config.go
 model_besu_transaction_config_to.go
