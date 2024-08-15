@@ -13,6 +13,7 @@ syntax = "proto3";
 package org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice;
 
 import "google/protobuf/empty.proto";
+import "models/backing_ledger_unavailable_error_pb.proto";
 import "models/deploy_contract_solidity_bytecode_no_keychain_v1_request_pb.proto";
 import "models/deploy_contract_solidity_bytecode_v1_request_pb.proto";
 import "models/deploy_contract_solidity_bytecode_v1_response_pb.proto";

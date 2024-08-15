@@ -93,6 +93,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [BackingLedgerUnavailableError](docs/BackingLedgerUnavailableError.md)
  - [BesuPrivateTransactionConfig](docs/BesuPrivateTransactionConfig.md)
  - [BesuTransactionConfig](docs/BesuTransactionConfig.md)
  - [BesuTransactionConfigTo](docs/BesuTransactionConfigTo.md)

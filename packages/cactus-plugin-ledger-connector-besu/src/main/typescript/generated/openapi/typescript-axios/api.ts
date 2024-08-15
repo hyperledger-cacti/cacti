@@ -26,6 +26,19 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface BackingLedgerUnavailableError
+ */
+export interface BackingLedgerUnavailableError {
+    /**
+     * 
+     * @type {string}
+     * @memberof BackingLedgerUnavailableError
+     */
+    'message'?: string;
+}
+/**
+ * 
+ * @export
  * @interface BesuPrivateTransactionConfig
  */
 export interface BesuPrivateTransactionConfig {

@@ -1,4 +1,5 @@
 import { Express, Request, Response } from "express";
+import { HttpStatusCode } from "axios";
 
 import {
   Logger,
@@ -6,18 +7,23 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  HttpHeader,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 
 import OAS from "../../json/openapi.json";
 import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
+import { isWeb3WebsocketProviderAbnormalClosureError } from "../common/is-web3-websocket-provider-abnormal-closure-error";
 
 export interface IRunTransactionEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -82,19 +88,36 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
+  private handleLedgerNotAccessibleError(res: Response): void {
+    const fn = "handleLedgerNotAccessibleError()";
+    this.log.debug(
+      "%s WebSocketProvider disconnected from ledger. Sending HttpStatusCode.ServiceUnavailable...",
+      fn,
+    );
+
+    res
+      .header(HttpHeader.RetryAfter, "5")
+      .status(HttpStatusCode.ServiceUnavailable)
+      .json({
+        success: false,
+        error: "Could not establish connection to the backing ledger.",
+      });
+  }
+
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
+    const { log } = this;
     this.log.debug(reqTag);
     const reqBody: RunTransactionRequest = req.body;
     try {
       const resBody = await this.options.connector.transact(reqBody);
       res.json({ success: true, data: resBody });
-    } catch (ex) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+    } catch (ex: unknown) {
+      if (isWeb3WebsocketProviderAbnormalClosureError(ex)) {
+        return this.handleLedgerNotAccessibleError(res);
+      }
+      const errorMsg = `request handler fn crashed for: ${reqTag}`;
+      await handleRestEndpointException({ errorMsg, log, error: ex, res });
     }
   }
 }

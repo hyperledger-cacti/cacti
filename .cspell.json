@@ -202,6 +202,7 @@
     "trivyignores",
     "txid",
     "txqueue",
+    "UIDH",
     "Uisrs",
     "undici",
     "unixfs",
@@ -214,7 +215,8 @@
     "websocat",
     "WSPROVIDER",
     "Xdai",
-    "xeipuuv"
+    "xeipuuv",
+    "XUIDH"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"
