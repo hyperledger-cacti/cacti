@@ -49,7 +49,6 @@ repositories {
             dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
             dirs '../../../../sdks/corda/build/libs'
             dirs '../../../../common/protos-java-kt/build/libs'
-            dirs 'libs'
         }
     }
 }
