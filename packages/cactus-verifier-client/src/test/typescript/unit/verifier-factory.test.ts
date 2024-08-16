@@ -1,4 +1,5 @@
 // Base Class: packages/cactus-verifier-client/src/main/typescript/verifier-factory.ts
+const testLogLevel: LogLevelDesc = "info";
 
 import "jest-extended";
 
@@ -8,6 +9,7 @@ import {
   VerifierFactoryConfig,
 } from "../../../main/typescript/verifier-factory";
 import { BesuApiClient } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 
 describe("Constructor Tests", () => {
   test("Basic construction", () => {
@@ -49,6 +51,11 @@ describe("Constructor Tests", () => {
 });
 
 describe("getVerifier Tests", () => {
+  const log = LoggerProvider.getOrCreate({
+    label: "verifier-factory.test.ts",
+    level: testLogLevel,
+  });
+
   const ledgerPluginInfo: VerifierFactoryConfig = [
     {
       validatorID: "myBesuValidatorId",
@@ -70,34 +77,20 @@ describe("getVerifier Tests", () => {
   });
 
   test("Throws when requesting validator not defined in config", async () => {
-    try {
-      await sut.getVerifier("missingValidatorId");
-      expect(1).toBe("getVerifier with invalid Id should throw an error!");
-    } catch (error) {
-      console.log("getVerifier with invalid Id throw error as expected.");
-    }
+    await expect(sut.getVerifier("missingValidatorId")).rejects.toThrow();
+    log.info("getVerifier with invalid Id threw error as expected.");
   });
 
   test("Throws when requested client type differs from configured type", async () => {
-    try {
-      await sut.getVerifier("myBesuValidatorId", "CORDA_4X");
-      expect(1).toBe(
-        "getVerifier with invalid verifier type should throw an error!",
-      );
-    } catch (error) {
-      console.log("getVerifier with invalid type throw error as expected.");
-    }
+    await expect(
+      sut.getVerifier("myBesuValidatorId", "CORDA_4X"),
+    ).rejects.toThrow();
+    log.info("getVerifier with invalid type threw error as expected.");
 
-    // even though the same clientApi is used for both BESU_1X and BESU_2X this should fail
-    // client code should not depend on internal implementation detail.
-    try {
-      await sut.getVerifier("myBesuValidatorId", "BESU_1X");
-      expect(1).toBe(
-        "getVerifier with invalid verifier type should throw an error!",
-      );
-    } catch (error) {
-      console.log("getVerifier with invalid type throw error as expected.");
-    }
+    await expect(
+      sut.getVerifier("myBesuValidatorId", "BESU_1X"),
+    ).rejects.toThrow();
+    log.info("getVerifier with invalid type threw error as expected.");
   });
 
   test("Creates a open-api based client", async () => {

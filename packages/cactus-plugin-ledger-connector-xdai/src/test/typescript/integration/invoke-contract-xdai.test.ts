@@ -192,25 +192,27 @@ describe(testCase, () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    try {
-      await connector.invokeContract({
-        contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.Send,
-        methodName: "setName",
-        params: [newName],
-        gas: 1000000,
-        web3SigningCredential: {
-          ethAccount: testEthAccount.address,
-          secret: testEthAccount.privateKey,
-          type: Web3SigningCredentialType.PrivateKeyHex,
-        },
-        nonce: 1,
-      });
-      fail("invalid nonce should have thrown");
-    } catch (error: any) {
-      expect(error.message).toContain("Nonce too low");
-    }
+    const contractInvocation = connector.invokeContract({
+      contractName,
+      keychainId: keychainPlugin.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "setName",
+      params: [newName],
+      gas: 1000000,
+      web3SigningCredential: {
+        ethAccount: testEthAccount.address,
+        secret: testEthAccount.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      nonce: 1,
+    });
+
+    await expect(contractInvocation).rejects.toThrow(
+      expect.objectContaining({
+        message: expect.stringContaining("Nonce too low"),
+      }),
+    );
+
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
@@ -294,21 +296,23 @@ describe(testCase, () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    try {
-      await connector.invokeContract({
-        contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.Send,
-        methodName: "setName",
-        params: [newName],
-        gas: 1000000,
-        web3SigningCredential,
-        nonce: 4,
-      });
-      fail("invalid nonce should have thrown");
-    } catch (error: any) {
-      expect(error.message).toContain("Nonce too low");
-    }
+    const contractInvocation = connector.invokeContract({
+      contractName,
+      keychainId: keychainPlugin.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "setName",
+      params: [newName],
+      gas: 1000000,
+      web3SigningCredential,
+      nonce: 4,
+    });
+
+    await expect(contractInvocation).rejects.toThrow(
+      expect.objectContaining({
+        message: expect.stringContaining("Nonce too low"),
+      }),
+    );
+
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),

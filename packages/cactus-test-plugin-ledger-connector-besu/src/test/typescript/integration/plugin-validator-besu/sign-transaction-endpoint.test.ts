@@ -35,7 +35,6 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import axios from "axios";
 
 const testCase = "Test sign transaction endpoint";
 const logLevel: LogLevelDesc = "TRACE";
@@ -170,19 +169,18 @@ describe(testCase, () => {
     expect(res).toBeTruthy();
     expect(signDataHex).toBe(res.data.signature);
 
-    try {
-      const notFoundRequest: SignTransactionRequest = {
-        keychainId: "fake",
-        keychainRef: "fake",
-        transactionHash:
-          "0x46eac4d1d1ff81837698cbab38862a428ddf042f92855a72010de2771a7b704d",
-      };
-      await api.signTransactionV1(notFoundRequest);
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        expect(error.response?.status).toEqual(404);
-        expect(error.response?.statusText).toEqual("Transaction not found");
-      }
-    }
+    const notFoundRequest: SignTransactionRequest = {
+      keychainId: "fake",
+      keychainRef: "fake",
+      transactionHash:
+        "0x46eac4d1d1ff81837698cbab38862a428ddf042f92855a72010de2771a7b704d",
+    };
+
+    await expect(api.signTransactionV1(notFoundRequest)).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 404,
+        statusText: "Transaction not found",
+      }),
+    });
   });
 });

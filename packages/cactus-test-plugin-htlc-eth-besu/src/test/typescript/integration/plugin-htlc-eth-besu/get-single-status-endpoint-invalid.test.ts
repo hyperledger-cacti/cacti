@@ -195,17 +195,20 @@ describe(testCase, () => {
     const balance2 = await web3.eth.getBalance(firstHighNetWorthAccount);
 
     expect(parseInt(balance)).toEqual(parseInt(balance2) - 10);
-    try {
-      const fakeId = "0x66616b654964";
-      const res = await api.getSingleStatusV1({
+
+    const fakeId = "0x66616b654964";
+
+    await expect(
+      api.getSingleStatusV1({
         id: fakeId,
         web3SigningCredential: fakeWeb3SigningCredential,
         connectorId,
         keychainId: "",
-      });
-      expect(res.status).toEqual(500);
-    } catch (e: any) {
-      expect(e.response.status).toEqual(500);
-    }
+      }),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 500,
+      }),
+    });
   });
 });
