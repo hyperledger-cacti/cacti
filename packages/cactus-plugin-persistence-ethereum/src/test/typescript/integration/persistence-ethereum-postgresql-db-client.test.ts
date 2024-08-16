@@ -407,8 +407,8 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       method_name: "",
     };
 
-    try {
-      await dbClient.insertBlockData({
+    await expect(
+      dbClient.insertBlockData({
         block,
         transactions: [
           {
@@ -416,11 +416,8 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
             token_transfers: [token_transfer],
           },
         ],
-      });
-      expect(true).toBe(false); // Block insertion should fail
-    } catch (error: unknown) {
-      log.info("insertBlockData was rejected as expected");
-    }
+      }),
+    ).rejects.toThrow(); 
 
     // Assert no data was added
     const blocksResponse = await getDbBlocks();
