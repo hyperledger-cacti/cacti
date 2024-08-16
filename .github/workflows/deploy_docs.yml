@@ -18,11 +18,15 @@ on:
 env:
   SITE_URL: https://${{ github.repository_owner }}.github.io/cacti
   NODEJS_VERSION: v18.18.2
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 jobs:
   deploy-docs:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pages: write
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v4.0.3

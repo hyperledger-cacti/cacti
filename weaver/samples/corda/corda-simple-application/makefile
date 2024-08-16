@@ -1,5 +1,3 @@
-CLIKT_VERSION=$(shell grep cliktVersion ./constants.properties | cut -d '=' -f 2)
-
 .PHONY: build-local-weaver-dependencies
 build-local-weaver-dependencies:
 	echo "Building local protos..."
@@ -112,4 +110,3 @@ publish-cordapps:
 clean:
 	./gradlew clean
 	rm -rf .gradle
-	rm -rf clients/libs
