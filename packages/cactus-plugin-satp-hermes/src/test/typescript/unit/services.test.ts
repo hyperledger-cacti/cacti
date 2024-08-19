@@ -153,8 +153,8 @@ describe("SATP Services Testing", () => {
       "hex",
     );
     sessionData.serverGatewayPubkey = sessionData.clientGatewayPubkey;
-    sessionData.originatorPubkey = sessionData.clientGatewayPubkey;
-    sessionData.beneficiaryPubkey = sessionData.clientGatewayPubkey;
+    sessionData.originatorPubkey = "MOCK_ORIGINATOR_PUBKEY";
+    sessionData.beneficiaryPubkey = "MOCK_BENEFICIARY_PUBKEY";
     sessionData.digitalAssetId = "MOCK_DIGITAL_ASSET_ID";
     sessionData.assetProfileId = "MOCK_ASSET_PROFILE_ID";
     sessionData.verifiedOriginatorEntityId =
@@ -162,6 +162,7 @@ describe("SATP Services Testing", () => {
     sessionData.verifiedBeneficiaryEntityId =
       "MOCK_VERIFIED_BENEFICIARY_ENTITY_ID";
     sessionData.receiverGatewayOwnerId = "MOCK_RECEIVER_GATEWAY_OWNER_ID";
+    sessionData.recipientGatewayNetworkId = "MOCK_RECIPIENT_GATEWAY_NETWORK_ID";
     sessionData.senderGatewayOwnerId = SupportedChain.FABRIC;
     sessionData.senderGatewayNetworkId = SupportedChain.BESU;
     sessionData.signatureAlgorithm = SignatureAlgorithm.RSA;
@@ -170,6 +171,8 @@ describe("SATP Services Testing", () => {
     sessionData.credentialProfile = CredentialProfile.X509;
     sessionData.loggingProfile = "MOCK_LOGGING_PROFILE";
     sessionData.accessControlProfile = "MOCK_ACCESS_CONTROL_PROFILE";
+    sessionData.resourceUrl = "MOCK_RESOURCE_URL";
+    sessionData.lockAssertionExpiration = BigInt(99999);
 
     transferProposalRequestMessage =
       (await satpClientService1.transferProposalRequest(
