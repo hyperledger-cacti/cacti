@@ -9,18 +9,12 @@ import {
   TransferClaims,
   NetworkCapabilities,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { SATP_VERSION } from "../../constants";
-import {
-  bufArray2HexStr,
-  getHash,
-  sign,
-  verifySignature,
-} from "../../../gateway-utils";
+import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
   getMessageHash,
   saveHash,
   saveSignature,
-  checkSessionData,
+  SessionType,
 } from "../../session-utils";
 import { SupportedChain } from "../../types";
 import { SATPSession } from "../../../core/satp-session";
@@ -30,6 +24,9 @@ import {
   ISATPClientServiceOptions,
   ISATPServiceOptions,
 } from "../satp-service";
+import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
+import { ACCEPTANCE } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { SessionError } from "../../errors/satp-service-errors";
 
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";
@@ -57,11 +54,13 @@ export class Stage1ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, transferProposalRequest...`);
 
-    const sessionData = session.getClientSessionData();
-
-    if (sessionData == undefined || !checkSessionData(sessionData)) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    if (session == undefined) {
+      throw new SessionError(fnTag);
     }
+
+    session.verify(fnTag, SessionType.CLIENT);
+
+    const sessionData = session.getClientSessionData();
 
     if (
       !supportedDLTs.includes(
@@ -73,17 +72,13 @@ export class Stage1ClientService extends SATPService {
       );
     }
 
-    if (sessionData.version != SATP_VERSION) {
-      throw new Error(`${fnTag}, unsupported SATP version`);
-    }
-
     const commonBody = new CommonSatp();
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.INIT_PROPOSAL;
     commonBody.sessionId = sessionData.id;
     commonBody.sequenceNumber = sessionData.lastSequenceNumber =
       sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.resourceUrl = "";
+    commonBody.resourceUrl = sessionData.resourceUrl;
 
     if (sessionData.transferContextId != undefined) {
       commonBody.transferContextId = sessionData.transferContextId;
@@ -213,20 +208,18 @@ export class Stage1ClientService extends SATPService {
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, transferCommenceRequest...`);
 
-    if (!response || !response.common) {
-      throw new Error("Response or response.common is undefined");
+    if (session == undefined) {
+      throw new SessionError(fnTag);
     }
+
+    session.verify(fnTag, SessionType.CLIENT);
 
     const sessionData = session.getClientSessionData();
-
-    if (sessionData == undefined) {
-      throw new Error("Session data not loaded successfully");
-    }
 
     const commonBody = new CommonSatp();
     commonBody.version = sessionData.version;
     commonBody.messageType = MessageType.TRANSFER_COMMENCE_REQUEST;
-    commonBody.sequenceNumber = response.common.sequenceNumber + BigInt(1);
+    commonBody.sequenceNumber = response.common!.sequenceNumber + BigInt(1);
 
     //todo check when reject
     commonBody.hashPreviousMessage = getMessageHash(
@@ -238,6 +231,7 @@ export class Stage1ClientService extends SATPService {
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
     commonBody.sessionId = sessionData.id;
     commonBody.transferContextId = sessionData.transferContextId;
+    commonBody.resourceUrl = sessionData.resourceUrl;
 
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
@@ -245,8 +239,6 @@ export class Stage1ClientService extends SATPService {
     transferCommenceRequestMessage.common = commonBody;
     transferCommenceRequestMessage.hashTransferInitClaims =
       sessionData.hashTransferInitClaims;
-
-    // transferCommenceRequestMessage.clientTransferNumber = sessionData.clientTransferNumber;
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, JSON.stringify(transferCommenceRequestMessage)),
@@ -286,102 +278,42 @@ export class Stage1ClientService extends SATPService {
     const stepTag = `checkTransferProposalReceiptMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, checkTransferProposalReceiptMessage...`);
-    if (response.common == undefined) {
-      throw new Error(`${fnTag}, message has no satp common body`);
+
+    if (session == undefined) {
+      throw new SessionError(fnTag);
     }
 
-    if (
-      response.common.version == undefined ||
-      response.common.sequenceNumber == undefined ||
-      response.common.hashPreviousMessage == undefined ||
-      response.timestamp == undefined
-    ) {
-      throw new Error(`${fnTag}, satp common body is missing required fields`);
-    }
-
-    // const sessionId = response.common.sessionId;
+    session.verify(fnTag, SessionType.CLIENT);
 
     const sessionData = session.getClientSessionData();
 
-    if (sessionData == undefined) {
-      throw new Error(
-        `${fnTag}, session data not found for session id ${response.common.sessionId}`,
-      );
-    }
+    commonBodyVerifier(
+      fnTag,
+      response.common,
+      sessionData,
+      MessageType.INIT_RECEIPT,
+      MessageType.INIT_REJECT,
+    );
+
+    signatureVerifier(fnTag, this.Signer, response, sessionData);
 
     if (
-      sessionData.serverGatewayPubkey == undefined ||
-      sessionData.lastSequenceNumber == undefined
-    ) {
-      throw new Error(`${fnTag}, session data was not loaded correctly`);
-    }
-
-    if (response.common.version != sessionData.version) {
-      throw new Error(`${fnTag}, TransferCommenceRequest version mismatch`);
-    }
-
-    if (
-      response.common.messageType != MessageType.INIT_RECEIPT &&
-      response.common.messageType != MessageType.INIT_REJECT
-    ) {
-      throw new Error(
-        `${fnTag}, wrong message type for TransferCommenceRequest()`,
-      );
-    }
-
-    if (
-      response.common.sequenceNumber !=
-      sessionData.lastSequenceNumber + BigInt(1)
-    ) {
-      throw new Error(
-        `${fnTag}, TransferProposalReceipt Message sequence number is wrong got: ${response.common.sequenceNumber} expected to be ${sessionData.lastSequenceNumber + BigInt(1)}`,
-      );
-    }
-
-    if (
-      response.common.hashPreviousMessage == undefined ||
-      response.common.hashPreviousMessage !=
-        getMessageHash(sessionData, MessageType.INIT_PROPOSAL)
-    ) {
-      throw new Error(
-        `${fnTag}, TransferProposalReceipt previous message hash does not match the one that was sent`,
-      );
-    }
-
-    if (
-      response.common.serverGatewayPubkey != sessionData.serverGatewayPubkey
-    ) {
-      throw new Error(
-        `${fnTag}, TransferProposalReceipt serverIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    if (
-      response.common.clientGatewayPubkey != sessionData.clientGatewayPubkey
-    ) {
-      throw new Error(
-        `${fnTag}, TransferProposalReceipt clientIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    if (
-      !verifySignature(this.Signer, response, sessionData.serverGatewayPubkey)
-    ) {
-      throw new Error(
-        `${fnTag}, TransferProposalReceipt message signature verification failed`,
-      );
-    }
-
-    if (
-      response.common.messageType == MessageType.INIT_REJECT &&
+      response.common!.messageType == MessageType.INIT_REJECT &&
       response.transferCounterClaims == undefined
     ) {
+      this.Log.info(
+        `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
+      );
+      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
       sessionData.completed = true;
+      saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
       return false;
     } else if (
-      response.common.messageType == MessageType.INIT_REJECT &&
+      response.common!.messageType == MessageType.INIT_REJECT &&
       response.transferCounterClaims != undefined
     ) {
+      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_CONDITIONAL;
+      saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
       if (
         await this.checkProposedTransferClaims(response.transferCounterClaims)
       ) {
@@ -391,13 +323,14 @@ export class Stage1ClientService extends SATPService {
         return true;
       } else {
         this.Log.info(
-          `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
+          `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected conditional`,
         );
         sessionData.completed = true;
         return false;
       }
     }
 
+    sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
     saveHash(sessionData, MessageType.INIT_RECEIPT, getHash(response));
 
     this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
