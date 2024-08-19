@@ -1,3 +1,5 @@
 src/main/typescript/fabric-contracts/satp/chaincode-typescript/.yarn/
 src/main/typescript/.env
 packages/cactus-plugin-satp-hermes/cache/solidity-files-cache.json
+src/keys/
+src/test/typescript/integration/gateway-info
