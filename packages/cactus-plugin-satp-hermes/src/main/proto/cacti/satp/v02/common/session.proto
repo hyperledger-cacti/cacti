@@ -68,6 +68,7 @@ message SessionData {
     string server_transfer_number = 58;
     uint64 lock_assertion_expiration = 59;
     cacti.satp.v02.common.AssetProfile asset_profile = 60;
+    string resource_url = 61;
 }
 
 

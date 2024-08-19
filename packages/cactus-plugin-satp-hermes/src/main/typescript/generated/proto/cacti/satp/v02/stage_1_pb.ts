@@ -105,7 +105,7 @@ export class TransferProposalReceiptMessage extends Message<TransferProposalRece
   timestamp = "";
 
   /**
-   * @generated from field: string server_signature = 5;
+   * @generated from field: string server_signature = 6;
    */
   serverSignature = "";
 
@@ -121,7 +121,7 @@ export class TransferProposalReceiptMessage extends Message<TransferProposalRece
     { no: 2, name: "hash_transfer_init_claims", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "transfer_counter_claims", kind: "message", T: TransferClaims },
     { no: 4, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferProposalReceiptMessage {

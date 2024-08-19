@@ -15,6 +15,12 @@ import {
 } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { Stage2ClientService } from "../stage-services/client/stage2-client-service";
 import { TransferCommenceResponseMessage } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
+import {
+  FailedToCreateMessageError,
+  FailedToProcessError,
+  SessionNotFoundError,
+} from "../errors/satp-handler-errors";
+import { getSessionId } from "./handler-utils";
 export class Stage2SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE2;
   private sessions: Map<string, SATPSession>;
@@ -54,30 +60,29 @@ export class Stage2SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Lock Assertion...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
 
-      if (!req.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(req.common?.sessionId);
+      const session = this.sessions.get(getSessionId(req));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
-      const sessionData =
-        await this.serverService.checkLockAssertionRequestMessage(req, session);
+      await this.serverService.checkLockAssertionRequestMessage(req, session);
+
       const message = await this.serverService.lockAssertionResponse(
         req,
         session,
       );
+
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
-      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
 
       if (!message) {
-        throw new Error(`${fnTag}, Failed to create LockAssertionReceipt`);
+        throw new FailedToCreateMessageError(
+          fnTag,
+          "LockAssertionImplementation",
+        );
       }
       return message;
     } catch (error) {
-      throw new Error(`${fnTag}, Failed to process LockAssertion ${error}`);
+      throw new FailedToProcessError(fnTag, "LockAssertionImplementation");
     }
   }
 
@@ -97,13 +102,9 @@ export class Stage2SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Lock Assertion Request Message...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      if (!response.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(response.common?.sessionId);
+      const session = this.sessions.get(getSessionId(response));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
       await this.clientService.checkTransferCommenceResponseMessage(
@@ -119,13 +120,11 @@ export class Stage2SATPHandler implements SATPHandler {
       );
 
       if (!request) {
-        throw new Error(`${fnTag}, Failed to create LockAssertionRequest`);
+        throw new FailedToCreateMessageError(fnTag, "LockAssertionRequest");
       }
       return request;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process LockAssertionRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "LockAssertionRequest");
     }
   }
 }

@@ -14,6 +14,14 @@ import {
   Stage3Signatures,
   Stage3Timestamps,
 } from "../generated/proto/cacti/satp/v02/common/session_pb";
+import {
+  SATPVersionError,
+  SessionCompletedError,
+  SessionDataNotLoadedCorrectlyError,
+} from "./errors/satp-service-errors";
+import { SATP_VERSION } from "./constants";
+import { LockType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { SessionType } from "./session-utils";
 
 // Define interface on protos
 export interface ISATPSessionOptions {
@@ -75,11 +83,21 @@ export class SATPSession {
     sessionData.signatures.stage3 = new Stage3Signatures();
   }
 
-  public getServerSessionData(): SessionData | undefined {
+  public getServerSessionData(): SessionData {
+    if (this.serverSessionData == undefined) {
+      throw new Error(
+        `${SATPSession.CLASS_NAME}#getServerSessionData(), serverSessionData is undefined`,
+      );
+    }
     return this.serverSessionData;
   }
 
-  public getClientSessionData(): SessionData | undefined {
+  public getClientSessionData(): SessionData {
+    if (this.clientSessionData == undefined) {
+      throw new Error(
+        `${SATPSession.CLASS_NAME}#getClientSessionData(), clientSessionData is undefined`,
+      );
+    }
     return this.clientSessionData;
   }
 
@@ -93,5 +111,59 @@ export class SATPSession {
 
   public getSessionId(): string {
     return this.serverSessionData?.id || this.clientSessionData?.id || "";
+  }
+
+  public verify(tag: string, type: SessionType): void {
+    let sessionData: SessionData | undefined;
+    if (type == SessionType.SERVER) {
+      sessionData = this.getServerSessionData();
+    } else if (type == SessionType.CLIENT) {
+      sessionData = this.getClientSessionData();
+    } else {
+      throw new Error(
+        `${SATPSession.CLASS_NAME}#verify(), sessionData type is not valid`,
+      );
+    }
+
+    if (sessionData == undefined) {
+      throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
+    }
+
+    if (sessionData.completed) {
+      throw new SessionCompletedError("Session already completed");
+    }
+
+    if (
+      sessionData.version == "" ||
+      sessionData.id == "" ||
+      sessionData.digitalAssetId == "" ||
+      sessionData.originatorPubkey == "" ||
+      sessionData.beneficiaryPubkey == "" ||
+      sessionData.senderGatewayNetworkId == "" ||
+      sessionData.recipientGatewayNetworkId == "" ||
+      sessionData.clientGatewayPubkey == "" ||
+      sessionData.serverGatewayPubkey == "" ||
+      sessionData.senderGatewayOwnerId == "" ||
+      sessionData.receiverGatewayOwnerId == "" ||
+      // sessionData.maxRetries == undefined ||
+      // sessionData.maxTimeout == undefined ||
+      sessionData.senderGatewayNetworkId == "" ||
+      sessionData.signatureAlgorithm == undefined ||
+      sessionData.lockType == LockType.UNSPECIFIED ||
+      sessionData.lockExpirationTime == BigInt(0) ||
+      sessionData.credentialProfile == undefined ||
+      sessionData.loggingProfile == "" ||
+      sessionData.accessControlProfile == "" ||
+      // sessionData.lastSequenceNumber == BigInt(0) ||
+      sessionData.transferContextId == ""
+    ) {
+      throw new SessionDataNotLoadedCorrectlyError(
+        tag,
+        JSON.stringify(sessionData),
+      );
+    }
+    if (sessionData.version != SATP_VERSION) {
+      throw new SATPVersionError(tag, sessionData.version, SATP_VERSION);
+    }
   }
 }

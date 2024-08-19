@@ -292,6 +292,47 @@ export function saveSignature(
   }
 }
 
+export function getPreviousMessageType(
+  sessionData: SessionData | undefined,
+  type: MessageType,
+): MessageType {
+  if (sessionData == undefined) {
+    throw new Error("No session data provided");
+  }
+
+  switch (type) {
+    case MessageType.INIT_PROPOSAL:
+      MessageType.UNSPECIFIED;
+    case MessageType.INIT_RECEIPT:
+      return MessageType.INIT_PROPOSAL;
+    case MessageType.INIT_REJECT:
+      return MessageType.INIT_PROPOSAL;
+    case MessageType.TRANSFER_COMMENCE_REQUEST:
+      if (sessionData.hashes?.stage1?.transferProposalRejectMessageHash) {
+        return MessageType.INIT_REJECT;
+      }
+      return MessageType.INIT_RECEIPT;
+    case MessageType.TRANSFER_COMMENCE_RESPONSE:
+      return MessageType.TRANSFER_COMMENCE_REQUEST;
+    case MessageType.LOCK_ASSERT:
+      return MessageType.TRANSFER_COMMENCE_RESPONSE;
+    case MessageType.ASSERTION_RECEIPT:
+      return MessageType.LOCK_ASSERT;
+    case MessageType.COMMIT_PREPARE:
+      return MessageType.ASSERTION_RECEIPT;
+    case MessageType.COMMIT_READY:
+      return MessageType.COMMIT_PREPARE;
+    case MessageType.COMMIT_FINAL:
+      return MessageType.COMMIT_READY;
+    case MessageType.ACK_COMMIT_FINAL:
+      return MessageType.COMMIT_FINAL;
+    case MessageType.COMMIT_TRANSFER_COMPLETE:
+      return MessageType.ACK_COMMIT_FINAL;
+    default:
+      throw new Error("Message type not found");
+  }
+}
+
 export function getMessageHash(
   sessionData: SessionData | undefined,
   messageType: MessageType,
@@ -398,35 +439,4 @@ export function getMessageTimestamp(
     default:
       throw new Error("Message hash not found");
   }
-}
-
-export function checkSessionData(sessionData: SessionData): boolean {
-  if (
-    sessionData.version == undefined ||
-    sessionData.id == undefined ||
-    sessionData.digitalAssetId == undefined ||
-    sessionData.originatorPubkey == undefined ||
-    sessionData.beneficiaryPubkey == undefined ||
-    sessionData.senderGatewayNetworkId == undefined ||
-    sessionData.recipientGatewayNetworkId == undefined ||
-    sessionData.clientGatewayPubkey == undefined ||
-    sessionData.serverGatewayPubkey == undefined ||
-    sessionData.senderGatewayOwnerId == undefined ||
-    sessionData.receiverGatewayOwnerId == undefined ||
-    // sessionData.maxRetries == undefined ||
-    // sessionData.maxTimeout == undefined ||
-    sessionData.senderGatewayNetworkId == undefined ||
-    sessionData.signatureAlgorithm == undefined ||
-    sessionData.lockType == undefined ||
-    sessionData.lockExpirationTime == undefined ||
-    sessionData.credentialProfile == undefined ||
-    sessionData.loggingProfile == undefined ||
-    sessionData.accessControlProfile == undefined ||
-    sessionData.lastSequenceNumber == undefined ||
-    sessionData.multipleClaimsAllowed == undefined ||
-    sessionData.multipleCancelsAllowed == undefined
-  ) {
-    return false;
-  }
-  return true;
 }

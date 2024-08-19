@@ -19,7 +19,7 @@ message TransferProposalReceiptMessage {
   string hash_transfer_init_claims = 2;
   cacti.satp.v02.common.TransferClaims transfer_counter_claims = 3;
   string timestamp = 4;
-  string server_signature = 5;
+  string server_signature = 6;
 }
 
 message TransferCommenceRequestMessage {

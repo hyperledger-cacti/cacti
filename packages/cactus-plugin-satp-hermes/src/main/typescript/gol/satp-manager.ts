@@ -221,6 +221,7 @@ export class SATPManager {
       bridgeManager: this.bridgesManager,
     }));
   }
+
   private initializeServices(
     serviceClasses: SATPServiceInstance[],
     serviceOptions: ISATPServiceOptions[],

@@ -16,6 +16,12 @@ import {
   SATPHandlerType,
 } from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  FailedToCreateMessageError,
+  FailedToProcessError,
+  SessionNotFoundError,
+} from "../errors/satp-handler-errors";
+import { getSessionId } from "./handler-utils";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
@@ -56,34 +62,30 @@ export class Stage1SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Transfer Proposal...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
 
-      if (!req.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(req.common?.sessionId);
+      const session = this.sessions.get(getSessionId(req));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
-      const sessionData =
-        await this.serverService.checkTransferProposalRequestMessage(
-          req,
-          session,
-          this.supportedDLTs,
-        );
+      await this.serverService.checkTransferProposalRequestMessage(
+        req,
+        session,
+        this.supportedDLTs,
+      );
+
       const message = await this.serverService.transferProposalResponse(
         req,
         session,
       );
+
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
-      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
 
       if (!message) {
-        throw new Error(`${fnTag}, Failed to create TransferProposalReceipt`);
+        throw new FailedToCreateMessageError(fnTag, "TransferProposalReceipt");
       }
       return message;
     } catch (error) {
-      throw new Error(`${fnTag}, Failed to process TransferProposal ${error}`);
+      throw new FailedToProcessError(fnTag, "TransferProposalRequest");
     }
   }
 
@@ -97,35 +99,27 @@ export class Stage1SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Transfer Commence...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
 
-      if (!req.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(req.common?.sessionId);
+      const session = this.sessions.get(getSessionId(req));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
-      const sessionData =
-        await this.serverService.checkTransferCommenceRequestMessage(
-          req,
-          session,
-        );
+      await this.serverService.checkTransferCommenceRequestMessage(
+        req,
+        session,
+      );
       const message = await this.serverService.transferCommenceResponse(
         req,
         session,
       );
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
-      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
 
       if (!message) {
-        throw new Error(`${fnTag}, Failed to create TransferCommenceResponse`);
+        throw new FailedToCreateMessageError(fnTag, "TransferCommenceResponse");
       }
       return message;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process TransferCommenceRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "TransferCommenceResponse");
     }
   }
 
@@ -157,13 +151,11 @@ export class Stage1SATPHandler implements SATPHandler {
         );
 
       if (!requestTransferProposal) {
-        throw new Error(`${fnTag}, Failed to create TransferProposalRequest`);
+        throw new FailedToCreateMessageError(fnTag, "TransferProposalRequest");
       }
       return requestTransferProposal;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process TransferProposalRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "TransferProposalRequest");
     }
   }
 
@@ -181,7 +173,7 @@ export class Stage1SATPHandler implements SATPHandler {
         throw new Error(`${fnTag}, Session Id not found`);
       }
 
-      const session = this.sessions.get(response.common?.sessionId);
+      const session = this.sessions.get(getSessionId(response));
       if (!session) {
         throw new Error(`${fnTag}, Session not found`);
       }
@@ -195,14 +187,12 @@ export class Stage1SATPHandler implements SATPHandler {
         await this.clientService.transferCommenceRequest(response, session);
 
       if (!requestTransferCommence) {
-        throw new Error(`${fnTag}, Failed to create TransferCommenceRequest`);
+        throw new FailedToCreateMessageError(fnTag, "TransferCommenceRequest");
       }
 
       return requestTransferCommence;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process TransferCommenceRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "TransferCommenceRequest");
     }
   }
 }
