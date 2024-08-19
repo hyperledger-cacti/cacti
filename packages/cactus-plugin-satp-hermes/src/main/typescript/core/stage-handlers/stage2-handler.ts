@@ -87,6 +87,7 @@ export class Stage2SATPHandler implements SATPHandler {
       }
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(
         fnTag,
         "LockAssertionImplementation",
@@ -138,6 +139,7 @@ export class Stage2SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "LockAssertionRequest", error);
     }
   }
