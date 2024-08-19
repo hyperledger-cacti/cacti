@@ -100,6 +100,7 @@ export class Stage0SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToCreateMessageError(fnTag, "NewSessionResponse", error);
     }
   }
@@ -139,6 +140,7 @@ export class Stage0SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToCreateMessageError(fnTag, "NewSessionResponse", error);
     }
   }
@@ -188,6 +190,7 @@ export class Stage0SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "NewSessionRequest", error);
     }
   }
@@ -228,6 +231,7 @@ export class Stage0SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "PreSATPTransferRequest", error);
     }
   }

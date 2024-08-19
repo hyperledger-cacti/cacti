@@ -504,6 +504,7 @@ export class Stage3ClientService extends SATPService {
         sign(this.Signer, sessionData.burnAssertionClaim.receipt),
       );
     } catch (error) {
+      this.logger.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "BurnAsset");
     }
   }

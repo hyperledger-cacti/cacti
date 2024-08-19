@@ -155,6 +155,50 @@ const serverGatewayOptions: IBesuSATPGatewayConstructorOptions = {
 
 Note that these gateways are extensions of the [default SATP Gateway class](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/main/typescript/gateway/plugin-satp-gateway.ts), that implements the gateway functionality. Each of these extensions implements ledger-specific operations.
 
+## Containerization
+
+### Building the container image locally
+
+In the project root directory run these commands on the terminal:
+
+```sh
+yarn configure
+yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+```
+
+Build the image:
+
+```sh
+docker build  \
+  --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile \
+  ./packages/cactus-plugin-satp-hermes/ \
+  --tag shg \
+  --tag satp-hermes-gateway \
+  --tag ghcr.io/hyperledger/cacti-satp-hermes-gateway:$(date +"%Y-%m-%dT%H-%M-%S" --utc)-dev-$(git rev-parse --short HEAD)
+```
+
+Run the image:
+
+```sh
+docker run \
+  -it \
+  satp-hermes-gateway
+```
+
+Alternatively you can use `docker compose up --build` from within the package directory or if you
+prefer to run it from the project root directory then:
+
+```sh
+docker compose \
+  --project-directory ./packages/cactus-plugin-satp-hermes/ \
+  -f ./packages/cactus-plugin-satp-hermes/docker-compose.yml \
+  up \
+  --build
+```
+
+
+> The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
+
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 

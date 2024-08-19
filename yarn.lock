@@ -10925,6 +10925,7 @@ __metadata:
     "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
+    "@vercel/ncc": "npm:0.38.1"
     axios: "npm:1.7.7"
     bignumber.js: "npm:9.1.2"
     bn.js: "npm:5.2.1"
@@ -10943,6 +10944,8 @@ __metadata:
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
     hardhat: "npm:2.22.5"
+    internal-ip: "npm:6.2.0"
+    jsonc: "npm:2.0.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
     make-dir-cli: "npm:3.1.0"
@@ -10955,6 +10958,7 @@ __metadata:
     sqlite3: "npm:5.1.5"
     swagger-cli: "npm:4.0.4"
     swagger-ui-express: "npm:5.0.0"
+    ts-node: "npm:10.9.1"
     typescript: "npm:5.5.2"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
@@ -30746,7 +30750,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-safe-stringify@npm:2.1.1, fast-safe-stringify@npm:^2.0.7, fast-safe-stringify@npm:^2.1.1":
+"fast-safe-stringify@npm:2.1.1, fast-safe-stringify@npm:^2.0.6, fast-safe-stringify@npm:^2.0.7, fast-safe-stringify@npm:^2.1.1":
   version: 2.1.1
   resolution: "fast-safe-stringify@npm:2.1.1"
   checksum: 10/dc1f063c2c6ac9533aee14d406441f86783a8984b2ca09b19c2fe281f9ff59d315298bc7bc22fd1f83d26fe19ef2f20e2ddb68e96b15040292e555c5ced0c1e4
@@ -37814,6 +37818,20 @@ __metadata:
   version: 3.0.0
   resolution: "jsonc-parser@npm:3.0.0"
   checksum: 10/30747660fe34a1abc9b749b7381f5750c0283bedaf8b806f8d0984111e67729476cd4d31529b86b5d85a148d30bb62b8f65dc43e681750b38020fbe5b6c0ea1a
+  languageName: node
+  linkType: hard
+
+"jsonc@npm:2.0.0":
+  version: 2.0.0
+  resolution: "jsonc@npm:2.0.0"
+  dependencies:
+    fast-safe-stringify: "npm:^2.0.6"
+    graceful-fs: "npm:^4.1.15"
+    mkdirp: "npm:^0.5.1"
+    parse-json: "npm:^4.0.0"
+    strip-bom: "npm:^4.0.0"
+    strip-json-comments: "npm:^3.0.1"
+  checksum: 10/a4d3052bea15baad31e95b8a8be5f0ddcd7f710cd0426e41efb1325a476605a27f7489706c52d96eeaa9295b543382afa5633e43cfef5e5756d70ae2a40091b4
   languageName: node
   linkType: hard
 
@@ -51423,7 +51441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"strip-json-comments@npm:3.1.1, strip-json-comments@npm:^3.1.1":
+"strip-json-comments@npm:3.1.1, strip-json-comments@npm:^3.0.1, strip-json-comments@npm:^3.1.1":
   version: 3.1.1
   resolution: "strip-json-comments@npm:3.1.1"
   checksum: 10/492f73e27268f9b1c122733f28ecb0e7e8d8a531a6662efbd08e22cccb3f9475e90a1b82cab06a392f6afae6d2de636f977e231296400d0ec5304ba70f166443
