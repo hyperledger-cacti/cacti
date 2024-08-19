@@ -1,4 +1,4 @@
-import { GetStatusError } from "../../core/errors";
+import { GetStatusError } from "../../core/errors/satp-errors";
 import {
   StatusRequest,
   StatusResponse,
