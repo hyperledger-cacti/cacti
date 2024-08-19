@@ -10,6 +10,7 @@
     "Interoperability",
     "Distributed Ledger Technology",
     "IETF",
+    "Hyperledger Cacti",
     "Secure Asset Transfer Protocol"
   ],
   "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
@@ -43,6 +44,10 @@
     {
       "name": "Carlos Amaro",
       "url": "https://github.com/LordKubaya"
+    },
+    {
+      "name": "Bruno Mateus",
+      "url": "https://github.com/brunoffmateus"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -52,6 +57,7 @@
     "dist/*"
   ],
   "scripts": {
+    "build:bundle": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --minify --out=./dist/bundle/ncc/ --external=fabric-common",
     "build": "run-s codegen tsc",
     "build-proto": "buf build --path src/main/proto --verbose",
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/knex && cp -r ./src/knex/* ./dist/lib/knex",
@@ -61,6 +67,12 @@
     "codegen:abi": "yarn forge:all && abi-types-generator './src/solidity/generated/satp-wrapper.sol/SATPWrapperContract.json' --output='./src/main/typescript/generated'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "npm run generate-proto",
+    "db:init": "run-s db:init:local db:init:remote",
+    "db:init:local": "knex migrate:latest --knexfile src/knex/knexfile.ts",
+    "db:init:remote": "knex migrate:latest --knexfile src/knex/knexfile-remote.ts",
+    "db:rollback": "run-s db:rollback:local db:rollback:remote",
+    "db:rollback:local": "knex migrate:rollback --knexfile src/knex/knexfile.ts",
+    "db:rollback:remote": "knex migrate:rollback --knexfile src/knex/knexfile-remote.ts",
     "forge": "forge build ./src/solidity/*.sol --out ./src/solidity/generated",
     "forge:all": "run-s 'forge' 'forge:test'",
     "forge:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
@@ -71,6 +83,7 @@
     "lint": "npm-run-all 'buf lint' eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "lint-protobuf": "buf lint --path src/main/proto --verbose",
     "pretsc": "npm run generate-sdk",
+    "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch"
   },
@@ -105,6 +118,7 @@
     "fs-extra": "11.2.0",
     "google-protobuf": "3.21.2",
     "hardhat": "2.22.5",
+    "jsonc": "2.0.0",
     "knex": "2.4.0",
     "secp256k1": "5.0.1",
     "kubo-rpc-client": "3.0.1",
@@ -135,15 +149,19 @@
     "@types/swagger-ui-express": "4.1.6",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",
+    "@vercel/ncc": "0.38.1",
     "body-parser": "1.20.3",
     "express": "5.1.0",
     "fabric-network": "2.2.20",
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
+    "internal-ip": "6.2.0",
+    "jsonc": "2.0.0",
     "kubo-rpc-client": "3.0.4",
     "make-dir-cli": "3.1.0",
     "protobufjs": "7.2.5",
     "swagger-cli": "4.0.4",
+    "ts-node": "10.9.1",
     "typescript": "5.5.2"
   },
   "engines": {

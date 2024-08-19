@@ -405,6 +405,7 @@ export class Stage0ServerService extends SATPService {
         sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
       );
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new Error(`${fnTag}, Failed to process Wrap Asset ${error}`);
     }
   }
