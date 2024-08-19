@@ -4,6 +4,7 @@ import { BridgeManager } from "./bridge-manager";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPBridgeConfig } from "../../types";
 import { Asset } from "./types/asset";
+import { TransactionIdUndefinedError } from "../../errors/bridge-erros";
 
 export class SATPBridgeManager implements BridgeManager {
   public static readonly CLASS_NAME = "FabricBridgeManager";
@@ -25,7 +26,7 @@ export class SATPBridgeManager implements BridgeManager {
     const response = await this.config.network.wrapAsset(asset);
 
     if (response.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = this.config.network.getReceipt(
@@ -43,7 +44,7 @@ export class SATPBridgeManager implements BridgeManager {
     const response = await this.config.network.unwrapAsset(assetId);
 
     if (response.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = this.config.network.getReceipt(
@@ -66,7 +67,7 @@ export class SATPBridgeManager implements BridgeManager {
     const response = await this.config.network.lockAsset(assetId, amount);
 
     if (response.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = await this.config.network.getReceipt(
@@ -85,7 +86,7 @@ export class SATPBridgeManager implements BridgeManager {
     const response = await this.config.network.unlockAsset(assetId, amount);
 
     if (response.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = await this.config.network.getReceipt(
@@ -104,7 +105,7 @@ export class SATPBridgeManager implements BridgeManager {
     const transaction = await this.config.network.mintAsset(assetId, amount);
 
     if (transaction.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = await this.config.network.getReceipt(
@@ -123,7 +124,7 @@ export class SATPBridgeManager implements BridgeManager {
     const transaction = await this.config.network.burnAsset(assetId, amount);
 
     if (transaction.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = await this.config.network.getReceipt(
@@ -150,7 +151,7 @@ export class SATPBridgeManager implements BridgeManager {
     );
 
     if (response.transactionId == undefined) {
-      throw new Error(`${fnTag}, transactionId is undefined`);
+      throw new TransactionIdUndefinedError(fnTag);
     }
 
     const receipt = await this.config.network.getReceipt(

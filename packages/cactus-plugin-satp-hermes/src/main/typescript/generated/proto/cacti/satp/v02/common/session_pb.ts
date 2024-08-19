@@ -337,6 +337,11 @@ export class SessionData extends Message<SessionData> {
    */
   assetProfile?: AssetProfile;
 
+  /**
+   * @generated from field: string resource_url = 61;
+   */
+  resourceUrl = "";
+
   constructor(data?: PartialMessage<SessionData>) {
     super();
     proto3.util.initPartial(data, this);
@@ -405,6 +410,7 @@ export class SessionData extends Message<SessionData> {
     { no: 58, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 59, name: "lock_assertion_expiration", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 60, name: "asset_profile", kind: "message", T: AssetProfile },
+    { no: 61, name: "resource_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {

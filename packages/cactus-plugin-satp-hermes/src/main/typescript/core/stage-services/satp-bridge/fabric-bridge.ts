@@ -20,6 +20,7 @@ import { NetworkBridge } from "./network-bridge";
 import { InteractionSignature } from "./types/fabric-asset";
 import { InteractionData } from "./types/interact";
 import { getInteractionType } from "./types/asset";
+import { OntologyError, TransactionError } from "../../errors/bridge-erros";
 
 export class FabricBridge implements NetworkBridge {
   public static readonly CLASS_NAME = "FabricBridge";
@@ -46,12 +47,12 @@ export class FabricBridge implements NetworkBridge {
     });
   }
   public async wrapAsset(asset: FabricAsset): Promise<TransactionResponse> {
-    this.log.debug(`Wrapping Asset: ${asset.tokenId}`);
-
+    const fnTag = `${FabricBridge.CLASS_NAME}}#wrapAsset`;
+    this.log.debug(
+      `${fnTag}, Wrapping Asset: {${asset.tokenId}, ${asset.owner}, ${asset.tokenType}}`,
+    );
     if (asset.ontology === undefined) {
-      throw new Error(
-        `${FabricBridge.CLASS_NAME}#wrapAsset: Ontology is required to interact with tokens`,
-      );
+      throw new OntologyError(fnTag);
     }
 
     const interactions = this.interactionList(asset.ontology);
@@ -73,13 +74,18 @@ export class FabricBridge implements NetworkBridge {
       invocationType: FabricContractInvocationType.Send,
     });
 
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
     return {
       transactionId: response.transactionId,
       output: response.functionOutput,
     };
   }
   public async unwrapAsset(assetId: string): Promise<TransactionResponse> {
-    this.log.debug(`Unwrapping Asset: ${assetId}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#unwrapAsset`;
+    this.log.debug(`${fnTag}, Unwrapping Asset: ${assetId}`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -88,6 +94,10 @@ export class FabricBridge implements NetworkBridge {
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Send,
     });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
 
     return {
       transactionId: response.transactionId,
@@ -98,7 +108,8 @@ export class FabricBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    this.log.debug(`Locking Asset: ${assetId} amount: ${amount}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#lockAsset`;
+    this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -107,6 +118,10 @@ export class FabricBridge implements NetworkBridge {
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Send,
     });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
 
     return {
       transactionId: response.transactionId,
@@ -117,7 +132,8 @@ export class FabricBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    this.log.debug(`Unlocking Asset: ${assetId} amount: ${amount}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#unlockAsset`;
+    this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -126,6 +142,10 @@ export class FabricBridge implements NetworkBridge {
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Send,
     });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
 
     return {
       transactionId: response.transactionId,
@@ -136,7 +156,8 @@ export class FabricBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    this.log.debug(`Minting Asset: ${assetId} amount: ${amount}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#mintAsset`;
+    this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -145,6 +166,10 @@ export class FabricBridge implements NetworkBridge {
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Send,
     });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
 
     return {
       transactionId: response.transactionId,
@@ -155,7 +180,8 @@ export class FabricBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    this.log.debug(`Burning Asset: ${assetId} amount: ${amount}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#burnAsset`;
+    this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -164,6 +190,10 @@ export class FabricBridge implements NetworkBridge {
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Send,
     });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
 
     return {
       transactionId: response.transactionId,
@@ -175,7 +205,10 @@ export class FabricBridge implements NetworkBridge {
     to: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    this.log.debug(`Assigning Asset: ${assetId} to: ${to} amount: ${amount}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#assignAsset`;
+    this.log.debug(
+      `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
+    );
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -185,6 +218,10 @@ export class FabricBridge implements NetworkBridge {
       invocationType: FabricContractInvocationType.Send,
     });
 
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
     return {
       transactionId: response.transactionId,
       output: response.functionOutput,
@@ -192,7 +229,8 @@ export class FabricBridge implements NetworkBridge {
   }
 
   public async getAsset(assetId: string): Promise<FabricAsset> {
-    this.log.debug(`Getting Asset: ${assetId}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#getAsset`;
+    this.log.debug(`${fnTag}, Getting Asset`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -202,13 +240,18 @@ export class FabricBridge implements NetworkBridge {
       invocationType: FabricContractInvocationType.Call,
     });
 
+    if (response == undefined) {
+      throw new TransactionError(fnTag);
+    }
+
     const token = JSON.parse(response.functionOutput) as FabricAsset;
 
     return token;
   }
 
   public async getClientId(): Promise<string> {
-    this.log.debug(`Getting Client Id`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#getClientId`;
+    this.log.debug(`${fnTag}, Getting Client Id`);
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -217,6 +260,10 @@ export class FabricBridge implements NetworkBridge {
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Call,
     });
+
+    if (response == undefined) {
+      throw new TransactionError(fnTag);
+    }
 
     return response.functionOutput;
   }
@@ -229,7 +276,10 @@ export class FabricBridge implements NetworkBridge {
     methodName: string,
     params: string[],
   ): Promise<TransactionResponse> {
-    this.log.debug(`Running Transaction: ${methodName} with params: ${params}`);
+    const fnTag = `${FabricBridge.CLASS_NAME}}#runTransaction`;
+    this.log.debug(
+      `${fnTag}, Running Transaction: ${methodName} with params: ${params}`,
+    );
     const response = await this.connector.transact({
       signingCredential: this.config.signingCredential,
       channelName: this.config.channelName,
@@ -239,9 +289,12 @@ export class FabricBridge implements NetworkBridge {
       invocationType: FabricContractInvocationType.Send,
     });
 
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
     return {
       transactionId: response.transactionId,
-      transactionReceipt: "response.transactionReceipt",
       output: response.functionOutput,
     };
   }
@@ -250,8 +303,9 @@ export class FabricBridge implements NetworkBridge {
     assetId: string,
     transactionId: string,
   ): Promise<string> {
+    const fnTag = `${FabricBridge.CLASS_NAME}}#getReceipt`;
     this.log.debug(
-      `Getting Receipt for Asset: ${assetId} Transaction: ${transactionId}`,
+      `${fnTag}, Getting Receipt: ${assetId} transactionHash: ${transactionId}`,
     );
     //todo needs implementation
     const networkDetails = {
