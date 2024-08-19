@@ -435,6 +435,7 @@ export class Stage3ServerService extends SATPService {
         sign(this.Signer, sessionData.mintAssertionClaim.receipt),
       );
     } catch (error) {
+      this.logger.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "MintAsset");
     }
   }
@@ -491,6 +492,7 @@ export class Stage3ServerService extends SATPService {
         sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
       );
     } catch (error) {
+      this.logger.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "AssignAsset");
     }
   }
