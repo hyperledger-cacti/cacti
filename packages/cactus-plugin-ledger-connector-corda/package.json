@@ -63,6 +63,7 @@
     "axios": "1.6.0",
     "express": "4.19.2",
     "express-openapi-validator": "5.2.0",
+    "form-data": "4.0.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "internal-ip": "6.2.0",
     "joi": "17.13.3",

@@ -254,6 +254,11 @@ export class CordaV5TestLedger implements ITestLedger {
       throw new Error(`${fnTag} ${validationResult.error.annotate()}`);
     }
   }
+  public async getFileFromContainer(filePath: string): Promise<Buffer> {
+    const container = this.getContainer();
+    const binaryFile = await Containers.pullBinaryFile(container, filePath);
+    return binaryFile;
+  }
 }
 
 export function extractShortHash(shortHashID: string, name: string) {
