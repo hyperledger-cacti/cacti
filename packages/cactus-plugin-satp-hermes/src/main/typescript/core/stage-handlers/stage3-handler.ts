@@ -18,6 +18,12 @@ import {
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Empty } from "@bufbuild/protobuf";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
+import { getSessionId } from "./handler-utils";
+import {
+  FailedToCreateMessageError,
+  FailedToProcessError,
+  SessionNotFoundError,
+} from "../errors/satp-handler-errors";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
@@ -58,34 +64,29 @@ export class Stage3SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Commit Preparation...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
 
-      if (!req.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(req.common?.sessionId);
+      const session = this.sessions.get(getSessionId(req));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
-      const sessionData =
-        await this.serverService.checkCommitPreparationRequestMessage(
-          req,
-          session,
-        );
+      await this.serverService.checkCommitPreparationRequestMessage(
+        req,
+        session,
+      );
 
       await this.serverService.mintAsset(session);
 
       const message = await this.serverService.commitReady(req, session);
 
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
-      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
 
-      const response = new CommitReadyResponseMessage();
-      return response;
+      if (!message) {
+        throw new FailedToCreateMessageError(fnTag, "CommitPreparationRequest");
+      }
+
+      return message;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process CommitPreparationRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "CommitPreparationRequest");
     }
   }
 
@@ -99,20 +100,15 @@ export class Stage3SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Commit Final Assertion...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
 
-      if (!req.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(req.common?.sessionId);
+      const session = this.sessions.get(getSessionId(req));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
-      const sessionData =
-        await this.serverService.checkCommitFinalAssertionRequestMessage(
-          req,
-          session,
-        );
+      await this.serverService.checkCommitFinalAssertionRequestMessage(
+        req,
+        session,
+      );
 
       await this.serverService.assignAsset(session);
 
@@ -121,15 +117,19 @@ export class Stage3SATPHandler implements SATPHandler {
           req,
           session,
         );
-      this.Log.debug(`${fnTag}, Returning response: ${message}`);
-      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
 
-      const response = new CommitFinalAcknowledgementReceiptResponseMessage();
-      return response;
+      this.Log.debug(`${fnTag}, Returning response: ${message}`);
+
+      if (!message) {
+        throw new FailedToCreateMessageError(
+          fnTag,
+          "CommitFinalAssertionRequest",
+        );
+      }
+
+      return message;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process CommitFinalAssertionRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "CommitFinalAssertionRequest");
     }
   }
 
@@ -143,28 +143,19 @@ export class Stage3SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Transfer Complete...`);
       this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
 
-      if (!req.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(req.common?.sessionId);
+      const session = this.sessions.get(getSessionId(req));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
-      const sessionData =
-        await this.serverService.checkTransferCompleteRequestMessage(
-          req,
-          session,
-        );
-
-      this.Log.debug(`${fnTag}, Session Data: ${sessionData}`);
+      await this.serverService.checkTransferCompleteRequestMessage(
+        req,
+        session,
+      );
 
       return new Empty({});
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process TransferCompleteRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "TransferCompleteRequest");
     }
   }
 
@@ -187,13 +178,9 @@ export class Stage3SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Commit Preparation Request...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      if (!response.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(response.common?.sessionId);
+      const session = this.sessions.get(getSessionId(response));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
       await this.clientService.checkCommitReadyResponseMessage(
@@ -207,13 +194,11 @@ export class Stage3SATPHandler implements SATPHandler {
       );
 
       if (!request) {
-        throw new Error(`${fnTag}, Failed to create TransferProposalRequest`);
+        throw new FailedToCreateMessageError(fnTag, "TransferProposalRequest");
       }
       return request;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process commitPreparationRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "TransferProposalRequest");
     }
   }
 
@@ -223,16 +208,12 @@ export class Stage3SATPHandler implements SATPHandler {
     const stepTag = `CommitFinalAssertionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     try {
-      this.Log.debug(`${fnTag}, Commit Preparation Request...`);
+      this.Log.debug(`${fnTag}, Commit Final Assertion Request...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      if (!response.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(response.common?.sessionId);
+      const session = this.sessions.get(getSessionId(response));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
       await this.clientService.checkCommitReadyResponseMessage(
@@ -248,15 +229,14 @@ export class Stage3SATPHandler implements SATPHandler {
       );
 
       if (!request) {
-        throw new Error(
-          `${fnTag}, Failed to create CommitFinalAssertionRequest`,
+        throw new FailedToCreateMessageError(
+          fnTag,
+          "CommitFinalAssertionRequest",
         );
       }
       return request;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process CommitFinalAssertionRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "CommitFinalAssertionRequest");
     }
   }
 
@@ -269,13 +249,9 @@ export class Stage3SATPHandler implements SATPHandler {
       this.Log.debug(`${fnTag}, Transfer Complete Request...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      if (!response.common?.sessionId) {
-        throw new Error(`${fnTag}, Session Id not found`);
-      }
-
-      const session = this.sessions.get(response.common?.sessionId);
+      const session = this.sessions.get(getSessionId(response));
       if (!session) {
-        throw new Error(`${fnTag}, Session not found`);
+        throw new SessionNotFoundError(fnTag);
       }
 
       await this.clientService.checkCommitFinalAcknowledgementReceiptResponseMessage(
@@ -289,13 +265,11 @@ export class Stage3SATPHandler implements SATPHandler {
       );
 
       if (!request) {
-        throw new Error(`${fnTag}, Failed to create TransferCompleteRequest`);
+        throw new FailedToCreateMessageError(fnTag, "TransferCompleteRequest");
       }
       return request;
     } catch (error) {
-      throw new Error(
-        `${fnTag}, Failed to process TransferCompleteRequest ${error}`,
-      );
+      throw new FailedToProcessError(fnTag, "TransferCompleteRequest");
     }
   }
 }
