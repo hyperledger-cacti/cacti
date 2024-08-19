@@ -324,6 +324,7 @@ export class Stage0ClientService extends SATPService {
         sign(this.Signer, sessionData.senderWrapAssertionClaim.receipt),
       );
     } catch (error) {
+      this.logger.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "WrapToken");
     }
   }

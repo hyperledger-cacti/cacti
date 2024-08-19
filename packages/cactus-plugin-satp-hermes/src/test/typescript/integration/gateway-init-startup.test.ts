@@ -18,6 +18,11 @@ import {
   ShutdownHook,
   SupportedChain,
 } from "./../../../main/typescript/core/types";
+import {
+  DEFAULT_PORT_GATEWAY_API,
+  DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_SERVER,
+} from "../../../main/typescript/core/constants";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -58,12 +63,10 @@ describe("SATPGateway initialization", () => {
         Crash: "v02",
       },
     ]);
-    expect(identity.supportedDLTs).toEqual([
-      SupportedChain.FABRIC,
-      SupportedChain.BESU,
-    ]);
-    expect(identity.proofID).toBe("mockProofID1");
-    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.supportedDLTs).toEqual([]);
+    expect(identity.gatewayServerPort).toBe(DEFAULT_PORT_GATEWAY_SERVER);
+    expect(identity.gatewayClientPort).toBe(DEFAULT_PORT_GATEWAY_CLIENT);
+    expect(identity.gatewayOpenAPIPort).toBe(DEFAULT_PORT_GATEWAY_API);
     expect(identity.address).toBe("http://localhost");
   });
 
@@ -214,12 +217,10 @@ describe("SATPGateway startup", () => {
         Crash: "v02",
       },
     ]);
-    expect(identity.supportedDLTs).toEqual([
-      SupportedChain.FABRIC,
-      SupportedChain.BESU,
-    ]);
-    expect(identity.proofID).toBe("mockProofID1");
-    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.supportedDLTs).toEqual([]);
+    expect(identity.gatewayServerPort).toBe(DEFAULT_PORT_GATEWAY_SERVER);
+    expect(identity.gatewayClientPort).toBe(DEFAULT_PORT_GATEWAY_CLIENT);
+    expect(identity.gatewayOpenAPIPort).toBe(DEFAULT_PORT_GATEWAY_API);
     expect(identity.address).toBe("http://localhost");
   });
 
@@ -281,8 +282,8 @@ describe("SATPGateway startup", () => {
         ],
         supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
-        gatewayClientPort: 3010,
-        gatewayServerPort: 3011,
+        gatewayServerPort: 13010,
+        gatewayClientPort: 13011,
         gatewayOpenAPIPort: 4010,
         address: "http://localhost",
       },
@@ -291,7 +292,8 @@ describe("SATPGateway startup", () => {
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const identity = gateway.Identity;
-    expect(identity.gatewayClientPort).toBe(3010);
+    expect(identity.gatewayServerPort).toBe(13010);
+    expect(identity.gatewayClientPort).toBe(13011);
     expect(identity.address).toBe("http://localhost");
     await gateway.startup();
     await gateway.shutdown();
