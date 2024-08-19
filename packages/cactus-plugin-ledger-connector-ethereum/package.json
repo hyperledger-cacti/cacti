@@ -81,9 +81,9 @@
     "sanitize-html": "2.12.1",
     "socket.io-client-fixed-types": "4.5.4",
     "typescript-optional": "2.0.1",
-    "web3": "4.14.0",
-    "web3-eth": "4.10.0",
-    "web3-eth-contract": "4.7.0"
+    "web3": "4.4.0",
+    "web3-eth": "4.4.0",
+    "web3-eth-contract": "4.2.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
