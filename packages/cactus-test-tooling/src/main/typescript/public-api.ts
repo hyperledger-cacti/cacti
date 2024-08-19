@@ -9,6 +9,11 @@ export {
 } from "./besu/besu-test-ledger";
 
 export {
+  SATPGatewayRunner,
+  ISATPGatewayRunnerConstructorOptions,
+} from "./satp-runner/satp-gateway-runner";
+
+export {
   BesuMpTestLedger,
   IBesuMpTestLedgerOptions,
 } from "./besu/besu-mp-test-ledger";
