@@ -95,6 +95,7 @@ export class Stage1SATPHandler implements SATPHandler {
       }
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "TransferProposalRequest", error);
     }
   }
@@ -134,6 +135,7 @@ export class Stage1SATPHandler implements SATPHandler {
       }
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "TransferCommenceResponse", error);
     }
   }
@@ -181,6 +183,7 @@ export class Stage1SATPHandler implements SATPHandler {
       }
       return requestTransferProposal;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "TransferProposalRequest", error);
     }
   }
@@ -218,6 +221,7 @@ export class Stage1SATPHandler implements SATPHandler {
 
       return requestTransferCommence;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "TransferCommenceRequest", error);
     }
   }
