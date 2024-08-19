@@ -1,3 +1,4 @@
+import { randomUUID as uuidv4 } from "node:crypto";
 import "jest-extended";
 
 import {
@@ -7,7 +8,8 @@ import {
   Secp256k1Keys,
   Servers,
 } from "@hyperledger/cactus-common";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as internalIpV4 } from "internal-ip";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -20,6 +22,7 @@ import {
   PluginLedgerConnectorFabric,
   DefaultApi as FabricApi,
   FabricContractInvocationType,
+  ConnectionProfile,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import http, { Server } from "http";
 import fs from "fs-extra";
@@ -35,6 +38,8 @@ import {
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+  SATPGatewayRunner,
+  ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger/cactus-test-tooling";
 import bodyParser from "body-parser";
 import express from "express";
@@ -48,24 +53,23 @@ import {
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
 import SATPWrapperContract from "../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
-import {
-  SATPGatewayConfig,
-  SATPGateway,
-  PluginFactorySATPGateway,
-  TransactRequest,
-  Asset,
-} from "../../../main/typescript";
+import { TransactRequest, Asset } from "../../../main/typescript";
 import {
   Address,
   GatewayIdentity,
   SupportedChain,
 } from "../../../main/typescript/core/types";
-import {
-  IPluginFactoryOptions,
-  PluginImportType,
-} from "@hyperledger/cactus-core-api";
 import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
 import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
+import { createClient } from "../test-utils";
+import {
+  DEFAULT_PORT_GATEWAY_API,
+  DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_SERVER,
+  SATP_CORE_VERSION,
+  SATP_ARCHITETURE_VERSION,
+  SATP_CRASH_VERSION,
+} from "../../../main/typescript/core/constants";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   EthContractInvocationType,
@@ -97,12 +101,14 @@ const BRIDGE_ID =
 
 let clientId: string;
 let fabricConfig: FabricConfig;
+let pluginOptionsFabricBridge: IPluginLedgerConnectorFabricOptions;
 let pluginBungeeFabricOptions: IPluginBungeeHermesOptions;
 
 let erc20TokenContract: string;
 let contractNameWrapper: string;
 
 let rpcApiHttpHost: string;
+
 let testing_connector: PluginLedgerConnectorEthereum;
 let bridgeEthAccount: string;
 const ETH_ASSET_ID = uuidv4();
@@ -115,11 +121,22 @@ let pluginBungeeEthOptions: IPluginBungeeHermesOptions;
 let ethereumConfig: EthereumConfig;
 let ethereumOptions: IPluginLedgerConnectorEthereumOptions;
 
+let keychainPluginBridge: PluginKeychainMemory;
+let keychainEntryKeyBridge: string;
+let keychainEntryValueBridge: string;
+
 let keychainPlugin1: PluginKeychainMemory;
 let keychainPlugin2: PluginKeychainMemory;
+
+let ethOptionsKeychainEntryValue: string;
+let ethOptionsKeychainEntryKey: string;
+
+let discoveryOptions: DiscoveryOptions;
+
 let fabricUser: X509Identity;
 
 let apiClient: FabricApi;
+
 const SATPContract1 = {
   contractName: "SATPContract",
   abi: SATPContract.abi,
@@ -131,7 +148,11 @@ const SATPWrapperContract1 = {
   bytecode: SATPWrapperContract.bytecode.object,
 };
 
+let gatewayRunner: SATPGatewayRunner;
+
 afterAll(async () => {
+  await gatewayRunner.stop();
+  await gatewayRunner.destroy();
   await ethereumLedger.stop();
   await ethereumLedger.destroy();
   await fabricLedger.stop();
@@ -157,6 +178,13 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
+
+  // currently not used due to GatewayRunner being in NetworkMode: "host"
+  // const lanIp = await internalIpV4();
+  // if (!lanIp) {
+  //   throw new Error(`LAN IP falsy. internal-ip package failed.`);
+  // }
+
   {
     const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
     const containerImageVersion = "2023-07-27-2a8c48ed6";
@@ -178,184 +206,20 @@ beforeAll(async () => {
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel: "INFO",
     });
-    log.info("Both Ledgers started successfully");
-  }
-  {
-    //setup ethereum ledger
-    rpcApiHttpHost = await ethereumLedger.getRpcApiHttpHost();
 
-    bridgeEthAccount = await ethereumLedger.newEthPersonalAccount();
-
-    erc20TokenContract = "SATPContract";
-    contractNameWrapper = "SATPWrapperContract";
-
-    const keychainEntryValue = "test";
-    const keychainEntryKey = bridgeEthAccount;
-    keychainPlugin1 = new PluginKeychainMemory({
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-
-      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-      logLevel,
-    });
-
-    keychainPlugin2 = new PluginKeychainMemory({
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-
-      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-      logLevel,
-    });
-
-    keychainPlugin1.set(erc20TokenContract, JSON.stringify(SATPContract1));
-    keychainPlugin2.set(
-      contractNameWrapper,
-      JSON.stringify(SATPWrapperContract1),
-    );
-
-    const pluginRegistry = new PluginRegistry({
-      plugins: [keychainPlugin1, keychainPlugin2],
-    });
-
-    ethereumOptions = {
-      instanceId: uuidv4(),
-      rpcApiHttpHost,
-      pluginRegistry,
-      logLevel,
-    };
-    testing_connector = new PluginLedgerConnectorEthereum(ethereumOptions);
-    pluginRegistry.add(testing_connector);
-
-    const deployOutSATPContract = await testing_connector.deployContract({
-      contract: {
-        keychainId: keychainPlugin1.getKeychainId(),
-        contractName: erc20TokenContract,
-      },
-      constructorArgs: [WHALE_ACCOUNT_ADDRESS, ETH_ASSET_ID],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(deployOutSATPContract).toBeTruthy();
-    expect(deployOutSATPContract.transactionReceipt).toBeTruthy();
-    expect(
-      deployOutSATPContract.transactionReceipt.contractAddress,
-    ).toBeTruthy();
-
-    assetContractAddress =
-      deployOutSATPContract.transactionReceipt.contractAddress ?? "";
-
-    log.info("SATPContract Deployed successfully");
-    const deployOutWrapperContract = await testing_connector.deployContract({
-      contract: {
-        keychainId: keychainPlugin2.getKeychainId(),
-        contractName: contractNameWrapper,
-      },
-      constructorArgs: [bridgeEthAccount],
-      web3SigningCredential: {
-        ethAccount: bridgeEthAccount,
-        secret: "test",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(deployOutWrapperContract).toBeTruthy();
-    expect(deployOutWrapperContract.transactionReceipt).toBeTruthy();
-    expect(
-      deployOutWrapperContract.transactionReceipt.contractAddress,
-    ).toBeTruthy();
-    log.info("SATPWrapperContract Deployed successfully");
-
-    wrapperContractAddress =
-      deployOutWrapperContract.transactionReceipt.contractAddress ?? "";
-
-    pluginBungeeEthOptions = {
-      keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-      instanceId: uuidv4(),
-      pluginRegistry: new PluginRegistry(),
-      logLevel,
-    };
-
-    ethereumConfig = {
-      network: SupportedChain.EVM,
-      keychainId: keychainPlugin2.getKeychainId(),
-      signingCredential: {
-        ethAccount: bridgeEthAccount,
-        secret: "test",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-      contractName: contractNameWrapper,
-      contractAddress: wrapperContractAddress,
-      options: ethereumOptions,
-      bungeeOptions: pluginBungeeEthOptions,
-      gas: 5000000,
-      claimFormat: ClaimFormat.BUNGEE,
-    };
-
-    const giveRoleRes = await testing_connector.invokeContract({
-      contract: {
-        contractName: erc20TokenContract,
-        keychainId: keychainPlugin1.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "giveRole",
-      params: [wrapperContractAddress],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-
-    expect(giveRoleRes).toBeTruthy();
-    expect(giveRoleRes.success).toBeTruthy();
-    log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
-
-    const responseMint = await testing_connector.invokeContract({
-      contract: {
-        contractName: erc20TokenContract,
-        keychainId: keychainPlugin1.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "mint",
-      params: [WHALE_ACCOUNT_ADDRESS, "100"],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(responseMint).toBeTruthy();
-    expect(responseMint.success).toBeTruthy();
-    log.info("Minted 100 tokens to firstHighNetWorthAccount");
-
-    const responseApprove = await testing_connector.invokeContract({
-      contract: {
-        contractName: erc20TokenContract,
-        keychainId: keychainPlugin1.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "approve",
-      params: [wrapperContractAddress, "100"],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(responseApprove).toBeTruthy();
-    expect(responseApprove.success).toBeTruthy();
-    log.info("Approved 100 tokens to SATPWrapperContract");
-  }
-  {
     await fabricLedger.start();
 
+    log.info("Both Ledgers started successfully");
+  }
+
+  {
     // setup fabric ledger
-    const connectionProfile = await fabricLedger.getConnectionProfileOrg1();
+    const connectionProfile: ConnectionProfile =
+      await fabricLedger.getConnectionProfileOrg1();
     expect(connectionProfile).not.toBeUndefined();
 
-    const bridgeProfile = await fabricLedger.getConnectionProfileOrgX("org2");
+    const bridgeProfile: ConnectionProfile =
+      await fabricLedger.getConnectionProfileOrgX("org2");
     expect(bridgeProfile).not.toBeUndefined();
 
     const enrollAdminOut = await fabricLedger.enrollAdmin();
@@ -387,13 +251,6 @@ beforeAll(async () => {
 
     console.log("keychainEntryValue: ", keychainEntryValue);
 
-    const keychainInstanceIdBridge = uuidv4();
-    const keychainIdBridge = uuidv4();
-    const keychainEntryKeyBridge = "bridge1";
-    const keychainEntryValueBridge = JSON.stringify(bridgeIdentity);
-
-    console.log("keychainEntryValue: ", keychainEntryValueBridge);
-
     const keychainPlugin = new PluginKeychainMemory({
       instanceId: keychainInstanceId,
       keychainId,
@@ -404,7 +261,16 @@ beforeAll(async () => {
       ]),
     });
 
-    const keychainPluginBridge = new PluginKeychainMemory({
+    const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
+
+    const keychainInstanceIdBridge = uuidv4();
+    const keychainIdBridge = uuidv4();
+    keychainEntryKeyBridge = "bridge1";
+    keychainEntryValueBridge = JSON.stringify(bridgeIdentity);
+
+    console.log("keychainEntryValueBridge: ", keychainEntryValueBridge);
+
+    keychainPluginBridge = new PluginKeychainMemory({
       instanceId: keychainInstanceIdBridge,
       keychainId: keychainIdBridge,
       logLevel,
@@ -414,13 +280,11 @@ beforeAll(async () => {
       ]),
     });
 
-    const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
-
     const pluginRegistryBridge = new PluginRegistry({
       plugins: [keychainPluginBridge],
     });
 
-    const discoveryOptions: DiscoveryOptions = {
+    discoveryOptions = {
       enabled: true,
       asLocalhost: true,
     };
@@ -796,6 +660,7 @@ beforeAll(async () => {
       keychainId: keychainIdBridge,
       keychainRef: keychainEntryKeyBridge,
     };
+
     const mspId: string = userIdentity.mspId;
 
     const initializeResponse = await apiClient.runTransactionV1({
@@ -876,7 +741,7 @@ beforeAll(async () => {
       logLevel,
     };
 
-    const pluginOptionsFabricBridge: IPluginLedgerConnectorFabricOptions = {
+    pluginOptionsFabricBridge = {
       instanceId: uuidv4(),
       dockerBinary: "/usr/local/bin/docker",
       peerBinary: "/fabric-samples/bin/peer",
@@ -900,7 +765,7 @@ beforeAll(async () => {
       contractName: satpWrapperContractName,
       options: pluginOptionsFabricBridge,
       bungeeOptions: pluginBungeeFabricOptions,
-      claimFormat: ClaimFormat.BUNGEE,
+      claimFormat: ClaimFormat.DEFAULT,
     } as FabricConfig;
 
     // networkDetails = {
@@ -911,49 +776,378 @@ beforeAll(async () => {
     //   participant: "Org1MSP",
     // };
   }
+
+  {
+    //setup ethereum ledger
+    rpcApiHttpHost = await ethereumLedger.getRpcApiHttpHost();
+
+    bridgeEthAccount = await ethereumLedger.newEthPersonalAccount();
+
+    erc20TokenContract = "SATPContract";
+    contractNameWrapper = "SATPWrapperContract";
+
+    ethOptionsKeychainEntryValue = "test";
+    ethOptionsKeychainEntryKey = bridgeEthAccount;
+    keychainPlugin1 = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+
+      backend: new Map([
+        [ethOptionsKeychainEntryKey, ethOptionsKeychainEntryValue],
+      ]),
+      logLevel,
+    });
+
+    keychainPlugin2 = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+
+      backend: new Map([
+        [ethOptionsKeychainEntryKey, ethOptionsKeychainEntryValue],
+      ]),
+      logLevel,
+    });
+
+    keychainPlugin1.set(erc20TokenContract, JSON.stringify(SATPContract1));
+    keychainPlugin2.set(
+      contractNameWrapper,
+      JSON.stringify(SATPWrapperContract1),
+    );
+
+    const pluginRegistry = new PluginRegistry({
+      plugins: [keychainPlugin1, keychainPlugin2],
+    });
+
+    ethereumOptions = {
+      instanceId: uuidv4(),
+      rpcApiHttpHost,
+      pluginRegistry,
+      logLevel,
+    };
+    testing_connector = new PluginLedgerConnectorEthereum(ethereumOptions);
+    pluginRegistry.add(testing_connector);
+
+    const deployOutSATPContract = await testing_connector.deployContract({
+      contract: {
+        keychainId: keychainPlugin1.getKeychainId(),
+        contractName: erc20TokenContract,
+      },
+      constructorArgs: [WHALE_ACCOUNT_ADDRESS, ETH_ASSET_ID],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(deployOutSATPContract).toBeTruthy();
+    expect(deployOutSATPContract.transactionReceipt).toBeTruthy();
+    expect(
+      deployOutSATPContract.transactionReceipt.contractAddress,
+    ).toBeTruthy();
+
+    assetContractAddress =
+      deployOutSATPContract.transactionReceipt.contractAddress ?? "";
+
+    log.info("SATPContract Deployed successfully");
+    const deployOutWrapperContract = await testing_connector.deployContract({
+      contract: {
+        keychainId: keychainPlugin2.getKeychainId(),
+        contractName: contractNameWrapper,
+      },
+      constructorArgs: [bridgeEthAccount],
+      web3SigningCredential: {
+        ethAccount: bridgeEthAccount,
+        secret: "test",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(deployOutWrapperContract).toBeTruthy();
+    expect(deployOutWrapperContract.transactionReceipt).toBeTruthy();
+    expect(
+      deployOutWrapperContract.transactionReceipt.contractAddress,
+    ).toBeTruthy();
+    log.info("SATPWrapperContract Deployed successfully");
+
+    wrapperContractAddress =
+      deployOutWrapperContract.transactionReceipt.contractAddress ?? "";
+
+    pluginBungeeEthOptions = {
+      keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry(),
+      logLevel,
+    };
+
+    ethereumConfig = {
+      network: SupportedChain.EVM,
+      keychainId: keychainPlugin2.getKeychainId(),
+      signingCredential: {
+        ethAccount: bridgeEthAccount,
+        secret: "test",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+      contractName: contractNameWrapper,
+      contractAddress: wrapperContractAddress,
+      options: ethereumOptions,
+      bungeeOptions: pluginBungeeEthOptions,
+      gas: 5000000,
+      claimFormat: ClaimFormat.DEFAULT,
+    };
+
+    const giveRoleRes = await testing_connector.invokeContract({
+      contract: {
+        contractName: erc20TokenContract,
+        keychainId: keychainPlugin1.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "giveRole",
+      params: [wrapperContractAddress],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+
+    expect(giveRoleRes).toBeTruthy();
+    expect(giveRoleRes.success).toBeTruthy();
+    log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
+  }
+
+  const responseMint = await testing_connector.invokeContract({
+    contract: {
+      contractName: erc20TokenContract,
+      keychainId: keychainPlugin1.getKeychainId(),
+    },
+    invocationType: EthContractInvocationType.Send,
+    methodName: "mint",
+    params: [WHALE_ACCOUNT_ADDRESS, "100"],
+    web3SigningCredential: {
+      ethAccount: WHALE_ACCOUNT_ADDRESS,
+      secret: "",
+      type: Web3SigningCredentialType.GethKeychainPassword,
+    },
+  });
+  expect(responseMint).toBeTruthy();
+  expect(responseMint.success).toBeTruthy();
+  log.info("Minted 100 tokens to firstHighNetWorthAccount");
+
+  const responseApprove = await testing_connector.invokeContract({
+    contract: {
+      contractName: erc20TokenContract,
+      keychainId: keychainPlugin1.getKeychainId(),
+    },
+    invocationType: EthContractInvocationType.Send,
+    methodName: "approve",
+    params: [wrapperContractAddress, "100"],
+    web3SigningCredential: {
+      ethAccount: WHALE_ACCOUNT_ADDRESS,
+      secret: "",
+      type: Web3SigningCredentialType.GethKeychainPassword,
+    },
+  });
+  expect(responseApprove).toBeTruthy();
+  expect(responseApprove.success).toBeTruthy();
+  log.info("Approved 100 tokens to SATPWrapperContract");
 });
+
 describe("SATPGateway sending a token from Ethereum to Fabric", () => {
   it("should realize a transfer", async () => {
-    //setup satp gateway
-    const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
-    };
-    const factory = new PluginFactorySATPGateway(factoryOptions);
+    const address: Address = `http://localhost`;
 
+    // gateway setup:
     const gatewayIdentity = {
       id: "mockID",
       name: "CustomGateway",
       version: [
         {
-          Core: "v02",
-          Architecture: "v02",
-          Crash: "v02",
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITETURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
         },
       ],
       supportedDLTs: [SupportedChain.FABRIC, SupportedChain.EVM],
       proofID: "mockProofID10",
-      address: "http://localhost" as Address,
+      address,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
     } as GatewayIdentity;
 
-    const options: SATPGatewayConfig = {
-      logLevel: "DEBUG",
-      gid: gatewayIdentity,
-      counterPartyGateways: [], //only knows itself
-      bridgesConfig: [ethereumConfig, fabricConfig],
+    // ethereumConfig Json object setup:
+    const ethPluginRegistryOptionsJSON = {
+      plugins: [
+        {
+          instanceId: keychainPlugin1.getInstanceId(),
+          keychainId: keychainPlugin1.getKeychainId(),
+          logLevel,
+          backend: [
+            {
+              keychainEntry: ethOptionsKeychainEntryKey,
+              keychainEntryValue: ethOptionsKeychainEntryValue,
+            },
+          ],
+          contractName: erc20TokenContract,
+          contractString: await keychainPlugin1.get(erc20TokenContract),
+        },
+        {
+          instanceId: keychainPlugin2.getInstanceId(),
+          keychainId: keychainPlugin2.getKeychainId(),
+          logLevel,
+          backend: [
+            {
+              keychainEntry: ethOptionsKeychainEntryKey,
+              keychainEntryValue: ethOptionsKeychainEntryValue,
+            },
+          ],
+          contractName: contractNameWrapper,
+          contractString: await keychainPlugin2.get(contractNameWrapper),
+        },
+      ],
     };
-    const gateway = await factory.create(options);
-    expect(gateway).toBeInstanceOf(SATPGateway);
 
-    const identity = gateway.Identity;
-    // default servers
-    expect(identity.gatewayServerPort).toBe(3010);
-    expect(identity.gatewayClientPort).toBe(3011);
-    expect(identity.address).toBe("http://localhost");
-    await gateway.startup();
+    const ethereumOptionsJSON = {
+      instanceId: ethereumOptions.instanceId,
+      rpcApiHttpHost: ethereumOptions.rpcApiHttpHost,
+      rpcApiWsHost: ethereumOptions.rpcApiWsHost,
+      pluginRegistryOptions: ethPluginRegistryOptionsJSON,
+      logLevel: ethereumOptions.logLevel,
+    };
 
-    const dispatcher = gateway.getBLODispatcher();
+    const ethBungeeOptionsJSON = {
+      keyPair: {
+        privateKey: Buffer.from(
+          pluginBungeeEthOptions.keyPair!.privateKey,
+        ).toString("hex"),
+        publicKey: Buffer.from(
+          pluginBungeeEthOptions.keyPair!.publicKey,
+        ).toString("hex"),
+      },
+      instanceId: pluginBungeeEthOptions.instanceId,
+      logLevel: pluginBungeeEthOptions.logLevel,
+    };
 
-    expect(dispatcher).toBeTruthy();
+    const ethereumConfigJSON = {
+      network: ethereumConfig.network,
+      keychainId: ethereumConfig.keychainId,
+      signingCredential: ethereumConfig.signingCredential,
+      contractName: ethereumConfig.contractName,
+      contractAddress: ethereumConfig.contractAddress,
+      gas: ethereumConfig.gas,
+      options: ethereumOptionsJSON,
+      bungeeOptions: ethBungeeOptionsJSON,
+      claimFormat: ethereumConfig.claimFormat,
+    };
+
+    // fabricConfig Json object setup:
+    const fabricPluginRegistryOptionsJSON = {
+      plugins: [
+        {
+          instanceId: keychainPluginBridge.getInstanceId(),
+          keychainId: keychainPluginBridge.getKeychainId(),
+          logLevel,
+          backend: [
+            {
+              keychainEntry: keychainEntryKeyBridge,
+              keychainEntryValue: keychainEntryValueBridge,
+            },
+            {
+              keychainEntry: "some-other-entry-key",
+              keychainEntryValue: "some-other-entry-value",
+            },
+          ],
+        },
+      ],
+    };
+
+    const fabricOptionsJSON = {
+      instanceId: pluginOptionsFabricBridge.instanceId,
+      dockerBinary: pluginOptionsFabricBridge.dockerBinary,
+      peerBinary: pluginOptionsFabricBridge.peerBinary,
+      goBinary: pluginOptionsFabricBridge.goBinary,
+      pluginRegistryOptions: fabricPluginRegistryOptionsJSON,
+      cliContainerEnv: pluginOptionsFabricBridge.cliContainerEnv,
+      sshConfig: pluginOptionsFabricBridge.sshConfig,
+      logLevel: pluginOptionsFabricBridge.logLevel,
+      connectionProfile: pluginOptionsFabricBridge.connectionProfile,
+      discoveryOptions: pluginOptionsFabricBridge.discoveryOptions,
+      eventHandlerOptions: pluginOptionsFabricBridge.eventHandlerOptions,
+    };
+
+    const fabricBungeeOptionsJSON = {
+      keyPair: {
+        privateKey: Buffer.from(
+          pluginBungeeFabricOptions.keyPair!.privateKey,
+        ).toString("hex"),
+        publicKey: Buffer.from(
+          pluginBungeeFabricOptions.keyPair!.publicKey,
+        ).toString("hex"),
+      },
+      instanceId: pluginBungeeFabricOptions.instanceId,
+      logLevel: pluginBungeeFabricOptions.logLevel,
+    };
+
+    const fabricConfigJSON = {
+      network: fabricConfig.network,
+      signingCredential: fabricConfig.signingCredential,
+      channelName: fabricConfig.channelName,
+      contractName: fabricConfig.contractName,
+      options: fabricOptionsJSON,
+      bungeeOptions: fabricBungeeOptionsJSON,
+      claimFormat: fabricConfig.claimFormat,
+    };
+
+    // gateway configuration setup:
+    const jsonObject = {
+      gid: gatewayIdentity,
+      logLevel: "DEBUG",
+      counterPartyGateways: [], //only knows itself
+      environment: "development",
+      enableOpenAPI: true,
+      bridgesConfig: [ethereumConfigJSON, fabricConfigJSON],
+    };
+
+    const configDir = path.join(__dirname, "gateway-info/config");
+    if (!fs.existsSync(configDir)) {
+      fs.mkdirSync(configDir, { recursive: true });
+    }
+    const configFile = path.join(configDir, "gateway-config.json");
+    fs.writeFileSync(configFile, JSON.stringify(jsonObject, null, 2));
+
+    expect(fs.existsSync(configFile)).toBe(true);
+
+    // gateway outputLogFile and errorLogFile setup:
+    const logDir = path.join(__dirname, "gateway-info/logs");
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    const outputLogFile = path.join(logDir, "gateway-logs-output.log");
+    const errorLogFile = path.join(logDir, "gateway-logs-error.log");
+
+    // Clear any existing logs
+    fs.writeFileSync(outputLogFile, "");
+    fs.writeFileSync(errorLogFile, "");
+
+    expect(fs.existsSync(outputLogFile)).toBe(true);
+    expect(fs.existsSync(errorLogFile)).toBe(true);
+
+    //TODO: when ready, change to official hyperledger image
+    // -- for now use your local image (the name might be different)
+    // gatewayRunner setup:
+    const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: "latest",
+      containerImageName: "cactus-plugin-satp-hermes-satp-hermes-gateway",
+      logLevel,
+      emitContainerLogs: true,
+      configFile,
+      outputLogFile,
+      errorLogFile,
+    };
+    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
+    console.log("starting gatewayRunner...");
+    await gatewayRunner.start(true);
+    console.log("gatewayRunner started sucessfully");
+
     const sourceAsset: Asset = {
       owner: WHALE_ACCOUNT_ADDRESS,
       ontology: JSON.stringify(BesuSATPInteraction),
@@ -979,8 +1173,23 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       receiverAsset,
     };
 
-    const res = await dispatcher?.Transact(req);
-    log.info(res?.statusResponse);
+    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_API);
+
+    const transactionApiClient = createClient(
+      "TransactionApi",
+      address,
+      port,
+      log,
+    );
+    const adminApi = createClient("AdminApi", address, port, log);
+
+    const res = await transactionApiClient.transact(req);
+    log.info(res?.data.statusResponse);
+
+    const sessions = await adminApi.getSessionIds({});
+    expect(sessions.data).toBeTruthy();
+    expect(sessions.data.length).toBe(1);
+    expect(sessions.data[0]).toBe(res.data.sessionID);
 
     const responseBalanceOwner = await testing_connector.invokeContract({
       contract: {
@@ -1050,7 +1259,5 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
     expect(responseBalance2.data).not.toBeUndefined();
     expect(responseBalance2.data.functionOutput).toBe("1");
     log.info("Amount was transfer correctly to the Owner account");
-    log.info(res?.statusResponse);
-    await gateway.shutdown();
   });
 });

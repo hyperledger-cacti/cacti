@@ -11,6 +11,7 @@ import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 //import { GatewayIdentity, GatewayChannel } from "../core/types";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
 import { GetStatusEndpointV1 } from "../web-services/status-endpoint";
+import { HealthCheckEndpointV1 } from "../web-services/health-check-endpoint";
 
 //import { GetAuditRequest, GetAuditResponse } from "../generated/gateway-client/typescript-axios";
 import {
@@ -97,7 +98,16 @@ export class BLODispatcher {
       logLevel: this.options.logLevel,
     });
 
-    const theEndpoints = [getStatusEndpointV1, getSessionIdsEndpointV1];
+    const healthCheckEndpointV1 = new HealthCheckEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
+    const theEndpoints = [
+      getStatusEndpointV1,
+      getSessionIdsEndpointV1,
+      healthCheckEndpointV1,
+    ];
     this.endpoints = theEndpoints;
     return theEndpoints;
   }

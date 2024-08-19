@@ -53,7 +53,7 @@ export class SATPBridgesManager {
           bridge = new FabricBridge(bridgeConfig as FabricConfig, this.level);
           break;
         case SupportedChain.BESU:
-          bridge = new BesuBridge(bridgeConfig as BesuConfig);
+          bridge = new BesuBridge(bridgeConfig as BesuConfig, this.level);
           break;
         case SupportedChain.EVM:
           bridge = new EthereumBridge(bridgeConfig as EthereumConfig);

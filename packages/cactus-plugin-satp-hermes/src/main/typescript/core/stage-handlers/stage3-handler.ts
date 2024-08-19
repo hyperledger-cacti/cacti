@@ -92,6 +92,7 @@ export class Stage3SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "CommitPreparationRequest", error);
     }
   }
@@ -135,6 +136,7 @@ export class Stage3SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(
         fnTag,
         "CommitFinalAssertionRequest",
@@ -165,6 +167,7 @@ export class Stage3SATPHandler implements SATPHandler {
 
       return new Empty({});
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "TransferCompleteRequest", error);
     }
   }
@@ -219,6 +222,7 @@ export class Stage3SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "CommitPreparationRequest", error);
     }
   }
@@ -257,6 +261,7 @@ export class Stage3SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(
         fnTag,
         "CommitFinalAssertionRequest",
@@ -294,6 +299,7 @@ export class Stage3SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "TransferCompleteRequest", error);
     }
   }

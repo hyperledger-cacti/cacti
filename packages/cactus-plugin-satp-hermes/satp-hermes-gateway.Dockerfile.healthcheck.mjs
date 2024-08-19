@@ -29,7 +29,8 @@ import https from "https";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const [nodeBinary, script, protocol, host, port, path] = process.argv;
 
-const thePath = path ?? "/api/v1/api-server/healthcheck";
+const thePath =
+  path ?? "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck";
 const isSecureHttp = protocol === "https";
 const httpModule = isSecureHttp ? https : http;
 

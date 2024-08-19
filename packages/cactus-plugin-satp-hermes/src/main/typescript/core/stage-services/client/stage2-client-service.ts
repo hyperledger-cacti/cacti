@@ -241,6 +241,7 @@ export class Stage2ClientService extends SATPService {
         sign(this.Signer, sessionData.lockAssertionClaim.receipt),
       );
     } catch (error) {
+      this.logger.debug(`Crash in ${fnTag}`, error);
       throw new FailedToProcessError(fnTag, "LockAsset");
     }
   }
