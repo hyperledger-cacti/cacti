@@ -9,7 +9,7 @@ export class SATPInternalError extends Error {
     super(message);
     this.name = this.constructor.name;
     Object.setPrototypeOf(this, new.target.prototype); // make sure prototype chain is set to error
-    this.stack = trace || new Error().stack;
+    //this.stack = trace || new Error().stack;
   }
 }
 
