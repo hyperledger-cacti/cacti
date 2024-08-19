@@ -7,14 +7,13 @@ import {
   CommonSatp,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { SessionData } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
-  bufArray2HexStr,
-  getHash,
-  sign,
-  verifySignature,
-} from "../../../gateway-utils";
-import { getMessageHash, saveHash, saveSignature } from "../../session-utils";
+  getMessageHash,
+  saveHash,
+  saveSignature,
+  SessionType,
+} from "../../session-utils";
 import {
   SATPService,
   SATPServiceType,
@@ -22,22 +21,13 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { SATPSession } from "../../../core/satp-session";
+import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
-  HashMissMatch,
-  MessageTypeMissMatch,
-  MissingClientGatewayPubkey,
-  MissingLockAssertionClaim,
-  MissingLockAssertionClaimFormat,
-  MissingLockAssertionExpiration,
-  MissingSatpCommonBody,
-  MissingServerGatewayPubkey,
-  SATPVersionUnsupported,
-  SequenceNumberMissMatch,
-  SessionDataNotLoadedCorrectly,
-  SessionUndefined,
-  SignatureVerificationFailed,
-  TransferContextIdMissMatch,
-} from "../errors";
+  LockAssertionClaimError,
+  LockAssertionClaimFormatError,
+  LockAssertionExpirationError,
+  SessionError,
+} from "../../errors/satp-service-errors";
 export class Stage2ServerService extends SATPService {
   public static readonly SATP_STAGE = "2";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -63,30 +53,25 @@ export class Stage2ServerService extends SATPService {
     this.Log.debug(`${fnTag}, lockAssertionResponse...`);
 
     if (session == undefined) {
-      throw SessionUndefined(fnTag);
+      throw new SessionError(fnTag);
     }
+
+    session.verify(fnTag, SessionType.SERVER);
 
     const sessionData = session.getServerSessionData();
-
-    if (sessionData == undefined) {
-      throw SessionDataNotLoadedCorrectly(fnTag);
-    }
-
-    if (request.common == undefined) {
-      throw MissingSatpCommonBody(fnTag);
-    }
 
     const commonBody = new CommonSatp();
     commonBody.version = SATP_VERSION;
     commonBody.messageType = MessageType.ASSERTION_RECEIPT;
-    commonBody.sequenceNumber = request.common.sequenceNumber + BigInt(1);
+    commonBody.sequenceNumber = request.common!.sequenceNumber + BigInt(1);
     commonBody.hashPreviousMessage = getMessageHash(
       sessionData,
       MessageType.LOCK_ASSERT,
     );
-    commonBody.sessionId = request.common.sessionId;
+    commonBody.sessionId = request.common!.sessionId;
     commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
     commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
+    commonBody.resourceUrl = sessionData.resourceUrl;
 
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
@@ -134,119 +119,48 @@ export class Stage2ServerService extends SATPService {
   async checkLockAssertionRequestMessage(
     request: LockAssertionRequestMessage,
     session: SATPSession,
-  ): Promise<SessionData> {
+  ): Promise<void> {
     const stepTag = `checkLockAssertionRequestMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, checkLockAssertionRequestMessage...`);
 
     if (session == undefined) {
-      throw SessionUndefined(fnTag);
+      throw new SessionError(fnTag);
     }
+
+    session.verify(fnTag, SessionType.SERVER);
 
     const sessionData = session.getServerSessionData();
 
-    if (
-      sessionData == undefined ||
-      sessionData.serverGatewayPubkey == undefined ||
-      sessionData.lastSequenceNumber == undefined
-    ) {
-      throw SessionDataNotLoadedCorrectly(fnTag);
-    }
+    commonBodyVerifier(
+      fnTag,
+      request.common,
+      sessionData,
+      MessageType.LOCK_ASSERT,
+    );
 
-    if (
-      request.common == undefined ||
-      request.common.version == undefined ||
-      request.common.messageType == undefined ||
-      request.common.sessionId == undefined ||
-      request.common.sequenceNumber == undefined ||
-      request.common.resourceUrl == undefined ||
-      request.clientSignature == undefined ||
-      request.common.clientGatewayPubkey == undefined ||
-      request.common.serverGatewayPubkey == undefined ||
-      request.common.hashPreviousMessage == undefined
-    ) {
-      throw MissingSatpCommonBody(fnTag);
-    }
-
-    if (request.common.version != SATP_VERSION) {
-      throw SATPVersionUnsupported(fnTag, request.common.version, SATP_VERSION);
-    }
-
-    if (request.common.serverGatewayPubkey != sessionData.serverGatewayPubkey) {
-      throw MissingServerGatewayPubkey(fnTag);
-    }
-
-    if (request.common.clientGatewayPubkey != sessionData.clientGatewayPubkey) {
-      throw MissingClientGatewayPubkey(fnTag);
-    }
-
-    if (
-      !verifySignature(this.Signer, request, request.common.serverGatewayPubkey)
-    ) {
-      throw SignatureVerificationFailed(fnTag);
-    }
-
-    if (request.common.messageType != MessageType.LOCK_ASSERT) {
-      throw MessageTypeMissMatch(
-        fnTag,
-        request.common.messageType.toString(),
-        MessageType.LOCK_ASSERT.toString(),
-      );
-    }
-
-    if (
-      request.common.sequenceNumber !=
-      sessionData.lastSequenceNumber + BigInt(1)
-    ) {
-      throw SequenceNumberMissMatch(
-        fnTag,
-        request.common.sequenceNumber,
-        sessionData.lastSequenceNumber,
-      );
-    }
-
-    if (
-      request.common.hashPreviousMessage !=
-      getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE)
-    ) {
-      throw HashMissMatch(
-        fnTag,
-        request.common.hashPreviousMessage,
-        getMessageHash(sessionData, MessageType.TRANSFER_COMMENCE_RESPONSE),
-      );
-    }
+    signatureVerifier(fnTag, this.Signer, request, sessionData);
 
     if (request.lockAssertionClaim == undefined) {
-      throw MissingLockAssertionClaim(fnTag);
+      throw new LockAssertionClaimError(fnTag);
     }
 
     sessionData.lockAssertionClaim = request.lockAssertionClaim;
 
     if (request.lockAssertionClaimFormat == undefined) {
-      throw MissingLockAssertionClaimFormat(fnTag);
+      throw new LockAssertionClaimFormatError(fnTag);
     }
 
     sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat; //todo check if valid
 
-    if (request.lockAssertionExpiration == undefined) {
-      throw MissingLockAssertionExpiration(fnTag);
+    if (request.lockAssertionExpiration == BigInt(0)) {
+      throw new LockAssertionExpirationError(fnTag);
     }
 
     sessionData.lockAssertionExpiration = request.lockAssertionExpiration; //todo check if expired
 
     if (
-      sessionData.transferContextId != undefined &&
-      request.common.transferContextId != sessionData.transferContextId
-    ) {
-      throw TransferContextIdMissMatch(
-        fnTag,
-        request.common.transferContextId,
-        sessionData.transferContextId,
-      );
-    }
-
-    if (
-      sessionData.clientTransferNumber != undefined &&
+      sessionData.clientTransferNumber != "" &&
       request.clientTransferNumber != sessionData.clientTransferNumber
     ) {
       // This does not throw an error because the clientTransferNumber is only meaningful to the client.
@@ -258,6 +172,5 @@ export class Stage2ServerService extends SATPService {
     saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
 
     this.Log.info(`${fnTag}, LockAssertionRequest passed all checks.`);
-    return sessionData;
   }
 }
