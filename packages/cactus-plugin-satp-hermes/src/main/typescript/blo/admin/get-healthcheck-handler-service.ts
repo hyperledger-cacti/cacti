@@ -41,7 +41,7 @@ export async function getHealthCheckService(
   const status = manager.healthCheck();
 
   const res: HealthCheckResponse = {
-    status: status
+    status: status,
   };
 
   log.debug(res);
