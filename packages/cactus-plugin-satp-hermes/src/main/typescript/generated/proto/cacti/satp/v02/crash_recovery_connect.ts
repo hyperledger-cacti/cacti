@@ -3,6 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
+import { RecoverMessage, RecoverSuccessMessage, RecoverUpdateMessage, RollbackAckMessage, RollbackMessage } from "./crash_recovery_pb.js";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
+
 /**
  * TODO: Rollback and crash-recovery related
  *
@@ -13,6 +16,53 @@
 export const CrashRecovery = {
   typeName: "cacti.satp.v02.crash.CrashRecovery",
   methods: {
+    /**
+     * step RPCs
+     *
+     * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RecoverV2Message
+     */
+    recoverV2Message: {
+      name: "RecoverV2Message",
+      I: RecoverMessage,
+      O: RecoverUpdateMessage,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RecoverV2UpdateMessage
+     */
+    recoverV2UpdateMessage: {
+      name: "RecoverV2UpdateMessage",
+      I: RecoverUpdateMessage,
+      O: RecoverSuccessMessage,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RecoverV2SuccessMessage
+     */
+    recoverV2SuccessMessage: {
+      name: "RecoverV2SuccessMessage",
+      I: RecoverSuccessMessage,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RollbackV2Message
+     */
+    rollbackV2Message: {
+      name: "RollbackV2Message",
+      I: RollbackMessage,
+      O: RollbackAckMessage,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RollbackV2AckMessage
+     */
+    rollbackV2AckMessage: {
+      name: "RollbackV2AckMessage",
+      I: RollbackAckMessage,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
   }
 } as const;
 

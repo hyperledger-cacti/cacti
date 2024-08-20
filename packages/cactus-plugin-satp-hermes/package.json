@@ -71,7 +71,19 @@
     "start-gateway": "ts-node /src/main/typescript/plugin-satp-hermes-gateway-cli.ts",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
-    "watch": "tsc --build --watch"
+    "watch": "tsc --build --watch",
+    "forge": "forge build ./src/solidity/*.sol --out ./src/solidity/generated",
+    "forge:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
+    "forge:all": "run-s 'forge' 'forge:test'",
+    "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
+    "db:destroy": "docker-compose down -v && npm run db:cleanup",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "db:reset": "run-s db:destroy db:start db:migrate db:seed",
+    "db:migrate": "knex migrate:latest --knexfile src/knex/knexfile.js",
+    "db:migrate:production": "knex migrate:latest --env production --knexfile src/knex/knexfile.ts",
+    "db:seed": "knex seed:run --knexfile src/knex/knexfile.ts",
+    "db:cleanup": "find src/knex/data -name '.dev-*.sqlite3' -delete"
   },
   "jest": {
     "moduleNameMapper": {
@@ -117,7 +129,7 @@
     "kubo-rpc-client": "3.0.1",
     "npm-run-all": "4.1.5",
     "openzeppelin-solidity": "3.4.2",
-    "safe-stable-stringify": "2.5.0",
+    "pg": "^8.8.0",
     "secp256k1": "4.0.3",
     "socket.io": "4.6.2",
     "sqlite3": "5.1.5",
@@ -139,6 +151,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/google-protobuf": "3.15.5",
     "@types/node": "18.18.2",
+    "@types/pg": "8.6.5",
     "@types/swagger-ui-express": "4.1.6",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",

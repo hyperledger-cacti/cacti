@@ -160,6 +160,8 @@ export class BLODispatcher {
     const res = Array.from(await this.manager.getSessions().keys());
     return res;
   }
+
+  // TODO implement recovery handlers
   // get channel by caller; give needed client from orchestrator to handler to call
   // for all channels, find session id on request
   // TODO implement handlers GetAudit, Transact, Cancel, Routes

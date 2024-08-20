@@ -55,6 +55,11 @@ import {
   SATPBridgesManager,
 } from "./gol/satp-bridges-manager";
 import bodyParser from "body-parser";
+import {
+  CrashOcurrence,
+  CrashRecoveryManager,
+  ICrashRecoveryManagerOptions,
+} from "./core/recovery/crash-manager";
 import cors from "cors";
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -92,6 +97,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
+  private readonly crashManager: CrashRecoveryManager;
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -175,6 +181,15 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!this.OAS) {
       this.logger.warn("Error loading OAS");
     }
+
+    // After setup, initialize crash manager and check if we crashed;
+    const crashOptions: ICrashRecoveryManagerOptions = {
+      instanceId: this.instanceId,
+      logLevel: this.config.logLevel,
+      bridgeConfig: SATPBridgeConfig,
+    };
+    this.crashManager = new CrashRecoveryManager(crashOptions);
+    this.crashManager.checkAndResolveCrash();
   }
 
   /* ICactus Plugin methods */
