@@ -67,7 +67,7 @@ export class SATPLogger {
       logEntry.operation,
     );
     const localLog: LocalLog = {
-      sessionID: logEntry.sessionID,
+      sessionId: logEntry.sessionID,
       type: logEntry.type,
       key: key,
       timestamp: Date.now().toString(),
@@ -96,7 +96,7 @@ export class SATPLogger {
       logEntry.operation,
     );
     const localLog: LocalLog = {
-      sessionID: logEntry.sessionID,
+      sessionId: logEntry.sessionID,
       type: logEntry.type,
       key: key,
       timestamp: Date.now().toString(),
@@ -116,7 +116,7 @@ export class SATPLogger {
   private getHash(logEntry: LocalLog): string {
     const fnTag = `SATPLogger#getHash()`;
     this.log.debug(
-      `${fnTag} - generating hash for log entry with sessionID: ${logEntry.sessionID}`,
+      `${fnTag} - generating hash for log entry with sessionID: ${logEntry.sessionId}`,
     );
 
     return SHA256(
