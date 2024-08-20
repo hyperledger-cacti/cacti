@@ -82,10 +82,10 @@ import { Knex, knex } from "knex";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/repository/knex-remote-log-repository";
 import { SATPLogger } from "../../../main/typescript/logging";
+import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client
 let knexInstanceRemote: Knex;
-import { create, isMessage } from "@bufbuild/protobuf";
 
 const logLevel: LogLevelDesc = "DEBUG";
 

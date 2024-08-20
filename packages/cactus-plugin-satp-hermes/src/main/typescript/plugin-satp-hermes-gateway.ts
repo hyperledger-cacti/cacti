@@ -57,9 +57,15 @@ import {
   SATPBridgesManager,
 } from "./gol/satp-bridges-manager";
 import bodyParser from "body-parser";
+import {
+  CrashManager,
+  ICrashRecoveryManagerOptions,
+} from "./gol/crash-manager";
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
+import { knexLocalInstance } from "../../knex/knexfile";
+import { knexRemoteInstance } from "../../knex/knexfile-remote";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -97,6 +103,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
+  private crashManager?: CrashManager;
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -110,9 +117,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     };
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
-
-    this.localRepository = new LocalLogRepository(options.knexLocalConfig);
-    this.remoteRepository = new RemoteLogRepository(options.knexRemoteConfig);
+    this.localRepository = new LocalLogRepository(this.config.knexLocalConfig);
+    this.remoteRepository = new RemoteLogRepository(
+      this.config.knexRemoteConfig,
+    );
 
     if (this.config.keyPair == undefined) {
       throw new Error("Key pair is undefined");
@@ -133,6 +141,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       localGateway: this.config.gid!,
       counterPartyGateways: this.config.counterPartyGateways,
       signer: this.signer!,
+      enableCrashRecovery: this.config.enableCrashManager,
     };
 
     const bridgesManagerOptions: ISATPBridgesOptions = {
@@ -181,6 +190,22 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
 
     this.OAS = OAS;
+
+    if (this.config.enableCrashManager) {
+      const crashOptions: ICrashRecoveryManagerOptions = {
+        instanceId: this.instanceId,
+        logLevel: this.config.logLevel,
+        bridgeConfig: this.bridgesManager,
+        orchestrator: this.gatewayOrchestrator,
+        localRepository: this.localRepository,
+        remoteRepository: this.remoteRepository,
+        signer: this.signer,
+      };
+      this.crashManager = new CrashManager(crashOptions);
+      this.logger.info("CrashManager has been initialized.");
+    } else {
+      this.logger.info("CrashManager is disabled!");
+    }
   }
 
   /* ICactus Plugin methods */
@@ -381,6 +406,18 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     if (!pluginOptions.bridgesConfig) {
       pluginOptions.bridgesConfig = [];
+    }
+
+    if (!pluginOptions.knexLocalConfig) {
+      pluginOptions.knexLocalConfig = knexLocalInstance.default;
+    }
+
+    if (!pluginOptions.knexRemoteConfig) {
+      pluginOptions.knexRemoteConfig = knexRemoteInstance.default;
+    }
+
+    if (!pluginOptions.enableCrashManager) {
+      pluginOptions.enableCrashManager = false;
     }
 
     return pluginOptions;
