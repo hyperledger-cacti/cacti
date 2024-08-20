@@ -27,4 +27,3 @@ The following ports are open on the container:
 ## Logs of DAML via supervisord web UI:
 
 Navigate your browser to http://localhost:9001
-
