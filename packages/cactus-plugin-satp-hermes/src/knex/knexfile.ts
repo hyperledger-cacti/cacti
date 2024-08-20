@@ -6,8 +6,8 @@ import { Knex } from "knex";
 const envPath = process.env.ENV_PATH;
 dotenv.config({ path: envPath });
 
-const config: { [key: string]: Knex.Config } = {
-  development: {
+export const knexLocalInstance: { [key: string]: Knex.Config } = {
+  default: {
     client: "sqlite3",
     connection: {
       filename: path.resolve(__dirname, `.dev.local-${uuidv4()}.sqlite3`),
@@ -34,5 +34,3 @@ const config: { [key: string]: Knex.Config } = {
     },
   },
 };
-
-export default config;
