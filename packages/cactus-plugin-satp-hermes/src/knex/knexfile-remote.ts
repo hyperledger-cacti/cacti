@@ -6,11 +6,11 @@ import { Knex } from "knex";
 const envPath = process.env.ENV_PATH;
 dotenv.config({ path: envPath });
 
-const config: { [key: string]: Knex.Config } = {
-  development: {
+export const knexRemoteInstance: { [key: string]: Knex.Config } = {
+  default: {
     client: "sqlite3",
     connection: {
-      filename: path.resolve(__dirname, ".dev.remote-" + uuidv4() + ".sqlite3"),
+      filename: path.resolve(__dirname, `.dev.remote-${uuidv4()}.sqlite3`),
     },
     migrations: {
       directory: path.resolve(__dirname, "migrations"),
@@ -31,5 +31,3 @@ const config: { [key: string]: Knex.Config } = {
     },
   },
 };
-
-export default config;

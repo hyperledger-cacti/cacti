@@ -57,6 +57,17 @@ The sequence diagram of SATP is pictured below.
 
 ![satp-sequence-diagram](https://i.imgur.com/SOdXFEt.png)
 
+### Crash Recovery Integration
+The crash recovery protocol ensures session consistency across all stages of SATP. Each session's state, logs, hashes, timestamps, and signatures are stored and recovered using the following mechanisms:
+
+1. **Session Logs**: A persistent log storage mechanism ensures crash-resilient state recovery.
+2. **Consistency Checks**: Ensures all messages and actions are consistent across both gateways and the connected ledgers.
+3. **Stage Recovery**: Recovers interrupted sessions by validating logs, hashes, timestamps, and signatures to maintain protocol integrity.
+4. **Rollback Operations**: In the event of a timeout or irrecoverable failure, rollback messages ensure the state reverts back the current stage.
+5. **Logging & Proofs**: The database is leveraged for state consistency and proof accountability across gateways.
+
+Refer to the [Crash Recovery Sequence](https://datatracker.ietf.org/doc/html/draft-belchior-satp-gateway-recovery) for more details.
+
 ### Application-to-Gateway API (API Type 1)
 We
 
@@ -76,16 +87,32 @@ There are Client and Server Endpoints for each type of message detailed in the S
   - CommitFinalV1Response
   - TransferCompleteV1Request
   - ClientV1Request
+### Crash Recovery Endpoints
+There are Client and Server gRPC Endpoints for the recovery and rollback messages:
 
-There are also defined the endpoints for the crash recovery procedure (there is still missing the endpoint to receive the Rollback mesage):
-  - RecoverV1Message
-  - RecoverUpdateV1Message
-  - RecoverUpdateAckV1Message
-  - RecoverSuccessV1Message
-  - RollbackV1Message
+- **Recovery Messages:**
+  - `RecoverV2Message`
+  - `RecoverV2SuccessMessage`
+  - `RecoverUpdateMessage`
+- **Rollback Messages:**
+  - `RollbackV2Message`
+  - `RollbackAckMessage`
 
 ## Use case
 Alice and Bob, in blockchains A and B, respectively, want to make a transfer of an asset from one to the other. Gateway A represents the gateway connected to Alice's blockchain. Gateway B represents the gateway connected to Bob's blockchain. Alice and Bob will run SATP, which will execute the transfer of the asset from blockchain A to blockchain B. The above endpoints will be called in sequence. Notice that the asset will first be locked on blockchain A and a proof is sent to the server-side. Afterward, the asset on the original blockchain is extinguished, followed by its regeneration on blockchain B.
+
+### Role of Crash Recovery in SATP
+In SATP, crash recovery ensures that asset transfers remain consistent and fault-tolerant across distributed ledgers. Key features include:
+- **Session Recovery**: Gateways synchronize state using recovery messages, ensuring continuity after failures.
+- **Rollback**: For irrecoverable errors, rollback procedures ensure safe reversion to previous states.
+- **Fault Resilience**: Enables recovery from crashes while maintaining the integrity of ongoing transfers.
+
+These features enhance reliability in scenarios where network or gateway disruptions occur during asset transfers.
+
+### Future Work
+
+- **Single-Gateway Topology Enhancement**  
+  The crash recovery and rollback mechanisms are implemented for configurations where client and server data are handled separately. For single-gateway setups, where both client and server data coexist in session, the current implementation of fetching a single log may not suffice. This requires to fetch multiple logs (X logs) `recoverSessions()` to differentiate and handle client and server-specific data accurately, to reconstruct the session back after the crash.
 
 ## Running the tests
 
@@ -109,6 +136,16 @@ Alice and Bob, in blockchains A and B, respectively, want to make a transfer of 
 
 [A test with a backup gateway resuming the protocol after the client gateway crashed.](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/backup-gateway-after-client-crash.test.ts)
 
+
+### Crash Recovery Tests
+- [Stage 1 Recovery Test](src/test/typescript/integration/recovery/recovery-stage-1.test.ts)
+- [Stage 2 Recovery Test](src/test/typescript/integration/recovery/recovery-stage-2.test.ts)
+- [Stage 3 Recovery Test](src/test/typescript/integration/recovery/recovery-stage-3.test.ts)
+- [Stage 0 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-0.test.ts)
+- [Stage 1 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-1.test.ts)
+- [Stage 2 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-2.test.ts)
+- [Stage 3 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-3.test.ts)
+  
 For developers that want to test separate steps/phases of the SATP protocol, please refer to [these](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/unit/) test files (client and server side along with the recovery procedure).
 
 ## Usage
