@@ -57,9 +57,16 @@ import {
   SATPBridgesManager,
 } from "./gol/satp-bridges-manager";
 import bodyParser from "body-parser";
+import {
+  CrashManager,
+  ICrashRecoveryManagerOptions,
+} from "./gol/crash-manager";
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
+import knex, { Knex } from "knex";
+import { knexLocalInstance } from "../../knex/knexfile";
+import { knexRemoteInstance } from "../../knex/knexfile-remote";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -97,6 +104,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
+  private crashManager?: CrashManager;
+  public knexLocalConnection?: Knex;
+  public knexRemoteConnection?: Knex;
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -110,9 +120,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     };
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
-
-    this.localRepository = new LocalLogRepository(options.knexLocalConfig);
-    this.remoteRepository = new RemoteLogRepository(options.knexRemoteConfig);
+    this.localRepository = new LocalLogRepository(this.config.knexLocalConfig);
+    this.remoteRepository = new RemoteLogRepository(
+      this.config.knexRemoteConfig,
+    );
 
     if (this.config.keyPair == undefined) {
       throw new Error("Key pair is undefined");
@@ -181,6 +192,26 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
 
     this.OAS = OAS;
+
+    if (this.config.enableCrashManager) {
+      const crashOptions: ICrashRecoveryManagerOptions = {
+        instanceId: this.instanceId,
+        logLevel: this.config.logLevel,
+        bridgeConfig: this.bridgesManager,
+        orchestrator: this.gatewayOrchestrator,
+        localRepository: this.localRepository,
+        remoteRepository: this.remoteRepository,
+        signer: this.signer,
+        pubKey: this.pubKey,
+      };
+      this.crashManager = new CrashManager(crashOptions);
+      this.logger.info("CrashManager has been initialized.");
+    }
+
+    if (this.config.enableMigration) {
+      this.knexLocalConnection = knex(knexLocalInstance.default);
+      this.knexRemoteConnection = knex(knexRemoteInstance.default);
+    }
   }
 
   /* ICactus Plugin methods */
@@ -383,6 +414,32 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       pluginOptions.bridgesConfig = [];
     }
 
+    if (pluginOptions.enableMigration) {
+      if (!pluginOptions.knexLocalConfig) {
+        pluginOptions.knexLocalConfig = knexLocalInstance.default;
+      } else {
+        throw new Error("Multiple knexLocalConfigs!");
+      }
+
+      if (!pluginOptions.knexRemoteConfig) {
+        pluginOptions.knexRemoteConfig = knexRemoteInstance.default;
+      } else {
+        throw new Error("Multiple knexRemoteConfig!");
+      }
+    } else {
+      if (!pluginOptions.knexLocalConfig) {
+        throw new Error("knexLocalConfig missing!");
+      }
+
+      if (!pluginOptions.knexRemoteConfig) {
+        throw new Error("knexRemoteConfig missing!");
+      }
+    }
+
+    if (!pluginOptions.enableCrashManager) {
+      pluginOptions.enableCrashManager = false;
+    }
+
     return pluginOptions;
   }
 
@@ -395,6 +452,20 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public async startup(): Promise<void> {
     const fnTag = `${this.className}#startup()`;
     this.logger.trace(`Entering ${fnTag}`);
+
+    if (this.config.enableMigration) {
+      try {
+        this.logger.info("Running database migrations...");
+        await this.knexLocalConnection?.migrate.latest();
+        await this.knexRemoteConnection?.migrate.latest();
+        this.logger.info("Database migrations completed successfully.");
+      } catch (error) {
+        this.logger.error(`Failed to run database migrations: ${error}`);
+        throw error;
+      }
+    } else {
+      this.logger.info("Migration is disabled! Skipping database migrations.");
+    }
 
     await Promise.all([this.startupBLOServer()]);
 
@@ -560,6 +631,18 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     this.logger.info(`Closed ${connectionsClosed} connections`);
     this.logger.info("Gateway Coordinator shut down");
+
+    if (this.knexLocalConnection) {
+      this.logger.debug("Destroying local knex instance...");
+      await this.knexLocalConnection.destroy();
+      this.logger.debug("Local knex instance destroyed");
+    }
+
+    if (this.knexRemoteConnection) {
+      this.logger.debug("Destroying remote knex instance...");
+      await this.knexRemoteConnection.destroy();
+      this.logger.debug("Remote knex instance destroyed");
+    }
 
     if (this.localRepository) {
       this.logger.debug("Destroying local repository...");
