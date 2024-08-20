@@ -157,7 +157,7 @@ export class SATPManager {
     };
 
     this.dbLogger = new SATPLogger(satpLoggerConfig);
-    this.logger.debug(`SATPManager dbLogger initialized: ${!!this.dbLogger}`);
+    this.logger.debug(`${fnTag} dbLogger initialized: ${!!this.dbLogger}`);
 
     const serviceClasses = [
       Stage0ServerService as unknown as SATPServiceInstance,
