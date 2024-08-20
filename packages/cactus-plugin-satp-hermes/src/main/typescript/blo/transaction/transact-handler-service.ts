@@ -1,4 +1,3 @@
-import { Logger } from "@hyperledger/cactus-common";
 import { TransactRequest, TransactResponse } from "../../public-api";
 import { SATPManager } from "../../gol/satp-manager";
 import { populateClientSessionData } from "../../core/session-utils";
@@ -12,7 +11,6 @@ import { GatewayOrchestrator } from "../../gol/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
-import { log } from "console";
 
 // todo
 export async function executeTransact(
@@ -26,7 +24,7 @@ export async function executeTransact(
     label: fnTag,
     level: logLevel,
   });
-  
+
   logger.info(`${fnTag}, executing transaction endpoint`);
 
   //TODO check input for valid strings...
