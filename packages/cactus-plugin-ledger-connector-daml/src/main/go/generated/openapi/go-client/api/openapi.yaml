@@ -1,0 +1,388 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a DAML ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cacti Plugin - Connector DAML
+  version: 2.0.0-rc.3
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/create-iou-endpoint:
+    post:
+      operationId: createIou
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIOUEndpointRequest'
+        description: Request body for creation of iou
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIOUEndpointResponse'
+          description: OK
+      summary: This method creates a simple iou countract
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/create-iou-endpoint
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/exercise-iou-endpoint:
+    post:
+      operationId: exerciseChoice
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseIOUEndpointRequest'
+        description: Request body for exercising choice(DAML term for function on
+          contracts) of iou
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseIOUEndpointResponse'
+          description: OK
+      summary: This method exercise choices(DAML term for function on contracts) for
+        iou countract
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/exercise-iou-endpoint
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-iou-endpoint:
+    post:
+      operationId: queryContract
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryIOUEndpointRequest'
+        description: Request body for creation of iou
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryIOUEndpointResponse'
+          description: OK
+      summary: This method queries DAML contracts
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-iou-endpoint
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-raw-iou-endpoint:
+    get:
+      operationId: queryRawContract
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRawIOUEndpointRequest'
+        description: Request for querying IOU contracts
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryIOUEndpointResponse'
+          description: OK
+      summary: This method queries DAML contracts that does not include request body
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-raw-iou-endpoint
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/get-parties-involved-endpoint:
+    get:
+      operationId: getPartiesInvolved
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPartiesInvolvedEndpointRequest'
+        description: Request body for getting the parties involved in daml instance
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryIOUEndpointResponse'
+          description: OK
+      summary: This method queries all the parties that is included on IOU contract
+      x-hyperledger-cactus:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/get-parties-involved-endpoint
+components:
+  schemas:
+    QueryRawIOUEndpointRequest:
+      description: This method is the request for querying a simple IOU contract.
+      example:
+        participantToken: participantToken
+      properties:
+        participantToken:
+          nullable: false
+          type: string
+      type: object
+    GetPartiesInvolvedEndpointRequest:
+      description: This method is the request for getting all of the parties involved
+        upon starting daml.
+      example:
+        participantToken: participantToken
+      properties:
+        participantToken:
+          nullable: false
+          type: string
+      type: object
+    QueryIOUEndpointRequest:
+      description: This method is the request for querying a simple IOU contract.
+      example:
+        templateIds:
+        - templateIds
+        - templateIds
+        readers:
+        - readers
+        - readers
+        query:
+          amount: 0.8008281904610115
+        participantToken: participantToken
+      properties:
+        participantToken:
+          nullable: false
+          type: string
+        templateIds:
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+        query:
+          $ref: '#/components/schemas/QueryIOUEndpointRequest_query'
+        readers:
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+      type: object
+    QueryIOUEndpointResponse:
+      description: This method is the response for querying a simple IOU contract.
+      example:
+        completionOffset: completionOffset
+        events:
+        - archived:
+            contractId: contractId
+            templateId: templateId
+        - archived:
+            contractId: contractId
+            templateId: templateId
+      properties:
+        completionOffset:
+          nullable: false
+          type: string
+        events:
+          items:
+            $ref: '#/components/schemas/QueryIOUEndpointResponse_events_inner'
+          nullable: false
+          type: array
+      type: object
+    CreateIOUEndpointRequest:
+      description: This method is the request for creating a simple IOU contract.
+      example:
+        payload:
+          owner: owner
+          amount: amount
+          currency: currency
+          issuer: issuer
+          observers:
+          - observers
+          - observers
+        templateId: templateId
+        participantToken: participantToken
+      properties:
+        templateId:
+          nullable: false
+          type: string
+        participantToken:
+          nullable: false
+          type: string
+        payload:
+          $ref: '#/components/schemas/CreateIOUEndpointRequest_payload'
+      type: object
+    CreateIOUEndpointResponse:
+      description: This method is the response for creating a simple IOU contract.
+      example:
+        completionOffset: completionOffset
+        signatories:
+        - signatories
+        - signatories
+        agreementText: agreementText
+        payload:
+          owner: owner
+          amount: amount
+          currency: currency
+          issuer: issuer
+          observers:
+          - observers
+          - observers
+        contractId: contractId
+        templateId: templateId
+        observers:
+        - observers
+        - observers
+      properties:
+        agreementText:
+          nullable: false
+          type: string
+        completionOffset:
+          nullable: false
+          type: string
+        contractId:
+          nullable: false
+          type: string
+        observers:
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+        templateId:
+          nullable: false
+          type: string
+        signatories:
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+        payload:
+          $ref: '#/components/schemas/CreateIOUEndpointRequest_payload'
+      type: object
+    ExerciseIOUEndpointRequest:
+      description: This method is the request for creating a simple IOU contract.
+      example:
+        argument:
+          newOwner: newOwner
+        contractId: contractId
+        templateId: templateId
+        choice: choice
+        previousParticipantToken: previousParticipantToken
+      properties:
+        previousParticipantToken:
+          nullable: false
+          type: string
+        templateId:
+          nullable: false
+          type: string
+        contractId:
+          nullable: false
+          type: string
+        choice:
+          nullable: false
+          type: string
+        argument:
+          $ref: '#/components/schemas/ExerciseIOUEndpointRequest_argument'
+      type: object
+    ExerciseIOUEndpointResponse:
+      description: This method is the request for creating a simple IOU contract.
+      example:
+        completionOffset: completionOffset
+        events:
+        - archived:
+            contractId: contractId
+            templateId: templateId
+        - archived:
+            contractId: contractId
+            templateId: templateId
+      properties:
+        completionOffset:
+          nullable: false
+          type: string
+        events:
+          items:
+            $ref: '#/components/schemas/QueryIOUEndpointResponse_events_inner'
+          nullable: false
+          type: array
+      type: object
+    QueryIOUEndpointRequest_query:
+      example:
+        amount: 0.8008281904610115
+      nullable: false
+      properties:
+        amount:
+          nullable: false
+          type: number
+      type: object
+    QueryIOUEndpointResponse_events_inner_archived:
+      example:
+        contractId: contractId
+        templateId: templateId
+      nullable: false
+      properties:
+        contractId:
+          nullable: false
+          type: string
+        templateId:
+          nullable: false
+          type: string
+      type: object
+    QueryIOUEndpointResponse_events_inner:
+      example:
+        archived:
+          contractId: contractId
+          templateId: templateId
+      nullable: false
+      properties:
+        archived:
+          $ref: '#/components/schemas/QueryIOUEndpointResponse_events_inner_archived'
+      type: object
+    CreateIOUEndpointRequest_payload:
+      example:
+        owner: owner
+        amount: amount
+        currency: currency
+        issuer: issuer
+        observers:
+        - observers
+        - observers
+      properties:
+        issuer:
+          nullable: false
+          type: string
+        owner:
+          nullable: false
+          type: string
+        currency:
+          nullable: false
+          type: string
+        amount:
+          nullable: false
+          type: string
+        observers:
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+      type: object
+    ExerciseIOUEndpointRequest_argument:
+      example:
+        newOwner: newOwner
+      properties:
+        newOwner:
+          nullable: false
+          type: string
+      type: object
