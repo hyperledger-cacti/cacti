@@ -143,6 +143,27 @@ export class SATPSession {
     return this.clientSessionData;
   }
 
+  public static getSession(sessionData: SessionData): SATPSession {
+    const isClient = !!sessionData.senderAsset;
+    const isServer = !!sessionData.receiverAsset;
+
+    const session = new SATPSession({
+      contextID: sessionData.transferContextId,
+      sessionID: sessionData.id,
+      server: isServer,
+      client: isClient,
+    });
+
+    if (isServer) {
+      session.serverSessionData = sessionData;
+    }
+    if (isClient) {
+      session.clientSessionData = sessionData;
+    }
+
+    return session;
+  }
+
   public createSessionData(
     type: SessionType,
     sessionId: string,

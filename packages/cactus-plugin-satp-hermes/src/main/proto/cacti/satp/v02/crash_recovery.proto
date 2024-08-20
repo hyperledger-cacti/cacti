@@ -9,7 +9,7 @@ service CrashRecovery   {
 
   // step RPCs
   rpc RecoverV2Message(RecoverMessage) returns (RecoverUpdateMessage);
-  rpc RecoverV2SuccessMessage(RecoverSuccessMessage) returns (google.protobuf.Empty);
+  rpc RecoverV2SuccessMessage(RecoverSuccessMessage) returns (RecoverSuccessMessageResponse);
   rpc RollbackV2Message(RollbackMessage) returns (RollbackAckMessage);
 }
 
@@ -39,6 +39,12 @@ message RecoverSuccessMessage {
   bool success = 4;
   repeated string entries_changed = 5;
   string sender_signature = 6;
+}
+
+message RecoverSuccessMessageResponse {
+  string session_id = 1;
+  bool received = 2;
+  string sender_signature = 3;
 }
 
 message RollbackMessage {

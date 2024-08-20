@@ -26,6 +26,7 @@ import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_pb"
 import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_pb";
 import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_pb";
 import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_pb";
+import { CrashRecovery } from "../generated/proto/cacti/satp/v02/crash_recovery_pb";
 
 export interface IGatewayOrchestratorOptions {
   logLevel?: LogLevelDesc;
@@ -327,12 +328,19 @@ export class GatewayOrchestrator {
       httpVersion: "1.1",
     });
 
+    const transport4 = createGrpcWebTransport({
+      baseUrl:
+        identity.address + ":" + identity.gatewayServerPort + `/${"crash"}`,
+      httpVersion: "1.1",
+    });
+
     const clients: Map<string, ConnectClient<SATPServiceInstance>> = new Map();
 
     clients.set("0", this.createStage0ServiceClient(transport0));
     clients.set("1", this.createStage1ServiceClient(transport1));
     clients.set("2", this.createStage2ServiceClient(transport2));
     clients.set("3", this.createStage3ServiceClient(transport3));
+    clients.set("crash", this.createCrashServiceClient(transport4));
 
     // todo perform healthcheck on startup; should be in stage 0
     return clients;
@@ -379,6 +387,17 @@ export class GatewayOrchestrator {
       transport,
     );
     const client = createClient(SatpStage3Service, transport);
+    return client;
+  }
+
+  private createCrashServiceClient(
+    transport: ConnectTransport,
+  ): ConnectClient<typeof CrashRecovery> {
+    this.logger.debug(
+      "Creating crash-manager client, with transport: ",
+      transport,
+    );
+    const client = createClient(CrashRecovery, transport);
     return client;
   }
 
