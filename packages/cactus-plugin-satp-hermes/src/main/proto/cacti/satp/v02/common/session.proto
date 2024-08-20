@@ -80,6 +80,7 @@ message SessionData {
     cacti.satp.v02.common.MessageType phase_error = 68;
     bool recovered_tried = 69;
     SATPMessages satp_Messages = 70; 
+    Type role = 71;
 }
 
 enum State {
@@ -91,6 +92,12 @@ enum State {
     STATE_ERROR = 5;
     STATE_RECOVERED = 6;
     STATE_RECOVERING = 7;
+}
+
+enum Type {
+    UNKNOWN = 0;
+    CLIENT = 1;
+    SERVER = 2;
 }
 
 message SATPMessages {

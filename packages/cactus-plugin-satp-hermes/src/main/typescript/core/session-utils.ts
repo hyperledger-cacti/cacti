@@ -835,6 +835,61 @@ export function getSessionActualStage(
   return [stage, messageType];
 }
 
+export function getCrashedStage(sessionData: SessionData): SATPStage {
+  if (!sessionData.hashes) {
+    throw new Error("Session data hashes are undefined.");
+  }
+
+  const hashes = sessionData.hashes;
+
+  const isStage0Complete = !!(
+    hashes.stage0?.newSessionRequestMessageHash &&
+    hashes.stage0?.newSessionResponseMessageHash &&
+    hashes.stage0?.preSatpTransferRequestMessageHash &&
+    hashes.stage0?.preSatpTransferResponseMessageHash
+  );
+
+  const isStage1Complete =
+    isStage0Complete &&
+    !!(
+      hashes.stage1?.transferProposalRequestMessageHash &&
+      hashes.stage1?.transferProposalReceiptMessageHash &&
+      hashes.stage1?.transferProposalRejectMessageHash &&
+      hashes.stage1?.transferCommenceRequestMessageHash &&
+      hashes.stage1?.transferCommenceResponseMessageHash
+    );
+
+  const isStage2Complete =
+    isStage1Complete &&
+    !!(
+      hashes.stage2?.lockAssertionRequestMessageHash &&
+      hashes.stage2?.lockAssertionReceiptMessageHash
+    );
+
+  const isStage3Complete =
+    isStage2Complete &&
+    !!(
+      hashes.stage3?.commitPreparationRequestMessageHash &&
+      hashes.stage3?.commitReadyResponseMessageHash &&
+      hashes.stage3?.commitFinalAssertionRequestMessageHash &&
+      hashes.stage3?.commitFinalAcknowledgementReceiptResponseMessageHash &&
+      hashes.stage3?.transferCompleteMessageHash &&
+      hashes.stage3?.transferCompleteResponseMessageHash
+    );
+
+  if (!isStage0Complete) {
+    return SATPStage.STAGE_0;
+  } else if (!isStage1Complete) {
+    return SATPStage.STAGE_1;
+  } else if (!isStage2Complete) {
+    return SATPStage.STAGE_2;
+  } else if (!isStage3Complete) {
+    return SATPStage.STAGE_3;
+  }
+
+  return SATPStage.STAGE_UNKNOWN;
+}
+
 export function saveMessageInSessionData(
   sessionData: SessionData,
   message:

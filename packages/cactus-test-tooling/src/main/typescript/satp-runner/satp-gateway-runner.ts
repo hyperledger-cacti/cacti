@@ -22,6 +22,7 @@ export interface ISATPGatewayRunnerConstructorOptions {
   outputLogFile?: string;
   errorLogFile?: string;
   knexDir?: string;
+  enableCrashManager?: boolean;
 }
 
 export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
@@ -30,6 +31,7 @@ export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
   serverPort: 3010,
   clientPort: 3011,
   apiPort: 4010,
+  enableCrashManager: false,
 });
 
 export const SATP_GATEWAY_RUNNER_OPTIONS_JOI_SCHEMA: Joi.Schema =
@@ -49,6 +51,7 @@ export const SATP_GATEWAY_RUNNER_OPTIONS_JOI_SCHEMA: Joi.Schema =
       .max(65535)
       .required(),
     apiPort: Joi.number().integer().positive().min(1024).max(65535).required(),
+    enableCrashManager: Joi.boolean().optional(),
   });
 
 export class SATPGatewayRunner implements ITestLedger {
@@ -62,6 +65,7 @@ export class SATPGatewayRunner implements ITestLedger {
   public readonly outputLogFile?: string;
   public readonly errorLogFile?: string;
   public readonly knexDir?: string;
+  public readonly enableCrashManager: boolean;
 
   private readonly log: Logger;
   private container: Container | undefined;
@@ -85,6 +89,9 @@ export class SATPGatewayRunner implements ITestLedger {
       options.clientPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort;
     this.apiPort =
       options.apiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.apiPort;
+    this.enableCrashManager =
+      options.enableCrashManager ??
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.enableCrashManager;
     this.configFile = options.configFile;
     this.outputLogFile = options.outputLogFile;
     this.errorLogFile = options.errorLogFile;
@@ -309,6 +316,7 @@ export class SATPGatewayRunner implements ITestLedger {
       serverPort: this.serverPort,
       clientPort: this.clientPort,
       apiPort: this.apiPort,
+      enableCrashManager: this.enableCrashManager,
     });
 
     if (validationResult.error) {

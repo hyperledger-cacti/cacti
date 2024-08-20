@@ -59,7 +59,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
     sequenceNumber: number,
   ): Promise<LocalLog[]> {
     return this.getLogsTable()
-      .where("sessionID", sessionId)
+      .where("sessionId", sessionId)
       .andWhere("sequenceNumber", ">", sequenceNumber);
   }
 

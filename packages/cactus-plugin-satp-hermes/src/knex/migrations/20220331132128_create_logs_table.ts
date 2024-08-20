@@ -2,7 +2,7 @@ import { Knex } from "knex";
 
 export function up(knex: Knex): Knex.SchemaBuilder {
   return knex.schema.createTable("logs", (table) => {
-    table.string("sessionID").notNullable();
+    table.string("sessionId").notNullable();
     table.string("type").notNullable();
     table.string("key").notNullable().primary();
     table.string("operation").notNullable();

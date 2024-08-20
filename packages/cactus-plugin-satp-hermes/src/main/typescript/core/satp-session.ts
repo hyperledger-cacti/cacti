@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
+  Type,
   MessageStagesHashesSchema,
   MessageStagesSignaturesSchema,
   MessageStagesTimestampsSchema,
@@ -141,6 +142,32 @@ export class SATPSession {
       );
     }
     return this.clientSessionData;
+  }
+
+  public static recreateSession(sessionData: SessionData): SATPSession {
+    const isClient = sessionData.role === Type.CLIENT;
+    const isServer = sessionData.role === Type.SERVER;
+
+    if (!isClient && !isServer) {
+      throw new Error("Invalid gateway type!");
+    }
+
+    const session = new SATPSession({
+      contextID: sessionData.transferContextId,
+      sessionID: sessionData.id,
+      server: isServer,
+      client: isClient,
+    });
+
+    if (isServer) {
+      session.serverSessionData = sessionData;
+    }
+
+    if (isClient) {
+      session.clientSessionData = sessionData;
+    }
+
+    return session;
   }
 
   public createSessionData(
