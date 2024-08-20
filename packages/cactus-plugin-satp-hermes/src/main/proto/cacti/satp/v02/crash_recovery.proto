@@ -9,5 +9,73 @@ service CrashRecovery   {
   // util RPCs
 
   // step RPCs
+  rpc RecoverV2Message (RecoverMessage) returns (RecoverUpdateMessage);
+  rpc RecoverV2UpdateMessage (RecoverUpdateMessage) returns (RecoverSuccessMessage);
+  rpc RecoverV2SuccessMessage (RecoverSuccessMessage) returns (google.protobuf.Empty) {};
+  rpc RollbackV2Message (RollbackMessage) returns (RollbackAckMessage);
+  rpc RollbackV2AckMessage (RollbackAckMessage) returns (google.protobuf.Empty) {};
+}
 
+message RecoverMessage  {
+  string sessionId = 1;
+  string messageType = 2;
+  string satpPhase = 3;
+  int32 sequenceNumber = 4;
+  bool isBackup = 5;
+  string newIdentityPublicKey = 6;
+  int64 lastEntryTimestamp = 7;
+  string senderSignature = 8;
+}
+
+message RecoverUpdateMessage {
+  string sessionId = 1;
+  string messageType = 2;
+  string hashRecoverMessage = 3;
+  repeated LocalLog recoveredLogs = 4;
+  string senderSignature = 5;
+}
+
+message RecoverSuccessMessage {
+  string sessionId = 1;
+  string messageType = 2;
+  string hashRecoverUpdateMessage = 3;
+  bool success = 4;
+  repeated string entriesChanged = 5;
+  string senderSignature = 6;
+}
+
+message RollbackMessage {
+  string sessionId = 1;
+  string messageType = 2;
+  bool success = 3;
+  repeated string actionsPerformed = 4;
+  repeated string proofs = 5;
+  string senderSignature = 6;
+}
+
+message RollbackAckMessage {
+  string sessionId = 1;
+  string messageType = 2;
+  bool success = 3;
+  repeated string actionsPerformed = 4;
+  repeated string proofs = 5;
+  string senderSignature = 6;
+}
+
+message LocalLog {
+  string key=1;
+  string sessionId=2;
+  string data=3;
+  string type=4;
+  string operation=5;
+  string timestamp=6;
+}
+
+message RollbackLogEntry {
+  string session_id = 1;
+  string stage = 2;
+  string timestamp = 3;
+  string action = 4; // action performed during rollback
+  string status = 5; // status of rollback (e.g., SUCCESS, FAILED)
+  string details = 6; // Additional details or metadata about the rollback
 }
