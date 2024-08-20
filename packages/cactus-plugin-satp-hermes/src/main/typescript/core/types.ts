@@ -84,6 +84,7 @@ export interface SATPGatewayConfig {
   bridgesConfig?: NetworkConfig[];
   knexLocalConfig?: Knex.Config;
   knexRemoteConfig?: Knex.Config;
+  enableCrashManager?: boolean;
 }
 
 // export interface SATPBridgeConfig {
@@ -107,7 +108,7 @@ export function isOfType<T>(
 }
 
 export interface LocalLog {
-  sessionID: string;
+  sessionId: string;
   type: string;
   key: string;
   operation: string;
@@ -127,3 +128,10 @@ export interface SATPBridgeConfig {
   logLevel?: LogLevelDesc;
 }
 export { SATPServiceInstance };
+
+export enum CrashStatus {
+  IDLE = "IDLE",
+  IN_RECOVERY = "IN_RECOVERY",
+  IN_ROLLBACK = "IN_ROLLBACK",
+  ERROR = "ERROR",
+}
