@@ -48,6 +48,10 @@
     {
       "name": "Bruno Mateus",
       "url": "https://github.com/brunoffmateus"
+    },
+    {
+      "name": "Yogesh D",
+      "url": "https://github.com/Yogesh01000100"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -84,6 +88,8 @@
     "lint-protobuf": "buf lint --path src/main/proto --verbose",
     "pretsc": "npm run generate-sdk",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
+    "test:integration": "npx jest ./src/test/typescript/integration",
+    "test:unit": "npx jest ./src/test/typescript/unit",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch",
     "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
@@ -142,6 +148,7 @@
     "knex": "2.4.0",
     "secp256k1": "5.0.1",
     "kubo-rpc-client": "3.0.1",
+    "node-schedule": "2.1.1",
     "npm-run-all": "4.1.5",
     "openzeppelin-solidity": "3.4.2",
     "pg": "8.13.1",
@@ -168,6 +175,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/google-protobuf": "3.15.12",
     "@types/node": "18.18.2",
+    "@types/node-schedule": "2.1.7",
     "@types/pg": "8.11.10",
     "@types/swagger-ui-express": "4.1.6",
     "@types/tape": "4.13.4",
