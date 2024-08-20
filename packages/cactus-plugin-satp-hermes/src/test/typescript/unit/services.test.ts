@@ -71,15 +71,15 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../../main/typescript/repository/interfaces/repository";
-import { knexClientConnection, knexRemoteConnection } from "../knex.config";
+import { knexClientConnection, knexRemoteConnection1 } from "../knex.config";
 import { Knex, knex } from "knex";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/repository/knex-remote-log-repository";
 import { SATPLogger } from "../../../main/typescript/logging";
+import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client
 let knexInstanceRemote: Knex;
-import { create, isMessage } from "@bufbuild/protobuf";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -146,11 +146,11 @@ beforeAll(async () => {
   knexInstanceClient = knex(knexClientConnection);
   await knexInstanceClient.migrate.latest();
 
-  knexInstanceRemote = knex(knexRemoteConnection);
+  knexInstanceRemote = knex(knexRemoteConnection1);
   await knexInstanceRemote.migrate.latest();
 
   localRepository = new LocalLogRepository(knexClientConnection);
-  remoteRepository = new RemoteLogRepository(knexRemoteConnection);
+  remoteRepository = new RemoteLogRepository(knexRemoteConnection1);
   dbLogger = new SATPLogger({
     localRepository,
     remoteRepository,
