@@ -11,6 +11,7 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { Containers } from "../common/containers";
+import * as crypto from "crypto";
 
 export interface IDamlTestLedgerOptions {
   imageVersion?: string;
@@ -50,7 +51,7 @@ export class DamlTestLedger implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
 
-  constructor(public readonly opts?: IDamlTestLedgerOptions) {
+  constructor(public readonly opts: IDamlTestLedgerOptions) {
     if (!opts) {
       throw new TypeError(`DAMLTestLedger#ctor options was falsy.`);
     }
@@ -273,21 +274,59 @@ export class DamlTestLedger implements ITestLedger {
       AttachStdin: false,
       AttachStdout: true,
       AttachStderr: true,
-      Tty: true,
+      Tty: false,
       Cmd: ["/bin/bash", "-c", "cat jwt"], // Command to execute
     });
     const stream = await exec.start({});
-
     return new Promise<string>((resolve, reject) => {
       let output = "";
       stream.on("data", (data: Buffer) => {
         output += data.toString(); // Accumulate the output
-        resolve(output);
+        // Remove the extra characters
+        const removettyvalues = output
+          .replace(/^[\u0001\u0000\u0000\u0000\u0000\u0000\u0000]*/, "")
+          .trim();
+        const removeunwantedcharacter = removettyvalues.replace(/�/g, "");
+        resolve(removeunwantedcharacter);
       });
       stream.on("error", (err: Error) => {
         reject(err);
       });
     });
+  }
+
+  public generateJwtToken(participant: string): string {
+    const base64UrlEncode = (input: Buffer): string => {
+      return input
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+    };
+    const header = base64UrlEncode(Buffer.from('{"alg":"HS256","typ":"JWT"}'));
+    const payload = base64UrlEncode(
+      Buffer.from(
+        `{"https://daml.com/ledger-api": {"ledgerId": "sandbox", "applicationId": "foobar","actAs":["${participant}"]}}`,
+      ),
+    );
+    const hmacSignature = base64UrlEncode(
+      crypto
+        .createHmac("sha256", "secret")
+        .update(`${header}.${payload}`)
+        .digest(),
+    );
+    return `${header}.${payload}.${hmacSignature}`;
+  }
+  public getIdentifierByDisplayName(
+    payload: string,
+    displayName: string,
+  ): string {
+    const data = JSON.parse(payload);
+    const item = data.find(
+      (obj: { displayName?: string; identifier: string }) =>
+        obj.displayName === displayName,
+    );
+    return item.identifier;
   }
 
   public async getContainerIpAddress(): Promise<string> {
