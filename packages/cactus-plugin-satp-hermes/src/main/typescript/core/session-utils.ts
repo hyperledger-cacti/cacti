@@ -1,25 +1,17 @@
 import {
+  Asset,
   CredentialProfile,
   LockType,
   MessageType,
   SignatureAlgorithm,
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  MessageStagesHashes,
-  MessageStagesSignatures,
   MessageStagesTimestamps,
   SessionData,
-  Stage1Hashes,
-  Stage1Signatures,
-  Stage1Timestamps,
-  Stage2Hashes,
-  Stage2Signatures,
-  Stage2Timestamps,
-  Stage3Hashes,
-  Stage3Signatures,
-  Stage3Timestamps,
 } from "../generated/proto/cacti/satp/v02/common/session_pb";
+import { SATPSession } from "./satp-session";
 
+import { v4 as uuidv4 } from "uuid";
 export enum TimestampType {
   PROCESSED = "PROCESSED",
   RECEIVED = "RECEIVED",
@@ -30,10 +22,11 @@ export enum SessionType {
   CLIENT = "CLIENT",
 }
 
-export function createSessionData(
-  id: string,
+export function populateClientSessionData(
+  session: SATPSession,
   version: string,
-  digitalAssetId: string,
+  sourceContractAddress: string | undefined,
+  destinyContractAddress: string | undefined,
   originatorPubkey: string,
   beneficiaryPubkey: string,
   senderGatewayNetworkId: string,
@@ -48,32 +41,26 @@ export function createSessionData(
   credentialProfile: CredentialProfile,
   loggingProfile: string,
   accessControlProfile: string,
-): SessionData {
-  const sessionData = new SessionData();
-  sessionData.processedTimestamps = new MessageStagesTimestamps();
-  sessionData.receivedTimestamps = new MessageStagesTimestamps();
-  sessionData.hashes = new MessageStagesHashes();
-  sessionData.signatures = new MessageStagesSignatures();
-
-  sessionData.processedTimestamps.stage1 = new Stage1Timestamps();
-  sessionData.processedTimestamps.stage2 = new Stage2Timestamps();
-  sessionData.processedTimestamps.stage3 = new Stage3Timestamps();
-
-  sessionData.receivedTimestamps.stage1 = new Stage1Timestamps();
-  sessionData.receivedTimestamps.stage2 = new Stage2Timestamps();
-  sessionData.receivedTimestamps.stage3 = new Stage3Timestamps();
-
-  sessionData.hashes.stage1 = new Stage1Hashes();
-  sessionData.hashes.stage2 = new Stage2Hashes();
-  sessionData.hashes.stage3 = new Stage3Hashes();
-
-  sessionData.signatures.stage1 = new Stage1Signatures();
-  sessionData.signatures.stage2 = new Stage2Signatures();
-  sessionData.signatures.stage3 = new Stage3Signatures();
-
-  sessionData.id = id;
+  senderContractOntology: string,
+  receiverContractOntology: string,
+  fromAmount: string,
+  toAmount: string,
+  sourceMspId: string,
+  sourceChannelName: string,
+  destinyMspId: string,
+  destinyChannelName: string,
+  sourceContractName: string,
+  destinyContractName: string,
+  sourceOwner: string,
+  destinyOwner: string,
+): SATPSession {
+  const fn = "session_utils#populateClientSessionData";
+  const sessionData = session.getClientSessionData();
+  if (!sessionData) {
+    throw new Error(fn + ":Session Data is undefined");
+  }
   sessionData.version = version;
-  sessionData.digitalAssetId = digitalAssetId;
+  sessionData.digitalAssetId = uuidv4();
   sessionData.originatorPubkey = originatorPubkey;
   sessionData.beneficiaryPubkey = beneficiaryPubkey;
   sessionData.senderGatewayNetworkId = senderGatewayNetworkId;
@@ -88,9 +75,135 @@ export function createSessionData(
   sessionData.credentialProfile = credentialProfile;
   sessionData.loggingProfile = loggingProfile;
   sessionData.accessControlProfile = accessControlProfile;
+  sessionData.senderContractOntology = senderContractOntology;
+  sessionData.receiverContractOntology = receiverContractOntology;
+  const senderAsset: Asset = new Asset();
+  senderAsset.tokenId = uuidv4() + "-" + sessionData.transferContextId;
+  senderAsset.owner = sourceOwner;
+  senderAsset.ontology = senderContractOntology;
+  senderAsset.contractName = sourceContractName;
+  senderAsset.contractAddress = sourceContractAddress || "";
+  senderAsset.amount = BigInt(fromAmount);
 
-  return sessionData;
+  senderAsset.mspId = sourceMspId;
+  senderAsset.channelName = sourceChannelName;
+  sessionData.senderAsset = senderAsset;
+
+  const receiverAsset: Asset = new Asset();
+  receiverAsset.tokenId = "";
+  receiverAsset.owner = destinyOwner;
+  receiverAsset.ontology = receiverContractOntology;
+  receiverAsset.contractName = destinyContractName;
+  receiverAsset.contractAddress = destinyContractAddress || "";
+  receiverAsset.amount = BigInt(toAmount);
+
+  receiverAsset.mspId = destinyMspId;
+  receiverAsset.channelName = destinyChannelName;
+  sessionData.receiverAsset = receiverAsset;
+
+  //todo check THis
+
+  sessionData.resourceUrl = "MOCK_RESOURCE_URL";
+
+  return session;
 }
+
+export function copySessionDataAttributes(
+  srcSessionData: SessionData,
+  destSessionData: SessionData,
+  sessionId?: string,
+  contextId?: string,
+): void {
+  destSessionData.id = sessionId || srcSessionData.id;
+  destSessionData.version = srcSessionData.version;
+  destSessionData.transferContextId =
+    contextId || srcSessionData.transferContextId;
+  destSessionData.hashes = srcSessionData.hashes;
+  destSessionData.payloadProfile = srcSessionData.payloadProfile;
+  destSessionData.signatures = srcSessionData.signatures;
+  destSessionData.maxRetries = srcSessionData.maxRetries;
+  destSessionData.maxTimeout = srcSessionData.maxTimeout;
+  destSessionData.loggingProfile = srcSessionData.loggingProfile;
+  destSessionData.recipientBasePath = srcSessionData.recipientBasePath;
+  destSessionData.sourceBasePath = srcSessionData.sourceBasePath;
+  destSessionData.accessControlProfile = srcSessionData.accessControlProfile;
+  destSessionData.applicationProfile = srcSessionData.applicationProfile;
+  destSessionData.lastSequenceNumber = srcSessionData.lastSequenceNumber;
+  destSessionData.senderGatewayNetworkId =
+    srcSessionData.senderGatewayNetworkId;
+  destSessionData.recipientGatewayNetworkId =
+    srcSessionData.recipientGatewayNetworkId;
+  destSessionData.sourceLedgerAssetId = srcSessionData.sourceLedgerAssetId;
+  destSessionData.recipientLedgerAssetId =
+    srcSessionData.recipientLedgerAssetId;
+  destSessionData.serverGatewayPubkey = srcSessionData.serverGatewayPubkey;
+  destSessionData.clientGatewayPubkey = srcSessionData.clientGatewayPubkey;
+  destSessionData.verifiedOriginatorEntityId =
+    srcSessionData.verifiedOriginatorEntityId;
+  destSessionData.verifiedBeneficiaryEntityId =
+    srcSessionData.verifiedBeneficiaryEntityId;
+  destSessionData.assetProfileId = srcSessionData.assetProfileId;
+  destSessionData.digitalAssetId = srcSessionData.digitalAssetId;
+  destSessionData.originatorPubkey = srcSessionData.originatorPubkey;
+  destSessionData.beneficiaryPubkey = srcSessionData.beneficiaryPubkey;
+  destSessionData.senderGatewayOwnerId = srcSessionData.senderGatewayOwnerId;
+  destSessionData.receiverGatewayOwnerId =
+    srcSessionData.receiverGatewayOwnerId;
+  destSessionData.hashTransferInitClaims =
+    srcSessionData.hashTransferInitClaims;
+  destSessionData.transferInitClaims = srcSessionData.transferInitClaims;
+  destSessionData.proposedTransferInitClaims =
+    srcSessionData.proposedTransferInitClaims;
+  destSessionData.signatureAlgorithm = srcSessionData.signatureAlgorithm;
+  destSessionData.lockType = srcSessionData.lockType;
+  destSessionData.lockExpirationTime = srcSessionData.lockExpirationTime;
+  destSessionData.permissions = srcSessionData.permissions;
+  destSessionData.developerUrn = srcSessionData.developerUrn;
+  destSessionData.credentialProfile = srcSessionData.credentialProfile;
+  destSessionData.subsequentCalls = srcSessionData.subsequentCalls;
+  destSessionData.history = srcSessionData.history;
+  destSessionData.multipleClaimsAllowed = srcSessionData.multipleClaimsAllowed;
+  destSessionData.multipleCancelsAllowed =
+    srcSessionData.multipleCancelsAllowed;
+  destSessionData.lastMessageReceivedTimestamp =
+    srcSessionData.lastMessageReceivedTimestamp;
+  destSessionData.processedTimestamps = srcSessionData.processedTimestamps;
+  destSessionData.receivedTimestamps = srcSessionData.receivedTimestamps;
+  destSessionData.lockAssertionClaim = srcSessionData.lockAssertionClaim;
+  destSessionData.lockAssertionClaimFormat =
+    srcSessionData.lockAssertionClaimFormat;
+  destSessionData.mintAssertionClaim = srcSessionData.mintAssertionClaim;
+  destSessionData.mintAssertionClaimFormat =
+    srcSessionData.mintAssertionClaimFormat;
+  destSessionData.burnAssertionClaim = srcSessionData.burnAssertionClaim;
+  destSessionData.burnAssertionClaimFormat =
+    srcSessionData.burnAssertionClaimFormat;
+  destSessionData.assignmentAssertionClaim =
+    srcSessionData.assignmentAssertionClaim;
+  destSessionData.assignmentAssertionClaimFormat =
+    srcSessionData.assignmentAssertionClaimFormat;
+  destSessionData.completed = srcSessionData.completed;
+  destSessionData.acceptance = srcSessionData.acceptance;
+  destSessionData.lastMessageHash = srcSessionData.lastMessageHash;
+  destSessionData.transferClaimsFormat = srcSessionData.transferClaimsFormat;
+  destSessionData.clientTransferNumber = srcSessionData.clientTransferNumber;
+  destSessionData.serverTransferNumber = srcSessionData.serverTransferNumber;
+  destSessionData.lockAssertionExpiration =
+    srcSessionData.lockAssertionExpiration;
+  destSessionData.assetProfile = srcSessionData.assetProfile;
+  destSessionData.senderContractOntology =
+    srcSessionData.senderContractOntology;
+  destSessionData.receiverContractOntology =
+    srcSessionData.receiverContractOntology;
+  destSessionData.resourceUrl = srcSessionData.resourceUrl;
+  destSessionData.senderWrapAssertionClaim =
+    srcSessionData.senderWrapAssertionClaim;
+  destSessionData.receiverWrapAssertionClaim =
+    srcSessionData.receiverWrapAssertionClaim;
+  destSessionData.senderAsset = srcSessionData.senderAsset;
+  destSessionData.receiverAsset = srcSessionData.receiverAsset;
+}
+
 export function saveTimestamp(
   session: SessionData | undefined,
   stageMessage: MessageType,
@@ -123,6 +236,7 @@ export function saveTimestamp(
 
   if (
     timestamps == undefined ||
+    timestamps.stage0 == undefined ||
     timestamps.stage1 == undefined ||
     timestamps.stage2 == undefined ||
     timestamps.stage3 == undefined
@@ -131,6 +245,18 @@ export function saveTimestamp(
   }
 
   switch (stageMessage) {
+    case MessageType.NEW_SESSION_REQUEST:
+      timestamps.stage0.newSessionRequestMessageTimestamp = timestamp;
+      break;
+    case MessageType.NEW_SESSION_RESPONSE:
+      timestamps.stage0.newSessionResponseMessageTimestamp = timestamp;
+      break;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      timestamps.stage0.preSatpTransferRequestMessageTimestamp = timestamp;
+      break;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      timestamps.stage0.preSatpTransferResponseMessageTimestamp = timestamp;
+      break;
     case MessageType.INIT_PROPOSAL:
       timestamps.stage1.transferProposalRequestMessageTimestamp = timestamp;
       break;
@@ -184,6 +310,7 @@ export function saveHash(
 
   if (
     hashes == undefined ||
+    hashes.stage0 == undefined ||
     hashes.stage1 == undefined ||
     hashes.stage2 == undefined ||
     hashes.stage3 == undefined
@@ -192,6 +319,18 @@ export function saveHash(
   }
 
   switch (stageMessage) {
+    case MessageType.NEW_SESSION_REQUEST:
+      hashes.stage0.newSessionRequestMessageHash = hash;
+      break;
+    case MessageType.NEW_SESSION_RESPONSE:
+      hashes.stage0.newSessionResponseMessageHash = hash;
+      break;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      hashes.stage0.preSatpTransferRequestMessageHash = hash;
+      break;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      hashes.stage0.preSatpTransferResponseMessageHash = hash;
+      break;
     case MessageType.INIT_PROPOSAL:
       hashes.stage1.transferProposalRequestMessageHash = hash;
       break;
@@ -244,6 +383,7 @@ export function saveSignature(
 
   if (
     signatures == undefined ||
+    signatures.stage0 == undefined ||
     signatures.stage1 == undefined ||
     signatures.stage2 == undefined ||
     signatures.stage3 == undefined
@@ -252,6 +392,18 @@ export function saveSignature(
   }
 
   switch (stageMessage) {
+    case MessageType.NEW_SESSION_REQUEST:
+      signatures.stage0.newSessionRequestMessageSignature = signature;
+      break;
+    case MessageType.NEW_SESSION_RESPONSE:
+      signatures.stage0.newSessionResponseMessageSignature = signature;
+      break;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      signatures.stage0.preSatpTransferRequestMessageSignature = signature;
+      break;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      signatures.stage0.preSatpTransferResponseMessageSignature = signature;
+      break;
     case MessageType.INIT_PROPOSAL:
       signatures.stage1.transferProposalRequestMessageSignature = signature;
       break;
@@ -343,6 +495,7 @@ export function getMessageHash(
 
   if (
     sessionData.hashes == undefined ||
+    sessionData.hashes.stage0 == undefined ||
     sessionData.hashes.stage1 == undefined ||
     sessionData.hashes.stage2 == undefined ||
     sessionData.hashes.stage3 == undefined
@@ -351,6 +504,14 @@ export function getMessageHash(
   }
 
   switch (messageType) {
+    case MessageType.NEW_SESSION_REQUEST:
+      return sessionData.hashes.stage0.newSessionRequestMessageHash;
+    case MessageType.NEW_SESSION_RESPONSE:
+      return sessionData.hashes.stage0.newSessionResponseMessageHash;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      return sessionData.hashes.stage0.preSatpTransferRequestMessageHash;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      return sessionData.hashes.stage0.preSatpTransferResponseMessageHash;
     case MessageType.INIT_PROPOSAL:
       return sessionData.hashes.stage1.transferProposalRequestMessageHash;
     case MessageType.INIT_RECEIPT:
@@ -403,6 +564,7 @@ export function getMessageTimestamp(
 
   if (
     timestamps == undefined ||
+    timestamps.stage0 == undefined ||
     timestamps.stage1 == undefined ||
     timestamps.stage2 == undefined ||
     timestamps.stage3 == undefined
@@ -411,6 +573,14 @@ export function getMessageTimestamp(
   }
 
   switch (stageMessage) {
+    case MessageType.NEW_SESSION_REQUEST:
+      return timestamps.stage0.newSessionRequestMessageTimestamp;
+    case MessageType.NEW_SESSION_RESPONSE:
+      return timestamps.stage0.newSessionResponseMessageTimestamp;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      return timestamps.stage0.preSatpTransferRequestMessageTimestamp;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      return timestamps.stage0.preSatpTransferResponseMessageTimestamp;
     case MessageType.INIT_PROPOSAL:
       return timestamps.stage1.transferProposalRequestMessageTimestamp;
     case MessageType.INIT_RECEIPT:
