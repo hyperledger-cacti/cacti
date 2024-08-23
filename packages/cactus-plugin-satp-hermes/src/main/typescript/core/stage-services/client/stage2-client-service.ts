@@ -28,7 +28,9 @@ import {
   LockAssertionClaimError,
   LockAssertionClaimFormatError,
   SessionError,
+  TokenIdMissingError,
 } from "../../errors/satp-service-errors";
+import { FailedToProcessError } from "../../errors/satp-handler-errors";
 
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
@@ -204,12 +206,17 @@ export class Stage2ClientService extends SATPService {
 
       const sessionData = session.getClientSessionData();
 
-      const assetId = sessionData?.transferInitClaims?.digitalAssetId;
-      const amount = sessionData?.transferInitClaims?.amountFromOriginator;
+      const assetId = sessionData.senderAsset?.tokenId;
+      const amount = sessionData.senderAsset?.amount;
 
       this.Log.debug(`${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`);
+
       if (assetId == undefined) {
-        throw new Error(`${fnTag}, Asset ID is missing`);
+        throw new TokenIdMissingError(fnTag);
+      }
+
+      if (amount == undefined) {
+        throw new Error(`${fnTag}, Amount is missing`);
       }
 
       const bridge = this.bridgeManager.getBridge(
@@ -230,7 +237,7 @@ export class Stage2ClientService extends SATPService {
         sign(this.Signer, sessionData.lockAssertionClaim.receipt),
       );
     } catch (error) {
-      throw new Error(`${fnTag}, Failed to process Lock Asset ${error}`);
+      throw new FailedToProcessError(fnTag, "LockAsset");
     }
   }
 }
