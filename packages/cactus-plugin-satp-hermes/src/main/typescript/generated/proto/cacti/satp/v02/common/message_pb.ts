@@ -125,6 +125,26 @@ export enum MessageType {
    * @generated from enum value: MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;
    */
   COMMIT_TRANSFER_COMPLETE = 17,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_NEW_SESSION_REQUEST = 18;
+   */
+  NEW_SESSION_REQUEST = 18,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_NEW_SESSION_RESPONSE = 19;
+   */
+  NEW_SESSION_RESPONSE = 19,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_PRE_SATP_TRANSFER_REQUEST = 20;
+   */
+  PRE_SATP_TRANSFER_REQUEST = 20,
+
+  /**
+   * @generated from enum value: MESSAGE_TYPE_PRE_SATP_TRANSFER_RESPONSE = 21;
+   */
+  PRE_SATP_TRANSFER_RESPONSE = 21,
 }
 // Retrieve enum metadata with: proto3.getEnumType(MessageType)
 proto3.util.setEnumType(MessageType, "cacti.satp.v02.common.MessageType", [
@@ -146,6 +166,10 @@ proto3.util.setEnumType(MessageType, "cacti.satp.v02.common.MessageType", [
   { no: 15, name: "MESSAGE_TYPE_COMMIT_FINAL" },
   { no: 16, name: "MESSAGE_TYPE_ACK_COMMIT_FINAL" },
   { no: 17, name: "MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE" },
+  { no: 18, name: "MESSAGE_TYPE_NEW_SESSION_REQUEST" },
+  { no: 19, name: "MESSAGE_TYPE_NEW_SESSION_RESPONSE" },
+  { no: 20, name: "MESSAGE_TYPE_PRE_SATP_TRANSFER_REQUEST" },
+  { no: 21, name: "MESSAGE_TYPE_PRE_SATP_TRANSFER_RESPONSE" },
 ]);
 
 /**
@@ -361,6 +385,38 @@ proto3.util.setEnumType(Error, "cacti.satp.v02.common.Error", [
 ]);
 
 /**
+ * @generated from enum cacti.satp.v02.common.TokenType
+ */
+export enum TokenType {
+  /**
+   * @generated from enum value: TOKEN_TYPE_ERC20 = 0;
+   */
+  ERC20 = 0,
+
+  /**
+   * @generated from enum value: TOKEN_TYPE_ERC721 = 1;
+   */
+  ERC721 = 1,
+
+  /**
+   * @generated from enum value: TOKEN_TYPE_ERC1155 = 2;
+   */
+  ERC1155 = 2,
+
+  /**
+   * @generated from enum value: TOKEN_TYPE_NONSTANDARD = 3;
+   */
+  NONSTANDARD = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(TokenType)
+proto3.util.setEnumType(TokenType, "cacti.satp.v02.common.TokenType", [
+  { no: 0, name: "TOKEN_TYPE_ERC20" },
+  { no: 1, name: "TOKEN_TYPE_ERC721" },
+  { no: 2, name: "TOKEN_TYPE_ERC1155" },
+  { no: 3, name: "TOKEN_TYPE_NONSTANDARD" },
+]);
+
+/**
  * TODO: define the common parameters to every protocol message
  *
  * @generated from message cacti.satp.v02.common.MessageCore
@@ -559,6 +615,16 @@ export class TransferClaims extends Message<TransferClaims> {
    */
   amountToBeneficiary = "";
 
+  /**
+   * @generated from field: repeated cacti.satp.v02.common.PrivacyPolicy processPolicies = 17;
+   */
+  processPolicies: PrivacyPolicy[] = [];
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.common.PrivacyPolicy mergePolicies = 18;
+   */
+  mergePolicies: PrivacyPolicy[] = [];
+
   constructor(data?: PartialMessage<TransferClaims>) {
     super();
     proto3.util.initPartial(data, this);
@@ -583,6 +649,8 @@ export class TransferClaims extends Message<TransferClaims> {
     { no: 14, name: "max_timeout", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 15, name: "amount_from_originator", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 16, name: "amount_to_beneficiary", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "processPolicies", kind: "message", T: PrivacyPolicy, repeated: true },
+    { no: 18, name: "mergePolicies", kind: "message", T: PrivacyPolicy, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TransferClaims {
@@ -630,6 +698,49 @@ export class TransferClaimsFormat extends Message<TransferClaimsFormat> {
 
   static equals(a: TransferClaimsFormat | PlainMessage<TransferClaimsFormat> | undefined, b: TransferClaimsFormat | PlainMessage<TransferClaimsFormat> | undefined): boolean {
     return proto3.util.equals(TransferClaimsFormat, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.PrivacyPolicy
+ */
+export class PrivacyPolicy extends Message<PrivacyPolicy> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: repeated string arguments = 2;
+   */
+  arguments: string[] = [];
+
+  constructor(data?: PartialMessage<PrivacyPolicy>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.PrivacyPolicy";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "arguments", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PrivacyPolicy {
+    return new PrivacyPolicy().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PrivacyPolicy {
+    return new PrivacyPolicy().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PrivacyPolicy {
+    return new PrivacyPolicy().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PrivacyPolicy | PlainMessage<PrivacyPolicy> | undefined, b: PrivacyPolicy | PlainMessage<PrivacyPolicy> | undefined): boolean {
+    return proto3.util.equals(PrivacyPolicy, a, b);
   }
 }
 
@@ -1586,6 +1697,138 @@ export class AssignmentAssertionClaim extends Message<AssignmentAssertionClaim> 
 
   static equals(a: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined, b: AssignmentAssertionClaim | PlainMessage<AssignmentAssertionClaim> | undefined): boolean {
     return proto3.util.equals(AssignmentAssertionClaim, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.WrapAssertionClaim
+ */
+export class WrapAssertionClaim extends Message<WrapAssertionClaim> {
+  /**
+   * @generated from field: string receipt = 1;
+   */
+  receipt = "";
+
+  /**
+   * @generated from field: string signature = 2;
+   */
+  signature = "";
+
+  constructor(data?: PartialMessage<WrapAssertionClaim>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.WrapAssertionClaim";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WrapAssertionClaim {
+    return new WrapAssertionClaim().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WrapAssertionClaim {
+    return new WrapAssertionClaim().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WrapAssertionClaim {
+    return new WrapAssertionClaim().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WrapAssertionClaim | PlainMessage<WrapAssertionClaim> | undefined, b: WrapAssertionClaim | PlainMessage<WrapAssertionClaim> | undefined): boolean {
+    return proto3.util.equals(WrapAssertionClaim, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Asset
+ */
+export class Asset extends Message<Asset> {
+  /**
+   * @generated from field: string token_id = 1;
+   */
+  tokenId = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.TokenType token_type = 2;
+   */
+  tokenType = TokenType.ERC20;
+
+  /**
+   * @generated from field: string owner = 3;
+   */
+  owner = "";
+
+  /**
+   * @generated from field: uint64 amount = 4;
+   */
+  amount = protoInt64.zero;
+
+  /**
+   * @generated from field: string ontology = 5;
+   */
+  ontology = "";
+
+  /**
+   * @generated from field: string contract_name = 7;
+   */
+  contractName = "";
+
+  /**
+   * besu
+   *
+   * @generated from field: string contract_address = 6;
+   */
+  contractAddress = "";
+
+  /**
+   * fabric
+   *
+   * @generated from field: string msp_id = 8;
+   */
+  mspId = "";
+
+  /**
+   * @generated from field: string channel_name = 9;
+   */
+  channelName = "";
+
+  constructor(data?: PartialMessage<Asset>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Asset";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "token_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "token_type", kind: "enum", T: proto3.getEnumType(TokenType) },
+    { no: 3, name: "owner", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "amount", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 5, name: "ontology", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "contract_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "contract_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "msp_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "channel_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Asset {
+    return new Asset().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Asset {
+    return new Asset().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Asset {
+    return new Asset().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Asset | PlainMessage<Asset> | undefined, b: Asset | PlainMessage<Asset> | undefined): boolean {
+    return proto3.util.equals(Asset, a, b);
   }
 }
 
