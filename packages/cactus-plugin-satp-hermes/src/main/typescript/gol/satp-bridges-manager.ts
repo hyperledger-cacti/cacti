@@ -57,8 +57,6 @@ export class SATPBridgesManager {
           throw new Error(`Unsupported network: ${bridgeConfig.network}`);
       }
 
-      this.log.debug(`Creating 2 ${SATPBridgesManager.CLASS_NAME}...`);
-
       const config: SATPBridgeConfig = {
         network: bridge,
         logLevel: this.level,

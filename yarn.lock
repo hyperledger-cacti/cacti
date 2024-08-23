@@ -5910,7 +5910,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/protobuf@npm:1.10.0, @bufbuild/protobuf@npm:^1.6.0":
+"@bufbuild/protobuf@npm:1.10.0":
   version: 1.10.0
   resolution: "@bufbuild/protobuf@npm:1.10.0"
   checksum: 10/1f120f72bbb40dd3d0f8c73f1474b001cfb9be09c38b7b0292e35fec98c5184a3db380a6feff7626fb3fff108c8a8aa7fc8cfea14904dc0a1174a01c8e637cc6
@@ -5984,17 +5984,6 @@ __metadata:
     "@typescript/vfs": "npm:^1.4.0"
     typescript: "npm:4.5.2"
   checksum: 10/e243f655dd02fe2dc857a48c00846857c4a9fae89565aabe98ae35e3a5d3002727b9e0790bc136e8f358a8e7d42c594b308ff6b47027cd679646273d3a76cb7b
-  languageName: node
-  linkType: hard
-
-"@bufbuild/protoplugin@npm:^1.6.0":
-  version: 1.10.0
-  resolution: "@bufbuild/protoplugin@npm:1.10.0"
-  dependencies:
-    "@bufbuild/protobuf": "npm:1.10.0"
-    "@typescript/vfs": "npm:^1.4.0"
-    typescript: "npm:4.5.2"
-  checksum: 10/829a6d64076a16d7a89e732be39f1988b52b8babee215d91a5f692e0e6ac3e2b58ea4012bd7707c3cef4b6952cfcc36076b646aa09ed68888aedb2fb004d659f
   languageName: node
   linkType: hard
 
@@ -6264,19 +6253,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connectrpc/connect-express@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@connectrpc/connect-express@npm:1.3.0"
-  dependencies:
-    "@types/express": "npm:^4.17.18"
-  peerDependencies:
-    "@bufbuild/protobuf": ^1.4.2
-    "@connectrpc/connect": 1.3.0
-    "@connectrpc/connect-node": 1.3.0
-  checksum: 10/581495391477e2b8a2738bdc34dbf45a245d26cb4943a5b3d1813d80ae4f11d85e0d0f01d95e408e7b1cb7812a873218428d6b0cde9fc643747f06e8b7205627
-  languageName: node
-  linkType: hard
-
 "@connectrpc/connect-express@npm:1.4.0":
   version: 1.4.0
   resolution: "@connectrpc/connect-express@npm:1.4.0"
@@ -6302,18 +6278,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connectrpc/connect-node@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@connectrpc/connect-node@npm:1.3.0"
-  dependencies:
-    undici: "npm:^5.28.2"
-  peerDependencies:
-    "@bufbuild/protobuf": ^1.4.2
-    "@connectrpc/connect": 1.3.0
-  checksum: 10/34b4903220881b39128bc31c79a0a006cb44c7cb9074fd0d77e853ff016f51c2a131811421c971c01210d4329068026c278cf64d349f2eb38126d0604710816a
-  languageName: node
-  linkType: hard
-
 "@connectrpc/connect-node@npm:1.4.0":
   version: 1.4.0
   resolution: "@connectrpc/connect-node@npm:1.4.0"
@@ -6336,41 +6300,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connectrpc/connect@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@connectrpc/connect@npm:1.3.0"
-  peerDependencies:
-    "@bufbuild/protobuf": ^1.4.2
-  checksum: 10/7707d97ee6e4a83cc03371b1da1709c103f0338e85b2fbf49813053d96114818d34831b1c11715cc9badcc3ce5d4c9fbc423af4b6a8efa953bf0ef76cdc6e50d
-  languageName: node
-  linkType: hard
-
 "@connectrpc/connect@npm:1.4.0":
   version: 1.4.0
   resolution: "@connectrpc/connect@npm:1.4.0"
   peerDependencies:
     "@bufbuild/protobuf": ^1.4.2
   checksum: 10/5e84fbba544f7e52533bdd0058caaa6d5c89903f522fbd9551c6bad0cd2fea2d3f14c7396696609d1787a5e2018054dd53db40b2d08c55975ff81334074eeeae
-  languageName: node
-  linkType: hard
-
-"@connectrpc/protoc-gen-connect-es@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@connectrpc/protoc-gen-connect-es@npm:1.3.0"
-  dependencies:
-    "@bufbuild/protobuf": "npm:^1.6.0"
-    "@bufbuild/protoplugin": "npm:^1.6.0"
-  peerDependencies:
-    "@bufbuild/protoc-gen-es": ^1.6.0
-    "@connectrpc/connect": 1.3.0
-  peerDependenciesMeta:
-    "@bufbuild/protoc-gen-es":
-      optional: true
-    "@connectrpc/connect":
-      optional: true
-  bin:
-    protoc-gen-connect-es: bin/protoc-gen-connect-es
-  checksum: 10/23a17bef378ac2fa414fb35fe50a7630134946a086f75f9201c5d0c3631f32e61445628b0420eac7353e88193e170059969bc83bad96a9f43cb98db30243aa1c
   languageName: node
   linkType: hard
 
@@ -10940,6 +10875,7 @@ __metadata:
     "@types/crypto-js": "npm:4.0.1"
     "@types/express": "npm:4.17.21"
     "@types/fs-extra": "npm:11.0.4"
+    "@types/google-protobuf": "npm:3.15.5"
     "@types/node": "npm:18.18.2"
     "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
@@ -10950,11 +10886,17 @@ __metadata:
     express: "npm:4.20.0"
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
+    google-protobuf: "npm:3.21.2"
+    grpc-tools: "npm:1.12.4"
+    grpc_tools_node_protoc_ts: "npm:5.3.3"
     hardhat: "npm:2.22.5"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
+    make-dir-cli: "npm:3.1.0"
     npm-run-all: "npm:4.1.5"
     openzeppelin-solidity: "npm:3.4.2"
+    protobufjs: "npm:7.2.5"
+    safe-stable-stringify: "npm:^2.5.0"
     secp256k1: "npm:4.0.3"
     socket.io: "npm:4.6.2"
     sqlite3: "npm:5.1.5"
@@ -46651,6 +46593,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"safe-stable-stringify@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "safe-stable-stringify@npm:2.5.0"
+  checksum: 10/2697fa186c17c38c3ca5309637b4ac6de2f1c3d282da27cd5e1e3c88eca0fb1f9aea568a6aabdf284111592c8782b94ee07176f17126031be72ab1313ed46c5c
+  languageName: node
+  linkType: hard
+
 "safer-buffer@npm:>= 2.1.2 < 3, safer-buffer@npm:>= 2.1.2 < 3.0.0, safer-buffer@npm:^2.0.2, safer-buffer@npm:^2.1.0, safer-buffer@npm:~2.1.0":
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
@@ -51290,7 +51239,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^5.28.2, undici@npm:^5.28.3":
+"undici@npm:^5.28.3":
   version: 5.28.4
   resolution: "undici@npm:5.28.4"
   dependencies:
