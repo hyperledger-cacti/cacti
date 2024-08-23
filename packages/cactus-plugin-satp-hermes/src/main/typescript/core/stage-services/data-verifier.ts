@@ -48,6 +48,7 @@ export function commonBodyVerifier(
     (common.hashPreviousMessage == "" &&
       messageStage != MessageType.INIT_PROPOSAL)
   ) {
+    console.error("errorcommon", JSON.stringify(common));
     throw new SatpCommonBodyError(tag, JSON.stringify(common));
   }
 
@@ -122,13 +123,16 @@ export function signatureVerifier(
     throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
   }
 
-  if (message.serverSignature != "") {
+  if (message.serverSignature != undefined && message.serverSignature != "") {
     if (
       !verifySignature(signer, message, sessionData?.serverGatewayPubkey || "")
     ) {
       throw new SignatureVerificationError(tag);
     }
-  } else if (message.clientSignature != "") {
+  } else if (
+    message.clientSignature != undefined &&
+    message.clientSignature != ""
+  ) {
     if (
       !verifySignature(signer, message, sessionData?.clientGatewayPubkey || "")
     ) {

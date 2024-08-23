@@ -23,6 +23,7 @@ export function verifySignature(
     const sourceSignature = new Uint8Array(
       Buffer.from(copy.clientSignature, "hex"),
     );
+
     const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
 
     copy.clientSignature = "";
@@ -36,6 +37,7 @@ export function verifySignature(
     const sourceSignature = new Uint8Array(
       Buffer.from(copy.serverSignature, "hex"),
     );
+
     const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
 
     copy.serverSignature = "";
