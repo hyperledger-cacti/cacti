@@ -9,6 +9,7 @@ configuration.go
 docs/APIError.md
 docs/Action.md
 docs/AdminApi.md
+docs/Asset.md
 docs/AuthzJwtClaim.md
 docs/AuthzScope.md
 docs/BridgeInfo.md
@@ -59,6 +60,7 @@ docs/Transact200ResponseStatusResponseDestinationChain.md
 docs/Transact200ResponseStatusResponseOriginChain.md
 docs/TransactDefaultResponse.md
 docs/TransactRequest.md
+docs/TransactRequestSourceAsset.md
 docs/TransactResponse.md
 docs/TransactionApi.md
 git_push.sh
@@ -66,6 +68,7 @@ go.mod
 go.sum
 model_action.go
 model_api_error.go
+model_asset.go
 model_authz_jwt_claim.go
 model_authz_scope.go
 model_bridge_info.go
@@ -116,6 +119,7 @@ model_transact_200_response_status_response_destination_chain.go
 model_transact_200_response_status_response_origin_chain.go
 model_transact_default_response.go
 model_transact_request.go
+model_transact_request_source_asset.go
 model_transact_response.go
 response.go
 utils.go

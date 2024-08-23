@@ -26,6 +26,13 @@ export enum SATPHandlerType {
   STAGE3 = "stage-3-handler",
 }
 
+export enum Stage {
+  STAGE0 = "stage-0",
+  STAGE1 = "stage-1",
+  STAGE2 = "stage-2",
+  STAGE3 = "stage-3",
+}
+
 export interface SATPServiceStatic {
   new (options: ISATPServiceOptions): SATPService;
   readonly SERVICE_TYPE: SATPServiceType;
@@ -51,6 +58,7 @@ export interface SATPHandler {
   setupRouter(router: ConnectRouter): void;
   getHandlerIdentifier(): SATPHandlerType;
   getHandlerSessions(): string[];
+  getStage(): string;
 }
 
 export interface SATPHandlerOptions {
@@ -58,6 +66,8 @@ export interface SATPHandlerOptions {
   serverService: SATPService;
   clientService: SATPService;
   supportedDLTs: SupportedChain[];
+  pubkeys: Map<string, string>;
+  gatewayId: string;
   loggerOptions: ILoggerOptions;
   stage: string;
 }
