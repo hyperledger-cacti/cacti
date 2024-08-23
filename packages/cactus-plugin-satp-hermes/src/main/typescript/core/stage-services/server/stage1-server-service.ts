@@ -71,7 +71,12 @@ export class Stage1ServerService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    session.verify(fnTag, SessionType.SERVER);
+    if (
+      session.getServerSessionData().acceptance ==
+      ACCEPTANCE.ACCEPTANCE_ACCEPTED
+    ) {
+      session.verify(fnTag, SessionType.SERVER);
+    }
 
     const sessionData = session.getServerSessionData();
 
@@ -236,6 +241,7 @@ export class Stage1ServerService extends SATPService {
     this.checkNetworkCapabilities(request.networkCapabilities, fnTag);
 
     if (this.checkTransferClaims(request.transferInitClaims, fnTag)) {
+      this.Log.info(`${fnTag}, TransferProposalRequest was accepted...`);
       sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
     } else {
       this.Log.info(`${fnTag}, TransferProposalRequest was rejected...`);
@@ -243,11 +249,11 @@ export class Stage1ServerService extends SATPService {
       return;
     }
 
-    const senderId = request.transferInitClaims!
-      .senderGatewayNetworkId as SupportedChain;
+    const receiverId = request.transferInitClaims!
+      .recipientGatewayNetworkId as SupportedChain;
 
-    if (!supportedDLTs.includes(senderId)) {
-      throw new DLTNotSupportedError(fnTag, senderId); //todo change this to the transferClaims check
+    if (!supportedDLTs.includes(receiverId)) {
+      throw new DLTNotSupportedError(fnTag, receiverId); //todo change this to the transferClaims check
     }
 
     sessionData.version = request.common!.version;
@@ -330,7 +336,7 @@ export class Stage1ServerService extends SATPService {
       throw new TransferInitClaimsHashError(fnTag);
     }
 
-    if (request.clientTransferNumber != undefined) {
+    if (request.clientTransferNumber != "") {
       this.Log.info(
         `${fnTag}, Optional variable loaded: clientTransferNumber...`,
       );
@@ -358,18 +364,18 @@ export class Stage1ServerService extends SATPService {
     }
     if (transferClaims.assetProfileId == "") {
       this.Log.error(`${tag}, assetProfileId is missing`);
-      return false;
+      //return false;
     }
     if (transferClaims.verifiedOriginatorEntityId == "") {
       this.Log.error(`${tag}, verifiedOriginatorEntityId is missing`);
-      return false;
+      //return false;
     }
     if (transferClaims.verifiedBeneficiaryEntityId == "") {
       this.Log.error(`${tag}, verifiedBeneficiaryEntityId is missing`);
     }
     if (transferClaims.originatorPubkey == "") {
       this.Log.error(`${tag}, originatorPubkey is missing`);
-      return false;
+      //return false;
     }
     if (transferClaims.beneficiaryPubkey == "") {
       this.Log.error(`${tag}, beneficiaryPubkey is missing`);
