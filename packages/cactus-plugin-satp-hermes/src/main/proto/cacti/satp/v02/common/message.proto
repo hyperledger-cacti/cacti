@@ -38,11 +38,18 @@ message TransferClaims {
     uint64 max_timeout = 14;
     string amount_from_originator = 15;
     string amount_to_beneficiary = 16;
+    repeated PrivacyPolicy processPolicies = 17;
+    repeated PrivacyPolicy mergePolicies = 18;
 }
 
 message TransferClaimsFormat {
 
 }
+
+message PrivacyPolicy {
+    string name = 1;
+    repeated string arguments = 2;
+  }
 
 message Permissions {
 
@@ -109,6 +116,10 @@ enum MessageType {
     MESSAGE_TYPE_COMMIT_FINAL = 15;
     MESSAGE_TYPE_ACK_COMMIT_FINAL = 16;
     MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;
+    MESSAGE_TYPE_NEW_SESSION_REQUEST = 18;
+    MESSAGE_TYPE_NEW_SESSION_RESPONSE = 19;
+    MESSAGE_TYPE_PRE_SATP_TRANSFER_REQUEST = 20;
+    MESSAGE_TYPE_PRE_SATP_TRANSFER_RESPONSE = 21;
   }
 
 message CommonSatp {
@@ -233,5 +244,33 @@ message BurnAssertionClaim {
 message AssignmentAssertionClaim {
     string receipt = 1;
     string signature = 2;
+}
+
+message WrapAssertionClaim {
+    string receipt = 1;
+    string signature = 2;
+}
+
+enum TokenType {
+    TOKEN_TYPE_ERC20 = 0;
+    TOKEN_TYPE_ERC721 = 1;
+    TOKEN_TYPE_ERC1155 = 2;
+    TOKEN_TYPE_NONSTANDARD = 3;
+}
+
+message Asset {
+  string token_id = 1;
+  TokenType token_type = 2;
+  string owner = 3;
+  uint64 amount = 4;
+  string ontology = 5;  
+  string contract_name = 7;
+  //besu
+  string contract_address = 6;
+  //fabric
+  string msp_id = 8;
+  string channel_name = 9;
+
+
 }
 
