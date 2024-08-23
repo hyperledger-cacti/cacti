@@ -5803,24 +5803,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/buf-darwin-arm64@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf-darwin-arm64@npm:1.29.0"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
 "@bufbuild/buf-darwin-arm64@npm:1.30.0":
   version: 1.30.0
   resolution: "@bufbuild/buf-darwin-arm64@npm:1.30.0"
   conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@bufbuild/buf-darwin-x64@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf-darwin-x64@npm:1.29.0"
-  conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
@@ -5831,24 +5817,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/buf-linux-aarch64@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf-linux-aarch64@npm:1.29.0"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
 "@bufbuild/buf-linux-aarch64@npm:1.30.0":
   version: 1.30.0
   resolution: "@bufbuild/buf-linux-aarch64@npm:1.30.0"
   conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@bufbuild/buf-linux-x64@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf-linux-x64@npm:1.29.0"
-  conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
@@ -5859,13 +5831,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/buf-win32-arm64@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf-win32-arm64@npm:1.29.0"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
 "@bufbuild/buf-win32-arm64@npm:1.30.0":
   version: 1.30.0
   resolution: "@bufbuild/buf-win32-arm64@npm:1.30.0"
@@ -5873,48 +5838,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/buf-win32-x64@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf-win32-x64@npm:1.29.0"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
 "@bufbuild/buf-win32-x64@npm:1.30.0":
   version: 1.30.0
   resolution: "@bufbuild/buf-win32-x64@npm:1.30.0"
   conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@bufbuild/buf@npm:1.29.0":
-  version: 1.29.0
-  resolution: "@bufbuild/buf@npm:1.29.0"
-  dependencies:
-    "@bufbuild/buf-darwin-arm64": "npm:1.29.0"
-    "@bufbuild/buf-darwin-x64": "npm:1.29.0"
-    "@bufbuild/buf-linux-aarch64": "npm:1.29.0"
-    "@bufbuild/buf-linux-x64": "npm:1.29.0"
-    "@bufbuild/buf-win32-arm64": "npm:1.29.0"
-    "@bufbuild/buf-win32-x64": "npm:1.29.0"
-  dependenciesMeta:
-    "@bufbuild/buf-darwin-arm64":
-      optional: true
-    "@bufbuild/buf-darwin-x64":
-      optional: true
-    "@bufbuild/buf-linux-aarch64":
-      optional: true
-    "@bufbuild/buf-linux-x64":
-      optional: true
-    "@bufbuild/buf-win32-arm64":
-      optional: true
-    "@bufbuild/buf-win32-x64":
-      optional: true
-  bin:
-    buf: bin/buf
-    protoc-gen-buf-breaking: bin/protoc-gen-buf-breaking
-    protoc-gen-buf-lint: bin/protoc-gen-buf-lint
-  checksum: 10/f966e764b9ef92d514361c6999c1633e57c79143317cf9d6dd3a12750e60e244c4e5d45bcf01fa3993a07d69a14011c95477ac365e889abeb742df51d2696294
   languageName: node
   linkType: hard
 
@@ -5953,13 +5880,6 @@ __metadata:
   version: 1.10.0
   resolution: "@bufbuild/protobuf@npm:1.10.0"
   checksum: 10/1f120f72bbb40dd3d0f8c73f1474b001cfb9be09c38b7b0292e35fec98c5184a3db380a6feff7626fb3fff108c8a8aa7fc8cfea14904dc0a1174a01c8e637cc6
-  languageName: node
-  linkType: hard
-
-"@bufbuild/protobuf@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@bufbuild/protobuf@npm:1.7.2"
-  checksum: 10/f23ccc77066100157043cf36bd2506acdcb235f0a902f7662fbbb992e78df4202780aeb55bd2e3fd1945bd9e52a4fca759351f333f2ff779e32996e13eb56d34
   languageName: node
   linkType: hard
 
@@ -11007,6 +10927,7 @@ __metadata:
     "@types/crypto-js": "npm:4.0.1"
     "@types/express": "npm:5.0.0"
     "@types/fs-extra": "npm:11.0.4"
+    "@types/google-protobuf": "npm:3.15.5"
     "@types/node": "npm:18.18.2"
     "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
@@ -11021,11 +10942,17 @@ __metadata:
     express: "npm:4.21.1"
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
+    google-protobuf: "npm:3.21.2"
+    grpc-tools: "npm:1.12.4"
+    grpc_tools_node_protoc_ts: "npm:5.3.3"
     hardhat: "npm:2.22.5"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
+    make-dir-cli: "npm:3.1.0"
     npm-run-all: "npm:4.1.5"
     openzeppelin-solidity: "npm:3.4.2"
+    protobufjs: "npm:7.2.5"
+    safe-stable-stringify: "npm:2.5.0"
     secp256k1: "npm:4.0.3"
     socket.io: "npm:4.6.2"
     sqlite3: "npm:5.1.5"
@@ -15171,7 +15098,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quobix/vacuum@npm:^0.9.10":
+"@quobix/vacuum@npm:0.9.16":
   version: 0.9.16
   resolution: "@quobix/vacuum@npm:0.9.16"
   dependencies:
@@ -31652,6 +31579,13 @@ __metadata:
   version: 3.15.8
   resolution: "google-protobuf@npm:3.15.8"
   checksum: 10/0b1ea24a552e0870b658b975ce5090c13f35793dc4ff8a733ad9c27990126eb9bd375fa9d3204af4f634930ae358d8b5e78f9f4cdb1f700e35b4d857f0aac742
+  languageName: node
+  linkType: hard
+
+"google-protobuf@npm:3.21.2":
+  version: 3.21.2
+  resolution: "google-protobuf@npm:3.21.2"
+  checksum: 10/b376c2e47fb0419b41b901e4da8f3827fe9594ffb7887708b9c241f36005d0b9f2edc7b3f05795f6793924a241e767f67831732eae0f23bdbb337b56a6ab4e26
   languageName: node
   linkType: hard
 
