@@ -50,37 +50,37 @@ export function getGatewaySeeds(logger: Logger): GatewayIdentity[] {
   const fnTag = `#getGatewaySeeds()`;
   logger.trace(`Entering ${fnTag}`);
 
-  const mockGatewayIdentity: GatewayIdentity[] = [
-    {
-      id: "1",
-      name: "Gateway1",
-      version: [
-        {
-          Core: "1.0",
-          Architecture: "1.0",
-          Crash: "1.0",
-        },
-      ],
-      supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
-      proofID: "mockProofID1",
-      gatewayServerPort: 3011,
-      address: "http://localhost",
-    },
-    {
-      id: "2",
-      name: "Gateway2",
-      version: [
-        {
-          Core: "1.0",
-          Architecture: "1.0",
-          Crash: "1.0",
-        },
-      ],
-      supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
-      proofID: "mockProofID1",
-      gatewayServerPort: 3014,
-      address: "http://localhost",
-    },
-  ];
-  return mockGatewayIdentity;
+  // const mockGatewayIdentity: GatewayIdentity[] = [
+  //   {
+  //     id: "1",
+  //     name: "Gateway1",
+  //     version: [
+  //       {
+  //         Core: "1.0",
+  //         Architecture: "1.0",
+  //         Crash: "1.0",
+  //       },
+  //     ],
+  //     supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+  //     proofID: "mockProofID1",
+  //     gatewayServerPort: 3011,
+  //     address: "http://localhost",
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Gateway2",
+  //     version: [
+  //       {
+  //         Core: "1.0",
+  //         Architecture: "1.0",
+  //         Crash: "1.0",
+  //       },
+  //     ],
+  //     supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+  //     proofID: "mockProofID1",
+  //     gatewayServerPort: 3014,
+  //     address: "http://localhost",
+  //   },
+  // ];
+  return [];
 }

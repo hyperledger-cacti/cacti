@@ -2,7 +2,6 @@ import { Asset, InteractionType } from "./asset";
 
 export interface FabricAsset extends Asset {
   mspId: string;
-  contractName: string;
   channelName: string;
 }
 

@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
-import { AssetProfile, AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, History, LockAssertionClaim, LockAssertionClaimFormat, LockType, MintAssertionClaim, MintAssertionClaimFormat, PayloadProfile, Permissions, SignatureAlgorithm, SubsequentCalls, TransferClaims, TransferClaimsFormat } from "./message_pb.js";
+import { Asset, AssetProfile, AssignmentAssertionClaim, AssignmentAssertionClaimFormat, BurnAssertionClaim, BurnAssertionClaimFormat, CredentialProfile, History, LockAssertionClaim, LockAssertionClaimFormat, LockType, MintAssertionClaim, MintAssertionClaimFormat, PayloadProfile, Permissions, SignatureAlgorithm, SubsequentCalls, TransferClaims, TransferClaimsFormat, WrapAssertionClaim } from "./message_pb.js";
 
 /**
  * @generated from enum cacti.satp.v02.common.ACCEPTANCE
@@ -338,9 +338,39 @@ export class SessionData extends Message<SessionData> {
   assetProfile?: AssetProfile;
 
   /**
-   * @generated from field: string resource_url = 61;
+   * @generated from field: string sender_contract_ontology = 61;
+   */
+  senderContractOntology = "";
+
+  /**
+   * @generated from field: string receiver_contract_ontology = 62;
+   */
+  receiverContractOntology = "";
+
+  /**
+   * @generated from field: string resource_url = 63;
    */
   resourceUrl = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim sender_wrap_assertion_claim = 64;
+   */
+  senderWrapAssertionClaim?: WrapAssertionClaim;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim receiver_wrap_assertion_claim = 65;
+   */
+  receiverWrapAssertionClaim?: WrapAssertionClaim;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Asset sender_asset = 66;
+   */
+  senderAsset?: Asset;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Asset receiver_asset = 67;
+   */
+  receiverAsset?: Asset;
 
   constructor(data?: PartialMessage<SessionData>) {
     super();
@@ -410,7 +440,13 @@ export class SessionData extends Message<SessionData> {
     { no: 58, name: "server_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 59, name: "lock_assertion_expiration", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 60, name: "asset_profile", kind: "message", T: AssetProfile },
-    { no: 61, name: "resource_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 61, name: "sender_contract_ontology", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 62, name: "receiver_contract_ontology", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 63, name: "resource_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 64, name: "sender_wrap_assertion_claim", kind: "message", T: WrapAssertionClaim },
+    { no: 65, name: "receiver_wrap_assertion_claim", kind: "message", T: WrapAssertionClaim },
+    { no: 66, name: "sender_asset", kind: "message", T: Asset },
+    { no: 67, name: "receiver_asset", kind: "message", T: Asset },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SessionData {
@@ -435,17 +471,22 @@ export class SessionData extends Message<SessionData> {
  */
 export class MessageStagesHashes extends Message<MessageStagesHashes> {
   /**
-   * @generated from field: cacti.satp.v02.common.Stage1Hashes stage1 = 1;
+   * @generated from field: cacti.satp.v02.common.Stage0Hashes stage0 = 1;
+   */
+  stage0?: Stage0Hashes;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage1Hashes stage1 = 2;
    */
   stage1?: Stage1Hashes;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Stage2Hashes stage2 = 2;
+   * @generated from field: cacti.satp.v02.common.Stage2Hashes stage2 = 3;
    */
   stage2?: Stage2Hashes;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Stage3Hashes stage3 = 3;
+   * @generated from field: cacti.satp.v02.common.Stage3Hashes stage3 = 4;
    */
   stage3?: Stage3Hashes;
 
@@ -457,9 +498,10 @@ export class MessageStagesHashes extends Message<MessageStagesHashes> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.MessageStagesHashes";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "stage1", kind: "message", T: Stage1Hashes },
-    { no: 2, name: "stage2", kind: "message", T: Stage2Hashes },
-    { no: 3, name: "stage3", kind: "message", T: Stage3Hashes },
+    { no: 1, name: "stage0", kind: "message", T: Stage0Hashes },
+    { no: 2, name: "stage1", kind: "message", T: Stage1Hashes },
+    { no: 3, name: "stage2", kind: "message", T: Stage2Hashes },
+    { no: 4, name: "stage3", kind: "message", T: Stage3Hashes },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageStagesHashes {
@@ -476,6 +518,61 @@ export class MessageStagesHashes extends Message<MessageStagesHashes> {
 
   static equals(a: MessageStagesHashes | PlainMessage<MessageStagesHashes> | undefined, b: MessageStagesHashes | PlainMessage<MessageStagesHashes> | undefined): boolean {
     return proto3.util.equals(MessageStagesHashes, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage0Hashes
+ */
+export class Stage0Hashes extends Message<Stage0Hashes> {
+  /**
+   * @generated from field: string new_session_request_message_hash = 1;
+   */
+  newSessionRequestMessageHash = "";
+
+  /**
+   * @generated from field: string new_session_response_message_hash = 2;
+   */
+  newSessionResponseMessageHash = "";
+
+  /**
+   * @generated from field: string pre_satp_transfer_request_message_hash = 3;
+   */
+  preSatpTransferRequestMessageHash = "";
+
+  /**
+   * @generated from field: string pre_satp_transfer_response_message_hash = 4;
+   */
+  preSatpTransferResponseMessageHash = "";
+
+  constructor(data?: PartialMessage<Stage0Hashes>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage0Hashes";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "new_session_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "new_session_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "pre_satp_transfer_request_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "pre_satp_transfer_response_message_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage0Hashes {
+    return new Stage0Hashes().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage0Hashes {
+    return new Stage0Hashes().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage0Hashes {
+    return new Stage0Hashes().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage0Hashes | PlainMessage<Stage0Hashes> | undefined, b: Stage0Hashes | PlainMessage<Stage0Hashes> | undefined): boolean {
+    return proto3.util.equals(Stage0Hashes, a, b);
   }
 }
 
@@ -649,17 +746,22 @@ export class Stage3Hashes extends Message<Stage3Hashes> {
  */
 export class MessageStagesSignatures extends Message<MessageStagesSignatures> {
   /**
-   * @generated from field: cacti.satp.v02.common.Stage1Signatures stage1 = 1;
+   * @generated from field: cacti.satp.v02.common.Stage0Signatures stage0 = 1;
+   */
+  stage0?: Stage0Signatures;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage1Signatures stage1 = 2;
    */
   stage1?: Stage1Signatures;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Stage2Signatures stage2 = 2;
+   * @generated from field: cacti.satp.v02.common.Stage2Signatures stage2 = 3;
    */
   stage2?: Stage2Signatures;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Stage3Signatures stage3 = 3;
+   * @generated from field: cacti.satp.v02.common.Stage3Signatures stage3 = 4;
    */
   stage3?: Stage3Signatures;
 
@@ -671,9 +773,10 @@ export class MessageStagesSignatures extends Message<MessageStagesSignatures> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.MessageStagesSignatures";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "stage1", kind: "message", T: Stage1Signatures },
-    { no: 2, name: "stage2", kind: "message", T: Stage2Signatures },
-    { no: 3, name: "stage3", kind: "message", T: Stage3Signatures },
+    { no: 1, name: "stage0", kind: "message", T: Stage0Signatures },
+    { no: 2, name: "stage1", kind: "message", T: Stage1Signatures },
+    { no: 3, name: "stage2", kind: "message", T: Stage2Signatures },
+    { no: 4, name: "stage3", kind: "message", T: Stage3Signatures },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageStagesSignatures {
@@ -690,6 +793,61 @@ export class MessageStagesSignatures extends Message<MessageStagesSignatures> {
 
   static equals(a: MessageStagesSignatures | PlainMessage<MessageStagesSignatures> | undefined, b: MessageStagesSignatures | PlainMessage<MessageStagesSignatures> | undefined): boolean {
     return proto3.util.equals(MessageStagesSignatures, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage0Signatures
+ */
+export class Stage0Signatures extends Message<Stage0Signatures> {
+  /**
+   * @generated from field: string new_session_request_message_signature = 1;
+   */
+  newSessionRequestMessageSignature = "";
+
+  /**
+   * @generated from field: string new_session_response_message_signature = 2;
+   */
+  newSessionResponseMessageSignature = "";
+
+  /**
+   * @generated from field: string pre_satp_transfer_request_message_signature = 3;
+   */
+  preSatpTransferRequestMessageSignature = "";
+
+  /**
+   * @generated from field: string pre_satp_transfer_response_message_signature = 4;
+   */
+  preSatpTransferResponseMessageSignature = "";
+
+  constructor(data?: PartialMessage<Stage0Signatures>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage0Signatures";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "new_session_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "new_session_response_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "pre_satp_transfer_request_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "pre_satp_transfer_response_message_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage0Signatures {
+    return new Stage0Signatures().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage0Signatures {
+    return new Stage0Signatures().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage0Signatures {
+    return new Stage0Signatures().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage0Signatures | PlainMessage<Stage0Signatures> | undefined, b: Stage0Signatures | PlainMessage<Stage0Signatures> | undefined): boolean {
+    return proto3.util.equals(Stage0Signatures, a, b);
   }
 }
 
@@ -863,17 +1021,22 @@ export class Stage3Signatures extends Message<Stage3Signatures> {
  */
 export class MessageStagesTimestamps extends Message<MessageStagesTimestamps> {
   /**
-   * @generated from field: cacti.satp.v02.common.Stage1Timestamps stage1 = 1;
+   * @generated from field: cacti.satp.v02.common.Stage0Timestamps stage0 = 1;
+   */
+  stage0?: Stage0Timestamps;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Stage1Timestamps stage1 = 2;
    */
   stage1?: Stage1Timestamps;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Stage2Timestamps stage2 = 2;
+   * @generated from field: cacti.satp.v02.common.Stage2Timestamps stage2 = 3;
    */
   stage2?: Stage2Timestamps;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Stage3Timestamps stage3 = 3;
+   * @generated from field: cacti.satp.v02.common.Stage3Timestamps stage3 = 4;
    */
   stage3?: Stage3Timestamps;
 
@@ -885,9 +1048,10 @@ export class MessageStagesTimestamps extends Message<MessageStagesTimestamps> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.MessageStagesTimestamps";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "stage1", kind: "message", T: Stage1Timestamps },
-    { no: 2, name: "stage2", kind: "message", T: Stage2Timestamps },
-    { no: 3, name: "stage3", kind: "message", T: Stage3Timestamps },
+    { no: 1, name: "stage0", kind: "message", T: Stage0Timestamps },
+    { no: 2, name: "stage1", kind: "message", T: Stage1Timestamps },
+    { no: 3, name: "stage2", kind: "message", T: Stage2Timestamps },
+    { no: 4, name: "stage3", kind: "message", T: Stage3Timestamps },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageStagesTimestamps {
@@ -904,6 +1068,61 @@ export class MessageStagesTimestamps extends Message<MessageStagesTimestamps> {
 
   static equals(a: MessageStagesTimestamps | PlainMessage<MessageStagesTimestamps> | undefined, b: MessageStagesTimestamps | PlainMessage<MessageStagesTimestamps> | undefined): boolean {
     return proto3.util.equals(MessageStagesTimestamps, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.common.Stage0Timestamps
+ */
+export class Stage0Timestamps extends Message<Stage0Timestamps> {
+  /**
+   * @generated from field: string new_session_request_message_timestamp = 1;
+   */
+  newSessionRequestMessageTimestamp = "";
+
+  /**
+   * @generated from field: string new_session_response_message_timestamp = 2;
+   */
+  newSessionResponseMessageTimestamp = "";
+
+  /**
+   * @generated from field: string pre_satp_transfer_request_message_timestamp = 3;
+   */
+  preSatpTransferRequestMessageTimestamp = "";
+
+  /**
+   * @generated from field: string pre_satp_transfer_response_message_timestamp = 4;
+   */
+  preSatpTransferResponseMessageTimestamp = "";
+
+  constructor(data?: PartialMessage<Stage0Timestamps>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.Stage0Timestamps";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "new_session_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "new_session_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "pre_satp_transfer_request_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "pre_satp_transfer_response_message_timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage0Timestamps {
+    return new Stage0Timestamps().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage0Timestamps {
+    return new Stage0Timestamps().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage0Timestamps {
+    return new Stage0Timestamps().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage0Timestamps | PlainMessage<Stage0Timestamps> | undefined, b: Stage0Timestamps | PlainMessage<Stage0Timestamps> | undefined): boolean {
+    return proto3.util.equals(Stage0Timestamps, a, b);
   }
 }
 

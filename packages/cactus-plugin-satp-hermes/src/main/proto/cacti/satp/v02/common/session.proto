@@ -68,14 +68,28 @@ message SessionData {
     string server_transfer_number = 58;
     uint64 lock_assertion_expiration = 59;
     cacti.satp.v02.common.AssetProfile asset_profile = 60;
-    string resource_url = 61;
+    string sender_contract_ontology = 61;
+    string receiver_contract_ontology = 62;
+    string resource_url = 63;
+    cacti.satp.v02.common.WrapAssertionClaim sender_wrap_assertion_claim = 64;
+    cacti.satp.v02.common.WrapAssertionClaim receiver_wrap_assertion_claim = 65;
+    cacti.satp.v02.common.Asset sender_asset = 66;
+    cacti.satp.v02.common.Asset receiver_asset = 67;
 }
 
 
 message MessageStagesHashes {
-    Stage1Hashes stage1 = 1;
-    Stage2Hashes stage2 = 2;
-    Stage3Hashes stage3 = 3;  
+    Stage0Hashes stage0 = 1;
+    Stage1Hashes stage1 = 2;
+    Stage2Hashes stage2 = 3;
+    Stage3Hashes stage3 = 4;  
+}
+
+message Stage0Hashes {
+    string new_session_request_message_hash = 1;
+    string new_session_response_message_hash = 2;
+    string pre_satp_transfer_request_message_hash = 3;
+    string pre_satp_transfer_response_message_hash = 4;
 }
 
 message Stage1Hashes {
@@ -100,9 +114,17 @@ message Stage3Hashes {
 }
 
 message MessageStagesSignatures {
-    Stage1Signatures stage1 = 1;
-    Stage2Signatures stage2 = 2;
-    Stage3Signatures stage3 = 3;  
+    Stage0Signatures stage0 = 1;
+    Stage1Signatures stage1 = 2;
+    Stage2Signatures stage2 = 3;
+    Stage3Signatures stage3 = 4;  
+}
+
+message Stage0Signatures {
+    string new_session_request_message_signature = 1;
+    string new_session_response_message_signature = 2;
+    string pre_satp_transfer_request_message_signature = 3;
+    string pre_satp_transfer_response_message_signature = 4;
 }
 
 message Stage1Signatures {
@@ -127,9 +149,17 @@ message Stage3Signatures {
 }
 
 message MessageStagesTimestamps {
-    Stage1Timestamps stage1 = 1;
-    Stage2Timestamps stage2 = 2;
-    Stage3Timestamps stage3 = 3;  
+    Stage0Timestamps stage0 = 1;
+    Stage1Timestamps stage1 = 2;
+    Stage2Timestamps stage2 = 3;
+    Stage3Timestamps stage3 = 4;  
+}
+
+message Stage0Timestamps {
+    string new_session_request_message_timestamp = 1;
+    string new_session_response_message_timestamp = 2;
+    string pre_satp_transfer_request_message_timestamp = 3;
+    string pre_satp_transfer_response_message_timestamp = 4;
 }
 
 message Stage1Timestamps {

@@ -7,6 +7,7 @@ import {
   SATPHandler,
   SATPHandlerOptions,
   SATPHandlerType,
+  Stage,
 } from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
@@ -50,6 +51,10 @@ export class Stage2SATPHandler implements SATPHandler {
     return Array.from(this.sessions.keys());
   }
 
+  getStage(): string {
+    return Stage.STAGE2;
+  }
+
   async LockAssertionImplementation(
     req: LockAssertionRequestMessage,
     context: HandlerContext,
@@ -82,13 +87,22 @@ export class Stage2SATPHandler implements SATPHandler {
       }
       return message;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "LockAssertionImplementation");
+      throw new FailedToProcessError(
+        fnTag,
+        "LockAssertionImplementation",
+        error,
+      );
     }
   }
 
   setupRouter(router: ConnectRouter): void {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const that = this;
     router.service(SatpStage2Service, {
-      lockAssertion: this.LockAssertionImplementation,
+      async lockAssertion(req, context) {
+        return await that.LockAssertionImplementation(req, context);
+      },
+      //lockAssertion: this.LockAssertionImplementation,
     });
   }
 
@@ -124,7 +138,7 @@ export class Stage2SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "LockAssertionRequest");
+      throw new FailedToProcessError(fnTag, "LockAssertionRequest", error);
     }
   }
 }

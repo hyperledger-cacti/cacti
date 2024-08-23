@@ -9,6 +9,8 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
+import { BesuAsset } from "../core/stage-services/satp-bridge/types/besu-asset";
+import { FabricAsset } from "../core/stage-services/satp-bridge/types/fabric-asset";
 
 // inject gateway, get connectors
 export type SATPLedgerConnector = string;
@@ -24,6 +26,7 @@ export interface FabricConfig extends NetworkConfig {
   contractName: string;
   options: IPluginLedgerConnectorFabricOptions;
   bungeeOptions: IPluginBungeeHermesOptions;
+  fabricAssets?: FabricAsset[];
 }
 export interface BesuConfig extends NetworkConfig {
   keychainId: string;
@@ -33,6 +36,7 @@ export interface BesuConfig extends NetworkConfig {
   gas: number;
   options: IPluginLedgerConnectorBesuOptions;
   bungeeOptions: IPluginBungeeHermesOptions;
+  besuAssets?: BesuAsset[];
 }
 
 export interface TransactionResponse {

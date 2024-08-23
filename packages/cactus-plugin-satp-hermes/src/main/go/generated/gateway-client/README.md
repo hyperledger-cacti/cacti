@@ -103,6 +103,7 @@ Class | Method | HTTP request | Description
 
  - [APIError](docs/APIError.md)
  - [Action](docs/Action.md)
+ - [Asset](docs/Asset.md)
  - [AuthzJwtClaim](docs/AuthzJwtClaim.md)
  - [AuthzScope](docs/AuthzScope.md)
  - [BridgeInfo](docs/BridgeInfo.md)
@@ -153,6 +154,7 @@ Class | Method | HTTP request | Description
  - [Transact200ResponseStatusResponseOriginChain](docs/Transact200ResponseStatusResponseOriginChain.md)
  - [TransactDefaultResponse](docs/TransactDefaultResponse.md)
  - [TransactRequest](docs/TransactRequest.md)
+ - [TransactRequestSourceAsset](docs/TransactRequestSourceAsset.md)
  - [TransactResponse](docs/TransactResponse.md)
 
 

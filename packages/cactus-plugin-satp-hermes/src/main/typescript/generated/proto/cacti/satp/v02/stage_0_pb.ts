@@ -5,291 +5,411 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { CommonSatp, TransferClaims } from "./common/message_pb.js";
+import { Asset, WrapAssertionClaim } from "./common/message_pb.js";
 
 /**
- * @generated from message cacti.satp.v02.PrivacyPolicy
+ * @generated from enum cacti.satp.v02.STATUS
  */
-export class PrivacyPolicy extends Message<PrivacyPolicy> {
+export enum STATUS {
   /**
-   * @generated from field: string name = 1;
+   * @generated from enum value: STATUS_UNSPECIFIED = 0;
    */
-  name = "";
+  STATUS_UNSPECIFIED = 0,
 
   /**
-   * @generated from field: repeated string arguments = 2;
+   * @generated from enum value: STATUS_ACCEPTED = 1;
    */
-  arguments: string[] = [];
+  STATUS_ACCEPTED = 1,
 
-  constructor(data?: PartialMessage<PrivacyPolicy>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.PrivacyPolicy";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "arguments", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PrivacyPolicy {
-    return new PrivacyPolicy().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PrivacyPolicy {
-    return new PrivacyPolicy().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PrivacyPolicy {
-    return new PrivacyPolicy().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: PrivacyPolicy | PlainMessage<PrivacyPolicy> | undefined, b: PrivacyPolicy | PlainMessage<PrivacyPolicy> | undefined): boolean {
-    return proto3.util.equals(PrivacyPolicy, a, b);
-  }
+  /**
+   * @generated from enum value: STATUS_REJECTED = 2;
+   */
+  STATUS_REJECTED = 2,
 }
+// Retrieve enum metadata with: proto3.getEnumType(STATUS)
+proto3.util.setEnumType(STATUS, "cacti.satp.v02.STATUS", [
+  { no: 0, name: "STATUS_UNSPECIFIED" },
+  { no: 1, name: "STATUS_ACCEPTED" },
+  { no: 2, name: "STATUS_REJECTED" },
+]);
 
 /**
- * @generated from message cacti.satp.v02.PreTransferVerificationAndContextEstablishmentRequest
+ * @generated from message cacti.satp.v02.NewSessionRequest
  */
-export class PreTransferVerificationAndContextEstablishmentRequest extends Message<PreTransferVerificationAndContextEstablishmentRequest> {
+export class NewSessionRequest extends Message<NewSessionRequest> {
   /**
-   * @generated from field: cacti.satp.v02.common.CommonSatp context = 1;
+   * @generated from field: string session_id = 1;
    */
-  context?: CommonSatp;
-
-  /**
-   * needed ?
-   *
-   * @generated from field: cacti.satp.v02.common.TransferClaims transfer_claims = 2;
-   */
-  transferClaims?: TransferClaims;
+  sessionId = "";
 
   /**
-   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy processPolicies = 3;
+   * @generated from field: string context_id = 2;
    */
-  processPolicies: PrivacyPolicy[] = [];
-
-  /**
-   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy mergePolicies = 4;
-   */
-  mergePolicies: PrivacyPolicy[] = [];
-
-  constructor(data?: PartialMessage<PreTransferVerificationAndContextEstablishmentRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.PreTransferVerificationAndContextEstablishmentRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "context", kind: "message", T: CommonSatp },
-    { no: 2, name: "transfer_claims", kind: "message", T: TransferClaims },
-    { no: 3, name: "processPolicies", kind: "message", T: PrivacyPolicy, repeated: true },
-    { no: 4, name: "mergePolicies", kind: "message", T: PrivacyPolicy, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferVerificationAndContextEstablishmentRequest {
-    return new PreTransferVerificationAndContextEstablishmentRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreTransferVerificationAndContextEstablishmentRequest {
-    return new PreTransferVerificationAndContextEstablishmentRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreTransferVerificationAndContextEstablishmentRequest {
-    return new PreTransferVerificationAndContextEstablishmentRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: PreTransferVerificationAndContextEstablishmentRequest | PlainMessage<PreTransferVerificationAndContextEstablishmentRequest> | undefined, b: PreTransferVerificationAndContextEstablishmentRequest | PlainMessage<PreTransferVerificationAndContextEstablishmentRequest> | undefined): boolean {
-    return proto3.util.equals(PreTransferVerificationAndContextEstablishmentRequest, a, b);
-  }
-}
-
-/**
- * TODO
- *
- * @generated from message cacti.satp.v02.PreTransferVerificationAndContextEstablishmentResponse
- */
-export class PreTransferVerificationAndContextEstablishmentResponse extends Message<PreTransferVerificationAndContextEstablishmentResponse> {
-  /**
-   * @generated from field: cacti.satp.v02.common.CommonSatp context = 1;
-   */
-  context?: CommonSatp;
-
-  /**
-   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy processPolicies_counter_proposal = 2;
-   */
-  processPoliciesCounterProposal: PrivacyPolicy[] = [];
-
-  /**
-   * @generated from field: repeated cacti.satp.v02.PrivacyPolicy mergePolicies_counter_proposal = 3;
-   */
-  mergePoliciesCounterProposal: PrivacyPolicy[] = [];
-
-  /**
-   * @generated from field: string hash_pre_transfer_verification_and_context = 4;
-   */
-  hashPreTransferVerificationAndContext = "";
-
-  /**
-   * @generated from field: string timestamp = 5;
-   */
-  timestamp = "";
-
-  constructor(data?: PartialMessage<PreTransferVerificationAndContextEstablishmentResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.PreTransferVerificationAndContextEstablishmentResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "context", kind: "message", T: CommonSatp },
-    { no: 2, name: "processPolicies_counter_proposal", kind: "message", T: PrivacyPolicy, repeated: true },
-    { no: 3, name: "mergePolicies_counter_proposal", kind: "message", T: PrivacyPolicy, repeated: true },
-    { no: 4, name: "hash_pre_transfer_verification_and_context", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferVerificationAndContextEstablishmentResponse {
-    return new PreTransferVerificationAndContextEstablishmentResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreTransferVerificationAndContextEstablishmentResponse {
-    return new PreTransferVerificationAndContextEstablishmentResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreTransferVerificationAndContextEstablishmentResponse {
-    return new PreTransferVerificationAndContextEstablishmentResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: PreTransferVerificationAndContextEstablishmentResponse | PlainMessage<PreTransferVerificationAndContextEstablishmentResponse> | undefined, b: PreTransferVerificationAndContextEstablishmentResponse | PlainMessage<PreTransferVerificationAndContextEstablishmentResponse> | undefined): boolean {
-    return proto3.util.equals(PreTransferVerificationAndContextEstablishmentResponse, a, b);
-  }
-}
-
-/**
- * @generated from message cacti.satp.v02.PreTransferCommenceRequestMessage
- */
-export class PreTransferCommenceRequestMessage extends Message<PreTransferCommenceRequestMessage> {
-  /**
-   * @generated from field: cacti.satp.v02.common.CommonSatp common = 1;
-   */
-  common?: CommonSatp;
-
-  /**
-   * @generated from field: string hash_pre_transfer_verification_and_context = 2;
-   */
-  hashPreTransferVerificationAndContext = "";
+  contextId = "";
 
   /**
    * @generated from field: string client_transfer_number = 3;
    */
   clientTransferNumber = "";
 
-  constructor(data?: PartialMessage<PreTransferCommenceRequestMessage>) {
+  /**
+   * @generated from field: string sender_gateway_network_id = 4;
+   */
+  senderGatewayNetworkId = "";
+
+  /**
+   * @generated from field: string recipient_gateway_network_id = 5;
+   */
+  recipientGatewayNetworkId = "";
+
+  /**
+   * TODO FIX this change so it gets the gateway ID from channel
+   *
+   * @generated from field: string gateway_id = 6;
+   */
+  gatewayId = "";
+
+  /**
+   * @generated from field: string client_signature = 7;
+   */
+  clientSignature = "";
+
+  constructor(data?: PartialMessage<NewSessionRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.PreTransferCommenceRequestMessage";
+  static readonly typeName = "cacti.satp.v02.NewSessionRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "common", kind: "message", T: CommonSatp },
-    { no: 2, name: "hash_pre_transfer_verification_and_context", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "context_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "sender_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "recipient_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "gateway_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferCommenceRequestMessage {
-    return new PreTransferCommenceRequestMessage().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NewSessionRequest {
+    return new NewSessionRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreTransferCommenceRequestMessage {
-    return new PreTransferCommenceRequestMessage().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NewSessionRequest {
+    return new NewSessionRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreTransferCommenceRequestMessage {
-    return new PreTransferCommenceRequestMessage().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NewSessionRequest {
+    return new NewSessionRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: PreTransferCommenceRequestMessage | PlainMessage<PreTransferCommenceRequestMessage> | undefined, b: PreTransferCommenceRequestMessage | PlainMessage<PreTransferCommenceRequestMessage> | undefined): boolean {
-    return proto3.util.equals(PreTransferCommenceRequestMessage, a, b);
+  static equals(a: NewSessionRequest | PlainMessage<NewSessionRequest> | undefined, b: NewSessionRequest | PlainMessage<NewSessionRequest> | undefined): boolean {
+    return proto3.util.equals(NewSessionRequest, a, b);
   }
 }
 
 /**
- * @generated from message cacti.satp.v02.PreTransferCommenceResponseMessage
+ * @generated from message cacti.satp.v02.NewSessionResponse
  */
-export class PreTransferCommenceResponseMessage extends Message<PreTransferCommenceResponseMessage> {
+export class NewSessionResponse extends Message<NewSessionResponse> {
   /**
-   * @generated from field: cacti.satp.v02.common.CommonSatp common = 1;
+   * @generated from field: string session_id = 1;
    */
-  common?: CommonSatp;
+  sessionId = "";
 
-  constructor(data?: PartialMessage<PreTransferCommenceResponseMessage>) {
+  /**
+   * @generated from field: string context_id = 2;
+   */
+  contextId = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.STATUS status = 3;
+   */
+  status = STATUS.STATUS_UNSPECIFIED;
+
+  /**
+   * @generated from field: string hash_previous_message = 4;
+   */
+  hashPreviousMessage = "";
+
+  /**
+   * @generated from field: string sender_gateway_network_id = 5;
+   */
+  senderGatewayNetworkId = "";
+
+  /**
+   * @generated from field: string recipient_gateway_network_id = 6;
+   */
+  recipientGatewayNetworkId = "";
+
+  /**
+   * @generated from field: string server_signature = 7;
+   */
+  serverSignature = "";
+
+  constructor(data?: PartialMessage<NewSessionResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.PreTransferCommenceResponseMessage";
+  static readonly typeName = "cacti.satp.v02.NewSessionResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "common", kind: "message", T: CommonSatp },
+    { no: 1, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "context_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(STATUS) },
+    { no: 4, name: "hash_previous_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "sender_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "recipient_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreTransferCommenceResponseMessage {
-    return new PreTransferCommenceResponseMessage().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NewSessionResponse {
+    return new NewSessionResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreTransferCommenceResponseMessage {
-    return new PreTransferCommenceResponseMessage().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NewSessionResponse {
+    return new NewSessionResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreTransferCommenceResponseMessage {
-    return new PreTransferCommenceResponseMessage().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NewSessionResponse {
+    return new NewSessionResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: PreTransferCommenceResponseMessage | PlainMessage<PreTransferCommenceResponseMessage> | undefined, b: PreTransferCommenceResponseMessage | PlainMessage<PreTransferCommenceResponseMessage> | undefined): boolean {
-    return proto3.util.equals(PreTransferCommenceResponseMessage, a, b);
+  static equals(a: NewSessionResponse | PlainMessage<NewSessionResponse> | undefined, b: NewSessionResponse | PlainMessage<NewSessionResponse> | undefined): boolean {
+    return proto3.util.equals(NewSessionResponse, a, b);
   }
 }
 
 /**
- * @generated from message cacti.satp.v02.PublicKey
+ * @generated from message cacti.satp.v02.PreSATPTransferRequest
  */
-export class PublicKey extends Message<PublicKey> {
+export class PreSATPTransferRequest extends Message<PreSATPTransferRequest> {
   /**
-   * @generated from field: string public_key = 1;
+   * @generated from field: string session_id = 1;
    */
-  publicKey = "";
+  sessionId = "";
 
-  constructor(data?: PartialMessage<PublicKey>) {
+  /**
+   * @generated from field: string context_id = 2;
+   */
+  contextId = "";
+
+  /**
+   * @generated from field: string client_transfer_number = 3;
+   */
+  clientTransferNumber = "";
+
+  /**
+   * @generated from field: string sender_gateway_network_id = 4;
+   */
+  senderGatewayNetworkId = "";
+
+  /**
+   * @generated from field: string recipient_gateway_network_id = 5;
+   */
+  recipientGatewayNetworkId = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Asset sender_asset = 6;
+   */
+  senderAsset?: Asset;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.Asset receiver_asset = 7;
+   */
+  receiverAsset?: Asset;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 8;
+   */
+  wrapAssertionClaim?: WrapAssertionClaim;
+
+  /**
+   * @generated from field: string hash_previous_message = 9;
+   */
+  hashPreviousMessage = "";
+
+  /**
+   * @generated from field: string client_signature = 10;
+   */
+  clientSignature = "";
+
+  constructor(data?: PartialMessage<PreSATPTransferRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "cacti.satp.v02.PublicKey";
+  static readonly typeName = "cacti.satp.v02.PreSATPTransferRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "context_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "client_transfer_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "sender_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "recipient_gateway_network_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "sender_asset", kind: "message", T: Asset },
+    { no: 7, name: "receiver_asset", kind: "message", T: Asset },
+    { no: 8, name: "wrap_assertion_claim", kind: "message", T: WrapAssertionClaim },
+    { no: 9, name: "hash_previous_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "client_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PublicKey {
-    return new PublicKey().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreSATPTransferRequest {
+    return new PreSATPTransferRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PublicKey {
-    return new PublicKey().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreSATPTransferRequest {
+    return new PreSATPTransferRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PublicKey {
-    return new PublicKey().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreSATPTransferRequest {
+    return new PreSATPTransferRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: PublicKey | PlainMessage<PublicKey> | undefined, b: PublicKey | PlainMessage<PublicKey> | undefined): boolean {
-    return proto3.util.equals(PublicKey, a, b);
+  static equals(a: PreSATPTransferRequest | PlainMessage<PreSATPTransferRequest> | undefined, b: PreSATPTransferRequest | PlainMessage<PreSATPTransferRequest> | undefined): boolean {
+    return proto3.util.equals(PreSATPTransferRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.PreSATPTransferResponse
+ */
+export class PreSATPTransferResponse extends Message<PreSATPTransferResponse> {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId = "";
+
+  /**
+   * @generated from field: string context_id = 2;
+   */
+  contextId = "";
+
+  /**
+   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 3;
+   */
+  wrapAssertionClaim?: WrapAssertionClaim;
+
+  /**
+   * @generated from field: string hash_previous_message = 4;
+   */
+  hashPreviousMessage = "";
+
+  /**
+   * @generated from field: string recipient_token_id = 5;
+   */
+  recipientTokenId = "";
+
+  /**
+   * @generated from field: string server_signature = 6;
+   */
+  serverSignature = "";
+
+  constructor(data?: PartialMessage<PreSATPTransferResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.PreSATPTransferResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "context_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "wrap_assertion_claim", kind: "message", T: WrapAssertionClaim },
+    { no: 4, name: "hash_previous_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "recipient_token_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "server_signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreSATPTransferResponse {
+    return new PreSATPTransferResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreSATPTransferResponse {
+    return new PreSATPTransferResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreSATPTransferResponse {
+    return new PreSATPTransferResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreSATPTransferResponse | PlainMessage<PreSATPTransferResponse> | undefined, b: PreSATPTransferResponse | PlainMessage<PreSATPTransferResponse> | undefined): boolean {
+    return proto3.util.equals(PreSATPTransferResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.CheckRequest
+ */
+export class CheckRequest extends Message<CheckRequest> {
+  /**
+   * @generated from field: string check = 1;
+   */
+  check = "";
+
+  constructor(data?: PartialMessage<CheckRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.CheckRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "check", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckRequest {
+    return new CheckRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckRequest {
+    return new CheckRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckRequest {
+    return new CheckRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckRequest | PlainMessage<CheckRequest> | undefined, b: CheckRequest | PlainMessage<CheckRequest> | undefined): boolean {
+    return proto3.util.equals(CheckRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message cacti.satp.v02.CheckResponse
+ */
+export class CheckResponse extends Message<CheckResponse> {
+  /**
+   * @generated from field: string check = 1;
+   */
+  check = "";
+
+  constructor(data?: PartialMessage<CheckResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.CheckResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "check", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckResponse {
+    return new CheckResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckResponse {
+    return new CheckResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckResponse {
+    return new CheckResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckResponse | PlainMessage<CheckResponse> | undefined, b: CheckResponse | PlainMessage<CheckResponse> | undefined): boolean {
+    return proto3.util.equals(CheckResponse, a, b);
   }
 }
 
