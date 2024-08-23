@@ -14,6 +14,7 @@ import {
   SATPHandler,
   SATPHandlerOptions,
   SATPHandlerType,
+  Stage,
 } from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Empty } from "@bufbuild/protobuf";
@@ -24,6 +25,7 @@ import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
+import { LockAssertionReceiptMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
@@ -52,6 +54,10 @@ export class Stage3SATPHandler implements SATPHandler {
 
   public get Log(): Logger {
     return this.logger;
+  }
+
+  getStage(): string {
+    return Stage.STAGE3;
   }
 
   async CommitPreparationImplementation(
@@ -86,7 +92,7 @@ export class Stage3SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "CommitPreparationRequest");
+      throw new FailedToProcessError(fnTag, "CommitPreparationRequest", error);
     }
   }
 
@@ -129,7 +135,11 @@ export class Stage3SATPHandler implements SATPHandler {
 
       return message;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "CommitFinalAssertionRequest");
+      throw new FailedToProcessError(
+        fnTag,
+        "CommitFinalAssertionRequest",
+        error,
+      );
     }
   }
 
@@ -155,22 +165,33 @@ export class Stage3SATPHandler implements SATPHandler {
 
       return new Empty({});
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferCompleteRequest");
+      throw new FailedToProcessError(fnTag, "TransferCompleteRequest", error);
     }
   }
 
   setupRouter(router: ConnectRouter): void {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const that = this;
     router.service(SatpStage3Service, {
-      commitPreparation: this.CommitPreparationImplementation,
-      commitFinalAssertion: this.CommitFinalAssertionImplementation,
-      transferComplete: this.TransferCompleteImplementation,
+      async commitPreparation(req, context) {
+        return await that.CommitPreparationImplementation(req, context);
+      },
+      async commitFinalAssertion(req, context) {
+        return await that.CommitFinalAssertionImplementation(req, context);
+      },
+      async transferComplete(req, context) {
+        return await that.TransferCompleteImplementation(req, context);
+      },
+      // commitPreparation: this.CommitPreparationImplementation,
+      // commitFinalAssertion: this.CommitFinalAssertionImplementation,
+      // transferComplete: this.TransferCompleteImplementation,
     });
   }
 
   //client side
 
   async CommitPreparationRequest(
-    response: CommitReadyResponseMessage,
+    response: LockAssertionReceiptMessage,
   ): Promise<CommitPreparationRequestMessage> {
     const stepTag = `CommitPreparationRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
@@ -183,7 +204,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.clientService.checkCommitReadyResponseMessage(
+      await this.clientService.checkLockAssertionReceiptMessage(
         response,
         session,
       );
@@ -194,11 +215,11 @@ export class Stage3SATPHandler implements SATPHandler {
       );
 
       if (!request) {
-        throw new FailedToCreateMessageError(fnTag, "TransferProposalRequest");
+        throw new FailedToCreateMessageError(fnTag, "CommitPreparationRequest");
       }
       return request;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferProposalRequest");
+      throw new FailedToProcessError(fnTag, "CommitPreparationRequest", error);
     }
   }
 
@@ -236,7 +257,11 @@ export class Stage3SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "CommitFinalAssertionRequest");
+      throw new FailedToProcessError(
+        fnTag,
+        "CommitFinalAssertionRequest",
+        error,
+      );
     }
   }
 
@@ -269,7 +294,7 @@ export class Stage3SATPHandler implements SATPHandler {
       }
       return request;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferCompleteRequest");
+      throw new FailedToProcessError(fnTag, "TransferCompleteRequest", error);
     }
   }
 }

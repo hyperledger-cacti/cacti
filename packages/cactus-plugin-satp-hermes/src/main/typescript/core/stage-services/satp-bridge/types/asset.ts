@@ -1,9 +1,11 @@
+import { v4 as uuidv4 } from "uuid";
 export interface Asset {
   tokenId: string;
   tokenType: TokenType;
   owner: string;
   amount: number;
   ontology: string;
+  contractName: string;
 }
 
 //When there is new token type, add it here or it will break the code
@@ -31,4 +33,12 @@ export function getInteractionType(stringType: string) {
   return InteractionType[
     stringType.toUpperCase() as keyof typeof InteractionType
   ];
+}
+
+export function createAssetId(
+  contextId: string,
+  tokenType: TokenType,
+  networkId: string,
+): string {
+  return `${uuidv4()}-${contextId}-${tokenType}-${networkId}`;
 }
