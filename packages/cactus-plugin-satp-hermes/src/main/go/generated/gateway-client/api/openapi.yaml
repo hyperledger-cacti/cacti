@@ -592,20 +592,54 @@ components:
       - sessionID
       type: object
       x-category: request
+    Asset:
+      description: An asset
+      properties:
+        owner:
+          type: string
+        ontology:
+          type: string
+        contractName:
+          type: string
+        contractAddress:
+          type: string
+        mspId:
+          type: string
+        channelName:
+          type: string
+      required:
+      - contractName
+      - ontology
+      - owner
+      type: object
     TransactRequest:
       description: "Request schema for initiating a transaction. Includes details\
         \ such as the transaction context, mode (data or transfer), payload, and information\
         \ about the source and destination DLT networks."
       example:
         mode: transfer
+        beneficiaryPubkey: beneficiaryPubkey
+        destinyAsset:
+          owner: owner
+          mspId: mspId
+          contractAddress: contractAddress
+          contractName: contractName
+          channelName: channelName
+          ontology: ontology
         payload: "{\"data\":\"example payload\"}"
         fromAmount: "100"
         toAmount: "95"
+        sourceAsset:
+          owner: owner
+          mspId: mspId
+          contractAddress: contractAddress
+          contractName: contractName
+          channelName: channelName
+          ontology: ontology
+        originatorPubkey: originatorPubkey
         contextID: 123e4567-e89b-12d3-a456-426614174000
         toDLTNetworkID: network2
         fromDLTNetworkID: network1
-        fromToken: TOKEN1
-        toToken: TOKEN2
       properties:
         contextID:
           example: 123e4567-e89b-12d3-a456-426614174000
@@ -629,18 +663,28 @@ components:
         fromAmount:
           example: "100"
           type: string
-        fromToken:
-          example: TOKEN1
-          type: string
         toAmount:
           example: "95"
           type: string
-        toToken:
-          example: TOKEN2
+        beneficiaryPubkey:
           type: string
+        originatorPubkey:
+          type: string
+        sourceAsset:
+          $ref: '#/components/schemas/Transact_request_sourceAsset'
+        destinyAsset:
+          $ref: '#/components/schemas/Transact_request_sourceAsset'
       required:
+      - beneficiaryPubkey
       - contextID
+      - destinyAsset
+      - fromAmount
+      - fromDLTNetworkID
       - mode
+      - originatorPubkey
+      - sourceAsset
+      - toAmount
+      - toDLTNetworkID
       type: object
     TransactResponse:
       description: Response schema for a transaction request. Includes the session
@@ -1181,6 +1225,33 @@ components:
         token:
           $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
       type: object
+    Transact_request_sourceAsset:
+      description: An asset
+      example:
+        owner: owner
+        mspId: mspId
+        contractAddress: contractAddress
+        contractName: contractName
+        channelName: channelName
+        ontology: ontology
+      properties:
+        owner:
+          type: string
+        ontology:
+          type: string
+        contractName:
+          type: string
+        contractAddress:
+          type: string
+        mspId:
+          type: string
+        channelName:
+          type: string
+      required:
+      - contractName
+      - ontology
+      - owner
+      type: object
     Transact_request:
       description: "Request schema for initiating a transaction. Includes details\
         \ such as the transaction context, mode (data or transfer), payload, and information\
@@ -1208,18 +1279,28 @@ components:
         fromAmount:
           example: "100"
           type: string
-        fromToken:
-          example: TOKEN1
-          type: string
         toAmount:
           example: "95"
           type: string
-        toToken:
-          example: TOKEN2
+        beneficiaryPubkey:
           type: string
+        originatorPubkey:
+          type: string
+        sourceAsset:
+          $ref: '#/components/schemas/Transact_request_sourceAsset'
+        destinyAsset:
+          $ref: '#/components/schemas/Transact_request_sourceAsset'
       required:
+      - beneficiaryPubkey
       - contextID
+      - destinyAsset
+      - fromAmount
+      - fromDLTNetworkID
       - mode
+      - originatorPubkey
+      - sourceAsset
+      - toAmount
+      - toDLTNetworkID
       type: object
     Transact_200_response_statusResponse_originChain:
       example:

@@ -7,7 +7,7 @@ import { Asset } from "./types/asset";
 import { TransactionIdUndefinedError } from "../../errors/bridge-erros";
 
 export class SATPBridgeManager implements BridgeManager {
-  public static readonly CLASS_NAME = "FabricBridgeManager";
+  public static readonly CLASS_NAME = "SATPBridgeManager";
 
   private _log: Logger;
 
@@ -29,10 +29,11 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = this.config.network.getReceipt(
-      asset.tokenId,
-      response.transactionId,
-    );
+    const receipt = "";
+    //  this.config.network.getReceipt(
+    //   asset.tokenId,
+    //   response.transactionId,
+    // );
 
     this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
 
@@ -70,10 +71,11 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = await this.config.network.getReceipt(
-      assetId,
-      response.transactionId,
-    );
+    const receipt = "";
+    //  this.config.network.getReceipt(
+    //   asset.tokenId,
+    //   response.transactionId,
+    // );
 
     this.log.info(`${fnTag}, proof of the asset lock: ${receipt}`);
 
@@ -108,10 +110,11 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = await this.config.network.getReceipt(
-      assetId,
-      transaction.transactionId,
-    );
+    const receipt = "";
+    //  this.config.network.getReceipt(
+    //   asset.tokenId,
+    //   response.transactionId,
+    // );
 
     this.log.info(`${fnTag}, proof of the asset creation: ${receipt}`);
 
@@ -127,10 +130,11 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = await this.config.network.getReceipt(
-      assetId,
-      transaction.transactionId,
-    );
+    const receipt = "";
+    //  this.config.network.getReceipt(
+    //   asset.tokenId,
+    //   response.transactionId,
+    // );
 
     this.log.info(`${fnTag}, proof of the asset deletion: ${receipt}`);
 
@@ -154,10 +158,11 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = await this.config.network.getReceipt(
-      assetId,
-      response.transactionId,
-    );
+    const receipt = "";
+    //  this.config.network.getReceipt(
+    //   asset.tokenId,
+    //   response.transactionId,
+    // );
 
     this.log.info(`${fnTag}, proof of the asset assignment: ${receipt}`);
 

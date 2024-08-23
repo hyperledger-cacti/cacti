@@ -14,6 +14,7 @@ import {
   SATPHandler,
   SATPHandlerOptions,
   SATPHandlerType,
+  Stage,
 } from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
@@ -22,6 +23,7 @@ import {
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
 import { getSessionId } from "./handler-utils";
+import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
@@ -46,6 +48,9 @@ export class Stage1SATPHandler implements SATPHandler {
 
   getHandlerSessions(): string[] {
     return Array.from(this.sessions.keys());
+  }
+  getStage(): string {
+    return Stage.STAGE1;
   }
 
   public get Log(): Logger {
@@ -78,14 +83,16 @@ export class Stage1SATPHandler implements SATPHandler {
         session,
       );
 
-      this.Log.debug(`${fnTag}, Returning response: ${message}`);
+      this.Log.debug(
+        `${fnTag}, Returning response: ${JSON.stringify(message)}`,
+      );
 
       if (!message) {
         throw new FailedToCreateMessageError(fnTag, "TransferProposalReceipt");
       }
       return message;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferProposalRequest");
+      throw new FailedToProcessError(fnTag, "TransferProposalRequest", error);
     }
   }
 
@@ -112,27 +119,39 @@ export class Stage1SATPHandler implements SATPHandler {
         req,
         session,
       );
-      this.Log.debug(`${fnTag}, Returning response: ${message}`);
+
+      this.Log.debug(
+        `${fnTag}, Returning response: ${JSON.stringify(message)}`,
+      );
 
       if (!message) {
         throw new FailedToCreateMessageError(fnTag, "TransferCommenceResponse");
       }
       return message;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferCommenceResponse");
+      throw new FailedToProcessError(fnTag, "TransferCommenceResponse", error);
     }
   }
 
   setupRouter(router: ConnectRouter): void {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const that = this;
     router.service(SatpStage1Service, {
-      transferProposal: this.TransferProposalImplementation,
-      transferCommence: this.TransferCommenceImplementation,
+      async transferProposal(req, context) {
+        return await that.TransferProposalImplementation(req, context)!;
+      },
+      async transferCommence(req, context) {
+        return that.TransferCommenceImplementation(req, context);
+      },
+      // transferProposal: this.TransferProposalImplementation,
+      // transferCommence: this.TransferCommenceImplementation,
     });
   }
 
   //client side
   public async TransferProposalRequest(
     sessionId: string,
+    response: PreSATPTransferResponse,
   ): Promise<TransferProposalRequestMessage> {
     const stepTag = `TransferProposalRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
@@ -143,6 +162,8 @@ export class Stage1SATPHandler implements SATPHandler {
       if (!session) {
         throw new Error(`${fnTag}, Session not found`);
       }
+
+      await this.clientService.checkPreSATPTransferResponse(response, session);
 
       const requestTransferProposal =
         await this.clientService.transferProposalRequest(
@@ -155,7 +176,7 @@ export class Stage1SATPHandler implements SATPHandler {
       }
       return requestTransferProposal;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferProposalRequest");
+      throw new FailedToProcessError(fnTag, "TransferProposalRequest", error);
     }
   }
 
@@ -192,7 +213,7 @@ export class Stage1SATPHandler implements SATPHandler {
 
       return requestTransferCommence;
     } catch (error) {
-      throw new FailedToProcessError(fnTag, "TransferCommenceRequest");
+      throw new FailedToProcessError(fnTag, "TransferCommenceRequest", error);
     }
   }
 }
