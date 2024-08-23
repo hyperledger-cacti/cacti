@@ -16,11 +16,14 @@ import { GetStatusEndpointV1 } from "../web-services/status-endpoint";
 import {
   StatusRequest,
   StatusResponse,
+  TransactRequest,
+  TransactResponse,
 } from "../generated/gateway-client/typescript-axios/api";
 import { ExecuteGetStatus } from "./admin/get-status-handler-service";
 import { ISATPManagerOptions, SATPManager } from "../gol/satp-manager";
 import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
 import { SATPBridgesManager } from "../gol/satp-bridges-manager";
+import { ExecuteTransact } from "./transaction/transact-handler-service";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -29,6 +32,7 @@ export interface BLODispatcherOptions {
   orchestrator: GatewayOrchestrator;
   signer: JsObjectSigner;
   bridgesManager: SATPBridgesManager;
+  pubKey: string;
 }
 
 export class BLODispatcher {
@@ -61,7 +65,8 @@ export class BLODispatcher {
       signer: signer,
       supportedDLTs: this.orchestrator.supportedDLTs,
       bridgeManager: this.bridgeManager,
-      orquestrator: this.orchestrator,
+      orchestrator: this.orchestrator,
+      pubKey: options.pubKey,
     };
 
     this.manager = new SATPManager(SATPManagerOpts);
@@ -111,8 +116,15 @@ export class BLODispatcher {
     return ExecuteGetStatus(this.logger, req);
   }
 
-  public async Transact(req: StatusRequest): Promise<StatusResponse> {
-    return ExecuteGetStatus(this.logger, req);
+  public async Transact(req: TransactRequest): Promise<TransactResponse> {
+    //TODO pre-verify verify input
+    const res = await ExecuteTransact(
+      this.logger,
+      req,
+      this.manager,
+      this.orchestrator,
+    );
+    return res;
   }
   // get channel by caller; give needed client from orchestrator to handler to call
   // for all channels, find session id on request
