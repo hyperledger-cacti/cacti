@@ -249,29 +249,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("deployContract with additional parameters should fail", async () => {
-    // this try-catch statement was not refactored because calling deployContract with additional parameters is actually not
-    // causing an error.
-
-    // try {
-    //   await apiClient.deployContract({
-    //     contract: {
-    //       contractJSON: HelloWorldContractJson,
-    //     },
-    //     web3SigningCredential: {
-    //       ethAccount: WHALE_ACCOUNT_ADDRESS,
-    //       secret: "",
-    //       type: Web3SigningCredentialType.GethKeychainPassword,
-    //     },
-    //     gas: 1000000,
-    //     fake: 4,
-    //   } as DeployContractV1Request);
-    //   //test is failing because "fail" is not defined. Without the fail statement, the test actually passes.
-    //   fail("Expected deployContract call to fail but it succeeded.");
-    // } catch (error) {
-    //   console.log("deployContract failed as expected");
-    // }
-
-    // have the left the original assertion above as a comment for additional context, this can be removed once this test is debugged. 
     await expect(
       apiClient.deployContract({
         contract: {
@@ -284,11 +261,10 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         },
         gas: 1000000,
         fake: 4,
-      } as DeployContractV1Request)
+      } as DeployContractV1Request),
     ).rejects.toThrow();
 
     log.info("deployContract failed as expected");
-    
   });
 
   //////////////////////////////////

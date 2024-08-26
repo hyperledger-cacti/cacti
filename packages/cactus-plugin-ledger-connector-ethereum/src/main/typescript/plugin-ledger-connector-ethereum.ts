@@ -943,6 +943,22 @@ export class PluginLedgerConnectorEthereum
   ): Promise<RunTransactionResponse> {
     Checks.truthy(req, "deployContract() request arg");
 
+    // Validate the keys in the request object
+    const validKeys = [
+      "web3SigningCredential",
+      "contract",
+      "constructorArgs",
+      "gasConfig",
+      "value",
+    ];
+    const extraKeys = Object.keys(req).filter(
+      (key) => !validKeys.includes(key),
+    );
+
+    if (extraKeys.length > 0) {
+      throw new Error(`Invalid parameters: ${extraKeys.join(", ")}`);
+    }
+
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
       throw new Error(`Cannot deploy contract with pre-signed TX`);
     }
