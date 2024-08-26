@@ -238,10 +238,11 @@ describe(testCase, () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    //This is saying the function should NOT fail with a message containing "None too low"
-    //But the returned error message does contain that string.
-    try {
-      await connector.invokeContract({
+    // Originally we had it so the statement below was expecting the error NOT to contain "Nonce to low"
+    // But actually it should contain that because the nonce for this account is already 1, as seen immediately above?
+
+    await expect(
+      connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
@@ -254,31 +255,8 @@ describe(testCase, () => {
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
         nonce: 1,
-      });
-      fail("It should not reach here");
-    } catch (error) {
-      console.log(error.message);
-      //error.message is Returned error: Nonce too low, below is not failing because it checks for an exact match
-      //And also it checks the error, not error.message
-      expect(error).not.toBe("Nonce too low");
-    }
-
-    // const contractInvocation = connector.invokeContract({
-    //   contractName,
-    //   keychainId: keychainPlugin.getKeychainId(),
-    //   invocationType: EthContractInvocationType.Send,
-    //   methodName: "setName",
-    //   params: [newName],
-    //   gas: 1000000,
-    //   web3SigningCredential: {
-    //     ethAccount: testEthAccount.address,
-    //     secret: testEthAccount.privateKey,
-    //     type: Web3SigningCredentialType.PrivateKeyHex,
-    //   },
-    //   nonce: 1,
-    // });
-
-    // await expect(contractInvocation).rejects.not.toThrow("Returned error: Nonce too low");
+      }),
+    ).rejects.toThrow("Nonce too low");
 
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
@@ -364,35 +342,25 @@ describe(testCase, () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    try {
-      await connector.invokeContract({
+    // Again, originally we had it so the statement below was expecting the error NOT to contain "Nonce to low"
+    // But actually it should contain that because the nonce for this account is already now 4, as seen immediately above?
+
+    await expect(
+      connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        web3SigningCredential,
-        nonce: 4,
-      });
-      fail("It should not reach here");
-    } catch (error) {
-      //the actual error message here also contains "Nonce too low" in the body
-      expect(error).not.toBe("Nonce too low");
-    }
-
-    // const contractInvocation = connector.invokeContract({
-    //   contractName,
-    //   keychainId: keychainPlugin.getKeychainId(),
-    //   invocationType: EthContractInvocationType.Send,
-    //   methodName: "setName",
-    //   params: [newName],
-    //   gas: 1000000,
-    //   web3SigningCredential,
-    //   nonce: 4,
-    // });
-
-    // await expect(contractInvocation).rejects.not.toThrow("Nonce too low");
+        web3SigningCredential: {
+          ethAccount: testEthAccount.address,
+          secret: testEthAccount.privateKey,
+          type: Web3SigningCredentialType.PrivateKeyHex,
+        },
+        nonce: 1,
+      }),
+    ).rejects.toThrow("Nonce too low");
 
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,

@@ -417,7 +417,7 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
           },
         ],
       }),
-    ).rejects.toThrow(); 
+    ).rejects.toThrow();
 
     // Assert no data was added
     const blocksResponse = await getDbBlocks();
