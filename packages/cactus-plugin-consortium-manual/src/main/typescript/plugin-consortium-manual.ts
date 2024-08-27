@@ -13,6 +13,7 @@ import {
   ICactusPluginOptions,
   JWSGeneral,
   JWSRecipient,
+  createIsJwsGeneralTypeGuard,
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
@@ -59,6 +60,7 @@ export class PluginConsortiumManual
   private readonly log: Logger;
   private readonly instanceId: string;
   private readonly repo: ConsortiumRepository;
+  private readonly isJwsGeneral: (x: unknown) => x is JWSGeneral;
   private endpoints: IWebServiceEndpoint[] | undefined;
 
   public get className(): string {
@@ -82,6 +84,7 @@ export class PluginConsortiumManual
 
     this.instanceId = this.options.instanceId;
     this.repo = new ConsortiumRepository({ db: options.consortiumDatabase });
+    this.isJwsGeneral = createIsJwsGeneralTypeGuard();
 
     this.prometheusExporter =
       options.prometheusExporter ||
@@ -204,16 +207,22 @@ export class PluginConsortiumManual
     const _protected = {
       iat: Date.now(),
       jti: uuidv4(),
-      iss: "Hyperledger Cactus",
+      iss: "Cacti",
     };
-    // TODO: double check if this casting is safe (it is supposed to be)
+
     const encoder = new TextEncoder();
-    const sign = new GeneralSign(encoder.encode(payloadJson));
+    const encodedPayload = encoder.encode(payloadJson);
+    const sign = new GeneralSign(encodedPayload);
     sign
       .addSignature(keyPair)
       .setProtectedHeader({ alg: "ES256K", _protected });
-    const jwsGeneral = await sign.sign();
-    return jwsGeneral as JWSGeneral;
+
+    const jws = await sign.sign();
+
+    if (!this.isJwsGeneral(jws)) {
+      throw new TypeError("Jose GeneralSign.sign() gave non-JWSGeneral type");
+    }
+    return jws;
   }
 
   public async getConsortiumJws(): Promise<JWSGeneral> {
