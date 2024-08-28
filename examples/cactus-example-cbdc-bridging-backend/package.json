@@ -70,7 +70,7 @@
     "@openzeppelin/contracts": "4.9.6",
     "@openzeppelin/contracts-upgradeable": "4.9.6",
     "async-exit-hook": "2.0.1",
-    "axios": "1.6.0",
+    "axios": "1.7.5",
     "crypto-js": "4.2.0",
     "dotenv": "16.0.1",
     "fabric-network": "2.2.20",

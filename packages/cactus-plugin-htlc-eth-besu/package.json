@@ -73,7 +73,7 @@
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.3",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.3",
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.3",
-    "axios": "1.6.0",
+    "axios": "1.7.5",
     "bn.js": "5.2.1",
     "dotenv": "16.0.3",
     "ethers": "6.3.0",
