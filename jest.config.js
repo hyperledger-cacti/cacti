@@ -56,7 +56,6 @@ module.exports = {
     `./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts`,
     `./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts`,
     `./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
-    `./packages/cactus-test-tooling/src/test/typescript/integration/postgres/postgres-test-container/constructor-validates-options.test.ts`,
     `./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts`,
     `./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts`,
     `./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts`,
