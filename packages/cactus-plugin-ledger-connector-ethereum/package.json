@@ -71,7 +71,7 @@
     "@hyperledger/cactus-common": "2.0.0-rc.3",
     "@hyperledger/cactus-core": "2.0.0-rc.3",
     "@hyperledger/cactus-core-api": "2.0.0-rc.3",
-    "axios": "1.7.2",
+    "axios": "1.7.5",
     "ethers": "6.8.1",
     "express": "4.19.2",
     "http-proxy-middleware": "2.0.6",

@@ -62,7 +62,7 @@
   "dependencies": {
     "@grpc/grpc-js": "1.11.1",
     "@hyperledger/cactus-common": "2.0.0-rc.3",
-    "axios": "1.7.2",
+    "axios": "1.7.5",
     "google-protobuf": "3.21.4"
   },
   "devDependencies": {

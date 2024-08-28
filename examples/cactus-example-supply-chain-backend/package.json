@@ -66,7 +66,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-rc.3",
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.3",
     "async-exit-hook": "2.0.1",
-    "axios": "1.6.0",
+    "axios": "1.7.5",
     "dotenv": "16.0.0",
     "express": "4.19.2",
     "express-jwt": "8.4.1",

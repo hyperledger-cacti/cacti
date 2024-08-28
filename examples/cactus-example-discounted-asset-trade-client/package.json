@@ -61,7 +61,7 @@
     "@hyperledger/anoncreds-nodejs": "0.2.0",
     "@hyperledger/aries-askar-nodejs": "0.2.0",
     "@hyperledger/indy-vdr-nodejs": "0.2.0",
-    "axios": "1.6.0",
+    "axios": "1.7.5",
     "inquirer": "8.2.6",
     "loglevel": "1.8.1"
   },

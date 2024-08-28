@@ -59,7 +59,7 @@
     "@hyperledger/cactus-common": "2.0.0-rc.3",
     "@hyperledger/cactus-core": "2.0.0-rc.3",
     "@hyperledger/cactus-core-api": "2.0.0-rc.3",
-    "axios": "1.6.0",
+    "axios": "1.7.5",
     "run-time-error-cjs": "1.4.0",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0"

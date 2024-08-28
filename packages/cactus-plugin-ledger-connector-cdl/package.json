@@ -58,7 +58,7 @@
     "@hyperledger/cactus-common": "2.0.0-rc.3",
     "@hyperledger/cactus-core": "2.0.0-rc.3",
     "@hyperledger/cactus-core-api": "2.0.0-rc.3",
-    "axios": "1.6.0",
+    "axios": "1.7.5",
     "sanitize-html": "2.12.1"
   },
   "devDependencies": {

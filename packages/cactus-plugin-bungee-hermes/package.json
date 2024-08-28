@@ -66,7 +66,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.3",
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-rc.3",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.3",
-    "axios": "1.7.2",
+    "axios": "1.7.5",
     "body-parser": "1.20.2",
     "fs-extra": "11.2.0",
     "http-errors-enhanced-cjs": "2.0.1",

@@ -59,7 +59,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.3",
     "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-rc.3",
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.3",
-    "axios": "1.7.2",
+    "axios": "1.7.5",
     "crypto-js": "4.2.0",
     "fs-extra": "11.2.0",
     "knex": "2.4.0",
