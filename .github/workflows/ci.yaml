@@ -2469,7 +2469,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-test-tooling
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/postgres/postgres-test-container/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
+        --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     runs-on: ubuntu-22.04
     steps:

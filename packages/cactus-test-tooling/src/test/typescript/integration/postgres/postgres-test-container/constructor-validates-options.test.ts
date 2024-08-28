@@ -1,42 +1,46 @@
-import test, { Test } from "tape-promise/tape";
+import "jest-extended";
 import isPortReachable from "is-port-reachable";
 import { Container } from "dockerode";
 import { PostgresTestContainer } from "../../../../../main/typescript/public-api";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
-test("constructor throws if invalid input is provided", (assert: Test) => {
-  assert.ok(PostgresTestContainer);
-  assert.throws(() => new PostgresTestContainer({ imageVersion: "nope" }));
-  assert.end();
-});
-
-test("constructor does not throw if valid input is provided", (assert: Test) => {
-  assert.ok(PostgresTestContainer);
-  assert.doesNotThrow(() => new PostgresTestContainer());
-  assert.end();
-});
-
-test("starts/stops/destroys a docker container", async (assert: Test) => {
+describe("PostgresTestContainer", () => {
   const postgresTestContainer = new PostgresTestContainer({ logLevel });
+  let postgresContainer: Container;
 
-  const postgresContainer: Container = await postgresTestContainer.start();
-  test.onFinish(async () => {
+  beforeAll(async () => {
+    postgresContainer = await postgresTestContainer.start();
+  });
+
+  afterAll(async () => {
     await postgresTestContainer.stop();
   });
 
-  assert.ok(postgresContainer);
-  const ipAddress: string = await postgresTestContainer.getContainerIpAddress();
-  assert.ok(ipAddress);
-  assert.ok(ipAddress.length);
+  it("constructor throws if invalid input is provided", () => {
+    expect(PostgresTestContainer).toBeTruthy();
+    expect(
+      () => new PostgresTestContainer({ imageVersion: "nope" }),
+    ).toThrowError();
+  });
 
-  const hostPort: number = await postgresTestContainer.getPostgresPort();
-  assert.ok(hostPort, "getRpcApiPublicPort() returns truthy OK");
-  assert.ok(isFinite(hostPort), "getRpcApiPublicPort() returns finite OK");
+  it("constructor does not throw if valid input is provided", () => {
+    expect(PostgresTestContainer).toBeTruthy();
+    expect(() => new PostgresTestContainer()).not.toThrow();
+  });
 
-  const isReachable = await isPortReachable(hostPort, { host: "127.0.0.1" });
-  assert.ok(isReachable, `HostPort ${hostPort} is reachable via 127.0.0.1`);
+  it("starts/stops/destroys a docker container", async () => {
+    expect(postgresContainer).toBeTruthy();
+    const ip: string = await postgresTestContainer.getContainerIpAddress();
+    expect(ip).toBeString();
+    expect(ip).not.toBeEmpty();
 
-  assert.end();
+    const hostPort: number = await postgresTestContainer.getPostgresPort();
+    expect(hostPort).toBeTruthy();
+    expect(hostPort).toBeFinite();
+
+    const reachabilityCheck = isPortReachable(hostPort, { host: "127.0.0.1" });
+    expect(reachabilityCheck).resolves.toBeTrue();
+  });
 });
