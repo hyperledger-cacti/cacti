@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724105300679,
+  "lastUpdate": 1724998486947,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -69,6 +69,44 @@ window.BENCHMARK_DATA = {
             "range": "±2.16%",
             "unit": "ops/sec",
             "extra": "179 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "sandeepn.official@gmail.com",
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES"
+          },
+          "distinct": true,
+          "id": "444e04cf796f29aac9fd4a860638ca064645dc08",
+          "message": "build(connector-corda): upgrade to Spring Boot v3.3.1\n\nIMPORTANT: The project now needs JDK 17 and Gradle 8 for development.\n\n1. The bean validation has been replaced to the jakarta flavor as mandated\nby the spring boot upgrade.\n2. Request bodies in the OpenAPI spec for Corda v4 were made mandatory\nwhere applicable (which is most of the endpoints)\n3. The Open API spec based request validation test case has been moved to\nthe new Corda v4.12 test case which now builds both the connector JVM app\nand the AIO image at runtime so that we can guarantee that the latest\ncode changes are being verified.\n4. Added quicker and easier steps in the readme of the corda connector\nto run trivy scans on the .jar files instead of the container images.\nThe .jar files are 20x faster to build and scanning them instead of the\ncontainer images doesn't suffer from the problem that the dev build\ndependencies are showing up in the scans (creating false positives)\n5. Updated the CI to use the .jar file for scanning as well instead of\nthe container image.\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-08-30T11:33:02+05:30",
+          "tree_id": "18622fb0c6917f8c7a51d34eb5a07864dda8c67e",
+          "url": "https://github.com/hyperledger/cacti/commit/444e04cf796f29aac9fd4a860638ca064645dc08"
+        },
+        "date": 1724998483432,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 592,
+            "range": "±1.78%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 346,
+            "range": "±1.72%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
