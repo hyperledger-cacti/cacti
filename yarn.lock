@@ -11106,6 +11106,7 @@ __metadata:
     sort-package-json: "npm:1.57.0"
     source-map-loader: "npm:4.0.1"
     stream-browserify: "npm:3.0.0"
+    string-similarity-js: "npm:2.1.4"
     tap: "npm:16.3.8"
     tape: "npm:5.6.6"
     tape-promise: "npm:4.0.0"
@@ -49354,6 +49355,13 @@ __metadata:
   version: 1.2.2
   resolution: "string-range@npm:1.2.2"
   checksum: 10/497d6981e6808e6ee512ca28918dcf020ffc4276543561ec1da7ec7ebfde276f25eefd5e9776691e52103c0e35ffe3ea00f074558dbc3151d580c1523de3a967
+  languageName: node
+  linkType: hard
+
+"string-similarity-js@npm:2.1.4":
+  version: 2.1.4
+  resolution: "string-similarity-js@npm:2.1.4"
+  checksum: 10/55063198f233aca8833d8429626d9fafdeb164e0fc6a66364a4d8f509df17d49f8a8a42e4096da60c53fe4586b1bace7098c0265da590fe4ec96c3a8ecb90f69
   languageName: node
   linkType: hard
 
