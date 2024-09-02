@@ -66,10 +66,10 @@
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-rc.3",
-    "axios": "1.7.5",
+    "axios": "1.7.7",
     "compare-versions": "3.6.0",
     "dockerode": "3.3.0",
-    "elliptic": "6.5.4",
+    "elliptic": "6.5.7",
     "execa": "5.1.1",
     "fabric-ca-client": "2.5.0-snapshot.23",
     "fabric-network": "2.5.0-snapshot.23",
