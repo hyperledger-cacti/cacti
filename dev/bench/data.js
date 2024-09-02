@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1725035884678,
+  "lastUpdate": 1725291668458,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -207,6 +207,44 @@ window.BENCHMARK_DATA = {
             "range": "±3.09%",
             "unit": "ops/sec",
             "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "957da7c3e1d80068391485a825ba6bb1e68333ac",
+          "message": "feat(core-api): add createIsJwsGeneralTypeGuard, createAjvTypeGuard<T>\n\n1. createAjvTypeGuard<T>() is the lower level utility which can be used\nto construct the more convenient, higher level type predicates/type guards\nsuch as createIsJwsGeneralTypeGuard() which uses createAjvTypeGuard<JwsGeneral>\nunder the hood.\n2. This commit is also meant to be establishing a larger, more generic\npattern of us being able to create type guards out of the Open API specs\nin a convenient way instead of having to write the validation code by hand.\n\nAn example usage of the new createAjvTypeGuard<T>() utility is the\ncreateIsJwsGeneralTypeGuard() function itself.\n\nAn example usage of the new createIsJwsGeneralTypeGuard() can be found\nin packages/cactus-plugin-consortium-manual/src/main/typescript/plugin-consortium-manual.ts\n\nThe code documentation contains examples as well for maximum discoverabilty\nand I'll also include it here:\n\n```typescript\nimport { JWSGeneral } from \"@hyperledger/cactus-core-api\";\nimport { createIsJwsGeneralTypeGuard } from \"@hyperledger/cactus-core-api\";\n\nexport class PluginConsortiumManual {\n  private readonly isJwsGeneral: (x: unknown) => x is JWSGeneral;\n\n  constructor() {\n    // Creating the type-guard function is relatively costly due to the Ajv schema\n    // compilation that needs to happen as part of it so it is good practice to\n    // cache the type-guard function as much as possible, for examle by adding it\n    // as a class member on a long-lived object such as a plugin instance which is\n    // expected to match the life-cycle of the API server NodeJS process itself.\n    // The specific anti-pattern would be to create a new type-guard function\n    // for each request received by a plugin as this would affect performance\n    // negatively.\n    this.isJwsGeneral = createIsJwsGeneralTypeGuard();\n  }\n\n  public async getNodeJws(): Promise<JWSGeneral> {\n    // rest of the implementation that produces a JWS ...\n    const jws = await joseGeneralSign.sign();\n\n    if (!this.isJwsGeneral(jws)) {\n      throw new TypeError(\"Jose GeneralSign.sign() gave non-JWSGeneral type\");\n    }\n    return jws;\n  }\n}\n```\n\nRelevant discussion took place here:\nhttps://github.com/hyperledger/cacti/pull/3471#discussion_r1731894747\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-09-02T08:23:56-07:00",
+          "tree_id": "f0a96975cecbe783530ab2031beadee53efbd0b2",
+          "url": "https://github.com/hyperledger/cacti/commit/957da7c3e1d80068391485a825ba6bb1e68333ac"
+        },
+        "date": 1725291665622,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 606,
+            "range": "±1.77%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 353,
+            "range": "±1.78%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
