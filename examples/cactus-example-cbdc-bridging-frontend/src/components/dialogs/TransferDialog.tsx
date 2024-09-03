@@ -11,8 +11,10 @@ import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
 import { transferTokensFabric } from "../../api-calls/fabric-api";
 import { transferTokensBesu } from "../../api-calls/besu-api";
+import { bridgeTokens } from "../../api-calls/gateway-api";
 
-const recipients = ["Alice", "Charlie", "Bridge"];
+const recipients = ["Alice", "Charlie"];
+const chains = ["Fabric", "Besu"];
 export interface ITransferDialogOptions {
   open: boolean;
   ledger: string;
@@ -22,7 +24,9 @@ export interface ITransferDialogOptions {
 
 export default function TransferDialog(props: ITransferDialogOptions) {
   const [recipient, setRecipient] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [originAmount, setSourceAmount] = useState(0);
+  const [destinyAmount, setDestinyAmount] = useState(0);
+  const [destinyChain, setDestinyChain] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -30,21 +34,36 @@ export default function TransferDialog(props: ITransferDialogOptions) {
     if (props.open) {
       setSending(false);
       setRecipient("");
-      setAmount(0);
+      setSourceAmount(0);
+      setDestinyAmount(0);
+      setDestinyChain("");
     }
   }, [props.open]);
 
-  const handleChangeAmount = (
+  const handleChangeOriginAmount = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) => {
     const value = parseInt(event.target.value);
 
     if (value < 0) {
       setErrorMessage("Amount must be a positive value");
-      setAmount(0);
+      setSourceAmount(0);
     } else {
       setErrorMessage("");
-      setAmount(value);
+      setSourceAmount(value);
+    }
+  };
+  const handleChangeDestinyAmount = (
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
+    const value = parseInt(event.target.value);
+
+    if (value < 0) {
+      setErrorMessage("Amount must be a positive value");
+      setDestinyAmount(0);
+    } else {
+      setErrorMessage("");
+      setDestinyAmount(value);
     }
   };
 
@@ -52,15 +71,34 @@ export default function TransferDialog(props: ITransferDialogOptions) {
     setRecipient(event.target.value);
   };
 
+  const handleChangeDestinyChain = (event: SelectChangeEvent<string>) => {
+    setDestinyChain(event.target.value);
+  };
+
   const performTransferTransaction = async () => {
-    if (amount === 0) {
-      setErrorMessage("Amount must be a positive value");
+    if (originAmount === 0 || destinyAmount === 0) {
+      setErrorMessage("Amounts must be a positive value");
     } else {
       setSending(true);
-      if (props.ledger === "Fabric") {
-        await transferTokensFabric(props.user, recipient, amount.toString());
+      if (props.ledger === destinyChain) {
+        if (props.ledger === "Fabric") {
+          await transferTokensFabric(
+            props.user,
+            recipient,
+            originAmount.toString(),
+          );
+        } else {
+          await transferTokensBesu(props.user, recipient, originAmount);
+        }
       } else {
-        await transferTokensBesu(props.user, recipient, amount);
+        await bridgeTokens(
+          props.user,
+          recipient,
+          props.ledger,
+          destinyChain,
+          originAmount,
+          destinyAmount,
+        );
       }
 
       props.onClose();
@@ -72,7 +110,7 @@ export default function TransferDialog(props: ITransferDialogOptions) {
       <DialogTitle>{"Transfer CBDC"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Select the recipient of the CBDC and how many you would like to
+          Select the recipient of the CBDC, target chain, and how many you would
           transfer from {props.user}"s address?
         </DialogContentText>
         <Select
@@ -84,27 +122,60 @@ export default function TransferDialog(props: ITransferDialogOptions) {
           defaultValue={recipient}
           onChange={handleChangeRecipient}
         >
-          {recipients.map(
-            (user) =>
-              user !== props.user && (
-                <MenuItem key={user} value={user}>
-                  {user}
-                </MenuItem>
-              ),
-          )}
+          {recipients.map((user) => (
+            <MenuItem key={user} value={user}>
+              {user}
+            </MenuItem>
+          ))}
+        </Select>
+        <Select
+          required
+          fullWidth
+          autoFocus
+          id="chain"
+          name="chain"
+          value={destinyChain}
+          label="chain"
+          variant="outlined"
+          placeholder="Destiny Chain"
+          defaultValue={destinyChain}
+          onChange={handleChangeDestinyChain}
+          sx={{ margin: "1rem 0" }}
+        >
+          {chains.map((chain) => {
+            return (
+              <MenuItem key={chain} value={chain}>
+                {chain}
+              </MenuItem>
+            );
+          })}
         </Select>
         <TextField
           required
           fullWidth
           autoFocus
-          id="amount"
-          name="amount"
-          value={amount}
-          label="Amount"
+          id="DestinyAmount"
+          name="DestinyAmount"
+          value={destinyAmount}
+          label="DestinyAmount"
           type="number"
-          placeholder="Amount"
+          placeholder="DestinyAmount"
           variant="outlined"
-          onChange={handleChangeAmount}
+          onChange={handleChangeDestinyAmount}
+          sx={{ margin: "1rem 0" }}
+        />
+        <TextField
+          required
+          fullWidth
+          autoFocus
+          id="OriginAmount"
+          name="OriginAmount"
+          value={originAmount}
+          label="OriginAmount"
+          type="number"
+          placeholder="OriginAmount"
+          variant="outlined"
+          onChange={handleChangeOriginAmount}
           sx={{ margin: "1rem 0" }}
         />
         {errorMessage !== "" && (
