@@ -6,12 +6,10 @@ import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
 import MintDialog from "./dialogs/MintDialog";
 import TransferDialog from "./dialogs/TransferDialog";
-import EscrowDialog from "./dialogs/EscrowDialog";
-import BridgeOutDialog from "./dialogs/BridgeOutDialog";
-import BridgeBackDialog from "./dialogs/BridgeBackDialog";
+import PermissionDialog from "./dialogs/PermissionDialog";
 import { getFabricBalance } from "../api-calls/fabric-api";
 import { getBesuBalance } from "../api-calls/besu-api";
-import { AssetReference } from "../models/AssetReference";
+import { SessionReference } from "../models/SessionReference";
 
 const NormalButton = styled(Button)<ButtonProps>(({ theme }) => ({
   margin: "auto",
@@ -46,16 +44,14 @@ const CriticalButton = styled(Button)<ButtonProps>(({ theme }) => ({
 export interface IActionsContainerOptions {
   user: string;
   ledger: string;
-  assetRefs: Array<AssetReference>;
+  sessionRefs: Array<SessionReference>;
 }
 
 export default function ActionsContainer(props: IActionsContainerOptions) {
   const [amount, setAmount] = useState(0);
   const [mintDialog, setMintDialog] = useState(false);
   const [transferDialog, setTransferDialog] = useState(false);
-  const [escrowDialog, setEscrowDialog] = useState(false);
-  const [bridgeOutDialog, setBridgeOutDialog] = useState(false);
-  const [bridgeBackDialog, setBridgeBackDialog] = useState(false);
+  const [permissionDialog, setGivePermissionDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -111,7 +107,7 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <span>{amount} CBDC</span>
           </Grid>
 
-          {props.user !== "Bridge" && props.ledger !== "Besu" && (
+          {props.user !== "Bridge" && (
             <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
@@ -122,18 +118,9 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             </Grid>
           )}
           {props.user === "Bridge" ? (
-            <Grid item xs={12} lg={12}>
-              <NormalButton
-                variant="contained"
-                fullWidth
-                disabled={amount === 0}
-                onClick={() => setTransferDialog(true)}
-              >
-                Transfer
-              </NormalButton>
-            </Grid>
+            <Grid item xs={12} lg={12}></Grid>
           ) : props.ledger === "Besu" ? (
-            <Grid item xs={12} lg={12}>
+            <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
                 disabled={amount === 0}
@@ -154,51 +141,29 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             </Grid>
           )}
           {props.user !== "Bridge" && (
-            <Grid item xs={12} lg={6}>
-              <CriticalButton
+            <Grid item xs={12} lg={12}>
+              <NormalButton
                 variant="contained"
                 disabled={amount === 0}
-                onClick={() => setEscrowDialog(true)}
+                onClick={() => setGivePermissionDialog(true)}
               >
-                Escrow
-              </CriticalButton>
+                Give Permission
+              </NormalButton>
             </Grid>
           )}
+          {props.user !== "Bridge" && <Grid item xs={12} lg={6}></Grid>}
           {props.ledger === "Fabric" && props.user !== "Bridge" && (
-            <Grid item xs={12} lg={6}>
-              <CriticalButton
-                variant="contained"
-                disabled={
-                  props.assetRefs.filter(
-                    (asset) => asset.recipient === props.user,
-                  ).length === 0
-                }
-                onClick={() => setBridgeOutDialog(true)}
-              >
-                Bridge Out
-              </CriticalButton>
-            </Grid>
+            <Grid item xs={12} lg={6}></Grid>
           )}
           {props.ledger === "Besu" && props.user !== "Bridge" && (
-            <Grid item xs={12} lg={6}>
-              <CriticalButton
-                variant="contained"
-                disabled={
-                  props.assetRefs.filter(
-                    (asset) => asset.recipient === props.user,
-                  ).length === 0
-                }
-                onClick={() => setBridgeBackDialog(true)}
-              >
-                Bridge Back
-              </CriticalButton>
-            </Grid>
+            <Grid item xs={12} lg={6}></Grid>
           )}
         </Grid>
       )}
       <MintDialog
         open={mintDialog}
         user={props.user}
+        ledger={props.ledger}
         onClose={() => setMintDialog(false)}
       />
       <TransferDialog
@@ -207,21 +172,11 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
         ledger={props.ledger}
         onClose={() => setTransferDialog(false)}
       />
-      <EscrowDialog
-        open={escrowDialog}
+      <PermissionDialog
+        open={permissionDialog}
         user={props.user}
         ledger={props.ledger}
-        onClose={() => setEscrowDialog(false)}
-      />
-      <BridgeOutDialog
-        open={bridgeOutDialog}
-        user={props.user}
-        onClose={() => setBridgeOutDialog(false)}
-      />
-      <BridgeBackDialog
-        open={bridgeBackDialog}
-        user={props.user}
-        onClose={() => setBridgeBackDialog(false)}
+        onClose={() => setGivePermissionDialog(false)}
       />
     </div>
   );
