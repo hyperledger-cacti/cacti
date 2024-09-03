@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 import Button, { ButtonProps } from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -20,7 +21,7 @@ const NormalButton = styled(Button)<ButtonProps>(({ theme }) => ({
   background: "#2B9BF6",
   color: "#FFFFFF",
   border: "0.5px solid #000000",
-  '&:disabled': {
+  "&:disabled": {
     border: "0",
   },
 }));
@@ -37,15 +38,15 @@ const CriticalButton = styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: "#444444",
     color: "#FFFFFF",
   },
-  '&:disabled': {
+  "&:disabled": {
     border: "0",
   },
 }));
 
 export interface IActionsContainerOptions {
-    user: string;
-    ledger: string;
-    assetRefs: Array<AssetReference>
+  user: string;
+  ledger: string;
+  assetRefs: Array<AssetReference>;
 }
 
 export default function ActionsContainer(props: IActionsContainerOptions) {
@@ -78,25 +79,35 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
     <div>
       {loading ? (
         <center>
-          <CircularProgress  sx={{
-            marginTop: "1rem",
-          }}/>
+          <CircularProgress
+            sx={{
+              marginTop: "1rem",
+            }}
+          />
         </center>
       ) : (
         <Grid container spacing={1}>
-          <Grid item lg={5} sx={{
-            textAlign: "left",
-            fontSize: "17px",
-            marginBottom: "0.2rem",
-          }}>
+          <Grid
+            item
+            lg={5}
+            sx={{
+              textAlign: "left",
+              fontSize: "17px",
+              marginBottom: "0.2rem",
+            }}
+          >
             <span>{props.user}</span>
           </Grid>
           <Grid item lg={1} />
-          <Grid item lg={6} sx={{
-            textAlign: "right",
-            fontSize: "17px",
-            marginBottom: "0.2rem",
-          }}>
+          <Grid
+            item
+            lg={6}
+            sx={{
+              textAlign: "right",
+              fontSize: "17px",
+              marginBottom: "0.2rem",
+            }}
+          >
             <span>{amount} CBDC</span>
           </Grid>
 
@@ -117,7 +128,6 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
                 fullWidth
                 disabled={amount === 0}
                 onClick={() => setTransferDialog(true)}
-            
               >
                 Transfer
               </NormalButton>
@@ -128,7 +138,6 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
                 variant="contained"
                 disabled={amount === 0}
                 onClick={() => setTransferDialog(true)}
-            
               >
                 Transfer
               </NormalButton>
@@ -139,7 +148,6 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
                 variant="contained"
                 disabled={amount === 0}
                 onClick={() => setTransferDialog(true)}
-            
               >
                 Transfer
               </NormalButton>
@@ -151,7 +159,6 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
                 variant="contained"
                 disabled={amount === 0}
                 onClick={() => setEscrowDialog(true)}
-            
               >
                 Escrow
               </CriticalButton>
@@ -182,7 +189,6 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
                   ).length === 0
                 }
                 onClick={() => setBridgeBackDialog(true)}
-            
               >
                 Bridge Back
               </CriticalButton>
