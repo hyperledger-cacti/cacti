@@ -14,10 +14,10 @@ import { transferTokensBesu } from "../../api-calls/besu-api";
 
 const recipients = ["Alice", "Charlie", "Bridge"];
 export interface ITransferDialogOptions {
-  open: boolean
-  ledger: string
-  user: string
-  onClose: () => any
+  open: boolean;
+  ledger: string;
+  user: string;
+  onClose: () => any;
 }
 
 export default function TransferDialog(props: ITransferDialogOptions) {
@@ -34,7 +34,9 @@ export default function TransferDialog(props: ITransferDialogOptions) {
     }
   }, [props.open]);
 
-  const handleChangeAmount = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleChangeAmount = (
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     const value = parseInt(event.target.value);
 
     if (value < 0) {
