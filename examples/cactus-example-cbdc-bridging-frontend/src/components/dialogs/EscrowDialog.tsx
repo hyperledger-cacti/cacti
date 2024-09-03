@@ -12,10 +12,10 @@ import { escrowTokensFabric } from "../../api-calls/fabric-api";
 import { escrowTokensBesu } from "../../api-calls/besu-api";
 
 export interface IEscrowDialogOptions {
-  open: boolean
-  user: string
-  ledger: string
-  onClose: () => any
+  open: boolean;
+  user: string;
+  ledger: string;
+  onClose: () => any;
 }
 
 export default function EscrowDialog(props: IEscrowDialogOptions) {
@@ -32,7 +32,9 @@ export default function EscrowDialog(props: IEscrowDialogOptions) {
     }
   }, [props.open]);
 
-  const handleChangeAmount = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleChangeAmount = (
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     const value = parseInt(event.target.value);
 
     if (value < 0) {

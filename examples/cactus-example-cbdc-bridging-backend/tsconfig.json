@@ -1,0 +1,54 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "rootDir": "./src",
+    "moduleResolution": "Node16",
+    "module": "Node16",
+    "tsBuildInfoFile": "../../.build-cache/cactus-example-cbdc-bridging-backend.tsbuildinfo",
+  },
+  "references": [
+    {
+      "path": "../../extensions/cactus-plugin-object-store-ipfs"
+    },
+    {
+      "path": "../../packages/cactus-api-client/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-cmd-api-server/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-keychain-memory/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-satp-hermes/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-test-tooling/tsconfig.json"
+    }
+  ],
+  "include": [
+    "./src",
+    "src/**/*.json"
+  ],
+  "exclude": [
+    "./src/fabric-contracts"
+  ]
+}
