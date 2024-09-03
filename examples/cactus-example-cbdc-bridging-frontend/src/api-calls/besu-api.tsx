@@ -33,7 +33,7 @@ export async function transferTokensBesu(
 export async function escrowTokensBesu(
   frontendUserFrom: string,
   amount: number,
-  assetRefID: string
+  assetRefID: string,
 ) {
   const from = getEthAddress(frontendUserFrom);
 
@@ -84,7 +84,11 @@ export async function getAssetReferencesBesu(frontendUser: string) {
   });
 }
 
-export async function bridgeBackTokensBesu(frontendUser: string, amount: number, assetRefID: string) {
+export async function bridgeBackTokensBesu(
+  frontendUser: string,
+  amount: number,
+  assetRefID: string,
+) {
   const address = getEthAddress(frontendUser);
   const fabricID = getFabricId(frontendUser);
 
