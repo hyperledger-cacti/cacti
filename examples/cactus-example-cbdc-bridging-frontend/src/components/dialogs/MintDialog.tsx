@@ -10,13 +10,13 @@ import Alert from "@mui/material/Alert";
 import { mintTokensFabric } from "../../api-calls/fabric-api";
 
 export interface IMintDialogOptions {
-  open: boolean
-  user: string
-  onClose: () => any
+  open: boolean;
+  user: string;
+  onClose: () => any;
 }
 
 export default function MintDialog(props: IMintDialogOptions) {
-  const [amount, setAmount] = useState<Number>(0);
+  const [amount, setAmount] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
 
@@ -27,7 +27,9 @@ export default function MintDialog(props: IMintDialogOptions) {
     }
   }, [props.open]);
 
-  const handleChangeAmount = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleChangeAmount = (
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     const value = parseInt(event.target.value);
 
     if (value < 0) {

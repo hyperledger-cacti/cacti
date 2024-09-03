@@ -29,7 +29,9 @@ export default function BridgeOutDialog(props: IBridgeOutDialogOptions) {
   useEffect(() => {
     async function fetchData() {
       const list = await getAssetReferencesFabric(props.user);
-      setAssetRefs(list.filter((asset: AssetReference) => asset.recipient === props.user));
+      setAssetRefs(
+        list.filter((asset: AssetReference) => asset.recipient === props.user),
+      );
     }
 
     if (props.open) {
@@ -48,14 +50,16 @@ export default function BridgeOutDialog(props: IBridgeOutDialogOptions) {
       setErrorMessage("Please choose a valid Asset Reference ID");
     } else {
       setSending(true);
-      const assetRef = assetRefs.find(
-        (asset) => asset.id === assetRefID,
-      );
+      const assetRef = assetRefs.find((asset) => asset.id === assetRefID);
       if (assetRef === undefined) {
         setErrorMessage("Something went wrong. Asset Reference not found");
         return;
       }
-      await bridgeOutTokensFabric(props.user, assetRef.numberTokens, assetRefID);
+      await bridgeOutTokensFabric(
+        props.user,
+        assetRef.numberTokens,
+        assetRefID,
+      );
       props.onClose();
     }
   };

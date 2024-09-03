@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Ledger from "../components/Ledger";
@@ -10,7 +11,7 @@ import ConnectionErrorDialog from "../components/dialogs/ConnectionErrorDialog";
 export default function HomePage() {
   const [errorDialog, setErrorDialog] = useState<boolean>(false);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const checkConnection = async () => {
       await checkApiServer1Connection()
         .then(() => setErrorDialog(false))
@@ -19,18 +20,21 @@ export default function HomePage() {
       await checkApiServer2Connection()
         .then(() => setErrorDialog(false))
         .catch(() => setErrorDialog(true));
-    }
+    };
 
     checkConnection();
-  }, []);
+  }, []);*/
 
   return (
     <div style={{ width: "95%", margin: "4rem auto" }}>
-      <Grid container sx={{
-        width: "95%",
-        margin: "2rem auto",
-        textAlign: "center",
-      }}>
+      <Grid
+        container
+        sx={{
+          width: "95%",
+          margin: "2rem auto",
+          textAlign: "center",
+        }}
+      >
         <Grid item sm={12} md={5}>
           <Ledger ledger={"Fabric"} />
         </Grid>
