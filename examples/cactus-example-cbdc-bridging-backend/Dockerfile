@@ -32,10 +32,10 @@ WORKDIR ${APP}
 
 SHELL ["/bin/bash", "--login", "-i", "-c"]
 # Installing Node Version Manager (nvm)
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
 RUN source ~/.bashrc && \
-    nvm install 16.8.0 && \
+    nvm install 18.18.2 && \
     npm install -g yarn && \
     npm run configure
 
@@ -48,6 +48,12 @@ ENV API_SERVER_1_PORT=4000
 ENV API_SERVER_2_PORT=4100
 ENV API_HOST_FRONTEND=localhost
 ENV API_PORT_FRONTEND=2000
+ENV API_GATEWAY_1_BLO_PORT=4010
+ENV API_GATEWAY_2_BLO_PORT=4110
+ENV API_GATEWAY_1_CLIENT_PORT=3011
+ENV API_GATEWAY_2_CLIENT_PORT=3111
+ENV API_GATEWAY_1_SERVER_PORT=3010
+ENV API_GATEWAY_2_SERVER_PORT=3110
 
 COPY examples/cactus-example-cbdc-bridging-backend/src/fabric-contracts /usr/src/app/cactus/examples/cactus-example-cbdc-bridging-backend/dist/lib/fabric-contracts
 COPY examples/cactus-example-cbdc-bridging-backend/supervisord.conf /etc/supervisord.conf
@@ -60,6 +66,15 @@ EXPOSE 9001
 EXPOSE 4000
 # API #2
 EXPOSE 4100
+
+EXPOSE 4010
+EXPOSE 4110
+EXPOSE 3011
+EXPOSE 3111
+EXPOSE 3010
+EXPOSE 3110
+#to the dummy server that exposes to the frontend the besu-satp contract address
+EXPOSE 9999
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script
