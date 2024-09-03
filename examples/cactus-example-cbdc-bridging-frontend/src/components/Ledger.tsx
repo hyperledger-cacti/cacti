@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import ActionsContainer from "./ActionsContainer";
-import { getAssetReferencesFabric } from "../api-calls/fabric-api";
-import { getAssetReferencesBesu } from "../api-calls/besu-api";
+import { getSessionReferencesBridge } from "../api-calls/gateway-api";
 import AssetReferencesTable from "./AssetReferencesTable";
 
 export interface ILedgerOptions {
@@ -11,15 +10,15 @@ export interface ILedgerOptions {
 }
 
 export default function Ledger(props: ILedgerOptions) {
-  const [assetReferences, setAssetReferences] = useState([]);
+  const [sessionReferences, setAssetReferences] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       if (props.ledger === "Fabric") {
-        const list = await getAssetReferencesFabric("Alice");
+        const list = await getSessionReferencesBridge("4010");
         setAssetReferences(list);
       } else {
-        const list = await getAssetReferencesBesu("Alice");
+        const list = await getSessionReferencesBridge("4110");
         setAssetReferences(list);
       }
     }
@@ -70,7 +69,7 @@ export default function Ledger(props: ILedgerOptions) {
             <ActionsContainer
               user={"Alice"}
               ledger={props.ledger}
-              assetRefs={assetReferences}
+              sessionRefs={sessionReferences}
             />
           </Paper>
         </Grid>
@@ -85,7 +84,7 @@ export default function Ledger(props: ILedgerOptions) {
             <ActionsContainer
               user={"Charlie"}
               ledger={props.ledger}
-              assetRefs={assetReferences}
+              sessionRefs={sessionReferences}
             />
           </Paper>
         </Grid>
@@ -121,11 +120,14 @@ export default function Ledger(props: ILedgerOptions) {
         <ActionsContainer
           user={"Bridge"}
           ledger={props.ledger}
-          assetRefs={assetReferences}
+          sessionRefs={sessionReferences}
         />
       </Paper>
-      <p>Asset References</p>
-      <AssetReferencesTable ledger={props.ledger} assetRefs={assetReferences} />
+      <p>Sessions Status</p>
+      <AssetReferencesTable
+        ledger={props.ledger}
+        sessionRefs={sessionReferences}
+      />
     </Paper>
   );
 }

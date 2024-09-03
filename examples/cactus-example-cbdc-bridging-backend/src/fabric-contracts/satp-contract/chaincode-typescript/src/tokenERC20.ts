@@ -91,7 +91,8 @@ class TokenERC20Contract extends Contract {
 
     const balanceBytes = await ctx.stub.getState(balanceKey);
     if (!balanceBytes || balanceBytes.length === 0) {
-      throw new Error(`the account ${owner} does not exist`);
+      //throw new Error(`the account ${owner} does not exist`);
+      return 0;
     }
     const balance: number = parseInt(balanceBytes.toString());
 
@@ -513,7 +514,8 @@ class TokenERC20Contract extends Contract {
     const balanceKey: string = ctx.stub.createCompositeKey(balancePrefix, [id]);
     const balanceBytes = await ctx.stub.getState(balanceKey);
     if (!balanceBytes || balanceBytes.length === 0) {
-      throw new Error(`the account ${id} does not exist`);
+      //throw new Error(`the account ${id} does not exist`);
+      return 0;
     }
     const balance: number = parseInt(balanceBytes.toString());
 
