@@ -9312,6 +9312,7 @@ __metadata:
     body-parser: "npm:1.20.3"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
+    cors: "npm:2.8.5"
     crypto-js: "npm:4.2.0"
     express: "npm:5.1.0"
     fabric-network: "npm:2.2.20"

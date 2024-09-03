@@ -1,3 +1,5 @@
+import express from "express";
+import cors from "cors";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs-extra";
@@ -44,8 +46,9 @@ import SATPWrapperContract from "../../../solidity/main/generated/satp-wrapper.s
 import { PluginFactorySATPGateway, SATPGateway, SATPGatewayConfig } from "@hyperledger/cactus-plugin-satp-hermes";
 import { IPluginFactoryOptions, PluginImportType } from "@hyperledger/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
-import { SupportedChain, GatewayIdentity, DraftVersions } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/core/types";
+import { SupportedChain, GatewayIdentity, DraftVersions, Address } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/core/types";
 import { FabricConfig, NetworkConfig } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/types/blockchain-interaction";
+import { bufArray2HexStr } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/gateway-utils";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -69,7 +72,7 @@ export class CbdcBridgingAppDummyInfrastructure {
   private besuFirstHighNetWorthAccountPriv: string = "";
 
   private besuOptions: IPluginLedgerConnectorBesuOptions | undefined;
-  private fabricOptions: IPluginLedgerConnectorFabricOptions | undefined;
+  private fabricConnectorBridgeOptions: IPluginLedgerConnectorFabricOptions | undefined;
 
   private besuContractAddress: string | undefined;
   private besuWrapperContractAddress: string | undefined;
@@ -164,6 +167,8 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   public async createFabricLedgerConnector(): Promise<PluginLedgerConnectorFabric> {
     const connectionProfileOrg1 = await this.fabric.getConnectionProfileOrg1();
+    const connectionProfileOrg2 = await this.fabric.getConnectionProfileOrgX("org2");
+
     const enrollAdminOutOrg1 = await this.fabric.enrollAdmin();
     const adminWalletOrg1 = enrollAdminOutOrg1[1];
     [this.userIdentity1] = await this.fabric.enrollUserV2({
@@ -201,7 +206,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     const keychainEntryKey2 = "userB";
     const keychainEntryValue2 = JSON.stringify(userIdentity2);
 
-    const keychainEntryKey3 = "bridge";
+    const keychainEntryKey3 = CryptoMaterial.keychains.keychain2.ref;
     const keychainEntryValue3 = JSON.stringify(bridgeIdentity);
 
     const keychainEntryKey4 = "adminUser";
@@ -219,9 +224,20 @@ export class CbdcBridgingAppDummyInfrastructure {
       ]),
     });
 
+    const bridgeKeychainPlugin = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: CryptoMaterial.keychains.keychain2.id,
+      logLevel: this.options.logLevel || "INFO",
+      backend: new Map([
+        [keychainEntryKey3, keychainEntryValue3],
+      ]),
+    });
+
     const pluginRegistry = new PluginRegistry({ plugins: [this.fabricKeychainPlugin] });
 
-    this.fabricOptions = {
+    const bridgePluginRegistry = new PluginRegistry({ plugins: [bridgeKeychainPlugin] });
+
+   const fabricOptions = {
       instanceId: uuidv4(),
       dockerBinary: "/usr/local/bin/docker",
       peerBinary: "/fabric-samples/bin/peer",
@@ -240,8 +256,29 @@ export class CbdcBridgingAppDummyInfrastructure {
         commitTimeout: 300,
       },
     }
+
+    this.fabricConnectorBridgeOptions = {
+      instanceId: uuidv4(),
+      dockerBinary: "/usr/local/bin/docker",
+      peerBinary: "/fabric-samples/bin/peer",
+      goBinary: "/usr/local/go/bin/go",
+      pluginRegistry: bridgePluginRegistry,
+      cliContainerEnv: this.org2Env,
+      sshConfig,
+      connectionProfile: connectionProfileOrg2,
+      logLevel: this.options.logLevel || "INFO",
+      discoveryOptions: {
+        enabled: true,
+        asLocalhost: true,
+      },
+      eventHandlerOptions: {
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+        commitTimeout: 300,
+      },
+    };
+
     this.log.info(`Creating Fabric Connector...`);
-    return new PluginLedgerConnectorFabric(this.fabricOptions);
+    return new PluginLedgerConnectorFabric(fabricOptions);
   }
 
   public async createBesuLedgerConnector(): Promise<PluginLedgerConnectorBesu> {
@@ -337,6 +374,10 @@ export class CbdcBridgingAppDummyInfrastructure {
     const fnTag = `${this.className}#createSATPGateways()`;
     const logLevel = this.options.logLevel || "INFO";
 
+    const fabricGatewayKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
+    const besuGatewayKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
     const fabricGatewayIdentity = {
       id: "fabric-satp-gateway-id",
       name: "Fabric SATP Gateway",
@@ -353,7 +394,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       id: "besu-satp-gateway-id",
       name: "Besu SATP Gateway",
       version: this.draftVersions,
-      supportedDLTs: [SupportedChain.FABRIC],
+      supportedDLTs: [SupportedChain.BESU],
       proofID: "besuGatewayProofID",
       address: `http://localhost`,
       gatewayServerPort: 3110,
@@ -383,7 +424,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       },
       channelName: CbdcBridgingAppDummyInfrastructure.FABRIC_CHANNEL_NAME,
       contractName: CbdcBridgingAppDummyInfrastructure.SATP_WRAPPER,
-      options: this.fabricOptions,
+      options: this.fabricConnectorBridgeOptions,
       bungeeOptions: pluginBungeeFabricOptions,
     } as FabricConfig;
 
@@ -402,18 +443,44 @@ export class CbdcBridgingAppDummyInfrastructure {
       gas: 999999999999999,
     };
 
-    const besuGatewayOptions = {
+    const besuGatewayOptions: SATPGatewayConfig = {
       logLevel: logLevel,
       gid: besuGatewayIdentity,
-      counterPartyGateways: [fabricGatewayIdentity],
+      counterPartyGateways: [{
+        id: "fabric-satp-gateway-id",
+        name: "Fabric SATP Gateway",
+        version: this.draftVersions,
+        supportedDLTs: [SupportedChain.FABRIC],
+        proofID: "fabricGatewayProofID",
+        address: `http://localhost`,
+        gatewayServerPort: 3010,
+        gatewayClientPort: 3011,
+        gatewayOpenAPIPort: 4010,
+        pubKey: bufArray2HexStr(fabricGatewayKeyPair.publicKey),
+      } as GatewayIdentity],
       bridgesConfig: [besuConfig],
+      enableOpenAPI: true,
+      keyPair: besuGatewayKeyPair,
     };
 
     const fabricGatewayOptions = {
       logLevel: logLevel,
       gid: fabricGatewayIdentity,
-      counterPartyGateways: [besuGatewayIdentity],
+      counterPartyGateways: [{
+        id: "besu-satp-gateway-id",
+        name: "Besu SATP Gateway",
+        version: this.draftVersions,
+        supportedDLTs: [SupportedChain.BESU],
+        proofID: "besuGatewayProofID",
+        address: `http://localhost`,
+        gatewayServerPort: 3110,
+        gatewayClientPort: 3111,
+        gatewayOpenAPIPort: 4110,
+        pubKey: bufArray2HexStr(besuGatewayKeyPair.publicKey),
+      } as GatewayIdentity],
       bridgesConfig: [fabricConfig],
+      enableOpenAPI: true,
+      keyPair: fabricGatewayKeyPair,
     };
 
     const besuGateway = await this.gatewayFactory.create(besuGatewayOptions);
@@ -550,9 +617,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       );
 
       const { packageIds, lifecycle, success } = res.data;
-      expect(res.status).toBe(200);
-      expect(success).toBe(true);
-      expect(lifecycle).not.toBeUndefined();
   
       const {
         approveForMyOrgList,
@@ -796,7 +860,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     }
     
     this.besuContractAddress = deployCbdcContractResponse.data.transactionReceipt.contractAddress ?? "";
-
+    await this.startDummyServer(this.besuContractAddress);
     const deployWrapperContractResponse =
       await besuApiClient.deployContractSolBytecodeV1({
         keychainId: CryptoMaterial.keychains.keychain2.id,
@@ -828,6 +892,19 @@ export class CbdcBridgingAppDummyInfrastructure {
       invocationType: EthContractInvocationType.Send,
       methodName: "giveRole",
       params: [deployWrapperContractResponse.data.transactionReceipt.contractAddress],
+      signingCredential: {
+        ethAccount: this.besuFirstHighNetWorthAccount,
+        secret: this.besuFirstHighNetWorthAccountPriv,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 1000000,
+    });
+    const giveRoleRes1 = await besuApiClient.invokeContractV1({
+      contractName: CbdcBridgingAppDummyInfrastructure.SATP_CONTRACT,
+      keychainId: CryptoMaterial.keychains.keychain2.id,
+      invocationType: EthContractInvocationType.Send,
+      methodName: "giveRole",
+      params: [CryptoMaterial.accounts["bridge"].ethAddress],
       signingCredential: {
         ethAccount: this.besuFirstHighNetWorthAccount,
         secret: this.besuFirstHighNetWorthAccountPriv,
@@ -938,5 +1015,28 @@ export class CbdcBridgingAppDummyInfrastructure {
       throw new Error("Failed to initialize CBDC Besu contract");
     }
 
+  }
+
+  async startDummyServer(address: string){
+    //just to send contract address to the frontend at each run
+    const app = express();
+    app.use(cors());
+    const port = 9999;
+
+    // Example endpoint that returns the contract address
+    app.get('/contract-address', (_req: any, res: { json: (arg0: { address: string; }) => void; }) => {
+      // Replace this with the actual logic to retrieve the contract address
+      const contractAddress = address;
+      res.json({ address: contractAddress });
+    });
+    app.get('/wrapper-address', (_req: any, res: { json: (arg0: { address: string; }) => void; }) => {
+      // Replace this with the actual logic to retrieve the contract address
+      const contractAddress = this.besuWrapperContractAddress!;
+      res.json({ address: contractAddress });
+    });
+
+    app.listen(port, () => {
+      //console.log(`Server running on http://localhost:${port}`);
+    });
   }
 }

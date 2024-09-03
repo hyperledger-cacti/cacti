@@ -75,6 +75,7 @@ import {
 import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
 import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
 import { createClient } from "../test-utils";
+import { bufArray2HexStr } from "../../../main/typescript/gateway-utils";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -963,6 +964,8 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
       address: "http://localhost" as Address,
     } as GatewayIdentity;
 
+    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
     const gatewayIdentity2 = {
       id: "mockID-2",
       name: "CustomGateway",
@@ -981,18 +984,58 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
       gatewayOpenAPIPort: 4110,
     } as GatewayIdentity;
 
+    const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
     const options1: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity1,
-      counterPartyGateways: [gatewayIdentity2], //only knows itself
+      counterPartyGateways: [
+        // this need to be like this because the shared memory was being altered
+        {
+          id: "mockID-2",
+          name: "CustomGateway",
+          pubKey: bufArray2HexStr(gateway2KeyPair.publicKey),
+          version: [
+            {
+              Core: "v02",
+              Architecture: "v02",
+              Crash: "v02",
+            },
+          ],
+          supportedDLTs: [SupportedChain.FABRIC],
+          proofID: "mockProofID11",
+          address: "http://localhost" as Address,
+          gatewayServerPort: 3110,
+          gatewayClientPort: 3111,
+          gatewayOpenAPIPort: 4110,
+        },
+      ],
       bridgesConfig: [besuConfig],
+      keyPair: gateway1KeyPair,
     };
 
     const options2: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity2,
-      counterPartyGateways: [gatewayIdentity1], //only knows itself
+      counterPartyGateways: [
+        {
+          id: "mockID-1",
+          name: "CustomGateway",
+          pubKey: bufArray2HexStr(gateway1KeyPair.publicKey),
+          version: [
+            {
+              Core: "v02",
+              Architecture: "v02",
+              Crash: "v02",
+            },
+          ],
+          supportedDLTs: [SupportedChain.BESU],
+          proofID: "mockProofID10",
+          address: "http://localhost" as Address,
+        },
+      ],
       bridgesConfig: [fabricConfig],
+      keyPair: gateway2KeyPair,
     };
     const gateway1 = await factory.create(options1);
     expect(gateway1).toBeInstanceOf(SATPGateway);

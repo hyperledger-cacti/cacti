@@ -55,7 +55,7 @@ import {
   SATPBridgesManager,
 } from "./gol/satp-bridges-manager";
 import bodyParser from "body-parser";
-
+import cors from "cors";
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
   @IsDefined()
@@ -381,7 +381,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error("BLODispatcher is not defined");
         }
         this.BLOApplication = express();
-        this.BLOApplication.use(bodyParser.json({ limit: "50mb" }));
+        this.BLOApplication.use(bodyParser.json({ limit: "250mb" }));
+        this.BLOApplication.use(cors());
         try {
           const webServices = await this.BLODispatcher.getOrCreateWebServices();
           for (const service of webServices) {

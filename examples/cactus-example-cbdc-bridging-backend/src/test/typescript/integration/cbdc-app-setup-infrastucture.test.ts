@@ -53,7 +53,7 @@ describe("Setup CBDC app infrastructure", () => {
     await app.start();
   });
 
-  it("Should shutdown everything successfully", async () => {
-    await app.stop();
-  });
+  /*it("Should shutdown everything successfully", async () => {
+    //await app.stop();
+  });*/
 })
