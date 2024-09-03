@@ -73,7 +73,11 @@ export async function transferTokensFabric(
   }
 }
 
-export async function escrowTokensFabric(frontendUser: string, amount: string, assetRefID: string) {
+export async function escrowTokensFabric(
+  frontendUser: string,
+  amount: string,
+  assetRefID: string,
+) {
   const response = await axios.post(
     "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
@@ -94,7 +98,11 @@ export async function escrowTokensFabric(frontendUser: string, amount: string, a
   }
 }
 
-export async function bridgeOutTokensFabric(frontendUser: string, amount: string, assetRefID: string) {
+export async function bridgeOutTokensFabric(
+  frontendUser: string,
+  amount: string,
+  assetRefID: string,
+) {
   const fabricID = getFabricId(frontendUser);
   const address = getEthAddress(frontendUser);
 

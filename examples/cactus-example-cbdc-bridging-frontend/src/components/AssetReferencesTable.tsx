@@ -52,7 +52,9 @@ export interface IAssetReferencesTableOptions {
   assetRefs: AssetReference[];
 }
 
-export default function AssetReferencesTable(props: IAssetReferencesTableOptions) {
+export default function AssetReferencesTable(
+  props: IAssetReferencesTableOptions,
+) {
   return (
     <div>
       {props.assetRefs && (
