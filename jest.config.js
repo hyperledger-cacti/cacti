@@ -63,7 +63,6 @@ module.exports = {
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts`,
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get--status-endpoint-invalid.test.ts`,
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts`,
-    `./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-consortium-manual.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts`,
