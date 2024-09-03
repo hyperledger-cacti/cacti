@@ -66,7 +66,9 @@ export class Stage0SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     try {
       this.Log.debug(`${fnTag}, New Session...`);
-      this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
+      this.Log.debug(
+        `${fnTag}, Request: ${JSON.stringify(req)}, Context: ${JSON.stringify(context)}`,
+      );
 
       let session = this.sessions.get(req.sessionId);
 
@@ -108,7 +110,9 @@ export class Stage0SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     try {
       this.Log.debug(`${fnTag}, PreSATPTransfer...`);
-      this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
+      this.Log.debug(
+        `${fnTag}, Request: ${JSON.stringify(req)}, Context: ${JSON.stringify(context)}`,
+      );
 
       const session = this.sessions.get(req.sessionId);
 
