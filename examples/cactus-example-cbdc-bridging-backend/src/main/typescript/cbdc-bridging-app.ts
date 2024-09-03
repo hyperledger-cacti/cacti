@@ -26,6 +26,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import http, { Server } from "http";
 import { Constants } from "@hyperledger/cactus-core-api";
+import cors from "cors";
 
 import { Server as SocketIoServer } from "socket.io";
 
@@ -100,6 +101,7 @@ export class CbdcBridgingApp {
     // Reserve the ports where the API Servers will run
     {
       const expressApp = express();
+      expressApp.use(cors());
       expressApp.use(bodyParser.json({ limit: "250mb" }));
       const fabricServer = http.createServer(expressApp);
 
@@ -118,6 +120,7 @@ export class CbdcBridgingApp {
   {    
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
+    expressApp.use(cors());
     const besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: this.options.apiHost,
