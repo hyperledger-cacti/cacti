@@ -4,7 +4,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { AssetReference } from "../models/AssetReference";
+import { SessionReference } from "../models/SessionReference";
 
 const headCells = [
   {
@@ -12,11 +12,10 @@ const headCells = [
     first: true,
     label: "ID",
   },
-  { id: "amount", numeric: true, label: "Amount" },
-  {
-    id: "owner",
-    label: "Owner",
-  },
+  { id: "status", label: "Status" },
+  { id: "substatus", label: "Substatus" },
+  { id: "origin", label: "Origin" },
+  { id: "destiny", label: "Destiny" },
 ];
 
 function ItemsTableHead() {
@@ -47,31 +46,38 @@ function ItemsTableHead() {
   );
 }
 
-export interface IAssetReferencesTableOptions {
+export interface ISessionReferencesTableOptions {
   ledger: string;
-  assetRefs: AssetReference[];
+  sessionRefs: SessionReference[];
 }
 
-export default function AssetReferencesTable(
-  props: IAssetReferencesTableOptions,
+export default function SessionReferencesTable(
+  props: ISessionReferencesTableOptions,
 ) {
   return (
     <div>
-      {props.assetRefs && (
+      {props.sessionRefs && (
         <TableContainer>
           <Table size="small" aria-label="a dense table">
             <ItemsTableHead />
             <TableBody>
-              {props.assetRefs.map((row) => (
+              {props.sessionRefs.map((row) => (
                 <TableRow
                   key={row.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  style={
+                    row.status === "DONE"
+                      ? { backgroundColor: "lightgreen" }
+                      : { backgroundColor: "orange" }
+                  }
                 >
                   <TableCell component="th" scope="row">
                     {row.id}
                   </TableCell>
-                  <TableCell align="center">{row.numberTokens}</TableCell>
-                  <TableCell align="center">{row.recipient}</TableCell>
+                  <TableCell align="center">{row.status}</TableCell>
+                  <TableCell align="center">{row.substatus}</TableCell>
+                  <TableCell align="center">{row.originLedger}</TableCell>
+                  <TableCell align="center">{row.destinyLedger}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
