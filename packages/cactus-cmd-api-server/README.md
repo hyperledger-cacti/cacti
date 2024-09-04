@@ -11,6 +11,7 @@
 - [Containerization](#containerization)
   - [Building the container image locally](#building-the-container-image-locally)
   - [Running the container image locally](#running-the-container-image-locally)
+  - [Running Locally Built Image with Locally Modified Plugins Without npm/ghcr Publishishing](#running-locally-built-image-with-locally-modified-plugins-without-npmghcr-publishishing)
   - [Testing API calls with the container](#testing-api-calls-with-the-container)
   - [Running a Security Scan on the Built Container Image](#running-a-security-scan-on-the-built-container-image)
 - [Prometheus Exporter](#prometheus-exporter)
@@ -347,6 +348,36 @@ Once you've built the container, the following commands should work:
       node index.js \
       --config-file=/.cacti-config.json
   ```
+
+### Running Locally Built Image with Locally Modified Plugins Without npm/ghcr Publishishing
+
+It can be very inconvenient to have to publish npm packages just for testing. If you'd like to
+evaluate some changes you've made in a plugin, but need to have the plugin installed in the API 
+server for it then you can use a command like the one below to make it use the local version with your changes.
+
+There are two things necessary for this scenario to work:
+1. You must mount the project folder of your host machine onto the container's file-system. See `--volume ${PWD}:/usr/src/cacti` parameter below in the example command. This (when executed from your Cacti repository root) will mount the entire project within the container under `/usr/src/cacti/`. The reason why this is necessary is because this will allow us to instruct the API server through configuration that when it is running the besu connector plugin, it should not pull it from the registry, but instead directly from the file-system from a given path that we provide in the configuration.
+2. You must specify the `packageSrc` optional parameter when declaring the constructor options of the plugin you are going to install. See the section of the configuration below that looks like this: `"options": { "packageSrc": "/usr/src/cacti/packages/cactus-plugin-ledger-connector-besu", .. }`. What the latter instructs the API server to do is the installation source override mentioned earlier: It will import and run an instance of the Besu connector plugin which was built locally on your host computer. Of course for this to work you have to make sure to have a working build so that the `./dist/` folder of your plugin contains the actual `.js` source files which the API server will then import.
+
+```sh
+docker run \
+  --rm \
+  --volume ${PWD}:/usr/src/cacti \
+  --publish 3000:3000 \
+  --publish 4000:4000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env API_TLS_CERT_PEM=- \
+  --env API_TLS_CLIENT_CA_PEM=- \
+  --env API_TLS_KEY_PEM=- \
+  --env API_TLS_ENABLED=false \
+  --env API_MTLS_ENABLED=false \
+  --env API_HOST=0.0.0.0 \
+  --env LOG_LEVEL=DEBUG \
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "packageSrc": "/usr/src/cacti/packages/cactus-plugin-ledger-connector-besu", "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
+  cas
+```
 
 ### Testing API calls with the container
 
