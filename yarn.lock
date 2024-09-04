@@ -9370,6 +9370,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:9.0.0"
     "@types/lodash": "npm:4.14.195"
     "@types/node": "npm:18.11.9"
+    http-status-codes: "npm:2.3.0"
     jsonwebtoken: "npm:9.0.0"
     lodash: "npm:4.17.21"
     rxjs: "npm:7.8.1"
@@ -32677,6 +32678,13 @@ __metadata:
   version: 2.1.4
   resolution: "http-status-codes@npm:2.1.4"
   checksum: 10/01db6e25c19fce4cb0da2251189c35c33a4d7eff26577b9652bbd841183132e0c8cf2042ff9a840cb196f4bef265ff2d3e1c40ef46a01580020f423314017658
+  languageName: node
+  linkType: hard
+
+"http-status-codes@npm:2.3.0":
+  version: 2.3.0
+  resolution: "http-status-codes@npm:2.3.0"
+  checksum: 10/1b8a01940b5e14d3c5b2f842313f4531469b41ce4fa40ca3aae5c82a3101828db2cc9406bfb2d50a46e6d521d106577b6656c2b065c76125b99ee54b2cbbac09
   languageName: node
   linkType: hard
 
