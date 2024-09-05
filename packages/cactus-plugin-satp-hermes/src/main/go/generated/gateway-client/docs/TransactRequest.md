@@ -5,7 +5,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ContextID** | **string** |  | 
-**Mode** | **string** |  | 
 **Payload** | Pointer to **string** |  | [optional] 
 **FromDLTNetworkID** | **string** |  | 
 **ToDLTNetworkID** | **string** |  | 
@@ -20,7 +19,7 @@ Name | Type | Description | Notes
 
 ### NewTransactRequest
 
-`func NewTransactRequest(contextID string, mode string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, toAmount string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, destinyAsset TransactRequestSourceAsset, ) *TransactRequest`
+`func NewTransactRequest(contextID string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, toAmount string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, destinyAsset TransactRequestSourceAsset, ) *TransactRequest`
 
 NewTransactRequest instantiates a new TransactRequest object
 This constructor will assign default values to properties that have it defined,
@@ -53,26 +52,6 @@ and a boolean to check if the value has been set.
 `func (o *TransactRequest) SetContextID(v string)`
 
 SetContextID sets ContextID field to given value.
-
-
-### GetMode
-
-`func (o *TransactRequest) GetMode() string`
-
-GetMode returns the Mode field if non-nil, zero value otherwise.
-
-### GetModeOk
-
-`func (o *TransactRequest) GetModeOk() (*string, bool)`
-
-GetModeOk returns a tuple with the Mode field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetMode
-
-`func (o *TransactRequest) SetMode(v string)`
-
-SetMode sets Mode field to given value.
 
 
 ### GetPayload

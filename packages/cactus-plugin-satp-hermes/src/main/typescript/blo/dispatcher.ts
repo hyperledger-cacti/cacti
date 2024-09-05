@@ -24,6 +24,7 @@ import { ISATPManagerOptions, SATPManager } from "../gol/satp-manager";
 import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
 import { SATPBridgesManager } from "../gol/satp-bridges-manager";
 import { ExecuteTransact } from "./transaction/transact-handler-service";
+import { TransactEndpointV1 } from "../web-services/transact-endpoint";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -39,6 +40,7 @@ export class BLODispatcher {
   public static readonly CLASS_NAME = "BLODispatcher";
   private readonly logger: Logger;
   private endpoints: IWebServiceEndpoint[] | undefined;
+  private OAPIEndpoints: IWebServiceEndpoint[] | undefined;
   private readonly instanceId: string;
   private manager: SATPManager;
   private orchestrator: GatewayOrchestrator;
@@ -95,6 +97,26 @@ export class BLODispatcher {
     return theEndpoints;
   }
 
+  public async getOrCreateOAPIWebServices(): Promise<IWebServiceEndpoint[]> {
+    const fnTag = `${BLODispatcher.CLASS_NAME}#getOrCreateOAPIWebServices()`;
+    this.logger.info(
+      `${fnTag}, Registering webservices on instanceId=${this.instanceId}`,
+    );
+
+    if (Array.isArray(this.OAPIEndpoints)) {
+      return this.OAPIEndpoints;
+    }
+
+    const transactEndpointV1 = new TransactEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
+    const theEndpoints = [transactEndpointV1];
+    this.OAPIEndpoints = theEndpoints;
+    return theEndpoints;
+  }
+
   private getTargetGatewayClient(id: string) {
     const channels = Array.from(this.orchestrator.getChannels());
     channels.filter((ch) => {
@@ -118,6 +140,7 @@ export class BLODispatcher {
 
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
+    this.logger.info(`Transact request: ${req}`);
     const res = await ExecuteTransact(
       this.logger,
       req,

@@ -39,7 +39,7 @@ export async function launchGateway(env?: NodeJS.ProcessEnv): Promise<void> {
       proofID: env?.SATP_PROOF_ID,
       gatewayServerPort: parseInt(env?.SATP_GATEWAY_SERVER_PORT || "0", 10),
       gatewayClientPort: parseInt(env?.SATP_GATEWAY_CLIENT_PORT || "0", 10),
-      gatewayGrpcPort: parseInt(env?.SATP_GATEWAY_GRPC_PORT || "0", 10),
+      gatewayOpenAPIPort: parseInt(env?.DEFAULT_PORT_GATEWAY_API || "0", 10),
       address: env?.SATP_GATEWAY_ADDRESS as
         | `http://${string}`
         | `https://${string}`

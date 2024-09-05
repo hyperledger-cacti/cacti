@@ -42,10 +42,15 @@ paths:
     post:
       tags:
         - transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -53,7 +58,6 @@ paths:
               type: object
               required:
                 - contextID
-                - mode
                 - fromDLTNetworkID
                 - toDLTNetworkID
                 - fromAmount
@@ -65,14 +69,8 @@ paths:
               properties:
                 contextID:
                   type: string
-                  format: uuid
+                  format: string
                   example: 123e4567-e89b-12d3-a456-426614174000
-                mode:
-                  type: string
-                  enum:
-                    - data
-                    - transfer
-                  example: transfer
                 payload:
                   type: string
                   example: '{"data":"example payload"}'
@@ -132,7 +130,6 @@ paths:
                       type: string
                     channelName:
                       type: string
-        required: true
       responses:
         '200':
           description: Transaction successfully queued
@@ -2108,7 +2105,6 @@ components:
       type: object
       required:
         - contextID
-        - mode
         - fromDLTNetworkID
         - toDLTNetworkID
         - fromAmount
@@ -2120,14 +2116,8 @@ components:
       properties:
         contextID:
           type: string
-          format: uuid
+          format: string
           example: 123e4567-e89b-12d3-a456-426614174000
-        mode:
-          type: string
-          enum:
-            - data
-            - transfer
-          example: transfer
         payload:
           type: string
           example: '{"data":"example payload"}'

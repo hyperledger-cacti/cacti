@@ -218,7 +218,6 @@ TransactRequest:
   type: object
   required:
     - contextID
-    - mode
     - fromDLTNetworkID
     - toDLTNetworkID
     - fromAmount
@@ -230,14 +229,8 @@ TransactRequest:
   properties:
     contextID:
       type: string
-      format: uuid
+      format: string
       example: "123e4567-e89b-12d3-a456-426614174000"
-    mode:
-      type: string
-      enum:
-        - data
-        - transfer
-      example: transfer
     payload:
       type: string
       example: '{"data":"example payload"}'

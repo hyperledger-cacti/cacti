@@ -42,15 +42,19 @@ paths:
     post:
       tags:
         - transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: ./schemas.yml#/TransactRequest
-        required: true
       responses:
         '200':
           description: Transaction successfully queued

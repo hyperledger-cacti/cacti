@@ -1887,12 +1887,6 @@ export interface TransactRequest {
      * @type {string}
      * @memberof TransactRequest
      */
-    'mode': TransactRequestModeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
     'payload'?: string;
     /**
      * 
@@ -1943,14 +1937,6 @@ export interface TransactRequest {
      */
     'destinyAsset': TransactRequestSourceAsset;
 }
-
-export const TransactRequestModeEnum = {
-    Data: 'data',
-    Transfer: 'transfer'
-} as const;
-
-export type TransactRequestModeEnum = typeof TransactRequestModeEnum[keyof typeof TransactRequestModeEnum];
-
 /**
  * An asset
  * @export
