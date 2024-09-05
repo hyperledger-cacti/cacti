@@ -18,26 +18,10 @@ jobs:
   pr-commit-parity:
     name: PR and Commit messages Parity
     runs-on: ubuntu-22.04
+    if: "!contains('dependabot[bot]', github.event.pull_request.user.login)"
     env:
       ACCEPTABLE_SIMILARITY_RATIO: 0.9
     steps:
     - uses: actions/checkout@v3.1.0
-    - name: Install Indy SDK
-      run: >
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
-          && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
-          && sudo apt-get update \
-          && sudo apt-get install -y \
-              libindy \
-              libnullpay \
-              libvcx \
-              indy-cli \
-          && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
-    - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
-      uses: actions/setup-node@v4.0.3
-      with:
-        node-version: ${{ env.NODEJS_VERSION }}
-    - run: npm run configure
-
     - name: Execute pr-commit-parity script
       run: node tools/pr-commit-parity.js ${{ github.event.pull_request.url }} "$ACCEPTABLE_SIMILARITY_RATIO"
