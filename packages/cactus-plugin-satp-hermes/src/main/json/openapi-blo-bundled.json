@@ -47,10 +47,17 @@
         "tags": [
           "transaction"
         ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact"
+          }
+        },
         "summary": "Submit a transaction intent",
         "description": "Allows users to queue intents for transactions based on specified parameters.",
         "operationId": "Transact",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -58,7 +65,6 @@
                 "type": "object",
                 "required": [
                   "contextID",
-                  "mode",
                   "fromDLTNetworkID",
                   "toDLTNetworkID",
                   "fromAmount",
@@ -71,16 +77,8 @@
                 "properties": {
                   "contextID": {
                     "type": "string",
-                    "format": "uuid",
+                    "format": "string",
                     "example": "123e4567-e89b-12d3-a456-426614174000"
-                  },
-                  "mode": {
-                    "type": "string",
-                    "enum": [
-                      "data",
-                      "transfer"
-                    ],
-                    "example": "transfer"
                   },
                   "payload": {
                     "type": "string",
@@ -169,8 +167,7 @@
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -2757,7 +2754,6 @@
         "type": "object",
         "required": [
           "contextID",
-          "mode",
           "fromDLTNetworkID",
           "toDLTNetworkID",
           "fromAmount",
@@ -2770,16 +2766,8 @@
         "properties": {
           "contextID": {
             "type": "string",
-            "format": "uuid",
+            "format": "string",
             "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "data",
-              "transfer"
-            ],
-            "example": "transfer"
           },
           "payload": {
             "type": "string",
