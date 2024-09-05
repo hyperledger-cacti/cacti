@@ -19,9 +19,9 @@ import {
   SupportedChain,
 } from "./../../../main/typescript/core/types";
 
-const logLevel: LogLevelDesc = "INFO";
+const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
-  level: "INFO",
+  level: logLevel,
   label: "satp-gateway-orchestrator-init-test",
 });
 const factoryOptions: IPluginFactoryOptions = {
@@ -69,7 +69,7 @@ describe("SATPGateway initialization", () => {
 
   it("should initiate gateway with custom config", async () => {
     const options: SATPGatewayConfig = {
-      logLevel: "INFO",
+      logLevel: logLevel,
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -112,7 +112,7 @@ describe("SATPGateway initialization", () => {
 
   it("should launch gateway server", async () => {
     const options: SATPGatewayConfig = {
-      logLevel: "INFO",
+      logLevel: logLevel,
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -225,7 +225,7 @@ describe("SATPGateway startup", () => {
 
   test("initiates custom config Gateway Coordinator", async () => {
     const options: SATPGatewayConfig = {
-      logLevel: "INFO",
+      logLevel: logLevel,
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -268,7 +268,7 @@ describe("SATPGateway startup", () => {
 
   test("Gateway Server launches", async () => {
     const options: SATPGatewayConfig = {
-      logLevel: "INFO",
+      logLevel: logLevel,
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -282,7 +282,9 @@ describe("SATPGateway startup", () => {
         supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
         proofID: "mockProofID10",
         gatewayClientPort: 3010,
-        address: "https://localhost",
+        gatewayServerPort: 3011,
+        gatewayOpenAPIPort: 4010,
+        address: "http://localhost",
       },
     };
     const gateway = await factory.create(options);
@@ -290,7 +292,7 @@ describe("SATPGateway startup", () => {
 
     const identity = gateway.Identity;
     expect(identity.gatewayClientPort).toBe(3010);
-    expect(identity.address).toBe("https://localhost");
+    expect(identity.address).toBe("http://localhost");
     await gateway.startup();
     await gateway.shutdown();
   });
