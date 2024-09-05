@@ -56,6 +56,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         proofID: "mockProofID10",
         gatewayServerPort: 3010,
         gatewayClientPort: 3011,
+        gatewayOpenAPIPort: 4010,
         address: "http://localhost",
       },
     };
@@ -65,7 +66,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = options.gid!.gatewayClientPort!;
+      const port = options.gid!.gatewayOpenAPIPort!;
       //const apiType = "AdminApi";
 
       const adminApiClient = createClient("AdminApi", address, port, logger);
