@@ -20,7 +20,6 @@ var _ MappedNullable = &TransactRequest{}
 // TransactRequest Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks.
 type TransactRequest struct {
 	ContextID string `json:"contextID"`
-	Mode string `json:"mode"`
 	Payload *string `json:"payload,omitempty"`
 	FromDLTNetworkID string `json:"fromDLTNetworkID"`
 	ToDLTNetworkID string `json:"toDLTNetworkID"`
@@ -36,10 +35,9 @@ type TransactRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransactRequest(contextID string, mode string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, toAmount string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, destinyAsset TransactRequestSourceAsset) *TransactRequest {
+func NewTransactRequest(contextID string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, toAmount string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, destinyAsset TransactRequestSourceAsset) *TransactRequest {
 	this := TransactRequest{}
 	this.ContextID = contextID
-	this.Mode = mode
 	this.FromDLTNetworkID = fromDLTNetworkID
 	this.ToDLTNetworkID = toDLTNetworkID
 	this.FromAmount = fromAmount
@@ -81,30 +79,6 @@ func (o *TransactRequest) GetContextIDOk() (*string, bool) {
 // SetContextID sets field value
 func (o *TransactRequest) SetContextID(v string) {
 	o.ContextID = v
-}
-
-// GetMode returns the Mode field value
-func (o *TransactRequest) GetMode() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Mode
-}
-
-// GetModeOk returns a tuple with the Mode field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetModeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Mode, true
-}
-
-// SetMode sets field value
-func (o *TransactRequest) SetMode(v string) {
-	o.Mode = v
 }
 
 // GetPayload returns the Payload field value if set, zero value otherwise.
@@ -342,7 +316,6 @@ func (o TransactRequest) MarshalJSON() ([]byte, error) {
 func (o TransactRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["contextID"] = o.ContextID
-	toSerialize["mode"] = o.Mode
 	if !IsNil(o.Payload) {
 		toSerialize["payload"] = o.Payload
 	}

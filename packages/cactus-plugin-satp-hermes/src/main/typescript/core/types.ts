@@ -64,7 +64,8 @@ export type GatewayIdentity = {
   proofID?: string;
   gatewayServerPort?: number;
   gatewayClientPort?: number;
-  gatewayGrpcPort?: number;
+  gatewayOpenAPIPort?: number;
+  gatewayUIPort?: number;
   address?: Address;
 };
 
