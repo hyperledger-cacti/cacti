@@ -1458,14 +1458,13 @@ jobs:
     continue-on-error: false
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
-      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      HFC_LOGGING: ''
       FULL_BUILD_DISABLED: true
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/plc-fabric-0
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
     runs-on: ubuntu-22.04
     steps:
@@ -1556,39 +1555,6 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts
-
-  plc-fabric-3:
-    needs:
-      - build-dev
-      - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
-    continue-on-error: false
-    env:
-      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
-      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_PATTERN: ""
-      TAPE_TEST_RUNNER_DISABLED: true
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
-
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-      - run: npm run configure
-      - run: yarn jest ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts
 
   plc-fabric-4:
     continue-on-error: false
