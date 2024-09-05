@@ -33,6 +33,7 @@ export { SATPGatewayConfig };
 import express, { Express } from "express";
 import http from "http";
 import {
+  DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
 } from "./core/constants";
@@ -53,6 +54,7 @@ import {
   ISATPBridgesOptions,
   SATPBridgesManager,
 } from "./gol/satp-bridges-manager";
+import bodyParser from "body-parser";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -190,6 +192,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return this.BLODispatcher;
   }
 
+  getBLOServer(): http.Server | undefined {
+    return this.BLOServer;
+  }
+
+  getBLOApplication(): Express | undefined {
+    return this.BLOApplication;
+  }
+
   public async onPluginInit(): Promise<unknown> {
     const fnTag = `${this.className}#onPluginInit()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -319,6 +329,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.gatewayClientPort = DEFAULT_PORT_GATEWAY_CLIENT;
       }
 
+      if (!pluginOptions.gid.gatewayOpenAPIPort) {
+        pluginOptions.gid.gatewayOpenAPIPort = DEFAULT_PORT_GATEWAY_API;
+      }
+
       if (!pluginOptions.logLevel) {
         pluginOptions.logLevel = "DEBUG";
       }
@@ -348,7 +362,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#startup()`;
     this.logger.trace(`Entering ${fnTag}`);
 
-    await Promise.all([this.startupBLOServer(), this.setupOpenAPIServer()]);
+    await Promise.all([this.startupBLOServer()]);
 
     await Promise.all([this.startupGOLServer()]);
   }
@@ -359,7 +373,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting BOL server");
     const port =
-      this.options.gid?.gatewayClientPort ?? DEFAULT_PORT_GATEWAY_CLIENT;
+      this.options.gid?.gatewayOpenAPIPort ?? DEFAULT_PORT_GATEWAY_API;
 
     return new Promise(async (resolve, reject) => {
       if (!this.BLOApplication || !this.BLOServer) {
@@ -367,6 +381,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error("BLODispatcher is not defined");
         }
         this.BLOApplication = express();
+        this.BLOApplication.use(bodyParser.json({ limit: "50mb" }));
         try {
           const webServices = await this.BLODispatcher.getOrCreateWebServices();
           for (const service of webServices) {
@@ -377,19 +392,41 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error(`Failed to register web services: ${error}`);
         }
 
+        if (this.OAPIServerEnabled) {
+          this.logger.debug("OpenAPI server is enabled");
+
+          try {
+            const webServices =
+              await this.BLODispatcher.getOrCreateOAPIWebServices();
+            for (const service of webServices) {
+              this.logger.debug(
+                `Registering OpenAPI web service: ${service.getPath()}`,
+              );
+              await service.registerExpress(this.BLOApplication);
+            }
+            this.BLOApplication.use(
+              "/api-docs",
+              swaggerUi.serve as express.RequestHandler[],
+              swaggerUi.setup(this.OAS) as express.RequestHandler,
+            );
+          } catch (error) {
+            throw new Error(`Error to register OpenAPI web services: ${error}`);
+          }
+        }
+
         this.BLOServer = http.createServer(this.BLOApplication);
 
         this.BLOServer.listen(port, () => {
-          this.logger.info(`BOL server started and listening on port ${port}`);
+          this.logger.info(`BLO server started and listening on port ${port}`);
           resolve();
         });
 
         this.BLOServer.on("error", (error) => {
-          this.logger.error(`BOL server failed to start: ${error}`);
+          this.logger.error(`BLO server failed to start: ${error}`);
           reject(error);
         });
       } else {
-        this.logger.warn("BOL Server already running.");
+        this.logger.warn("BLO Server already running.");
         resolve();
       }
     });
@@ -403,6 +440,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     const port =
       this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
+
+    //TODO create a server for the client part
 
     return new Promise(async (resolve, reject) => {
       if (!this.GOLServer) {
@@ -427,30 +466,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         resolve();
       }
     });
-  }
-
-  public setupOpenAPIServer(): void {
-    if (!this.OAPIServerEnabled) {
-      this.logger.debug("OpenAPI server is disabled");
-      return;
-    }
-
-    if (!this.BLOApplication) {
-      this.logger.debug(
-        "BLOApplication is not defined. Not initializing OpenAPI server",
-      );
-      return;
-    }
-
-    if (!this.OAS) {
-      throw new Error("OpenAPI spec is not set");
-    }
-    // Type assertion here
-    this.BLOApplication.use(
-      "/api-docs",
-      swaggerUi.serve as express.RequestHandler[],
-      swaggerUi.setup(this.OAS) as express.RequestHandler,
-    );
   }
 
   /**

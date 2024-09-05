@@ -66,6 +66,10 @@ paths:
       summary: Submit a transaction intent
       tags:
       - transaction
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel:
     post:
       description: Attempts to cancel a previously submitted transaction intent using
@@ -617,7 +621,6 @@ components:
         \ such as the transaction context, mode (data or transfer), payload, and information\
         \ about the source and destination DLT networks."
       example:
-        mode: transfer
         beneficiaryPubkey: beneficiaryPubkey
         destinyAsset:
           owner: owner
@@ -643,13 +646,7 @@ components:
       properties:
         contextID:
           example: 123e4567-e89b-12d3-a456-426614174000
-          format: uuid
-          type: string
-        mode:
-          enum:
-          - data
-          - transfer
-          example: transfer
+          format: string
           type: string
         payload:
           example: "{\"data\":\"example payload\"}"
@@ -680,7 +677,6 @@ components:
       - destinyAsset
       - fromAmount
       - fromDLTNetworkID
-      - mode
       - originatorPubkey
       - sourceAsset
       - toAmount
@@ -1259,13 +1255,7 @@ components:
       properties:
         contextID:
           example: 123e4567-e89b-12d3-a456-426614174000
-          format: uuid
-          type: string
-        mode:
-          enum:
-          - data
-          - transfer
-          example: transfer
+          format: string
           type: string
         payload:
           example: "{\"data\":\"example payload\"}"
@@ -1296,7 +1286,6 @@ components:
       - destinyAsset
       - fromAmount
       - fromDLTNetworkID
-      - mode
       - originatorPubkey
       - sourceAsset
       - toAmount
