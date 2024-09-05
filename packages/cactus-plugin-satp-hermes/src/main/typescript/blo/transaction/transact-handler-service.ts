@@ -21,13 +21,13 @@ export async function ExecuteTransact(
   logger: Logger,
   req: TransactRequest,
   manager: SATPManager,
-  gol: GatewayOrchestrator,
+  orchestrator: GatewayOrchestrator,
 ): Promise<TransactResponse> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fn = "BLO#transact-handler-service#ExecuteTransact";
 
   //TODO check input for valid strings...
-  const ourGateway: GatewayIdentity = gol.ourGateway;
+  const ourGateway: GatewayIdentity = orchestrator.ourGateway;
   const senderGatewayOwnerId: string = ourGateway.id;
 
   //This data is set in satpManager GOL
