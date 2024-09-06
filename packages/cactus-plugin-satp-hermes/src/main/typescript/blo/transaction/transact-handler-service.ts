@@ -1,10 +1,5 @@
 import { Logger } from "@hyperledger/cactus-common";
-import {
-  TransactRequest,
-  TransactResponse,
-  Transact200ResponseStatusResponseOriginChain,
-  StatusResponse,
-} from "../../public-api";
+import { TransactRequest, TransactResponse } from "../../public-api";
 import { SATPManager } from "../../gol/satp-manager";
 import { populateClientSessionData } from "../../core/session-utils";
 import {
@@ -15,6 +10,7 @@ import {
 import { GatewayOrchestrator } from "../../gol/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
+import { GetStatusService } from "../admin/get-status-handler-service";
 
 // todo
 export async function ExecuteTransact(
@@ -83,33 +79,16 @@ export async function ExecuteTransact(
   );
   await manager.initiateTransfer(session);
 
-  //mock
-  const originChain: Transact200ResponseStatusResponseOriginChain = {
-    dltProtocol: "besu",
-    dltSubnetworkID: "v24.4.0-RC1",
-  };
-
-  const destinationChain: Transact200ResponseStatusResponseOriginChain = {
-    dltProtocol: "besu",
-    dltSubnetworkID: "v24.4.0-RC1",
-  };
-
-  const mock: StatusResponse = {
-    status: "DONE",
-    substatus: "COMPLETED",
-    stage: "STAGE3",
-    step: "transfer-complete-message",
-    startTime: "2023-03-14T16:50:06.662Z",
-    originChain: originChain,
-    destinationChain: destinationChain,
-  };
-
   logger.info(req);
   // logger.error("GetStatusService not implemented");
   // throw new GetStatusError(req.sessionID, "GetStatusService not implemented");
 
   return {
     sessionID: session.getSessionId(),
-    statusResponse: mock,
+    statusResponse: await GetStatusService(
+      logger,
+      { sessionID: session.getSessionId() },
+      manager,
+    ),
   };
 }

@@ -27,6 +27,16 @@ CredentialProfile:
     - OAUTH
     - X509
   example: OAUTH
+AllSessionIdsRequest:
+  type: object
+  description: Empty object
+
+AllSessionIdsResponse:
+  type: array
+  items:
+    type: string
+    nullable: false
+  description: Array with session Ids
 getAuditRequest:
   description: "Request schema for initiating an audit. Includes the start and end dates for the audit period and an option to include proofs."
   type: object
