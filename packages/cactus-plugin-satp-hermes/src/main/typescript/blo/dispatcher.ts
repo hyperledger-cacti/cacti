@@ -25,6 +25,7 @@ import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
 import { SATPBridgesManager } from "../gol/satp-bridges-manager";
 import { ExecuteTransact } from "./transaction/transact-handler-service";
 import { TransactEndpointV1 } from "../web-services/transact-endpoint";
+import { GetSessionIdsEndpointV1 } from "../web-services/get-all-session-ids-endpoints";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -91,8 +92,12 @@ export class BLODispatcher {
       dispatcher: this,
       logLevel: this.options.logLevel,
     });
+    const getSessionIdsEndpointV1 = new GetSessionIdsEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
 
-    const theEndpoints = [getStatusEndpointV1];
+    const theEndpoints = [getStatusEndpointV1, getSessionIdsEndpointV1];
     this.endpoints = theEndpoints;
     return theEndpoints;
   }
@@ -135,7 +140,7 @@ export class BLODispatcher {
   }
 
   public async GetStatus(req: StatusRequest): Promise<StatusResponse> {
-    return ExecuteGetStatus(this.logger, req);
+    return ExecuteGetStatus(this.logger, req, this.manager);
   }
 
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
@@ -147,6 +152,12 @@ export class BLODispatcher {
       this.manager,
       this.orchestrator,
     );
+    return res;
+  }
+
+  public async GetSessionIds(): Promise<string[]> {
+    this.logger.info(`Get Session Ids request`);
+    const res = Array.from(await this.manager.getSessions().keys());
     return res;
   }
   // get channel by caller; give needed client from orchestrator to handler to call
