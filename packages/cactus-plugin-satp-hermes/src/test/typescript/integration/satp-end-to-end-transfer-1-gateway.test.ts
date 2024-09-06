@@ -171,7 +171,7 @@ beforeAll(async () => {
       imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
-      logLevel,
+      logLevel: "INFO",
     });
 
     await fabricLedger.start();
@@ -1002,7 +1002,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       toDLTNetworkID: SupportedChain.FABRIC,
       fromAmount: "100",
       toAmount: "1",
-      mode: "transfer",
       originatorPubkey: assigneeEthAccount.address,
       beneficiaryPubkey: fabricUser.credentials.certificate,
       sourceAsset,
@@ -1078,7 +1077,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     expect(responseBalance2.data).not.toBeUndefined();
     expect(responseBalance2.data.functionOutput).toBe("1");
     log.info("Amount was transfer correctly to the Owner account");
-
+    log.info(res?.statusResponse);
     await gateway.shutdown();
   });
 });

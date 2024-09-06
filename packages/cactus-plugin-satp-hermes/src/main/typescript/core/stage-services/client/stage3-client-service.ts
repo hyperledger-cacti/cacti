@@ -282,7 +282,7 @@ export class Stage3ClientService extends SATPService {
       MessageType.COMMIT_TRANSFER_COMPLETE,
       messageSignature,
     );
-
+    sessionData.completed = true;
     saveHash(
       sessionData,
       MessageType.COMMIT_TRANSFER_COMPLETE,

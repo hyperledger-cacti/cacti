@@ -1034,7 +1034,6 @@ describe("2 SATPGateway sending a token from Besu to Fabric", () => {
       toDLTNetworkID: SupportedChain.FABRIC,
       fromAmount: "100",
       toAmount: "1",
-      mode: "transfer",
       originatorPubkey: assigneeEthAccount.address,
       beneficiaryPubkey: fabricUser.credentials.certificate,
       sourceAsset,
