@@ -164,7 +164,7 @@ export class SATPManager {
     return SATPManager.CLASS_NAME;
   }
 
-  public getSessions(): Map<string, SATPSession> | undefined {
+  public getSessions(): Map<string, SATPSession> {
     return this.sessions;
   }
 
