@@ -129,6 +129,35 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids:
+    get:
+      summary: Get SATP session ids
+      description: Retrieve the all SATP session IDs
+      operationId: GetSessionIds
+      tags:
+        - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids
+      parameters:
+        - name: SessionsRequest
+          in: query
+          schema:
+            $ref: "./schemas.yml#/AllSessionIdsRequest"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas.yml#/AllSessionIdsResponse"
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck:
     get:
       summary: Health check endpoint
