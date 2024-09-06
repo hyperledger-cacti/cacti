@@ -2122,6 +2122,41 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Retrieve the all SATP session IDs
+         * @summary Get SATP session ids
+         * @param {object} [sessionsRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSessionIds: async (sessionsRequest?: object, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (sessionsRequest !== undefined) {
+                localVarQueryParameter['SessionsRequest'] = sessionsRequest;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieve the status of a SATP session
          * @summary Get SATP current session data
          * @param {string} sessionID Unique identifier for the session.
@@ -2239,6 +2274,17 @@ export const AdminApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Retrieve the all SATP session IDs
+         * @summary Get SATP session ids
+         * @param {object} [sessionsRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSessionIds(sessionsRequest?: object, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionIds(sessionsRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Retrieve the status of a SATP session
          * @summary Get SATP current session data
          * @param {string} sessionID Unique identifier for the session.
@@ -2300,6 +2346,16 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          */
         getHealthCheck(options?: any): AxiosPromise<GetHealthCheck200Response> {
             return localVarFp.getHealthCheck(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieve the all SATP session IDs
+         * @summary Get SATP session ids
+         * @param {object} [sessionsRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSessionIds(sessionsRequest?: object, options?: any): AxiosPromise<Array<string>> {
+            return localVarFp.getSessionIds(sessionsRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieve the status of a SATP session
@@ -2366,6 +2422,18 @@ export class AdminApi extends BaseAPI {
      */
     public getHealthCheck(options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).getHealthCheck(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieve the all SATP session IDs
+     * @summary Get SATP session ids
+     * @param {object} [sessionsRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public getSessionIds(sessionsRequest?: object, options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).getSessionIds(sessionsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

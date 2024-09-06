@@ -374,6 +374,7 @@ export class Stage3ServerService extends SATPService {
     this.Log.info(
       `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
     );
+    sessionData.completed = true;
 
     saveHash(
       sessionData,
