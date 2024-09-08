@@ -5,7 +5,7 @@ info:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: 'Hyperledger Cactus Plugin - Keychain Memory '
-  version: 2.0.0-rc.3
+  version: 2.0.0-rc.4
 servers:
 - url: /
 paths:

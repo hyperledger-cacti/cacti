@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.4](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2024-09-08)
+
+### Features
+
+* **consortium-static:** new consortium plugin ([db3475f](https://github.com/hyperledger/cacti/commit/db3475fe359ede8fbf5bcbe6e9dc40c40cd2378d))
+* **go-ethereum-socketio:** remove deprecated connector ([56dd9f8](https://github.com/hyperledger/cacti/commit/56dd9f8aa72883aeb5bfcf0303b0af6e84daad7a)), closes [#3155](https://github.com/hyperledger/cacti/issues/3155)
+
 # [2.0.0-rc.3](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2024-07-21)
 
 **Note:** Version bump only for package @hyperledger/cactus-api-client
