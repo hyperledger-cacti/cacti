@@ -218,3 +218,9 @@ export {
   IBuildImageCordaAllInOneV412Response,
   buildImageCordaAllInOneV412,
 } from "./corda/build-image-corda-all-in-one-v4-12";
+
+export {
+  IBuildImageBesuAllInOneLatestRequest,
+  IBuildImageBesuAllInOneLatestResponse,
+  buildImageBesuAllInOneLatest,
+} from "./corda/build-image-besu-all-in-one-latest";
