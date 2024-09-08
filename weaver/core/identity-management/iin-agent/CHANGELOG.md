@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.4](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2024-09-08)
+
+### Bug Fixes
+
+* **security:** address CVE-2022-3517 - minimatch < 3.0.5 ReDoS vuln ([e97e27b](https://github.com/hyperledger/cacti/commit/e97e27bca0a8fb4b52c716ee25437d69efff74d4))
+
 # [2.0.0-rc.3](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2024-07-21)
 
 ### Build System

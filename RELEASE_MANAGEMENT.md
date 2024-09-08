@@ -40,13 +40,15 @@ yarn build:dev
 
 - Do note the `.` as the last parameter in last two commands.
 
+- The `./tools/weaver-update-version.sh` automation script seems slightly buggy at the moment so you'll have to manually update `./weaver/core/relay/Cargo.toml` yourself. See this comment for an example: https://github.com/hyperledger/cacti/pull/3427#discussion_r1686850372
+
 - Double check that all of the package dependencies were updated from the previous
 version to the new one because lerna usually fails to do that for `devDependency` parts
 of the package.json files so you have to do this manually with search and replace through
 the entire repository...
 
 The trick is to search for the previous release version within package.json 
-files or just search for "@hyperledger/cactus-*" within the package.json files. 
+files or just search for "@hyperledger/cact*-*" within the package.json files. 
 
 With VSCode you can do a project wide search & replace where:
   1. Make sure that regex based replacing is enabled on the VSCode search UI (top right corner of the search panel)
@@ -56,7 +58,7 @@ With VSCode you can do a project wide search & replace where:
 
 - Also double check that the `"version": "?.?.?"` property has been updated in the package.json files all over the packages.
 
-- Finally a generic full-text search project-wide for the previous version string `?.?.?` where you exclude these from the results: `CHANGELOG.md,go.sum,go.mod,yarn.lock,package-lock.json` and then replace the findings with the new version such as `1.1.3`
+- Finally a generic full-text search project-wide for the previous version string `?.?.?` where you exclude these from the results: `CHANGELOG.md,go.sum,go.mod,yarn.lock,package-lock.json,.yarn/` and then replace the findings with the new version such as `1.1.3`
 
 - update the lock file if necessary
     ```sh
@@ -69,9 +71,9 @@ With VSCode you can do a project wide search & replace where:
     ```
 
 - Double check that the changelog does not contain your fork's links instead of the upstream repo. You'll need to change this manually otherwise. For example, replace: 
-    - `https://github.com/petermetz/cactus` 
+    - `https://github.com/petermetz/cact` 
     with 
-    - `https://github.com/hyperledger/cactus`
+    - `https://github.com/hyperledger/cact`
 
 ```sh
 git add . && git commit --signoff --gpg-sign --message="chore(release): publish v1.1.3"

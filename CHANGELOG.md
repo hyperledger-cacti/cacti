@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.4](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2024-09-08)
+
+### Bug Fixes
+
+* **ci:** updated permissioning and versioning in GitHub Actions ([cd71082](https://github.com/hyperledger/cacti/commit/cd71082c849e773e5e214c06cbf40aa703e6177f))
+* **relay:** curl openssl added -L; upgrade openssl from 1.1.1 to 3.0.14 ([935e4b8](https://github.com/hyperledger/cacti/commit/935e4b872becb4034becd9f31cf03e958b9abbde))
+* **security:** address CVE-2022-3517 - minimatch < 3.0.5 ReDoS vuln ([e97e27b](https://github.com/hyperledger/cacti/commit/e97e27bca0a8fb4b52c716ee25437d69efff74d4))
+* **security:** address CVE-2024-39338 SSRF in axios >= 1.3.2, <= 1.7.3 ([7e7bb44](https://github.com/hyperledger/cacti/commit/7e7bb44c01a2d19306ecaaaa2ba2e3c574039c87))
+
+### Features
+
+* **connector-daml:** aio image ([141ee24](https://github.com/hyperledger/cacti/commit/141ee2488b44da4282c48a1c15533f5ceb83ec5f))
+* **consortium-static:** new consortium plugin ([db3475f](https://github.com/hyperledger/cacti/commit/db3475fe359ede8fbf5bcbe6e9dc40c40cd2378d))
+* **corda:** support 5.1 via TS/HTTP (no JVM) ([ec9683d](https://github.com/hyperledger/cacti/commit/ec9683d38670fe5d657b602db8215e602fd4209d)), closes [#2978](https://github.com/hyperledger/cacti/issues/2978) [#3293](https://github.com/hyperledger/cacti/issues/3293)
+* **core-api:** add createIsJwsGeneralTypeGuard, createAjvTypeGuard<T> ([957da7c](https://github.com/hyperledger/cacti/commit/957da7c3e1d80068391485a825ba6bb1e68333ac)), closes [/github.com/hyperledger/cacti/pull/3471#discussion_r1731894747](https://github.com//github.com/hyperledger/cacti/pull/3471/issues/discussion_r1731894747)
+* **go-ethereum-socketio:** remove deprecated connector ([56dd9f8](https://github.com/hyperledger/cacti/commit/56dd9f8aa72883aeb5bfcf0303b0af6e84daad7a)), closes [#3155](https://github.com/hyperledger/cacti/issues/3155)
+* **ledger-browser:** implement dynamic app setup ([0e368de](https://github.com/hyperledger/cacti/commit/0e368de059d30e099a8979989949ca34834ffdf9)), closes [#3347](https://github.com/hyperledger/cacti/issues/3347)
+* **ledger-browser:** refactor home page ([500ac9b](https://github.com/hyperledger/cacti/commit/500ac9ba8ac9d6694e0838d34871028ace896a9c)), closes [#3320](https://github.com/hyperledger/cacti/issues/3320)
+* **ledger-browser:** rewrite fabric application ([ecf074c](https://github.com/hyperledger/cacti/commit/ecf074c8c6d5ed67eed2e490c653b41aae691c19)), closes [#3308](https://github.com/hyperledger/cacti/issues/3308) [#3279](https://github.com/hyperledger/cacti/issues/3279)
+* **persistence-ethereum:** add sample setup scripts, improve documentation ([ed915cf](https://github.com/hyperledger/cacti/commit/ed915cf6f8f1388cbfdc16c954102da1e381920b))
+* **persistence-ethereum:** migrate to separate db schema ([b160c52](https://github.com/hyperledger/cacti/commit/b160c52f1a99f8019beb8af9d4f8c0b46cf1953c)), closes [#3340](https://github.com/hyperledger/cacti/issues/3340)
+* **persistence-fabric:** add sample setup scripts, improve documentation ([9fef336](https://github.com/hyperledger/cacti/commit/9fef336494911fa3673530f6945e97d3dd3ce934))
+* **tcs-huawei-socketio:** remove deprecated connector ([053224f](https://github.com/hyperledger/cacti/commit/053224f55762d545f6ea656228f922630dc0dbf5)), closes [#3155](https://github.com/hyperledger/cacti/issues/3155) [#3155](https://github.com/hyperledger/cacti/issues/3155)
+* **weaver:** upgrade to corda 4.12 and jvm 17 ([edde6c6](https://github.com/hyperledger/cacti/commit/edde6c62cc02549d4c4dd20b830c1a97ba05f933))
+
 # [2.0.0-rc.3](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2024-07-21)
 
 ### Bug Fixes

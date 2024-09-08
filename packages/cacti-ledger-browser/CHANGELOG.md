@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.4](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2024-09-08)
+
+### Features
+
+* **ledger-browser:** implement dynamic app setup ([0e368de](https://github.com/hyperledger/cacti/commit/0e368de059d30e099a8979989949ca34834ffdf9)), closes [#3347](https://github.com/hyperledger/cacti/issues/3347)
+* **ledger-browser:** refactor home page ([500ac9b](https://github.com/hyperledger/cacti/commit/500ac9ba8ac9d6694e0838d34871028ace896a9c)), closes [#3320](https://github.com/hyperledger/cacti/issues/3320)
+* **ledger-browser:** rewrite fabric application ([ecf074c](https://github.com/hyperledger/cacti/commit/ecf074c8c6d5ed67eed2e490c653b41aae691c19)), closes [#3308](https://github.com/hyperledger/cacti/issues/3308) [#3279](https://github.com/hyperledger/cacti/issues/3279)
+* **persistence-ethereum:** migrate to separate db schema ([b160c52](https://github.com/hyperledger/cacti/commit/b160c52f1a99f8019beb8af9d4f8c0b46cf1953c)), closes [#3340](https://github.com/hyperledger/cacti/issues/3340)
+
 # [2.0.0-rc.3](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.2...v2.0.0-rc.3) (2024-07-21)
 
 ### Code Refactoring
