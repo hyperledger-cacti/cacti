@@ -10857,6 +10857,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.7"
     express: "npm:4.19.2"
+    http-status-codes: "npm:2.3.0"
     key-encoder: "npm:2.0.3"
     socket.io: "npm:4.6.2"
     uuid: "npm:10.0.0"
