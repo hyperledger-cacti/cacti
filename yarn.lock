@@ -8831,13 +8831,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:1.11.1":
-  version: 1.11.1
-  resolution: "@grpc/grpc-js@npm:1.11.1"
+"@grpc/grpc-js@npm:1.11.2":
+  version: 1.11.2
+  resolution: "@grpc/grpc-js@npm:1.11.2"
   dependencies:
     "@grpc/proto-loader": "npm:^0.7.13"
     "@js-sdsl/ordered-map": "npm:^4.4.2"
-  checksum: 10/28fb8d0bbccc0a8f9f73899e6f982e5e762e8f0c009eb9234d4067021f96896479be76463f8a02b80d13ecfd52817ae6d0a189f6cfe22fd32df0505bf577a720
+  checksum: 10/05bc4bbc9907017e723de7c3a776a07155b522c1a56f68cc89655eeee3f72f00f4c31584e908c250495344f384d9528c18a44db0976783fd17e338a563df6f84
   languageName: node
   linkType: hard
 
@@ -9075,7 +9075,7 @@ __metadata:
     "@types/react-dom": "npm:18.2.17"
     "@vitejs/plugin-react": "npm:4.2.1"
     apexcharts: "npm:3.45.2"
-    axios: "npm:1.7.2"
+    axios: "npm:1.7.7"
     buffer: "npm:6.0.3"
     ethers: "npm:6.12.1"
     react: "npm:18.2.0"
@@ -9211,7 +9211,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-driver-fabric@workspace:weaver/core/drivers/fabric-driver"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-rc.4"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-rc.4"
     "@types/node": "npm:18.11.9"
@@ -9233,7 +9233,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-fabric-cli@workspace:weaver/samples/fabric/fabric-cli"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-rc.4"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-rc.4"
@@ -9265,7 +9265,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-iin-agent@workspace:weaver/core/identity-management/iin-agent"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-rc.4"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0-rc.4"
     "@types/jsrsasign": "npm:10.5.11"
@@ -9296,7 +9296,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-protos-js@workspace:weaver/common/protos-js"
   dependencies:
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@grpc/proto-loader": "npm:0.7.13"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -9330,7 +9330,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-sdk-fabric@workspace:weaver/sdks/fabric/interoperation-node-sdk"
   dependencies:
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0-rc.4"
     "@types/node": "npm:18.11.9"
@@ -9390,7 +9390,7 @@ __metadata:
     "@connectrpc/connect-fastify": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.4"
@@ -9519,7 +9519,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-common@workspace:packages/cactus-common"
   dependencies:
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/secp256k1": "npm:4.0.3"
@@ -9543,7 +9543,7 @@ __metadata:
   dependencies:
     "@bufbuild/protobuf": "npm:1.10.0"
     "@connectrpc/connect": "npm:1.4.0"
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
     "@types/express": "npm:4.17.21"
@@ -9617,7 +9617,7 @@ __metadata:
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.2"
     openapi-types: "npm:12.1.3"
-    qs: "npm:6.9.7"
+    qs: "npm:6.13.0"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
     web3-core: "npm:1.6.1"
@@ -10260,7 +10260,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu"
   dependencies:
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.4"
@@ -10844,7 +10844,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-test-plugin-ledger-connector-besu@workspace:packages/cactus-test-plugin-ledger-connector-besu"
   dependencies:
-    "@grpc/grpc-js": "npm:1.11.1"
+    "@grpc/grpc-js": "npm:1.11.2"
     "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.4"
@@ -45129,17 +45129,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qs@npm:6.13.0":
+  version: 6.13.0
+  resolution: "qs@npm:6.13.0"
+  dependencies:
+    side-channel: "npm:^1.0.6"
+  checksum: 10/f548b376e685553d12e461409f0d6e5c59ec7c7d76f308e2a888fd9db3e0c5e89902bedd0754db3a9038eda5f27da2331a6f019c8517dc5e0a16b3c9a6e9cef8
+  languageName: node
+  linkType: hard
+
 "qs@npm:6.7.0":
   version: 6.7.0
   resolution: "qs@npm:6.7.0"
   checksum: 10/d8f4b216c6777853c17586dc17fa685fb4e14269dbf6e860add6c0c61fd12137dc7aa4bf5066a794ba9a8dbb9c11e9ef20b72db763228701be95546ea807213a
-  languageName: node
-  linkType: hard
-
-"qs@npm:6.9.7":
-  version: 6.9.7
-  resolution: "qs@npm:6.9.7"
-  checksum: 10/fb364b54bf4f092a095554968f5abf06036cfe359c9aba258a81b0c0366f625a46098fe1224b2a71ee2f88642470af391c7a8a1496508eca29c37093293f91a9
   languageName: node
   linkType: hard
 
@@ -48199,6 +48201,18 @@ __metadata:
     get-intrinsic: "npm:^1.0.2"
     object-inspect: "npm:^1.9.0"
   checksum: 10/c4998d9fc530b0e75a7fd791ad868fdc42846f072734f9080ff55cc8dc7d3899abcda24fd896aa6648c3ab7021b4bb478073eb4f44dfd55bce9714bc1a7c5d45
+  languageName: node
+  linkType: hard
+
+"side-channel@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "side-channel@npm:1.0.6"
+  dependencies:
+    call-bind: "npm:^1.0.7"
+    es-errors: "npm:^1.3.0"
+    get-intrinsic: "npm:^1.2.4"
+    object-inspect: "npm:^1.13.1"
+  checksum: 10/eb10944f38cebad8ad643dd02657592fa41273ce15b8bfa928d3291aff2d30c20ff777cfe908f76ccc4551ace2d1245822fdc576657cce40e9066c638ca8fa4d
   languageName: node
   linkType: hard
 
