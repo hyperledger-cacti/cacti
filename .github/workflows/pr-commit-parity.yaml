@@ -1,15 +1,6 @@
 ---
 name: PR - Commit Parity
-'on':
-  pull_request:
-    branches:
-      - main
-      - dev
-      - petermetz/**
-  push:
-    branches:
-      - main
-      - dev
+on: [pull_request]
 
 env:
   NODEJS_VERSION: v18.18.2
