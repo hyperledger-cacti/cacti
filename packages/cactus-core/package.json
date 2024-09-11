@@ -52,8 +52,8 @@
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-rc.4",
     "@hyperledger/cactus-core-api": "2.0.0-rc.4",
-    "body-parser": "1.20.2",
-    "express": "4.19.2",
+    "body-parser": "1.20.3",
+    "express": "4.20.0",
     "express-jwt-authz": "2.4.1",
     "express-openapi-validator": "5.2.0",
     "http-errors": "2.0.0",

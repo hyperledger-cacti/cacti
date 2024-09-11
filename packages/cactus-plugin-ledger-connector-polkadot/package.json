@@ -75,7 +75,7 @@
     "@polkadot/util": "12.6.2",
     "axios": "1.7.7",
     "bl": "6.0.14",
-    "express": "4.19.2",
+    "express": "4.20.0",
     "express-openapi-validator": "5.2.0",
     "form-data": "4.0.0",
     "fs-extra": "11.2.0",
