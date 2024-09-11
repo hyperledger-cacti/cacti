@@ -67,7 +67,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-rc.4",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-rc.4",
     "axios": "1.7.7",
-    "body-parser": "1.20.2",
+    "body-parser": "1.20.3",
     "fs-extra": "11.2.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "key-encoder": "2.0.3",
@@ -86,7 +86,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",
-    "express": "4.19.2",
+    "express": "4.20.0",
     "fabric-network": "2.2.20",
     "socket.io": "4.6.2"
   },
