@@ -4,7 +4,7 @@
     "composite": true,
     "outDir": "./dist/lib",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-cmd-socketio-server.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cactus-common-example-server.tsbuildinfo"
   },
   "include": [
     "./src/main/typescript/business-logic-plugin/*.ts",
@@ -17,13 +17,13 @@
   "exclude": ["copyStaticAssets.ts"],
   "references": [
     {
-      "path": "../cactus-common/tsconfig.json"
+      "path": "../../packages/cactus-common/tsconfig.json"
     },
     {
-      "path": "../cactus-core-api/tsconfig.json"
+      "path": "../../packages/cactus-core-api/tsconfig.json"
     },
     {
-      "path": "../cactus-test-tooling/tsconfig.json"
+      "path": "../../packages/cactus-test-tooling/tsconfig.json"
     }
   ]
 }

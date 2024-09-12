@@ -1,6 +1,4 @@
 /* verifier/Verifier.ts Unit Tests
- * Execute:
- *    cd cactus/packages/cactus-cmd-socketio-server && npm install && npx jest
  * Note:
  *    Don't use jest timer mocks here, they do not work well with node http module.
  *    With timer mocks tests will either hang or report open timeout handle.

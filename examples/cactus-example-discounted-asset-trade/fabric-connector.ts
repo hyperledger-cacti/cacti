@@ -1,7 +1,7 @@
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { IListenOptions, Servers } from "@hyperledger/cactus-common";
 import { Constants, Configuration } from "@hyperledger/cactus-core-api";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
 import {
   PluginLedgerConnectorFabric,
   FabricApiClient,

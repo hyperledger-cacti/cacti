@@ -6,9 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { TransactionManagement } from "@hyperledger/cactus-cmd-socketio-server";
-import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import { TransactionManagement } from "@hyperledger/cactus-common-example-server";
+import { RIFError } from "@hyperledger/cactus-common-example-server";
+import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
 
 import escapeHtml from "escape-html";
 const config: any = ConfigUtil.getConfig();

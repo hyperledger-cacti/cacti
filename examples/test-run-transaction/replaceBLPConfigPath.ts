@@ -7,7 +7,7 @@
 const fs = require("fs");
 
 const targetFile =
-  "../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BLP_config.js";
+  "../cactus-common-example-server/dist/lib/main/typescript/business-logic-plugin/BLP_config.js";
 const srcStr = '"../BusinessLogicRunTransaction"';
 const distStr =
   '"../../../../../../examples/test-run-transaction/BusinessLogicRunTransaction"';

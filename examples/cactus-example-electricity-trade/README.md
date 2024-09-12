@@ -17,7 +17,7 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
 ## Prerequisites
 
 - Available directory (This directory must be empty):
-  - `./etc/cactus`: the directory for storing the config files of `cactus-cmd-socketio-server`, will be mounted by the containers.
+  - `./etc/cactus`: the directory for storing the config files of `cactus-common-example-server`, will be mounted by the containers.
 
 ## Setup
 

@@ -4,12 +4,12 @@ version: "3.4"
 # ./etc/cactus should already exist and contain cactus node configs
 
 services:
-  cmd-socketio-base-image:
+  common-server-base-image:
     # Build base image and immediately exit
     container_name: cmd-socketio-base-dummy
-    image: cactus-cmd-socketio-server
+    image: cactus-common-example-server
     build:
-      context: ../../packages/cactus-cmd-socketio-server/
+      context: ../../packages/cactus-common-example-server/
     command: ["echo", "OK - Exit"]
 
   cactus-example-electricity-trade-blp:

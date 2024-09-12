@@ -6,8 +6,8 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
-import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
+import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { RIFError } from "@hyperledger/cactus-common-example-server";
 import { queryAsset, queryAllAssets } from "./transaction-fabric";
 
 const config: any = ConfigUtil.getConfig();

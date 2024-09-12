@@ -8,9 +8,6 @@
       "path": "./packages/cactus-cmd-api-server/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-cmd-socketio-server/tsconfig.json"
-    },
-    {
       "path": "./packages/cacti-ledger-browser/tsconfig.json"
     },
     {
@@ -123,6 +120,9 @@
     },
     {
       "path": "./packages/cactus-test-verifier-client/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-common-example-server/tsconfig.json"
     },
     {
       "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"

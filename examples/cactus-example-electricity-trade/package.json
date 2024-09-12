@@ -14,8 +14,8 @@
     "start-dockerless": "node ./dist/www.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-rc.4",
     "@hyperledger/cactus-common": "2.0.0-rc.4",
+    "@hyperledger/cactus-common-example-server": "2.0.0-rc.4",
     "@hyperledger/cactus-core": "2.0.0-rc.4",
     "@hyperledger/cactus-core-api": "2.0.0-rc.4",
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.4",

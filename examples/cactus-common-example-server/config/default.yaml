@@ -1,11 +1,11 @@
-# Default cactus-cmd-socketio-server configuration
+# Default cactus-common-example-server configuration
 # Do not change this, update the settings in usersetting.yaml
 # Check examples/cactus-example-discounted-asset-trade/config for working example
 
 # List of Bussiness Logic Plugin and it's validators
 blpRegistry: []
 
-# log4js log levels used by cactus-cmd-socketio-server and smaple BLPs
+# log4js log levels used by cactus-common-example-server and smaple BLPs
 logLevel: info
 
 # Connection info

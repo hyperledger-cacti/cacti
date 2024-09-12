@@ -9457,9 +9457,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-cmd-socketio-server@npm:2.0.0-rc.4, @hyperledger/cactus-cmd-socketio-server@workspace:packages/cactus-cmd-socketio-server":
+"@hyperledger/cactus-common-example-server@npm:2.0.0-rc.4, @hyperledger/cactus-common-example-server@workspace:examples/cactus-common-example-server":
   version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-cmd-socketio-server@workspace:packages/cactus-cmd-socketio-server"
+  resolution: "@hyperledger/cactus-common-example-server@workspace:examples/cactus-common-example-server"
   dependencies:
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.4"
@@ -9766,8 +9766,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-example-discounted-asset-trade@workspace:examples/cactus-example-discounted-asset-trade"
   dependencies:
-    "@hyperledger/cactus-cmd-socketio-server": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
+    "@hyperledger/cactus-common-example-server": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-rc.4"
@@ -9811,8 +9811,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-example-electricity-trade@workspace:examples/cactus-example-electricity-trade"
   dependencies:
-    "@hyperledger/cactus-cmd-socketio-server": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-common": "npm:2.0.0-rc.4"
+    "@hyperledger/cactus-common-example-server": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-core-api": "npm:2.0.0-rc.4"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0-rc.4"

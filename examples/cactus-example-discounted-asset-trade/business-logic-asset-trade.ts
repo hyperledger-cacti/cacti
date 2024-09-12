@@ -6,21 +6,21 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "@hyperledger/cactus-cmd-socketio-server";
-import { TradeInfo } from "@hyperledger/cactus-cmd-socketio-server";
+import { RequestInfo } from "@hyperledger/cactus-common-example-server";
+import { TradeInfo } from "@hyperledger/cactus-common-example-server";
 import { TransactionInfoManagement } from "./transaction-info-management";
 import { TransactionInfo } from "./transaction-info";
 import { TransactionData } from "./transaction-data";
 import { BusinessLogicInquireAssetTradeStatus } from "./business-logic-inquire-asset-trade-status";
 import { TxInfoData } from "./tx-info-data";
-import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
+import { BusinessLogicBase } from "@hyperledger/cactus-common-example-server";
 import { transferOwnership } from "./transaction-fabric";
 import { isEmploymentCredentialProofValid } from "./transaction-indy";
 import {
   LedgerEvent,
   ConfigUtil,
-} from "@hyperledger/cactus-cmd-socketio-server";
-import { json2str } from "@hyperledger/cactus-cmd-socketio-server";
+} from "@hyperledger/cactus-common-example-server";
+import { json2str } from "@hyperledger/cactus-common-example-server";
 import { AssetTradeStatus } from "./define";
 import {
   CactiBlockTransactionEventV1,

@@ -1,9 +1,8 @@
-# `@hyperledger/cactus-cmd-socketio-server`
+# `@hyperledger/cactus-common-example-server`
 
-This module is responsible for providing the cactus node server using socket.io connection to validators
+This is a module for common server setup used by some sample application. Do not use on production.
 
 ## Usage samples
-- To confirm the operation of this package, please refer to the following business-logic sample application:
 	- [cactus-example-electricity-trade](../../examples/cactus-example-electricity-trade)
 	- [cactus-example-discounted-asset-trade](../../examples/cactus-example-discounted-asset-trade)
 
@@ -13,5 +12,5 @@ This module is responsible for providing the cactus node server using socket.io 
 
 ```
 # Build
-docker build . -t cactus-cmd-socketio-server
+docker build . -t cactus-common-example-server
 ```

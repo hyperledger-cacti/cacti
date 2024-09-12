@@ -13,7 +13,7 @@ import {
   BusinessLogicBase,
   json2str,
   ConfigUtil,
-} from "@hyperledger/cactus-cmd-socketio-server";
+} from "@hyperledger/cactus-common-example-server";
 import { sendEthereumTransaction } from "./TransactionEthereum";
 
 const config: any = ConfigUtil.getConfig() as any;
