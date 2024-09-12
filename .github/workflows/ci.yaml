@@ -519,13 +519,13 @@ jobs:
           fail-on-alert: true
           alert-comment-cc-users: '@hyperledger/cacti-maintainers'
 
-  cactus-cmd-socketio-server:
+  cactus-common-example-server:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-cmd-socketio-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_PATTERN: examples/cactus-common-example-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-cmd-socketio-server
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common-example-server
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
@@ -2155,8 +2155,8 @@ jobs:
   cp-bungee-hermes:
     continue-on-error: false
     env:
-      # Otherwise it fails with: You are running out of disk space. 
-      # The runner will stop working when the machine runs out of disk space. 
+      # Otherwise it fails with: You are running out of disk space.
+      # The runner will stop working when the machine runs out of disk space.
       # Free space left: 26 MB
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       FULL_BUILD_DISABLED: true

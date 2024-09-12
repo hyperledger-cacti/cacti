@@ -1,6 +1,6 @@
 FROM node:16
 
-ENV CACTUS_CMD_SOCKETIO_PATH=/opt/cactus-cmd-socketio-server
+ENV CACTUS_CMD_SOCKETIO_PATH=/opt/cactus-common-example-server
 
 WORKDIR ${CACTUS_CMD_SOCKETIO_PATH}
 

@@ -12,5 +12,5 @@ import * as shell from "shelljs";
 //        shell.cp('-R', 'src/routing-interface/views', 'dist/routing-interface/views/');
 shell.cp(
   "../../dist/examples/test-run-transaction/config/BLP_config.js",
-  "../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/",
+  "../cactus-common-example-server/src/main/typescript/business-logic-plugin/",
 );

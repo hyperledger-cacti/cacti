@@ -18,7 +18,7 @@
       "path": "../../packages/cactus-core-api/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-cmd-socketio-server/tsconfig.json"
+      "path": "../cactus-common-example-server/tsconfig.json"
     },
     {
       "path": "../../packages/cactus-plugin-keychain-memory/tsconfig.json"

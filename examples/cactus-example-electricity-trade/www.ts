@@ -1,5 +1,5 @@
 import { BusinessLogicElectricityTrade } from "./BusinessLogicElectricityTrade";
-import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socketio-server";
+import { startCactusSocketIOServer } from "@hyperledger/cactus-common-example-server";
 import { initEthereumConnector } from "./ethereum-connector";
 import { initSawtoothConnector } from "./sawtooth-connector";
 

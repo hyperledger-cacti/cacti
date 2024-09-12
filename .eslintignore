@@ -8,21 +8,21 @@ weaver/core/identity-management/iin-agent/out/
 **/src/main/typescript/generated/proto/**
 **/src/main/typescript/generated/wasm-pack/**
 
-packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/LedgerOperation.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/app.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TransactionManagement.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/login.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/BLPRegistry.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ContractInfoHolder.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon.ts
-packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier.ts
+examples/cactus-common-example-server/src/main/typescript/business-logic-plugin/BusinessLogicBase.ts
+examples/cactus-common-example-server/src/main/typescript/business-logic-plugin/LedgerOperation.ts
+examples/cactus-common-example-server/src/main/typescript/business-logic-plugin/app.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/TransactionManagement.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/routes/login.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/util/BLPRegistry.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/util/ConfigUtil.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/util/ContractInfoHolder.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/util/LPInfoHolder.ts
+examples/cactus-common-example-server/src/main/typescript/routing-interface/util/RIFUtil.ts
+examples/cactus-common-example-server/src/main/typescript/verifier/DriverCommon.ts
+examples/cactus-common-example-server/src/main/typescript/verifier/Verifier.ts
 
-packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierFactory.ts
-packages/cactus-cmd-socketio-server/src/test/typescript/unit/Verifier.test.ts
+examples/cactus-common-example-server/src/main/typescript/verifier/VerifierFactory.ts
+examples/cactus-common-example-server/src/test/typescript/unit/Verifier.test.ts
 
 weaver/common/policy-dsl/index.js
 weaver/common/policy-dsl/parser/PolicyListener.js

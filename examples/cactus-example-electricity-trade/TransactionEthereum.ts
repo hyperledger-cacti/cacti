@@ -5,7 +5,7 @@
  * transaction-ethereum.ts
  */
 
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
 import {
   Web3SigningCredentialType,
   signTransaction,

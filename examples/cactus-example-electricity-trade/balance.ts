@@ -6,7 +6,10 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { ConfigUtil, RIFError } from "@hyperledger/cactus-cmd-socketio-server";
+import {
+  ConfigUtil,
+  RIFError,
+} from "@hyperledger/cactus-common-example-server";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";

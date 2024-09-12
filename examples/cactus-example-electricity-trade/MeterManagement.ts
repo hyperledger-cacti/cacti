@@ -6,7 +6,7 @@
  */
 
 import { MeterInfo } from "./MeterInfo";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
 const fs = require("fs");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";

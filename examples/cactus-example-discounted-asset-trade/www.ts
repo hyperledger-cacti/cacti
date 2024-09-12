@@ -1,5 +1,5 @@
 import { BusinessLogicAssetTrade } from "./business-logic-asset-trade";
-import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socketio-server";
+import { startCactusSocketIOServer } from "@hyperledger/cactus-common-example-server";
 import { initFabricConnector } from "./fabric-connector";
 import { initEthereumConnector } from "./ethereum-connector";
 import { initAriesConnector } from "./aries-connector";

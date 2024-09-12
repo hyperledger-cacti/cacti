@@ -10,7 +10,7 @@ import {
   TransactionManagement,
   RIFError,
   ConfigUtil,
-} from "@hyperledger/cactus-cmd-socketio-server";
+} from "@hyperledger/cactus-common-example-server";
 import escapeHtml from "escape-html";
 
 const config: any = ConfigUtil.getConfig();

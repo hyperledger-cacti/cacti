@@ -1,4 +1,4 @@
-FROM cactus-cmd-socketio-server:latest
+FROM cactus-common-example-server:latest
 
 ARG NPM_PKG_VERSION=latest
 ENV APP_HOME=/root/cactus

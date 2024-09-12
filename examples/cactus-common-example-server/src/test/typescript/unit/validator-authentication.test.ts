@@ -1,6 +1,4 @@
 /* verifier/ValidatorAuthentication.ts Unit Tests
- * Execute:
- *    cd cactus/packages/cactus-cmd-socketio-server && npm install && npx jest
  */
 
 //////////////////////////

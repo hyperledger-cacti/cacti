@@ -6,9 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { TransactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TransactionManagement";
-import { RIFError } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
-import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
+import { TransactionManagement } from "../cactus-common-example-server/src/main/typescript/routing-interface/TransactionManagement";
+import { RIFError } from "../cactus-common-example-server/src/main/typescript/routing-interface/RIFError";
+import { ConfigUtil } from "../cactus-common-example-server/src/main/typescript/routing-interface/util/ConfigUtil";
 
 import escapeHtml from "escape-html";
 const config: any = ConfigUtil.getConfig();

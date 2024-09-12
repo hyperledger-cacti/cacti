@@ -36,7 +36,7 @@ const mockAppConfig = {
   appRouters: [],
 };
 
-// Must be mocked before loading cactus-cmd-socketio-server
+// Must be mocked before loading cactus-common-example-server
 import * as ConfigUtil from "../../../main/typescript/routing-interface/util/ConfigUtil";
 jest.mock("../../../main/typescript/routing-interface/util/ConfigUtil");
 (ConfigUtil as any)["__configMock"] = mockAppConfig;

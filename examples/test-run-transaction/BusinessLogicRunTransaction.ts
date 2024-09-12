@@ -7,12 +7,12 @@
 
 import { Request } from "express";
 import { RequestInfo } from "./RequestInfo";
-import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo";
-import { transactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
-import { LedgerEvent } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
-import { json2str } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon";
+import { TradeInfo } from "../cactus-common-example-server/src/main/typescript/routing-interface/TradeInfo";
+import { transactionManagement } from "../cactus-common-example-server/src/main/typescript/routing-interface/routes/index";
+import { verifierFactory } from "../cactus-common-example-server/src/main/typescript/routing-interface/routes/index";
+import { BusinessLogicBase } from "../cactus-common-example-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
+import { LedgerEvent } from "../cactus-common-example-server/src/main/typescript/verifier/LedgerPlugin";
+import { json2str } from "../cactus-common-example-server/src/main/typescript/verifier/DriverCommon";
 
 import fs from "fs";
 import yaml from "js-yaml";
