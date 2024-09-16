@@ -9,23 +9,24 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
-import { transferTokensFabric } from "../../api-calls/fabric-api";
-import { transferTokensBesu } from "../../api-calls/besu-api";
+import { bridgeTokens } from "../../api-calls/gateway-api";
 
 const recipients = ["Alice", "Charlie"];
 
-export interface ITransferDialogOptions {
+export interface ICrossChainTransferDialogOptions {
   open: boolean;
   ledger: string;
   user: string;
-  balance: number;
-  onClose: () => any;
+  tokensApproved: number;
+  onClose: () => unknown;
 }
 
-export default function TransferDialog(props: ITransferDialogOptions) {
-  const [errorMessage, setErrorMessage] = useState("");
+export default function CrossChainTransferDialog(
+  props: ICrossChainTransferDialogOptions,
+) {
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
@@ -49,9 +50,11 @@ export default function TransferDialog(props: ITransferDialogOptions) {
       setAmount(value);
     }
 
-    if (value > props.balance) {
-      setErrorMessage("Amount must be lower or equal to current balance");
-      setAmount(props.balance);
+    if (value > props.tokensApproved) {
+      setErrorMessage(
+        "Amount must be lower or equal to the amount approved to the bridge",
+      );
+      setAmount(props.tokensApproved);
     } else {
       setErrorMessage("");
       setAmount(value);
@@ -62,27 +65,30 @@ export default function TransferDialog(props: ITransferDialogOptions) {
     setRecipient(event.target.value);
   };
 
-  const performLocalTransferTransaction = async () => {
+  const performCrossChainTransaction = async () => {
     if (amount === 0) {
       setErrorMessage("Amounts must be a positive value");
     } else {
       setSending(true);
-
-      if (props.ledger === "Fabric") {
-        await transferTokensFabric(props.user, recipient, amount.toString());
-      } else {
-        await transferTokensBesu(props.user, recipient, amount);
-      }
+      await bridgeTokens(
+        props.user,
+        recipient,
+        props.ledger,
+        props.ledger === "Fabric" ? "Besu" : "Fabric",
+        amount,
+      );
     }
+
     props.onClose();
   };
 
   return (
     <Dialog open={props.open} keepMounted onClose={props.onClose}>
-      <DialogTitle>{"Transfer CBDC"}</DialogTitle>
+      <DialogTitle>{"Cross-Chain Transfer CBDC"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Select the recipient of the tokens and the amount to transfer
+          Select the recipient of the tokens and the amount to transfer to the
+          other blockchain
         </DialogContentText>
         <Select
           fullWidth
@@ -121,11 +127,11 @@ export default function TransferDialog(props: ITransferDialogOptions) {
       </DialogContent>
       <DialogActions>
         {sending ? (
-          <Button disabled>Sending...</Button>
+          <Button disabled>Running SATP...</Button>
         ) : (
           <div>
             <Button onClick={props.onClose}>Cancel</Button>
-            <Button onClick={performLocalTransferTransaction}>Confirm</Button>
+            <Button onClick={performCrossChainTransaction}>Confirm</Button>
           </div>
         )}
       </DialogActions>
