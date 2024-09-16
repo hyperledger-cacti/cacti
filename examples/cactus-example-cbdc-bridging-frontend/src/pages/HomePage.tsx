@@ -6,6 +6,8 @@ import {
   checkApiServer1Connection,
   checkApiServer2Connection,
 } from "../api-calls/common";
+import IconButton from "@mui/material/IconButton";
+import HelpIcon from "@mui/icons-material/Help";
 import ConnectionErrorDialog from "../components/dialogs/ConnectionErrorDialog";
 
 export default function HomePage() {
@@ -56,13 +58,23 @@ export default function HomePage() {
 function BridgeImage() {
   return (
     <>
+      <IconButton
+        sx={{ marginTop: "1rem" }}
+        color="secondary"
+        aria-label="help"
+        size="large"
+        href="/help"
+      >
+        <HelpIcon />
+      </IconButton>
+      <br />
       <svg
         width="105"
         height="203"
         viewBox="0 0 105 203"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ marginTop: "15rem" }}
+        style={{ marginTop: "5rem" }}
       >
         <path
           d="M91.4749 28.4749C92.8417 27.108 92.8417 24.892 91.4749 23.5251L69.201 1.25126C67.8342 -0.115572 65.6181 -0.115572 64.2513 1.25126C62.8844 2.6181 62.8844 4.83418 64.2513 6.20101L84.0503 26L64.2513 45.799C62.8844 47.1658 62.8844 49.3819 64.2513 50.7487C65.6181 52.1156 67.8342 52.1156 69.201 50.7487L91.4749 28.4749ZM16 29.5H89V22.5H16V29.5Z"

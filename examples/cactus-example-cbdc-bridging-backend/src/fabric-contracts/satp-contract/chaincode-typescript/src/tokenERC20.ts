@@ -307,6 +307,7 @@ class TokenERC20Contract extends Contract {
    * @param {String} spender The spender who are able to transfer the tokens
    * @returns {Number} Return the amount of remaining tokens allowed to spent
    */
+  @Transaction(false)
   async Allowance(
     ctx: Context,
     owner: string,

@@ -15,7 +15,7 @@ const headCells = [
   { id: "status", label: "Status" },
   { id: "substatus", label: "Substatus" },
   { id: "origin", label: "Origin" },
-  { id: "destiny", label: "Destiny" },
+  { id: "destination", label: "Destination" },
 ];
 
 function ItemsTableHead() {

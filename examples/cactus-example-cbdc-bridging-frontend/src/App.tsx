@@ -1,14 +1,18 @@
-import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import { CssBaseline } from "@mui/material";
+import Helper from "./pages/Helper";
 import "./App.css";
 
 function App() {
   return (
-    <>
-      <CssBaseline />
-      <HomePage />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/">
+          <Route index element={<HomePage />} />
+          <Route path="help" element={<Helper />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

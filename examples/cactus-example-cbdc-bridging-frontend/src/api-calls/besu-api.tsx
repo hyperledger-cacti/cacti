@@ -35,6 +35,36 @@ export async function authorizeNTokensBesu(
   }
 }
 
+export async function fetchAmountApprovedToBridge(frontendUser: string) {
+  const response = await fetch("http://localhost:9999/wrapper-address");
+  const data = await response.json();
+  const wrapperAddress = data.address;
+
+  try {
+    const from = getEthAddress(frontendUser);
+    const response = await axios.post(
+      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      {
+        contractName: BESU_CONTRACT_CBDC_ERC20_NAME,
+        invocationType: "CALL",
+        methodName: "allowance",
+        gas: 1000000,
+        params: [from, wrapperAddress],
+        signingCredential: {
+          ethAccount: from,
+          secret: getEthUserPrKey(frontendUser),
+          type: "PRIVATE_KEY_HEX",
+        },
+        keychainId: CryptoMaterial.keychains.keychain2.id,
+      },
+    );
+    return parseInt(response.data.callOutput);
+  } catch (error) {
+    // there is no allowance, so we will return 0
+    return 0;
+  }
+}
+
 export async function transferTokensBesu(
   frontendUserFrom: string,
   frontendUserTo: string,

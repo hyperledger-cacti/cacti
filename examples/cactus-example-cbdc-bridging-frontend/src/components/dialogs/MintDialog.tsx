@@ -9,13 +9,12 @@ import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
 import { mintTokensFabric } from "../../api-calls/fabric-api";
 import { mintTokensBesu } from "../../api-calls/besu-api";
-//import { mintTokensFabric } from "../../api-calls/fabric-api";
 
 export interface IMintDialogOptions {
   open: boolean;
   user: string;
   ledger: string;
-  onClose: () => any;
+  onClose: () => unknown;
 }
 
 export default function MintDialog(props: IMintDialogOptions) {

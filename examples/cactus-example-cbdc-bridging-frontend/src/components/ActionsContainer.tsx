@@ -1,56 +1,61 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
-import { styled } from "@mui/material/styles";
-import Button, { ButtonProps } from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
 import MintDialog from "./dialogs/MintDialog";
+import CrossChainTransferDialog from "./dialogs/CrossChainTransferDialog";
 import TransferDialog from "./dialogs/TransferDialog";
 import PermissionDialog from "./dialogs/PermissionDialog";
 import { getFabricBalance } from "../api-calls/fabric-api";
 import { getBesuBalance } from "../api-calls/besu-api";
 import { SessionReference } from "../models/SessionReference";
+import { NormalButton } from "./buttons/NormalButton";
+import { CriticalButton } from "./buttons/CriticalButton";
 
-const NormalButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  margin: "auto",
-  width: "100%",
-  fontSize: "13px",
-  textTransform: "none",
-  background: "#2B9BF6",
-  color: "#FFFFFF",
-  border: "0.5px solid #000000",
-  "&:disabled": {
-    border: "0",
-  },
-}));
+// const NormalButton = styled(Button)<ButtonProps>(({ theme }) => ({
+//   margin: "auto",
+//   width: "100%",
+//   fontSize: "13px",
+//   textTransform: "none",
+//   background: "#2B9BF6",
+//   color: "#FFFFFF",
+//   border: "0.5px solid #000000",
+//   "&:disabled": {
+//     border: "0",
+//   },
+// }));
 
-const CriticalButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  margin: "auto",
-  width: "100%",
-  fontSize: "13px",
-  textTransform: "none",
-  background: "#FF584B",
-  color: "#FFFFFF",
-  border: "0.5px solid #000000",
-  "&:hover": {
-    backgroundColor: "#444444",
-    color: "#FFFFFF",
-  },
-  "&:disabled": {
-    border: "0",
-  },
-}));
+// const CriticalButton = styled(Button)<ButtonProps>(({ theme }) => ({
+//   margin: "auto",
+//   width: "100%",
+//   fontSize: "13px",
+//   textTransform: "none",
+//   background: "#FF584B",
+//   color: "#FFFFFF",
+//   border: "0.5px solid #000000",
+//   "&:hover": {
+//     backgroundColor: "#444444",
+//     color: "#FFFFFF",
+//   },
+//   "&:disabled": {
+//     border: "0",
+//   },
+// }));
 
 export interface IActionsContainerOptions {
   user: string;
   ledger: string;
   sessionRefs: Array<SessionReference>;
+  tokensApproved: number;
 }
 
 export default function ActionsContainer(props: IActionsContainerOptions) {
   const [amount, setAmount] = useState(0);
   const [mintDialog, setMintDialog] = useState(false);
   const [transferDialog, setTransferDialog] = useState(false);
+  const [crossChainTransferDialog, setCrossChainTransferDialog] =
+    useState(false);
   const [permissionDialog, setGivePermissionDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -72,7 +77,13 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
   }, [props.user, props.ledger]);
 
   return (
-    <div>
+    <Paper
+      elevation={0}
+      sx={{
+        background: "#EAEAEA",
+        padding: "0.5rem 1.1rem 1.1rem 1.1rem",
+      }}
+    >
       {loading ? (
         <center>
           <CircularProgress
@@ -141,17 +152,27 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             </Grid>
           )}
           {props.user !== "Bridge" && (
-            <Grid item xs={12} lg={12}>
-              <NormalButton
+            <Grid item xs={12} lg={6}>
+              <CriticalButton
                 variant="contained"
                 disabled={amount === 0}
                 onClick={() => setGivePermissionDialog(true)}
               >
-                Give Permission
-              </NormalButton>
+                Approval
+              </CriticalButton>
             </Grid>
           )}
-          {props.user !== "Bridge" && <Grid item xs={12} lg={6}></Grid>}
+          {props.user !== "Bridge" && (
+            <Grid item xs={12} lg={6}>
+              <CriticalButton
+                variant="contained"
+                disabled={amount === 0 || props.tokensApproved == 0}
+                onClick={() => setCrossChainTransferDialog(true)}
+              >
+                Bridge
+              </CriticalButton>
+            </Grid>
+          )}
           {props.ledger === "Fabric" && props.user !== "Bridge" && (
             <Grid item xs={12} lg={6}></Grid>
           )}
@@ -170,14 +191,23 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
         open={transferDialog}
         user={props.user}
         ledger={props.ledger}
+        balance={amount}
         onClose={() => setTransferDialog(false)}
+      />
+      <CrossChainTransferDialog
+        open={crossChainTransferDialog}
+        user={props.user}
+        ledger={props.ledger}
+        tokensApproved={props.tokensApproved}
+        onClose={() => setCrossChainTransferDialog(false)}
       />
       <PermissionDialog
         open={permissionDialog}
         user={props.user}
         ledger={props.ledger}
+        balance={amount}
         onClose={() => setGivePermissionDialog(false)}
       />
-    </div>
+    </Paper>
   );
 }
