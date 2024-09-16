@@ -81,15 +81,14 @@ export async function bridgeTokens(
   sender: string,
   recipient: string,
   sourceChain: string,
-  destinyChain: string,
-  originAmount: number,
-  destinyAmount: number,
+  destinationChain: string,
+  amount: number,
 ) {
   let senderAddress;
   let receiverAddress;
   let port;
   let sourceAsset;
-  let destinyAsset;
+  let destinationAsset;
   //only way we found to pass contract address from backend to frontend at each run of tests
   const response = await fetch("http://localhost:9999/contract-address");
   const data = await response.json();
@@ -110,14 +109,17 @@ export async function bridgeTokens(
     port = "4110";
   }
 
-  if (destinyChain === "Fabric") {
+  if (destinationChain === "Fabric") {
     toDLTNetworkID = "FabricSATPGateway";
     receiverAddress = getFabricId(recipient);
-    destinyAsset = setFabricAsset(receiverAddress as string);
+    destinationAsset = setFabricAsset(receiverAddress as string);
   } else {
     toDLTNetworkID = "BesuSATPGateway";
     receiverAddress = getEthAddress(recipient);
-    destinyAsset = setBesuAsset(receiverAddress as string, besuContractAddress);
+    destinationAsset = setBesuAsset(
+      receiverAddress as string,
+      besuContractAddress,
+    );
   }
   try {
     await axios.post(
@@ -126,13 +128,13 @@ export async function bridgeTokens(
         contextID: "MockID",
         fromDLTNetworkID,
         toDLTNetworkID,
-        fromAmount: originAmount,
-        toAmount: destinyAmount,
+        fromAmount: amount,
+        toAmount: amount,
         receiver: receiverAddress,
         originatorPubkey: senderAddress,
         beneficiaryPubkey: receiverAddress,
         sourceAsset,
-        destinyAsset,
+        destinyAsset: destinationAsset,
       },
     );
   } catch (error) {
