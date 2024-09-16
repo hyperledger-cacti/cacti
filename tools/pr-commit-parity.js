@@ -51,12 +51,12 @@ export async function fetchJsonFromUrl(url) {
 
 // regex expressions
 const PULL_REQ_REQUIREMENTS_REGEX = /\*\*Pull\sRequest\sRequirements(.|\n)*/gim;
-const FIXES_OR_DEPENDS_REGEX = /(Fixes|Depends)(.|\n)*/gim;
 const SIGNED_OFF_REGEX = /(")*Signed-off-by:(.|\s)*/gim;
-const COMMIT_TITLE_REGEX = /.*\n/m;
+const COMMIT_TITLE_REGEX = /^.*$/m;
 const HYPHEN_REGEX = /(-)+/gm;
 const BACKTICK_REGEX = /`+/gm;
 const COMMIT_TO_BE_REVIEWED_REGEX = /("#*\s*Commit\sto\sbe\sreviewed)/gim;
+const HYPERLEDGER_REFERENCE_REGEX = /hyperledger#/gm;
 const WHITESPACES_HARDCODED_REGEX = /(\r\n|\\r)/gm;
 const NEWLINE_HARDCODED_REGEX = /\\n/gm;
 
@@ -82,31 +82,53 @@ commitMessagesMetadata.forEach((commitMessageMetadata) => {
       .replace(SIGNED_OFF_REGEX, "")
       .replace(HYPHEN_REGEX, "")
       .replace(BACKTICK_REGEX, "")
+      .replace(HYPERLEDGER_REFERENCE_REGEX, "#")
       .replace(WHITESPACES_HARDCODED_REGEX, "")
-      .replace(FIXES_OR_DEPENDS_REGEX, ""),
+      .trim(),
   );
 });
 
 let prBodyStriped = prBodyRaw
   .replace(PULL_REQ_REQUIREMENTS_REGEX, "")
-  .replace(FIXES_OR_DEPENDS_REGEX, "")
   .replace(WHITESPACES_HARDCODED_REGEX, "\n")
   .replace(SIGNED_OFF_REGEX, "")
   .replace(HYPHEN_REGEX, "")
   .replace(BACKTICK_REGEX, "")
+  .replace(HYPERLEDGER_REFERENCE_REGEX, "#")
   .replace(COMMIT_TO_BE_REVIEWED_REGEX, "")
-  .replace(NEWLINE_HARDCODED_REGEX, "");
+  .replace(NEWLINE_HARDCODED_REGEX, "")
+  .trim();
 
 let PR_COMMIT_PARITY = false;
 for (let commitMessageListIndex in commitMessageList) {
   let commitMessage = commitMessageList[commitMessageListIndex];
+  let commitMessageSubject = commitMessage.match(COMMIT_TITLE_REGEX)[0];
+  /*
+   *  This condition checks for (A && (B || C)) is true, where,
+   *  A) pr title is similar to the commit subject
+   *  B) pr body is similar to the entire commit message
+   *  C) pr body is similar to the commit message excluding commit subject
+   */
   if (
-    stringSimilarity(commitMessage, prBodyStriped) >=
+    stringSimilarity(commitMessageSubject, prMetadata.title) >=
+      ACCEPTABLE_SIMILARITY_RATIO &&
+    (stringSimilarity(commitMessage, prBodyStriped) >=
       ACCEPTABLE_SIMILARITY_RATIO ||
-    stringSimilarity(
-      commitMessage.replace(COMMIT_TITLE_REGEX, ""),
-      prBodyStriped,
-    ) >= ACCEPTABLE_SIMILARITY_RATIO
+      stringSimilarity(
+        commitMessage.replace(COMMIT_TITLE_REGEX, ""),
+        prBodyStriped,
+      ) >= ACCEPTABLE_SIMILARITY_RATIO)
+  )
+    PR_COMMIT_PARITY = true;
+  /*
+   *  This condition checks for (A && B) is true, where,
+   *  A) pr title is similar to the commit subject
+   *  B) pr body is empty (in case of releases)
+   */
+  if (
+    stringSimilarity(commitMessageSubject, prMetadata.title) >=
+      ACCEPTABLE_SIMILARITY_RATIO &&
+    prBodyStriped === ""
   )
     PR_COMMIT_PARITY = true;
 }
