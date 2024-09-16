@@ -14,7 +14,8 @@ export interface IPermissionDialogOptions {
   open: boolean;
   user: string;
   ledger: string;
-  onClose: () => any;
+  balance: number;
+  onClose: () => unknown;
 }
 
 export default function setGivePermissionDialog(
@@ -43,6 +44,14 @@ export default function setGivePermissionDialog(
       setErrorMessage("");
       setAmount(value);
     }
+
+    if (value > props.balance) {
+      setErrorMessage("Amount must be lower or equal to user's balance");
+      setAmount(props.balance);
+    } else {
+      setErrorMessage("");
+      setAmount(value);
+    }
   };
 
   const performAccessTransaction = async () => {
@@ -61,11 +70,10 @@ export default function setGivePermissionDialog(
 
   return (
     <Dialog open={props.open} keepMounted onClose={props.onClose}>
-      <DialogTitle>{"Give Permission"}</DialogTitle>
+      <DialogTitle>{"Approve Funds to Bridge"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          How many tokens would you like to give permission to {props.user}"s
-          address?
+          How many tokens can the bridge use on your behalf?
         </DialogContentText>
         <TextField
           required
@@ -93,7 +101,7 @@ export default function setGivePermissionDialog(
         ) : (
           <div>
             <Button onClick={props.onClose}>Cancel</Button>
-            <Button onClick={performAccessTransaction}>Give Permission</Button>
+            <Button onClick={performAccessTransaction}>Approve</Button>
           </div>
         )}
       </DialogActions>
