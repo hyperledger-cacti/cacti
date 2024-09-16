@@ -29,7 +29,6 @@ export async function getFabricBalance(frontendUser: string) {
     console.error(error.msg);
     return -1;
   }
-  console.log(response);
 
   return parseInt(response.data.functionOutput);
 }
@@ -217,6 +216,33 @@ export async function authorizeNTokensFabric(user: string, amount: string) {
       },
     },
   );
+}
+
+export async function fetchAmountApprovedToBridge(frontendUser: string) {
+  const owner = getFabricId(frontendUser);
+  let response;
+
+  try {
+    response = await axios.post(
+      "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+      {
+        contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
+        channelName: FABRIC_CHANNEL_NAME,
+        params: [owner, CryptoMaterial.accounts.bridge.fabricID],
+        methodName: "Allowance",
+        invocationType: "FabricContractInvocationType.CALL",
+        signingCredential: {
+          keychainId: CryptoMaterial.keychains.keychain1.id,
+          keychainRef: getUserFromPseudonim(frontendUser),
+        },
+      },
+    );
+  } catch (error) {
+    // there is no allowance, so we will return 0
+    return 0;
+  }
+
+  return parseInt(response.data.functionOutput);
 }
 
 export function getUserFromFabricId(fabricID: string): string {
