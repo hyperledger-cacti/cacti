@@ -6,7 +6,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { getSessionReferencesBridge } from "../api-calls/gateway-api";
 import { fetchAmountApprovedToBridge as fetchAmountApprovedToBridgeFabric } from "../api-calls/fabric-api";
 import { fetchAmountApprovedToBridge as fetchAmountApprovedToBridgeBesu } from "../api-calls/besu-api";
-import AssetReferencesTable from "./AssetReferencesTable";
+import SessionReferencesTable from "./SessionReferencesTable";
 import ApprovalsTable from "./ApprovalsTable";
 
 export interface ILedgerOptions {
@@ -92,7 +92,7 @@ export default function Ledger(props: ILedgerOptions) {
         />
       )}
       <p>Sessions Status</p>
-      <AssetReferencesTable
+      <SessionReferencesTable
         ledger={props.ledger}
         sessionRefs={sessionReferences}
       />
