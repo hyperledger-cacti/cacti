@@ -1,6 +1,6 @@
 import { Logger } from "@hyperledger/cactus-common";
 import {
-  RemoteNetworkConfig,
+  RemoteOrgConfig,
   LocalRelayConfig,
   DLAccount,
   DLTransactionParams,
@@ -19,7 +19,7 @@ export class FabricRemoteTransactionContext
   private localRelayConfig: LocalRelayConfig;
   private account: DLAccount;
   private interopContractName: string;
-  private remoteNetConfig: RemoteNetworkConfig;
+  private remoteNetConfig: RemoteOrgConfig;
   private gateway: Gateway;
   private log: Logger;
 
@@ -27,7 +27,7 @@ export class FabricRemoteTransactionContext
     localContext: FabricContractContext,
     localRelayConfig: LocalRelayConfig,
     account: DLAccount,
-    remoteNetworkConfig: RemoteNetworkConfig,
+    RemoteOrgConfig: RemoteOrgConfig,
 
     interopContractName: string,
     log: Logger,
@@ -35,7 +35,7 @@ export class FabricRemoteTransactionContext
     this.localContext = localContext;
     this.localRelayConfig = localRelayConfig;
     this.account = account;
-    this.remoteNetConfig = remoteNetworkConfig;
+    this.remoteNetConfig = RemoteOrgConfig;
     this.log = log;
     this.interopContractName = interopContractName;
     this.gateway = new Gateway();
@@ -65,7 +65,7 @@ export class FabricRemoteTransactionContext
           channel: this.localContext.channelName,
           ccFunc: localTransactionParams.method,
           ccArgs: localTransactionParams.args,
-          contractName: localTransactionParams.contract,
+          contractName: localTransactionParams.contractId,
         },
         this.localContext.mspId,
         this.localRelayConfig.endpoint,

@@ -16,8 +16,8 @@ export function validateGetVerifiedViewRequest(req: GetVerifiedViewV1Request): {
   if (!req.getVerifiedViewV1RequestPB.view) {
     throw new ConnectError("view required", Code.InvalidArgument);
   }
-  if (!req.getVerifiedViewV1RequestPB.view.network) {
-    throw new ConnectError("view.network required", Code.InvalidArgument);
+  if (!req.getVerifiedViewV1RequestPB.view.organization) {
+    throw new ConnectError("view.organization required", Code.InvalidArgument);
   }
   if (!req.getVerifiedViewV1RequestPB.view.viewAddress) {
     throw new ConnectError("view.viewAddress required", Code.InvalidArgument);
@@ -44,7 +44,7 @@ export function validateGetVerifiedViewRequest(req: GetVerifiedViewV1Request): {
       req.getVerifiedViewV1RequestPB.account,
       "account",
     ),
-    remoteNetwork: req.getVerifiedViewV1RequestPB.view.network,
+    remoteNetwork: req.getVerifiedViewV1RequestPB.view.organization,
     contractId: req.getVerifiedViewV1RequestPB.view.viewAddress.contractId,
     method: req.getVerifiedViewV1RequestPB.view.viewAddress.function,
     args: args,

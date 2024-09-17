@@ -1,11 +1,11 @@
-import { DLTransactionParams, RemoteNetworkConfig } from "./types";
+import { DLTransactionParams, RemoteOrgConfig } from "./types";
 
 export class ViewAddress {
-  private remoteNetConfig: RemoteNetworkConfig;
+  private remoteNetConfig: RemoteOrgConfig;
   private transactionParams: DLTransactionParams;
 
   constructor(
-    remoteNetConfig: RemoteNetworkConfig,
+    remoteNetConfig: RemoteOrgConfig,
     transactionParams: DLTransactionParams,
   ) {
     this.remoteNetConfig = remoteNetConfig;
@@ -14,14 +14,14 @@ export class ViewAddress {
 
   public toString(): string {
     let address =
-      this.remoteNetConfig.relayAddr + "/" + this.remoteNetConfig.network;
+      this.remoteNetConfig.relayAddr + "/" + this.remoteNetConfig.networkName;
     if (this.remoteNetConfig.networkType == "fabric") {
       address =
         address +
         "/" +
         this.remoteNetConfig.channelName +
         ":" +
-        this.transactionParams.contract +
+        this.transactionParams.contractId +
         ":" +
         this.transactionParams.method +
         ":" +
@@ -32,7 +32,7 @@ export class ViewAddress {
         "/" +
         this.remoteNetConfig.partyEndPoint +
         "#" +
-        this.remoteNetConfig.flowPackage +
+        this.transactionParams.contractId +
         "." +
         this.transactionParams.method +
         ":" +

@@ -1,0 +1,112 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+//    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id "java"
+    id "idea"
+    id "application"
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
+    id "org.jetbrains.kotlin.plugin.jpa" version "$kotlin_version"
+    id "org.jetbrains.kotlin.plugin.spring" version "$kotlin_version"
+    id "org.springframework.boot" version "3.0.2"
+    id "io.spring.dependency-management" version "1.0.14.RELEASE"
+
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file("config/dev")
+        }
+        kotlin.srcDirs += ['../../main/kotlin', '.' ]
+    }
+}
+
+Properties constants = new Properties()
+
+repositories {
+    google()
+    mavenCentral()
+    mavenLocal()
+    maven { url "https://download.corda.net/maven/corda-dependencies" } // access to the patched Quasar and Caffeine version
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    // Corda dependencies.
+    implementation "$corda_core_release_group:corda-core:$corda_core_release_version"
+    implementation "$corda_release_group:corda-node-api:$corda_release_version"
+    implementation "$corda_release_group:corda:$corda_release_version"
+    implementation "$corda_release_group:corda-rpc:$corda_release_version"
+    
+    implementation "io.arrow-kt:arrow-core:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
+
+    // gRPC and protobuf dependencies
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
+    implementation "io.grpc:grpc-netty-shaded:$grpc_version"
+    implementation "io.grpc:grpc-stub:$grpc_version"
+    implementation "io.grpc:grpc-okhttp:$grpc_version"
+    implementation "io.grpc:grpc-protobuf:$grpc_version"
+    implementation group: 'org.json', name: 'json', version: '20190722'
+
+    implementation "org.springframework.boot:spring-boot-starter-parent:3.0.4"
+    implementation "org.springframework.boot:spring-boot-maven-plugin:3.0.4"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation "net.devh:grpc-spring-boot-starter:2.14.0.RELEASE" 
+    implementation "jakarta.validation:jakarta.validation-api"
+    implementation "jakarta.annotation:jakarta.annotation-api:2.1.0"
+
+
+    //// Logger dependencies
+    implementation "org.slf4j:slf4j-simple:1.6.1"
+
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
+jar {
+    // This makes the JAR's SHA-256 hash repeatable.
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+
+    dependencies {
+        implementation files("./localdeps/copm-corda-" + version + ".jar")
+        implementation files("./localdeps/protos-java-kt-" + version + ".jar")
+        implementation files("./localdeps/weaver-sdk-corda-" + version + ".jar")
+        implementation files("./localdeps/interop-workflows-" + version + ".jar")
+        implementation files("./localdeps/interop-contracts-" + version + ".jar")
+        implementation files("./localdeps/contracts-kotlin-" + weaver_sample_contracts_version + ".jar")
+        implementation files("./localdeps/workflows-kotlin-" + weaver_sample_contracts_version + ".jar")
+    }
+
+    manifest {
+        attributes(
+                'Main-Class': "com.copmCorda.MainClassKt"
+        )
+    }
+}
+
+application {
+    mainClass = 'com.copmCorda.MainClassKt'
+}
+

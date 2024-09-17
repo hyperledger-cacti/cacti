@@ -41,14 +41,14 @@
         }
       },
       "AssetAccountV1": {
-        "description": "A network account used in exchanging or transferring assets.",
+        "description": "An account used in exchanging or transferring assets.",
         "type": "object",
-        "required": ["network", "user_id"],
+        "required": ["organization", "user_id"],
         "properties": {
-          "network": {
+          "organization": {
             "x-protobuf-index": 1,
             "type": "string",
-            "example": "network1.org"
+            "example": "org1.network1.org"
           },
           "user_id": {
             "x-protobuf-index": 2,
@@ -132,26 +132,31 @@
               "asset_id": "ref203"
             }
           },
-          "owner": {
+          "source": {
             "type": "object",
             "$ref": "#/components/schemas/AssetAccountV1",
             "x-protobuf-index": 2
           },
+          "dest": {
+            "type": "object",
+            "$ref": "#/components/schemas/AssetAccountV1",
+            "x-protobuf-index": 3
+          },
           "hash_info": {
             "type": "object",
             "$ref": "#/components/schemas/HashInfoV1",
-            "x-protobuf-index": 3
+            "x-protobuf-index": 4
           },
           "destination_certificate": {
-            "x-protobuf-index": 4,
-            "type": "string"
-          },
-          "source_certificate": {
             "x-protobuf-index": 5,
             "type": "string"
           },
-          "expiry_secs": {
+          "source_certificate": {
             "x-protobuf-index": 6,
+            "type": "string"
+          },
+          "expiry_secs": {
+            "x-protobuf-index": 7,
             "type": "integer",
             "format": "int64",
             "default": 3600
@@ -160,28 +165,16 @@
       },
       "AssetLockClaimV1": {
         "description": "Claim a previously locked asset on the same network.\n\"lock_id\" is required for fungible assets, \"asset\" is required for non-fungible assets.\nhttps://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/asset-exchange/generic-htlc.md",
-        "required": [
-          "lock_id",
-          "source",
-          "destination",
-          "asset",
-          "source_certificate",
-          "hash_info"
-        ],
+        "required": ["lock_id", "destination", "asset", "hash_info"],
         "properties": {
           "lock_id": {
             "x-protobuf-index": 1,
             "type": "string"
           },
-          "source": {
-            "type": "object",
-            "$ref": "#/components/schemas/AssetAccountV1",
-            "x-protobuf-index": 2
-          },
           "destination": {
             "type": "object",
             "$ref": "#/components/schemas/AssetAccountV1",
-            "x-protobuf-index": 3,
+            "x-protobuf-index": 2,
             "example": {
               "network": "network2.org",
               "user_id": "Bob"
@@ -190,7 +183,7 @@
           "asset": {
             "type": "object",
             "$ref": "#/components/schemas/TransferrableAssetV1",
-            "x-protobuf-index": 4,
+            "x-protobuf-index": 3,
             "example": {
               "type": "bond",
               "asset_id": "ref203"
@@ -199,15 +192,7 @@
           "hash_info": {
             "type": "object",
             "$ref": "#/components/schemas/HashInfoV1",
-            "x-protobuf-index": 5
-          },
-          "source_certificate": {
-            "x-protobuf-index": 6,
-            "type": "string"
-          },
-          "dest_certificate": {
-            "x-protobuf-index": 7,
-            "type": "string"
+            "x-protobuf-index": 4
           }
         }
       },
@@ -284,12 +269,12 @@
         }
       },
       "ViewV1": {
-        "description": "The address of a view on a given network",
+        "description": "The address of a view on a given remote organizations' chaincode",
         "properties": {
-          "network": {
+          "organization": {
             "x-protobuf-index": 1,
             "type": "string",
-            "example": "network1"
+            "example": "Corda_Network1"
           },
           "view_address": {
             "type": "object",
@@ -301,11 +286,29 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/pledge-asset": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/no-op": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/pledge-asset",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/no-op",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "noopV1",
+        "summary": "A no-op operation.  May be used as a health check.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/pledge-asset": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/pledge-asset",
             "verbLowerCase": "post"
           }
         },
@@ -344,11 +347,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/lock-asset": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/lock-asset": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/lock-asset",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/lock-asset",
             "verbLowerCase": "post"
           }
         },
@@ -387,11 +390,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-pledged-asset": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-pledged-asset": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-pledged-asset",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-pledged-asset",
             "verbLowerCase": "post"
           }
         },
@@ -430,11 +433,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-locked-asset": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-locked-asset": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-locked-asset",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-locked-asset",
             "verbLowerCase": "post"
           }
         },
@@ -473,11 +476,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/get-verified-view": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/get-verified-view": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/get-verified-view",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/get-verified-view",
             "verbLowerCase": "post"
           }
         },

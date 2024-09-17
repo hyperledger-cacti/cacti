@@ -13,9 +13,11 @@ import {
   ClaimLockedAssetV1Request,
   ClaimPledgedAssetV1200ResponsePB,
   Interfaces as CopmIF,
-  CopmContractNames,
 } from "@hyperledger-cacti/cacti-copm-core";
 import * as Endpoints from "./endpoints";
+import { InteropConfiguration } from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/interfaces";
+import { FabricConfiguration } from "./public-api";
+import { FabricTransactionContextFactory } from "./lib/fabric-context-factory";
 
 type DefaultServiceMethodDefinitions = typeof DefaultService.methods;
 type DefaultServiceMethodNames = keyof DefaultServiceMethodDefinitions;
@@ -34,16 +36,27 @@ export class CopmFabricImpl
 
   private readonly log: Logger;
   private readonly contextFactory: CopmIF.DLTransactionContextFactory;
-  private readonly contractNames: CopmContractNames;
+  private readonly fabricConfig: FabricConfiguration;
+  private readonly interopConfig: InteropConfiguration;
 
   constructor(
     log: Logger,
-    contextFactory: CopmIF.DLTransactionContextFactory,
-    copmContractNames: CopmContractNames,
+    interopConfig: InteropConfiguration,
+    fabricConfig: FabricConfiguration,
   ) {
     this.log = log;
-    this.contextFactory = contextFactory;
-    this.contractNames = copmContractNames;
+    this.contextFactory = new FabricTransactionContextFactory(
+      fabricConfig,
+      interopConfig,
+      this.log,
+    );
+    this.interopConfig = interopConfig;
+    this.fabricConfig = fabricConfig;
+  }
+
+  public async noopV1(): Promise<void> {
+    // operation can be used as a health check
+    return;
   }
 
   public async pledgeAssetV1(
@@ -55,7 +68,7 @@ export class CopmFabricImpl
         req,
         this.log,
         this.contextFactory,
-        this.contractNames.pledgeContract,
+        this.fabricConfig,
       );
       const res = new PledgeAssetV1200ResponsePB({ pledgeId: pledgeId });
       return res;
@@ -74,7 +87,7 @@ export class CopmFabricImpl
         req,
         this.log,
         this.contextFactory,
-        this.contractNames.lockContract,
+        this.fabricConfig,
       );
       const res = new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId });
       return res;
@@ -88,12 +101,19 @@ export class CopmFabricImpl
     req: ClaimPledgedAssetV1Request,
   ): Promise<ClaimPledgedAssetV1200ResponsePB> {
     this.log.debug("claimAssetV1 ENTRY req=%o", req);
-    const claimId = await Endpoints.claimPledgedAssetV1Impl(
-      req,
-      this.log,
-      this.contextFactory,
-      this.contractNames.pledgeContract,
-    );
+    let claimId;
+    try {
+      claimId = await Endpoints.claimPledgedAssetV1Impl(
+        req,
+        this.log,
+        this.contextFactory,
+        this.interopConfig,
+        this.fabricConfig,
+      );
+    } catch (ex) {
+      this.log.error(ex);
+      throw ex;
+    }
     const res = new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId });
     return res;
   }
@@ -107,7 +127,7 @@ export class CopmFabricImpl
         req,
         this.log,
         this.contextFactory,
-        this.contractNames.lockContract,
+        this.fabricConfig,
       );
       const res = new LockAssetV1200ResponsePB({ lockId: lockId });
       return res;

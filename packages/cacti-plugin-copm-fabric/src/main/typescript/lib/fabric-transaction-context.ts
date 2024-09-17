@@ -40,11 +40,11 @@ export class FabricTransactionContext implements CopmIF.DLTransactionContext {
 
     const network = await gateway.getNetwork(this.context.channelName);
     // Get the contract from the network.
-    const contract = network.getContract(transactionParams.contract);
+    const contract = network.getContract(transactionParams.contractId);
 
     const currentQuery = {
       channel: this.context.channelName,
-      contractName: transactionParams.contract,
+      contractName: transactionParams.contractId,
       ccFunc: transactionParams.method,
       args: transactionParams.args,
     };

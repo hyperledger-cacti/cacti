@@ -64,7 +64,7 @@ jobs:
       plugin-htlc-coordinator-besu-changed: ${{ steps.changes.outputs.plugin-htlc-coordinator-besu-changed }}
       test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
       ghcr-dev-container-vscode-changed: ${{ steps.changes.outputs.ghcr-dev-container-vscode-changed }}
-      plugin-copm-fabric-changed: ${{ steps.changes.outputs.plugin-copm-fabric-changed }}
+      copm-changed: ${{ steps.changes.outputs.copm-changed }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.7
@@ -175,9 +175,15 @@ jobs:
               - './packages/cactus-plugin-keychain-memory/**'
               # - './.github/workflows/ci.yaml'
 
-            plugin-copm-fabric-changed:
+            copm-changed:
+              - './packages/cactus-common/**'
+              - './packages/cactus-core/**'
+              - './packages/cactus-core-api/**'
               - './packages/cacti-copm-common/**'
+              - './packages/cacti-copm-test/**'
               - './packages/cacti-plugin-copm-fabric/**'
+              - './packages/cacti-plugin-copm-corda/**'
+              - './weaver/**'
 
   build-dev:
     needs: check-ci-skip
@@ -1471,7 +1477,7 @@ jobs:
     needs: 
       - build-dev
       - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.plugin-copm-fabric-changed == 'true'
+    if: needs.compute_changed_packages.outputs.copm-changed == 'true'
     uses: ./.github/workflows/test_copm.yaml
         
 

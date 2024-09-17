@@ -10,7 +10,7 @@
 
 syntax = "proto3";
 
-package org.hyperledger.cacti.plugin.cacti.plugin.copm.core.services.defaultservice;
+package org.hyperledger.cacti.plugin.copm.core.services.defaultservice;
 
 import "google/protobuf/empty.proto";
 import "models/asset_lock_claim_v1_pb.proto";
@@ -31,6 +31,8 @@ service DefaultService {
   rpc GetVerifiedViewV1 (GetVerifiedViewV1Request) returns (GetVerifiedViewV1200ResponsePB);
 
   rpc LockAssetV1 (LockAssetV1Request) returns (LockAssetV1200ResponsePB);
+
+  rpc NoopV1 (google.protobuf.Empty) returns (google.protobuf.Empty);
 
   rpc PledgeAssetV1 (PledgeAssetV1Request) returns (PledgeAssetV1200ResponsePB);
 

@@ -20,7 +20,7 @@ const main = async () => {
     const pkgJsonPath = `${pi.location}/package.json`;
     const pkgJson = await fs.readJson(pkgJsonPath);
 
-    if (!pkgJson.scripts.webpack) {
+    if (!pkgJson.scripts || !pkgJson.scripts.webpack) {
       console.log(`Skipping ${pi.name} due to lack of webpack npm script`);
       return;
     }

@@ -10,7 +10,7 @@
 
 syntax = "proto3";
 
-package org.hyperledger.cacti.plugin.cacti.plugin.copm.core;
+package org.hyperledger.cacti.plugin.copm.core;
 
 import "google/protobuf/any.proto";
 

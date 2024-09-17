@@ -1,7 +1,16 @@
-import { LocalRelayConfig, RemoteNetworkConfig } from "../lib/types";
+import {
+  LocalRelayConfig,
+  RemoteOrgConfig,
+  DLTransactionParams,
+} from "../lib/types";
 
 export interface InteropConfiguration {
-  getLocalRelayConfig(orgKey: string): LocalRelayConfig;
-  getRemoteNetworkConfig(remoteOrgKey: string): RemoteNetworkConfig;
+  getLocalRelayConfig(localOrgKey: string): LocalRelayConfig;
+  getRemoteOrgConfig(remoteOrgKey: string): RemoteOrgConfig;
+  getRemotePledgeStatusCmd(
+    remoteOrgKey: string,
+    ValidatedClaimPledgedAssetRequest,
+  ): DLTransactionParams;
+
   interopContractName: string;
 }

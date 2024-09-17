@@ -3,7 +3,7 @@
 This cactus plugin implements a connectRPC server for the fabric COPM implementation.
 
 Command documentation as OpenAPI:
-https://jenniferlianne.github.io/cacti/references/openapi/cacti-copm-core_openapi/
+https://hyperledger-cacti.github.io/cacti/references/openapi/cacti-copm-core_openapi/
 
 These endpoints require the following:
 
@@ -28,28 +28,21 @@ The following application-specific interfaces must be implemented:
 
 -  FabricConfiguration
    -    getConnectionProfile(orgKey: string): object;
-   -    getContractContext(orgKey: string): Promise<FabricContractContext>;
-   -    getOrgWallet(orgKey: string): Promise<Wallet>;
+   -    getContractContext(orgKey: string): Promise\<FabricContractContext\>;
+   -    getOrgWallet(orgKey: string): Promise\<Wallet\>;
 
 -  InteropConfiguration (from cacti-copm-common)
    -    getLocalRelayConfig(orgKey: string): LocalRelayConfig;
-   -    getRemoteNetworkConfig(remoteOrgKey: string): RemoteNetworkConfig;
+   -    getRemoteOrgConfig(remoteOrgKey: string): RemoteOrgConfig;
+   -    getRemotePledgeStatusCmd(remoteOrgKey: string, ValidatedClaimPledgedAssetRequest): DLTransactionParams;
+
 
   These implementations are then supplied to the plugin constructor. 
 
 ## Development
 
-A Makefile is provided which will build a docker weaver network with the following commands:
+Please see [the cacti-cop-test README](./../cacti-copm-test/README.md) for details on building a 
+fabric test network.
 
-- make setup
-  - build all weaver components
-- make pledge-network
-  - makes a network for running pledge/claim (asset transfer)
-- make lock-network
-  - makes a network for running lock/claim (asset exchange)
-- make clean-network
-  - tear down the current network
-  
-The asset exchanges and asset transfer network modes are currently mutually exclusive.
   
   

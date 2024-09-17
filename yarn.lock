@@ -9042,13 +9042,60 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric":
+"@hyperledger-cacti/cacti-copm-test@npm:2.1.0, @hyperledger-cacti/cacti-copm-test@workspace:packages/cacti-copm-test":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger-cacti/cacti-copm-test@workspace:packages/cacti-copm-test"
+  dependencies:
+    "@connectrpc/connect": "npm:1.4.0"
+    "@connectrpc/connect-node": "npm:1.4.0"
+    "@hyperledger-cacti/cacti-copm-core": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-plugin-copm-corda": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-plugin-copm-fabric": "npm:2.1.0"
+    "@hyperledger/cacti-weaver-protos-js": "npm:2.1.0"
+    "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.1.0"
+    "@hyperledger/cactus-cmd-api-server": "npm:2.1.0"
+    "@hyperledger/cactus-common": "npm:2.1.0"
+    "@hyperledger/cactus-core": "npm:2.1.0"
+    "@hyperledger/cactus-core-api": "npm:2.1.0"
+    "@hyperledger/cactus-plugin-ledger-connector-corda": "npm:2.1.0"
+    "@hyperledger/cactus-test-tooling": "npm:2.1.0"
+    "@types/dockerode": "npm:3.2.7"
+    dockerode: "npm:3.3.0"
+    fabric-ca-client: "npm:2.2.20"
+    fabric-common: "npm:2.2.20"
+    fabric-network: "npm:2.2.20"
+    fs-extra: "npm:11.2.0"
+    uuid: "npm:10.0.0"
+  languageName: unknown
+  linkType: soft
+
+"@hyperledger-cacti/cacti-plugin-copm-corda@npm:2.1.0, @hyperledger-cacti/cacti-plugin-copm-corda@workspace:packages/cacti-plugin-copm-corda":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger-cacti/cacti-plugin-copm-corda@workspace:packages/cacti-plugin-copm-corda"
+  dependencies:
+    "@bufbuild/buf": "npm:1.30.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
+    "@connectrpc/connect": "npm:1.4.0"
+    "@connectrpc/connect-node": "npm:1.4.0"
+    "@connectrpc/connect-web": "npm:1.4.0"
+    "@hyperledger-cacti/cacti-copm-core": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-copm-test": "npm:2.1.0"
+    "@hyperledger/cacti-weaver-protos-js": "npm:2.1.0"
+    "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.1.0"
+    "@hyperledger/cactus-common": "npm:2.1.0"
+    "@hyperledger/cactus-core": "npm:2.1.0"
+    "@hyperledger/cactus-core-api": "npm:2.1.0"
+    "@types/convict": "npm:6.1.1"
+    convict: "npm:6.2.4"
+  languageName: unknown
+  linkType: soft
+
+"@hyperledger-cacti/cacti-plugin-copm-fabric@npm:2.1.0, @hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric"
   dependencies:
     "@bufbuild/buf": "npm:1.30.0"
     "@bufbuild/protobuf": "npm:1.10.0"
-    "@bufbuild/protoc-gen-es": "npm:1.8.0"
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
@@ -9062,7 +9109,6 @@ __metadata:
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
-    "@openapitools/openapi-generator-cli": "npm:2.7.0"
     fabric-ca-client: "npm:2.2.20"
     fabric-common: "npm:2.2.20"
     fabric-network: "npm:2.2.20"

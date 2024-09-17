@@ -6,5 +6,7 @@ export async function createPluginFactory(
 ): Promise<PluginFactoryCopmFabric> {
   return new PluginFactoryCopmFabric(pluginFactoryOptions);
 }
-
+export { PluginCopmFabric } from "./plugin-copm-fabric";
 export { FabricConfiguration } from "./lib/fabric-configuration";
+export { FabricTransactionContextFactory } from "./lib/fabric-context-factory";
+export { FabricContractContext } from "./lib/fabric-types";

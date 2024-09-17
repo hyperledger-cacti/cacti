@@ -10,7 +10,7 @@
 
 syntax = "proto3";
 
-package org.hyperledger.cacti.plugin.cacti.plugin.copm.core;
+package org.hyperledger.cacti.plugin.copm.core;
 
 import "google/protobuf/any.proto";
 
@@ -18,7 +18,7 @@ import "models/view_address_v1_pb.proto";
 
 message ViewV1PB {
 
-  string network = 1;
+  string organization = 1;
 
   ViewAddressV1PB view_address = 312477787;
 

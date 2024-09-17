@@ -17,7 +17,7 @@ export async function getVerifiedViewV1Impl(
   );
 
   const data = await remoteContext.invoke({
-    contract: params.contractId,
+    contractId: params.contractId,
     method: params.method,
     args: params.args,
   });

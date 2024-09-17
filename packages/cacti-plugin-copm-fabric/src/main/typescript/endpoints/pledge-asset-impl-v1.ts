@@ -4,13 +4,15 @@ import {
   Validators,
   Interfaces as CopmIF,
 } from "@hyperledger-cacti/cacti-copm-core";
+import { FabricConfiguration } from "../lib/fabric-configuration";
 
 export async function pledgeAssetV1Impl(
   req: PledgeAssetV1Request,
   log: Logger,
   contextFactory: CopmIF.DLTransactionContextFactory,
-  contractName: string,
+  fabricConfig: FabricConfiguration,
 ): Promise<string> {
+  log.debug("PledgeAssetV1Impl called");
   const data = Validators.validatePledgeAssetRequest(req);
 
   const transactionContext = await contextFactory.getTransactionContext(
@@ -18,16 +20,17 @@ export async function pledgeAssetV1Impl(
   );
 
   const pledgeId = await transactionContext.invoke({
-    contract: contractName,
+    contractId: fabricConfig.getAssetContractName(data.asset),
     method: data.asset.isNFT() ? "PledgeAsset" : "PledgeTokenAsset",
     args: [
       data.asset.assetType,
       data.asset.idOrQuantity(),
-      data.destinationNetwork,
+      data.destinationOrganization,
       data.destinationCertificate,
       (Math.floor(Date.now() / 1000) + data.expirySecs).toString(),
     ],
   });
 
+  log.debug("PledgeAssetV1Impl complete");
   return pledgeId;
 }

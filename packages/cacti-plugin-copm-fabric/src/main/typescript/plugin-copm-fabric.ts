@@ -4,6 +4,7 @@ import {
   Logger,
 } from "@hyperledger/cactus-common";
 import {
+  ICactusPlugin,
   ICactusPluginOptions,
   ICrpcSvcRegistration,
   IPluginCrpcService,
@@ -11,41 +12,31 @@ import {
 import { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,
-  CopmContractNames,
   Interfaces as CopmIF,
 } from "@hyperledger-cacti/cacti-copm-core";
 import { CopmFabricImpl } from "./service-implementation";
-import { FabricTransactionContextFactory } from "./lib/fabric-context-factory";
 import { FabricConfiguration } from "./lib/fabric-configuration";
 
 export interface IPluginCopmFabricOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   fabricConfig: FabricConfiguration;
   interopConfig: CopmIF.InteropConfiguration;
-  contractNames: CopmContractNames;
 }
 
-export class PluginCopmFabric implements IPluginCrpcService {
+export class PluginCopmFabric implements IPluginCrpcService, ICactusPlugin {
   public static readonly CLASS_NAME = "PluginCopmFabric";
   private readonly instanceId: string;
   private readonly logLevel: LogLevelDesc;
-  private contextFactory: FabricTransactionContextFactory;
-  private copmContractNames: CopmContractNames;
+  private readonly opts: IPluginCopmFabricOptions;
   private readonly log: Logger;
 
-  constructor(public readonly opts: IPluginCopmFabricOptions) {
+  constructor(opts: IPluginCopmFabricOptions) {
     this.logLevel = opts.logLevel || "INFO";
     this.log = LoggerProvider.getOrCreate({
       level: this.logLevel,
       label: "CopmFabricImpl",
     });
-
-    this.contextFactory = new FabricTransactionContextFactory(
-      opts.fabricConfig,
-      opts.interopConfig,
-      this.log,
-    );
-    this.copmContractNames = opts.contractNames;
+    this.opts = opts;
     this.instanceId = this.opts.instanceId;
   }
 
@@ -56,8 +47,8 @@ export class PluginCopmFabric implements IPluginCrpcService {
 
     const implementation = new CopmFabricImpl(
       this.log,
-      this.contextFactory,
-      this.copmContractNames,
+      this.opts.interopConfig,
+      this.opts.fabricConfig,
     );
 
     const crpcSvcRegistration: ICrpcSvcRegistration<ServiceType> = {

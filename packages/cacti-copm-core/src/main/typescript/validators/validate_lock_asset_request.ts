@@ -10,7 +10,7 @@ import { LockAssetV1Request } from "../generated/services/default_service_pb";
 import { HashFunctions } from "@hyperledger/cacti-weaver-sdk-fabric";
 
 export function validateLockAssetRequest(request: LockAssetV1Request): {
-  owner: DLAccount;
+  sourceAccount: DLAccount;
   hashInfo: HashFunctions.Hash;
   sourceCertificate: string;
   destinationCertificate: string;
@@ -29,8 +29,10 @@ export function validateLockAssetRequest(request: LockAssetV1Request): {
   if (!request.assetLockV1PB.sourceCertificate) {
     throw new ConnectError("sourceCertificate required", Code.InvalidArgument);
   }
+
+  // destination account is required only in CORDA implementation
   return {
-    owner: validateAssetAccount(request.assetLockV1PB.owner, "owner"),
+    sourceAccount: validateAssetAccount(request.assetLockV1PB.source, "source"),
     hashInfo: validateHashInfo(request.assetLockV1PB.hashInfo, "hashInfo"),
     asset: validateTransferrableAsset(request.assetLockV1PB.asset, "asset"),
     sourceCertificate: request.assetLockV1PB.sourceCertificate,
