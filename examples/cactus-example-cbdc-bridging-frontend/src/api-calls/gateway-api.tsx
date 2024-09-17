@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from "axios";
-import CryptoMaterial from "../crypto-material/crypto-material.json";
-import { getEthAddress, getEthUserPrKey } from "./common";
-import { getUserFromPseudonim, getFabricId } from "./common";
+import { getEthAddress, getFabricId } from "./common";
 import {
   createSessionReference,
   SessionReference,
@@ -10,11 +7,9 @@ import {
 
 import BesuSATPInteraction from "../ontology/besu-erc20-ontology.json";
 import FabricSATPInteraction from "../ontology/fabric-erc20-ontology.json";
-import { uuidV4 } from "web3-utils";
 
 const FABRIC_CHANNEL_NAME = "mychannel";
 const CONTRACT_CBDC_ERC20_NAME = "SATPContract";
-const CONTRACT_WRAPPER_NAME = "SATPWrapperContract";
 
 export async function getSessionReferencesBridge(port: string): Promise<any> {
   try {
