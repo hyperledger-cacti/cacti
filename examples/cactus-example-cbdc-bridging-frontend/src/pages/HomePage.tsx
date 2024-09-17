@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Ledger from "../components/Ledger";
-import {
-  checkApiServer1Connection,
-  checkApiServer2Connection,
-} from "../api-calls/common";
+// import {
+//   checkApiServer1Connection,
+//   checkApiServer2Connection,
+// } from "../api-calls/common";
 import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/Help";
 import ConnectionErrorDialog from "../components/dialogs/ConnectionErrorDialog";
@@ -13,19 +12,17 @@ import ConnectionErrorDialog from "../components/dialogs/ConnectionErrorDialog";
 export default function HomePage() {
   const [errorDialog, setErrorDialog] = useState<boolean>(false);
 
-  /*useEffect(() => {
-    const checkConnection = async () => {
-      await checkApiServer1Connection()
-        .then(() => setErrorDialog(false))
-        .catch(() => setErrorDialog(true));
-
-      await checkApiServer2Connection()
-        .then(() => setErrorDialog(false))
-        .catch(() => setErrorDialog(true));
-    };
-
-    checkConnection();
-  }, []);*/
+  useEffect(() => {
+    // const checkConnection = async () => {
+    //   await checkApiServer1Connection()
+    //     .then(() => setErrorDialog(false))
+    //     .catch(() => setErrorDialog(true));
+    //   await checkApiServer2Connection()
+    //     .then(() => setErrorDialog(false))
+    //     .catch(() => setErrorDialog(true));
+    // };
+    // checkConnection();
+  }, []);
 
   return (
     <div style={{ width: "95%", margin: "4rem auto" }}>

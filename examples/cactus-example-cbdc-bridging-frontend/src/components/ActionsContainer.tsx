@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -12,36 +11,6 @@ import { getBesuBalance } from "../api-calls/besu-api";
 import { SessionReference } from "../models/SessionReference";
 import { NormalButton } from "./buttons/NormalButton";
 import { CriticalButton } from "./buttons/CriticalButton";
-
-// const NormalButton = styled(Button)<ButtonProps>(({ theme }) => ({
-//   margin: "auto",
-//   width: "100%",
-//   fontSize: "13px",
-//   textTransform: "none",
-//   background: "#2B9BF6",
-//   color: "#FFFFFF",
-//   border: "0.5px solid #000000",
-//   "&:disabled": {
-//     border: "0",
-//   },
-// }));
-
-// const CriticalButton = styled(Button)<ButtonProps>(({ theme }) => ({
-//   margin: "auto",
-//   width: "100%",
-//   fontSize: "13px",
-//   textTransform: "none",
-//   background: "#FF584B",
-//   color: "#FFFFFF",
-//   border: "0.5px solid #000000",
-//   "&:hover": {
-//     backgroundColor: "#444444",
-//     color: "#FFFFFF",
-//   },
-//   "&:disabled": {
-//     border: "0",
-//   },
-// }));
 
 export interface IActionsContainerOptions {
   user: string;
