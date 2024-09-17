@@ -41,7 +41,7 @@ export class FabricTransactionContextFactory
       await this.fabricConfiguration.getContractContext(account.organization),
       this.interopConfiguration.getLocalRelayConfig(account.organization),
       account,
-      this.interopConfiguration.getRemoteNetworkConfig(remoteNetwork),
+      this.interopConfiguration.getRemoteOrgConfig(remoteNetwork),
       this.interopConfiguration.interopContractName,
       this.log,
     );

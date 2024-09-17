@@ -1,0 +1,44 @@
+{
+  "name": "@hyperledger-cacti/cacti-plugin-copm-corda",
+  "version": "2.1.0",
+  "description": "Cacti Common Operators - Corda",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Jennifer Bell",
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "./gradlew build",
+    "bundleopenapi": "yarn run --top-level tools:bundle-open-api-tpl-files"
+  },
+  "dependencies": {
+    "@bufbuild/buf": "1.30.0",
+    "@bufbuild/protobuf": "1.10.0",
+    "@connectrpc/connect": "1.4.0",
+    "@connectrpc/connect-node": "1.4.0",
+    "@connectrpc/connect-web": "1.4.0",
+    "@hyperledger-cacti/cacti-copm-core": "2.1.0",
+    "@hyperledger-cacti/cacti-copm-test": "2.1.0",
+    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0"
+  },
+  "devDependencies": {
+    "@connectrpc/connect-node": "1.4.0",
+    "@types/convict": "6.1.1",
+    "convict": "6.2.4"
+  }
+}

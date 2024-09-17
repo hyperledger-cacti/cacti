@@ -7,7 +7,7 @@ cordapp {
     targetPlatformVersion corda_platform_version
     minimumPlatformVersion corda_platform_version
     workflow {
-        name "Template Flows"
+        name "Weaver Corda Simple App"
         vendor "Corda Open Source"
         licence "Apache License, Version 2.0"
         versionId 1

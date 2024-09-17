@@ -1,0 +1,8 @@
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://download.corda.net/maven/corda-dependencies' }
+    maven { url 'https://download.corda.net/maven/corda-releases' }
+    maven { url 'https://repo.gradle.org/gradle/libs-releases' }
+}

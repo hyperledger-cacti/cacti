@@ -1,0 +1,26 @@
+{
+  "O=PartyA, L=London, C=GB@Corda_Network": {
+    "host": "127.0.0.1",
+    "username": "clientUser1",
+    "password": "test",
+    "port": 10006
+  },
+  "O=PartyB, L=London, C=GB@Corda_Network": {
+    "host": "127.0.0.1",
+    "username": "clientUser1",
+    "password": "test",
+    "port": 10009
+  },
+  "O=PartyA, L=London, C=GB@Corda_Network2": {
+    "host": "127.0.0.1",
+    "username": "clientUser1",
+    "password": "test",
+    "port": 30006
+  },
+  "O=PartyB, L=London, C=GB@Corda_Network2": {
+    "host": "127.0.0.1",
+    "username": "clientUser1",
+    "password": "test",
+    "port": 30009
+  }
+}

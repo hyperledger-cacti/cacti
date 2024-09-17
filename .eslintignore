@@ -1,6 +1,7 @@
 **/node_modules/**
 **/dist/**
-
+**/build/** 
+docs/*
 examples/cactus-example-carbon-accounting-frontend/www/
 examples/cactus-example-supply-chain-frontend/www/
 weaver/core/identity-management/iin-agent/out/
@@ -32,6 +33,8 @@ weaver/common/policy-dsl/parser/PolicyParser.js
 weaver/common/policy-dsl/test/MyErrorListener.js
 weaver/common/policy-dsl/test/MyParseTreeVisitor.js
 weaver/common/protos-js/driver/driver_grpc_pb.js
+weaver/common/protos-sol/solidity-protos/soltest/test/TestFixture.js
+weaver/common/protos-sol/solidity-protos/soltest/migrations/1_deploy_contract.js
 weaver/core/drivers/fabric-driver/server/dbConnector.ts
 weaver/core/drivers/fabric-driver/server/events.ts
 weaver/core/drivers/fabric-driver/server/fabric-code.ts
@@ -106,3 +109,4 @@ weaver/sdks/fabric/interoperation-node-sdk/src/helpers.ts
 weaver/sdks/fabric/interoperation-node-sdk/test/AssetManager.js
 weaver/sdks/fabric/interoperation-node-sdk/test/InteroperableHelper.js
 weaver/sdks/fabric/interoperation-node-sdk/test/Relay.js
+weaver/sdks/fabric/interoperation-node-sdk/protos-js/driver/driver_grpc_pb.js

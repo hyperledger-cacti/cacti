@@ -6,6 +6,7 @@ module.exports = {
   moduleNameMapper: {
     "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
   },
+  modulePathIgnorePatterns: ["./weaver/core"],
   maxWorkers: 1,
   maxConcurrency: 1,
   setupFilesAfterEnv: ["jest-extended/all", "./jest.setup.console.logs.js"],

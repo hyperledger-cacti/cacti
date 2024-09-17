@@ -13,9 +13,9 @@ export function validateAssetAccount(
   if (!account) {
     throw new ConnectError(`${object_prefix} required`, Code.InvalidArgument);
   }
-  if (!account.network) {
+  if (!account.organization) {
     throw new ConnectError(
-      `${object_prefix}.network required`,
+      `${object_prefix}.organization required`,
       Code.InvalidArgument,
     );
   }
@@ -26,7 +26,7 @@ export function validateAssetAccount(
     );
   }
   return {
-    organization: account.network,
+    organization: account.organization,
     userId: account.userId,
   };
 }
@@ -77,4 +77,14 @@ export function validateHashInfo(
   }
   hash.setPreimage(hashInfo.secret);
   return hash;
+}
+
+export function validateRequiredString(
+  value: string | undefined,
+  object_prefix: string,
+): string {
+  if (!value) {
+    throw new ConnectError(`${object_prefix} required`, Code.InvalidArgument);
+  }
+  return value;
 }

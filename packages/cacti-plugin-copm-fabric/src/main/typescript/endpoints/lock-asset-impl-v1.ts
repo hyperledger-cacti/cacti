@@ -5,17 +5,18 @@ import {
 } from "@hyperledger-cacti/cacti-copm-core";
 import { Logger } from "@hyperledger/cactus-common";
 import { AssetManager } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { FabricConfiguration } from "../lib/fabric-configuration";
 
 export async function lockAssetV1Impl(
   req: LockAssetV1Request,
   log: Logger,
   contextFactory: CopmIF.DLTransactionContextFactory,
-  contractName: string,
+  fabricConfig: FabricConfiguration,
 ): Promise<string> {
   const params = Validators.validateLockAssetRequest(req);
 
   const transactionContext = await contextFactory.getTransactionContext(
-    params.owner,
+    params.sourceAccount,
   );
 
   const serializeAgreementFunc = params.asset.isNFT()
@@ -35,7 +36,7 @@ export async function lockAssetV1Impl(
   );
 
   const claimId = await transactionContext.invoke({
-    contract: contractName,
+    contractId: fabricConfig.getAssetContractName(params.asset),
     method: params.asset.isNFT() ? "LockAsset" : "LockFungibleAsset",
     args: [agreementStr, lockInfoStr],
   });

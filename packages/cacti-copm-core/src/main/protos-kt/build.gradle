@@ -1,0 +1,88 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+//    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id "java"
+    id "idea"
+    id 'com.google.protobuf' version "$protobuf_plugin_version"
+    id "application"
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
+    id "org.jetbrains.kotlin.plugin.jpa" version "$kotlin_version"
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir "./../proto/generated/openapi/"
+        }
+    }
+}
+
+Properties constants = new Properties()
+
+repositories {
+    google()
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    // gRPC and protobuf dependencies
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
+    implementation "io.grpc:grpc-netty-shaded:$grpc_version"
+    implementation "io.grpc:grpc-stub:$grpc_version"
+    implementation "io.grpc:grpc-okhttp:$grpc_version"
+    implementation "io.grpc:grpc-protobuf:$grpc_version"
+    implementation group: 'org.json', name: 'json', version: '20190722'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
+jar {
+    // This makes the JAR's SHA-256 hash repeatable.
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:3.21.12" }
+    plugins {
+        // Specify protoc to generate using kotlin protobuf plugin
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
+        }
+        // Specify protoc to generate using our grpc kotlin plugin
+        grpckt {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version:jdk8@jar"
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                // Generate Java gRPC classes
+                grpc { }
+                // Generate Kotlin gRPC using the custom plugin from library
+                grpckt { }
+            }
+        }
+    }
+}
+
+

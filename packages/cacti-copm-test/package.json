@@ -1,0 +1,74 @@
+{
+  "name": "@hyperledger-cacti/cacti-copm-test",
+  "version": "2.1.0",
+  "description": "COPM testing.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti#issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Jennifer Bell",
+      "email": "jenniferlianne@gmail.com"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "test": "yarn run --top-level test:jest:all ./src/test/typescript/*/*.test.ts",
+    "test:lock": "yarn run --top-level test:jest:all ./src/test/typescript/integration/test-copm-lock-claim.test.ts",
+    "test:pledge": "yarn run --top-level test:jest:all ./src/test/typescript/integration/test-copm-pledge-claim.test.ts",
+    "test:view": "yarn run --top-level test:jest:all ./src/test/typescript/integration/test-copm-getverifiedview.test.ts"
+  },
+  "dependencies": {
+    "@connectrpc/connect": "1.4.0",
+    "@connectrpc/connect-node": "1.4.0",
+    "@hyperledger-cacti/cacti-copm-core": "2.1.0",
+    "@hyperledger-cacti/cacti-plugin-copm-corda": "2.1.0",
+    "@hyperledger-cacti/cacti-plugin-copm-fabric": "2.1.0",
+    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-corda": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/dockerode": "3.2.7",
+    "dockerode": "3.3.0",
+    "fabric-ca-client": "2.2.20",
+    "fabric-common": "2.2.20",
+    "fabric-network": "2.2.20",
+    "fs-extra": "11.2.0",
+    "uuid": "10.0.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "watch": {}
+}

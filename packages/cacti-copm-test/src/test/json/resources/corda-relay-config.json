@@ -1,0 +1,8 @@
+{
+  "Corda_Network": {
+    "relayEndpoint": "127.0.0.1:9081"
+  },
+  "Corda_Network2": {
+    "relayEndpoint": "127.0.0.1:9082"
+  }
+}

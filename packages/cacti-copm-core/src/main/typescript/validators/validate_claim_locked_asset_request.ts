@@ -6,6 +6,7 @@ import {
   validateTransferrableAsset,
   validateHashInfo,
   validateAssetAccount,
+  validateRequiredString,
 } from "./common";
 import { ClaimLockedAssetV1Request } from "../generated/services/default_service_pb";
 
@@ -16,42 +17,9 @@ export function validateClaimLockedAssetRequest(
   destination: DLAccount;
   hashInfo: HashFunctions.Hash;
   lockId: string;
-  sourceCertificate: string;
-  destCertificate: string;
 } {
   if (!req.assetLockClaimV1PB) {
     throw new ConnectError(`request data is required`, Code.InvalidArgument);
-  }
-  if (
-    !req.assetLockClaimV1PB?.asset?.assetId &&
-    !req.assetLockClaimV1PB?.lockId
-  ) {
-    throw new ConnectError(
-      "either lockId or asset.assetId is required",
-      Code.InvalidArgument,
-    );
-  }
-
-  if (req.assetLockClaimV1PB?.asset.assetId) {
-    if (!req.assetLockClaimV1PB?.destCertificate) {
-      throw new ConnectError(
-        "destinationCertificate required for NFT claim",
-        Code.InvalidArgument,
-      );
-    }
-    if (!req.assetLockClaimV1PB?.sourceCertificate) {
-      throw new ConnectError(
-        "sourceCertificate required for NFT claim",
-        Code.InvalidArgument,
-      );
-    }
-  } else {
-    if (!req.assetLockClaimV1PB.lockId) {
-      throw new ConnectError(
-        "lockId must be supplied for fungible assets",
-        Code.InvalidArgument,
-      );
-    }
   }
 
   return {
@@ -61,8 +29,6 @@ export function validateClaimLockedAssetRequest(
       req.assetLockClaimV1PB.destination,
       "destination",
     ),
-    sourceCertificate: req.assetLockClaimV1PB.sourceCertificate || "",
-    destCertificate: req.assetLockClaimV1PB.destCertificate || "",
-    lockId: req.assetLockClaimV1PB.lockId || "",
+    lockId: validateRequiredString(req.assetLockClaimV1PB.lockId, "lockId"),
   };
 }

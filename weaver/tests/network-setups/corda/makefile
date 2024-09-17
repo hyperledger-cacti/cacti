@@ -70,7 +70,7 @@ stop-network1:
 	docker exec corda_partya_1 bash -c "rm -rf /opt/corda/logs/*" || true 
 	(docker logs corda_partyb_1 > /dev/null && docker exec corda_partyb_1 bash -c "rm -rf /opt/corda/logs/*") || true
 	(docker logs corda_partyc_1 > /dev/null && docker exec corda_partyc_1 bash -c "rm -rf /opt/corda/logs/*") || true
-	docker-compose -f dev/Corda_Network/docker-compose.yml -p corda --profile $(PROFILE) down --volumes || true
+	docker compose -f dev/Corda_Network/docker-compose.yml -p corda --profile $(PROFILE) down --volumes || true
 
 .PHONY:	stop-network2
 stop-network2: 
@@ -78,7 +78,7 @@ stop-network2:
 	docker exec corda_network2_partya_1 bash -c "rm -rf /opt/corda/logs/*" || true
 	(docker logs corda_network2_partyb_1 > /dev/null && docker exec corda_network2_partyb_1 bash -c "rm -rf /opt/corda/logs/*") || true
 	(docker logs corda_network2_partyc_1 > /dev/null && docker exec corda_network2_partyc_1 bash -c "rm -rf /opt/corda/logs/*") || true
-	docker-compose -f dev/Corda_Network2/docker-compose.yml -p corda_network2 --profile $(PROFILE) down --volumes || true
+	docker compose -f dev/Corda_Network2/docker-compose.yml -p corda_network2 --profile $(PROFILE) down --volumes || true
 
 stop: stop-network1 stop-network2
 

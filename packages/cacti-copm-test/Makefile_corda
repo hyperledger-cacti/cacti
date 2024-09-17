@@ -1,0 +1,81 @@
+WORKSPACE ?= $(shell realpath `pwd`/../../)
+
+# DL-NETWORK ---------------------------------------------------
+
+corda-pledge-dl:
+	cd $(WORKSPACE)/weaver/tests/network-setups/corda && \
+	./scripts/get-cordapps.sh simple local && \
+	make start-local
+
+corda-lock-dl:
+	cd $(WORKSPACE)/weaver/tests/network-setups/corda && \
+	./scripts/get-cordapps.sh  simple local  && \
+	make start-network1-local PROFILE=3-nodes
+
+# DRIVERS -----------------------------------------------------
+
+corda1-driver:
+	echo "starting corda driver 1"
+	cd $(WORKSPACE)/weaver/core/drivers/corda-driver && \
+	make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
+
+corda2-driver:
+	echo "starting corda driver 2"
+	cd $(WORKSPACE)/weaver/core/drivers/corda-driver && \
+	make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
+
+
+# RELAYS ---------------------------------------------------------
+
+common-relay-config:
+	make common-relay-config
+
+corda-relay-config:
+	cd $(WORKSPACE)/weaver/core/relay &&\
+	make protos-local &&\
+	cargo update -p nom &&\
+	cargo update -p lexical-core
+
+corda1-relay:
+	echo "starting corda relay 1"
+	cd $(WORKSPACE)/weaver/core/relay &&\
+	make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda' 
+
+corda2-relay:
+	echo "starting corda relay 2"
+	cd $(WORKSPACE)/weaver/core/relay &&\
+    make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
+
+
+# CLI --------------------------------------------------------------------------------------
+
+corda-cli:
+	echo "preparing corda cli"
+	cd $(WORKSPACE)/weaver/samples/corda/corda-simple-application/clients/src/main/resources/config && \
+	cp remote-network-config.json.template remote-network-config.json && \
+	sed -i "s#localhost:9080#relay-network1:9080#g" remote-network-config.json && \
+	sed -i "s#localhost:9081#relay-corda:9081#g" remote-network-config.json && \
+	sed -i "s#localhost:9082#relay-corda2:9082#g" remote-network-config.json && \
+	sed -i "s#localhost:9083#relay-network2:9083#g" remote-network-config.json  && \
+	sed -i "s#localhost:10006#corda_partya_1:10003#g" remote-network-config.json  && \
+	sed -i "s#localhost:30006#corda_network2_partya_1:10003#g" remote-network-config.json 
+
+
+corda-pledge-cli-setup:
+	cd $(WORKSPACE)/weaver/samples/corda/corda-simple-application &&\
+	make initialise-vault-asset-transfer-docker
+
+# MAIN TARGETS
+
+PATH := $(PATH):$(WORKSPACE)/protoc/bin
+
+# SETUP - run once
+
+setup: 
+	cd $(WORKSPACE)/packages/cacti-plugin-copm-corda/src/test/kotlin && make build-image-local
+
+pledge-network: corda-pledge-dl corda1-driver corda2-driver common-relay-config corda-relay-config corda1-relay corda2-relay corda-cli corda-pledge-cli-setup
+
+lock-network: corda-lock-dl corda-cli 
+
+

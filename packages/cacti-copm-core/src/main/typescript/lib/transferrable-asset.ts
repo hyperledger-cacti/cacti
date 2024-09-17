@@ -23,4 +23,8 @@ export class TransferrableAsset {
       return this.asset.assetId || "";
     }
   }
+
+  public quantity(): number {
+    return this.asset.assetQuantity || 0;
+  }
 }

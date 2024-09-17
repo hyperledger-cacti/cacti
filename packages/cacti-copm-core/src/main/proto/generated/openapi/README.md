@@ -1,4 +1,4 @@
-# gPRC for org.hyperledger.cacti.plugin.cacti.plugin.copm.core
+# gPRC for org.hyperledger.cacti.plugin.copm.core
 
 Contains/describes the Hyperledger Cacti Common Operator Primitives plugin.  These primitives require specific chaincode and weaver relays to be deployed on the network as described at https://hyperledger-cacti.github.io/cacti/weaver/introduction/.
 
@@ -16,15 +16,15 @@ Below are some usage examples for Go and Ruby. For other languages, please refer
 ### Go
 ```
 # assuming `protoc-gen-go` has been installed with `go get -u github.com/golang/protobuf/protoc-gen-go`
-mkdir /var/tmp/go/org.hyperledger.cacti.plugin.cacti.plugin.copm.core
-protoc --go_out=/var/tmp/go/org.hyperledger.cacti.plugin.cacti.plugin.copm.core services/*
-protoc --go_out=/var/tmp/go/org.hyperledger.cacti.plugin.cacti.plugin.copm.core models/*
+mkdir /var/tmp/go/org.hyperledger.cacti.plugin.copm.core
+protoc --go_out=/var/tmp/go/org.hyperledger.cacti.plugin.copm.core services/*
+protoc --go_out=/var/tmp/go/org.hyperledger.cacti.plugin.copm.core models/*
 ```
 
 ### Ruby
 ```
 # assuming `grpc_tools_ruby_protoc` has been installed via `gem install grpc-tools`
-RUBY_OUTPUT_DIR="/var/tmp/ruby/org.hyperledger.cacti.plugin.cacti.plugin.copm.core"
+RUBY_OUTPUT_DIR="/var/tmp/ruby/org.hyperledger.cacti.plugin.copm.core"
 mkdir $RUBY_OUTPUT_DIR
 grpc_tools_ruby_protoc --ruby_out=$RUBY_OUTPUT_DIR --grpc_out=$RUBY_OUTPUT_DIR/lib services/*
 grpc_tools_ruby_protoc --ruby_out=$RUBY_OUTPUT_DIR --grpc_out=$RUBY_OUTPUT_DIR/lib models/*

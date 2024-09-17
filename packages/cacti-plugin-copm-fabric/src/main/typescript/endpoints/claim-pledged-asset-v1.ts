@@ -4,14 +4,16 @@ import {
   Interfaces as CopmIF,
   Validators,
 } from "@hyperledger-cacti/cacti-copm-core";
+import { FabricConfiguration } from "../lib/fabric-configuration";
 
 export async function claimPledgedAssetV1Impl(
   req: ClaimPledgedAssetV1Request,
   log: Logger,
   contextFactory: CopmIF.DLTransactionContextFactory,
-  contractName: string,
+  interopConfig: CopmIF.InteropConfiguration,
+  fabricConfig: FabricConfiguration,
 ): Promise<string> {
-  const data = Validators.validateClaimPledgedAssetRequest(req);
+  const data = new Validators.ValidatedClaimPledgedAssetRequest(req);
 
   const interop_context = await contextFactory.getRemoteTransactionContext(
     data.destAccount,
@@ -19,18 +21,9 @@ export async function claimPledgedAssetV1Impl(
   );
 
   const claimId = await interop_context.invokeFlow(
+    interopConfig.getRemotePledgeStatusCmd(data.sourceNetwork, data),
     {
-      contract: contractName,
-      method: "GetAssetPledgeStatus",
-      args: [
-        data.pledgeId,
-        data.sourceCert,
-        data.destAccount.organization,
-        data.destCert,
-      ],
-    },
-    {
-      contract: contractName,
+      contractId: fabricConfig.getAssetContractName(data.asset),
       method: data.asset.isNFT() ? "ClaimRemoteAsset" : "ClaimRemoteTokenAsset",
       args: [
         data.pledgeId,

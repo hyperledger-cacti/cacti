@@ -15,11 +15,11 @@ export { HashInfoV1PB } from "./generated/models/hash_info_v1_pb_pb";
 export { TransferrableAssetV1PB } from "./generated/models/transferrable_asset_v1_pb_pb";
 export {
   DLAccount,
-  CopmContractNames,
-  RemoteNetworkConfig,
+  RemoteOrgConfig,
   LocalRelayConfig,
   DLTransactionParams,
 } from "./lib/types";
 export { ViewAddress } from "./lib/view-address";
+export { TransferrableAsset } from "./lib/transferrable-asset";
 export * as Interfaces from "./interfaces";
 export * as Validators from "./validators";
