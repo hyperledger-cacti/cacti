@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727457421850,
+  "lastUpdate": 1727457895236,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -207,6 +207,37 @@ window.BENCHMARK_DATA = {
             "range": "±2.60%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "raynato.c.pedrajeta@accenture.com",
+            "name": "raynato.c.pedrajeta",
+            "username": "raynatopedrajeta"
+          },
+          "committer": {
+            "email": "petermetz@users.noreply.github.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": true,
+          "id": "ebe781657fa1887c27c68dfc420afde84690791d",
+          "message": "test(test tooling): add DamlTestLedger implementation\nPrimary Changes\n---------------\n1. Create a test tooling class for DAML AIO Image\nFixes #3435\n\nSigned-off-by: raynato.c.pedrajeta <raynato.c.pedrajeta@accenture.com>",
+          "timestamp": "2024-09-27T10:04:52-07:00",
+          "tree_id": "540e311b78daeb1a1ee820a155dd30e25a700597",
+          "url": "https://github.com/hyperledger/cacti/commit/ebe781657fa1887c27c68dfc420afde84690791d"
+        },
+        "date": 1727457892854,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 685,
+            "range": "±2.59%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
           }
         ]
       }
