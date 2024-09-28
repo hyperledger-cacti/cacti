@@ -1,10 +1,12 @@
-import path from "path";
-import test, { Test } from "tape-promise/tape";
-import { v4 as uuidv4 } from "uuid";
-import { readFile } from "fs/promises";
+import { randomUUID as uuidv4 } from "node:crypto";
+import path from "node:path";
+import { readFile } from "node:fs/promises";
+
+import "jest-extended";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
+  PluginImport,
   PluginImportAction,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
@@ -14,9 +16,9 @@ import {
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
-test("can install plugins at runtime with specified version based on imports", async (t: Test) => {
+describe("ApiServer", () => {
   const pluginsPath = path.join(
     __dirname,
     "../../../../../../", // walk back up to the project root
@@ -25,59 +27,61 @@ test("can install plugins at runtime with specified version based on imports", a
   );
   const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
-  const configService = new ConfigService();
-
-  const apiServerOptions = await configService.newExampleConfig();
-  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
-  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-  apiServerOptions.configFile = "";
-  apiServerOptions.apiCorsDomainCsv = "*";
-  apiServerOptions.apiPort = 0;
-  apiServerOptions.cockpitPort = 0;
-  apiServerOptions.grpcPort = 0;
-  apiServerOptions.crpcPort = 0;
-  apiServerOptions.apiTlsEnabled = false;
-  apiServerOptions.plugins = [
-    {
-      packageName: "@hyperledger/cactus-plugin-keychain-memory",
-      type: PluginImportType.Local,
-      action: PluginImportAction.Install,
-      options: {
-        instanceId: uuidv4(),
-        keychainId: uuidv4(),
-        logLevel,
-        version: "0.9.0",
-      },
+  const aPluginImport: PluginImport = {
+    packageName: "@hyperledger/cactus-plugin-keychain-memory",
+    type: PluginImportType.Local,
+    action: PluginImportAction.Install,
+    options: {
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      logLevel,
+      version: "0.9.0",
     },
-  ];
-  const config = await configService.newExampleConfigConvict(apiServerOptions);
-
-  const apiServer = new ApiServer({
-    config: config.getProperties(),
-  });
-
-  const startResponse = apiServer.start();
-  await t.doesNotReject(
-    startResponse,
-    "failed to start API server with dynamic plugin imports configured for it...",
-  );
-  t.ok(startResponse, "startResponse truthy OK");
+  };
 
   const packageFilePath = path.join(
     pluginsPath,
-    apiServerOptions.plugins[0].options.instanceId,
+    aPluginImport.options.instanceId,
     "node_modules",
-    `${apiServerOptions.plugins[0].packageName}`,
+    `${aPluginImport.packageName}`,
     "package.json",
   );
-  const pkgJsonStr = await readFile(packageFilePath, "utf-8");
-  const { version } = JSON.parse(pkgJsonStr);
 
-  t.strictEquals(
-    version,
-    apiServerOptions.plugins[0].options.version,
-    `Package version strictly equal to ${version}`,
-  );
+  const configService = new ConfigService();
 
-  test.onFinish(() => apiServer.shutdown());
+  let apiServer: ApiServer;
+
+  beforeAll(async () => {
+    const apiSrvOpts = await configService.newExampleConfig();
+    apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
+    apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiSrvOpts.logLevel = logLevel;
+    apiSrvOpts.configFile = "";
+    apiSrvOpts.apiCorsDomainCsv = "*";
+    apiSrvOpts.apiPort = 0;
+    apiSrvOpts.cockpitPort = 0;
+    apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.crpcPort = 0;
+    apiSrvOpts.apiTlsEnabled = false;
+    apiSrvOpts.plugins = [aPluginImport];
+    const config = await configService.newExampleConfigConvict(apiSrvOpts);
+
+    apiServer = new ApiServer({
+      config: config.getProperties(),
+    });
+  });
+
+  afterAll(async () => {
+    await apiServer.shutdown();
+  });
+
+  test("can install plugins at runtime with specified version based on imports", async () => {
+    const startResponse = apiServer.start();
+    await expect(startResponse).toResolve();
+
+    const pkgJsonStr = await readFile(packageFilePath, "utf-8");
+    const { version } = JSON.parse(pkgJsonStr);
+
+    expect(version).toEqual(aPluginImport.options.version);
+  });
 });
