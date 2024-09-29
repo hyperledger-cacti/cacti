@@ -1,5 +1,5 @@
+import "jest-extended";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import test, { Test } from "tape-promise/tape";
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { v4 as uuidv4 } from "uuid";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -36,118 +36,115 @@ import axios from "axios";
 // - make invoke (InitLedger) using 1st client
 // - make invoke (TransferAsset) using 2nd client (p384) client
 // - make query ("ReadAsset") using registrar(p256)
-test("run-transaction-with-identities", async (t: Test) => {
-  test.onFailure(async () => {
-    await Containers.logDiagnostics({ logLevel });
-  });
 
-  const ledger = new FabricTestLedgerV1({
-    emitContainerLogs: true,
-    publishAllPorts: true,
-    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-    imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
-    envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
-    logLevel,
-  });
-
-  const tearDown = async () => {
-    await ledger.stop();
-    await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
-  };
-
-  test.onFinish(tearDown);
-  await ledger.start({ omitPull: false });
-
-  const connectionProfile = await ledger.getConnectionProfileOrg1();
-  t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
-
+describe("Run transaction with identities", () => {
   const registrarKey = "registrar";
   const client1Key = "client-default-";
   const client2Key = "client-vault";
   const keychainInstanceId = uuidv4();
   const keychainId = uuidv4();
-  /////
-  const vaultTestContainer = new VaultTestServer({});
-  await vaultTestContainer.start();
-
-  const ci = await Containers.getById(vaultTestContainer.containerId);
-  const vaultIpAddr = await internalIpV4();
-  const hostPort = await Containers.getPublicPort(
-    K_DEFAULT_VAULT_HTTP_PORT,
-    ci,
-  );
-  const vaultHost = `http://${vaultIpAddr}:${hostPort}`;
-  /////
-  const vaultConfig: IVaultConfig = {
-    endpoint: vaultHost,
-    transitEngineMountPath: "/transit",
-  };
+  let plugin: PluginLedgerConnectorFabric;
+  let ledger: FabricTestLedgerV1;
+  let vaultTestContainer: VaultTestServer;
+  let keychainPlugin: PluginKeychainMemory;
   const testToken = "myroot";
-  {
-    // mount engine and create some test keys
-    const vaultHTTPClient = axios.create({
-      baseURL: vaultConfig.endpoint + "/v1",
-      headers: {
-        "X-Vault-Token": testToken,
-      },
+  beforeAll(async () => {
+    ledger = new FabricTestLedgerV1({
+      emitContainerLogs: true,
+      publishAllPorts: true,
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
+      logLevel,
     });
-    await vaultHTTPClient.post(
-      "/sys/mounts" + vaultConfig.transitEngineMountPath,
-      { type: "transit" },
+    await ledger.start({ omitPull: false });
+    const connectionProfile = await ledger.getConnectionProfileOrg1();
+    expect(connectionProfile).toBeTruthy();
+
+    vaultTestContainer = new VaultTestServer({});
+    await vaultTestContainer.start();
+
+    const ci = await Containers.getById(vaultTestContainer.containerId);
+    const vaultIpAddr = await internalIpV4();
+    const hostPort = await Containers.getPublicPort(
+      K_DEFAULT_VAULT_HTTP_PORT,
+      ci,
     );
-    await vaultHTTPClient.post(
-      vaultConfig.transitEngineMountPath + "/keys/" + registrarKey,
-      {
-        type: "ecdsa-p256",
+    const vaultHost = `http://${vaultIpAddr}:${hostPort}`;
+
+    /////
+    const vaultConfig: IVaultConfig = {
+      endpoint: vaultHost,
+      transitEngineMountPath: "/transit",
+    };
+
+    {
+      // mount engine and create some test keys
+      const vaultHTTPClient = axios.create({
+        baseURL: vaultConfig.endpoint + "/v1",
+        headers: {
+          "X-Vault-Token": testToken,
+        },
+      });
+      await vaultHTTPClient.post(
+        "/sys/mounts" + vaultConfig.transitEngineMountPath,
+        { type: "transit" },
+      );
+      await vaultHTTPClient.post(
+        vaultConfig.transitEngineMountPath + "/keys/" + registrarKey,
+        {
+          type: "ecdsa-p256",
+        },
+      );
+      await vaultHTTPClient.post(
+        vaultConfig.transitEngineMountPath + "/keys/" + client2Key,
+        {
+          type: "ecdsa-p384",
+        },
+      );
+    }
+    ///
+    keychainPlugin = new PluginKeychainMemory({
+      instanceId: keychainInstanceId,
+      keychainId: keychainId,
+      logLevel,
+    });
+    const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
+
+    const discoveryOptions: DiscoveryOptions = {
+      enabled: true,
+      asLocalhost: true,
+    };
+    const supportedIdentity: FabricSigningCredentialType[] = [
+      FabricSigningCredentialType.VaultX509,
+      FabricSigningCredentialType.X509,
+    ];
+    const pluginOptions: IPluginLedgerConnectorFabricOptions = {
+      instanceId: uuidv4(),
+      pluginRegistry,
+      sshConfig: {},
+      cliContainerEnv: {},
+      peerBinary: "not-required",
+      logLevel,
+      connectionProfile,
+      discoveryOptions,
+      eventHandlerOptions: {
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+        commitTimeout: 300,
       },
-    );
-    await vaultHTTPClient.post(
-      vaultConfig.transitEngineMountPath + "/keys/" + client2Key,
-      {
-        type: "ecdsa-p384",
-      },
-    );
-  }
-  test.onFinish(async () => {
+      supportedIdentity,
+      vaultConfig: vaultConfig,
+    };
+    plugin = new PluginLedgerConnectorFabric(pluginOptions);
+  });
+  afterAll(async () => {
+    await ledger.stop();
+    await ledger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
     await vaultTestContainer.stop();
     await vaultTestContainer.destroy();
   });
-  ///
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: keychainInstanceId,
-    keychainId: keychainId,
-    logLevel,
-  });
-  const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
-
-  const discoveryOptions: DiscoveryOptions = {
-    enabled: true,
-    asLocalhost: true,
-  };
-  const supportedIdentity: FabricSigningCredentialType[] = [
-    FabricSigningCredentialType.VaultX509,
-    FabricSigningCredentialType.X509,
-  ];
-
-  const pluginOptions: IPluginLedgerConnectorFabricOptions = {
-    instanceId: uuidv4(),
-    pluginRegistry,
-    sshConfig: {},
-    cliContainerEnv: {},
-    peerBinary: "not-required",
-    logLevel,
-    connectionProfile,
-    discoveryOptions,
-    eventHandlerOptions: {
-      strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-      commitTimeout: 300,
-    },
-    supportedIdentity,
-    vaultConfig: vaultConfig,
-  };
-  const plugin = new PluginLedgerConnectorFabric(pluginOptions);
-  t.test("with-vaultKey", async (t: Test) => {
+  test(`test with-vaultKey`, async () => {
     {
       // enroll registrar using default identity
       await plugin.enroll(
@@ -165,10 +162,10 @@ test("run-transaction-with-identities", async (t: Test) => {
       );
 
       const rawCert = await keychainPlugin.get(registrarKey + "-x.509");
-      t.ok(rawCert);
+      expect(rawCert).toBeTruthy();
       const certData = JSON.parse(rawCert) as IIdentityData;
-      t.equal(certData.type, FabricSigningCredentialType.X509);
-      t.ok(certData.credentials.privateKey);
+      expect(certData.type).toEqual(FabricSigningCredentialType.X509);
+      expect(certData.credentials.privateKey).toBeTruthy();
     }
     {
       // enroll registrar using vault identity
@@ -191,10 +188,10 @@ test("run-transaction-with-identities", async (t: Test) => {
       );
 
       const rawCert = await keychainPlugin.get(registrarKey + "-vault");
-      t.ok(rawCert);
+      expect(rawCert).toBeTruthy();
       const certData = JSON.parse(rawCert) as IIdentityData;
-      t.equal(certData.type, FabricSigningCredentialType.VaultX509);
-      t.notok(certData.credentials.privateKey);
+      expect(certData.type).toEqual(FabricSigningCredentialType.VaultX509);
+      expect(certData.credentials.privateKey).toBeFalsy();
     }
     {
       // register a client1 using registrar's default x509 identity
@@ -210,7 +207,7 @@ test("run-transaction-with-identities", async (t: Test) => {
         },
         "ca.org1.example.com",
       );
-      t.equal(secret, "pw");
+      expect(secret).toEqual("pw");
     }
     {
       // register a client using registrar's vault identity
@@ -231,9 +228,8 @@ test("run-transaction-with-identities", async (t: Test) => {
         },
         "ca.org1.example.com",
       );
-      t.equal(secret, "pw");
+      expect(secret).toEqual("pw");
     }
-
     {
       // enroll client client1 registered above
       await plugin.enroll(
@@ -250,10 +246,10 @@ test("run-transaction-with-identities", async (t: Test) => {
       );
 
       const rawCert = await keychainPlugin.get(client1Key);
-      t.ok(rawCert);
+      expect(rawCert).toBeTruthy();
       const certData = JSON.parse(rawCert) as IIdentityData;
-      t.equal(certData.type, FabricSigningCredentialType.X509);
-      t.ok(certData.credentials.privateKey);
+      expect(certData.type).toEqual(FabricSigningCredentialType.X509);
+      expect(certData.credentials.privateKey).toBeTruthy();
     }
     {
       // enroll client2 using vault identity
@@ -276,11 +272,11 @@ test("run-transaction-with-identities", async (t: Test) => {
       );
 
       const rawCert = await keychainPlugin.get(client2Key);
-      t.ok(rawCert, "rawCert truthy OK");
+      expect(rawCert).toBeTruthy();
       const { type, credentials } = JSON.parse(rawCert) as IIdentityData;
       const { privateKey } = credentials;
-      t.equal(type, FabricSigningCredentialType.VaultX509, "Cert is X509 OK");
-      t.notok(privateKey, "certData.credentials.privateKey falsy OK");
+      expect(type).toEqual(FabricSigningCredentialType.VaultX509);
+      expect(privateKey).toBeFalsy();
     }
 
     // Temporary workaround here: Deploy a second contract because the default
@@ -308,9 +304,10 @@ test("run-transaction-with-identities", async (t: Test) => {
     const timeout = 180000; // 3 minutes
     const cwd = "/fabric-samples/test-network/";
     const out = await Containers.exec(container, cmd, timeout, logLevel, cwd);
-    t.ok(out, "deploy Basic2 command output truthy OK");
-    t.comment("Output of Basic2 contract deployment below:");
-    t.comment(out);
+    expect(out).toBeTruthy();
+    console.log("Output of Basic2 contract deployment below:");
+    console.log(out);
+
     {
       // make invoke InitLedger using a client1 client
       await plugin.transact({
@@ -363,9 +360,7 @@ test("run-transaction-with-identities", async (t: Test) => {
         params: ["asset1"],
       });
       const asset = JSON.parse(resp.functionOutput);
-      t.equal(asset.Owner, "client2");
+      expect(asset.Owner).toEqual("client2");
     }
-    t.end();
   });
-  t.end();
 });
