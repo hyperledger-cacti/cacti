@@ -1,54 +1,39 @@
+import "jest-extended";
 import { AddressInfo } from "net";
 import http from "http";
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import express from "express";
 import bodyParser from "body-parser";
-import {
-  Containers,
-  pruneDockerAllIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   IListenOptions,
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-
 import {
   DefaultEventHandlerStrategy,
   PluginLedgerConnectorFabric,
   DeployContractGoSourceV1Request,
 } from "../../../../main/typescript/public-api";
-
 import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api";
-
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
-
 import { DiscoveryOptions } from "fabric-network";
 import { Configuration } from "@hyperledger/cactus-core-api";
-
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
 
 const testCase = "check openapi validation in fabric endpoints";
 const logLevel: LogLevelDesc = "TRACE";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
-  test.onFailure(async () => {
-    await Containers.logDiagnostics({ logLevel });
-  });
-
-  const discoveryOptions: DiscoveryOptions = {
-    enabled: true,
-    asLocalhost: true,
-  };
+describe(testCase, () => {
+  let apiUrl: string;
+  let server: http.Server;
+  let plugin: PluginLedgerConnectorFabric;
+  let apiClient: FabricApi;
+  const fDeployGo = "deployContractGoSourceV1";
+  const cWithoutParams = "not sending all required parameters";
+  const cInvalidParams = "sending invalid parameters";
 
   // these below mirror how the fabric-samples sets up the configuration
   const org1Env = {
@@ -74,61 +59,63 @@ test(testCase, async (t: Test) => {
       "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
   };
 
-  const pluginOptions: IPluginLedgerConnectorFabricOptions = {
-    instanceId: uuidv4(),
-    dockerBinary: "/usr/local/bin/docker",
-    pluginRegistry: new PluginRegistry({ plugins: [] }),
-    // pluginRegistry,
-    peerBinary: "/fabric-samples/bin/peer",
-    cliContainerEnv: org1Env,
-    sshConfig: new Configuration(),
-    // sshConfig,
-    logLevel,
-    connectionProfile: {
-      name: "",
-      version: "",
-      organizations: {},
-      peers: {},
-    },
-    // connectionProfile,
-    discoveryOptions,
-    eventHandlerOptions: {
-      strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-      commitTimeout: 300,
-    },
-  };
-  const plugin = new PluginLedgerConnectorFabric(pluginOptions);
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.not.toThrow();
+    const discoveryOptions: DiscoveryOptions = {
+      enabled: true,
+      asLocalhost: true,
+    };
+    const pluginOptions: IPluginLedgerConnectorFabricOptions = {
+      instanceId: uuidv4(),
+      dockerBinary: "/usr/local/bin/docker",
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
+      peerBinary: "/fabric-samples/bin/peer",
+      cliContainerEnv: org1Env,
+      sshConfig: new Configuration(),
+      logLevel,
+      connectionProfile: {
+        name: "",
+        version: "",
+        organizations: {},
+        peers: {},
+      },
+      discoveryOptions,
+      eventHandlerOptions: {
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+        commitTimeout: 300,
+      },
+    };
+    plugin = new PluginLedgerConnectorFabric(pluginOptions);
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { port } = addressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    server = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "127.0.0.1",
+      port: 0,
+      server,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    apiUrl = `http://127.0.0.1:${addressInfo.port}`;
+    const config = new Configuration({ basePath: apiUrl });
+    apiClient = new FabricApi(config);
 
-  await installOpenapiValidationMiddleware({
-    logLevel,
-    app: expressApp,
-    apiSpec: OAS,
+    await installOpenapiValidationMiddleware({
+      logLevel,
+      app: expressApp,
+      apiSpec: OAS,
+    });
+
+    await plugin.getOrCreateWebServices();
+    await plugin.registerWebServices(expressApp);
   });
 
-  await plugin.getOrCreateWebServices();
-  await plugin.registerWebServices(expressApp);
-  const apiUrl = `http://127.0.0.1:${port}`;
+  afterAll(async () => {
+    await Servers.shutdown(server);
+  });
 
-  const config = new Configuration({ basePath: apiUrl });
-  const apiClient = new FabricApi(config);
-
-  const fDeployGo = "deployContractGoSourceV1";
-  const cWithoutParams = "not sending all required parameters";
-  const cInvalidParams = "sending invalid parameters";
-
-  test(`${testCase} - ${fDeployGo} - ${cWithoutParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fDeployGo} - ${cWithoutParams}`, async () => {
     const parameters = {
       tlsRootCertFiles:
         "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
@@ -165,30 +152,22 @@ test(testCase, async (t: Test) => {
         "google.golang.org/grpc@v1.31.1",
       ],
     };
-
-    try {
-      await apiClient.deployContractGoSourceV1(
-        parameters as any as DeployContractGoSourceV1Request,
-      );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDeployGo} without required targetPeerAddresses: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(
-        fields.includes("targetPeerAddresses"),
-        "Rejected because targetPeerAddresses is required",
-      );
-    }
-
-    t2.end();
+    await expect(
+      apiClient.deployContractGoSourceV1(
+        parameters as DeployContractGoSourceV1Request,
+      ),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("targetPeerAddresses"),
+          }),
+        ]),
+      }),
+    });
   });
-
-  test(`${testCase} - ${fDeployGo} - ${cInvalidParams}`, async (t2: Test) => {
+  test(`${testCase} - ${fDeployGo} - ${cInvalidParams}`, async () => {
     const parameters = {
       targetPeerAddresses: ["peer0.org1.example.com:7051"],
       tlsRootCertFiles:
@@ -227,34 +206,17 @@ test(testCase, async (t: Test) => {
       ],
       fake: 4,
     };
-
-    try {
-      await apiClient.deployContractGoSourceV1(
-        parameters as any as DeployContractGoSourceV1Request,
-      );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDeployGo} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
-    }
-
-    t2.end();
+    await expect(
+      apiClient.deployContractGoSourceV1(parameters),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("fake"),
+          }),
+        ]),
+      }),
+    });
   });
-
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
 });

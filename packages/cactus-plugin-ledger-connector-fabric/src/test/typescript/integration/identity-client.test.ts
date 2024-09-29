@@ -1,3 +1,4 @@
+import "jest-extended";
 import axios from "axios";
 import { v4 as internalIpV4 } from "internal-ip";
 import {
@@ -7,7 +8,6 @@ import {
   WsTestServer,
   WS_IDENTITY_HTTP_PORT,
 } from "@hyperledger/cactus-test-tooling";
-import test, { Test } from "tape-promise/tape";
 import { InternalIdentityClient } from "../../../main/typescript/identity/internal/client";
 import { VaultTransitClient } from "../../../main/typescript/identity/vault-client";
 import { WebSocketClient } from "../../../main/typescript/identity/web-socket-client";
@@ -18,19 +18,27 @@ import { KJUR } from "jsrsasign";
 import { WsWallet, ECCurveType as ECCurveTypeW } from "ws-wallet";
 import { WsIdentityClient } from "ws-identity-client";
 
-const logLevel: LogLevelDesc = "ERROR";
 // a generic test suite for testing all the identity clients
 // supported by this package
-test("identity-clients", async (t: Test) => {
+describe("identity clients test", () => {
+  const logLevel: LogLevelDesc = "ERROR";
   const testClients: Map<string, InternalIdentityClient> = new Map();
   const testECP256 = "test-ec-p256";
   const testECP384 = "test-ec-p384";
   const testNotFoundKey = "keyNotFound";
-  {
-    const IpAdd = await internalIpV4();
-    //
+  let wsTestContainer: WsTestServer;
+  let vaultTestContainer: VaultTestServer;
+  let IpAdd: string;
+  let wsWallet256: WsWallet;
+  let wsWallet384: WsWallet;
+  let vaultHost: string;
+  // let wsPathPrefix: any;
+  let wsUrl: string;
+  beforeAll(async () => {
+    IpAdd = (await internalIpV4()) as string;
+
     // setup web-socket client
-    const wsTestContainer = new WsTestServer({
+    wsTestContainer = new WsTestServer({
       logLevel,
       imageVersion: "0.0.1",
     });
@@ -41,39 +49,29 @@ test("identity-clients", async (t: Test) => {
       ci,
     );
     // setup vault client
-    const vaultTestContainer = new VaultTestServer({});
+    vaultTestContainer = new VaultTestServer({});
     await vaultTestContainer.start();
     ci = await Containers.getById(vaultTestContainer.containerId);
     const hostPort = await Containers.getPublicPort(
       K_DEFAULT_VAULT_HTTP_PORT,
       ci,
     );
-
-    const vaultHost = `http://${IpAdd}:${hostPort}`;
-    const wsUrl = `http://${IpAdd}:${wsHostPort}`;
+    vaultHost = `http://${IpAdd}:${hostPort}`;
+    wsUrl = `http://${IpAdd}:${wsHostPort}`;
 
     // External client with private key
-    const wsWallet256 = new WsWallet({
+    wsWallet256 = new WsWallet({
       keyName: "256",
       logLevel,
       strictSSL: false,
     });
 
     // establish session Id to be used by external client with p384 key
-    const wsWallet384 = new WsWallet({
+    wsWallet384 = new WsWallet({
       keyName: "384",
       curve: "p384" as ECCurveTypeW,
       logLevel,
       strictSSL: false,
-    });
-
-    test.onFinish(async () => {
-      await wsTestContainer.stop();
-      await wsTestContainer.destroy();
-      await vaultTestContainer.stop();
-      await vaultTestContainer.destroy();
-      await wsWallet384.close();
-      await wsWallet256.close();
     });
 
     const mountPath = "/transit";
@@ -185,135 +183,138 @@ test("identity-clients", async (t: Test) => {
         }),
       );
     }
-  }
+  });
+  afterAll(async () => {
+    await wsTestContainer.stop();
+    await wsTestContainer.destroy();
+    await vaultTestContainer.stop();
+    await vaultTestContainer.destroy();
+    await wsWallet384.close();
+    await wsWallet256.close();
+  });
 
-  //
-  for (const [clientName, client] of testClients) {
+  it("sign and verify for all clients", async () => {
     const digest = Buffer.from("Hello Cactus");
     const hashDigest = createHash("sha256").update(digest).digest();
-    t.test(`${clientName}::sign`, async (t: Test) => {
+
+    for (const [clientName, client] of testClients.entries()) {
       if (
-        clientName == "web-socket-client-256" ||
-        clientName == "vault-client"
+        clientName === "web-socket-client-256" ||
+        clientName === "vault-client"
       ) {
         const { sig, crv } = await client.sign(testECP256, hashDigest);
-        t.equal(crv, ECCurveType.P256);
-        t.ok(sig);
-        {
-          // asn1 encoding check
-          const pSig = (KJUR.crypto.ECDSA as any).parseSigHexInHexRS(
-            sig.toString("hex"),
-          ) as { r: string; s: string };
-          const re = /[0-9A-Fa-f]{6}/g;
-          t.true(re.test(pSig.r));
-          t.true(re.test(pSig.s));
-        }
+        expect(crv).toBe(ECCurveType.P256);
+        expect(sig).toBeTruthy();
 
-        {
-          // signature verification
-          const pub = await client.getPub(testECP256);
-          const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
-          verify.init(pub);
-          verify.updateHex(digest.toString("hex"));
-          t.true(verify.verify(sig.toString("hex")));
-        }
+        // ASN.1 encoding check
+        const pSig = (KJUR.crypto.ECDSA as any).parseSigHexInHexRS(
+          sig.toString("hex"),
+        );
+        const re = /[0-9A-Fa-f]{6}/g;
+        expect(re.test(pSig.r)).toBeTruthy();
+        expect(re.test(pSig.s)).toBeTruthy();
+
+        // Signature verification
+        const pub = await client.getPub(testECP256);
+        const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
+        verify.init(pub);
+        verify.updateHex(digest.toString("hex"));
+        expect(verify.verify(sig.toString("hex"))).toBeTruthy();
       }
+
       if (
-        clientName == "web-socket-client-384" ||
-        clientName == "vault-client"
+        clientName === "web-socket-client-384" ||
+        clientName === "vault-client"
       ) {
         const { sig, crv } = await client.sign(testECP384, hashDigest);
-        t.equal(crv, ECCurveType.P384);
-        t.ok(sig);
-        {
-          // asn1 encoding check
-          const pSig = (KJUR.crypto.ECDSA as any).parseSigHexInHexRS(
-            sig.toString("hex"),
-          ) as { r: string; s: string };
-          const re = /[0-9A-Fa-f]{6}/g;
-          t.true(re.test(pSig.r));
-          t.true(re.test(pSig.s));
-        }
+        expect(crv).toBe(ECCurveType.P384);
+        expect(sig).toBeTruthy();
 
-        {
-          // signature verification
-          const pub = await client.getPub(testECP384);
-          const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
-          verify.init(pub);
-          verify.updateHex(digest.toString("hex"));
-          t.true(verify.verify(sig.toString("hex")));
-        }
+        // ASN.1 encoding check
+        const pSig = (KJUR.crypto.ECDSA as any).parseSigHexInHexRS(
+          sig.toString("hex"),
+        );
+        const re = /[0-9A-Fa-f]{6}/g;
+        expect(re.test(pSig.r)).toBeTruthy();
+        expect(re.test(pSig.s)).toBeTruthy();
+
+        // Signature verification
+        const pub = await client.getPub(testECP384);
+        const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
+        verify.init(pub);
+        verify.updateHex(digest.toString("hex"));
+        expect(verify.verify(sig.toString("hex"))).toBeTruthy();
       }
-      t.end();
-    });
-    t.test(`${clientName}::getPub`, async (t: Test) => {
+    }
+  });
+
+  it("getPub for all clients", async () => {
+    for (const [clientName, client] of testClients.entries()) {
       if (
-        clientName == "web-socket-client-256" ||
-        clientName == "vault-client"
+        clientName === "web-socket-client-256" ||
+        clientName === "vault-client"
       ) {
         const pub = await client.getPub(testECP256);
-        t.ok(pub);
-        t.equal((pub as any).curveName, "secp256r1");
+        expect(pub).toBeTruthy();
+        expect((pub as any).curveName).toBe("secp256r1");
       }
-      if (
-        //clientName == "web-socket-client-384" ||
-        clientName == "vault-client"
-      ) {
+      if (clientName === "vault-client") {
         const pub = await client.getPub(testECP384);
-        t.ok(pub);
-        t.equal((pub as any).curveName, "secp384r1");
-      }
-      if (clientName == "vault-client") {
+        expect(pub).toBeTruthy();
+        expect((pub as any).curveName).toBe("secp384r1");
+
         try {
           await client.getPub(testNotFoundKey);
-          t.fail("Should not get here");
+          throw new Error("Should not get here");
         } catch (error) {
-          t.true(
-            (error as Error).message.includes(
-              `keyName = ${testNotFoundKey} not found`,
-            ),
+          expect((error as Error).message).toContain(
+            `keyName = ${testNotFoundKey} not found`,
           );
         }
       }
-      t.end();
-    });
-    t.test(`${clientName}::rotateKey`, async (t: Test) => {
-      if (clientName == "vault-client") {
-        const pubOld = await client.getPub(testECP256);
+    }
+  });
+
+  it("rotateKey for all clients", async () => {
+    const digest = Buffer.from("Hello Cactus");
+    const hashDigest = createHash("sha256").update(digest).digest();
+
+    for (const [clientName, client] of testClients.entries()) {
+      if (clientName === "vault-client") {
+        const pubOld256 = await client.getPub(testECP256);
         await client.rotateKey(testECP256);
-        const pubNew = await client.getPub(testECP256);
-        {
-          // public key should be different
-          t.notEqual(pubNew.getPublicKeyXYHex(), pubOld.getPublicKeyXYHex());
-        }
-        {
-          // signature should be made using new key
-          const { sig } = await client.sign(testECP256, hashDigest);
-          const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
-          verify.init(pubOld);
-          verify.updateHex(digest.toString("hex"));
-          t.false(verify.verify(sig.toString("hex")));
-        }
+        const pubNew256 = await client.getPub(testECP256);
+
+        // Public key should be different
+        expect(pubNew256.getPublicKeyXYHex()).not.toBe(
+          pubOld256.getPublicKeyXYHex(),
+        );
+
+        // Signature should be made using the new key
+        const { sig } = await client.sign(testECP256, hashDigest);
+        const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
+        verify.init(pubOld256);
+        verify.updateHex(digest.toString("hex"));
+        expect(verify.verify(sig.toString("hex"))).toBeFalsy();
       }
-      if (clientName == "vault-client") {
-        const pubOld = await client.getPub(testECP384);
+
+      if (clientName === "vault-client") {
+        const pubOld384 = await client.getPub(testECP384);
         await client.rotateKey(testECP384);
-        const pubNew = await client.getPub(testECP384);
-        {
-          // public key should be different
-          t.notEqual(pubNew.getPublicKeyXYHex(), pubOld.getPublicKeyXYHex());
-        }
-        {
-          // signature should be made using new key
-          const { sig } = await client.sign(testECP384, hashDigest);
-          const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
-          verify.init(pubOld);
-          verify.updateHex(digest.toString("hex"));
-          t.false(verify.verify(sig.toString("hex")));
-        }
+        const pubNew384 = await client.getPub(testECP384);
+
+        // Public key should be different
+        expect(pubNew384.getPublicKeyXYHex()).not.toBe(
+          pubOld384.getPublicKeyXYHex(),
+        );
+
+        // Signature should be made using the new key
+        const { sig } = await client.sign(testECP384, hashDigest);
+        const verify = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
+        verify.init(pubOld384);
+        verify.updateHex(digest.toString("hex"));
+        expect(verify.verify(sig.toString("hex"))).toBeFalsy();
       }
-      t.end();
-    });
-  }
-  t.end();
+    }
+  });
 });

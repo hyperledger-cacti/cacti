@@ -1,7 +1,4 @@
-// The TAP runner has a bug and prevents the test from passing in the CI when yarn "tap --ts ..."" is used
-// if test is run with ts-node, it successfully executes
-import test, { Test } from "tape-promise/tape";
-
+import "jest-extended";
 import {
   DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
@@ -19,25 +16,33 @@ import {
 
 const testCase = "adds org4 to the network";
 const logLevel: LogLevelDesc = "TRACE";
-
-test.skip("BEFORE " + testCase, async (t: Test) => {
+let ledger: FabricTestLedgerV1;
+beforeAll(async () => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
-  t.end();
+  await expect(pruning).resolves.not.toThrow();
 });
-const addOrgXPath = path.join(__dirname, "../../../resources/fixtures/addOrgX");
 
-const extraOrg = {
-  path: addOrgXPath,
-  orgName: "org4",
-  orgChannel: "mychannel",
-  certificateAuthority: false,
-  stateDatabase: STATE_DATABASE.COUCH_DB,
-  port: "11071",
-};
+afterAll(async () => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await expect(pruning).resolves.not.toThrow();
+  await ledger.stop();
+  await ledger.destroy();
+});
+test.skip(testCase, async () => {
+  const addOrgXPath = path.join(
+    __dirname,
+    "../../../resources/fixtures/addOrgX",
+  );
 
-test.skip(testCase, async (t: Test) => {
-  const ledger = new FabricTestLedgerV1({
+  const extraOrg = {
+    path: addOrgXPath,
+    orgName: "org4",
+    orgChannel: "mychannel",
+    certificateAuthority: false,
+    stateDatabase: STATE_DATABASE.COUCH_DB,
+    port: "11071",
+  };
+  ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
@@ -46,19 +51,10 @@ test.skip(testCase, async (t: Test) => {
     envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     extraOrgs: [extraOrg],
   });
-
-  const tearDown = async () => {
-    await ledger.stop();
-    await ledger.destroy();
-  };
-
-  test.onFinish(tearDown);
-
   const startOps: LedgerStartOptions = {
     omitPull: false,
     setContainer: false,
   };
-
   // Recover running ledger
   /*const startOpsContainerRunning: LedgerStartOptions = {
     omitPull: true,
@@ -69,36 +65,23 @@ test.skip(testCase, async (t: Test) => {
 
   const results = await ledger.start(startOpsContainerRunning);
   */
-
   await ledger.start(startOps);
   const connectionProfile = await ledger.getConnectionProfileOrg1();
-
-  t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
+  expect(connectionProfile).toBeTruthy();
 
   const connectionProfileOrg1 = await ledger.getConnectionProfileOrgX("org1");
-  t.isEquivalent(connectionProfile, connectionProfileOrg1);
+  expect(connectionProfile).toEqual(connectionProfileOrg1);
 
   const connectionProfileOrg2 = await ledger.getConnectionProfileOrgX("org2");
-  t.ok(connectionProfileOrg2, "getConnectionProfileOrg2() out truthy OK");
+  expect(connectionProfileOrg2).toBeTruthy();
 
-  // Do not use org3, as its files are used as templates
   const connectionProfileOrg4 = await ledger.getConnectionProfileOrgX("org4");
-  t.ok(connectionProfileOrg4, "getConnectionProfileOrg4() out truthy OK");
+  expect(connectionProfileOrg4).toBeTruthy();
 
-  t.ok(
-    connectionProfileOrg1 !== connectionProfileOrg2,
-    "connection profile from org1 is different from the one from org2 OK",
+  expect(connectionProfileOrg1).not.toEqual(connectionProfileOrg2);
+
+  // Expect rejection as org101 does not exist
+  await expect(ledger.getConnectionProfileOrgX("org101")).rejects.toThrow(
+    /no such container - Could not find the file.*/,
   );
-
-  //Should return error, as there is no org101 in the default deployment of Fabric AIO image nor it was added
-  const error = "/no such container - Could not find the file.*/";
-  await t.rejects(ledger.getConnectionProfileOrgX("org101"), error);
-
-  t.end();
-});
-
-test.skip("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
-  t.end();
 });
