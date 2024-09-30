@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727457895236,
+  "lastUpdate": 1727707921460,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -238,6 +238,37 @@ window.BENCHMARK_DATA = {
             "range": "±2.59%",
             "unit": "ops/sec",
             "extra": "178 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": false,
+          "id": "fb3286c78eb0b442eb624e35d0215bbb73492e75",
+          "message": "chore(release): publish v2.0.0-rc.5\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-09-29T23:37:37-07:00",
+          "tree_id": "f38e2c43f2f277107d82ad76321f3b0419b5d0f5",
+          "url": "https://github.com/hyperledger/cacti/commit/fb3286c78eb0b442eb624e35d0215bbb73492e75"
+        },
+        "date": 1727707917752,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 646,
+            "range": "±4.68%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
           }
         ]
       }
