@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-driver-fabric",
-  "version": "2.0.0-rc.5",
+  "version": "2.0.0-rc.6",
   "description": "",
   "repository": {
     "type": "git",
@@ -20,8 +20,8 @@
   "dependencies": {
     "@fidm/x509": "1.2.1",
     "@grpc/grpc-js": "1.11.2",
-    "@hyperledger/cacti-weaver-protos-js": "2.0.0-rc.5",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-rc.5",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-rc.6",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-rc.6",
     "dotenv": "8.6.0",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",

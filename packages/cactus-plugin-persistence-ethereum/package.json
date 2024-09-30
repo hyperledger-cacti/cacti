@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-persistence-ethereum",
-  "version": "2.0.0-rc.5",
+  "version": "2.0.0-rc.6",
   "description": "Persistence plugin for Ethereum ledgers to store data into a database.",
   "keywords": [
     "Hyperledger",
@@ -62,10 +62,10 @@
   },
   "dependencies": {
     "@ethersproject/abi": "5.7.0",
-    "@hyperledger/cactus-common": "2.0.0-rc.5",
-    "@hyperledger/cactus-core": "2.0.0-rc.5",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.5",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-rc.5",
+    "@hyperledger/cactus-common": "2.0.0-rc.6",
+    "@hyperledger/cactus-core": "2.0.0-rc.6",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.6",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-rc.6",
     "async-mutex": "0.4.0",
     "axios": "1.7.7",
     "pg": "8.8.0",
@@ -75,10 +75,10 @@
     "web3-validator": "2.0.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.5",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.5",
-    "@hyperledger/cactus-test-geth-ledger": "2.0.0-rc.5",
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.5",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.6",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.6",
+    "@hyperledger/cactus-test-geth-ledger": "2.0.0-rc.6",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.6",
     "@openapitools/openapi-generator-cli": "2.7.0",
     "@types/express": "4.17.21",
     "@types/pg": "8.6.5",
