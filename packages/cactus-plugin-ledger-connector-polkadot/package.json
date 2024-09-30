@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-polkadot",
-  "version": "2.0.0-rc.4",
+  "version": "2.0.0-rc.5",
   "description": "Allows Cactus nodes to connect to a Substrate ledger.",
   "keywords": [
     "Hyperledger",
@@ -65,9 +65,9 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-rc.4",
-    "@hyperledger/cactus-core": "2.0.0-rc.4",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.4",
+    "@hyperledger/cactus-common": "2.0.0-rc.5",
+    "@hyperledger/cactus-core": "2.0.0-rc.5",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.5",
     "@polkadot/api": "10.9.1",
     "@polkadot/api-contract": "10.9.1",
     "@polkadot/rpc-provider": "10.9.1",
@@ -93,8 +93,8 @@
     "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.4",
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.4",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.5",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.5",
     "@types/express": "4.17.21",
     "@types/joi": "17.2.3",
     "@types/multer": "1.4.7",

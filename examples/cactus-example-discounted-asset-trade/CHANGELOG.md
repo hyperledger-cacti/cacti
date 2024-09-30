@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.5](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.4...v2.0.0-rc.5) (2024-09-30)
+
+### Features
+
+* **cmd-socketio-server:** move to examples as deprecated ([4de8069](https://github.com/hyperledger/cacti/commit/4de806974f0066359cca422561042a55173d3655))
+
 # [2.0.0-rc.4](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2024-09-08)
 
 ### Bug Fixes

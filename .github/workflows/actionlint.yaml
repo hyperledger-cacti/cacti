@@ -48,6 +48,13 @@ jobs:
     - name: wipe_non_yaml_sources
       run: rm -rf packages/ examples/ extensions/ package.json weaver/
 
+    # Shellcheck comlains that inside single quotes
+    # the environment variables are not expanded, but that's exactly what we want here because
+    # we are replacing environment variables inside the configuration file.
+    # The only way we know how to ignore a file is to delete it...
+    - name: wipe_files_with_false_positives
+      run: rm .github/workflows/all-nodejs-packages-publish.yaml
+
     # We need to exclude these from the linting process for now because these files have 
     # hundreds of linter errors that we didn't yet have time to fix. Once the errors are fixed
     # we can add the files.
@@ -73,7 +80,7 @@ jobs:
         version: 1.7.1
         cache: true
         files: ${{ env.CACTI_ACTIONLINT_FILES_TO_LINT }}
-        flags: "--verbose"
+        flags: '--verbose'
 
     - name: actionlint_summary
       if: ${{ steps.actionlint.outputs.exit-code != 0 }} # example usage, do echo only when actionlint action failed

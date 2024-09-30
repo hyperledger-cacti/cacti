@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-htlc-coordinator-besu",
-  "version": "2.0.0-rc.4",
+  "version": "2.0.0-rc.5",
   "description": "HTLC Coordinator to exchange tokens between networks.",
   "keywords": [
     "Hyperledger",
@@ -58,13 +58,13 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-rc.4",
-    "@hyperledger/cactus-core": "2.0.0-rc.4",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.4",
-    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.0.0-rc.4",
-    "@hyperledger/cactus-plugin-htlc-eth-besu-erc20": "2.0.0-rc.4",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.4",
-    "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.0.0-rc.4",
+    "@hyperledger/cactus-common": "2.0.0-rc.5",
+    "@hyperledger/cactus-core": "2.0.0-rc.5",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.5",
+    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.0.0-rc.5",
+    "@hyperledger/cactus-plugin-htlc-eth-besu-erc20": "2.0.0-rc.5",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.5",
+    "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.0.0-rc.5",
     "axios": "1.7.7",
     "body-parser": "1.20.3",
     "fast-safe-stringify": "2.1.1",
@@ -77,8 +77,8 @@
     "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.4",
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.4",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.5",
+    "@hyperledger/cactus-test-tooling": "2.0.0-rc.5",
     "@types/express": "4.17.21",
     "@types/uuid": "10.0.0",
     "express": "4.20.0",

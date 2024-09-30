@@ -13,30 +13,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   build-and-publish-packages:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
-    - run: git fetch --unshallow --prune
-    - uses: actions/setup-node@v4.0.3
-      with:
-        always-auth: true
-        node-version: ${{ env.NODEJS_VERSION }}
-        registry-url: 'https://registry.npmjs.org'
-    - name: ./tools/ci.sh
-      run: ./tools/ci.sh
-      env:
-        DEV_BUILD_DISABLED: false
-        FULL_BUILD_DISABLED: false
-        JEST_TEST_RUNNER_DISABLED: true
-        TAPE_TEST_RUNNER_DISABLED: true
-    - name: lerna-publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config --global user.email "npm-ci@hyperledger.org"
-        git config --global user.name "hyperledger-ghci"
-        npm whoami
-        yarn lerna publish from-git --yes --loglevel=debug --ignore-scripts
+      - uses: actions/checkout@v4.1.7
+      - run: git fetch --unshallow --prune
+
+      - uses: actions/setup-node@v4.0.3
+        with:
+          always-auth: true
+          node-version: ${{ env.NODEJS_VERSION }}
+          registry-url: "https://registry.npmjs.org/"
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - uses: actions/setup-node@v4.0.3
+        with:
+          always-auth: true
+          node-version: ${{ env.NODEJS_VERSION }}
+          registry-url: "https://npm.pkg.github.com/"
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - run: sed -i 's/npm.pkg.github.com\/:_authToken=${NODE_AUTH_TOKEN}/npm.pkg.github.com\/:_authToken=${GITHUB_TOKEN}/' /home/runner/work/_temp/.npmrc
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - name: ./tools/ci.sh
+        run: ./tools/ci.sh
+        env:
+          DEV_BUILD_DISABLED: false
+          FULL_BUILD_DISABLED: false
+          JEST_TEST_RUNNER_DISABLED: true
+          TAPE_TEST_RUNNER_DISABLED: true
+
+      - name: lerna-publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.email "npm-ci@hyperledger.org"
+          git config --global user.name "hyperledger-ghci"
+          npm whoami
+          yarn lerna publish from-git --yes --loglevel=debug --ignore-scripts

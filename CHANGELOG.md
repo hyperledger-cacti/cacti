@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-rc.5](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.4...v2.0.0-rc.5) (2024-09-30)
+
+### Bug Fixes
+
+* **openapi:** openapi-generator-ignore file ([4df1211](https://github.com/hyperledger/cacti/commit/4df1211d0bdaa75467eaf71b2bc6e5b9d79676b4))
+* **weaver-corda:** added duplicate handling strategy in build.gradle ([c5bbb33](https://github.com/hyperledger/cacti/commit/c5bbb334aeb34282eb0aeaaf446f50bc785f4982))
+
+### Features
+
+* **cmd-socketio-server:** move to examples as deprecated ([4de8069](https://github.com/hyperledger/cacti/commit/4de806974f0066359cca422561042a55173d3655))
+
 # [2.0.0-rc.4](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.3...v2.0.0-rc.4) (2024-09-08)
 
 ### Bug Fixes
