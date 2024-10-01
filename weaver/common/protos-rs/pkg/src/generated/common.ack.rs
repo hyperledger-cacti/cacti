@@ -2,7 +2,6 @@
 /// This message respresents "ACKs" sent between relay-relay,
 /// relay-driver and relay-network
 #[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Ack {
     #[prost(enumeration = "ack::Status", tag = "2")]
@@ -40,8 +39,8 @@ pub mod ack {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                Status::Ok => "OK",
-                Status::Error => "ERROR",
+                Self::Ok => "OK",
+                Self::Error => "ERROR",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
