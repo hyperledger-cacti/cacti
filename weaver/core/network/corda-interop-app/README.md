@@ -89,8 +89,8 @@ and then follow above 4 steps.
 5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
-	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "2.0.0-rc.6")
-	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "2.0.0-rc.6")
+	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "2.0.0-rc.7")
+	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "2.0.0-rc.7")
 }
 ```
 

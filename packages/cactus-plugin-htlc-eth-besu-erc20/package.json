@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-htlc-eth-besu-erc20",
-  "version": "2.0.0-rc.6",
+  "version": "2.0.0-rc.7",
   "description": "Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens",
   "keywords": [
     "Hyperledger",
@@ -61,10 +61,10 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-rc.6",
-    "@hyperledger/cactus-core": "2.0.0-rc.6",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.6",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.6",
+    "@hyperledger/cactus-common": "2.0.0-rc.7",
+    "@hyperledger/cactus-core": "2.0.0-rc.7",
+    "@hyperledger/cactus-core-api": "2.0.0-rc.7",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.7",
     "axios": "1.7.7",
     "express": "4.20.0",
     "joi": "17.13.3",
