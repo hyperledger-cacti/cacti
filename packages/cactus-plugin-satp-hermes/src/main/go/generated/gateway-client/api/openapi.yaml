@@ -137,6 +137,43 @@ paths:
         http:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/status
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids:
+    get:
+      description: Retrieve the all SATP session IDs
+      operationId: GetSessionIds
+      parameters:
+      - explode: true
+        in: query
+        name: SessionsRequest
+        required: false
+        schema:
+          description: Empty object
+          type: object
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                description: Array with session Ids
+                items:
+                  nullable: false
+                  type: string
+                type: array
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Get SATP session ids
+      tags:
+      - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck:
     get:
       description: Responds if SATP Hermes is on
@@ -429,6 +466,15 @@ components:
       - X509
       example: OAUTH
       type: string
+    AllSessionIdsRequest:
+      description: Empty object
+      type: object
+    AllSessionIdsResponse:
+      description: Array with session Ids
+      items:
+        nullable: false
+        type: string
+      type: array
     getAuditRequest:
       description: Request schema for initiating an audit. Includes the start and
         end dates for the audit period and an option to include proofs.
