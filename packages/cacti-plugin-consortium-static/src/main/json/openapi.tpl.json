@@ -115,25 +115,13 @@
             "$ref": "#/components/schemas/LedgerId"
           },
           "ledgerType": {
-            "$ref": "#/components/schemas/LedgerType",
+            "$ref": "../../../../../packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/LedgerType",
             "nullable": false
           },
           "consortiumMemberId": {
             "$ref": "#/components/schemas/ConsortiumMemberId"
           }
         }
-      },
-      "LedgerType": {
-        "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
-        "type": "string",
-        "enum": [
-          "BESU_1X",
-          "BESU_2X",
-          "BURROW_0X",
-          "CORDA_4X",
-          "FABRIC_2",
-          "SAWTOOTH_1X"
-        ]
       },
       "CactusNodeMeta": {
         "description": "A Cactus node meta information",

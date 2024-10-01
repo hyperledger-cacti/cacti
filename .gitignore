@@ -12,6 +12,8 @@ jspm_packages/
 generated-sources/
 coverage/
 
+**/generated/build-info/*.json
+
 # Optional npm cache directory
 .npm
 
