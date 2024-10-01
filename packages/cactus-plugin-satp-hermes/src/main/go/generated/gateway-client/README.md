@@ -91,6 +91,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**CallContinue**](docs/AdminApi.md#callcontinue) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue | Continue a paused transaction session
 *AdminApi* | [**GetAudit**](docs/AdminApi.md#getaudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 *AdminApi* | [**GetHealthCheck**](docs/AdminApi.md#gethealthcheck) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck | Health check endpoint
+*AdminApi* | [**GetSessionIds**](docs/AdminApi.md#getsessionids) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids | Get SATP session ids
 *AdminApi* | [**GetStatus**](docs/AdminApi.md#getstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 *AdminApi* | [**Pause**](docs/AdminApi.md#pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
 *TransactionApi* | [**Cancel**](docs/TransactionApi.md#cancel) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel | Cancel a transaction session
