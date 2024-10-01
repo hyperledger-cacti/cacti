@@ -41,6 +41,7 @@ import {
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
 import { SATPHandler, Stage } from "../types/satp-protocol";
+import { IExpressRequestHandler } from "@hyperledger/cactus-core-api";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -108,17 +109,18 @@ export class GatewayOrchestrator {
 
   public startServices(): void {
     for (const stage of this.handlers.keys()) {
-      this.logger.info(
-        `Setting up routes for stage ${`/${this.handlers.get(stage)!.getStage()}`}`,
-      );
-      this.expressServer!.use(
-        `/${this.handlers.get(stage)!.getStage()}`,
-        expressConnectMiddleware({
-          routes: this.handlers
-            .get(stage)!
-            .setupRouter.bind(this.handlers.get(stage)!),
-        }),
-      );
+      const httpPath = `/${this.handlers.get(stage)!.getStage()}`;
+      this.logger.info(`Setting up routes for stage ${httpPath}`);
+      if (!this.expressServer) {
+        throw new Error(`${this.label}#startServices() expressServer falsy.`);
+      }
+      const theHandler = expressConnectMiddleware({
+        routes: this.handlers
+          .get(stage)!
+          .setupRouter.bind(this.handlers.get(stage)!),
+      }) as IExpressRequestHandler; // FIXME(petermetz) - unsafe cast
+
+      this.expressServer.use(httpPath, theHandler);
     }
   }
 

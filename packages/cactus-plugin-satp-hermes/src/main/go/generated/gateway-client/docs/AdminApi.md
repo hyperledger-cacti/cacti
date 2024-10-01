@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**CallContinue**](AdminApi.md#CallContinue) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue | Continue a paused transaction session
 [**GetAudit**](AdminApi.md#GetAudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 [**GetHealthCheck**](AdminApi.md#GetHealthCheck) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck | Health check endpoint
+[**GetSessionIds**](AdminApi.md#GetSessionIds) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids | Get SATP session ids
 [**GetStatus**](AdminApi.md#GetStatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 [**Pause**](AdminApi.md#Pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
 
@@ -195,6 +196,72 @@ Other parameters are passed through a pointer to a apiGetHealthCheckRequest stru
 ### Return type
 
 [**GetHealthCheck200Response**](GetHealthCheck200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetSessionIds
+
+> []string GetSessionIds(ctx).SessionsRequest(sessionsRequest).Execute()
+
+Get SATP session ids
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated"
+)
+
+func main() {
+    sessionsRequest := map[string]interface{}{ ... } // map[string]interface{} |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.AdminApi.GetSessionIds(context.Background()).SessionsRequest(sessionsRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.GetSessionIds``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `GetSessionIds`: []string
+    fmt.Fprintf(os.Stdout, "Response from `AdminApi.GetSessionIds`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiGetSessionIdsRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sessionsRequest** | [**map[string]interface{}**](map[string]interface{}.md) |  | 
+
+### Return type
+
+**[]string**
 
 ### Authorization
 

@@ -347,18 +347,18 @@ export class SATPManager {
 
   public async initiateTransfer(session: SATPSession): Promise<void> {
     const fnTag = `${SATPManager.CLASS_NAME}#initiateTransfer()`;
-    this.logger.info(`${fnTag}, Initiating Transfer`);
-    this.logger.debug(
-      `SessionData: ${JSON.stringify(session.getClientSessionData())}`,
-    );
+    this.logger.debug(`${fnTag}, Initiating Transfer`);
 
-    if (!session.getClientSessionData()) {
+    const clientSessionData = session.getClientSessionData();
+    const clientSessionDataJson = JSON.stringify(clientSessionData);
+    this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
+
+    if (!clientSessionData) {
       throw new Error(`${fnTag}, Session not found`);
     }
     //maybe get a suitable gateway first.
     const channel = this.orchestrator.getChannel(
-      session.getClientSessionData()
-        ?.recipientGatewayNetworkId as SupportedChain,
+      clientSessionData.recipientGatewayNetworkId as SupportedChain,
     );
 
     if (!channel) {
@@ -370,8 +370,7 @@ export class SATPManager {
     if (!counterGatewayID) {
       throw new Error(`${fnTag}, counterparty gateway ID not found`);
     }
-    const sessionData: SessionData =
-      session.getClientSessionData() as SessionData;
+    const sessionData: SessionData = clientSessionData;
 
     sessionData.receiverGatewayOwnerId = channel.toGatewayID;
 
