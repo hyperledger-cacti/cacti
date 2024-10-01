@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727770499891,
+  "lastUpdate": 1727770962312,
   "repoUrl": "https://github.com/hyperledger/cacti",
   "entries": {
     "Benchmark": [
@@ -305,6 +305,37 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 697,
             "range": "±2.87%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "committer": {
+            "email": "peter.somogyvari@accenture.com",
+            "name": "Peter Somogyvari",
+            "username": "petermetz"
+          },
+          "distinct": false,
+          "id": "ce5f9df3f7a0f0cd1a63c8e6d0db38c2efda38dd",
+          "message": "chore(release): publish v2.0.0-rc.6\n\nIn addition to being a regular release candidate, this also includes a\n(probable) fix for the npm/ghcr publishing github action.\n\nThe above fix is the entire reason why we are issuing this release to begin\nwith: to verify that the automatic publishing script works before issuing\nthe v2.0.0 GA release after long last.\n\nDepends on #3563\n\nSigned-off-by: Peter Somogyvari <peter.somogyvari@accenture.com>",
+          "timestamp": "2024-10-01T00:23:39-07:00",
+          "tree_id": "bda34f8b9c952db3ee650022f8632c3307b451ff",
+          "url": "https://github.com/hyperledger/cacti/commit/ce5f9df3f7a0f0cd1a63c8e6d0db38c2efda38dd"
+        },
+        "date": 1727770959275,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 729,
+            "range": "±2.77%",
             "unit": "ops/sec",
             "extra": "180 samples"
           }
