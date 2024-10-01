@@ -46,7 +46,7 @@
   "scripts": {
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/fabric-contracts && cp -r ./src/fabric-contracts/* ./dist/lib/fabric-contracts/",
     "forge": "forge build ./src/solidity/main/*.sol --out ./src/solidity/main/generated",
-    "forge:all": "run-s 'forge' 'forge:test'",
+    "forge:all": "yarn run --top-level run-s 'forge' 'forge:test'",
     "forge:test": "forge build ./src/solidity/test/*.sol --out ./src/solidity/test/generated",
     "solidity": "hardhat compile",
     "start": "node dist/lib/main/typescript/cbdc-bridging-app-cli.js dotenv_config_path=./process.env",
