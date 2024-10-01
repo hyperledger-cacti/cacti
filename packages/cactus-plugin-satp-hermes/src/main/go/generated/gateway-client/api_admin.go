@@ -65,6 +65,20 @@ type AdminApi interface {
 	GetHealthCheckExecute(r ApiGetHealthCheckRequest) (*GetHealthCheck200Response, *http.Response, error)
 
 	/*
+	GetSessionIds Get SATP session ids
+
+	Retrieve the all SATP session IDs
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetSessionIdsRequest
+	*/
+	GetSessionIds(ctx context.Context) ApiGetSessionIdsRequest
+
+	// GetSessionIdsExecute executes the request
+	//  @return []string
+	GetSessionIdsExecute(r ApiGetSessionIdsRequest) ([]string, *http.Response, error)
+
+	/*
 	GetStatus Get SATP current session data
 
 	Retrieve the status of a SATP session
@@ -388,6 +402,114 @@ func (a *AdminApiService) GetHealthCheckExecute(r ApiGetHealthCheckRequest) (*Ge
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetSessionIdsRequest struct {
+	ctx context.Context
+	ApiService AdminApi
+	sessionsRequest *map[string]interface{}
+}
+
+func (r ApiGetSessionIdsRequest) SessionsRequest(sessionsRequest map[string]interface{}) ApiGetSessionIdsRequest {
+	r.sessionsRequest = &sessionsRequest
+	return r
+}
+
+func (r ApiGetSessionIdsRequest) Execute() ([]string, *http.Response, error) {
+	return r.ApiService.GetSessionIdsExecute(r)
+}
+
+/*
+GetSessionIds Get SATP session ids
+
+Retrieve the all SATP session IDs
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetSessionIdsRequest
+*/
+func (a *AdminApiService) GetSessionIds(ctx context.Context) ApiGetSessionIdsRequest {
+	return ApiGetSessionIdsRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return []string
+func (a *AdminApiService) GetSessionIdsExecute(r ApiGetSessionIdsRequest) ([]string, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  []string
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.GetSessionIds")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.sessionsRequest != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "SessionsRequest", r.sessionsRequest, "")
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
