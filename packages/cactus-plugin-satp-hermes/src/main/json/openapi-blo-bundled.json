@@ -72,7 +72,7 @@
                   "beneficiaryPubkey",
                   "originatorPubkey",
                   "sourceAsset",
-                  "destinyAsset"
+                  "receiverAsset"
                 ],
                 "properties": {
                   "contextID": {
@@ -135,7 +135,7 @@
                       }
                     }
                   },
-                  "destinyAsset": {
+                  "receiverAsset": {
                     "description": "An asset",
                     "type": "object",
                     "required": [
@@ -2825,7 +2825,7 @@
           "beneficiaryPubkey",
           "originatorPubkey",
           "sourceAsset",
-          "destinyAsset"
+          "receiverAsset"
         ],
         "properties": {
           "contextID": {
@@ -2888,7 +2888,7 @@
               }
             }
           },
-          "destinyAsset": {
+          "receiverAsset": {
             "description": "An asset",
             "type": "object",
             "required": [
