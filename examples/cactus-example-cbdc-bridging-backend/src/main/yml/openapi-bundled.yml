@@ -1,0 +1,530 @@
+openapi: 3.0.3
+info:
+  title: CBDC-example backend API
+  version: 0.0.2
+  description: |
+    Cactus-Example
+  contact:
+    name: Hyperledger Cacti
+  x-logo:
+    altText: Cacti logo
+    backgroundColor: '#fafafa'
+    url: 'https://github.com/hyperledger/cacti/blob/main/images/HL_Cacti_Logo_Color.png'
+tags:
+  - name: transaction
+    description: API endpoints for interacting with blockchains via gateways
+  - name: admin
+    description: API endpoints for fetching information on SATP sessions
+paths:
+  /api/v1/@hyperledger/cactus-example-cbdc/transact:
+    post:
+      tags:
+        - transact
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/transact
+      summary: Submit a transaction intent
+      description: Allows users to queue intents for transactions based on specified parameters.
+      operationId: Transact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: 'Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and receiver DLT networks.'
+              type: object
+              required:
+                - sender
+                - receiver
+                - sourceChain
+                - receiverChain
+                - amount
+              properties:
+                sender:
+                  type: string
+                  example: user1
+                receiver:
+                  type: string
+                  example: user2
+                sourceChain:
+                  description: Enum for the type of asset being transferred.
+                  type: object
+                  properties:
+                    assetType:
+                      type: string
+                      enum:
+                        - FABRIC
+                        - BESU
+                receiverChain:
+                  description: Enum for the type of asset being transferred.
+                  type: object
+                  properties:
+                    assetType:
+                      type: string
+                      enum:
+                        - FABRIC
+                        - BESU
+                amount:
+                  type: string
+                  example: '100'
+      responses:
+        '200':
+          description: Transaction successfully queued
+          content:
+            application/json:
+              schema:
+                description: Response schema for a transaction request.
+                type: object
+                properties:
+                  statusResponse:
+                    description: Response schema for a transaction status request.
+                    type: object
+                    properties:
+                      sessionID:
+                        type: string
+                        example: 123e4567-e89b-12d3-a456-426614174000
+                      status:
+                        type: string
+                        enum:
+                          - NOT_FOUND
+                          - INVALID
+                          - PENDING
+                          - DONE
+                          - FAILED
+                    required:
+                      - status
+                required:
+                  - statusResponse
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
+  /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references:
+    get:
+      tags:
+        - get-sessions-references
+      summary: Get SATP current sessions data
+      description: Retrieve the status of a SATP sessions of a gateway
+      operationId: GetSessionsReferences
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references
+      parameters:
+        - name: Ledger
+          in: query
+          schema:
+            type: string
+            enum:
+              - FABRIC
+              - BESU
+          description: Unique identifier for the session.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Response schema for a transaction status request.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 123e4567-e89b-12d3-a456-426614174000
+                    status:
+                      type: string
+                    sourceLedger:
+                      type: string
+                    receiverLedger:
+                      type: string
+                  required:
+                    - status
+                    - id
+                    - sourceLedger
+                    - receiverLedger
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-example-cbdc/get-balance:
+    get:
+      tags:
+        - get-balance
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-balance
+      operationId: GetBalance
+      parameters:
+        - name: user
+          in: query
+          schema:
+            type: string
+        - name: chain
+          in: query
+          schema:
+            type: string
+            enum:
+              - FABRIC
+              - BESU
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Response schema for an amount request.
+                type: object
+                properties:
+                  amount:
+                    type: string
+                    example: '100'
+                required:
+                  - amount
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens:
+    post:
+      tags:
+        - mint
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens
+      summary: Submit a transaction intent
+      description: Allows users to queue intents for transactions based on specified parameters.
+      operationId: Mint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Request schema for minting an asset.
+              type: object
+              properties:
+                user:
+                  type: string
+                  example: user1
+                amount:
+                  type: string
+                  example: '100'
+                ledger:
+                  description: Enum for the type of asset being transferred.
+                  type: object
+                  properties:
+                    assetType:
+                      type: string
+                      enum:
+                        - FABRIC
+                        - BESU
+              required:
+                - user
+                - amount
+                - ledger
+      responses:
+        '200':
+          description: Transaction successfully queued
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
+  /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens:
+    post:
+      tags:
+        - approve
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens
+      summary: Submit a transaction intent
+      description: Approves a certain amount to be transferred from the user's account by the bridge.
+      operationId: Approve
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Request schema for approving a transaction.
+              type: object
+              properties:
+                user:
+                  type: string
+                  example: user1
+                amount:
+                  type: string
+                  example: '100'
+                ledger:
+                  description: Enum for the type of asset being transferred.
+                  type: object
+                  properties:
+                    assetType:
+                      type: string
+                      enum:
+                        - FABRIC
+                        - BESU
+              required:
+                - user
+                - amount
+                - ledger
+      responses:
+        '200':
+          description: Transaction successfully queued
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
+  /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved:
+    get:
+      tags:
+        - get-amount-approved
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved
+      summary: Get the amount approved for a transaction
+      description: Get the amount approved for a transaction
+      operationId: GetAmountApproved
+      parameters:
+        - name: user
+          in: query
+          schema:
+            type: string
+        - name: chain
+          in: query
+          schema:
+            type: string
+            enum:
+              - FABRIC
+              - BESU
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '100'
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens:
+    post:
+      tags:
+        - transfer
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens
+      summary: Submit a transaction intent
+      description: Allows users to queue intents for transactions based on specified parameters.
+      operationId: Transfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Request schema for transferring an asset.
+              type: object
+              properties:
+                from:
+                  type: string
+                  example: user1
+                to:
+                  type: string
+                  example: user2
+                sourceChain:
+                  description: Enum for the type of asset being transferred.
+                  type: object
+                  properties:
+                    assetType:
+                      type: string
+                      enum:
+                        - FABRIC
+                        - BESU
+                receiverChain:
+                  description: Enum for the type of asset being transferred.
+                  type: object
+                  properties:
+                    assetType:
+                      type: string
+                      enum:
+                        - FABRIC
+                        - BESU
+                amount:
+                  type: string
+                  example: '100'
+              required:
+                - from
+                - to
+                - amount
+                - sourceChain
+                - receiverChain
+      responses:
+        '200':
+          description: Transaction successfully queued
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
