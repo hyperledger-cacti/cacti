@@ -1935,7 +1935,7 @@ export interface TransactRequest {
      * @type {TransactRequestSourceAsset}
      * @memberof TransactRequest
      */
-    'destinyAsset': TransactRequestSourceAsset;
+    'receiverAsset': TransactRequestSourceAsset;
 }
 /**
  * An asset
