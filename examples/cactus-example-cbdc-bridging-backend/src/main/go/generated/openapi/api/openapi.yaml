@@ -1,0 +1,497 @@
+openapi: 3.0.3
+info:
+  contact:
+    name: Hyperledger Cacti
+  description: |
+    Cactus-Example
+  title: CBDC-example backend API
+  version: 0.0.2
+  x-logo:
+    altText: Cacti logo
+    backgroundColor: '#fafafa'
+    url: https://github.com/hyperledger/cacti/blob/main/images/HL_Cacti_Logo_Color.png
+servers:
+- url: /
+tags:
+- description: API endpoints for interacting with blockchains via gateways
+  name: transaction
+- description: API endpoints for fetching information on SATP sessions
+  name: admin
+paths:
+  /api/v1/@hyperledger/cactus-example-cbdc/transact:
+    post:
+      description: Allows users to queue intents for transactions based on specified
+        parameters.
+      operationId: Transact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactResponse'
+          description: Transaction successfully queued
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: An error occurred
+      summary: Submit a transaction intent
+      tags:
+      - transact
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/transact
+  /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references:
+    get:
+      description: Retrieve the status of a SATP sessions of a gateway
+      operationId: GetSessionsReferences
+      parameters:
+      - description: Unique identifier for the session.
+        explode: true
+        in: query
+        name: Ledger
+        required: false
+        schema:
+          enum:
+          - FABRIC
+          - BESU
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionsReferencesResponse'
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Get SATP current sessions data
+      tags:
+      - get-sessions-references
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references
+  /api/v1/@hyperledger/cactus-example-cbdc/get-balance:
+    get:
+      operationId: GetBalance
+      parameters:
+      - explode: true
+        in: query
+        name: user
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: chain
+        required: false
+        schema:
+          enum:
+          - FABRIC
+          - BESU
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      tags:
+      - get-balance
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-balance
+  /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens:
+    post:
+      description: Allows users to queue intents for transactions based on specified
+        parameters.
+      operationId: Mint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintRequest'
+        required: true
+      responses:
+        "200":
+          description: Transaction successfully queued
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: An error occurred
+      summary: Submit a transaction intent
+      tags:
+      - mint
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens
+  /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens:
+    post:
+      description: Approves a certain amount to be transferred from the user's account
+        by the bridge.
+      operationId: Approve
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveRequest'
+        required: true
+      responses:
+        "200":
+          description: Transaction successfully queued
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: An error occurred
+      summary: Submit a transaction intent
+      tags:
+      - approve
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens
+  /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved:
+    get:
+      description: Get the amount approved for a transaction
+      operationId: GetAmountApproved
+      parameters:
+      - explode: true
+        in: query
+        name: user
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: chain
+        required: false
+        schema:
+          enum:
+          - FABRIC
+          - BESU
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                example: "100"
+                type: string
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Get the amount approved for a transaction
+      tags:
+      - get-amount-approved
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved
+  /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens:
+    post:
+      description: Allows users to queue intents for transactions based on specified
+        parameters.
+      operationId: Transfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+        required: true
+      responses:
+        "200":
+          description: Transaction successfully queued
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: An error occurred
+      summary: Submit a transaction intent
+      tags:
+      - transfer
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens
+components:
+  schemas:
+    TransactRequest:
+      description: "Request schema for initiating a transaction. Includes details\
+        \ such as the transaction context, mode (data or transfer), payload, and information\
+        \ about the source and receiver DLT networks."
+      example:
+        sourceChain:
+          assetType: FABRIC
+        amount: "100"
+        receiver: user2
+        sender: user1
+        receiverChain:
+          assetType: FABRIC
+      properties:
+        sender:
+          example: user1
+          type: string
+        receiver:
+          example: user2
+          type: string
+        sourceChain:
+          $ref: '#/components/schemas/AssetType'
+        receiverChain:
+          $ref: '#/components/schemas/AssetType'
+        amount:
+          example: "100"
+          type: string
+      required:
+      - amount
+      - receiver
+      - receiverChain
+      - sender
+      - sourceChain
+      type: object
+    AssetType:
+      description: Enum for the type of asset being transferred.
+      example:
+        assetType: FABRIC
+      properties:
+        assetType:
+          enum:
+          - FABRIC
+          - BESU
+          type: string
+      type: object
+    TransactResponse:
+      description: Response schema for a transaction request.
+      example:
+        statusResponse:
+          sessionID: 123e4567-e89b-12d3-a456-426614174000
+          status: NOT_FOUND
+      properties:
+        statusResponse:
+          $ref: '#/components/schemas/StatusResponse'
+      required:
+      - statusResponse
+      type: object
+    StatusResponse:
+      description: Response schema for a transaction status request.
+      example:
+        sessionID: 123e4567-e89b-12d3-a456-426614174000
+        status: NOT_FOUND
+      properties:
+        sessionID:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        status:
+          enum:
+          - NOT_FOUND
+          - INVALID
+          - PENDING
+          - DONE
+          - FAILED
+          type: string
+      required:
+      - status
+      type: object
+    APIError:
+      description: An Error
+      example:
+        code: 16384
+        type: bad-request
+        message: Oops there's been an internal error handling
+        status: 500
+        timestamp: 2021-07-21T17:32:28Z
+      properties:
+        type:
+          description: HTTP error type
+          example: bad-request
+          type: string
+        code:
+          description: Numeric error code
+          example: 16384
+          type: integer
+        status:
+          description: HTTP status of the error
+          example: 500
+          type: integer
+        message:
+          description: Long error description
+          example: Oops there's been an internal error handling
+          type: string
+        timestamp:
+          description: Timestamp of the error
+          example: 2021-07-21T17:32:28Z
+          type: string
+      required:
+      - code
+      - message
+      - status
+      - timestamp
+      - type
+      type: object
+      x-category: response
+      x-go-type: ApiError
+      x-go-name: ApiError
+    SessionsReferencesResponse:
+      description: Response schema for a transaction status request.
+      items:
+        $ref: '#/components/schemas/SessionReference'
+      type: array
+    SessionReference:
+      example:
+        receiverLedger: receiverLedger
+        id: 123e4567-e89b-12d3-a456-426614174000
+        sourceLedger: sourceLedger
+        status: status
+      properties:
+        id:
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        status:
+          type: string
+        sourceLedger:
+          type: string
+        receiverLedger:
+          type: string
+      required:
+      - id
+      - receiverLedger
+      - sourceLedger
+      - status
+      type: object
+    BalanceResponse:
+      description: Response schema for an amount request.
+      example:
+        amount: "100"
+      properties:
+        amount:
+          example: "100"
+          type: string
+      required:
+      - amount
+      type: object
+    MintRequest:
+      description: Request schema for minting an asset.
+      example:
+        ledger:
+          assetType: FABRIC
+        amount: "100"
+        user: user1
+      properties:
+        user:
+          example: user1
+          type: string
+        amount:
+          example: "100"
+          type: string
+        ledger:
+          $ref: '#/components/schemas/AssetType'
+      required:
+      - amount
+      - ledger
+      - user
+      type: object
+    ApproveRequest:
+      description: Request schema for approving a transaction.
+      example:
+        ledger:
+          assetType: FABRIC
+        amount: "100"
+        user: user1
+      properties:
+        user:
+          example: user1
+          type: string
+        amount:
+          example: "100"
+          type: string
+        ledger:
+          $ref: '#/components/schemas/AssetType'
+      required:
+      - amount
+      - ledger
+      - user
+      type: object
+    TransferRequest:
+      description: Request schema for transferring an asset.
+      example:
+        sourceChain:
+          assetType: FABRIC
+        amount: "100"
+        receiverChain:
+          assetType: FABRIC
+        from: user1
+        to: user2
+      properties:
+        from:
+          example: user1
+          type: string
+        to:
+          example: user2
+          type: string
+        sourceChain:
+          $ref: '#/components/schemas/AssetType'
+        receiverChain:
+          $ref: '#/components/schemas/AssetType'
+        amount:
+          example: "100"
+          type: string
+      required:
+      - amount
+      - from
+      - receiverChain
+      - sourceChain
+      - to
+      type: object

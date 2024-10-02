@@ -989,7 +989,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       contractName: erc20TokenContract,
       contractAddress: assetContractAddress,
     };
-    const destinyAsset: Asset = {
+    const receiverAsset: Asset = {
       owner: clientId,
       ontology: JSON.stringify(FabricSATPInteraction),
       contractName: satpContractName,
@@ -1005,7 +1005,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       originatorPubkey: assigneeEthAccount.address,
       beneficiaryPubkey: fabricUser.credentials.certificate,
       sourceAsset,
-      destinyAsset,
+      receiverAsset,
     };
 
     const res = await dispatcher?.Transact(req);
