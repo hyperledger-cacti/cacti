@@ -9,11 +9,14 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
-import { bridgeTokens } from "../../api-calls/gateway-api";
+import { transactTokens } from "../../api-calls/gateway-api";
+import FormControl from "@mui/material/FormControl";
+import { InputLabel } from "@mui/material";
 
 const recipients = ["Alice", "Charlie"];
 
 export interface ICrossChainTransferDialogOptions {
+  path: string;
   open: boolean;
   ledger: string;
   user: string;
@@ -70,13 +73,23 @@ export default function CrossChainTransferDialog(
       setErrorMessage("Amounts must be a positive value");
     } else {
       setSending(true);
-      await bridgeTokens(
-        props.user,
-        recipient,
-        props.ledger,
-        props.ledger === "Fabric" ? "Besu" : "Fabric",
-        amount,
-      );
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        setErrorMessage("Invalid ledger");
+        return;
+      }
+
+      if (
+        await transactTokens(
+          props.path,
+          props.user,
+          recipient,
+          props.ledger,
+          props.ledger === "FABRIC" ? "BESU" : "FABRIC",
+          amount.toString(),
+        )
+      ) {
+        window.location.reload();
+      }
     }
 
     props.onClose();
@@ -87,24 +100,39 @@ export default function CrossChainTransferDialog(
       <DialogTitle>{"Cross-Chain Transfer CBDC"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Select the recipient of the tokens and the amount to transfer to the
+          Select the tokens' recipient and the amount to be transferred to the
           other blockchain
         </DialogContentText>
-        <Select
+        <FormControl
           fullWidth
-          name="recipient"
-          value={recipient}
-          label="Recipient"
+          required
           variant="outlined"
-          defaultValue={recipient}
-          onChange={handleChangeRecipient}
+          sx={{ marginBottom: "1rem" }}
         >
-          {recipients.map((user) => (
-            <MenuItem key={user} value={user}>
-              {user}
-            </MenuItem>
-          ))}
-        </Select>
+          <InputLabel shrink={true} id="recipient-label">
+            Recipient
+          </InputLabel>
+          <Select
+            labelId="recipient-label"
+            name="recipient"
+            value={recipient}
+            label="Recipient" // Label prop is used with the InputLabel
+            onChange={handleChangeRecipient}
+            displayEmpty
+            renderValue={(selected) => {
+              if (!selected) {
+                return <em style={{ color: "gray" }}>Select a recipient</em>;
+              }
+              return selected;
+            }}
+          >
+            {recipients.map((user) => (
+              <MenuItem key={user} value={user}>
+                {user}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           required
           fullWidth
@@ -112,7 +140,7 @@ export default function CrossChainTransferDialog(
           id="amount"
           name="amount"
           value={amount}
-          label="amount"
+          label="Amount"
           type="number"
           placeholder="amount"
           variant="outlined"

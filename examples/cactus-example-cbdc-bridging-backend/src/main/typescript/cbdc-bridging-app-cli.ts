@@ -7,7 +7,6 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { ICbdcBridgingApp, CbdcBridgingApp } from "./cbdc-bridging-app";
-import CryptoMaterial from "../../crypto-material/crypto-material.json";
 import "dotenv/config";
 
 export async function launchApp(
@@ -21,7 +20,7 @@ export async function launchApp(
     exampleConfig.authorizationConfigJson,
   ) as unknown as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
- 
+
   const convictConfig =
     await configService.newExampleConfigConvict(exampleConfig);
 
@@ -31,24 +30,6 @@ export async function launchApp(
   const serverOptions = config.getProperties();
 
   LoggerProvider.setLogLevel(serverOptions.logLevel);
-
-  const clientGatewayKeyPair = {
-    privateKey: Uint8Array.from(
-      Buffer.from(CryptoMaterial.gateways["gateway1"].privateKey, "hex"),
-    ),
-    publicKey: Uint8Array.from(
-      Buffer.from(CryptoMaterial.gateways["gateway1"].publicKey, "hex"),
-    ),
-  };
-
-  const serverGatewayKeyPair = {
-    privateKey: Uint8Array.from(
-      Buffer.from(CryptoMaterial.gateways["gateway2"].privateKey, "hex"),
-    ),
-    publicKey: Uint8Array.from(
-      Buffer.from(CryptoMaterial.gateways["gateway2"].publicKey, "hex"),
-    ),
-  };
 
   if (
     process.env.API_HOST == undefined ||
@@ -65,16 +46,16 @@ export async function launchApp(
   }
 
   const appOptions: ICbdcBridgingApp = {
-      apiServer1Port: parseInt(process.env.API_SERVER_1_PORT),
-      apiServer2Port: parseInt(process.env.API_SERVER_2_PORT),
-      apiHost: process.env.API_HOST,
-      apiGateway1ServerPort: parseInt(process.env.API_GATEWAY_1_SERVER_PORT),
-      apiGateway1ClientPort: parseInt(process.env.API_GATEWAY_1_CLIENT_PORT),
-      apiGateway1BloPort: parseInt(process.env.API_GATEWAY_1_BLO_PORT),
-      apiGateway2ServerPort: parseInt(process.env.API_GATEWAY_2_SERVER_PORT),
-      apiGateway2ClientPort: parseInt(process.env.API_GATEWAY_2_CLIENT_PORT),
-      apiGateway2BloPort: parseInt(process.env.API_GATEWAY_2_BLO_PORT),
-      logLevel: "DEBUG",
+    apiServer1Port: parseInt(process.env.API_SERVER_1_PORT),
+    apiServer2Port: parseInt(process.env.API_SERVER_2_PORT),
+    apiHost: process.env.API_HOST,
+    apiGateway1ServerPort: parseInt(process.env.API_GATEWAY_1_SERVER_PORT),
+    apiGateway1ClientPort: parseInt(process.env.API_GATEWAY_1_CLIENT_PORT),
+    apiGateway1BloPort: parseInt(process.env.API_GATEWAY_1_BLO_PORT),
+    apiGateway2ServerPort: parseInt(process.env.API_GATEWAY_2_SERVER_PORT),
+    apiGateway2ClientPort: parseInt(process.env.API_GATEWAY_2_CLIENT_PORT),
+    apiGateway2BloPort: parseInt(process.env.API_GATEWAY_2_BLO_PORT),
+    logLevel: "DEBUG",
   };
 
   const cbdcBridgingApp = new CbdcBridgingApp(appOptions);
