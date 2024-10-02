@@ -235,7 +235,7 @@ TransactRequest:
     - beneficiaryPubkey
     - originatorPubkey
     - sourceAsset
-    - destinyAsset
+    - receiverAsset
   properties:
     contextID:
       type: string
@@ -262,7 +262,7 @@ TransactRequest:
       type: string
     sourceAsset:
       $ref: ./schemas.yml#/Asset
-    destinyAsset:
+    receiverAsset:
       $ref: ./schemas.yml#/Asset
 
 
