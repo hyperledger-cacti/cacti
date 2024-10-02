@@ -727,7 +727,7 @@ export class ApiServer {
 
     const crpcMiddlewareHandler = expressConnectMiddleware({
       routes: crpcRoutesHandler,
-    });
+    }) as unknown as RequestHandler; // FIXME this cast is not safe
 
     return { svcCount, crpcMiddlewareHandler };
   }

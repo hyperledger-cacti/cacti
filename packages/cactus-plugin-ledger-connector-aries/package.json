@@ -75,10 +75,10 @@
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-rc.7",
     "@types/body-parser": "1.19.4",
-    "@types/express": "4.17.21",
+    "@types/express": "5.0.0",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
-    "express": "4.20.0",
+    "express": "4.21.0",
     "jest": "29.6.2",
     "jest-extended": "4.0.1",
     "socket.io": "4.6.2",

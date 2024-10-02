@@ -60,7 +60,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.11.2",
+    "@grpc/grpc-js": "1.11.3",
     "@hyperledger/cactus-common": "2.0.0-rc.7",
     "ajv": "8.17.1",
     "ajv-draft-04": "1.0.0",
@@ -72,7 +72,7 @@
     "@bufbuild/protobuf": "1.10.0",
     "@connectrpc/connect": "1.4.0",
     "@grpc/proto-loader": "0.7.13",
-    "@types/express": "4.17.21",
+    "@types/express": "5.0.0",
     "@types/google-protobuf": "3.15.5",
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
