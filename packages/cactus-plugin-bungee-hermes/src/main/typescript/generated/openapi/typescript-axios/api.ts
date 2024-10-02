@@ -185,8 +185,7 @@ export interface MergeViewsResponse {
  */
 
 export const PrivacyPolicyOpts = {
-    PruneState: 'pruneState',
-    SingleTransaction: 'singleTransaction'
+    PruneState: 'pruneState'
 } as const;
 
 export type PrivacyPolicyOpts = typeof PrivacyPolicyOpts[keyof typeof PrivacyPolicyOpts];

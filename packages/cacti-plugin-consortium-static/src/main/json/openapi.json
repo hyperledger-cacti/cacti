@@ -132,7 +132,8 @@
           "BURROW_0X",
           "CORDA_4X",
           "FABRIC_2",
-          "SAWTOOTH_1X"
+          "SAWTOOTH_1X",
+          "ETHEREUM"
         ]
       },
       "CactusNodeMeta": {

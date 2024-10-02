@@ -33,9 +33,9 @@ export class PrivacyPolicies {
       case PrivacyPolicyOpts.PruneState:
         return this.pruneState;
         break;
-      case PrivacyPolicyOpts.SingleTransaction:
-        return this.singleTransaction;
-        break;
+      // case PrivacyPolicyOpts.SingleTransaction:
+      //   return this.singleTransaction;
+      //   break;
       default:
         return undefined;
         break;

@@ -28,8 +28,8 @@
       "PrivacyPolicyOpts": {
         "description": "identifier of the policy used to process a view",
         "type": "string",
-        "enum": ["pruneState", "singleTransaction"],
-        "x-enum-varnames": ["PruneState", "SingleTransaction"]
+        "enum": ["pruneState"],
+        "x-enum-varnames": ["PruneState"]
       },
       "MergePolicyOpts": {
         "description": "identifier of the policy used to merge views (can be none)",

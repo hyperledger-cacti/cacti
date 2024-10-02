@@ -24,6 +24,7 @@ const (
 	BESU_2_X LedgerType = "BESU_2X"
 	BURROW_0_X LedgerType = "BURROW_0X"
 	CORDA_4_X LedgerType = "CORDA_4X"
+	ETHEREUM LedgerType = "ETHEREUM"
 	FABRIC_2 LedgerType = "FABRIC_2"
 	SAWTOOTH_1_X LedgerType = "SAWTOOTH_1X"
 )
@@ -34,6 +35,7 @@ var AllowedLedgerTypeEnumValues = []LedgerType{
 	"BESU_2X",
 	"BURROW_0X",
 	"CORDA_4X",
+	"ETHEREUM",
 	"FABRIC_2",
 	"SAWTOOTH_1X",
 }

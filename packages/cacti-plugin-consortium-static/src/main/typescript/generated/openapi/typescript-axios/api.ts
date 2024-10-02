@@ -313,7 +313,8 @@ export const LedgerType = {
     Burrow0X: 'BURROW_0X',
     Corda4X: 'CORDA_4X',
     Fabric2: 'FABRIC_2',
-    Sawtooth1X: 'SAWTOOTH_1X'
+    Sawtooth1X: 'SAWTOOTH_1X',
+    Ethereum: 'ETHEREUM'
 } as const;
 
 export type LedgerType = typeof LedgerType[keyof typeof LedgerType];
