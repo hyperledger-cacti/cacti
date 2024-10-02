@@ -7,6 +7,12 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
+    inputs:
+      GIT_TAG_TO_PUBLISH:
+        description: 'The specific git tag to publish'
+        required: false
+        default: ''
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -16,8 +22,17 @@ jobs:
   build-and-publish-packages:
     runs-on: ubuntu-22.04
     steps:
+      - name: Print Workflow inputs.GIT_TAG_TO_PUBLISH
+        run: |
+          echo "inputs.GIT_TAG_TO_PUBLISH=${{ inputs.GIT_TAG_TO_PUBLISH }}" 
+
       - uses: actions/checkout@v4.1.7
+        with:
+          ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
+      
       - run: git fetch --unshallow --prune
+
+      - run: git status --long --verbose
 
       - uses: actions/setup-node@v4.0.3
         with:
@@ -35,6 +50,10 @@ jobs:
           FULL_BUILD_DISABLED: false
           JEST_TEST_RUNNER_DISABLED: true
           TAPE_TEST_RUNNER_DISABLED: true
+
+      - name: Check npm whoami with --registry set to npmjs
+        continue-on-error: true
+        run: npm whoami --registry=https://registry.npmjs.org/
 
       - name: lerna-publish-npm
         env:
@@ -60,14 +79,29 @@ jobs:
           scope: "@hyperledger"
 
       - run: cat /home/runner/work/_temp/.npmrc
-  
+
+      # Re-initialize the registries so that the @iroha2 scope gets configured in .npmrc
+      - run: yarn run init-registries
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - name: Check npm whoami with no --registry parameter.
+        continue-on-error: true
+        run: npm whoami
+
+      - name: Check npm whoami with --registry set to GHCR
+        continue-on-error: true
+        run: npm whoami --registry=https://npm.pkg.github.com/
+
+      - name: Configure git user and email
+        run: |
+          git config --global user.email "npm-ci@hyperledger.org"
+          git config --global user.name "hyperledger-ghci"
+
       # We run the publish script a second time after having reconfigured the registry to be GHCR
       # instead of npmjs.org so that we can publish the packages everywhere.
       - name: lerna-publish-ghcr
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.email "npm-ci@hyperledger.org"
-          git config --global user.name "hyperledger-ghci"
-          npm whoami
           yarn lerna publish from-git --yes --loglevel=debug --ignore-scripts
