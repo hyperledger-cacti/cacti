@@ -1,28 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Ledger from "../components/Ledger";
-// import {
-//   checkApiServer1Connection,
-//   checkApiServer2Connection,
-// } from "../api-calls/common";
 import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/Help";
 import ConnectionErrorDialog from "../components/dialogs/ConnectionErrorDialog";
 
-export default function HomePage() {
+export interface IHomePageOptions {
+  path: string;
+}
+export default function HomePage(props: IHomePageOptions) {
   const [errorDialog, setErrorDialog] = useState<boolean>(false);
-
-  useEffect(() => {
-    // const checkConnection = async () => {
-    //   await checkApiServer1Connection()
-    //     .then(() => setErrorDialog(false))
-    //     .catch(() => setErrorDialog(true));
-    //   await checkApiServer2Connection()
-    //     .then(() => setErrorDialog(false))
-    //     .catch(() => setErrorDialog(true));
-    // };
-    // checkConnection();
-  }, []);
 
   return (
     <div style={{ width: "95%", margin: "4rem auto" }}>
@@ -35,13 +22,13 @@ export default function HomePage() {
         }}
       >
         <Grid item sm={12} md={5}>
-          <Ledger ledger={"Fabric"} />
+          <Ledger path={props.path} ledger={"FABRIC"} />
         </Grid>
         <Grid item sm={12} md={2}>
           <BridgeImage />
         </Grid>
         <Grid item sm={12} md={5}>
-          <Ledger ledger={"Besu"} />
+          <Ledger path={props.path} ledger={"BESU"} />
         </Grid>
       </Grid>
       <ConnectionErrorDialog

@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  title: CBDC-example backend API
+  version: 0.0.2
+  description: |
+    Cactus-Example
+  contact:
+    name: Hyperledger Cacti
+  x-logo:
+    altText: Cacti logo
+    backgroundColor: '#fafafa'
+    url: https://github.com/hyperledger/cacti/blob/main/images/HL_Cacti_Logo_Color.png
+tags:
+  - name: transaction
+    description: API endpoints for interacting with blockchains via gateways
+  - name: admin
+    description: API endpoints for fetching information on SATP sessions
+paths:
+  /api/v1/@hyperledger/cactus-example-cbdc/transact:
+    post:
+      tags:
+        - transact
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/transact
+      summary: Submit a transaction intent
+      description: Allows users to queue intents for transactions based on specified parameters.
+      operationId: Transact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/TransactRequest
+      responses:
+        '200':
+          description: Transaction successfully queued
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/TransactResponse
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
+  /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references:
+    get:
+      tags:
+          - get-sessions-references
+      summary: Get SATP current sessions data
+      description: Retrieve the status of a SATP sessions of a gateway
+      operationId: GetSessionsReferences
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references
+      parameters:
+        - name: Ledger
+          in: query
+          schema:
+            type: string
+            enum:
+              - FABRIC
+              - BESU
+          description: Unique identifier for the session.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/SessionsReferencesResponse
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-example-cbdc/get-balance:
+      get:
+        tags:
+          - get-balance
+        x-hyperledger-cacti:
+          http:
+            verbLowerCase: get
+            path: /api/v1/@hyperledger/cactus-example-cbdc/get-balance
+        operationId: GetBalance
+        parameters:
+            - name: user
+              in: query
+              schema:
+                type: string
+            - name: chain
+              in: query
+              schema:
+                type: string
+                enum:
+                  - FABRIC
+                  - BESU
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: ./schemas.yml#/BalanceResponse
+          '400':
+            description: Bad request
+          '404':
+            description: Transaction not found
+          '500':
+            description: Internal server error
+  /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens:
+    post:
+      tags:
+        - mint
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens
+      summary: Submit a transaction intent
+      description: Allows users to queue intents for transactions based on specified parameters.
+      operationId: Mint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/MintRequest
+      responses:
+        '200':
+          description: Transaction successfully queued
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
+  /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens:
+    post:
+      tags:
+        - approve
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens
+      summary: Submit a transaction intent
+      description: Approves a certain amount to be transferred from the user's account by the bridge.
+      operationId: Approve
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/ApproveRequest
+      responses:
+        '200':
+          description: Transaction successfully queued
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
+  /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved:
+    get:
+      tags:
+      - get-amount-approved
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved
+      summary: Get the amount approved for a transaction
+      description: Get the amount approved for a transaction
+      operationId: GetAmountApproved
+      parameters:
+        - name: user
+          in: query
+          schema:
+            type: string
+        - name: chain
+          in: query
+          schema:
+            type: string
+            enum:
+              - FABRIC
+              - BESU
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "100"
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens:
+    post:
+      tags:
+        - transfer
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens
+      summary: Submit a transaction intent
+      description: Allows users to queue intents for transactions based on specified parameters.
+      operationId: Transfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/TransferRequest
+      responses:
+        '200':
+          description: Transaction successfully queued
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
