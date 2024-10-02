@@ -74,15 +74,6 @@ jobs:
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record
           } >> urls.txt
 
-      - name: Show file content
-        run: |
-          pwd
-          ls -la
-          cat urls.txt
-
-      # TODO: Clean up comments
-      # TODO: Remove --debug flag
-
       - run: yarn generate-api-server-config
 
       - run: jq '.authorizationProtocol = "NONE"' .config.json > .config2.json && mv .config2.json .config.json
@@ -104,20 +95,14 @@ jobs:
           docker run -d -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger/cactus-besu-all-in-one:2022-04-14-dda3f00
           until curl --fail -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545; do sleep 5;  done
 
-      # - run: |
-      #     touch ~/nuclei-github-config.yaml \
-      #     && echo -e "severity: critical,high" >> ~/nuclei-github-config.yaml \
-      #     && echo -e "github:" >> ~/nuclei-github-config.yaml \
-      #     && echo -e "  username: \"$GITHUB_ACTOR\"" >> ~/nuclei-github-config.yaml \
-      #     && echo -e "  owner: \"${GITHUB_REPOSITORY%%/*}\"" >> ~/nuclei-github-config.yaml \
-      #     && echo -e "  token: \"${{ inputs.github-token }}\"" >> ~/nuclei-github-config.yaml \
-      #     && echo -e "  project-name: \"${GITHUB_REPOSITORY#*/}\"" >> ~/nuclei-github-config.yaml \
-      #     && echo -e "  issue-label: \"Nuclei\"" >> ~/nuclei-github-config.yaml \
-      #     && echo "githubconfig=-rc ~/nuclei-github-config.yaml" >> $GITHUB_ENV
+      - name: Print API Server Config File - ./.config.json
+        run: cat .config.json
 
-      #   shell: bash
+      - name: Print Nuclei Config File - ./.nuclei-config.yaml
+        run: cat .nuclei-config.yaml
 
-      # - run: ls -alt
+      - name: Print Nuclei URL List File - ./urls.txt
+        run: cat urls.txt
 
       - name: Start API Server & Run DAST
         uses: BerniWittmann/background-server-action@v1.1.0
@@ -130,21 +115,13 @@ jobs:
           build: yarn --version
           start: yarn start:api-server
           command: "nuclei -update-templates --config=.nuclei-config.yaml --list=urls.txt --sarif-export ~/nuclei.sarif --output nuclei.log"
+          command-windows: echo "The project build is not supported on the Windows operating system. Please use Linux or macOS"
           wait-on: "https://localhost:4000/api/v1/api-server/healthcheck"
           # wait for 10 minutes for the server to respond
           wait-on-timeout: 120
-
-      - run: pwd
-
-      - run: ls -alt
 
       - name: GitHub Workflow artifacts
         uses: actions/upload-artifact@v3.0.0
         with:
           name: nuclei.log
           path: nuclei.log
-
-      # - name: GitHub Security Dashboard Alerts update
-      #   uses: github/codeql-action/upload-sarif@v1
-      #   with:
-      #     sarif_file: ~/nuclei.sarif
