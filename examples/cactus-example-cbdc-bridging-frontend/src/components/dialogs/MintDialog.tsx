@@ -7,10 +7,10 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
-import { mintTokensFabric } from "../../api-calls/fabric-api";
-import { mintTokensBesu } from "../../api-calls/besu-api";
+import { mintTokens } from "../../api-calls/ledgers-api";
 
 export interface IMintDialogOptions {
+  path: string;
   open: boolean;
   user: string;
   ledger: string;
@@ -48,10 +48,20 @@ export default function MintDialog(props: IMintDialogOptions) {
       setErrorMessage("Amount must be a positive value");
     } else {
       setSending(true);
-      if (props.ledger === "Fabric") {
-        await mintTokensFabric(props.user, amount.toString());
-      } else {
-        await mintTokensBesu(props.user, amount);
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        setErrorMessage("Invalid ledger");
+        return;
+      }
+
+      if (
+        await mintTokens(
+          props.path,
+          props.ledger,
+          props.user,
+          amount.toString(),
+        )
+      ) {
+        window.location.reload();
       }
       props.onClose();
     }

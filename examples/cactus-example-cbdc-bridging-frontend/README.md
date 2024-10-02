@@ -17,7 +17,13 @@ docker run -p 2000:2000 cbdc-app-frontend
 ### Running in debug mode
 
 ```
-npm start
+yarn start
+```
+### Config Variables  
+
+```
+PORT=2000 // port where the frontend will be running
+REACT_APP_BACKEND_PATH=http://localhost:9999 // set this to the path where the cbdc backend is running
 ```
 
 Runs the app in the development mode.\

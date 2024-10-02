@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "declaration": true,
     "composite": true,
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",
@@ -46,7 +48,7 @@
   ],
   "include": [
     "./src",
-    "src/**/*.json"
+    "src/**/*.json",
   ],
   "exclude": [
     "./src/fabric-contracts"

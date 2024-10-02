@@ -4,42 +4,47 @@ import Grid from "@mui/material/Grid";
 import ActionsContainer from "./ActionsContainer";
 import CircularProgress from "@mui/material/CircularProgress";
 import { getSessionReferencesBridge } from "../api-calls/gateway-api";
-import { fetchAmountApprovedToBridge as fetchAmountApprovedToBridgeFabric } from "../api-calls/fabric-api";
-import { fetchAmountApprovedToBridge as fetchAmountApprovedToBridgeBesu } from "../api-calls/besu-api";
+import { fetchAmountApprovedToBridge as fetchAmountApprovedToBridge } from "../api-calls/ledgers-api";
 import SessionReferencesTable from "./SessionReferencesTable";
 import ApprovalsTable from "./ApprovalsTable";
+import { SessionReference } from "@hyperledger/cactus-example-cbdc-bridging-backend/src/main/typescript/types";
 
 export interface ILedgerOptions {
+  path: string;
   ledger: string;
 }
 
 export default function Ledger(props: ILedgerOptions) {
-  const [sessionReferences, setAssetReferences] = useState([]);
+  const [sessionReferences, setAssetReferences] = useState<SessionReference[]>(
+    [],
+  );
   const [aliceApprovals, setAliceApprovals] = useState(0);
   const [charlieApprovals, setCharlieApprovals] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      if (props.ledger === "Fabric") {
-        const list = await getSessionReferencesBridge("4010");
-        setAssetReferences(list);
-
-        const alice = await fetchAmountApprovedToBridgeFabric("Alice");
-        setAliceApprovals(alice);
-
-        const charlie = await fetchAmountApprovedToBridgeFabric("Charlie");
-        setCharlieApprovals(charlie);
-      } else {
-        const list = await getSessionReferencesBridge("4110");
-        setAssetReferences(list);
-
-        const alice = await fetchAmountApprovedToBridgeBesu("Alice");
-        setAliceApprovals(alice);
-
-        const charlie = await fetchAmountApprovedToBridgeBesu("Charlie");
-        setCharlieApprovals(charlie);
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        console.log("Invalid ledger");
+        return;
       }
+      const list = await getSessionReferencesBridge(props.path, props.ledger);
+      setAssetReferences(list);
+
+      const alice = await fetchAmountApprovedToBridge(
+        props.path,
+        props.ledger,
+        "Alice",
+      );
+
+      setAliceApprovals(alice ?? 0);
+
+      const charlie = await fetchAmountApprovedToBridge(
+        props.path,
+        props.ledger,
+        "Charlie",
+      );
+      setCharlieApprovals(charlie ?? 0);
       setLoading(false);
     }
 
@@ -59,6 +64,7 @@ export default function Ledger(props: ILedgerOptions) {
       <Grid container spacing={2}>
         <Grid item sm={12} md={6}>
           <ActionsContainer
+            path={props.path}
             user={"Alice"}
             ledger={props.ledger}
             sessionRefs={sessionReferences}
@@ -67,6 +73,7 @@ export default function Ledger(props: ILedgerOptions) {
         </Grid>
         <Grid item sm={12} md={6}>
           <ActionsContainer
+            path={props.path}
             user={"Charlie"}
             ledger={props.ledger}
             sessionRefs={sessionReferences}

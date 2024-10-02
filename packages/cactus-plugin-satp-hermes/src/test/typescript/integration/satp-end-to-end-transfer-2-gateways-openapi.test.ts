@@ -1068,7 +1068,7 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
       contractName: erc20TokenContract,
       contractAddress: assetContractAddress,
     };
-    const destinyAsset: Asset = {
+    const receiverAsset: Asset = {
       owner: clientId,
       ontology: JSON.stringify(FabricSATPInteraction),
       contractName: satpContractName,
@@ -1084,7 +1084,7 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
       originatorPubkey: assigneeEthAccount.address,
       beneficiaryPubkey: fabricUser.credentials.certificate,
       sourceAsset,
-      destinyAsset,
+      receiverAsset,
     };
 
     const address = options1.gid!.address!;

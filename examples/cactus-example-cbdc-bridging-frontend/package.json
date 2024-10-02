@@ -30,10 +30,10 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "start": "react-scripts start",
-    "test": "react-scripts test"
+    "build": "react-app-rewired build",
+    "eject": "react-app-rewired eject",
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test"
   },
   "browserslist": {
     "production": [
@@ -47,14 +47,30 @@
       "last 1 safari version"
     ]
   },
+  "contributors": [
+    {
+      "name": "Eduardo Vasques",
+      "email": "eduardovasques10@tecnico.ulisboa.pt"
+    },
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt"
+    },
+    {
+      "name": "Carlos Amaro",
+      "email": "carlosrscamaro@tecnico.ulisboa.pt"
+    }
+  ],
   "dependencies": {
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
-    "@mui/icons-material": "5.14.19",
-    "@mui/material": "5.14.19",
+    "@hyperledger/cactus-example-cbdc-bridging-backend": "2.0.0-rc.7",
+    "@mui/icons-material": "6.1.1",
+    "@mui/material": "6.1.1",
     "@testing-library/jest-dom": "5.17.0",
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "13.5.0",
+    "@types/copy-webpack-plugin": "^10.1.0",
     "@types/jest": "27.5.2",
     "@types/node": "18.11.9",
     "@types/react": "18.2.39",
@@ -62,14 +78,25 @@
     "axios": "1.8.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
     "react-router-dom": "6.2.1",
     "react-scripts": "5.0.1",
-    "typescript": "5.5.2",
+    "style-loader": "^4.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
     "uuid": "10.0.0",
-    "web-vitals": "2.1.4"
+    "webpack": "^5.94.0",
+    "webpack-cli": "5.1.4",
+    "webpack-dev-server": "^5.1.0"
   },
   "devDependencies": {
-    "@types/uuid": "10.0.0"
+    "@types/customize-cra": "^1",
+    "@types/uuid": "10.0.0",
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.2.1",
+    "ts-loader": "^9.5.1"
   },
   "engines": {
     "node": ">=18",

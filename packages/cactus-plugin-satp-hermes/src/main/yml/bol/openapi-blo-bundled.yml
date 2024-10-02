@@ -65,7 +65,7 @@ paths:
                 - beneficiaryPubkey
                 - originatorPubkey
                 - sourceAsset
-                - destinyAsset
+                - receiverAsset
               properties:
                 contextID:
                   type: string
@@ -110,7 +110,7 @@ paths:
                       type: string
                     channelName:
                       type: string
-                destinyAsset:
+                receiverAsset:
                   description: An asset
                   type: object
                   required:
@@ -2155,7 +2155,7 @@ components:
         - beneficiaryPubkey
         - originatorPubkey
         - sourceAsset
-        - destinyAsset
+        - receiverAsset
       properties:
         contextID:
           type: string
@@ -2200,7 +2200,7 @@ components:
               type: string
             channelName:
               type: string
-        destinyAsset:
+        receiverAsset:
           description: An asset
           type: object
           required:

@@ -1,5 +1,4 @@
 import { AddressInfo } from "net";
-import { v4 as uuidv4 } from "uuid";
 import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
@@ -41,7 +40,6 @@ export interface ICbdcBridgingApp {
   apiGateway2ClientPort: number;
   apiGateway2BloPort: number;
 
-
   logLevel?: LogLevelDesc;
   apiServerOptions?: ICactusApiServerOptions;
   disableSignalHandlers?: true;
@@ -77,7 +75,7 @@ export class CbdcBridgingApp {
     });
   }
 
-  public async start()/*: Promise<IStartInfo> */{
+  public async start() /*: Promise<IStartInfo> */ {
     this.log.debug(`Starting CBDC Bridging App...`);
 
     if (!this.options.disableSignalHandlers) {
@@ -111,30 +109,29 @@ export class CbdcBridgingApp {
         server: fabricServer,
       };
       addressInfoA = (await Servers.listen(listenOptions)) as AddressInfo;
-          
+
       await fabricPlugin.getOrCreateWebServices();
       await fabricPlugin.registerWebServices(expressApp);
-
     }
 
-  {    
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    expressApp.use(cors());
-    const besuServer = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: this.options.apiHost,
-      port: this.options.apiServer2Port,
-      server: besuServer,
-    };
-    addressInfoB = (await Servers.listen(listenOptions)) as AddressInfo;
-    await besuPlugin.getOrCreateWebServices();
-    const wsApi = new SocketIoServer(besuServer, {
-      path: Constants.SocketIoConnectionPathV1,
-    });
-    await besuPlugin.registerWebServices(expressApp, wsApi);
-  }
-   
+    {
+      const expressApp = express();
+      expressApp.use(bodyParser.json({ limit: "250mb" }));
+      expressApp.use(cors());
+      const besuServer = http.createServer(expressApp);
+      const listenOptions: IListenOptions = {
+        hostname: this.options.apiHost,
+        port: this.options.apiServer2Port,
+        server: besuServer,
+      };
+      addressInfoB = (await Servers.listen(listenOptions)) as AddressInfo;
+      await besuPlugin.getOrCreateWebServices();
+      const wsApi = new SocketIoServer(besuServer, {
+        path: Constants.SocketIoConnectionPathV1,
+      });
+      await besuPlugin.registerWebServices(expressApp, wsApi);
+    }
+
     const nodeApiHostA = `http://${this.options.apiHost}:${addressInfoA.port}`;
     const nodeApiHostB = `http://${this.options.apiHost}:${addressInfoB.port}`;
 
@@ -146,23 +143,24 @@ export class CbdcBridgingApp {
       new Configuration({ basePath: nodeApiHostB }),
     );
 
+    this.infrastructure.setFabricApi(fabricApiClient);
+    this.infrastructure.setBesuApi(besuApiClient);
+
     this.log.info("Deploying chaincode and smart contracts...");
 
-    await this.infrastructure.deployFabricSATPContract(fabricApiClient);
+    await this.infrastructure.deployFabricSATPContract();
 
-    await this.infrastructure.deployFabricWrapperContract(
-      fabricApiClient,
-    );
+    await this.infrastructure.deployFabricWrapperContract();
     this.log.info("Fabric Chaincode Deployed");
-    await this.infrastructure.deployBesuContracts(besuApiClient);
+    await this.infrastructure.deployBesuContracts();
 
-    await this.infrastructure.initializeContractsAndAddPermitions(fabricApiClient, besuApiClient);
+    await this.infrastructure.initializeContractsAndAddPermitions();
 
     this.log.info(`Chaincode and smart Contracts deployed.`);
 
     const gatways = await this.infrastructure.createSATPGateways();
 
-    for(const gateway of gatways){
+    for (const gateway of gatways) {
       await gateway.startup();
     }
 
@@ -229,8 +227,6 @@ export class CbdcBridgingApp {
 export interface IStartInfo {
   readonly apiServer1: ApiServer;
   readonly apiServer2: ApiServer;
-  //readonly fabricGatewayApi: SatpApi;
-  //readonly besuGatewayApi: SatpApi;
   readonly besuApiClient: BesuApi;
   readonly fabricApiClient: FabricApi;
   readonly fabricSatpGateway: SATPGateway;

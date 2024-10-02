@@ -9,17 +9,18 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
-import { transferTokensFabric } from "../../api-calls/fabric-api";
-import { transferTokensBesu } from "../../api-calls/besu-api";
+import { transferTokens } from "../../api-calls/ledgers-api";
+import { FormControl, InputLabel } from "@mui/material";
 
 const recipients = ["Alice", "Charlie"];
 
 export interface ITransferDialogOptions {
+  path: string;
   open: boolean;
   ledger: string;
   user: string;
   balance: number;
-  onClose: () => any;
+  onClose: () => unknown;
 }
 
 export default function TransferDialog(props: ITransferDialogOptions) {
@@ -68,10 +69,21 @@ export default function TransferDialog(props: ITransferDialogOptions) {
     } else {
       setSending(true);
 
-      if (props.ledger === "Fabric") {
-        await transferTokensFabric(props.user, recipient, amount.toString());
-      } else {
-        await transferTokensBesu(props.user, recipient, amount);
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        setErrorMessage("Invalid ledger");
+        return;
+      }
+
+      if (
+        await transferTokens(
+          props.path,
+          props.ledger,
+          props.user,
+          recipient,
+          amount.toString(),
+        )
+      ) {
+        window.location.reload();
       }
     }
     props.onClose();
@@ -82,23 +94,38 @@ export default function TransferDialog(props: ITransferDialogOptions) {
       <DialogTitle>{"Transfer CBDC"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Select the recipient of the tokens and the amount to transfer
+          Select the tokens' recipient and the amount to be transferred
         </DialogContentText>
-        <Select
+        <FormControl
           fullWidth
-          name="recipient"
-          value={recipient}
-          label="Recipient"
+          required
           variant="outlined"
-          defaultValue={recipient}
-          onChange={handleChangeRecipient}
+          sx={{ marginBottom: "1rem" }}
         >
-          {recipients.map((user) => (
-            <MenuItem key={user} value={user}>
-              {user}
-            </MenuItem>
-          ))}
-        </Select>
+          <InputLabel shrink={true} id="recipient-label">
+            Recipient
+          </InputLabel>
+          <Select
+            labelId="recipient-label"
+            name="recipient"
+            value={recipient}
+            label="Recipient" // Label prop is used with the InputLabel
+            onChange={handleChangeRecipient}
+            displayEmpty
+            renderValue={(selected) => {
+              if (!selected) {
+                return <em style={{ color: "gray" }}>Select a recipient</em>;
+              }
+              return selected;
+            }}
+          >
+            {recipients.map((user) => (
+              <MenuItem key={user} value={user}>
+                {user}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           required
           fullWidth
