@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": ["../../tsconfig.base.json"],
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -8,6 +8,7 @@
       "esnext"
     ],
     "allowJs": true,
+    "allowArbitraryExtensions": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -19,12 +20,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-cbdc-bridging-frontend.tsbuildinfo"
   },
   "include": [
     "src",
-    "src/**/*.json"
+    "src/**/*.json",
   ],
   "references": [
     {
@@ -35,6 +37,9 @@
     },
     {
       "path": "../../packages/cactus-plugin-satp-hermes/tsconfig.json"
+    },
+    {
+      "path": "../cactus-example-cbdc-bridging-backend/tsconfig.json"
     }
   ]
 }
