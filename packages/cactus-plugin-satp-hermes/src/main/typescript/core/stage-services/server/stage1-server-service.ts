@@ -12,9 +12,7 @@ import {
   LockType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 // eslint-disable-next-line prettier/prettier
-import {
-  ACCEPTANCE,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { ACCEPTANCE } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
