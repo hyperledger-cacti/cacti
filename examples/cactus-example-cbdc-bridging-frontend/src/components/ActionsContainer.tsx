@@ -5,14 +5,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import MintDialog from "./dialogs/MintDialog";
 import CrossChainTransferDialog from "./dialogs/CrossChainTransferDialog";
 import TransferDialog from "./dialogs/TransferDialog";
-import PermissionDialog from "./dialogs/PermissionDialog";
-import { getFabricBalance } from "../api-calls/fabric-api";
-import { getBesuBalance } from "../api-calls/besu-api";
-import { SessionReference } from "../models/SessionReference";
+import ApprovalDialog from "./dialogs/ApprovalDialog";
+import { getBalance } from "../api-calls/ledgers-api";
+import { SessionReference } from "@hyperledger/cactus-example-cbdc-bridging-backend/src/main/typescript/types";
 import { NormalButton } from "./buttons/NormalButton";
 import { CriticalButton } from "./buttons/CriticalButton";
 
 export interface IActionsContainerOptions {
+  path: string;
   user: string;
   ledger: string;
   sessionRefs: Array<SessionReference>;
@@ -23,21 +23,20 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
   const [amount, setAmount] = useState(0);
   const [mintDialog, setMintDialog] = useState(false);
   const [transferDialog, setTransferDialog] = useState(false);
+  const [, setErrorMessage] = useState<string>("");
   const [crossChainTransferDialog, setCrossChainTransferDialog] =
     useState(false);
-  const [permissionDialog, setGivePermissionDialog] = useState(false);
+  const [approvalDialog, setGiveApprovalDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      let response;
-      if (props.ledger === "Fabric") {
-        response = await getFabricBalance(props.user);
-        setAmount(response);
-      } else if (props.ledger === "Besu") {
-        response = await getBesuBalance(props.user);
-        setAmount(response);
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        setErrorMessage("Invalid ledger");
+        return;
       }
+      const response = await getBalance(props.path, props.ledger, props.user);
+      setAmount(response);
       setLoading(false);
     }
 
@@ -103,7 +102,7 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
-                disabled={amount === 0}
+                disabled={amount <= 0}
                 onClick={() => setTransferDialog(true)}
               >
                 Transfer
@@ -113,7 +112,7 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
-                disabled={amount === 0}
+                disabled={amount <= 0}
                 onClick={() => setTransferDialog(true)}
               >
                 Transfer
@@ -124,8 +123,8 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <Grid item xs={12} lg={6}>
               <CriticalButton
                 variant="contained"
-                disabled={amount === 0}
-                onClick={() => setGivePermissionDialog(true)}
+                disabled={amount <= 0}
+                onClick={() => setGiveApprovalDialog(true)}
               >
                 Approval
               </CriticalButton>
@@ -135,7 +134,7 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <Grid item xs={12} lg={6}>
               <CriticalButton
                 variant="contained"
-                disabled={amount === 0 || props.tokensApproved == 0}
+                disabled={amount <= 0 || props.tokensApproved == 0}
                 onClick={() => setCrossChainTransferDialog(true)}
               >
                 Bridge
@@ -151,12 +150,14 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
         </Grid>
       )}
       <MintDialog
+        path={props.path}
         open={mintDialog}
         user={props.user}
         ledger={props.ledger}
         onClose={() => setMintDialog(false)}
       />
       <TransferDialog
+        path={props.path}
         open={transferDialog}
         user={props.user}
         ledger={props.ledger}
@@ -164,18 +165,20 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
         onClose={() => setTransferDialog(false)}
       />
       <CrossChainTransferDialog
+        path={props.path}
         open={crossChainTransferDialog}
         user={props.user}
         ledger={props.ledger}
         tokensApproved={props.tokensApproved}
         onClose={() => setCrossChainTransferDialog(false)}
       />
-      <PermissionDialog
-        open={permissionDialog}
+      <ApprovalDialog
+        path={props.path}
+        open={approvalDialog}
         user={props.user}
         ledger={props.ledger}
         balance={amount}
-        onClose={() => setGivePermissionDialog(false)}
+        onClose={() => setGiveApprovalDialog(false)}
       />
     </Paper>
   );

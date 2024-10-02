@@ -26,7 +26,7 @@ export function populateClientSessionData(
   session: SATPSession,
   version: string,
   sourceContractAddress: string | undefined,
-  destinyContractAddress: string | undefined,
+  receiverContractAddress: string | undefined,
   originatorPubkey: string,
   beneficiaryPubkey: string,
   senderGatewayNetworkId: string,
@@ -47,12 +47,12 @@ export function populateClientSessionData(
   toAmount: string,
   sourceMspId: string,
   sourceChannelName: string,
-  destinyMspId: string,
-  destinyChannelName: string,
+  receiverMspId: string,
+  receiverChannelName: string,
   sourceContractName: string,
-  destinyContractName: string,
+  receiverContractName: string,
   sourceOwner: string,
-  destinyOwner: string,
+  receiverOwner: string,
 ): SATPSession {
   const fn = "session_utils#populateClientSessionData";
   const sessionData = session.getClientSessionData();
@@ -91,14 +91,14 @@ export function populateClientSessionData(
 
   const receiverAsset: Asset = new Asset();
   receiverAsset.tokenId = "";
-  receiverAsset.owner = destinyOwner;
+  receiverAsset.owner = receiverOwner;
   receiverAsset.ontology = receiverContractOntology;
-  receiverAsset.contractName = destinyContractName;
-  receiverAsset.contractAddress = destinyContractAddress || "";
+  receiverAsset.contractName = receiverContractName;
+  receiverAsset.contractAddress = receiverContractAddress || "";
   receiverAsset.amount = BigInt(toAmount);
 
-  receiverAsset.mspId = destinyMspId;
-  receiverAsset.channelName = destinyChannelName;
+  receiverAsset.mspId = receiverMspId;
+  receiverAsset.channelName = receiverChannelName;
   sessionData.receiverAsset = receiverAsset;
 
   //todo check THis

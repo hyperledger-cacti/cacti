@@ -4,7 +4,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { SessionReference } from "../models/SessionReference";
+import { SessionReference } from "@hyperledger/cactus-example-cbdc-bridging-backend/src/main/typescript/types";
 
 const headCells = [
   {
@@ -76,8 +76,8 @@ export default function SessionReferencesTable(
                   </TableCell>
                   <TableCell align="center">{row.status}</TableCell>
                   <TableCell align="center">{row.substatus}</TableCell>
-                  <TableCell align="center">{row.originLedger}</TableCell>
-                  <TableCell align="center">{row.destinyLedger}</TableCell>
+                  <TableCell align="center">{row.sourceLedger}</TableCell>
+                  <TableCell align="center">{row.receiverLedger}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
