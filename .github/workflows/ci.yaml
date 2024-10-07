@@ -16,9 +16,11 @@ env:
   RUN_CODE_COVERAGE: true
 jobs:
   ActionLint:
+    needs: check-ci-skip
     uses: ./.github/workflows/actionlint.yaml
   DCI-Lint:
     name: DCI-Lint
+    needs: check-ci-skip
     runs-on: ubuntu-22.04
     steps:
       - id: lint-git-repo
@@ -29,7 +31,15 @@ jobs:
       - name: Get the output response
         run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
 
+  check-ci-skip:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Check CI Skip
+        run: node tools/ci-skip-for-maintainers.js ${{ github.event.pull_request.url }} ${{ github.event.pull_request.user.login }}
+
   check-coverage:
+    needs: check-ci-skip
     outputs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
@@ -40,6 +50,7 @@ jobs:
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
 
   compute_changed_packages:
+    needs: check-ci-skip
     outputs:
       cmd-api-server-changed: ${{ steps.changes.outputs.cmd-api-server-changed }}
       plugin-ledger-connector-polkadot-changed: ${{ steps.changes.outputs.plugin-ledger-connector-polkadot-changed }}
@@ -164,6 +175,7 @@ jobs:
               # - './.github/workflows/ci.yaml'
 
   build-dev:
+    needs: check-ci-skip
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -2627,6 +2639,7 @@ jobs:
           ignore-unfixed: false
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+
 name: Cactus_CI
 'on':
   pull_request:
