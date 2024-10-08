@@ -4,7 +4,7 @@ This page presents different patterns that some plugin applications follow. Whil
 
 ## Browser App / Persistence Plugin Apps
 
-These applications rely heavily on the existence of Cacti persistence plugins, such as [cactus-plugin-persistence-ethereum](https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-persistence-ethereum) or [cactus-plugin-persistence-fabric](https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-persistence-fabric).
+These applications rely heavily on the existence of Cacti persistence plugins, such as [cactus-plugin-persistence-ethereum](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-persistence-ethereum) or [cactus-plugin-persistence-fabric](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-persistence-fabric).
 
 As the name suggests, persistence plugins store the ledger state in an SQL database (e.g., PostgreSQL managed by Supabase). They synchronize all blocks, transactions, token operations, etc., into the database for later use and push new data as it arrives.
 

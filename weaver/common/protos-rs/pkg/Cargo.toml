@@ -5,8 +5,8 @@ authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad
 edition = "2021"
 license = "Apache-2.0"
 description = "Rust compiled Weaver protobuf package"
-documentation = "https://github.com/hyperledger/cacti/tree/main/weaver/rfcs/formats"
-repository = "https://github.com/hyperledger/cacti/"
+documentation = "https://github.com/hyperledger-cacti/cacti/tree/main/weaver/rfcs/formats"
+repository = "https://github.com/hyperledger-cacti/cacti/"
 readme = "README.md"
 keywords = ["cacti", "weaver", "interoperability", "protobuf", "protos"]
 

@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= cacti-weaver-relay
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger
-GIT_URL = https://github.com/hyperledger/cacti/weaver
+GIT_URL = https://github.com/hyperledger-cacti/cacti/weaver
 
 PROTOS_TAG ?= v1.4.2
 

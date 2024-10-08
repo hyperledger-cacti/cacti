@@ -5,7 +5,7 @@
  -->
 # Cross-Network Identity Management
 
-Enabling two independent networks/ledgers to interoperate requires the establishment of trust on the basis of the identities of the main participants (stakeholders) of each network. The cross-network identity management required for this trust establishment must itself be as decentralized as possible and adhere to blockchain/DLT tenets. In this folder, we implement the cross-network architecture described in the [Weaver identity RFCs](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/models/identity/network-identity-management.md).
+Enabling two independent networks/ledgers to interoperate requires the establishment of trust on the basis of the identities of the main participants (stakeholders) of each network. The cross-network identity management required for this trust establishment must itself be as decentralized as possible and adhere to blockchain/DLT tenets. In this folder, we implement the cross-network architecture described in the [Weaver identity RFCs](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/models/identity/network-identity-management.md).
 
 The fulcra of this architecture that are external to the interoperating networks are the IINs, or Interoperable Identity Networks (an adaptation of a generic distributed identity registry). Though our specifications allow integration with any form of distributed identity registry (with some augmentations), we provide in the [iin](./iin) folder a reference implementation of an ideal IIN.
 

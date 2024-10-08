@@ -53,7 +53,7 @@ Once the last command has finished executing, open link printed on the console w
 ## Documentation
 
 * [Project Wiki](https://wiki.hyperledger.org/display/cactus): Schedule and logs of the maintainer meetings
-* [Understanding and Using](https://hyperledger.github.io/cacti/cactus/introduction/): Description of components and instructions for usage and testing
+* [Understanding and Using](https://hyperledger-cacti.github.io/cacti/cactus/introduction/): Description of components and instructions for usage and testing
 * [Whitepaper](./whitepaper/whitepaper.md): The official document on Cactus design specifications (_Note_: this is deprecated. We are working on a new version.)
 * [Contributing](./CONTRIBUTING.md): How to get from an idea to an approved pull request
 * [Build](./BUILD.md): Instructions on how to set up the project for development

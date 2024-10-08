@@ -127,7 +127,7 @@ dependencies {
   implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.0.0-rc.2")
 }
 ```
-(Or check out the [package website](https://github.com/hyperledger/cacti/packages/1856827) and select a different version.)
+(Or check out the [package website](https://github.com/hyperledger-cacti/cacti/packages/1856827) and select a different version.)
   
 #### For Identity Administration
 
@@ -171,7 +171,7 @@ Consider a scenario inspired by the [global trade use case](../../user-stories/g
 
 (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded in the vault of `trade-finance-network`. We will see how to do this in the [Startup and Bootstrap Weaver Components](#startup-and-bootstrap-weaver-components) section later.)
 
-You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [cacti-weaver-sdk-corda](https://github.com/hyperledger/cacti/packages/1856827) library. The following code sample illustrates this:
+You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [cacti-weaver-sdk-corda](https://github.com/hyperledger-cacti/cacti/packages/1856827) library. The following code sample illustrates this:
 
 ```kt
 import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
@@ -410,8 +410,8 @@ The asset exchange mode currently requires only the Interoperation CorDapp modul
 
 After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
 
-- [org.hyperledger.cacti.weaver.imodule.corda.interop-contracts](https://github.com/hyperledger/cacti/packages/1856825)
-- [org.hyperledger.cacti.weaver.imodule.corda.interop-workflows](https://github.com/hyperledger/cacti/packages/1856826)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-contracts](https://github.com/hyperledger-cacti/cacti/packages/1856825)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-workflows](https://github.com/hyperledger-cacti/cacti/packages/1856826)
 
 | Notes |
 |:------|
@@ -425,8 +425,8 @@ Both the data sharing and asset transfer modes require the Interoperation CorDap
 
 After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
 
-- [org.hyperledger.cacti.weaver.imodule.corda.interop-contracts](https://github.com/hyperledger/cacti/packages/1856825)
-- [org.hyperledger.cacti.weaver.imodule.corda.interop-workflows](https://github.com/hyperledger/cacti/packages/1856826)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-contracts](https://github.com/hyperledger-cacti/cacti/packages/1856825)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-workflows](https://github.com/hyperledger-cacti/cacti/packages/1856826)
 
 | Notes |
 |:------|
@@ -436,9 +436,9 @@ After bootstrapping the nodes folder, copy the following two CorDapps in `build/
 
 You need to run one or more relays for network-to-network communication. Here we provide instructions to run one relay running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple relays, which will be useful from a failover perspective.)
 
-Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
+Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
 
-- `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
+- `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
   ```
   PATH_TO_CONFIG=./config.toml
   RELAY_NAME=<"name" in config.toml>
@@ -451,9 +451,9 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
     - The `RELAY_PORT` variable specifies the port this relay server will listen on. It should match what's specified in the `config.toml` (more on that below).
     - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
-    - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server).
+    - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-relay-server).
 
-  For more details, see the [Relay Docker README](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
+  For more details, see the [Relay Docker README](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
 - `config.toml`: This is the file specified in the `PATH_TO_CONFIG` variable in the `.env`. It specifies properties of this relay and the driver(s) it supports. A sample is given below:
   ```toml
@@ -515,7 +515,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
   | You can specify more than one foreign relay instance in the `relays` section. |
   | You can specify more than one driver instance in the `drivers` section. |
 
-- `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/docker-compose.yaml) verbatim.
+- `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/docker-compose.yaml) verbatim.
 
 To start the relay server, navigate to the folder containing the above files and run the following:
 ```bash
@@ -526,9 +526,9 @@ docker compose up -d relay-server
 
 You need to run one or more drivers through which your relay can interact with your Corda network. Here we provide instructions to run one Corda driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Corda network.)
 
-Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-driver-corda) for the Corda driver. Before launching a container, you just need to customize the container configuration for your Corda network, which you can do by simply configuring the following:
+Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-driver-corda) for the Corda driver. Before launching a container, you just need to customize the container configuration for your Corda network, which you can do by simply configuring the following:
 
-- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.docker.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/corda-driver/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
+- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.docker.template` file [from the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/corda-driver/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
   ```
   NETWORK_NAME=<container-name-suffix>
   DRIVER_PORT=<driver-server-port>
@@ -553,9 +553,9 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - **Enabling TLS**:
         - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
         - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
-        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/corda-driver/credentials` folder in the Fabric Driver container as specified in the [docker compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
+        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/corda-driver/credentials` folder in the Fabric Driver container as specified in the [docker compose file](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
 
-- `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/corda-driver/docker-compose.yml) verbatim.
+- `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/corda-driver/docker-compose.yml) verbatim.
 
 To start the driver, navigate to the folder containing the above files and run the following:
 ```bash
@@ -564,7 +564,7 @@ docker compose up -d
 
 #### Vault Initialization
 
-To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the [Corda SDK](https://github.com/hyperledger/cacti/packages/1856827) (`org.hyperledger.cacti.weaver.sdk.corda.weaver-sdk-corda`):
+To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the [Corda SDK](https://github.com/hyperledger-cacti/cacti/packages/1856827) (`org.hyperledger.cacti.weaver.sdk.corda.weaver-sdk-corda`):
 
 - **Access control policies**:
   Let's take the example of the request made from `trade-finance-network` to `trade-logistics-network` for a B/L earlier in this document. `trade-logistics-network` can have a policy of the following form permitting access to the `GetBillOfLading` function from a client representing the `PartyA` node in `trade-finance-network` as follows:
@@ -614,7 +614,7 @@ To prepare your network for interoperation with a foreign network, you need to r
   |:------|
   | If the remote network is built on Corda, the resource specified in the access control policy can be used here as the `pattern`, with different node names specified in the `criteria`. |
 
-  You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function `VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)`, where `proxy` is an instance of `CordaRPCOps` as described in previous sections, and `verificationPolicyProto` is an object of protobuf `org.hyperledger.cacti.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy`. You can examine the full proto structure [here](https://github.com/hyperledger/cacti/blob/main/weaver/common/protos/common/verification_policy.proto). (_Google's protobuf library can be used to convert above JSON to protobuf object._)
+  You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function `VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)`, where `proxy` is an instance of `CordaRPCOps` as described in previous sections, and `verificationPolicyProto` is an object of protobuf `org.hyperledger.cacti.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy`. You can examine the full proto structure [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/common/protos/common/verification_policy.proto). (_Google's protobuf library can be used to convert above JSON to protobuf object._)
 
   | Notes |
   |:------|

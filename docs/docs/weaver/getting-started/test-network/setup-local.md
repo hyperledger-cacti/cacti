@@ -175,7 +175,7 @@ Follow the instructions below to build and launch the networks:
 | If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local` |
 | If you wish to enable end-to-end confidentiality by default in the interoperation modules that are deployed during network launch, set the environment variable `E2E_CONFIDENTIALITY` to `true` in the command line as follows: `E2E_CONFIDENTIALITY=true make start-interop-local` |
 
-For more information, refer to the associated [README](https://github.com/hyperledger/cacti/tree/main/weaver/tests/network-setups/fabric/dev).
+For more information, refer to the associated [README](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/tests/network-setups/fabric/dev).
 
 **Troubleshooting Tips**:
 
@@ -321,7 +321,7 @@ Run a relay for `network2` as follows (_do this only if you have launched both F
   RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
   ```
 
-For more information, see the [relay README](https://github.com/hyperledger/cacti/tree/main/weaver/core/relay).
+For more information, see the [relay README](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/core/relay).
 
 
 ### Fabric Driver
@@ -864,7 +864,7 @@ Follow the instructions below to build and launch the networks:
 |:------|
 | If you do not wish to test Besu-Besu interoperation, you can choose to launch only one of the two networks. For `Network1`, run `make start-network1`, and for `Network2`, run `make start-network2` |
 
-For more information, refer to the associated [README](https://github.com/hyperledger/cacti/tree/main/weaver/tests/network-setups/besu).
+For more information, refer to the associated [README](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/tests/network-setups/besu).
 
 ### Contracts
 

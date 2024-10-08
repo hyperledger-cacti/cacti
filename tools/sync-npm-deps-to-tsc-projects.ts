@@ -45,7 +45,7 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
       "**/weaver/common/protos-js/**",
       "**/weaver/samples/besu/simpleasset/**",
       "**/weaver/samples/besu/simplestate/**",
-    ], // Follow-up issue regarding these hardcoded paths (https://github.com/hyperledger/cacti/issues/3366)
+    ], // Follow-up issue regarding these hardcoded paths (https://github.com/hyperledger-cacti/cacti/issues/3366)
   };
   const pkgJsonPaths = await globby(pkgJsonGlobPatterns, globbyOptions);
   console.log(`Package paths (${pkgJsonPaths.length}): `, pkgJsonPaths);

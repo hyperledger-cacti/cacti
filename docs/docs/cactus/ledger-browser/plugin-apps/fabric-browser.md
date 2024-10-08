@@ -21,13 +21,13 @@ Additionally, you'll need a `PostgreSQL connection string` to start the persiste
 
 ##### Expose custom schema
 
-Fabric data is stored in a custom schema named `fabric`. To access this data from our GUI application, you need to ensure the schema is exposed. If you're using our [supabase-all-in-one](https://github.com/hyperledger/cacti/tree/main/tools/docker/supabase-all-in-one) image, all application schemas, including `fabric`, are already exposed, so you can skip this step. However, if you're using Supabase Cloud, you'll need to go to the [API settings](https://supabase.com/dashboard/project/_/settings/api) and add `fabric` to the `Exposed schemas` list.
+Fabric data is stored in a custom schema named `fabric`. To access this data from our GUI application, you need to ensure the schema is exposed. If you're using our [supabase-all-in-one](https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/supabase-all-in-one) image, all application schemas, including `fabric`, are already exposed, so you can skip this step. However, if you're using Supabase Cloud, you'll need to go to the [API settings](https://supabase.com/dashboard/project/_/settings/api) and add `fabric` to the `Exposed schemas` list.
 
 For more details, refer to [the full guide on custom schemas](https://supabase.com/docs/guides/api/using-custom-schemas) (note that the necessary SQL code has already been executed during the persistence plugin schema setup).
 
 #### Fabric Ledger (Optional)
 
-This step is optional as you can use any running Fabric ledger. However, for testing purposes, you may use our [fabric-all-in-one](https://github.com/hyperledger/cacti/tree/main/tools/docker/fabric-all-in-one). To start it, execute the following commands from the root of your project:
+This step is optional as you can use any running Fabric ledger. However, for testing purposes, you may use our [fabric-all-in-one](https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/fabric-all-in-one). To start it, execute the following commands from the root of your project:
 
 ```shell
 # Build
@@ -39,7 +39,7 @@ docker run --detach --privileged --publish-all --name faio2x-testnet faio2x
 
 ### Persistence Plugin
 
-Follow the instructions in the [plugin README file](https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-persistence-fabric).
+Follow the instructions in the [plugin README file](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-persistence-fabric).
 
 To quickly set up the plugin for your Fabric ledger, run the complete setup script:
 

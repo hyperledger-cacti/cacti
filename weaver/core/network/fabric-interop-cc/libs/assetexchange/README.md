@@ -38,8 +38,8 @@ Atleast following 5 functions needs to be added in chaincode (Note: the function
       return contractId, nil
   }
   ```
-  Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements). 
-  Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
+  Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements). 
+  Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
   
 2. **LockFungibleAsset**
   ```go
@@ -55,7 +55,7 @@ Atleast following 5 functions needs to be added in chaincode (Note: the function
       return contractId, nil
   }
   ```
-  Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+  Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
   
 3. **IsAssetLockedQueryUsingContractId**
   ```go
