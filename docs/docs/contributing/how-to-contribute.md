@@ -1,6 +1,6 @@
 # How to Contribute
 
-The Hyperledger Cacti repository contains [specific instructions](https://github.com/hyperledger/cacti/blob/main/CONTRIBUTING.md) for contributing to that project.
+The Hyperledger Cacti repository contains [specific instructions](https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md) for contributing to that project.
 
 In this section, you will find generic instructions and guidelines for contributing to any Hyperledger project.
 

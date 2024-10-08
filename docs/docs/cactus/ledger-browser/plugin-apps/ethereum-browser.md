@@ -22,13 +22,13 @@ Additionally, you'll need a `PostgreSQL connection string` to start the persiste
 
 ##### Expose custom schema
 
-Fabric data is stored in a custom schema named `ethereum`. To access this data from our GUI application, you need to ensure the schema is exposed. If you're using our [supabase-all-in-one](https://github.com/hyperledger/cacti/tree/main/tools/docker/supabase-all-in-one) image, all application schemas, including `ethereum`, are already exposed, so you can skip this step. However, if you're using Supabase Cloud, you'll need to go to the [API settings](https://supabase.com/dashboard/project/_/settings/api) and add `ethereum` to the `Exposed schemas` list.
+Fabric data is stored in a custom schema named `ethereum`. To access this data from our GUI application, you need to ensure the schema is exposed. If you're using our [supabase-all-in-one](https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/supabase-all-in-one) image, all application schemas, including `ethereum`, are already exposed, so you can skip this step. However, if you're using Supabase Cloud, you'll need to go to the [API settings](https://supabase.com/dashboard/project/_/settings/api) and add `ethereum` to the `Exposed schemas` list.
 
 For more details, refer to [the full guide on custom schemas](https://supabase.com/docs/guides/api/using-custom-schemas) (note that the necessary SQL code has already been executed during the persistence plugin schema setup).
 
 #### Ethereum Ledger (Optional)
 
-This step is optional as you can use any running Ethereum ledger. However, for testing purposes, you may use our [geth-all-in-one](https://github.com/hyperledger/cacti/tree/main/tools/docker/geth-all-in-one). To start it, execute the following commands from the root of your project:
+This step is optional as you can use any running Ethereum ledger. However, for testing purposes, you may use our [geth-all-in-one](https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/geth-all-in-one). To start it, execute the following commands from the root of your project:
 
 ```shell
 # Build
@@ -40,7 +40,7 @@ docker run --rm --name geth_aio_testnet --detach -p 8545:8545 -p 8546:8546 cactu
 
 ### Persistence Plugin
 
-Follow the instructions in the [plugin README file](https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-persistence-ethereum).
+Follow the instructions in the [plugin README file](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-persistence-ethereum).
 
 To quickly set up the plugin for your Ethereum ledger, run the sample setup script:
 

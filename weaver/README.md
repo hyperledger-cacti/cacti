@@ -7,8 +7,8 @@
 
 <div align="center">
 
-[![Data Sharing Status](https://github.com/hyperledger/cacti/actions/workflows/test_data-sharing.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_data-sharing.yml) [![Asset Transfer Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-transfer.yml)  
-[![Fabric Asset Exchange Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-fabric.yml) [![Corda Asset Exchange Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-corda.yml) [![Besu Asset Exchange Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-besu.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-besu.yml)
+[![Data Sharing Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_data-sharing.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_data-sharing.yml) [![Asset Transfer Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-transfer.yml)  
+[![Fabric Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-fabric.yml) [![Corda Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-corda.yml) [![Besu Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-besu.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-besu.yml)
 
 </div>
 
@@ -51,8 +51,8 @@ For more details and illustrations, see the [project overview](./OVERVIEW.md).
 Weaver can be used to link business workflows (implemented as smart contracts or decentralized applications) spanning multiple independent permissioned ledgers, in effect scaling up the reach and impact of those processes without sacrificing decentralized operation and network sovereignty.
 
 Two popular categories of enterprise applications in which blockchain or distributed ledger technology play a major role today and which need interoperability support of the kind Weaver offers are:
-- [Global Trade](https://hyperledger.github.io/cacti/weaver/user-stories/global-trade/)
-- [Financial Markets](https://hyperledger.github.io/cacti/weaver/user-stories/financial-markets/)
+- [Global Trade](https://hyperledger-cacti.github.io/cacti/weaver/user-stories/global-trade/)
+- [Financial Markets](https://hyperledger-cacti.github.io/cacti/weaver/user-stories/financial-markets/)
 
 ## Weaver Support Status
 The table below shows what interoperation capabilities (or use cases) are presently supported by Weaver, and what DLTs the platform offers out-of-the-box components for.
@@ -66,8 +66,8 @@ Prominent features in our future roadmap are:
 - Support the use cases of cross-network transaction invocations (i.e., instructions) and event dissemination (publish/subscribe).
 
 ## Documentation
-- Blockchain practitioners who wish to understand what Weaver offers, use Weaver capabilities, or experiment with the code, should check the [Documentation](https://hyperledger.github.io/cacti/weaver/introduction/).
-- To dive straight into running a basic setup and testing sample interoperation scenarios, start with the [Getting Started guide](https://hyperledger.github.io/cacti/weaver/getting-started/guide/).
+- Blockchain practitioners who wish to understand what Weaver offers, use Weaver capabilities, or experiment with the code, should check the [Documentation](https://hyperledger-cacti.github.io/cacti/weaver/introduction/).
+- To dive straight into running a basic setup and testing sample interoperation scenarios, start with the [Getting Started guide](https://hyperledger-cacti.github.io/cacti/weaver/getting-started/guide/).
 
 ## Repository Structure
 - Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs and found in the [rfcs folder](./rfcs).

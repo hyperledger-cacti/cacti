@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= cacti-weaver-driver-corda
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger
-GIT_URL = https://github.com/hyperledger/cacti/weaver/core/drivers/corda-driver
+GIT_URL = https://github.com/hyperledger-cacti/cacti/weaver/core/drivers/corda-driver
 
 COMPOSE_ARG ?=
 

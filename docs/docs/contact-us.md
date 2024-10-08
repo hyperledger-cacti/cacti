@@ -6,4 +6,4 @@ You can contact us or seek help through the following channels:
   * Cacti contributors: [https://discord.com/channels/905194001349627914/908379338716631050](https://discord.com/channels/905194001349627914/908379338716631050)
   * Hyperledger: [https://discord.com/invite/hyperledger](https://discord.com/invite/hyperledger)
 
-The maintainers are [listed](https://github.com/hyperledger/cacti/blob/main/MAINTAINERS.md) in the GitHub repository.
+The maintainers are [listed](https://github.com/hyperledger-cacti/cacti/blob/main/MAINTAINERS.md) in the GitHub repository.

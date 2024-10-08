@@ -65,7 +65,7 @@ To deploy, run `make deploy`
 
 * Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
-* Copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc, check image details here: [cacti-weaver-fabric-driver](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-fabric-driver)).
+* Copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc, check image details here: [cacti-weaver-fabric-driver](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-fabric-driver)).
 * Make sure connection profile used for docker, containers correct hostnames instead of localhost in urls.
 * If deploying more than one driver on same host, make sure to change service name in docker compose to avoid conflicts.
 * Finally run `docker compose up -d` to deploy the fabric driver.
@@ -101,7 +101,7 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 
 **For docker-compose:***
 
-* `DOCKER_IMAGE_NAME`, and `DOCKER_TAG` needs to specified based on [cacti-weaver-fabric-driver](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-fabric-driver) image.
+* `DOCKER_IMAGE_NAME`, and `DOCKER_TAG` needs to specified based on [cacti-weaver-fabric-driver](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-fabric-driver) image.
 * `DRIVER_PORT` is the driver server port.
 * `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
 

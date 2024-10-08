@@ -120,7 +120,7 @@ To push image to github container registry:
     - `DRIVER_RPC_PASSWORD`: Password for the above RPC user.
     - `EXTERNAL_NETWORK`: Name of the docker network in which the Corda containers are deployed.
     - `DOCKER_IMAGE_NAME`: _Keep this unchanged_.
-    - `DOCKER_TAG`: Refer here for the image tags available: [cacti-weaver-driver-corda](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-driver-corda)
+    - `DOCKER_TAG`: Refer here for the image tags available: [cacti-weaver-driver-corda](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-driver-corda)
     - `COMPOSE_PROJECT_NAME`: Docker project name for the Corda network to which this driver is supposed to attach. By default, the folder name of the Corda network's `docker-compose.yml`, is the project name.
     - `COMPOSE_PROJECT_NETWORK`: Docker project network name for the Corda network to which this driver is supposed to attach. By default, `default` is the project network name.
     - `RELAY_TLS`: Boolean flag indicating whether or not the local relay requires TLS connections

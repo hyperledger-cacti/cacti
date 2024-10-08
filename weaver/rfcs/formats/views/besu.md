@@ -76,4 +76,4 @@ message BesuView {
 }
 ```
 
-You can find the besu view_data.proto file [here](https://github.com/hyperledger/cacti/blob/main/weaver/common/protos/besu/view_data.proto).
+You can find the besu view_data.proto file [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/common/protos/besu/view_data.proto).

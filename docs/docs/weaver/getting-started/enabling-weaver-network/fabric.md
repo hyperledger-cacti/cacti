@@ -107,8 +107,8 @@ Below, we list the template functions with sample code that you, as a developer,
            return contractId, nil
        }
        ```
-       Here `assetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
-       Similarly `lockInfoSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
+       Here `assetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+       Similarly `lockInfoSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
     2. **LockFungibleAsset**
        ```go
        func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
@@ -123,7 +123,7 @@ Below, we list the template functions with sample code that you, as a developer,
            return contractId, nil
        }
        ```
-       Here `fungibleAssetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+       Here `fungibleAssetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
     3. **IsAssetLockedQueryUsingContractId**
        ```go
        func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
@@ -169,7 +169,7 @@ Below, we list the template functions with sample code that you, as a developer,
   }
   ```
 
-  There is an alternative API to implement asset exchange using this library, which doesn't involve contract IDs. For details, see the [Asset Exchange Library README](https://github.com/hyperledger/cacti/blob/main/weaver/core/network/fabric-interop-cc/libs/assetexchange/README.md#without-contractid).
+  There is an alternative API to implement asset exchange using this library, which doesn't involve contract IDs. For details, see the [Asset Exchange Library README](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/network/fabric-interop-cc/libs/assetexchange/README.md#without-contractid).
         
 - _Using the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v2)_: This method requires the Fabric Interoperation Chaincode to be installed on all peers of the channel, using a special chaincode ID (e.g., `interop`, which is what we will use later in this document). Your application chaincode needs to implement the interface `github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2`.
   In your smart contract's `go.mod`, add the following in the `require` section (update the version to the latest Cacti version):
@@ -207,8 +207,8 @@ Below, we list the template functions with sample code that you, as a developer,
            return contractId, nil
        }
        ```
-       Here `assetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
-       Similarly `lockInfoSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
+       Here `assetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+       Similarly `lockInfoSerializedProto64` is a serialized protobuf in Base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
     2. **LockFungibleAsset**
        ```go
        func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
@@ -223,7 +223,7 @@ Below, we list the template functions with sample code that you, as a developer,
            return contractId, nil
        }
        ```
-       Here `fungibleAssetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+       Here `fungibleAssetExchangeAgreementSerializedProto64` is a serialized protobuf in Base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
     3. **IsAssetLockedQueryUsingContractId**
        ```go
        func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
@@ -284,7 +284,7 @@ To import and use the Weaver SDK, you need to add the following dependency to th
 ```json
 "@hyperledger/cacti-weaver-sdk-fabric": "latest",
 ```
-(Instead of `latest`, you can select a particular version from the [package website](https://github.com/hyperledger/cacti/pkgs/npm/cacti-weaver-sdk-fabric).)
+(Instead of `latest`, you can select a particular version from the [package website](https://github.com/hyperledger-cacti/cacti/pkgs/npm/cacti-weaver-sdk-fabric).)
 
 Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in GitHub. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
 
@@ -327,7 +327,7 @@ Consider a scenario inspired by the [global trade use case](../../user-stories/g
       
 (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded on `tradefinancechannel` in `trade-finance-network`. We will see how to do this in the "Startup and Boostrap" section later.)
 
-You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [cacti-weaver-sdk-fabric](https://github.com/hyperledger/cacti/pkgs/npm/cacti-weaver-sdk-fabric) library (there's an [equivalent library in Golang](https://github.com/hyperledger/cacti/releases/tag/weaver%2Fsdks%2Ffabric%2Fgo-sdk%2Fv2.0.0-rc.2) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
+You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [cacti-weaver-sdk-fabric](https://github.com/hyperledger-cacti/cacti/pkgs/npm/cacti-weaver-sdk-fabric) library (there's an [equivalent library in Golang](https://github.com/hyperledger-cacti/cacti/releases/tag/weaver%2Fsdks%2Ffabric%2Fgo-sdk%2Fv2.0.0-rc.2) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
 ```js
 const ihelper = require('@hyperledger/cacti-weaver-sdk-fabric').InteroperableHelper;
 const interopcc = <handle-to-fabric-interop-chaincode>;   // Use Fabric SDK functions: (new Gateway()).getNetwork(...).getContract(<fabric-interop-chaincode-id>)
@@ -527,9 +527,9 @@ Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., th
 
 You need to run one or more relays for network-to-network communication. Here we provide instructions to run one relay running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple relays, which will be useful from a failover perspective.)
 
-Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
+Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
 
-- `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
+- `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
   ```
   PATH_TO_CONFIG=./config.toml
   RELAY_NAME=<"name" in config.toml>
@@ -544,7 +544,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
     - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](ility/pkgs/container/weaver-relay-server).
 
-    For more details, see the [Relay Docker README](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
+    For more details, see the [Relay Docker README](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
 - `config.toml`: This is the file specified in the `PATH_TO_CONFIG` variable in the `.env`. It specifies properties of this relay and the driver(s) it supports. A sample is given below:
   ```toml
@@ -606,7 +606,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
   | You can specify more than one foreign relay instance in the `relays` section. |
   | You can specify more than one driver instance in the `drivers` section. |
 
-- `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/docker-compose.yaml) verbatim.
+- `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/docker-compose.yaml) verbatim.
 
 To start the relay server, navigate to the folder containing the above files and run the following:
 ```bash
@@ -617,9 +617,9 @@ docker compose up -d relay-server
 
 You need to run one or more drivers through which your relay can interact with your Fabric network. Here we provide instructions to run one Fabric driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Fabric network, like private data collections.)
 
-Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-driver-fabric) for the Fabric driver. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `driver_config`) and configuring the following files in it:
+Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-driver-fabric) for the Fabric driver. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `driver_config`) and configuring the following files in it:
 
-- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.docker.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
+- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.docker.template` file [from the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/fabric-driver/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
   ```
   CONNECTION_PROFILE=<path_to_connection_profile>
   DRIVER_CONFIG=./config.json
@@ -647,7 +647,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - **Enabling TLS**:
         - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
         - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
-        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
+        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker compose file](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
 
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
   ```json
@@ -675,7 +675,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
   |:------|
   | If your connection profile already contains specifications for a CA server, you can leave the `<ca-service-endpoint>` value as a blank. |
 
-- `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml) verbatim.
+- `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml) verbatim.
 
 To start the driver, navigate to the folder containing the above files and run the following:
 ```bash
@@ -686,7 +686,7 @@ docker compose up -d
 
 You need to run one IIN Agent for each organization in the Fabric network channel you are enabling Weaver in. This agent runs a protocol with other organizations' agents and with targeted foreign networks' agents to sync and record foreign networks' memberships to the channel ledger.
 
-Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-iin-agent) for the IIN Agent. Before launching a container, you just need to customize its configuration for your Fabric network organization, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
+Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-iin-agent) for the IIN Agent. Before launching a container, you just need to customize its configuration for your Fabric network organization, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
 
 - `config.json`: This contains settings used to connect to a Fabric network organization and its CA (part of the organization's MSP). A sample is given below:
   ```
@@ -753,7 +753,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
   }
   ```
 
-- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
+- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/identity-management/iin-agent/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
   ```
   IIN_AGENT_PORT=<iin-agent-server-port>
   IIN_AGENT_TLS=<true/false>
@@ -786,13 +786,13 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
     - `WEAVER_CONTRACT_ID`: Contract ID for DLT specific Weaver interoperation module installed on network
     - `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
     - `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
-    - `DOCKER_TAG`: Set this to the desired version of the Weaver IIN Agent [docker image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-iin-agent)
+    - `DOCKER_TAG`: Set this to the desired version of the Weaver IIN Agent [docker image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-iin-agent)
     - `EXTERNAL_NETWORK`: Set to the network [name](https://docs.docker.com/compose/networking/) of your Fabric network.
     - **Enabling TLS**:
         - Make your IIN Agent accept TLS connections by specifying `IIN_AGENT_TLS` as `true` and specifying a TLS certificate file path and private key file path in `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` respectively. The same certificate should be specified in this agent's JSON object in another agent's `dnsconfig.json` file under the appropriate security domain and IIN Agent ID scope.
-        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/opt/iinagent/credentials` folder in the IIN Agent container as specified in the [docker compose file](https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` variables respectively.
+        - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/opt/iinagent/credentials` folder in the IIN Agent container as specified in the [docker compose file](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` variables respectively.
 
-- `docker-compose.yaml`: This specifies the properties of the IIN agent container. You can use the [file in the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml) verbatim.
+- `docker-compose.yaml`: This specifies the properties of the IIN agent container. You can use the [file in the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/identity-management/iin-agent/docker-compose.yml) verbatim.
 
 Now to start the IIN agent, navigate to the folder containing the above files and run the following:
 ```bash

@@ -95,7 +95,7 @@ Follow the instructions below to build and launch the networks:
 | If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2` |
 | If you wish to enable end-to-end confidentiality by default in the interoperation modules that are deployed during network launch, set the environment variable `E2E_CONFIDENTIALITY` to `true` in the command line as follows: `E2E_CONFIDENTIALITY=true make start-interop` |
 
-For more information, refer to the associated [README](https://github.com/hyperledger/cacti/tree/main/weaver/tests/network-setups/fabric/dev).
+For more information, refer to the associated [README](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/tests/network-setups/fabric/dev).
 
 **Troubleshooting Tips**:
 
@@ -135,7 +135,7 @@ Navigate to the `weaver/core/relay` folder and run a relay as follows:
   make convert-compose-method1
   ```
 
-For more information, see the [relay-docker README](https://github.com/hyperledger/cacti/tree/main/weaver/core/relay/relay-docker.md).
+For more information, see the [relay-docker README](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/core/relay/relay-docker.md).
 
 ### Fabric Driver
 

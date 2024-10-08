@@ -10,11 +10,11 @@
     "solidity",
     "smart-contract"
   ],
-  "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simpleasset",
+  "homepage": "https://github.com/hyperledger-cacti/cacti/weaver/samples/besu/simpleasset",
   "bugs": {
-    "url": "https://github.com/hyperledger/cacti/issues"
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
-  "repository": "https://github.com/hyperledger/cacti/samples/besu/simpleasset",
+  "repository": "https://github.com/hyperledger-cacti/cacti/samples/besu/simpleasset",
   "license": "Apache-2.0",
   "directories": {
     "doc": "docs",

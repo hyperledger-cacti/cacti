@@ -9,7 +9,7 @@ title: Publications
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-[Visit the repository](https://github.com/hyperledger/cacti/blob/main/weaver/OVERVIEW.md#articles) to find the current list of articles, talks, and research papers.
+[Visit the repository](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/OVERVIEW.md#articles) to find the current list of articles, talks, and research papers.
 
 ## 2021
 

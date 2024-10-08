@@ -64,7 +64,7 @@ $ sqlite3 gateway_log.db .dump > gateway_log.sql
 
 ## Run the Gateways
 
-We will use `Fabric_Relay` as the gateway for `network1` and `Fabric_Relay2` for `network2`. Install the components and set up appropriate configurations for each according to instructions in https://hyperledger.github.io/cacti/weaver/getting-started/test-network/setup-local/#fabric-relay. Use the same instructions to launch relays (as called out below):
+We will use `Fabric_Relay` as the gateway for `network1` and `Fabric_Relay2` for `network2`. Install the components and set up appropriate configurations for each according to instructions in https://hyperledger-cacti.github.io/cacti/weaver/getting-started/test-network/setup-local/#fabric-relay. Use the same instructions to launch relays (as called out below):
 
 To launch a gateway for Fabric `network1`, run from a new terminal window:
 ```
@@ -82,7 +82,7 @@ $ RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
 
 Ensure that you have the correct configuration in the file .env
 In a new terminal, run the following commands:
-We will use the default drivers associated with `Fabric_Relay` and `Fabric_Relay2` as specified in https://hyperledger.github.io/cacti/weaver/getting-started/test-network/setup-local. Install the components and set up appropriate configurations for each according to instructions in https://hyperledger.github.io/cacti/weaver/getting-started/test-network/setup-local/#fabric-driver. Use the same instructions to launch drivers (as called out below):
+We will use the default drivers associated with `Fabric_Relay` and `Fabric_Relay2` as specified in https://hyperledger-cacti.github.io/cacti/weaver/getting-started/test-network/setup-local. Install the components and set up appropriate configurations for each according to instructions in https://hyperledger-cacti.github.io/cacti/weaver/getting-started/test-network/setup-local/#fabric-driver. Use the same instructions to launch drivers (as called out below):
 
 To launch a driver for Fabric `network1`, run from a new terminal window:
 ```
@@ -97,7 +97,7 @@ $ CONNECTION_PROFILE=/opt/gopath/src/github.com/VRamakrishna/cacti/weaver/tests/
 
 ## Configure the Fabric-CLI
 
-Configure Fabric-CLI parameters in a `config.json` and a `.env` as indicated in https://hyperledger.github.io/cacti/weaver/getting-started/test-network/ledger-initialization/#initializing-the-fabric-networks (use instructions for relays and drivers deployed in host machines). In the `config.json`, make sure the `chaincode` values are set to `satpsimpleasset`. For the `.env`, only the following settings are mandatory:
+Configure Fabric-CLI parameters in a `config.json` and a `.env` as indicated in https://hyperledger-cacti.github.io/cacti/weaver/getting-started/test-network/ledger-initialization/#initializing-the-fabric-networks (use instructions for relays and drivers deployed in host machines). In the `config.json`, make sure the `chaincode` values are set to `satpsimpleasset`. For the `.env`, only the following settings are mandatory:
 ```
 MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
 CONFIG_PATH=./config.json

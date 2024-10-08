@@ -10,6 +10,6 @@ There are some distinctive features of the Weaver Fabric driver that are not cov
 
 For detailed information about fabric driver visit [here](src/main/typescript/readme.md).
 
-To use fabric-driver in your application please refer [documentation](https://hyperledger.github.io/cacti/weaver/getting-started/guide/). 
+To use fabric-driver in your application please refer [documentation](https://hyperledger-cacti.github.io/cacti/weaver/getting-started/guide/). 
 
 

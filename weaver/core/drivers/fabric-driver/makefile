@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= cacti-weaver-driver-fabric
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger
-GIT_URL = https://github.com/hyperledger/cacti/cacti/core/drivers/fabric-driver
+GIT_URL = https://github.com/hyperledger-cacti/cacti/cacti/core/drivers/fabric-driver
 NETWORK_NAME ?= network1
 COMPOSE_ARG ?=
 

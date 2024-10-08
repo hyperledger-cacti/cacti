@@ -136,8 +136,8 @@ for (let commitMessageListIndex in commitMessageList) {
 if (!PR_COMMIT_PARITY) {
   console.error(
     "PR message and commit message are not similar. A general solution for this is to have PR message exactly same as the commit message\n" +
-      "Please refer the following PR for reference: https://github.com/hyperledger/cacti/pull/3338\n" +
-      "And the commit message here: https://github.com/hyperledger/cacti/pull/3338/commits/47ebdec442d30fa48c8518b876c47c38097cf028\n",
+      "Please refer the following PR for reference: https://github.com/hyperledger-cacti/cacti/pull/3338\n" +
+      "And the commit message here: https://github.com/hyperledger-cacti/cacti/pull/3338/commits/47ebdec442d30fa48c8518b876c47c38097cf028\n",
     "-----------------------------------------------\n\n",
     "Commit Message List (ignore extra white spaces and new lines)\n" +
       commitMessageList +

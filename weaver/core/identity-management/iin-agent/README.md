@@ -5,7 +5,7 @@
  -->
 # IIN Agent Implementation
 
-In this folder lies an implementation of the IIN agent according to the [RFC specification](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/models/identity/iin-agent.md).
+In this folder lies an implementation of the IIN agent according to the [RFC specification](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/models/identity/iin-agent.md).
 
 The core part of this module is built in a DLT-neutral manner and can be used by a participant of a network running on any DLT platform. The module also has extensions that can be activated for specific DLT platforms.
 

@@ -40,7 +40,7 @@ yarn build:dev
 
 - Do note the `.` as the last parameter in last two commands.
 
-- The `./tools/weaver-update-version.sh` automation script seems slightly buggy at the moment so you'll have to manually update `./weaver/core/relay/Cargo.toml` yourself. See this comment for an example: https://github.com/hyperledger/cacti/pull/3427#discussion_r1686850372
+- The `./tools/weaver-update-version.sh` automation script seems slightly buggy at the moment so you'll have to manually update `./weaver/core/relay/Cargo.toml` yourself. See this comment for an example: https://github.com/hyperledger-cacti/cacti/pull/3427#discussion_r1686850372
 
 - Double check that all of the package dependencies were updated from the previous
 version to the new one because lerna usually fails to do that for `devDependency` parts

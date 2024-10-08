@@ -18,4 +18,4 @@ The present (initial) version of the Cacti code base is simply an aggregation of
 
 ## Project Roadmap
 
-You can find the project roadmap in the [GitHub repository](https://github.com/hyperledger/cacti/blob/main/ROADMAP.md).
+You can find the project roadmap in the [GitHub repository](https://github.com/hyperledger-cacti/cacti/blob/main/ROADMAP.md).

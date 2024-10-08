@@ -5,6 +5,6 @@
  -->
 # IIN Trust Anchor Reference Implementation
 
-In this folder lies a reference implementation of an IIN trust anchor according to the [RFC specification](https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/models/identity/iin.md#trust-anchors).
+In this folder lies a reference implementation of an IIN trust anchor according to the [RFC specification](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/models/identity/iin.md#trust-anchors).
 
 _This is currently a placeholder._

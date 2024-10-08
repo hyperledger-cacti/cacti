@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= cacti-weaver-iin-agent
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger
-GIT_URL = https://github.com/hyperledger/cacti/weaver/core/identity-management/iin-agent
+GIT_URL = https://github.com/hyperledger-cacti/cacti/weaver/core/identity-management/iin-agent
 DLT_SPECIFIC_DIR ?= .
 COMPOSE_ARG ?=
 

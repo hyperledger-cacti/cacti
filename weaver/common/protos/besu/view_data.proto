@@ -11,7 +11,7 @@ option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/bes
 
 
 // link below will take you to besu view rfc 
-// https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/views/besu.md
+// https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/views/besu.md
 //
 // take a view at BlockHeader in Besu
 // https://github.com/hyperledger/besu/blob/21.7.0/ethereum/core/src/main/java/org/hyperledger/besu/ethereum/core/BlockHeader.java#L199
