@@ -40,7 +40,6 @@ module.exports = {
     `./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts`,
     `./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts`,
     `./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts`,
-    `./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-sign-transaction-endpoint.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts`,

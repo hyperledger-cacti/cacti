@@ -2373,7 +2373,7 @@ jobs:
     needs:
       - build-dev
       - compute_changed_packages
-    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-besu-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -2381,7 +2381,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-sign-transaction-endpoint.test.ts}
+        --files={./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-past-logs-endpoint.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
