@@ -91,6 +91,7 @@
     "axios": ">=0.27.2",
     "braces": ">=3.0.3",
     "x-dicer": ">0.3.1",
+    "elliptic": ">=6.5.7",
     "engine.io": ">=6.4.2",
     "get-func-name": ">=2.0.1",
     "glob-parent": ">=5.1.2",
