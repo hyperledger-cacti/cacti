@@ -84,6 +84,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [CmdApiServerEndpointErrorResponse](docs/CmdApiServerEndpointErrorResponse.md)
  - [HealthCheckResponse](docs/HealthCheckResponse.md)
  - [MemoryUsage](docs/MemoryUsage.md)
  - [WatchHealthcheckV1](docs/WatchHealthcheckV1.md)
@@ -91,7 +92,18 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Authorization
 
-Endpoints do not require authorization.
+
+Authentication schemes defined for the API:
+### bearerTokenAuth
+
+- **Type**: HTTP Bearer token authentication
+
+Example
+
+```golang
+auth := context.WithValue(context.Background(), sw.ContextAccessToken, "BEARER_TOKEN_STRING")
+r, err := client.Service.Operation(auth, args)
+```
 
 
 ## Documentation for Utility Methods

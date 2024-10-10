@@ -101,7 +101,11 @@ describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
 
     grpcHost = `${addressInfoGrpc.address}:${addressInfoGrpc.port}`;
 
-    const jwtPayload = { name: "Peter", location: "Albertirsa" };
+    const jwtPayload = {
+      name: "Peter",
+      location: "London",
+      scope: "read:spec",
+    };
     const validJwt = await new SignJWT(jwtPayload)
       .setProtectedHeader({ alg: "RS256" })
       .setIssuer(expressJwtOptions.issuer)

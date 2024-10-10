@@ -4,7 +4,8 @@
  * source: services/default_service.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as dependency_1 from "./../google/protobuf/empty";
-import * as dependency_2 from "./../models/health_check_response_pb";
+import * as dependency_2 from "./../models/cmd_api_server_endpoint_error_response_pb";
+import * as dependency_3 from "./../models/health_check_response_pb";
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace org.hyperledger.cactus.cmd_api_server {
@@ -174,8 +175,8 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                 responseStream: false,
                 requestSerialize: (message: dependency_1.google.protobuf.Empty) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => dependency_1.google.protobuf.Empty.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.deserialize(new Uint8Array(bytes))
             },
             GetOpenApiSpecV1: {
                 path: "/org.hyperledger.cactus.cmd_api_server.DefaultService/GetOpenApiSpecV1",
@@ -197,7 +198,7 @@ export namespace org.hyperledger.cactus.cmd_api_server {
             }
         };
         [method: string]: grpc_1.UntypedHandleCall;
-        abstract GetHealthCheckV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, callback: grpc_1.sendUnaryData<dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>): void;
+        abstract GetHealthCheckV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, callback: grpc_1.sendUnaryData<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>): void;
         abstract GetOpenApiSpecV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetOpenApiSpecV1Response>, callback: grpc_1.sendUnaryData<GetOpenApiSpecV1Response>): void;
         abstract GetPrometheusMetricsV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetPrometheusMetricsV1Response>, callback: grpc_1.sendUnaryData<GetPrometheusMetricsV1Response>): void;
     }
@@ -205,7 +206,7 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
             super(address, credentials, options);
         }
-        GetHealthCheckV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, callback?: grpc_1.requestCallback<dependency_2.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>): grpc_1.ClientUnaryCall => {
+        GetHealthCheckV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, callback?: grpc_1.requestCallback<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>): grpc_1.ClientUnaryCall => {
             return super.GetHealthCheckV1(message, metadata, options, callback);
         };
         GetOpenApiSpecV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, GetOpenApiSpecV1Response> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetOpenApiSpecV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetOpenApiSpecV1Response>, callback?: grpc_1.requestCallback<GetOpenApiSpecV1Response>): grpc_1.ClientUnaryCall => {
