@@ -87,7 +87,11 @@ describe(testCase, () => {
     try {
       expect(expressJwtOptions).toBeTruthy();
 
-      const jwtPayload = { name: "Peter", location: "London" };
+      const jwtPayload = {
+        name: "Peter",
+        location: "London",
+        scope: "read:health",
+      };
       const tokenGood = await new SignJWT(jwtPayload)
         .setProtectedHeader({
           alg: "RS256",
@@ -100,7 +104,6 @@ describe(testCase, () => {
       const startResponse = apiServer.start();
       await expect(startResponse).not.toReject;
       expect(startResponse).toBeTruthy();
-
       const addressInfoApi = (await startResponse).addressInfoApi;
       const protocol = apiSrvOpts.apiTlsEnabled ? "https" : "http";
       const { address, port } = addressInfoApi;

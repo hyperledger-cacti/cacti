@@ -19,6 +19,7 @@ import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
+import org.openapitools.client.models.CmdApiServerEndpointErrorResponse
 import org.openapitools.client.models.HealthCheckResponse
 
 import com.squareup.moshi.Json
@@ -108,7 +109,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             path = "/api/v1/api-server/healthcheck",
             query = localVariableQuery,
             headers = localVariableHeaders,
-            requiresAuthentication = false,
+            requiresAuthentication = true,
             body = localVariableBody
         )
     }
@@ -176,7 +177,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             path = "/api/v1/api-server/get-open-api-spec",
             query = localVariableQuery,
             headers = localVariableHeaders,
-            requiresAuthentication = false,
+            requiresAuthentication = true,
             body = localVariableBody
         )
     }
@@ -243,7 +244,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             path = "/api/v1/api-server/get-prometheus-exporter-metrics",
             query = localVariableQuery,
             headers = localVariableHeaders,
-            requiresAuthentication = false,
+            requiresAuthentication = true,
             body = localVariableBody
         )
     }

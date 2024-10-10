@@ -1,4 +1,5 @@
 README.md
+models/cmd_api_server_endpoint_error_response_pb.proto
 models/health_check_response_pb.proto
 models/memory_usage_pb.proto
 models/watch_healthcheck_v1_pb.proto

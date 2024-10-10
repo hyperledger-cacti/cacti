@@ -84,7 +84,11 @@ describe("cmd-api-server:ApiServer", () => {
     const { address, port } = addressInfoApi;
     apiHost = `${protocol}://${address}:${port}`;
 
-    const jwtPayload = { name: "Peter", location: "Albertirsa" };
+    const jwtPayload = {
+      name: "Peter",
+      location: "London",
+      scope: "read:health",
+    };
     const validJwt = await new SignJWT(jwtPayload)
       .setProtectedHeader({ alg: "RS256" })
       .setIssuer(expressJwtOptions.issuer)

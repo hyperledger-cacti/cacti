@@ -6,6 +6,7 @@ client.go
 configuration.go
 go.mod
 go.sum
+model_cmd_api_server_endpoint_error_response.go
 model_health_check_response.go
 model_memory_usage.go
 model_watch_healthcheck_v1.go
