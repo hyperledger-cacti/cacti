@@ -2,10 +2,8 @@
 
 pragma solidity ^0.8.15;
 
-import "./../contracts/satp-erc20.sol";
+import "../main/satp-erc20.sol";
 import "remix_tests.sol";
-import "remix_accounts.sol";
-
 import "remix_accounts.sol";
 
 contract SATPContractTest {
