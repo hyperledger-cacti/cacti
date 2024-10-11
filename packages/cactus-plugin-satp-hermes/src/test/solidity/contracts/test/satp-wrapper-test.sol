@@ -9,8 +9,9 @@ import "remix_tests.sol";
 // Although it may fail compilation in 'Solidity Compiler' plugin
 // But it will work fine in 'Solidity Unit Testing' plugin
 import "remix_accounts.sol";
-import "../contracts/satp-wrapper.sol";
-import "./../contracts/satp-erc20.sol";
+
+import "../../../../solidity/satp-wrapper.sol";
+import "../satp-erc20.sol";
 
 contract SATPWrapTest {
 
