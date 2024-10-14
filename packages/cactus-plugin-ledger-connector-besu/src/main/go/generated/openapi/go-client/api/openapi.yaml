@@ -1024,7 +1024,6 @@ components:
         web3SigningCredential:
           type: null
         contractName: contractName
-        contractJSONString: contractJSONString
         gasPrice: gasPrice
       properties:
         contractName:
@@ -1038,11 +1037,6 @@ components:
           items: {}
           nullable: false
           type: array
-        contractJSONString:
-          description: "For use when not using keychain, pass the contract in as this\
-            \ string variable"
-          nullable: false
-          type: string
         constructorArgs:
           default: []
           items: {}
@@ -1076,9 +1070,7 @@ components:
       - bytecode
       - constructorArgs
       - contractAbi
-      - contractJson
       - contractName
-      - keychainId
       - web3SigningCredential
       type: object
     DeployContractSolidityBytecodeV1Response:

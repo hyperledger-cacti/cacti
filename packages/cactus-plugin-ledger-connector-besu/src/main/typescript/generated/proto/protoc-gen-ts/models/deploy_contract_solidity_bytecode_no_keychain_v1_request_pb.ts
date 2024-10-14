@@ -13,7 +13,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         constructor(data?: any[] | {
             contractName?: string;
             contractAbi?: dependency_1.google.protobuf.Any[];
-            contractJSONString?: string;
             constructorArgs?: dependency_1.google.protobuf.Any[];
             web3SigningCredential?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPB;
             bytecode?: string;
@@ -30,9 +29,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 }
                 if ("contractAbi" in data && data.contractAbi != undefined) {
                     this.contractAbi = data.contractAbi;
-                }
-                if ("contractJSONString" in data && data.contractJSONString != undefined) {
-                    this.contractJSONString = data.contractJSONString;
                 }
                 if ("constructorArgs" in data && data.constructorArgs != undefined) {
                     this.constructorArgs = data.constructorArgs;
@@ -68,12 +64,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         }
         set contractAbi(value: dependency_1.google.protobuf.Any[]) {
             pb_1.Message.setRepeatedWrapperField(this, 512852493, value);
-        }
-        get contractJSONString() {
-            return pb_1.Message.getFieldWithDefault(this, 405816750, "") as string;
-        }
-        set contractJSONString(value: string) {
-            pb_1.Message.setField(this, 405816750, value);
         }
         get constructorArgs() {
             return pb_1.Message.getRepeatedWrapperField(this, dependency_1.google.protobuf.Any, 336490508) as dependency_1.google.protobuf.Any[];
@@ -126,7 +116,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         static fromObject(data: {
             contractName?: string;
             contractAbi?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
-            contractJSONString?: string;
             constructorArgs?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
             web3SigningCredential?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPB.prototype.toObject>;
             bytecode?: string;
@@ -141,9 +130,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             }
             if (data.contractAbi != null) {
                 message.contractAbi = data.contractAbi.map(item => dependency_1.google.protobuf.Any.fromObject(item));
-            }
-            if (data.contractJSONString != null) {
-                message.contractJSONString = data.contractJSONString;
             }
             if (data.constructorArgs != null) {
                 message.constructorArgs = data.constructorArgs.map(item => dependency_1.google.protobuf.Any.fromObject(item));
@@ -172,7 +158,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             const data: {
                 contractName?: string;
                 contractAbi?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
-                contractJSONString?: string;
                 constructorArgs?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
                 web3SigningCredential?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPB.prototype.toObject>;
                 bytecode?: string;
@@ -186,9 +171,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             }
             if (this.contractAbi != null) {
                 data.contractAbi = this.contractAbi.map((item: dependency_1.google.protobuf.Any) => item.toObject());
-            }
-            if (this.contractJSONString != null) {
-                data.contractJSONString = this.contractJSONString;
             }
             if (this.constructorArgs != null) {
                 data.constructorArgs = this.constructorArgs.map((item: dependency_1.google.protobuf.Any) => item.toObject());
@@ -221,8 +203,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 writer.writeString(328784197, this.contractName);
             if (this.contractAbi.length)
                 writer.writeRepeatedMessage(512852493, this.contractAbi, (item: dependency_1.google.protobuf.Any) => item.serialize(writer));
-            if (this.contractJSONString.length)
-                writer.writeString(405816750, this.contractJSONString);
             if (this.constructorArgs.length)
                 writer.writeRepeatedMessage(336490508, this.constructorArgs, (item: dependency_1.google.protobuf.Any) => item.serialize(writer));
             if (this.has_web3SigningCredential)
@@ -251,9 +231,6 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                         break;
                     case 512852493:
                         reader.readMessage(message.contractAbi, () => pb_1.Message.addToRepeatedWrapperField(message, 512852493, dependency_1.google.protobuf.Any.deserialize(reader), dependency_1.google.protobuf.Any));
-                        break;
-                    case 405816750:
-                        message.contractJSONString = reader.readString();
                         break;
                     case 336490508:
                         reader.readMessage(message.constructorArgs, () => pb_1.Message.addToRepeatedWrapperField(message, 336490508, dependency_1.google.protobuf.Any.deserialize(reader), dependency_1.google.protobuf.Any));

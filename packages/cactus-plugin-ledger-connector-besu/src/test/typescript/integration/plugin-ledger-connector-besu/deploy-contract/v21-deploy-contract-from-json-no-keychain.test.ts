@@ -186,11 +186,9 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   test("deploys contract via .json file", async () => {
-    const contractJSONString = JSON.stringify(HelloWorldContractJson);
     const deployOut = await connector.deployContractNoKeychain({
       contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      contractJSONString: contractJSONString,
       constructorArgs: [],
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,

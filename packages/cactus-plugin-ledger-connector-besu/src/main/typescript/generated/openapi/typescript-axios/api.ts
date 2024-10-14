@@ -151,12 +151,6 @@ export interface DeployContractSolidityBytecodeNoKeychainV1Request {
      */
     'contractAbi': Array<any>;
     /**
-     * For use when not using keychain, pass the contract in as this string variable
-     * @type {string}
-     * @memberof DeployContractSolidityBytecodeNoKeychainV1Request
-     */
-    'contractJSONString'?: string;
-    /**
      * 
      * @type {Array<any>}
      * @memberof DeployContractSolidityBytecodeNoKeychainV1Request

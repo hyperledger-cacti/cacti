@@ -35,11 +35,11 @@ export async function deployContractV1Keychain(
   },
   req: DeployContractSolidityBytecodeV1Request,
 ): Promise<IDeployContractV1KeychainResponse> {
-  const fnTag = `deployContract()`;
+  const fnTag = `deployContractV1Keychain()`;
   Checks.truthy(req, `${fnTag} req`);
 
   const log = LoggerProvider.getOrCreate({
-    label: "getBlockV1Impl()",
+    label: fnTag,
     level: ctx.logLevel,
   });
 

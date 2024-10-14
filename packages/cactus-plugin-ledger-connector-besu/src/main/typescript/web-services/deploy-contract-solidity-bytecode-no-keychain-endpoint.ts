@@ -20,7 +20,7 @@ import {
 } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
-import { DeployContractSolidityBytecodeV1Request } from "../generated/openapi/typescript-axios";
+import type { DeployContractSolidityBytecodeNoKeychainV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
 export interface IDeployContractSolidityBytecodeNoKeychainOptions {
@@ -96,7 +96,7 @@ export class DeployContractSolidityBytecodeNoKeychainEndpoint
     const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody: DeployContractSolidityBytecodeV1Request = req.body;
+    const reqBody: DeployContractSolidityBytecodeNoKeychainV1Request = req.body;
     try {
       const resBody =
         await this.options.connector.deployContractNoKeychain(reqBody);

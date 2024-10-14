@@ -29,7 +29,7 @@ export async function transactV1Signed(
     `${fnTag}:req.transactionConfig.rawTransaction`,
   );
   const log = LoggerProvider.getOrCreate({
-    label: "getBlockGrpc()",
+    label: "transactV1Signed()",
     level: ctx.logLevel,
   });
   const rawTx = req.transactionConfig.rawTransaction as string;
@@ -53,7 +53,7 @@ export async function getTxReceipt(
   const fnTag = `getTxReceipt()`;
 
   const log = LoggerProvider.getOrCreate({
-    label: "getBlockGrpc()",
+    label: "getTxReceipt",
     level: ctx.logLevel,
   });
   log.debug("Received preliminary receipt from Besu node.");
@@ -103,7 +103,7 @@ export async function pollForTxReceipt(
 ): Promise<TransactionReceipt> {
   const fnTag = `pollForTxReceipt()`;
   const log = LoggerProvider.getOrCreate({
-    label: "getBlockGrpc()",
+    label: "pollForTxReceipt()",
     level: ctx.logLevel,
   });
   let txReceipt;
