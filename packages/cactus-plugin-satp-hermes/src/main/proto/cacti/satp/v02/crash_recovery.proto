@@ -79,3 +79,13 @@ message RollbackLogEntry {
   string status = 5; // status of rollback (e.g., SUCCESS, FAILED)
   string details = 6; // Additional details or metadata about the rollback
 }
+
+message RollbackState {
+  string session_id = 1;
+  string current_stage = 2;
+  int32 steps_remaining = 3;
+  repeated RollbackLogEntry rollback_log_entries = 4;
+  string estimated_time_to_completion = 5;
+  string status = 6; // Overall status (e.g., IN_PROGRESS, COMPLETED, FAILED)
+  string details = 7; // Additional metadata or information
+}

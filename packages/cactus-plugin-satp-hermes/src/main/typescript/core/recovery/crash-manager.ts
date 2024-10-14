@@ -8,7 +8,6 @@ import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session
 import { CrashRecoveryHandler } from "./crash-recovery-handler";
 import { SATPSession } from "../satp-session";
 import {
-  RollbackState,
   RollbackStrategy,
   RollbackStrategyFactory,
 } from "./rollback/rollback-strategy-factory";
@@ -16,13 +15,20 @@ import { CrashRecoveryService } from "./crash-utils";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../repository/knex-local-log-repository";
 import { ILocalLogRepository } from "../../repository/interfaces/repository";
 import { Knex } from "knex";
-import { SATPBridgeConfig, LocalLog } from "../types";
+import {
+  RecoverMessage,
+  RecoverSuccessMessage,
+  RecoverUpdateMessage,
+  RollbackState,
+} from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { SessionType } from "../session-utils";
+import { ISATPBridgesOptions } from "../../gol/satp-bridges-manager";
 
-enum CrashStatus {
+export enum CrashStatus {
   IN_RECOVERY = "IN_RECOVERY",
   RECOVERED = "RECOVERED",
   NO_CRASH = "NO_CRASH",
+  ERROR = "ERROR",
 }
 
 class CrashOccurrence {
@@ -37,7 +43,7 @@ export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
   instanceId: string;
   knexConfig?: Knex.Config;
-  bridgeConfig: SATPBridgeConfig;
+  bridgeConfig: ISATPBridgesOptions;
 }
 
 export class CrashRecoveryManager {
@@ -59,8 +65,11 @@ export class CrashRecoveryManager {
     this.instanceId = options.instanceId;
     this.sessions = new Map<string, SessionData>();
     this.log.info(`Instantiated ${this.className} OK`);
-    this.factory = new RollbackStrategyFactory(options.bridgeConfig);
     this.logRepository = new LocalLogRepository(options.knexConfig);
+    this.factory = new RollbackStrategyFactory(
+      options.bridgeConfig,
+      this.logRepository,
+    );
     const crashRecoveryServiceOptions = {
       logLevel: this.options.logLevel,
       instanceId: this.instanceId,
@@ -85,72 +94,39 @@ export class CrashRecoveryManager {
     return CrashRecoveryManager.CLASS_NAME;
   }
 
-  public async init(): Promise<void> {
-    this.sessions = await this.getSessions();
-  }
-
-  // todo read from local log to get session data
-  /*private async getSessions(): Map<string, SessionData> {
-    const sessionMap = new Map<string, SessionData>();
-    try {
-      const allSessions = await this.logRepository.readLogsNotProofs();
-      allSessions.forEach((log) => {
-        const sessionData = new SessionData();
-        sessionData.id = log.sessionID;
-
-        sessionMap.set(log.sessionID, sessionData);
-      });
-    } catch (error) {
-      this.log.error(`Error initializing sessions: ${error}`);
-    }
-
-    return sessionMap;
-  }*/
-
-  private async getSessions(): Promise<Map<string, SessionData>> {
-    const sessionMap = new Map<string, SessionData>();
+  public async recoverSessions() {
+    const fnTag = `${this.className}#recoverSessions()`;
 
     try {
       const allLogs = await this.logRepository.readLogsNotProofs();
-
       for (const log of allLogs) {
         const sessionId = log.sessionID;
+        this.log.info(`${fnTag}, recovering session: ${sessionId}`);
 
-        let sessionData = sessionMap.get(sessionId);
-        if (!sessionData) {
-          sessionData = new SessionData();
-          sessionData.id = sessionId;
-          sessionMap.set(sessionId, sessionData);
+        if (log == undefined || log.data == undefined) {
+          throw new Error(`${fnTag}, invalid log}`);
         }
 
         try {
-          const logEntry = JSON.parse(log.data);
-
-          Object.assign(sessionData, logEntry);
-
-          if (logEntry.sequenceNumber !== undefined) {
-            sessionData.lastSequenceNumber = logEntry.sequenceNumber;
-          }
+          const logEntry: SessionData = JSON.parse(log.data);
+          this.sessions.set(sessionId, logEntry);
         } catch (error) {
           this.log.error(
-            `Error parsing log data for session ${sessionId}: ${error}`,
+            `Error parsing log data for session Id: ${sessionId}: ${error}`,
           );
         }
       }
     } catch (error) {
       this.log.error(`Error initializing sessions: ${error}`);
     }
-
-    return sessionMap;
   }
 
-  // todo create util functoin that retrieves sessionid and checks if it is valid; i believe it is implemented in the satp services, refactor making it reusable
   private async checkCrash(session: SATPSession): Promise<CrashStatus> {
-    // todo implement crash check - check logs and understsands if there was a crash; might use timouts, etc
-
     const fnTag = `${this.className}#checkCrash()`;
+    const sessionData = session.hasClientSessionData()
+      ? session.getClientSessionData()
+      : session.getServerSessionData();
 
-    // check the logs and from the timeout logic make out
     try {
       session.verify(
         fnTag,
@@ -158,27 +134,25 @@ export class CrashRecoveryManager {
           ? SessionType.CLIENT
           : SessionType.SERVER,
       );
+
       const lastLog = await this.logRepository.readLastestLog(
         session.getSessionId(),
       );
-      if (lastLog && lastLog.operation !== "COMPLETED") {
+
+      if (lastLog && lastLog.operation !== "done") {
         this.log.debug(
-          `${fnTag} Crash detected for session ${session.getSessionId()}`,
+          `${fnTag} Crash detected for session ID: ${session.getSessionId()} last log operation: ${lastLog.operation}`,
         );
         return CrashStatus.IN_RECOVERY;
       }
 
-      const sessionData = session.hasClientSessionData()
-        ? session.getClientSessionData()
-        : session.getServerSessionData();
-
-      const logTimestamp = Number(lastLog.timestamp);
+      const logTimestamp = new Date(lastLog?.timestamp ?? 0).getTime();
       const currentTime = new Date().getTime();
       const timeDifference = currentTime - logTimestamp;
 
       if (timeDifference > Number(sessionData.maxTimeout)) {
         this.log.warn(
-          `${fnTag} Timeout exceeded for session ID: ${session.getSessionId()}`,
+          `${fnTag} Timeout exceeded by ${timeDifference} ms for session ID: ${session.getSessionId()}`,
         );
         return CrashStatus.IN_RECOVERY;
       }
@@ -188,34 +162,31 @@ export class CrashRecoveryManager {
       );
       return CrashStatus.NO_CRASH;
     } catch (error) {
-      this.log.error(`${fnTag} Error detecting crash: ${error}`);
-      return CrashStatus.NO_CRASH;
+      this.log.error(`${fnTag} Error occured !`);
+      return CrashStatus.ERROR;
     }
   }
 
-  public async checkAndResolveCrash(sessionId: SATPSession): Promise<boolean> {
+  public async checkAndResolveCrash(session: SATPSession): Promise<void> {
     const fnTag = `${this.className}#checkAndResolveCrash()`;
-    this.log.info(`${fnTag} Checking crash status for session ${sessionId}`);
+
+    const sessionData = session.hasClientSessionData()
+      ? session.getClientSessionData()
+      : session.getServerSessionData();
+
+    if (!sessionData) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
 
     try {
-      const sessionData = sessionId.hasClientSessionData()
-        ? sessionId.getClientSessionData()
-        : sessionId.getServerSessionData();
-
-      if (!sessionData) {
-        throw new Error(`${fnTag}, session data is not correctly initialized`);
-      }
-
       let attempts = 0;
       let crashOccurrence: CrashOccurrence | undefined;
 
       while (attempts < BigInt(sessionData.maxRetries)) {
-        const crashStatus = await this.checkCrash(sessionId);
+        const crashStatus = await this.checkCrash(session);
 
         if (crashStatus === CrashStatus.IN_RECOVERY) {
-          this.log.info(
-            `${fnTag} Crash detected. Attempting recovery for session ${sessionId}`,
-          );
+          this.log.info(`${fnTag} Crash detected! Attempting recovery`);
 
           if (!crashOccurrence) {
             crashOccurrence = new CrashOccurrence(
@@ -227,55 +198,90 @@ export class CrashRecoveryManager {
             crashOccurrence.lastUpdate = new Date();
           }
 
-          await this.handleRecovery(sessionId);
-          this.log.info(`${fnTag} Recovery successful.`);
-
-          crashOccurrence.status = CrashStatus.RECOVERED;
-
-          return true;
+          const status = await this.handleRecovery(session);
+          if (status) {
+            crashOccurrence.status = CrashStatus.RECOVERED;
+            this.log.info(
+              `${fnTag} Recovery successful for sessionID: ${session.getSessionId()}`,
+            );
+            return;
+          }
         }
         attempts++;
         this.log.info(
-          `${fnTag} Retry attempt ${attempts} for session ${sessionId}`,
+          `${fnTag} Retry attempt ${attempts} for sessionID: ${session.getSessionId()}`,
         );
       }
-
-      this.log.warn(`${fnTag} All retries exhausted. Initiating rollback.`);
-      await this.initiateRollback(sessionId, true);
-      return false;
+      if (attempts != 0) {
+        this.log.warn(`${fnTag} All retries exhausted ! Initiating Rollback`);
+        const rollBackStatus = await this.initiateRollback(session, true);
+        if (rollBackStatus) {
+          this.log.info(
+            `${fnTag} rollback was success: ${session.getSessionId()}`,
+          );
+        } else {
+          this.log.error(
+            `${fnTag} rollback failed ! ${session.getSessionId()}`,
+          );
+        }
+      }
     } catch (error) {
       this.log.error(`${fnTag} Error during crash resolution: ${error}`);
-      return false;
     }
   }
 
-  public async handleRecovery(session: SATPSession): Promise<void> {
+  public async handleRecovery(session: SATPSession): Promise<boolean> {
     const fnTag = `${this.className}#handleRecovery()`;
 
+    const sessionData = session.hasClientSessionData()
+      ? session.getClientSessionData()
+      : session.getServerSessionData();
+    if (!sessionData) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
     try {
-      if (session.hasServerSessionData()) {
-        this.log.info(
-          `${fnTag} Initiating recovery as a server for session ID: ${session.getSessionId()}`,
-        );
-      } else if (session.hasClientSessionData()) {
-        this.log.info(
-          `${fnTag} Initiating recovery as a client for session ID: ${session.getSessionId()}`,
-        );
-      } else {
-        throw new Error(
-          `${fnTag} Neither client nor server session data is available for session ID: ${session.getSessionId()}`,
-        );
-      }
-
-      const recoverMessage =
-        await this.crashRecoveryHandler.sendRecover(session);
-      const recoverUpdateMessage =
-        await this.crashRecoveryHandler.sendRecoverUpdate(recoverMessage);
-      await this.crashRecoveryHandler.sendRecoverSuccess(recoverUpdateMessage);
-
       this.log.info(
-        `${fnTag} Recovery handled successfully for session ID: ${session.getSessionId()}`,
+        `${fnTag} Initiating recovery for session ID: ${session.getSessionId()}`,
       );
+
+      const recoverMessage = new RecoverMessage({
+        sessionId: session.getSessionId(),
+        messageType: "urn:ietf:SATP-2pc:msgtype:recover-msg",
+        satpPhase: "sessionData.hashes?.stage0", //todo: get phase info
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+        isBackup: false,
+        newIdentityPublicKey: "",
+        lastEntryTimestamp: sessionData.lastSequenceNumber,
+        senderSignature: "",
+      });
+
+      const recoverUpdateMessage =
+        await this.crashRecoveryHandler.handleRecover(recoverMessage);
+
+      const response = await this.processRecoverUpdate(recoverUpdateMessage);
+
+      if (response) {
+        const recoverSuccessMessage = new RecoverSuccessMessage({
+          sessionId: session.getSessionId(),
+          messageType: "urn:ietf:SATP-2pc:msgtype:recover-success-msg",
+          hashRecoverUpdateMessage: "",
+          success: true,
+          entriesChanged: [],
+          senderSignature: "",
+        });
+
+        await this.crashRecoveryHandler.handleRecoverSuccess(
+          recoverSuccessMessage,
+        );
+
+        this.log.info(
+          `${fnTag} Recovery handled successfully for session ID: ${session.getSessionId()}`,
+        );
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       this.log.error(
         `${fnTag} Error during recovery process for session ID: ${session.getSessionId()} - ${error}`,
@@ -286,29 +292,34 @@ export class CrashRecoveryManager {
     }
   }
 
+  private processRecoverUpdate(
+    message: RecoverUpdateMessage,
+  ): Promise<boolean> {
+    this.log.debug("Message received: ", message.messageType);
+    // get the logs from counterparty gateway and sync with current session
+    this.log.debug(`Session processed & updated with RecoverUpdateMessage`);
+
+    return Promise.resolve(true);
+  }
+
   public async initiateRollback(
     session: SATPSession,
     forceRollback?: boolean,
   ): Promise<boolean> {
     const fnTag = `CrashRecoveryManager#initiateRollback()`;
+
+    const sessionData = session.hasClientSessionData()
+      ? session.getClientSessionData()
+      : session.getServerSessionData();
+    if (!sessionData) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
     this.log.info(
       `${fnTag} Initiating rollback for session ${session.getSessionId()}`,
     );
 
     try {
-      // Implement check for rollback (needs to read logs, etc) OR we assume that at satp handler/service layer this check is done and rollback is good to do
-
-      const sessionLog: LocalLog = await this.logRepository.readLastestLog(
-        session.getSessionId(),
-      );
-
-      let shouldRollback = false;
-      if (sessionLog.operation !== "COMPLETED") {
-        shouldRollback = true;
-      }
-
-      if (forceRollback || shouldRollback) {
-        // send bridge manager and possibly others to factory
+      if (forceRollback) {
         const strategy = this.factory.createStrategy(session);
         const rollbackState = await this.executeRollback(strategy, session);
 
