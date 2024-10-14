@@ -11,9 +11,7 @@ import {
 import { ApiServer } from "../../../../main/typescript/public-api";
 import { ConfigService } from "../../../../main/typescript/public-api";
 
-const testcase = "";
-
-describe(testcase, () => {
+describe("ConfigService", () => {
   const configService = new ConfigService();
   let apiServer: ApiServer,
     exampleConfig: ICactusApiServerOptions,
@@ -24,7 +22,7 @@ describe(testcase, () => {
     exampleConfig = await configService.newExampleConfig();
     const pluginsPath = path.join(
       __dirname,
-      "../../../../../../", // walk back up to the project root
+      "../../../../../../../", // walk back up to the project root
       ".tmp/test/test-cmd-api-server/config-service-example-config-validity_test/", // the dir path from the root
       uuidv4(), // then a random directory to ensure proper isolation
     );
