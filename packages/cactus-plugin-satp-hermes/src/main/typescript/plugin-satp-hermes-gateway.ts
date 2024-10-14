@@ -56,7 +56,7 @@ import {
 } from "./gol/satp-bridges-manager";
 import bodyParser from "body-parser";
 import {
-  CrashOcurrence,
+  //CrashOcurrence,
   CrashRecoveryManager,
   ICrashRecoveryManagerOptions,
 } from "./core/recovery/crash-manager";
@@ -186,10 +186,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const crashOptions: ICrashRecoveryManagerOptions = {
       instanceId: this.instanceId,
       logLevel: this.config.logLevel,
-      bridgeConfig: SATPBridgeConfig,
+      bridgeConfig: bridgesManagerOptions,
     };
     this.crashManager = new CrashRecoveryManager(crashOptions);
-    this.crashManager.checkAndResolveCrash();
   }
 
   /* ICactus Plugin methods */

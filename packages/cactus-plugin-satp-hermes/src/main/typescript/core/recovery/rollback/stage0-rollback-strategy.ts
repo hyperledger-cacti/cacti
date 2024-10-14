@@ -1,74 +1,87 @@
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPSession } from "../../satp-session";
-import { RollbackState, RollbackStrategy } from "./rollback-strategy-factory";
-import { RollbackLogEntry } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { RollbackStrategy } from "./rollback-strategy-factory";
+import {
+  RollbackLogEntry,
+  RollbackState,
+} from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { ILocalLogRepository } from "../../../repository/interfaces/repository";
 
 export class Stage0RollbackStrategy implements RollbackStrategy {
   private log: Logger;
-  private rollbackLogEntry: RollbackLogEntry;
+  private logRepository: ILocalLogRepository;
 
-  constructor(logEntry: RollbackLogEntry) {
+  constructor(localLog: ILocalLogRepository) {
     this.log = LoggerProvider.getOrCreate({ label: "Stage0RollbackStrategy" });
-    this.rollbackLogEntry = logEntry;
+    this.logRepository = localLog;
   }
 
-  // return a rollback state in all strategies
   async execute(session: SATPSession): Promise<RollbackState> {
     const fnTag = "Stage0RollbackStrategy#execute";
     this.log.info(`${fnTag} Executing rollback for Stage 0`);
 
-    // check session exists
     if (!session) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
+    const sessionData = session.hasClientSessionData()
+      ? session.getClientSessionData()
+      : session.getServerSessionData();
+
+    if (!sessionData) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+    const rollbackState = new RollbackState({
+      sessionId: session.getSessionId(),
+      currentStage: String(sessionData.hashes?.stage0),
+      stepsRemaining: 0,
+      rollbackLogEntries: [],
+      estimatedTimeToCompletion: "0",
+      status: "IN_PROGRESS",
+      details: "",
+    });
     try {
-      // TODO record the rollback on the log. Implement RollbackLogEntry
-      this.log.debug("Persisting rollback log entry");
+      const rollbackLogEntry = new RollbackLogEntry({
+        sessionId: session.getSessionId(),
+        stage: String(sessionData.hashes?.stage0),
+        timestamp: new Date().toISOString(),
+        action: "NO_ACTION_REQUIRED",
+        status: "SUCCESS",
+        details: "",
+      });
 
-      this.rollbackLogEntry.sessionId = session.getSessionId();
-      this.rollbackLogEntry.stage = "Stage0";
-      this.rollbackLogEntry.timestamp = Date.now().toString();
-      this.rollbackLogEntry.action = "";
-      this.rollbackLogEntry.status = "SUCCESS";
-      this.rollbackLogEntry.details = "";
+      rollbackState.rollbackLogEntries.push(rollbackLogEntry);
+      rollbackState.status = "COMPLETED";
+      rollbackState.details = "Rollback of Stage 0 completed successfully";
 
-      this.log.info(`Successfully rolled back Stage 0`);
+      this.log.info(`${fnTag} Rollback of Stage 0 completed successfully`);
 
-      const state: RollbackState = {
-        currentStage: "Stage0",
-        rollbackLogEntry: this.rollbackLogEntry,
-      };
-      await this.rollbackLogs.create(state); // todo: log for the rollbackentry
+      //await this.logRepository.create(logEntry);
 
-      return state;
+      return rollbackState;
     } catch (error) {
-      this.log.error(`Failed to rollback Stage 0: ${error}`);
+      this.log.error(`${fnTag} Error during rollback of Stage 0: ${error}`);
 
-      this.rollbackLogEntry.sessionId = session.getSessionId();
-      this.rollbackLogEntry.stage = "Stage0";
-      this.rollbackLogEntry.timestamp = Date.now().toString();
-      this.rollbackLogEntry.action = "";
-      this.rollbackLogEntry.status = "FAILURE";
-      this.rollbackLogEntry.details = "";
+      rollbackState.status = "FAILED";
+      rollbackState.details = `Rollback of Stage 0 failed: ${error}`;
 
-      const state: RollbackState = {
-        currentStage: "Stage0",
-        rollbackLogEntry: this.rollbackLogEntry,
-      };
-      await this.rollbackLogs.create(state); // todo: implement the correct log support
-      return state;
+      return rollbackState;
     }
   }
 
   async cleanup(session: SATPSession): Promise<RollbackState> {
     const fnTag = "Stage0RollbackStrategy#cleanup";
-    // for stage 0, do nothing
-    const state: RollbackState = {
+    this.log.info(`${fnTag} Cleanup not required for Stage 0`);
+
+    const rollbackState = new RollbackState({
+      sessionId: session.getSessionId(),
       currentStage: "Stage0",
-    };
-    if (!session) {
-      this.log.error(`${fnTag} Session not found`);
-    }
-    return state;
+      stepsRemaining: 0,
+      rollbackLogEntries: [],
+      estimatedTimeToCompletion: "",
+      status: "",
+      details: "",
+    });
+
+    return rollbackState;
   }
 }

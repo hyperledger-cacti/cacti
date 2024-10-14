@@ -1,57 +1,111 @@
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPSession } from "../../satp-session";
-import { RollbackState, RollbackStrategy } from "./rollback-strategy-factory";
-import { RollbackLogEntry } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
-import { SATPBridgeManager } from "../../stage-services/satp-bridge/satp-bridge-manager";
+import { RollbackStrategy } from "./rollback-strategy-factory";
+import {
+  RollbackLogEntry,
+  RollbackState,
+} from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import { ILocalLogRepository } from "../../../repository/interfaces/repository";
 
 export class Stage3RollbackStrategy implements RollbackStrategy {
   private log: Logger;
-  private bridgeManager: SATPBridgeManager;
-  private rollbackLogEntry: RollbackLogEntry;
+  private bridgesManager: SATPBridgesManager;
+  private logRepository: ILocalLogRepository;
 
-  constructor(bridgeManager: SATPBridgeManager, logEntry: RollbackLogEntry) {
+  constructor(
+    bridgeManager: SATPBridgesManager,
+    localLog: ILocalLogRepository,
+  ) {
     this.log = LoggerProvider.getOrCreate({ label: "Stage3RollbackStrategy" });
-    this.bridgeManager = bridgeManager;
-    this.rollbackLogEntry = logEntry;
+    this.bridgesManager = bridgeManager;
+    this.logRepository = localLog;
   }
 
   async execute(session: SATPSession): Promise<RollbackState> {
     const fnTag = "Stage3RollbackStrategy#execute";
     this.log.info(`${fnTag} Executing rollback for Stage 3`);
 
-    if (!session) {
+    const sessionData = session.hasClientSessionData()
+      ? session.getClientSessionData()
+      : session.getServerSessionData();
+
+    if (!sessionData) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
+    const network = sessionData.senderGatewayNetworkId;
+
+    if (!network) {
+      throw new Error(
+        `${fnTag}: Unable to determine network from session data.`,
+      );
+    }
+
+    const bridgeManager = this.bridgesManager.getBridge(network);
+
+    const rollbackState = new RollbackState({
+      sessionId: session.getSessionId(),
+      currentStage: String(sessionData.hashes?.stage3),
+      stepsRemaining: 2,
+      rollbackLogEntries: [],
+      estimatedTimeToCompletion: "",
+      status: "IN_PROGRESS",
+      details: "",
+    });
+
     try {
-      // TODO: Implement Stage 3 specific rollback logic
+      const assetId = sessionData.senderAsset?.tokenId;
+      const amount = sessionData.senderAsset?.amount;
+      if (!assetId) {
+        throw new Error(`${fnTag}: Asset ID is undefined`);
+      }
 
-      // TODO: Record the rollback on the log. Implement RollbackLogEntry
+      if (!amount) {
+        throw new Error(`${fnTag}, Amount is missing`);
+      }
 
-      const receipt = await this.bridgeManager.burnAsset("assetId", Number());
+      this.log.info(`${fnTag} Asset Id: ${assetId} amount: ${amount}`);
 
-      this.log.info(`${fnTag}, Asset unlocked: ${receipt}`);
+      await bridgeManager.burnAsset(assetId, Number(amount));
 
-      this.rollbackLogEntry.sessionId = session.getSessionId();
-      this.rollbackLogEntry.stage = "Stage3";
-      this.rollbackLogEntry.timestamp = Date.now().toString();
-      this.rollbackLogEntry.action = "BURN";
-      this.rollbackLogEntry.status = "SUCCESS";
-      this.rollbackLogEntry.details = "";
+      const rollbackLogEntry = new RollbackLogEntry({
+        sessionId: session.getSessionId(),
+        stage: String(sessionData.hashes?.stage0),
+        timestamp: new Date().toISOString(),
+        action: "BURN_ASSET",
+        status: "SUCCESS",
+        details: "",
+      });
 
-      this.log.debug("Persisting rollback log entry");
+      rollbackState.rollbackLogEntries.push(rollbackLogEntry);
+      rollbackState.stepsRemaining = 2;
+      rollbackState.status = "COMPLETED";
+      rollbackState.estimatedTimeToCompletion = "0";
+      rollbackState.details = "Rollback of Stage 3 completed successfully";
 
-      this.log.info(`Successfully rolled back Stage 3`);
-      const state: RollbackState = {
-        currentStage: "Stage3",
-        rollbackLogEntry: this.rollbackLogEntry,
-      };
-
-      await this.rollbackLogs.create(state); // todo: log support
-      return state;
+      this.log.info(
+        `${fnTag} Successfully rolled back Stage 3 for session ${session.getSessionId()}`,
+      );
+      //await this.logRepository.create(logEntry);
+      return rollbackState;
     } catch (error) {
-      this.log.error(`Failed to rollback Stage 3: ${error}`);
-      return false;
+      this.log.error(`${fnTag} Failed to rollback Stage 3: ${error}`);
+
+      const rollbackLogEntry = new RollbackLogEntry({
+        sessionId: session.getSessionId(),
+        stage: String(sessionData.hashes?.stage3),
+        timestamp: new Date().toISOString(),
+        action: "BURN_ASSET",
+        status: "FAILED",
+        details: `Error burning asset: ${error}`,
+      });
+
+      rollbackState.rollbackLogEntries.push(rollbackLogEntry);
+      rollbackState.status = "FAILED";
+      rollbackState.details = `Rollback of Stage 3 failed: ${error}`;
+
+      return rollbackState;
     }
   }
 
@@ -70,7 +124,7 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
     try {
       // TODO: Implement Stage 3 specific cleanup logic
 
-      state.currentStage = "Stage3";
+      //state.currentStage = "";
       // TODO: Update other state properties as needed
 
       return state;

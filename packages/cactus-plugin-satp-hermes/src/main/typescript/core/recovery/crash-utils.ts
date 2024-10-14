@@ -6,7 +6,6 @@ import {
 import {
   RecoverMessage,
   RecoverUpdateMessage,
-  RecoverSuccessMessage,
   RollbackMessage,
   RollbackAckMessage,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
@@ -18,48 +17,33 @@ interface ICrashRecoveryServiceOptions {
 }
 
 export class CrashRecoveryService {
-  private readonly logger: Logger;
+  private readonly log: Logger;
   private readonly logRepository: ILocalLogRepository;
 
   constructor(options: ICrashRecoveryServiceOptions) {
-    this.logger = LoggerProvider.getOrCreate(options.loggerOptions);
+    this.log = LoggerProvider.getOrCreate(options.loggerOptions);
     this.logRepository = options.logRepository;
   }
 
   async createRecoverUpdateMessage(
     request: RecoverMessage,
   ): Promise<RecoverUpdateMessage> {
-    this.logger.debug("Creating RecoverUpdateMessage...");
+    this.log.debug("Creating RecoverUpdateMessage...");
     const recoveredLogs =
       await this.logRepository.readLogsMoreRecentThanTimestamp(
         request.lastEntryTimestamp.toString(),
       );
-
     return new RecoverUpdateMessage({
       sessionId: request.sessionId,
-      messageType: "urn:ietf:SATP-2pc:msgtype:recover-msg",
+      messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
       hashRecoverMessage: "",
       recoveredLogs: recoveredLogs,
       senderSignature: "",
     });
   }
 
-  createRecoverSuccessMessage(
-    request: RecoverUpdateMessage,
-  ): RecoverSuccessMessage {
-    this.logger.debug("Creating RecoverSuccessMessage...");
-    return new RecoverSuccessMessage({
-      sessionId: request.sessionId,
-      messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
-      hashRecoverUpdateMessage: "",
-      success: true,
-      entriesChanged: [],
-      senderSignature: "",
-    });
-  }
-
   createRollbackAckMessage(request: RollbackMessage): RollbackAckMessage {
-    this.logger.debug("Creating RollbackAckMessage...");
+    this.log.debug("Creating RollbackAckMessage...");
     return new RollbackAckMessage({
       sessionId: request.sessionId,
       messageType: "urn:ietf:SATP-2pc:msgtype:rollback-msg",
@@ -73,23 +57,15 @@ export class CrashRecoveryService {
   async sendRecoverMessage(
     message: RecoverMessage,
   ): Promise<RecoverUpdateMessage> {
-    this.logger.debug("Sending RecoverMessage...");
+    this.log.debug("Sending RecoverMessage...");
     const updateMessage = await this.createRecoverUpdateMessage(message);
     return updateMessage;
-  }
-
-  async sendRecoverUpdateMessage(
-    message: RecoverUpdateMessage,
-  ): Promise<RecoverSuccessMessage> {
-    this.logger.debug("Sending RecoverUpdateMessage...");
-    const successMessage = this.createRecoverSuccessMessage(message);
-    return successMessage;
   }
 
   async sendRollbackMessage(
     message: RollbackMessage,
   ): Promise<RollbackAckMessage> {
-    this.logger.debug("Sending RollbackMessage...");
+    this.log.debug("Sending RollbackMessage...");
     const ackMessage = this.createRollbackAckMessage(message);
     return ackMessage;
   }
