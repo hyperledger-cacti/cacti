@@ -766,10 +766,8 @@
         "required": [
           "contractName",
           "contractAbi",
-          "contractJson",
           "bytecode",
           "web3SigningCredential",
-          "keychainId",
           "constructorArgs"
         ],
         "additionalProperties": false,
@@ -786,11 +784,6 @@
             "type": "array",
             "items": {},
             "nullable": false
-          },
-          "contractJSONString": {
-            "description": "For use when not using keychain, pass the contract in as this string variable",
-            "nullable": false,
-            "type": "string"
           },
           "constructorArgs": {
             "type": "array",

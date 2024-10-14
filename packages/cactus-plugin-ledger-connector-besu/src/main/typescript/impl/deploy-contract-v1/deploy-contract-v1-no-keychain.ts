@@ -15,15 +15,6 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PrometheusExporter } from "../../prometheus-exporter/prometheus-exporter";
 import Web3 from "web3";
 import { transactV1Impl } from "../transact-v1/transact-v1-impl";
-import createHttpError from "http-errors";
-import { Contract } from "web3-eth-contract";
-
-export interface IDeployContractV1NoKeychainResponse {
-  contractName: string;
-  contract: Contract;
-  contractJsonString: string;
-  deployResponse: DeployContractSolidityBytecodeV1Response;
-}
 
 export async function deployContractV1NoKeychain(
   ctx: {
@@ -33,20 +24,18 @@ export async function deployContractV1NoKeychain(
     readonly logLevel: LogLevelDesc;
   },
   req: DeployContractSolidityBytecodeNoKeychainV1Request,
-): Promise<IDeployContractV1NoKeychainResponse> {
+): Promise<DeployContractSolidityBytecodeV1Response> {
   const fnTag = `deployContractNoKeychain()`;
   Checks.truthy(req, `${fnTag} req`);
 
   const log = LoggerProvider.getOrCreate({
-    label: "getBlockV1Impl()",
+    label: "deployContractV1NoKeychain()",
     level: ctx.logLevel,
   });
 
   if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
     throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
   }
-  const { contractName, contractJSONString } = req;
-  const networkId = await ctx.web3.eth.net.getId();
 
   const tmpContract = new ctx.web3.eth.Contract(req.contractAbi);
   const deployment = tmpContract.deploy({
@@ -95,33 +84,8 @@ export async function deployContractV1NoKeychain(
 
   Checks.truthy(contractAddress, `deployContractNoKeychain():contractAddress`);
 
-  if (contractJSONString) {
-    const networkInfo = { address: contractAddress };
-    const contractJSON = JSON.parse(contractJSONString);
-    log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
-    const contract = new ctx.web3.eth.Contract(
-      contractJSON.abi,
-      contractAddress || " ",
-    );
-    // this.contracts[contractName] = contract;
-    const network = { [networkId]: networkInfo };
-    contractJSON.networks = network;
-
-    const deployResponse: DeployContractSolidityBytecodeV1Response = {
-      transactionReceipt: runTxResponse.transactionReceipt,
-    };
-    const deployContractV1NoKeychainResponse: IDeployContractV1NoKeychainResponse =
-      {
-        contractName: contractName,
-        contract: contract,
-        contractJsonString: contractJSONString,
-        deployResponse: deployResponse,
-      };
-    return deployContractV1NoKeychainResponse;
-  } else {
-    const errorMessage =
-      `${fnTag} Cannot create an instance of the contract instance because` +
-      `the contractName in the request does not exist on the keychain`;
-    throw new createHttpError[400](errorMessage);
-  }
+  const res: DeployContractSolidityBytecodeV1Response = {
+    transactionReceipt: runTxResponse.transactionReceipt,
+  };
+  return res;
 }

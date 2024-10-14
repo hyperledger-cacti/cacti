@@ -102,14 +102,8 @@ import { BesuGrpcSvcOpenApi } from "./grpc-services/besu-grpc-svc-open-api";
 import { BesuGrpcSvcStreams } from "./grpc-services/besu-grpc-svc-streams";
 import { getBlockV1Http } from "./impl/get-block-v1/get-block-v1-http";
 import { transactV1Impl } from "./impl/transact-v1/transact-v1-impl";
-import {
-  IDeployContractV1KeychainResponse,
-  deployContractV1Keychain,
-} from "./impl/deploy-contract-v1/deploy-contract-v1-keychain";
-import {
-  IDeployContractV1NoKeychainResponse,
-  deployContractV1NoKeychain,
-} from "./impl/deploy-contract-v1/deploy-contract-v1-no-keychain";
+import { deployContractV1Keychain } from "./impl/deploy-contract-v1/deploy-contract-v1-keychain";
+import { deployContractV1NoKeychain } from "./impl/deploy-contract-v1/deploy-contract-v1-no-keychain";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -166,6 +160,7 @@ export class PluginLedgerConnectorBesu
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level: this.logLevel, label });
 
+    this.log.debug("Creating WebsocketProvider for %s", options.rpcApiWsHost);
     this.web3Provider = new Web3.providers.WebsocketProvider(
       this.options.rpcApiWsHost,
     );
@@ -203,6 +198,9 @@ export class PluginLedgerConnectorBesu
 
   public async onPluginInit(): Promise<void> {
     this.web3Quorum = Web3JsQuorum(this.web3);
+    this.log.info("onPluginInit() querying networkId...");
+    const networkId = await this.web3.eth.net.getId();
+    this.log.info("onPluginInit() obtained networkId: %d", networkId);
   }
 
   public async shutdown(): Promise<void> {
@@ -639,17 +637,12 @@ export class PluginLedgerConnectorBesu
       logLevel: this.logLevel,
     };
 
-    const deployContractV1KeychainResponse: IDeployContractV1KeychainResponse =
-      await deployContractV1Keychain(ctx, req);
-    if (
-      deployContractV1KeychainResponse.status &&
-      deployContractV1KeychainResponse.contractAddress &&
-      deployContractV1KeychainResponse.contract
-    ) {
-      this.contracts[deployContractV1KeychainResponse.contractName] =
-        deployContractV1KeychainResponse.contract;
+    const res = await deployContractV1Keychain(ctx, req);
+    const { status, contractAddress, contractName, contract } = res;
+    if (status && contractAddress && contract) {
+      this.contracts[contractName] = contract;
     }
-    return deployContractV1KeychainResponse.deployResponse;
+    return res.deployResponse;
   }
 
   public async deployContractNoKeychain(
@@ -661,13 +654,10 @@ export class PluginLedgerConnectorBesu
       web3: this.web3,
       logLevel: this.logLevel,
     };
-    const deployContractV1NoKeychainResponse: IDeployContractV1NoKeychainResponse =
-      await deployContractV1NoKeychain(ctx, req);
-    if (deployContractV1NoKeychainResponse.contractJsonString) {
-      this.contracts[deployContractV1NoKeychainResponse.contractName] =
-        deployContractV1NoKeychainResponse.contract;
-    }
-    return deployContractV1NoKeychainResponse.deployResponse;
+    this.log.debug("Invoking deployContractV1NoKeychain()...");
+    const res = deployContractV1NoKeychain(ctx, req);
+    this.log.debug("Ran deployContractV1NoKeychain() OK");
+    return res;
   }
 
   public async signTransaction(

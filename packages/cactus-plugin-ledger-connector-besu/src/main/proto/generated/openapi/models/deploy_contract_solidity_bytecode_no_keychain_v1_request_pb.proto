@@ -25,9 +25,6 @@ message DeployContractSolidityBytecodeNoKeychainV1RequestPB {
   // The application binary interface of the solidity contract
   repeated google.protobuf.Any contractAbi = 512852493;
 
-  // For use when not using keychain, pass the contract in as this string variable
-  string contractJSONString = 405816750;
-
   repeated google.protobuf.Any constructorArgs = 336490508;
 
   Web3SigningCredentialPB web3SigningCredential = 451211679;

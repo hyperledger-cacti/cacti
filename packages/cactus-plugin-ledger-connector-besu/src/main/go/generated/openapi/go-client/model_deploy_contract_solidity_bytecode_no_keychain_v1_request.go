@@ -23,8 +23,6 @@ type DeployContractSolidityBytecodeNoKeychainV1Request struct {
 	ContractName string `json:"contractName"`
 	// The application binary interface of the solidity contract
 	ContractAbi []interface{} `json:"contractAbi"`
-	// For use when not using keychain, pass the contract in as this string variable
-	ContractJSONString *string `json:"contractJSONString,omitempty"`
 	ConstructorArgs []interface{} `json:"constructorArgs"`
 	Web3SigningCredential Web3SigningCredential `json:"web3SigningCredential"`
 	// See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
@@ -108,38 +106,6 @@ func (o *DeployContractSolidityBytecodeNoKeychainV1Request) GetContractAbiOk() (
 // SetContractAbi sets field value
 func (o *DeployContractSolidityBytecodeNoKeychainV1Request) SetContractAbi(v []interface{}) {
 	o.ContractAbi = v
-}
-
-// GetContractJSONString returns the ContractJSONString field value if set, zero value otherwise.
-func (o *DeployContractSolidityBytecodeNoKeychainV1Request) GetContractJSONString() string {
-	if o == nil || IsNil(o.ContractJSONString) {
-		var ret string
-		return ret
-	}
-	return *o.ContractJSONString
-}
-
-// GetContractJSONStringOk returns a tuple with the ContractJSONString field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DeployContractSolidityBytecodeNoKeychainV1Request) GetContractJSONStringOk() (*string, bool) {
-	if o == nil || IsNil(o.ContractJSONString) {
-		return nil, false
-	}
-	return o.ContractJSONString, true
-}
-
-// HasContractJSONString returns a boolean if a field has been set.
-func (o *DeployContractSolidityBytecodeNoKeychainV1Request) HasContractJSONString() bool {
-	if o != nil && !IsNil(o.ContractJSONString) {
-		return true
-	}
-
-	return false
-}
-
-// SetContractJSONString gets a reference to the given string and assigns it to the ContractJSONString field.
-func (o *DeployContractSolidityBytecodeNoKeychainV1Request) SetContractJSONString(v string) {
-	o.ContractJSONString = &v
 }
 
 // GetConstructorArgs returns the ConstructorArgs field value
@@ -354,9 +320,6 @@ func (o DeployContractSolidityBytecodeNoKeychainV1Request) ToMap() (map[string]i
 	toSerialize := map[string]interface{}{}
 	toSerialize["contractName"] = o.ContractName
 	toSerialize["contractAbi"] = o.ContractAbi
-	if !IsNil(o.ContractJSONString) {
-		toSerialize["contractJSONString"] = o.ContractJSONString
-	}
 	toSerialize["constructorArgs"] = o.ConstructorArgs
 	toSerialize["web3SigningCredential"] = o.Web3SigningCredential
 	toSerialize["bytecode"] = o.Bytecode
