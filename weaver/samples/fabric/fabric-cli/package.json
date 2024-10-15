@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-fabric-cli",
-  "version": "2.0.0-rc.7",
+  "version": "2.0.0",
   "description": "fabric-cli CLI",
   "license": "Apache-2.0",
   "types": "build/types/types.d.ts",
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@hyperledger/cacti-weaver-protos-js": "2.0.0-rc.7",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-rc.7",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0",
     "body-parser": "1.20.3",
     "dotenv": "8.6.0",
     "express": "4.21.0",

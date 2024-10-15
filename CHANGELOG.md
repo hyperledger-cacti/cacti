@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/hyperledger-cacti/cacti/compare/v2.0.0-rc.7...v2.0.0) (2024-10-15)
+
+### Bug Fixes
+
+* mitigate CVE-2024-42461 - bump elliptic to v6.5.7 ([32c242a](https://github.com/hyperledger-cacti/cacti/commit/32c242a1a984a890aeba88073ff9805c697e5579))
+* **test-tooling:** use of hardcoded password ([63f2943](https://github.com/hyperledger-cacti/cacti/commit/63f2943d47960d2e09cd527da77f661b0f9265b2))
+
 # [2.0.0-rc.6](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.5...v2.0.0-rc.6) (2024-09-30)
 
 **Note:** Version bump only for package @hyperledger/cactus

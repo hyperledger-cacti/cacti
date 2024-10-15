@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-plugin-consortium-static",
-  "version": "2.0.0-rc.7",
+  "version": "2.0.0",
   "description": "A web service plugin that provides management capabilities on a Cactus consortium as a whole for administrative purposes.",
   "keywords": [
     "Hyperledger",
@@ -55,9 +55,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-rc.7",
-    "@hyperledger/cactus-core": "2.0.0-rc.7",
-    "@hyperledger/cactus-core-api": "2.0.0-rc.7",
+    "@hyperledger/cactus-common": "2.0.0",
+    "@hyperledger/cactus-core": "2.0.0",
+    "@hyperledger/cactus-core-api": "2.0.0",
     "axios": "1.7.7",
     "body-parser": "1.20.3",
     "express": "4.21.0",
@@ -70,10 +70,10 @@
     "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-rc.7",
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-rc.7",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-rc.7",
-    "@hyperledger/cactus-test-tooling": "2.0.0-rc.7",
+    "@hyperledger/cactus-api-client": "2.0.0",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0",
+    "@hyperledger/cactus-test-tooling": "2.0.0",
     "@types/express": "5.0.0",
     "@types/json-stable-stringify": "1.0.33",
     "@types/uuid": "10.0.0",
