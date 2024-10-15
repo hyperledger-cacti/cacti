@@ -5,13 +5,13 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<link href="https://hyperledger.github.io/cacti/weaver/getting-started/enabling-weaver-network/corda/" rel="canonical"/>
+<link href="https://hyperledger-cacti.github.io/cacti/weaver/getting-started/enabling-weaver-network/corda/" rel="canonical"/>
 <link href="../fabric/" rel="prev"/>
 <link href="../besu/" rel="next"/>
 <link href="../../../../images/HL_Cacti_Logo_Colorreverse.svg" rel="icon"/>
-<meta content="mkdocs-1.6.1, mkdocs-material-9.5.34" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.5.40" name="generator"/>
 <title>Corda - Using and Developing with Hyperledger Cacti</title>
-<link href="../../../../assets/stylesheets/main.35f28582.min.css" rel="stylesheet"/>
+<link href="../../../../assets/stylesheets/main.8c3ca2c6.min.css" rel="stylesheet"/>
 <link href="../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
@@ -1686,7 +1686,7 @@ You also need to add the following to your application's <code>build.gradle</cod
 <a href="#__codelineno-3-14" id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="w">  </span><span class="n">implementation</span><span class="o">(</span><span class="nl">group:</span><span class="w"> </span><span class="s1">'org.hyperledger.cacti.weaver.protos'</span><span class="o">,</span><span class="w"> </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'protos-java-kt'</span><span class="o">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s2">"2.0.0-rc.2"</span><span class="o">)</span>
 <a href="#__codelineno-3-15" id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="o">}</span>
 </code></pre></div>
-(Or check out the <a href="https://github.com/hyperledger/cacti/packages/1856827">package website</a> and select a different version.)</p>
+(Or check out the <a href="https://github.com/hyperledger-cacti/cacti/packages/1856827">package website</a> and select a different version.)</p>
 <h4 id="for-identity-administration">For Identity Administration<a class="headerlink" href="#for-identity-administration" title="Permanent link">¶</a></h4>
 <p>A Corda network needs to share its security domain (or membership) configuration, i.e., its nodes' CA certificate chains, with a foreign network with which it seeks to interoperate. Though such sharing can be implemented using several different mechanisms, ranging from manual to automated, the simplest and most modular way is to expose a REST endpoint that agents in foreign networks can reach. Further, this REST endpoint can be implemented as a standalone web application or it can be an extension of one or more of the existing client layer applications. (Multiple apps can expose the same endpoint serving the same information for redundancy.) We will demonstrate an example of this while leaving other implementation modes to the user.
 Let's say a Corda network consists of two nodes called <code>PartyA</code> and <code>PartyB</code>, each running a client layer application with a web server whose URL prefixes are <code>http://partya.mynetwork.com:9000</code> and <code>http://partyb.mynetwork.com:9000</code> respectively. Each app then can expose a REST endpoint (again, as an example) <code>http://partya.mynetwork.com:9000/node_sec_grp</code> and <code>http://partyb.mynetwork.com:9000/node_sec_grp</code> respectively.
@@ -1722,7 +1722,7 @@ An agent from a foreign network can query either <code>http://partya.mynetwork.c
 <h4 id="for-data-sharing_1">For Data Sharing<a class="headerlink" href="#for-data-sharing_1" title="Permanent link">¶</a></h4>
 <p>Consider a scenario inspired by the <a href="../../../user-stories/global-trade/">global trade use case</a> where a letter of credit (L/C) management business logic is installed in the <code>trade-finance-network</code> network, supports a flow named <code>UploadBillOfLading</code>, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network <code>trade-logistics-network</code> by querying the function <code>GetBillOfLading</code> exposed by the chaincode <code>shipmentcc</code> installed in the <code>tradelogisticschannel</code> channel (<em>The trade logistics network can be built on Corda as well. The steps for Weaver-enablement will mostly be the same, with the exception of view address creation logic. Here, for demonstration purposes, we assume that that counter-party network is built on Fabric</em>).</p>
 <p>(In preparation, a suitable access control policy must be recorded on <code>tradelogisticschannel</code> in <code>trade-logistics-network</code>, and a suitable verification policy must be recorded in the vault of <code>trade-finance-network</code>. We will see how to do this in the <a href="#startup-and-bootstrap-weaver-components">Startup and Bootstrap Weaver Components</a> section later.)</p>
-<p>You will need to insert some code in the client layer application that accepts a B/L and submits a <code>UploadBillOfLading</code> request in <code>trade-finance-network</code>. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the <code>InteroperableHelper.interopFlow</code> function offered by the <a href="https://github.com/hyperledger/cacti/packages/1856827">cacti-weaver-sdk-corda</a> library. The following code sample illustrates this:</p>
+<p>You will need to insert some code in the client layer application that accepts a B/L and submits a <code>UploadBillOfLading</code> request in <code>trade-finance-network</code>. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the <code>InteroperableHelper.interopFlow</code> function offered by the <a href="https://github.com/hyperledger-cacti/cacti/packages/1856827">cacti-weaver-sdk-corda</a> library. The following code sample illustrates this:</p>
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a>import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
 <a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a>import com.mynetwork.flow.UploadBillOfLading
 <a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a>
@@ -1933,8 +1933,8 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <h3 id="install-interoperation-cordapp-on-nodes">Install Interoperation CorDapp on Nodes<a class="headerlink" href="#install-interoperation-cordapp-on-nodes" title="Permanent link">¶</a></h3>
 <p>After bootstrapping the nodes folder, copy the following two CorDapps in <code>build/nodes/PartyA/cordapps</code> and <code>build/nodes/PartyB/cordapps</code> folders (<code>PartyA</code> and <code>PartyB</code> node names are for example only):</p>
 <ul>
-<li><a href="https://github.com/hyperledger/cacti/packages/1856825">org.hyperledger.cacti.weaver.imodule.corda.interop-contracts</a></li>
-<li><a href="https://github.com/hyperledger/cacti/packages/1856826">org.hyperledger.cacti.weaver.imodule.corda.interop-workflows</a></li>
+<li><a href="https://github.com/hyperledger-cacti/cacti/packages/1856825">org.hyperledger.cacti.weaver.imodule.corda.interop-contracts</a></li>
+<li><a href="https://github.com/hyperledger-cacti/cacti/packages/1856826">org.hyperledger.cacti.weaver.imodule.corda.interop-workflows</a></li>
 </ul>
 <table>
 <thead>
@@ -1953,8 +1953,8 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <h4 id="install-interoperation-cordapp-on-nodes_1">Install Interoperation CorDapp on Nodes<a class="headerlink" href="#install-interoperation-cordapp-on-nodes_1" title="Permanent link">¶</a></h4>
 <p>After bootstrapping the nodes folder, copy the following two CorDapps in <code>build/nodes/PartyA/cordapps</code> and <code>build/nodes/PartyB/cordapps</code> folders (<code>PartyA</code> and <code>PartyB</code> node names are for example only):</p>
 <ul>
-<li><a href="https://github.com/hyperledger/cacti/packages/1856825">org.hyperledger.cacti.weaver.imodule.corda.interop-contracts</a></li>
-<li><a href="https://github.com/hyperledger/cacti/packages/1856826">org.hyperledger.cacti.weaver.imodule.corda.interop-workflows</a></li>
+<li><a href="https://github.com/hyperledger-cacti/cacti/packages/1856825">org.hyperledger.cacti.weaver.imodule.corda.interop-contracts</a></li>
+<li><a href="https://github.com/hyperledger-cacti/cacti/packages/1856826">org.hyperledger.cacti.weaver.imodule.corda.interop-workflows</a></li>
 </ul>
 <table>
 <thead>
@@ -1970,9 +1970,9 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 </table>
 <h4 id="launch-relay">Launch Relay<a class="headerlink" href="#launch-relay" title="Permanent link">¶</a></h4>
 <p>You need to run one or more relays for network-to-network communication. Here we provide instructions to run one relay running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple relays, which will be useful from a failover perspective.)</p>
-<p>Weaver provides a <a href="https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server">pre-built image</a> for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it <code>relay_config</code>) and configuring the following files in it:</p>
+<p>Weaver provides a <a href="https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-relay-server">pre-built image</a> for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it <code>relay_config</code>) and configuring the following files in it:</p>
 <ul>
-<li><code>.env</code>: This sets suitable environment variables within the relay container. Copy the <code>.env.template</code> file <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/.env.template">from the repository</a> and customize it for your purposes, as indicated in the below sample:
+<li><code>.env</code>: This sets suitable environment variables within the relay container. Copy the <code>.env.template</code> file <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/.env.template">from the repository</a> and customize it for your purposes, as indicated in the below sample:
   <div class="highlight"><pre><span></span><code><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a>PATH_TO_CONFIG=./config.toml
 <a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a>RELAY_NAME=&lt;"name" in config.toml&gt;
 <a href="#__codelineno-15-3" id="__codelineno-15-3" name="__codelineno-15-3"></a>RELAY_PORT=&lt;relay-server-port/"port" in config.toml&gt;
@@ -1984,11 +1984,11 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <li>The <code>RELAY_NAME</code> variable specifies a unique name for this relay. It should match what's specified in the <code>config.toml</code> (more on that below).</li>
 <li>The <code>RELAY_PORT</code> variable specifies the port this relay server will listen on. It should match what's specified in the <code>config.toml</code> (more on that below).</li>
 <li>The <code>EXTERNAL_NETWORK</code> variable should be set to the <a href="https://docs.docker.com/compose/networking/">name</a> of your Fabric network.</li>
-<li>The <code>DOCKER_*</code> variables are used to specify the image on which the container will be built. Make sure you set <code>DOCKER_TAG</code> to the latest version you see on <a href="https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server">GitHub</a>.</li>
+<li>The <code>DOCKER_*</code> variables are used to specify the image on which the container will be built. Make sure you set <code>DOCKER_TAG</code> to the latest version you see on <a href="https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-relay-server">GitHub</a>.</li>
 </ul>
 </li>
 </ul>
-<p>For more details, see the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/relay-docker.md">Relay Docker README</a> ("Relay Server Image" and "Running With Docker Compose" sections).</p>
+<p>For more details, see the <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/relay-docker.md">Relay Docker README</a> ("Relay Server Image" and "Running With Docker Compose" sections).</p>
 <ul>
 <li><code>config.toml</code>: This is the file specified in the <code>PATH_TO_CONFIG</code> variable in the <code>.env</code>. It specifies properties of this relay and the driver(s) it supports. A sample is given below:
   <div class="highlight"><pre><span></span><code><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="n">name</span><span class="o">=</span><span class="err">&lt;relay-name&gt;</span>
@@ -2062,17 +2062,17 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 </tbody>
 </table>
 <ul>
-<li><code>docker-compose.yaml</code>: This specifies the properties of the relay container. You can use the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/docker-compose.yaml">file in the repository</a> verbatim.</li>
+<li><code>docker-compose.yaml</code>: This specifies the properties of the relay container. You can use the <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/docker-compose.yaml">file in the repository</a> verbatim.</li>
 </ul>
 <p>To start the relay server, navigate to the folder containing the above files and run the following:
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-19-1" id="__codelineno-19-1" name="__codelineno-19-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>relay-server
 </code></pre></div></p>
 <h4 id="launch-driver">Launch Driver<a class="headerlink" href="#launch-driver" title="Permanent link">¶</a></h4>
 <p>You need to run one or more drivers through which your relay can interact with your Corda network. Here we provide instructions to run one Corda driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Corda network.)</p>
-<p>Weaver provides a <a href="https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-driver-corda">pre-built image</a> for the Corda driver. Before launching a container, you just need to customize the container configuration for your Corda network, which you can do by simply configuring the following:</p>
+<p>Weaver provides a <a href="https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-driver-corda">pre-built image</a> for the Corda driver. Before launching a container, you just need to customize the container configuration for your Corda network, which you can do by simply configuring the following:</p>
 <ul>
 <li>
-<p><code>.env</code>: This sets suitable environment variables within the driver container. Copy the <code>.env.docker.template</code> file <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/corda-driver/.env.docker.template">from the repository</a> and customize it for your purposes, as indicated in the below sample:
+<p><code>.env</code>: This sets suitable environment variables within the driver container. Copy the <code>.env.docker.template</code> file <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/corda-driver/.env.docker.template">from the repository</a> and customize it for your purposes, as indicated in the below sample:
   <div class="highlight"><pre><span></span><code><a href="#__codelineno-20-1" id="__codelineno-20-1" name="__codelineno-20-1"></a>NETWORK_NAME=&lt;container-name-suffix&gt;
 <a href="#__codelineno-20-2" id="__codelineno-20-2" name="__codelineno-20-2"></a>DRIVER_PORT=&lt;driver-server-port&gt;
 <a href="#__codelineno-20-3" id="__codelineno-20-3" name="__codelineno-20-3"></a>DRIVER_RPC_USERNAME=&lt;driver-rpc-username&gt;
@@ -2097,20 +2097,20 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <li><strong>Enabling TLS</strong>:<ul>
 <li>You can make your driver accept TLS connections by specifying <code>DRIVER_TLS</code> as <code>true</code> and specifying a TLS certificate file path and private key file path in <code>DRIVER_TLS_CERT_PATH</code> and <code>DRIVER_TLS_KEY_PATH</code> respectively. The same certificate should be specified in this driver's definition in the <code>drivers</code> section in the <code>config.toml</code> file of your relay in the <code>tlsca_cert_path</code> property (see the earlier section on relay configuration).</li>
 <li>To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in <code>RELAY_TLSCA_CERT_PATH</code> (currently only one certificate can be configured) and set <code>RELAY_TLS</code> to <code>true</code>. This CA certificate should match the one specified in the <code>cert_path</code> property in the relay's <code>config.toml</code> file (see the earlier section on relay configuration):</li>
-<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/corda-driver/credentials</code> folder in the Fabric Driver container as specified in the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">docker compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>DRIVER_TLS_CERT_PATH</code>, <code>DRIVER_TLS_KEY_PATH</code>, and <code>RELAY_TLSCA_CERT_PATH</code> variables.</li>
+<li>You can point to the folder in your host system containing the certificate and key using the <code>TLS_CREDENTIALS_DIR</code> variable. (This folder will be synced to the <code>/corda-driver/credentials</code> folder in the Fabric Driver container as specified in the <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/fabric-driver/docker-compose.yml">docker compose file</a>.) Make sure you point to the right certificate and key file paths within the container using the <code>DRIVER_TLS_CERT_PATH</code>, <code>DRIVER_TLS_KEY_PATH</code>, and <code>RELAY_TLSCA_CERT_PATH</code> variables.</li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<p><code>docker-compose.yaml</code>: This specifies the properties of the driver container. You can use the <a href="https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/corda-driver/docker-compose.yml">file in the repository</a> verbatim.</p>
+<p><code>docker-compose.yaml</code>: This specifies the properties of the driver container. You can use the <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/drivers/corda-driver/docker-compose.yml">file in the repository</a> verbatim.</p>
 </li>
 </ul>
 <p>To start the driver, navigate to the folder containing the above files and run the following:
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-21-1" id="__codelineno-21-1" name="__codelineno-21-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div></p>
 <h4 id="vault-initialization">Vault Initialization<a class="headerlink" href="#vault-initialization" title="Permanent link">¶</a></h4>
-<p>To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the <a href="https://github.com/hyperledger/cacti/packages/1856827">Corda SDK</a> (<code>org.hyperledger.cacti.weaver.sdk.corda.weaver-sdk-corda</code>):</p>
+<p>To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the <a href="https://github.com/hyperledger-cacti/cacti/packages/1856827">Corda SDK</a> (<code>org.hyperledger.cacti.weaver.sdk.corda.weaver-sdk-corda</code>):</p>
 <ul>
 <li><strong>Access control policies</strong>:
   Let's take the example of the request made from <code>trade-finance-network</code> to <code>trade-logistics-network</code> for a B/L earlier in this document. <code>trade-logistics-network</code> can have a policy of the following form permitting access to the <code>GetBillOfLading</code> function from a client representing the <code>PartyA</code> node in <code>trade-finance-network</code> as follows:
@@ -2166,7 +2166,7 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 </tr>
 </tbody>
 </table>
-<p>You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function <code>VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)</code>, where <code>proxy</code> is an instance of <code>CordaRPCOps</code> as described in previous sections, and <code>verificationPolicyProto</code> is an object of protobuf <code>org.hyperledger.cacti.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy</code>. You can examine the full proto structure <a href="https://github.com/hyperledger/cacti/blob/main/weaver/common/protos/common/verification_policy.proto">here</a>. (<em>Google's protobuf library can be used to convert above JSON to protobuf object.</em>)</p>
+<p>You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function <code>VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)</code>, where <code>proxy</code> is an instance of <code>CordaRPCOps</code> as described in previous sections, and <code>verificationPolicyProto</code> is an object of protobuf <code>org.hyperledger.cacti.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy</code>. You can examine the full proto structure <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/common/protos/common/verification_policy.proto">here</a>. (<em>Google's protobuf library can be used to convert above JSON to protobuf object.</em>)</p>
 <table>
 <thead>
 <tr>
@@ -2260,8 +2260,8 @@ Also, the Corda Driver (which we will setup in the following sections) needs a s
 <div class="md-dialog" data-md-component="dialog">
 <div class="md-dialog__inner md-typeset"></div>
 </div>
-<script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
-<script src="../../../../assets/javascripts/bundle.56dfad97.min.js"></script>
+<script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../../../../assets/javascripts/bundle.525ec568.min.js"></script>
 <script>document$.subscribe(() => {
             window.update_swagger_ui_iframe_height = function (id) {
                 var iFrameID = document.getElementById(id);

@@ -5,13 +5,13 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<link href="https://hyperledger.github.io/cacti/cactus/ledger-browser/plugin-apps/ethereum-browser/" rel="canonical"/>
+<link href="https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/ethereum-browser/" rel="canonical"/>
 <link href="../app-patterns/" rel="prev"/>
 <link href="../fabric-browser/" rel="next"/>
 <link href="../../../../images/HL_Cacti_Logo_Colorreverse.svg" rel="icon"/>
-<meta content="mkdocs-1.6.1, mkdocs-material-9.5.34" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.5.40" name="generator"/>
 <title>Ethereum Browser - Using and Developing with Hyperledger Cacti</title>
-<link href="../../../../assets/stylesheets/main.35f28582.min.css" rel="stylesheet"/>
+<link href="../../../../assets/stylesheets/main.8c3ca2c6.min.css" rel="stylesheet"/>
 <link href="../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
@@ -1600,10 +1600,10 @@
 <p>To set up the GUI app, you'll need a <code>Supabase URL</code>, <code>API key</code>, and the <code>Schema</code> under which the data resides in the database.</p>
 <p>Additionally, you'll need a <code>PostgreSQL connection string</code> to start the persistence plugin.</p>
 <h5 id="expose-custom-schema">Expose custom schema<a class="headerlink" href="#expose-custom-schema" title="Permanent link">¶</a></h5>
-<p>Fabric data is stored in a custom schema named <code>ethereum</code>. To access this data from our GUI application, you need to ensure the schema is exposed. If you're using our <a href="https://github.com/hyperledger/cacti/tree/main/tools/docker/supabase-all-in-one">supabase-all-in-one</a> image, all application schemas, including <code>ethereum</code>, are already exposed, so you can skip this step. However, if you're using Supabase Cloud, you'll need to go to the <a href="https://supabase.com/dashboard/project/_/settings/api">API settings</a> and add <code>ethereum</code> to the <code>Exposed schemas</code> list.</p>
+<p>Fabric data is stored in a custom schema named <code>ethereum</code>. To access this data from our GUI application, you need to ensure the schema is exposed. If you're using our <a href="https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/supabase-all-in-one">supabase-all-in-one</a> image, all application schemas, including <code>ethereum</code>, are already exposed, so you can skip this step. However, if you're using Supabase Cloud, you'll need to go to the <a href="https://supabase.com/dashboard/project/_/settings/api">API settings</a> and add <code>ethereum</code> to the <code>Exposed schemas</code> list.</p>
 <p>For more details, refer to <a href="https://supabase.com/docs/guides/api/using-custom-schemas">the full guide on custom schemas</a> (note that the necessary SQL code has already been executed during the persistence plugin schema setup).</p>
 <h4 id="ethereum-ledger-optional">Ethereum Ledger (Optional)<a class="headerlink" href="#ethereum-ledger-optional" title="Permanent link">¶</a></h4>
-<p>This step is optional as you can use any running Ethereum ledger. However, for testing purposes, you may use our <a href="https://github.com/hyperledger/cacti/tree/main/tools/docker/geth-all-in-one">geth-all-in-one</a>. To start it, execute the following commands from the root of your project:</p>
+<p>This step is optional as you can use any running Ethereum ledger. However, for testing purposes, you may use our <a href="https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/geth-all-in-one">geth-all-in-one</a>. To start it, execute the following commands from the root of your project:</p>
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="c1"># Build</span>
 <a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>docker<span class="w"> </span>build<span class="w"> </span>./tools/docker/geth-all-in-one/<span class="w"> </span>-t<span class="w"> </span>cactus_geth_all_in_one
 <a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>
@@ -1611,7 +1611,7 @@
 <a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--name<span class="w"> </span>geth_aio_testnet<span class="w"> </span>--detach<span class="w"> </span>-p<span class="w"> </span><span class="m">8545</span>:8545<span class="w"> </span>-p<span class="w"> </span><span class="m">8546</span>:8546<span class="w"> </span>cactus_geth_all_in_one
 </code></pre></div>
 <h3 id="persistence-plugin_1">Persistence Plugin<a class="headerlink" href="#persistence-plugin_1" title="Permanent link">¶</a></h3>
-<p>Follow the instructions in the <a href="https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-persistence-ethereum">plugin README file</a>.</p>
+<p>Follow the instructions in the <a href="https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-persistence-ethereum">plugin README file</a>.</p>
 <p>To quickly set up the plugin for your Ethereum ledger, run the sample setup script:</p>
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>packages/cactus-plugin-persistence-ethereum/
 <a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="c1"># Replace the environment variables with JSON-RPC WS url to your ledger and postgresql connection string to your database instance.</span>
@@ -1709,8 +1709,8 @@
 <div class="md-dialog" data-md-component="dialog">
 <div class="md-dialog__inner md-typeset"></div>
 </div>
-<script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
-<script src="../../../../assets/javascripts/bundle.56dfad97.min.js"></script>
+<script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../../../../assets/javascripts/bundle.525ec568.min.js"></script>
 <script>document$.subscribe(() => {
             window.update_swagger_ui_iframe_height = function (id) {
                 var iFrameID = document.getElementById(id);
