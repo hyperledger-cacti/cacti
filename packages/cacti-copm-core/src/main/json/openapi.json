@@ -1,0 +1,473 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cacti Plugin - Common Operator Primitives",
+    "description": "Contains/describes the Hyperledger Cacti Common Operator Primitives plugin.  These primitives require specific chaincode and weaver relays to be deployed on the network as described at https://hyperledger.github.io/cacti/weaver/introduction/.",
+    "version": "2.0.0-rc.2",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "TransferrableAssetV1": {
+        "type": "object",
+        "description": "An asset.  One of 'asset_id' or 'asset_quantity' is required.  Please see https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/protocols/asset-transfer/generic.md",
+        "oneOf": [
+          {
+            "required": ["asset_type", "asset_id"]
+          },
+          {
+            "required": ["asset_type", "asset_quantity"]
+          }
+        ],
+        "properties": {
+          "asset_type": {
+            "type": "string",
+            "example": "bond"
+          },
+          "asset_id": {
+            "type": "string",
+            "description": "encoded description of NFT"
+          },
+          "asset_quantity": {
+            "type": "integer",
+            "example": 22
+          }
+        }
+      },
+      "AssetAccountV1": {
+        "description": "A network account used in exchanging or transferring assets.",
+        "type": "object",
+        "required": ["network", "user_id"],
+        "properties": {
+          "network": {
+            "type": "string",
+            "example": "network1.org"
+          },
+          "user_id": {
+            "type": "string",
+            "example": "Alice"
+          }
+        }
+      },
+      "AssetPledgeV1": {
+        "description": "Asset Pledge per https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/protocols/asset-transfer/generic.md#protocol-units-or-building-blocks",
+        "type": "object",
+        "required": [
+          "source",
+          "destination",
+          "asset",
+          "destination_certificate"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/AssetAccountV1"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/AssetAccountV1",
+            "example": {
+              "network": "network2.org",
+              "user_id": "Bob"
+            }
+          },
+          "asset": {
+            "$ref": "#/components/schemas/TransferrableAssetV1",
+            "example": {
+              "type": "bond",
+              "asset_id": "ref203"
+            }
+          },
+          "expiry_secs": {
+            "type": "integer",
+            "format": "int64",
+            "default": 3600
+          },
+          "destination_certificate": {
+            "type": "string"
+          }
+        }
+      },
+      "HashInfoV1": {
+        "description": "hash used to lock asset in HTLC when claiming",
+        "type": "object",
+        "required": ["hash_fcn", "secret"],
+        "properties": {
+          "hash_fcn": {
+            "type": "string",
+            "example": "SHA256"
+          },
+          "secret": {
+            "type": "string",
+            "example": "my_secret"
+          }
+        }
+      },
+      "AssetLockV1": {
+        "description": "lock an asset by HTLC so it can be claimed by a user on the same network.  https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/protocols/asset-exchange/generic-htlc.md",
+        "required": ["asset", "hash_info", "expiry_secs"],
+        "properties": {
+          "asset": {
+            "$ref": "#/components/schemas/TransferrableAssetV1",
+            "example": {
+              "type": "bond",
+              "asset_id": "ref203"
+            }
+          },
+          "owner": {
+            "$ref": "#/components/schemas/AssetAccountV1"
+          },
+          "hash_info": {
+            "$ref": "#/components/schemas/HashInfoV1"
+          },
+          "destination_certificate": {
+            "type": "string"
+          },
+          "source_certificate": {
+            "type": "string"
+          },
+          "expiry_secs": {
+            "type": "integer",
+            "format": "int64",
+            "default": 3600
+          }
+        }
+      },
+      "AssetLockClaimV1": {
+        "description": "Claim a previously locked asset on the same network.\n\"lock_id\" is required for fungible assets, \"asset\" is required for non-fungible assets.\nhttps://github.com/hyperledger/cacti/blob/main/weaver/rfcs/protocols/asset-exchange/generic-htlc.md",
+        "required": [
+          "lock_id",
+          "source",
+          "destination",
+          "asset",
+          "source_certificate",
+          "hash_info"
+        ],
+        "properties": {
+          "lock_id": {
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/AssetAccountV1"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/AssetAccountV1",
+            "example": {
+              "network": "network2.org",
+              "user_id": "Bob"
+            }
+          },
+          "asset": {
+            "$ref": "#/components/schemas/TransferrableAssetV1",
+            "example": {
+              "type": "bond",
+              "asset_id": "ref203"
+            }
+          },
+          "hash_info": {
+            "$ref": "#/components/schemas/HashInfoV1"
+          },
+          "source_certificate": {
+            "type": "string"
+          },
+          "dest_certificate": {
+            "type": "string"
+          }
+        }
+      },
+      "AssetPledgeClaimV1": {
+        "description": "Asset Claim per https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/protocols/asset-transfer/generic.md#protocol-units-or-building-blocks",
+        "required": [
+          "pledge_id",
+          "source",
+          "destination",
+          "asset",
+          "source_certificate"
+        ],
+        "properties": {
+          "pledge_id": {
+            "type": "string",
+            "example": "pledge_550e8400-e29b-41d4-a716-446655440000"
+          },
+          "source": {
+            "$ref": "#/components/schemas/AssetAccountV1"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/AssetAccountV1",
+            "example": {
+              "network": "network2.org",
+              "gateway": "gateway2.network2.org",
+              "user_id": "Bob"
+            }
+          },
+          "asset": {
+            "$ref": "#/components/schemas/TransferrableAssetV1",
+            "example": {
+              "type": "bond",
+              "asset_id": "ref203"
+            }
+          },
+          "source_certificate": {
+            "type": "string"
+          },
+          "dest_certificate": {
+            "type": "string"
+          }
+        }
+      },
+      "ViewAddressV1": {
+        "description": "View addressing per https://github.com/hyperledger/cacti/blob/main/weaver/rfcs/formats/views/addressing.md#views",
+        "properties": {
+          "contract_id": {
+            "type": "string",
+            "example": "trade-chaincode"
+          },
+          "function": {
+            "type": "string",
+            "example": "getBillOfLading"
+          },
+          "input": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "bill-10012"
+            }
+          }
+        }
+      },
+      "ViewV1": {
+        "description": "The address of a view on a given network",
+        "properties": {
+          "network": {
+            "type": "string",
+            "example": "network1"
+          },
+          "view_address": {
+            "$ref": "#/components/schemas/ViewAddressV1"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/pledge-asset": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/pledge-asset",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "pledgeAssetV1",
+        "summary": "Pledge an asset.",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetPledgeV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pledge_id": {
+                      "type": "string",
+                      "example": "pledge-550e8400-e29b-41d4-a716-446655440000"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/lock-asset": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/lock-asset",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "lockAssetV1",
+        "summary": "Lock an asset.",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetLockV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "lock_id": {
+                      "type": "string",
+                      "example": "lock-550e8400-e29b-41d4-a716-446655440000"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-pledged-asset": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-pledged-asset",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "claimPledgedAssetV1",
+        "summary": "Claim an asset that has been pledged.",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetPledgeClaimV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "claim_id": {
+                      "type": "string",
+                      "example": "claim-550e8400-e29b-41d4-a716-446655440000"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-locked-asset": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/claim-locked-asset",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "claimLockedAssetV1",
+        "summary": "Claim an asset that has been locked.",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetLockClaimV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "claim_id": {
+                      "type": "string",
+                      "example": "claim-550e8400-e29b-41d4-a716-446655440000"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-copm/get-verified-view": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-copm/get-verified-view",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "get_verified_viewV1",
+        "summary": "Runs a transaction on the remote network and returns the result.  Result is verified according to rules pre-populated in the chaincode.",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "$ref": "#/components/schemas/AssetAccountV1"
+                  },
+                  "view": {
+                    "$ref": "#/components/schemas/ViewV1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": "bill:invoice-2033"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

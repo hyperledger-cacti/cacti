@@ -1,0 +1,69 @@
+on:
+    # Triggers the workflow on push or pull request events but only for the main branch
+    workflow_call:
+  
+env:
+  NODEJS_VERSION: v18.18.2
+  RUN_TRIVY_SCAN: true
+  RUN_CODE_COVERAGE: true
+
+jobs:
+    copm-fabric-fabric-pledge-and-provestate:
+        continue-on-error: false
+        env:
+          CACTI_NPM_PACKAGE_NAME: "@hyperledger/cacti-plugin-copm-fabric"
+          HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+          FULL_BUILD_DISABLED: true
+          FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+          JEST_TEST_PATTERN: packages/cacti-plugin-copm-fabric/src/test/typescript/integration/test-copm-pledge-claim.test.ts packages/cacti-plugin-copm-fabric/src/test/typescript/integration/test-copm-getverifiedview.test.ts
+          JEST_TEST_RUNNER_DISABLED: false
+          JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/plc-copm-fabric-fabric-pledge
+          JEST_TEST_CODE_COVERAGE_ENABLED: true
+          TAPE_TEST_PATTERN: ""
+          TAPE_TEST_RUNNER_DISABLED: true
+        runs-on: ubuntu-22.04
+        steps:
+          - uses: actions/checkout@v4.1.1
+          - uses: ./.github/actions/copm_test/
+          - name: Make the fabric network
+            run: make pledge-network --trace
+            working-directory: packages/cacti-plugin-copm-fabric
+          - name: show the running network
+            run: docker container ls
+          - run: ./tools/ci.sh
+          - name: Upload coverage reports as artifacts
+            if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
+            uses: actions/upload-artifact@v4.3.3
+            with:
+              name: coverage-reports-copm-fabric
+              path: ./code-coverage-ts/**/
+
+    copm-fabric-fabric-lock:
+        continue-on-error: false
+        env:
+          CACTI_NPM_PACKAGE_NAME: "@hyperledger/cacti-plugin-copm-fabric"
+          HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+          FULL_BUILD_DISABLED: true
+          FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+          JEST_TEST_PATTERN: packages/cacti-plugin-copm-fabric/src/test/typescript/integration/test-copm-lock-claim.test.ts
+          JEST_TEST_RUNNER_DISABLED: false
+          JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/plc-copm-fabric-fabric-lock
+          JEST_TEST_CODE_COVERAGE_ENABLED: true
+          TAPE_TEST_PATTERN: ""
+          TAPE_TEST_RUNNER_DISABLED: true
+        runs-on: ubuntu-22.04
+        steps:
+          - uses: actions/checkout@v4.1.1
+          - uses: ./.github/actions/copm_test/
+          - name: Make the fabric network
+            run: make lock-network --trace
+            working-directory: packages/cacti-plugin-copm-fabric
+          - name: show the running network
+            run: docker container ls
+          - run: ./tools/ci.sh
+          - name: Upload coverage reports as artifacts
+            if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
+            uses: actions/upload-artifact@v4.3.3
+            with:
+              name: coverage-reports-copm-fabric-lock
+              path: ./code-coverage-ts/**/

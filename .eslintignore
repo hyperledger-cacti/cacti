@@ -30,6 +30,7 @@ weaver/common/policy-dsl/parser/PolicyListener.js
 weaver/common/policy-dsl/parser/PolicyParser.js
 weaver/common/policy-dsl/test/MyErrorListener.js
 weaver/common/policy-dsl/test/MyParseTreeVisitor.js
+weaver/common/protos-js/driver/driver_grpc_pb.js
 weaver/core/drivers/fabric-driver/server/dbConnector.ts
 weaver/core/drivers/fabric-driver/server/events.ts
 weaver/core/drivers/fabric-driver/server/fabric-code.ts

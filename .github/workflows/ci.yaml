@@ -53,6 +53,7 @@ jobs:
       plugin-htlc-coordinator-besu-changed: ${{ steps.changes.outputs.plugin-htlc-coordinator-besu-changed }}
       test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
       ghcr-dev-container-vscode-changed: ${{ steps.changes.outputs.ghcr-dev-container-vscode-changed }}
+      plugin-copm-fabric-changed: ${{ steps.changes.outputs.plugin-copm-fabric-changed }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.7
@@ -162,6 +163,10 @@ jobs:
               - './packages/cactus-test-tooling/**'
               - './packages/cactus-plugin-keychain-memory/**'
               # - './.github/workflows/ci.yaml'
+
+            plugin-copm-fabric-changed:
+              - './packages/cacti-copm-common/**'
+              - './packages/cacti-plugin-copm-fabric/**'
 
   build-dev:
     continue-on-error: false
@@ -1449,6 +1454,14 @@ jobs:
         with:
           name: coverage-reports-27
           path: ./code-coverage-ts/**/
+
+  copm-tests:
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-copm-fabric-changed == 'true'
+    uses: ./.github/workflows/test_copm.yaml
+        
 
   plc-fabric-0:
     needs:
