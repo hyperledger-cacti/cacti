@@ -80,7 +80,8 @@
     "web3-eth": "1.6.1",
     "web3-eth-contract": "1.6.1",
     "web3-utils": "1.6.1",
-    "web3js-quorum": "22.4.0"
+    "web3js-quorum": "22.4.0",
+    "websocket-event-codes": "1.1.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-rc.7",
@@ -105,7 +106,8 @@
     "tsx": "4.16.2",
     "uuid": "10.0.0",
     "web3-core": "1.6.1",
-    "web3-eth": "1.6.1"
+    "web3-eth": "1.6.1",
+    "web3-eth-accounts": "patch:web3-eth-accounts@npm%3A1.6.1#~/.yarn/patches/web3-eth-accounts-npm-1.6.1-c95f31ca81.patch"
   },
   "engines": {
     "node": ">=18",
