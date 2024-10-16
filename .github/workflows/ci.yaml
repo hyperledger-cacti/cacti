@@ -359,7 +359,12 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - name: Installing AreTheTypesWrong Library
+        run: npm i -g @arethetypeswrong/cli
       - run: ./tools/ci.sh
+      - run: yarn lerna exec 'npm pack'
+      - name: Running AreTheTypesWrong scan
+        run: yarn run are-the-types-wrong
   yarn_tools_validate_bundle_names:
     continue-on-error: false
     env:

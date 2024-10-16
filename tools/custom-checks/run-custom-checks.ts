@@ -9,6 +9,8 @@ import {
   checkMissingNodeDeps,
 } from "./check-missing-node-deps";
 import { getAllPkgDirs } from "./get-all-pkg-dirs";
+import { getAllTgzPath, IGetAllTgzPathResponse } from "./get-all-tgz-path";
+import { runAttwOnTgz } from "./run-attw-on-tgz";
 
 export async function runCustomChecks(
   argv: string[],
@@ -69,6 +71,18 @@ export async function runCustomChecks(
       pkgDirsToCheck,
     };
     const [success, errors] = await checkMissingNodeDeps(req);
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
+  {
+    const { relativePaths } = await getAllTgzPath();
+
+    const req: IGetAllTgzPathResponse = {
+      relativePaths,
+    };
+
+    const [success, errors] = await runAttwOnTgz();
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
