@@ -53,7 +53,6 @@ export async function fetchJsonFromUrl(url) {
 const PULL_REQ_REQUIREMENTS_REGEX = /\*\*Pull\sRequest\sRequirements(.|\n)*/gim;
 const SIGNED_OFF_REGEX = /(")*Signed-off-by:(.|\s)*/gim;
 const COMMIT_TITLE_REGEX = /^.*$/m;
-const HYPHEN_REGEX = /(-)+/gm;
 const BACKTICK_REGEX = /`+/gm;
 const COMMIT_TO_BE_REVIEWED_REGEX = /("#*\s*Commit\sto\sbe\sreviewed)/gim;
 const HYPERLEDGER_REFERENCE_REGEX = /hyperledger#/gm;
@@ -80,7 +79,6 @@ commitMessagesMetadata.forEach((commitMessageMetadata) => {
   commitMessageList.push(
     commitMessageMetadata["commit"]["message"]
       .replace(SIGNED_OFF_REGEX, "")
-      .replace(HYPHEN_REGEX, "")
       .replace(BACKTICK_REGEX, "")
       .replace(HYPERLEDGER_REFERENCE_REGEX, "#")
       .replace(WHITESPACES_HARDCODED_REGEX, "")
@@ -92,7 +90,6 @@ let prBodyStriped = prBodyRaw
   .replace(PULL_REQ_REQUIREMENTS_REGEX, "")
   .replace(WHITESPACES_HARDCODED_REGEX, "\n")
   .replace(SIGNED_OFF_REGEX, "")
-  .replace(HYPHEN_REGEX, "")
   .replace(BACKTICK_REGEX, "")
   .replace(HYPERLEDGER_REFERENCE_REGEX, "#")
   .replace(COMMIT_TO_BE_REVIEWED_REGEX, "")
