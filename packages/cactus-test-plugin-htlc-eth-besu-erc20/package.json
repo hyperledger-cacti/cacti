@@ -59,7 +59,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "axios": "1.7.7",
-    "express": "4.21.0",
+    "express": "4.21.1",
     "web3-eth-abi": "4.0.3",
     "web3-utils": "4.2.1"
   },
