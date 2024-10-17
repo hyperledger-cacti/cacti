@@ -40,7 +40,7 @@
     "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
     "body-parser": "1.20.3",
     "dotenv": "8.6.0",
-    "express": "4.21.0",
+    "express": "4.21.1",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
@@ -49,7 +49,7 @@
     "winston": "3.10.0"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.11.3",
+    "@grpc/grpc-js": "1.12.4",
     "@grpc/proto-loader": "0.7.13",
     "@types/express": "5.0.0",
     "@types/node": "18.11.9",

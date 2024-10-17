@@ -63,7 +63,7 @@
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.7.7",
-    "express": "4.21.0",
+    "express": "4.21.1",
     "http-errors-enhanced-cjs": "2.0.1",
     "joi": "17.13.3",
     "openapi-types": "12.1.3",

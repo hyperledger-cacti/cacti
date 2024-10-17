@@ -80,7 +80,7 @@
     "@types/express": "5.0.0",
     "@types/pg": "8.6.5",
     "body-parser": "1.20.3",
-    "express": "4.21.0",
+    "express": "4.21.1",
     "fabric-network": "2.5.0-snapshot.23",
     "jest-extended": "4.0.1",
     "rxjs": "7.8.1",
