@@ -172,13 +172,10 @@
   ],
   "compilerOptions": {
     "incremental": true,
-    "target": "ES2017",
+    "target": "ES2022",
     "module": "Node16",
     "lib": [
-      "es2015",
-      "es2016",
-      "es2017",
-      "es2019",
+      "ES2022",
       "dom"
     ] /* Specify library files to be included in the compilation. */,
     // "allowJs": true,                       /* Allow javascript files to be compiled. */
