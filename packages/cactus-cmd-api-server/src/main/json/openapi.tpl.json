@@ -76,8 +76,20 @@
         "type": "string",
         "nullable": false
       }
+    },
+    "securitySchemes": {
+      "bearerTokenAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JSON Web Tokens"
+      }
     }
   },
+  "security": [
+    {
+      "bearerTokenAuth": ["read:health", "read:metrics", "read:spec"]
+    }
+  ],
   "paths": {
     "/api/v1/api-server/healthcheck": {
       "get": {
@@ -101,8 +113,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerTokenAuth": ["read:health"]
+          }
+        ]
       }
     },
     "/api/v1/api-server/get-prometheus-exporter-metrics": {
@@ -126,8 +146,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerTokenAuth": ["read:metrics"]
+          }
+        ]
       }
     },
     "/api/v1/api-server/get-open-api-spec": {
@@ -151,8 +179,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerTokenAuth": ["read:spec"]
+          }
+        ]
       }
     }
   }
