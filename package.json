@@ -57,6 +57,7 @@
     "format:prettier": "prettier --write --config .prettierrc.js \"./**/{openapi.json,*.ts,*.js}\"",
     "spellcheck": "cspell lint --no-progress \"*/*/src/**/*.{js,ts}\"",
     "tsc": "NODE_OPTIONS=\"--max_old_space_size=3072\" tsc --build --verbose",
+    "are-the-types-wrong": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-attw-on-tgz.ts",
     "codegen": "run-s 'codegen:warmup-*' codegen:lerna codegen:cleanup",
     "codegen:cleanup": "rm --force --verbose ./openapitools.json",
     "codegen:lerna": "lerna run codegen",
