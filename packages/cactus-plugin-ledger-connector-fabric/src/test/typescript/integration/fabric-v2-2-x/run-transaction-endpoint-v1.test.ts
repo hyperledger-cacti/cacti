@@ -251,6 +251,29 @@ describe(testCase, () => {
     }
 
     {
+      const connectionProfileBase64Encoded = Buffer.from(
+        JSON.stringify(connectionProfile),
+      ).toString("base64");
+      const sshConfigBase64Encoded = Buffer.from(
+        JSON.stringify(sshConfig),
+      ).toString("base64");
+      const pluginOptionsSerialized: IPluginLedgerConnectorFabricOptions = {
+        instanceId: uuidv4(),
+        pluginRegistry,
+        sshConfigBase64Encoded,
+        cliContainerEnv: {},
+        peerBinary: "/fabric-samples/bin/peer",
+        logLevel,
+        connectionProfileBase64Encoded,
+        discoveryOptions,
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+        },
+      };
+      const pluginWithSerializedInputs = new PluginLedgerConnectorFabric(
+        pluginOptionsSerialized,
+      );
       const req: RunTransactionRequest = {
         signingCredential,
         gatewayOptions: {
@@ -267,10 +290,9 @@ describe(testCase, () => {
         endorsingOrgs: ["org1.example.com", "Org2MSP"],
       };
 
-      const res = await apiClient.runTransactionV1(req);
+      const res = await pluginWithSerializedInputs.transact(req);
       expect(res).toBeTruthy();
-      expect(res.data).toBeTruthy();
-      expect(res.status).toEqual(200);
+      expect(res.transactionId).toBeTruthy();
     }
 
     {
