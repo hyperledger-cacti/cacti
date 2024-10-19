@@ -1,7 +1,7 @@
 site_name: Using and Developing with Hyperledger Cacti
 site_url: !ENV [SITE_URL, 'https://${{ github.repository_owner }}.github.io/cacti']
-repo_name: hyperledger/cacti
-repo_url: https://github.com/hyperledger/cacti
+repo_name: hyperledger-cacti/cacti
+repo_url: https://github.com/hyperledger-cacti/cacti
 theme:
   name: material
   custom_dir: overrides
