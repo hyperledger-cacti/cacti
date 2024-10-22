@@ -56,7 +56,7 @@ To use the SDK, add following in your `build.gradle`:
 ```
 repositories {
     maven {
-        url https://maven.pkg.github.com/hyperledger/cacti
+        url https://maven.pkg.github.com/hyperledger-cacti/cacti
         credentials {
             username <github-email>
             password <github-personal-access-token>

@@ -7,7 +7,7 @@ syntax = "proto3";
 package corda;
 
 option java_package = "org.hyperledger.cacti.weaver.protos.corda";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/corda";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/corda";
 
 message ViewData {
     message NotarizedPayload {

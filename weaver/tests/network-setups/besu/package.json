@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
-  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "dependencies": {
     "web3": "1.10.0"
   }

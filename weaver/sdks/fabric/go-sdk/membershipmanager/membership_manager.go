@@ -32,7 +32,7 @@ import (
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 	cidentity "github.com/hyperledger/fabric-gateway/pkg/identity"
 
-	cactiprotos "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	cactiprotos "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 )
 
 

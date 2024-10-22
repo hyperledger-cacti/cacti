@@ -11,8 +11,8 @@ To use this library, in you smart contract `go.mod`, add following in require (u
 ```
 require(
     ...
-    github.com/hyperledger/cacti/weaver/common/protos-go/v2 v1.5.3
-    github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2 v1.5.3
+    github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v1.5.3
+    github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2 v1.5.3
     ...
 )
 ```
@@ -24,7 +24,7 @@ Atleast following 5 functions needs to be added in chaincode (Note: the function
   ```go
   import (
       ...
-      "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+      "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
   )
   func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
       // Add some safety checks before calling LockAsset from library

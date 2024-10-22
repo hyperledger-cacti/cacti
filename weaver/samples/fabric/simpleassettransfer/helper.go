@@ -18,7 +18,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 )
 
 // functions to log and return errors

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"

@@ -1,4 +1,4 @@
-module github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils
+module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils
 
 go 1.20
 

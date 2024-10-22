@@ -4,6 +4,9 @@
 
 name: Deploy Go Modules
 
+env:
+  DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
 on:
   push:
     tags:
@@ -14,7 +17,7 @@ on:
 
 jobs:
   publish-protos-go:
-    if: github.repository_owner == 'hyperledger'
+    if: github.repository_owner == 'hyperledger-cacti'
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -70,7 +73,7 @@ jobs:
         run: sleep 300
           
   publish-lib-utils:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: ${{ always() && github.repository_owner == 'hyperledger-cacti' }}
     needs: publish-protos-go
     runs-on: ubuntu-22.04
     steps:
@@ -136,7 +139,7 @@ jobs:
         run: sleep 300
 
   publish-lib-asset-exchange:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: ${{ always() && github.repository_owner == 'hyperledger-cacti' }}
     needs: publish-protos-go
     runs-on: ubuntu-22.04
     steps:
@@ -202,7 +205,7 @@ jobs:
         run: sleep 300
       
   publish-interface-asset-mgmt:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: ${{ always() && github.repository_owner == 'hyperledger-cacti' }}
     needs: [publish-protos-go]
     runs-on: ubuntu-22.04
     steps:
@@ -268,7 +271,7 @@ jobs:
         run: sleep 300
 
   publish-interop-cc:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: ${{ always() && github.repository_owner == 'hyperledger-cacti' }}
     needs: [publish-protos-go, publish-lib-utils, publish-lib-asset-exchange]
     runs-on: ubuntu-22.04
     steps:
@@ -334,7 +337,7 @@ jobs:
         run: sleep 300
 
   publish-go-sdk:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: ${{ always() && github.repository_owner == 'hyperledger-cacti' }}
     needs: [publish-protos-go]
     runs-on: ubuntu-22.04
     steps:
@@ -400,7 +403,7 @@ jobs:
         run: sleep 300
         
   publish-weaver-fabric-cc-image:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: always()
     needs: [publish-protos-go, publish-lib-utils, publish-lib-asset-exchange]
     runs-on: ubuntu-22.04
     steps:
@@ -415,15 +418,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if package already exists
-        run: (make check-if-tag-exists && echo "WEAVER_FABRIC_CC_PUSH=true" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_CC_PUSH=false" >> $GITHUB_ENV
+        run: (make check-if-tag-exists DOCKER_REGISTRY=${DOCKER_REGISTRY} && echo "WEAVER_FABRIC_CC_PUSH=true" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_CC_PUSH=false" >> $GITHUB_ENV
         working-directory: weaver/core/network/fabric-interop-cc
 
       - name: Build and Push
         if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
-        run: make push-image
+        run: make push-image DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/network/fabric-interop-cc
         
       - name: Push latest tag
         if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
-        run: make push-image-latest
+        run: make push-image-latest DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/network/fabric-interop-cc

@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
-	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

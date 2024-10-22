@@ -7,7 +7,7 @@ syntax = "proto3";
 package fabric.view_data;
 
 option java_package = "org.hyperledger.cacti.weaver.protos.fabric.view_data";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/fabric";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/fabric";
 
 import "peer/proposal_response.proto";
 

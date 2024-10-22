@@ -77,7 +77,7 @@ jobs:
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger/cacti" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti" >> github.main.properties
 
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
 

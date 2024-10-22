@@ -6,7 +6,7 @@ syntax = "proto3";
 
 package common.state;
 option java_package = "org.hyperledger.cacti.weaver.protos.common.state";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common";
 
 // Metadata for a View
 message Meta {

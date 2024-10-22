@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/ethereum/go-ethereum/crypto/ecies"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 )
 
 func TestVerifyCertificateChain(t *testing.T) {

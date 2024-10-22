@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
+	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

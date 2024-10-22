@@ -5,7 +5,7 @@ package relay.satp;
 import "common/ack.proto";
 
 option java_package = "org.hyperledger.cacti.weaver.protos.relay.datatransfer";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/relay";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/relay";
 
 service SATP {
   // Stage 1 endpoints

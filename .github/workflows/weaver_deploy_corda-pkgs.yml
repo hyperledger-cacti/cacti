@@ -4,6 +4,9 @@
 
 name: Deploy Corda Packages
 
+env:
+  DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
 on:
   push:
     tags:
@@ -129,7 +132,7 @@ jobs:
         working-directory: weaver/sdks/corda
     
   publish-driver-image:
-    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    if: always()
     needs: [publish-protos-java-kt, publish-interop-app, publish-sdk]
     runs-on: ubuntu-22.04
     permissions:
@@ -157,15 +160,15 @@ jobs:
         working-directory: weaver/core/drivers/corda-driver
 
       - name: Check if package already exists
-        run: (make check-if-tag-exists && echo "CORDA_DRIVER_PUSH=true" >> $GITHUB_ENV) || echo "CORDA_DRIVER_PUSH=false" >> $GITHUB_ENV
+        run: (make check-if-tag-exists DOCKER_REGISTRY=${DOCKER_REGISTRY} && echo "CORDA_DRIVER_PUSH=true" >> $GITHUB_ENV) || echo "CORDA_DRIVER_PUSH=false" >> $GITHUB_ENV
         working-directory: weaver/core/drivers/corda-driver
           
       - name: Build and Push
         if: ${{ env.CORDA_DRIVER_PUSH == 'true' }}
-        run: make push-image
+        run: make push-image DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/drivers/corda-driver
         
       - name: Push latest tag
         if: ${{ env.CORDA_DRIVER_PUSH == 'true' }}
-        run: make push-image-latest
+        run: make push-image-latest DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/drivers/corda-driver
