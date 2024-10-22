@@ -1,4 +1,4 @@
-import test, { Test } from "tape-promise/tape";
+import "jest-extended";
 
 import { v4 as uuidv4 } from "uuid";
 import { createServer } from "http";
@@ -16,6 +16,7 @@ import {
   Secp256k1Keys,
   KeyFormat,
   LogLevelDesc,
+  LoggerProvider,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -35,142 +36,155 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
-const testCase = "API client can call getPastLogs via network";
+// Main test case name and log level
+const testCase = "API client can call get-PastLogs via network";
 const logLevel: LogLevelDesc = "TRACE";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
-  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
-  const keychainId = uuidv4();
-  const keychainRef = uuidv4();
-
-  const { privateKey } = Secp256k1Keys.generateKeyPairsBuffer();
-  const keyHex = privateKey.toString("hex");
-  const pem = keyEncoder.encodePrivate(keyHex, KeyFormat.Raw, KeyFormat.PEM);
-
-  const keychain = new PluginKeychainMemory({
-    backend: new Map([[keychainRef, pem]]),
-    keychainId,
-    logLevel,
-    instanceId: uuidv4(),
-  });
-
-  const httpServer1 = createServer();
-  await new Promise((resolve, reject) => {
-    httpServer1.once("error", reject);
-    httpServer1.once("listening", resolve);
-    httpServer1.listen(0, "127.0.0.1");
-  });
-  const addressInfo1 = httpServer1.address() as AddressInfo;
-  t.comment(`HttpServer1 AddressInfo: ${JSON.stringify(addressInfo1)}`);
-  const node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
-  t.comment(`Cactus Node 1 Host: ${node1Host}`);
+describe("PluginLedgerBesu-v21GetPastLogs", () => {
+  const log = LoggerProvider.getOrCreate({
+      label: "v21-get-past-logs-endpoint.test.ts",
+      level: logLevel,
+    });
 
   const containerImageVersion = "2021-08-24--feat-1244";
   const containerImageName =
     "ghcr.io/hyperledger/cactus-besu-21-1-6-all-in-one";
   const besuOptions = { containerImageName, containerImageVersion };
   const besuTestLedger = new BesuTestLedger(besuOptions);
-  await besuTestLedger.start();
+
+  let apiServer: ApiServer;
+  let web3JsQuorum: IWeb3Quorum;
+  let besuPrivateKey: string;
+  let node1Host: string;
+  let web3: Web3;
+
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).toResolve();
+  });
+
+  beforeAll(async () => {
+    await besuTestLedger.start();
+  });
+
+  beforeAll(async () => {
+    const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+    const keychainId = uuidv4();
+    const keychainRef = uuidv4();
+
+    const { privateKey } = Secp256k1Keys.generateKeyPairsBuffer();
+    const keyHex = privateKey.toString("hex");
+    const pem = keyEncoder.encodePrivate(keyHex, KeyFormat.Raw, KeyFormat.PEM);
+
+    const keychain = new PluginKeychainMemory({
+      backend: new Map([[keychainRef, pem]]),
+      keychainId,
+      logLevel,
+      instanceId: uuidv4(),
+    });
+
+    const httpServer1 = createServer();
+    await new Promise((resolve, reject) => {
+      httpServer1.once("error", reject);
+      httpServer1.once("listening", resolve);
+      httpServer1.listen(0, "127.0.0.1");
+    });
+
+    const addressInfo1 = httpServer1.address() as AddressInfo;
+    log.debug(`HttpServer1 AddressInfo: ${JSON.stringify(addressInfo1)}`);
+    node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
+    log.debug(`Cactus Node 1 Host: ${node1Host}`);
+
+    const testAccount = await besuTestLedger.createEthTestAccount();
+    const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+    const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
+
+    const pluginRegistry = new PluginRegistry({ plugins: [keychain] });
+
+    const options: IPluginLedgerConnectorBesuOptions= {
+      instanceId: uuidv4(),
+      rpcApiHttpHost,
+      rpcApiWsHost,
+      pluginRegistry,
+      logLevel,
+    };
+    const pluginValidatorBesu = new PluginLedgerConnectorBesu(options);
+
+    const configService = new ConfigService();
+    const apiServerOptions = await configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiServerOptions.configFile = "";
+    apiServerOptions.apiCorsDomainCsv = "*";
+    apiServerOptions.apiPort = addressInfo1.port;
+    apiServerOptions.cockpitPort = 0;
+    apiServerOptions.apiTlsEnabled = false;
+    const config = await configService.newExampleConfigConvict(apiServerOptions);
+
+    pluginRegistry.add(pluginValidatorBesu);
+
+    apiServer = new ApiServer({
+      httpServerApi: httpServer1,
+      config: config.getProperties(),
+      pluginRegistry,
+    });
+
+    await  apiServer.start();
+
+    const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
+    web3 = new Web3(web3Provider);
+    web3JsQuorum = Web3JsQuorum(web3);
+
+    const besuKeyPair = await besuTestLedger.getBesuKeyPair();
+    besuPrivateKey = besuKeyPair.privateKey.toLowerCase().startsWith("0x")
+      ? besuKeyPair.privateKey.substring(2)
+      : besuKeyPair.privateKey;
+  });
+
+  afterAll(async () => {
+    await apiServer.shutdown();
+  });
 
   const tearDown = async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
   };
 
-  test.onFinish(tearDown);
-  const testAccount = await besuTestLedger.createEthTestAccount();
-  const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
-  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
+  afterAll(tearDown);
 
-  // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
-  const pluginRegistry = new PluginRegistry({ plugins: [keychain] });
-
-  // 3. Instantiate the web service consortium plugin
-  const options: IPluginLedgerConnectorBesuOptions = {
-    instanceId: uuidv4(),
-    rpcApiHttpHost,
-    rpcApiWsHost,
-    pluginRegistry,
-    logLevel,
-  };
-  const pluginValidatorBesu = new PluginLedgerConnectorBesu(options);
-
-  // 4. Create the API Server object that we embed in this test
-  const configService = new ConfigService();
-  const apiServerOptions = await configService.newExampleConfig();
-  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-  apiServerOptions.configFile = "";
-  apiServerOptions.apiCorsDomainCsv = "*";
-  apiServerOptions.apiPort = addressInfo1.port;
-  apiServerOptions.cockpitPort = 0;
-  apiServerOptions.apiTlsEnabled = false;
-  const config = await configService.newExampleConfigConvict(apiServerOptions);
-
-  pluginRegistry.add(pluginValidatorBesu);
-
-  const apiServer = new ApiServer({
-    httpServerApi: httpServer1,
-    config: config.getProperties(),
-    pluginRegistry,
+  afterAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).toResolve();
   });
 
-  // 5. make sure the API server is shut down when the testing if finished.
-  test.onFinish(() => apiServer.shutdown());
+  test(testCase, async () => {
+    const orionKeyPair = await besuTestLedger.getOrionKeyPair();
+    const contractOptions = {
+      data: `0x123`,
+      // privateFrom : Orion public key of the sender.
+      privateFrom: orionKeyPair.publicKey,
+      // privateFor : Orion public keys of recipients or privacyGroupId: Privacy group to receive the transaction
+      privateFor: [orionKeyPair.publicKey],
+      // privateKey: Ethereum private key with which to sign the transaction.
+      privateKey: besuPrivateKey,
+    };
 
-  // 6. Start the API server which is now listening on port A and it's healthcheck works through the main SDK
-  await apiServer.start();
+    const transactionHash =
+      await web3JsQuorum.priv.generateAndSendRawTransaction(contractOptions);
 
-  // 7. Instantiate the main SDK dynamically with whatever port the API server ended up bound to (port 0)
-  t.comment(`AddressInfo: ${JSON.stringify(addressInfo1)}`);
+    await web3.eth.getTransaction(transactionHash);
 
-  const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
-  const web3 = new Web3(web3Provider);
-  const web3JsQuorum: IWeb3Quorum = Web3JsQuorum(web3);
+    const request: GetPastLogsV1Request = {
+      address: (await besuTestLedger.createEthTestAccount()).address,
+    };
 
-  const orionKeyPair = await besuTestLedger.getOrionKeyPair();
-  const besuKeyPair = await besuTestLedger.getBesuKeyPair();
+    const configuration = new BesuApiClientOptions({ basePath: node1Host });
+    const api = new BesuApiClient(configuration);
 
-  const besuPrivateKey = besuKeyPair.privateKey.toLowerCase().startsWith("0x")
-    ? besuKeyPair.privateKey.substring(2)
-    : besuKeyPair.privateKey; // besu node's private key
+    const res = await api.getPastLogsV1(request);
 
-  const contractOptions = {
-    data: `0x123`,
-    // privateFrom : Orion public key of the sender.
-    privateFrom: orionKeyPair.publicKey,
-    // privateFor : Orion public keys of recipients or privacyGroupId: Privacy group to receive the transaction
-    privateFor: [orionKeyPair.publicKey],
-    // privateKey: Ethereum private key with which to sign the transaction.
-    privateKey: besuPrivateKey,
-  };
+    expect(res).toBeTruthy();
 
-  const transactionHash =
-    await web3JsQuorum.priv.generateAndSendRawTransaction(contractOptions);
-
-  await web3.eth.getTransaction(transactionHash);
-
-  const request: GetPastLogsV1Request = {
-    address: testAccount.address,
-  };
-
-  const configuration = new BesuApiClientOptions({ basePath: node1Host });
-  const api = new BesuApiClient(configuration);
-
-  const res = await api.getPastLogsV1(request);
-  // const { } = res;
-  t.ok(res, "API response object is truthy");
-  t.ok(res.data.logs, "Response.logs is truthy ok");
-  t.true(Array.isArray(res.data.logs), "Response.logs is Array ok");
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
+    expect(res.data.logs).toBeArray();
+    expect(res.data.logs).toBeTruthy();
+  });
 });

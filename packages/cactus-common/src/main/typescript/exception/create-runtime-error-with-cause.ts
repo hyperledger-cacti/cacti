@@ -2,6 +2,25 @@ import { RuntimeError } from "run-time-error-cjs";
 import { coerceUnknownToError } from "./coerce-unknown-to-error";
 
 /**
+ * ## DEPRECATED
+ *
+ * Instead of relying on this function, in the future, use the new `cause`
+ * property of the built-in `Error` type in combination
+ * with the `asError(unknown)` utility function:
+ * ```typescript
+ * import { asError } from "@hyperledger/cactus-common";
+ *
+ * try {
+ *   await performSomeImportantOperation();
+ * } catch (ex: unknown) {
+ *  const cause = asError(ex);
+ *   throw new Error("Something went wrong while doing something.", { cause });
+ * }
+ * ```
+ * More information about the EcmaScript proposal that made this possible:
+ * https://github.com/tc39/proposal-error-cause
+ *
+ * ## The Old Documentation Prior to the Deprecation:
  * ### STANDARD EXCEPTION HANDLING - EXAMPLE WITH RE-THROW:
  *
  * Use the this utility function and pass in any throwable of whatever type and format
@@ -77,6 +96,7 @@ import { coerceUnknownToError } from "./coerce-unknown-to-error";
  *    return result; // 42
  *  }
  * ```
+ * @deprecated
  *
  * @param message The contextual information that will be passed into the
  * constructor of the returned {@link RuntimeError} instance.
@@ -93,9 +113,28 @@ export function createRuntimeErrorWithCause(
 }
 
 /**
+ * ## DEPRECATED
+ *
+ * Instead of relying on this function, in the future, use the new `cause`
+ * property of the built-in `Error` type in combination
+ * with the `asError(unknown)` utility function:
+ * ```typescript
+ * import { asError } from "@hyperledger/cactus-common";
+ *
+ * try {
+ *   await performSomeImportantOperation();
+ * } catch (ex: unknown) {
+ *  const cause = asError(ex);
+ *   throw new Error("Something went wrong while doing something.", { cause });
+ * }
+ * ```
+ * More information about the EcmaScript proposal that made this possible:
+ * https://github.com/tc39/proposal-error-cause
+ *
  * An alias to the `createRuntimeErrorWithCause` function for those prefering
  * a shorter utility for their personal style.
  *
+ * @deprecated
  * @see {@link createRuntimeErrorWithCause}
  * @returns `RuntimeError`
  */

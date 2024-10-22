@@ -2,9 +2,6 @@
 name: PR - Commit Parity
 on: [pull_request]
 
-env:
-  NODEJS_VERSION: v18.18.2
-
 jobs:
   pr-commit-parity:
     name: PR and Commit messages Parity
