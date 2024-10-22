@@ -10,10 +10,10 @@ import (
 	"encoding/json"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
-	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
+	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 // asset specific checks (ideally an asset in a different application might implement checks specific to that asset)

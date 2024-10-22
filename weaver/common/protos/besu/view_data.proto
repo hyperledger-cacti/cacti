@@ -7,7 +7,7 @@ syntax = "proto3";
 package besu;
 
 option java_package = "org.hyperledger.cacti.weaver.protos.besu";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/besu";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/besu";
 
 
 // link below will take you to besu view rfc 

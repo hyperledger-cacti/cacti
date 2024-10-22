@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	mmsdk "github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/membershipmanager"
+	mmsdk "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/membershipmanager"
  )
 
 

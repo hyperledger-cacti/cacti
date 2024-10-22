@@ -12,8 +12,8 @@ import (
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/stretchr/testify/require"
-	am "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2"
-	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	am "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2"
+	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 const (

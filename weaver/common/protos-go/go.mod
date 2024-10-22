@@ -1,4 +1,4 @@
-module github.com/hyperledger/cacti/weaver/common/protos-go/v2
+module github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2
 
 go 1.20
 

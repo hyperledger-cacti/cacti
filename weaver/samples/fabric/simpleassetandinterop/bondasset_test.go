@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleassetandinterop"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
 	"github.com/stretchr/testify/require"
-	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
-	wtestmocks "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
+	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	wtestmocks "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
 )
 
 const (

@@ -1,11 +1,11 @@
-module github.com/hyperledger/cacti/weaver/samples/fabric/go-cli
+module github.com/hyperledger-cacti/cacti/weaver/samples/fabric/go-cli
 
 go 1.20
 
 require (
 	github.com/cloudflare/cfssl v1.4.1
-	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-rc.7
-	github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-rc.7
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.0.0-rc.7
+	github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-rc.7
 	github.com/hyperledger/fabric-sdk-go v1.0.1-0.20221020141211-7af45cede6af
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1

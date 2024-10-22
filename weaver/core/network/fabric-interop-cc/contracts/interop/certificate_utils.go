@@ -26,7 +26,7 @@ import (
 	"golang.org/x/crypto/ed25519"
 	"github.com/ethereum/go-ethereum/crypto/ecies"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 )
 
 const (

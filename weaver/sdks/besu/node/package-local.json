@@ -4,7 +4,7 @@
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperledger/cacti.git"
+    "url": "https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
   "author": "",

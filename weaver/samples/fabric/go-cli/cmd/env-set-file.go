@@ -11,7 +11,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers"
+	"github.com/hyperledger-cacti/cacti/weaver/samples/fabric/go-cli/helpers"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

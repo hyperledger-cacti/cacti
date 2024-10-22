@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	interoperablehelper "github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/interoperablehelper"
+	interoperablehelper "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/interoperablehelper"
 )
 
 func TestValidPatternString(t *testing.T) {

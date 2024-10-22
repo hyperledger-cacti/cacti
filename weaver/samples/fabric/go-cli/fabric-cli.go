@@ -6,7 +6,7 @@
 
 package main
 
-import "github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/cmd"
+import "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/go-cli/cmd"
 
 func main() {
 	cmd.Execute()

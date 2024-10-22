@@ -4,6 +4,9 @@
 
 name: Deploy Relay Docker Image
 
+env:
+  DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
 on:
   push:
     tags:
@@ -14,7 +17,7 @@ on:
 
 jobs:
   publish-protos-rs:
-      if: github.repository_owner == 'hyperledger'
+      if: github.repository_owner == 'hyperledger-cacti'
       runs-on: ubuntu-22.04
       permissions:
         packages: write
@@ -38,7 +41,6 @@ jobs:
           working-directory: weaver/common/protos-rs/pkg
     
   publish-relay-image:
-    if: github.repository_owner == 'hyperledger'
     needs: publish-protos-rs
     runs-on: ubuntu-22.04
     permissions:
@@ -69,15 +71,15 @@ jobs:
         working-directory: weaver/core/relay
           
       - name: Check if package already exists
-        run: (make check-if-tag-exists && echo "RELAY_PUSH=true" >> $GITHUB_ENV) || echo "RELAY_PUSH=false" >> $GITHUB_ENV
+        run: (make check-if-tag-exists DOCKER_REGISTRY=${DOCKER_REGISTRY} && echo "RELAY_PUSH=true" >> $GITHUB_ENV) || echo "RELAY_PUSH=false" >> $GITHUB_ENV
         working-directory: weaver/core/relay
           
       - name: Build and Push
         if: ${{ env.RELAY_PUSH == 'true' }}
-        run: make push-server
+        run: make push-server DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/relay
         
       - name: Push latest tag
         if: ${{ env.RELAY_PUSH == 'true' }}
-        run: (cat out | grep "exists") || make push-server-latest
+        run: (cat out | grep "exists") || make push-server-latest DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/relay

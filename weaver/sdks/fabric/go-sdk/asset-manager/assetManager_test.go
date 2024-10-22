@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	assetmanager "github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/asset-manager"
+	assetmanager "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/asset-manager"
 )
 
 var submitTransactionMock func() ([]byte, error)

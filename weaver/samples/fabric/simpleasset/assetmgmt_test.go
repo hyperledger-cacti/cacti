@@ -18,9 +18,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/stretchr/testify/require"
-	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleasset"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
-	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleasset"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() in locker/recipient context

@@ -12,7 +12,7 @@ package identity
 
 import (
 	context "context"
-	common "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	common "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

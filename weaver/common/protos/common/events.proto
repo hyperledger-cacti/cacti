@@ -10,7 +10,7 @@ import "common/query.proto";
 import "common/state.proto";
 
 option java_package = "org.hyperledger.cacti.weaver.protos.common.events";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common";
 
 enum EventType {
   LEDGER_STATE = 0;
