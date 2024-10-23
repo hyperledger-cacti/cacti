@@ -47,3 +47,5 @@ export {
 } from "./http/express-http-verb-method-name";
 
 export { isGrpcStatusObjectWithCode } from "./grpc/is-grpc-status-object-with-code";
+
+export { HttpHeader } from "./http/http-header";
