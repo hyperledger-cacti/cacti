@@ -9,6 +9,7 @@ import {
   checkMissingNodeDeps,
 } from "./check-missing-node-deps";
 import { getAllPkgDirs } from "./get-all-pkg-dirs";
+import { runAttwOnTgz } from "./run-attw-on-tgz";
 
 export async function runCustomChecks(
   argv: string[],
@@ -69,6 +70,12 @@ export async function runCustomChecks(
       pkgDirsToCheck,
     };
     const [success, errors] = await checkMissingNodeDeps(req);
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
+  {
+    const [success, errors] = await runAttwOnTgz();
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
