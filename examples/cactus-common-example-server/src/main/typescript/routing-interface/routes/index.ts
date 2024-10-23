@@ -102,7 +102,7 @@ router.delete(
   (req: Request, res: Response, next: NextFunction) => {
     try {
       const walletIdEsc = escapeHtml(req.params.id);
-      const out = "Not Implemented (Delete a Wallet, id=" + walletIdEsc + ")\n";
+      const out = `Not Implemented (Delete a Wallet, id=${walletIdEsc})\n`;
       res.status(501).send(out);
     } catch (err) {
       next(err);
