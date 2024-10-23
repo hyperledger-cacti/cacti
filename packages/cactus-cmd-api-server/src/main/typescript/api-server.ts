@@ -81,6 +81,10 @@ import {
   GetOpenApiSpecV1Endpoint,
   IGetOpenApiSpecV1EndpointOptions,
 } from "./web-services/get-open-api-spec-v1-endpoint";
+import {
+  GetHealthcheckV1Endpoint,
+  IGetHealthcheckV1EndpointOptions,
+} from "./web-services/get-healthcheck-v1-endpoint";
 
 export interface IApiServerConstructorOptions {
   readonly pluginManagerOptions?: { pluginsPath: string };
@@ -641,6 +645,15 @@ export class ApiServer {
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
     {
+      const opts: IGetHealthcheckV1EndpointOptions = {
+        process: global.process,
+        logLevel,
+      };
+      const endpoint = new GetHealthcheckV1Endpoint(opts);
+      await registerWebServiceEndpoint(app, endpoint);
+    }
+
+    {
       const oasPath = OAS.paths["/api/v1/api-server/get-open-api-spec"];
 
       const operationId = oasPath.get.operationId;
@@ -656,23 +669,6 @@ export class ApiServer {
       const endpoint = new GetOpenApiSpecV1Endpoint(opts);
       await registerWebServiceEndpoint(app, endpoint);
     }
-
-    const healthcheckHandler = (req: Request, res: Response) => {
-      res.json({
-        success: true,
-        createdAt: new Date(),
-        memoryUsage: process.memoryUsage(),
-      });
-    };
-
-    const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
-    const { http } = oasPath.get["x-hyperledger-cacti"];
-    const { path: httpPath, verbLowerCase: httpVerb } = http;
-    if (!isExpressHttpVerbMethodName(httpVerb)) {
-      const eMsg = `${fnTag} Invalid HTTP verb "${httpVerb}" in cmd-api-server OpenAPI specification for HTTP path: "${httpPath}"`;
-      throw new RuntimeError(eMsg);
-    }
-    app[httpVerb](httpPath, healthcheckHandler);
 
     this.wsApi.on("connection", (socket: SocketIoSocket) => {
       const { id } = socket;
