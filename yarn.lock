@@ -8987,6 +8987,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hyperledger-cacti/cacti-copm-core@workspace:^, @hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core"
+  dependencies:
+    "@bufbuild/buf": "npm:1.30.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
+    "@bufbuild/protoc-gen-es": "npm:1.8.0"
+    "@connectrpc/connect": "npm:1.4.0"
+    "@connectrpc/connect-node": "npm:1.4.0"
+    "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
+    "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0"
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@openapitools/openapi-generator-cli": "npm:2.13.4"
+  languageName: unknown
+  linkType: soft
+
+"@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric"
+  dependencies:
+    "@bufbuild/buf": "npm:1.30.0"
+    "@bufbuild/protobuf": "npm:1.10.0"
+    "@bufbuild/protoc-gen-es": "npm:1.8.0"
+    "@connectrpc/connect": "npm:1.4.0"
+    "@connectrpc/connect-node": "npm:1.4.0"
+    "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
+    "@hyperledger-cacti/cacti-copm-core": "workspace:^"
+    "@hyperledger/cacti-weaver-protos-js": "npm:2.0.0"
+    "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.0.0"
+    "@hyperledger/cactus-cmd-api-server": "npm:2.0.0"
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@hyperledger/cactus-core": "npm:2.0.0"
+    "@hyperledger/cactus-core-api": "npm:2.0.0"
+    "@hyperledger/cactus-plugin-keychain-memory": "npm:2.0.0"
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.0.0"
+    "@hyperledger/cactus-test-tooling": "npm:2.0.0"
+    "@openapitools/openapi-generator-cli": "npm:2.13.4"
+    fabric-ca-client: "npm:2.2.20"
+    fabric-common: "npm:2.2.20"
+    fabric-network: "npm:2.2.20"
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/anoncreds-nodejs@npm:0.2.0":
   version: 0.2.0
   resolution: "@hyperledger/anoncreds-nodejs@npm:0.2.0"
@@ -9298,6 +9341,7 @@ __metadata:
   dependencies:
     "@grpc/grpc-js": "npm:1.11.3"
     "@grpc/proto-loader": "npm:0.7.13"
+    "@types/node": "npm:18.19.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
@@ -13105,6 +13149,38 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nestjs/axios@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@nestjs/axios@npm:3.0.2"
+  peerDependencies:
+    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    axios: ^1.3.1
+    rxjs: ^6.0.0 || ^7.0.0
+  checksum: 10/00866a630596ab6aad4f27dd91aceb600b9db605a5307d359f0898177b020a77764782d8b102a25ed227a0f2d5f0679c5b68967261aec71d445be3f3f028ec84
+  languageName: node
+  linkType: hard
+
+"@nestjs/common@npm:10.3.0":
+  version: 10.3.0
+  resolution: "@nestjs/common@npm:10.3.0"
+  dependencies:
+    iterare: "npm:1.2.1"
+    tslib: "npm:2.6.2"
+    uid: "npm:2.0.2"
+  peerDependencies:
+    class-transformer: "*"
+    class-validator: "*"
+    reflect-metadata: ^0.1.12
+    rxjs: ^7.1.0
+  peerDependenciesMeta:
+    class-transformer:
+      optional: true
+    class-validator:
+      optional: true
+  checksum: 10/bedb3437e6517df423526409b5a70cc33c52b557d17bd74ca12ab09a37ad5ff4ecdece44db625e3d702e21d308bc49d5419afe1752181af6aafdee3a27c9d394
+  languageName: node
+  linkType: hard
+
 "@nestjs/common@npm:9.3.11":
   version: 9.3.11
   resolution: "@nestjs/common@npm:9.3.11"
@@ -13126,6 +13202,34 @@ __metadata:
     class-validator:
       optional: true
   checksum: 10/0c315c81368a65da8d6131e4f2be8843b0c64df0c01ecc29fddc22d5709c16816ef7f49d3e3ee26364c1eb799f2b8007c934571a618762b2fba2046a584a88ee
+  languageName: node
+  linkType: hard
+
+"@nestjs/core@npm:10.3.0":
+  version: 10.3.0
+  resolution: "@nestjs/core@npm:10.3.0"
+  dependencies:
+    "@nuxtjs/opencollective": "npm:0.3.2"
+    fast-safe-stringify: "npm:2.1.1"
+    iterare: "npm:1.2.1"
+    path-to-regexp: "npm:3.2.0"
+    tslib: "npm:2.6.2"
+    uid: "npm:2.0.2"
+  peerDependencies:
+    "@nestjs/common": ^10.0.0
+    "@nestjs/microservices": ^10.0.0
+    "@nestjs/platform-express": ^10.0.0
+    "@nestjs/websockets": ^10.0.0
+    reflect-metadata: ^0.1.12
+    rxjs: ^7.1.0
+  peerDependenciesMeta:
+    "@nestjs/microservices":
+      optional: true
+    "@nestjs/platform-express":
+      optional: true
+    "@nestjs/websockets":
+      optional: true
+  checksum: 10/4bdeed0f203e55b4a1edf0031df55b6bf059c1f9faf6f86ac70e08a6e279c2d494df858ea251cbef915aa0df27b6534d1baace2847a3be7853bf07c1ad3a196f
   languageName: node
   linkType: hard
 
@@ -14019,6 +14123,34 @@ __metadata:
   dependencies:
     "@octokit/openapi-types": "npm:^22.2.0"
   checksum: 10/d2aeebc1d8684c4e950f054a52b484e898b72d9f5f8433bcf010161716eea20d1132820d922212f19557a8f147354f2674d1a27b22941308b7c298bdd2674ffa
+  languageName: node
+  linkType: hard
+
+"@openapitools/openapi-generator-cli@npm:2.13.4":
+  version: 2.13.4
+  resolution: "@openapitools/openapi-generator-cli@npm:2.13.4"
+  dependencies:
+    "@nestjs/axios": "npm:3.0.2"
+    "@nestjs/common": "npm:10.3.0"
+    "@nestjs/core": "npm:10.3.0"
+    "@nuxtjs/opencollective": "npm:0.3.2"
+    axios: "npm:1.6.8"
+    chalk: "npm:4.1.2"
+    commander: "npm:8.3.0"
+    compare-versions: "npm:4.1.4"
+    concurrently: "npm:6.5.1"
+    console.table: "npm:0.10.0"
+    fs-extra: "npm:10.1.0"
+    glob: "npm:7.2.3"
+    https-proxy-agent: "npm:7.0.4"
+    inquirer: "npm:8.2.6"
+    lodash: "npm:4.17.21"
+    reflect-metadata: "npm:0.1.13"
+    rxjs: "npm:7.8.1"
+    tslib: "npm:2.6.2"
+  bin:
+    openapi-generator-cli: main.js
+  checksum: 10/87efe136d4c223ff71ba8a31569623ed16de28b839ad50b01340c55ebebf6a7c82ce1caa79c8491ed090477f7928357b483f62e2f362c0311e7c1efcbf9b1307
   languageName: node
   linkType: hard
 
@@ -17461,6 +17593,15 @@ __metadata:
   version: 18.15.13
   resolution: "@types/node@npm:18.15.13"
   checksum: 10/b9bbe923573797ef7c5fd2641a6793489e25d9369c32aeadcaa5c7c175c85b42eb12d6fe173f6781ab6f42eaa1ebd9576a419eeaa2a1ec810094adb8adaa9a54
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:18.19.0":
+  version: 18.19.0
+  resolution: "@types/node@npm:18.19.0"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10/dfaf489b31098d5184aa6ce07fec9619d05b2c953a319b23b0f46e4c901b9996d87da8c193ea388488119ccc8e79ce228d769b7a59077ac6645aa86c826b56cd
   languageName: node
   linkType: hard
 
@@ -31289,6 +31430,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glob@npm:7.2.3, glob@npm:^7.0.3, glob@npm:^7.1.2, glob@npm:^7.2.3":
+  version: 7.2.3
+  resolution: "glob@npm:7.2.3"
+  dependencies:
+    fs.realpath: "npm:^1.0.0"
+    inflight: "npm:^1.0.4"
+    inherits: "npm:2"
+    minimatch: "npm:^3.1.1"
+    once: "npm:^1.3.0"
+    path-is-absolute: "npm:^1.0.0"
+  checksum: 10/59452a9202c81d4508a43b8af7082ca5c76452b9fcc4a9ab17655822e6ce9b21d4f8fbadabe4fe3faef448294cec249af305e2cd824b7e9aaf689240e5e96a7b
+  languageName: node
+  linkType: hard
+
 "glob@npm:^10.2.2":
   version: 10.3.4
   resolution: "glob@npm:10.3.4"
@@ -31332,20 +31487,6 @@ __metadata:
   bin:
     glob: dist/esm/bin.mjs
   checksum: 10/e412776b5952a818eba790c830bea161c9a56813fd767d8c4c49f855603b1fb962b3e73f1f627a47298a57d2992b9f0f2fe15cf93e74ecaaa63fb45d63fdd090
-  languageName: node
-  linkType: hard
-
-"glob@npm:^7.0.3, glob@npm:^7.1.2, glob@npm:^7.2.3":
-  version: 7.2.3
-  resolution: "glob@npm:7.2.3"
-  dependencies:
-    fs.realpath: "npm:^1.0.0"
-    inflight: "npm:^1.0.4"
-    inherits: "npm:2"
-    minimatch: "npm:^3.1.1"
-    once: "npm:^1.3.0"
-    path-is-absolute: "npm:^1.0.0"
-  checksum: 10/59452a9202c81d4508a43b8af7082ca5c76452b9fcc4a9ab17655822e6ce9b21d4f8fbadabe4fe3faef448294cec249af305e2cd824b7e9aaf689240e5e96a7b
   languageName: node
   linkType: hard
 
@@ -52132,6 +52273,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uid@npm:2.0.2":
+  version: 2.0.2
+  resolution: "uid@npm:2.0.2"
+  dependencies:
+    "@lukeed/csprng": "npm:^1.0.0"
+  checksum: 10/18f6da43d8e1b8643077e8123f877b4506759d9accc15337140a1bf7c99f299a66e88b27ab4c640e66e6a10f19e3a85afa45fdf830dd4bab7570d07a3d51e073
+  languageName: node
+  linkType: hard
+
 "uint8-varint@npm:^2.0.1":
   version: 2.0.1
   resolution: "uint8-varint@npm:2.0.1"
@@ -52198,6 +52348,13 @@ __metadata:
   version: 2.0.5
   resolution: "undefsafe@npm:2.0.5"
   checksum: 10/f42ab3b5770fedd4ada175fc1b2eb775b78f609156f7c389106aafd231bfc210813ee49f54483d7191d7b76e483bc7f537b5d92d19ded27156baf57592eb02cc
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: 10/0097779d94bc0fd26f0418b3a05472410408877279141ded2bd449167be1aed7ea5b76f756562cb3586a07f251b90799bab22d9019ceba49c037c76445f7cddd
   languageName: node
   linkType: hard
 

@@ -116,6 +116,18 @@
       "path": "./packages/cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
     },
     {
+      "path": "./packages/cacti-copm-core/tsconfig.json"
+    },
+    {
+      "path": "./weaver/common/protos-js/tsconfig.json"
+    },
+    {
+      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.cacti.json"
+    },
+    {
+      "path": "./packages/cacti-plugin-copm-fabric/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-test-tooling/tsconfig.json"
     },
     {
