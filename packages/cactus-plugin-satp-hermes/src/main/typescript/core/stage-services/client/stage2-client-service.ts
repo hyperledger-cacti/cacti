@@ -14,6 +14,8 @@ import {
   SessionType,
 } from "../../session-utils";
 import { SATPSession } from "../../../core/satp-session";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   SATPService,
   ISATPClientServiceOptions,
@@ -125,7 +127,7 @@ export class Stage2ClientService extends SATPService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(lockAssertionRequestMessage)),
+      sign(this.Signer, safeStableStringify(lockAssertionRequestMessage)),
     );
 
     lockAssertionRequestMessage.clientSignature = messageSignature;
@@ -143,7 +145,7 @@ export class Stage2ClientService extends SATPService {
       sessionID: sessionData.id,
       type: "lockAssertionRequest",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(`${fnTag}, sending LockAssertionMessage...`);
@@ -228,8 +230,10 @@ export class Stage2ClientService extends SATPService {
         assetId,
         Number(amount),
       );
+      sessionData.lockAssertionClaim.proof = await bridge.getProof(assetId);
 
       sessionData.lockAssertionClaimFormat = new LockAssertionClaimFormat();
+      sessionData.lockAssertionClaimFormat.format = bridge.getReceiptFormat();
 
       sessionData.lockAssertionExpiration = BigInt(99999999999); //todo implement
 

@@ -2,6 +2,7 @@ import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-obj
 import { Configuration } from "@hyperledger/cactus-core-api";
 import { IRemoteLogRepository } from "./interfaces/repository";
 import { RemoteLog } from "../core/types";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class IPFSRemoteLogRepository implements IRemoteLogRepository {
   public static readonly CLASS_NAME = "IPFSRemoteLogRepository";
@@ -34,7 +35,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
 
   create(log: RemoteLog): any {
     const fnTag = `${this.className}#create()`;
-    const logBase64 = Buffer.from(JSON.stringify(log)).toString("base64");
+    const logBase64 = Buffer.from(safeStableStringify(log)).toString("base64");
 
     return this.database
       .setObjectV1({

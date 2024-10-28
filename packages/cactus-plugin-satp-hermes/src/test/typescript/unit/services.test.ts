@@ -23,8 +23,10 @@ import {
   Asset,
   AssignmentAssertionClaim,
   BurnAssertionClaim,
+  ClaimFormat,
   CredentialProfile,
   LockAssertionClaim,
+  LockAssertionClaimFormat,
   LockType,
   MessageType,
   MintAssertionClaim,
@@ -599,8 +601,9 @@ describe("SATP Services Testing", () => {
       new LockAssertionClaim();
 
     mockSession.getClientSessionData().lockAssertionClaimFormat =
-      new LockAssertionClaim();
-
+      new LockAssertionClaimFormat();
+    mockSession.getClientSessionData().lockAssertionClaimFormat!.format =
+      ClaimFormat.DEFAULT;
     mockSession.getClientSessionData().lockExpirationTime = BigInt(1000);
 
     lockAssertionRequestMessage =
