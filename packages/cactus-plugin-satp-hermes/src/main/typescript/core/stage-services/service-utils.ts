@@ -1,7 +1,7 @@
 import { Asset as ProtoAsset } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SupportedChain } from "../types";
 import { Asset } from "./satp-bridge/types/asset";
-import { BesuAsset } from "./satp-bridge/types/besu-asset";
+import { EvmAsset } from "./satp-bridge/types/evm-asset";
 import { FabricAsset } from "./satp-bridge/types/fabric-asset";
 
 export function assetToProto(
@@ -16,7 +16,10 @@ export function assetToProto(
 
   switch (networkId) {
     case SupportedChain.BESU:
-      protoAsset.contractAddress = (asset as BesuAsset).contractAddress;
+      protoAsset.contractAddress = (asset as EvmAsset).contractAddress;
+      break;
+    case SupportedChain.EVM:
+      protoAsset.contractAddress = (asset as EvmAsset).contractAddress;
       break;
     case SupportedChain.FABRIC:
       protoAsset.mspId = (asset as FabricAsset).mspId;
@@ -39,8 +42,11 @@ export function protoToAsset(asset: ProtoAsset, networkId: string): Asset {
   };
 
   switch (networkId) {
+    case SupportedChain.EVM:
+      (assetObj as EvmAsset).contractAddress = asset.contractAddress;
+      break;
     case SupportedChain.BESU:
-      (assetObj as BesuAsset).contractAddress = asset.contractAddress;
+      (assetObj as EvmAsset).contractAddress = asset.contractAddress;
       break;
     case SupportedChain.FABRIC:
       (assetObj as FabricAsset).mspId = asset.mspId;

@@ -8,9 +8,16 @@ import {
   IPluginLedgerConnectorBesuOptions,
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+
+import {
+  IPluginLedgerConnectorEthereumOptions,
+  Web3SigningCredential as Web3SigningCredentialEth,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { BesuAsset } from "../core/stage-services/satp-bridge/types/besu-asset";
+import { EvmAsset } from "../core/stage-services/satp-bridge/types/evm-asset";
 import { FabricAsset } from "../core/stage-services/satp-bridge/types/fabric-asset";
+import { ClaimFormat } from "../generated/proto/cacti/satp/v02/common/message_pb";
 
 // inject gateway, get connectors
 export type SATPLedgerConnector = string;
@@ -19,6 +26,7 @@ export type SATPLedgerConnector = string;
 
 export interface NetworkConfig {
   network: string;
+  claimFormat: ClaimFormat;
 }
 export interface FabricConfig extends NetworkConfig {
   signingCredential: FabricSigningCredential;
@@ -36,7 +44,18 @@ export interface BesuConfig extends NetworkConfig {
   gas: number;
   options: IPluginLedgerConnectorBesuOptions;
   bungeeOptions: IPluginBungeeHermesOptions;
-  besuAssets?: BesuAsset[];
+  besuAssets?: EvmAsset[];
+}
+
+export interface EthereumConfig extends NetworkConfig {
+  keychainId: string;
+  signingCredential: Web3SigningCredentialEth;
+  contractName: string;
+  contractAddress: string;
+  gas: number;
+  options: IPluginLedgerConnectorEthereumOptions;
+  bungeeOptions: IPluginBungeeHermesOptions;
+  ethereumAssets?: EvmAsset[];
 }
 
 export interface TransactionResponse {

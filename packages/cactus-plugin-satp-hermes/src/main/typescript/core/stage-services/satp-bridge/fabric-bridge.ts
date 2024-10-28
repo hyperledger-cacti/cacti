@@ -9,6 +9,9 @@ import {
   FabricConfig,
   TransactionResponse,
 } from "../../../types/blockchain-interaction";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PrivacyPolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/generated/openapi/typescript-axios";
 import { FabricAsset, getVarTypes } from "./types/fabric-asset";
 import {
@@ -21,11 +24,13 @@ import { InteractionSignature } from "./types/fabric-asset";
 import { InteractionData } from "./types/interact";
 import { getInteractionType } from "./types/asset";
 import { OntologyError, TransactionError } from "../../errors/bridge-erros";
+import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export class FabricBridge implements NetworkBridge {
   public static readonly CLASS_NAME = "FabricBridge";
 
   network: string = "FABRIC";
+  claimFormat: ClaimFormat;
 
   public log: Logger;
 
@@ -38,6 +43,7 @@ export class FabricBridge implements NetworkBridge {
     this.config = fabricConfig;
     this.options = fabricConfig.options;
     this.connector = new PluginLedgerConnectorFabric(fabricConfig.options);
+    this.claimFormat = fabricConfig.claimFormat;
     this.bungee = new PluginBungeeHermes(fabricConfig.bungeeOptions);
     level = level || "INFO";
     this.bungee.addStrategy(this.network, new StrategyFabric(level));
@@ -68,7 +74,7 @@ export class FabricBridge implements NetworkBridge {
         asset.mspId,
         asset.channelName,
         asset.contractName,
-        JSON.stringify(interactions),
+        safeStableStringify(interactions),
       ],
       contractName: this.config.contractName,
       invocationType: FabricContractInvocationType.Send,
@@ -298,50 +304,51 @@ export class FabricBridge implements NetworkBridge {
       output: response.functionOutput,
     };
   }
-
-  public async getReceipt(
-    assetId: string,
-    transactionId: string,
-  ): Promise<string> {
+  public async getReceipt(transactionId: string): Promise<string> {
     const fnTag = `${FabricBridge.CLASS_NAME}}#getReceipt`;
-    this.log.debug(
-      `${fnTag}, Getting Receipt: ${assetId} transactionHash: ${transactionId}`,
-    );
+    this.log.debug(`${fnTag}, Getting Receipt: ${transactionId}`);
+    const receipt = await this.connector.getTransactionReceiptByTxID({
+      signingCredential: this.config.signingCredential,
+      channelName: this.config.channelName,
+      contractName: "qscc",
+      invocationType: FabricContractInvocationType.Call,
+      methodName: "GetBlockByTxID",
+      params: [this.config.channelName, transactionId],
+    });
+
+    return safeStableStringify(receipt);
+  }
+
+  public async getView(assetId: string): Promise<string> {
+    const fnTag = `${FabricBridge.CLASS_NAME}}#getView`;
+    this.log.debug(`${fnTag}, Getting View: ${assetId}`);
     //todo needs implementation
     const networkDetails = {
-      //connector: this.connector,
-      connectorApiPath: "", //todo check this to not use api
+      connector: this.connector,
+      //connectorApiPath: "", //todo check this to not use api
       signingCredential: this.config.signingCredential,
       contractName: this.config.contractName,
       channelName: this.config.channelName,
-      participant: "Org1MSP",
+      participant: "Org2MSP",
     };
+    try {
+      const snapshot = await this.bungee.generateSnapshot(
+        [assetId],
+        this.network,
+        networkDetails,
+      );
 
-    const snapshot = await this.bungee.generateSnapshot(
-      [],
-      this.network,
-      networkDetails,
-    );
-
-    const generated = this.bungee.generateView(
-      snapshot,
-      "0",
-      Number.MAX_SAFE_INTEGER.toString(),
-      undefined,
-    );
-
-    if (generated.view == undefined) {
-      throw new Error("View is undefined");
+      const generated = this.bungee.generateView(
+        snapshot,
+        "0",
+        Number.MAX_SAFE_INTEGER.toString(),
+        undefined,
+      );
+      return safeStableStringify(generated);
+    } catch (error) {
+      console.error(error);
+      return "";
     }
-
-    const view = await this.bungee.processView(
-      generated.view,
-      //PrivacyPolicyOpts.SingleTransaction,
-      PrivacyPolicyOpts.PruneState,
-      [assetId, transactionId],
-    );
-
-    return view.getViewStr();
   }
 
   private interactionList(jsonString: string): InteractionSignature[] {
@@ -373,7 +380,7 @@ export class FabricBridge implements NetworkBridge {
       interactions.push(interactionRequest);
     }
 
-    this.log.info(`Interactions: ${JSON.stringify(interactions)}`);
+    this.log.info(`Interactions: ${safeStableStringify(interactions)}`);
 
     return interactions;
   }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // this file contains a class that encapsulates the logic for managing the SATP bridge (lock, unlock, etc).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
 import { BridgeManager } from "./bridge-manager";
@@ -5,6 +6,7 @@ import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPBridgeConfig } from "../../types";
 import { Asset } from "./types/asset";
 import { TransactionIdUndefinedError } from "../../errors/bridge-erros";
+import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export class SATPBridgeManager implements BridgeManager {
   public static readonly CLASS_NAME = "SATPBridgeManager";
@@ -29,11 +31,9 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = "";
-    //  this.config.network.getReceipt(
-    //   asset.tokenId,
-    //   response.transactionId,
-    // );
+    const receipt = await this.config.network.getReceipt(
+      response.transactionId,
+    );
 
     this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
 
@@ -48,8 +48,7 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = this.config.network.getReceipt(
-      assetId,
+    const receipt = await this.config.network.getReceipt(
       response.transactionId,
     );
 
@@ -70,13 +69,9 @@ export class SATPBridgeManager implements BridgeManager {
     if (response.transactionId == undefined) {
       throw new TransactionIdUndefinedError(fnTag);
     }
-
-    const receipt = "";
-    //  this.config.network.getReceipt(
-    //   asset.tokenId,
-    //   response.transactionId,
-    // );
-
+    const receipt = await this.config.network.getReceipt(
+      response.transactionId,
+    );
     this.log.info(`${fnTag}, proof of the asset lock: ${receipt}`);
 
     return receipt;
@@ -92,7 +87,6 @@ export class SATPBridgeManager implements BridgeManager {
     }
 
     const receipt = await this.config.network.getReceipt(
-      assetId,
       response.transactionId,
     );
 
@@ -110,12 +104,9 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = "";
-    //  this.config.network.getReceipt(
-    //   asset.tokenId,
-    //   response.transactionId,
-    // );
-
+    const receipt = await this.config.network.getReceipt(
+      transaction.transactionId,
+    );
     this.log.info(`${fnTag}, proof of the asset creation: ${receipt}`);
 
     return receipt;
@@ -130,11 +121,9 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = "";
-    //  this.config.network.getReceipt(
-    //   asset.tokenId,
-    //   response.transactionId,
-    // );
+    const receipt = await this.config.network.getReceipt(
+      transaction.transactionId,
+    );
 
     this.log.info(`${fnTag}, proof of the asset deletion: ${receipt}`);
 
@@ -158,12 +147,9 @@ export class SATPBridgeManager implements BridgeManager {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
-    const receipt = "";
-    //  this.config.network.getReceipt(
-    //   asset.tokenId,
-    //   response.transactionId,
-    // );
-
+    const receipt = await this.config.network.getReceipt(
+      response.transactionId,
+    );
     this.log.info(`${fnTag}, proof of the asset assignment: ${receipt}`);
 
     return receipt;
@@ -201,5 +187,20 @@ export class SATPBridgeManager implements BridgeManager {
     }
 
     return true;
+  }
+  getReceiptFormat() {
+    return this.config.network.claimFormat;
+  }
+  async getProof(assetId: string): Promise<string> {
+    // different receipt/proof formats
+    switch (this.getReceiptFormat()) {
+      case ClaimFormat.DEFAULT:
+        return "";
+      case ClaimFormat.BUNGEE:
+        const view = await this.config.network.getView(assetId);
+        return view;
+      default:
+        return "";
+    }
   }
 }

@@ -72,7 +72,7 @@ export type SATPWrapperContractEvents =
 export interface SATPWrapperContractEventsContext {
   Assign(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -81,7 +81,7 @@ export interface SATPWrapperContractEventsContext {
   ): EventResponse;
   Burn(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -99,7 +99,7 @@ export interface SATPWrapperContractEventsContext {
   ): EventResponse;
   Lock(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -108,7 +108,7 @@ export interface SATPWrapperContractEventsContext {
   ): EventResponse;
   Mint(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -129,7 +129,7 @@ export interface SATPWrapperContractEventsContext {
   ): EventResponse;
   Unlock(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -138,7 +138,7 @@ export interface SATPWrapperContractEventsContext {
   ): EventResponse;
   Unwrap(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -147,7 +147,7 @@ export interface SATPWrapperContractEventsContext {
   ): EventResponse;
   Wrap(
     parameters: {
-      filter?: {};
+      filter?: { tokenId?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -230,9 +230,9 @@ export interface UnwrapEventEmittedResponse {
   tokenId: string;
 }
 export interface WrapEventEmittedResponse {
+  tokenId: string;
   contractAddress: string;
   tokenType: string | number;
-  tokenId: string;
   owner: string;
 }
 export interface SATPWrapperContract {

@@ -8,9 +8,11 @@ import {
 import { SATP_VERSION } from "../../constants";
 import {
   AssignmentAssertionClaim,
+  AssignmentAssertionClaimFormat,
   CommonSatp,
   MessageType,
   MintAssertionClaim,
+  MintAssertionClaimFormat,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
@@ -19,6 +21,8 @@ import {
   saveSignature,
   SessionType,
 } from "../../session-utils";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   SATPService,
   SATPServiceType,
@@ -117,7 +121,7 @@ export class Stage3ServerService extends SATPService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(commitReadyMessage)),
+      sign(this.Signer, safeStableStringify(commitReadyMessage)),
     );
 
     commitReadyMessage.serverSignature = messageSignature;
@@ -135,7 +139,7 @@ export class Stage3ServerService extends SATPService {
       sessionID: sessionData.id,
       type: "commitReady",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(`${fnTag}, sending commitReadyMessage...`);
@@ -203,7 +207,7 @@ export class Stage3ServerService extends SATPService {
     const messageSignature = bufArray2HexStr(
       sign(
         this.Signer,
-        JSON.stringify(commitFinalAcknowledgementReceiptResponseMessage),
+        safeStableStringify(commitFinalAcknowledgementReceiptResponseMessage),
       ),
     );
 
@@ -223,7 +227,7 @@ export class Stage3ServerService extends SATPService {
       sessionID: sessionData.id,
       type: "commitFinalAcknowledgementReceiptResponse",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(
@@ -424,6 +428,9 @@ export class Stage3ServerService extends SATPService {
         assetId,
         Number(amount),
       );
+      sessionData.mintAssertionClaim.proof = await bridge.getProof(assetId);
+      sessionData.mintAssertionClaimFormat = new MintAssertionClaimFormat();
+      sessionData.mintAssertionClaimFormat.format = bridge.getReceiptFormat();
       sessionData.mintAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.mintAssertionClaim.receipt),
       );
@@ -474,6 +481,12 @@ export class Stage3ServerService extends SATPService {
         recipient,
         Number(amount),
       );
+      sessionData.assignmentAssertionClaim.proof =
+        await bridge.getProof(assetId);
+      sessionData.assignmentAssertionClaimFormat =
+        new AssignmentAssertionClaimFormat();
+      sessionData.assignmentAssertionClaimFormat.format =
+        bridge.getReceiptFormat();
       sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
       );

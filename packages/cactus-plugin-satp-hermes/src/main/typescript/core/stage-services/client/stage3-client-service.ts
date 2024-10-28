@@ -1,5 +1,6 @@
 import {
   BurnAssertionClaim,
+  BurnAssertionClaimFormat,
   CommonSatp,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -18,6 +19,8 @@ import {
   saveSignature,
   SessionType,
 } from "../../session-utils";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   SATPService,
   ISATPClientServiceOptions,
@@ -109,7 +112,7 @@ export class Stage3ClientService extends SATPService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(commitPreparationRequestMessage)),
+      sign(this.Signer, safeStableStringify(commitPreparationRequestMessage)),
     );
 
     commitPreparationRequestMessage.clientSignature = messageSignature;
@@ -127,7 +130,7 @@ export class Stage3ClientService extends SATPService {
       sessionID: sessionData.id,
       type: "commitPreparation",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
 
@@ -194,7 +197,10 @@ export class Stage3ClientService extends SATPService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(commitFinalAssertionRequestMessage)),
+      sign(
+        this.Signer,
+        safeStableStringify(commitFinalAssertionRequestMessage),
+      ),
     );
 
     commitFinalAssertionRequestMessage.clientSignature = messageSignature;
@@ -212,7 +218,7 @@ export class Stage3ClientService extends SATPService {
       sessionID: sessionData.id,
       type: "commitFinalAssertion",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(`${fnTag}, sending CommitFinalAssertionMessage...`);
@@ -272,7 +278,7 @@ export class Stage3ClientService extends SATPService {
     );
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(transferCompleteRequestMessage)),
+      sign(this.Signer, safeStableStringify(transferCompleteRequestMessage)),
     );
 
     transferCompleteRequestMessage.clientSignature = messageSignature;
@@ -294,7 +300,7 @@ export class Stage3ClientService extends SATPService {
       sessionID: sessionData.id,
       type: "transferComplete",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
 
@@ -490,6 +496,10 @@ export class Stage3ClientService extends SATPService {
         assetId,
         Number(amount),
       );
+      sessionData.burnAssertionClaim.proof = await bridge.getProof(assetId);
+
+      sessionData.burnAssertionClaimFormat = new BurnAssertionClaimFormat();
+      sessionData.burnAssertionClaimFormat.format = bridge.getReceiptFormat();
       sessionData.burnAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.burnAssertionClaim.receipt),
       );

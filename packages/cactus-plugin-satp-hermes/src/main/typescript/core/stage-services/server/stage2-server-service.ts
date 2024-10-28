@@ -20,6 +20,8 @@ import {
   ISATPServerServiceOptions,
   ISATPServiceOptions,
 } from "../satp-service";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { SATPSession } from "../../../core/satp-session";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
@@ -89,7 +91,7 @@ export class Stage2ServerService extends SATPService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(lockAssertionReceiptMessage)),
+      sign(this.Signer, safeStableStringify(lockAssertionReceiptMessage)),
     );
 
     lockAssertionReceiptMessage.serverSignature = messageSignature;
@@ -107,7 +109,7 @@ export class Stage2ServerService extends SATPService {
       sessionID: sessionData.id,
       type: "lockAssertionResponse",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
 

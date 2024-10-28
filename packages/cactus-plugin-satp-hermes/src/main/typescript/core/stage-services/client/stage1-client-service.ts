@@ -16,6 +16,8 @@ import {
   saveSignature,
   SessionType,
 } from "../../session-utils";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { SupportedChain } from "../../types";
 import { SATPSession } from "../../../core/satp-session";
 import {
@@ -181,7 +183,7 @@ export class Stage1ClientService extends SATPService {
     }
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(transferProposalRequestMessage)),
+      sign(this.Signer, safeStableStringify(transferProposalRequestMessage)),
     );
 
     transferProposalRequestMessage.clientSignature = messageSignature;
@@ -199,7 +201,7 @@ export class Stage1ClientService extends SATPService {
       sessionID: sessionID,
       type: "transferProposalRequest",
       operation: "validate",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(`${fnTag}, sending TransferProposalRequest...`);
@@ -248,7 +250,7 @@ export class Stage1ClientService extends SATPService {
       sessionData.hashTransferInitClaims;
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(transferCommenceRequestMessage)),
+      sign(this.Signer, safeStableStringify(transferCommenceRequestMessage)),
     );
 
     transferCommenceRequestMessage.clientSignature = messageSignature;
@@ -270,7 +272,7 @@ export class Stage1ClientService extends SATPService {
       sessionID: sessionData.id,
       type: "transferCommenceRequest",
       operation: "validate",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(`${fnTag}, sending TransferCommenceRequest...`);

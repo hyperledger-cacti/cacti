@@ -75,6 +75,7 @@ import {
 import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
 import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
 import { bufArray2HexStr } from "../../../main/typescript/gateway-utils";
+import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -728,6 +729,7 @@ beforeAll(async () => {
       contractName: satpWrapperContractName,
       options: pluginOptionsFabricBridge,
       bungeeOptions: pluginBungeeFabricOptions,
+      claimFormat: ClaimFormat.DEFAULT,
     } as FabricConfig;
 
     // networkDetails = {
@@ -885,6 +887,7 @@ beforeAll(async () => {
       options: besuOptions,
       bungeeOptions: pluginBungeeBesuOptions,
       gas: 999999999999999,
+      claimFormat: ClaimFormat.DEFAULT,
     };
 
     const giveRoleRes = await testing_connector.invokeContract({

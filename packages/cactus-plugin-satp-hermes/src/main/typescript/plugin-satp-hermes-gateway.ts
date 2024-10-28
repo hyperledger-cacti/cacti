@@ -279,7 +279,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             Crash: "v02",
           },
         ],
-        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+        supportedDLTs: [
+          SupportedChain.FABRIC,
+          SupportedChain.BESU,
+          SupportedChain.EVM,
+        ],
         proofID: "mockProofID1",
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
@@ -314,6 +318,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.supportedDLTs = [
           SupportedChain.FABRIC,
           SupportedChain.BESU,
+          SupportedChain.EVM,
         ];
       }
 

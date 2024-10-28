@@ -4,6 +4,8 @@ import {
   CommonSatp,
   MessageType,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import { SATP_VERSION } from "../constants";
 import {
@@ -48,8 +50,8 @@ export function commonBodyVerifier(
     (common.hashPreviousMessage == "" &&
       messageStage != MessageType.INIT_PROPOSAL)
   ) {
-    console.error("errorcommon", JSON.stringify(common));
-    throw new SatpCommonBodyError(tag, JSON.stringify(common));
+    console.error("errorcommon", safeStableStringify(common));
+    throw new SatpCommonBodyError(tag, safeStableStringify(common));
   }
 
   if (common.version != SATP_VERSION) {

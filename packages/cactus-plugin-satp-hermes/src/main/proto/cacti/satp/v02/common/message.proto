@@ -209,46 +209,57 @@ enum Error {
     ERROR_MESSAGE_OUT_OF_SEQUENCE = 11;
 }
 
-
+enum ClaimFormat {
+    DEFAULT = 0;
+    BUNGEE = 1;
+}
+message WrapAssertionClaimFormat {
+    ClaimFormat format = 1;
+}
 message LockAssertionClaimFormat {
-
+    ClaimFormat format = 1;
 }
 
 message MintAssertionClaimFormat {
-
+    ClaimFormat format = 1;
 }
 
 message BurnAssertionClaimFormat {
-
+    ClaimFormat format = 1;
 }
 
 message AssignmentAssertionClaimFormat {
-
+    ClaimFormat format = 1;
 }
 
 message LockAssertionClaim {
     string receipt = 1;
-    string signature = 2;
+    string proof = 2;
+    string signature = 3;
 }
 
 message MintAssertionClaim {
     string receipt = 1;
-    string signature = 2;
+    string proof = 2;
+    string signature = 3;
 }
 
 message BurnAssertionClaim {
     string receipt = 1;
-    string signature = 2;
+    string proof = 2;
+    string signature = 3;
 }
 
 message AssignmentAssertionClaim {
     string receipt = 1;
-    string signature = 2;
+    string proof = 2;
+    string signature = 3;
 }
 
 message WrapAssertionClaim {
     string receipt = 1;
-    string signature = 2;
+    string proof = 2;
+    string signature = 3;
 }
 
 enum TokenType {

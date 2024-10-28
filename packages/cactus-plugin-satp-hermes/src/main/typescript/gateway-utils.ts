@@ -2,6 +2,7 @@ import { JsObjectSigner } from "@hyperledger/cactus-common";
 import { LocalLog, RemoteLog } from "./core/types";
 import { SATPGateway } from "./plugin-satp-hermes-gateway";
 import { SHA256 } from "crypto-js";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export function bufArray2HexStr(array: Uint8Array): string {
   return Buffer.from(array).toString("hex");
@@ -17,7 +18,7 @@ export function verifySignature(
   obj: any,
   pubKey: string,
 ): boolean {
-  const copy = JSON.parse(JSON.stringify(obj));
+  const copy = JSON.parse(safeStableStringify(obj)!);
 
   if (copy.clientSignature) {
     const sourceSignature = new Uint8Array(
@@ -28,7 +29,11 @@ export function verifySignature(
 
     copy.clientSignature = "";
     if (
-      !objectSigner.verify(JSON.stringify(copy), sourceSignature, sourcePubkey)
+      !objectSigner.verify(
+        safeStableStringify(copy),
+        sourceSignature,
+        sourcePubkey,
+      )
     ) {
       return false;
     }
@@ -42,7 +47,11 @@ export function verifySignature(
 
     copy.serverSignature = "";
     if (
-      !objectSigner.verify(JSON.stringify(copy), sourceSignature, sourcePubkey)
+      !objectSigner.verify(
+        safeStableStringify(copy),
+        sourceSignature,
+        sourcePubkey,
+      )
     ) {
       return false;
     }
@@ -88,7 +97,7 @@ export async function storeLog(
   // Keep the order consistent with the order of the fields in the table
   // so that the hash matches when retrieving from the database
   const hash = SHA256(
-    JSON.stringify(localLog, [
+    safeStableStringify(localLog, [
       "sessionID",
       "type",
       "key",
@@ -123,7 +132,7 @@ export async function storeRemoteLog(
   };
 
   remoteLog.signature = bufArray2HexStr(
-    sign(gateway.Signer, JSON.stringify(remoteLog)),
+    sign(gateway.Signer, safeStableStringify(remoteLog)),
   );
 
   const response = await gateway.remoteRepository?.create(remoteLog);
@@ -144,5 +153,5 @@ export function getSatpLogKey(
 }
 
 export function getHash(object: unknown) {
-  return SHA256(JSON.stringify(object)).toString();
+  return SHA256(safeStableStringify(object) ?? "").toString();
 }

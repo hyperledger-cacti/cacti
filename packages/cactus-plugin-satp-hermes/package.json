@@ -124,6 +124,7 @@
     "@bufbuild/buf": "1.30.0",
     "@bufbuild/protoc-gen-es": "1.8.0",
     "@grpc/proto-loader": "0.7.13",
+    "@hyperledger/cactus-test-geth-ledger": "2.0.0-rc.7",
     "@quobix/vacuum": "0.9.16",
     "@types/body-parser": "1.19.4",
     "@types/crypto-js": "4.0.1",

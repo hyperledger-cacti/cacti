@@ -12,8 +12,10 @@ import {
   FabricConfig,
   BesuConfig,
   NetworkConfig,
+  EthereumConfig,
 } from "../types/blockchain-interaction";
 import { ValidatorOptions } from "class-validator";
+import { EthereumBridge } from "../core/stage-services/satp-bridge/ethereum-bridge";
 
 export interface ISATPBridgesOptions {
   logLevel?: LogLevelDesc;
@@ -53,6 +55,9 @@ export class SATPBridgesManager {
         case SupportedChain.BESU:
           bridge = new BesuBridge(bridgeConfig as BesuConfig);
           break;
+        case SupportedChain.EVM:
+          bridge = new EthereumBridge(bridgeConfig as EthereumConfig);
+          break;
         default:
           throw new Error(`Unsupported network: ${bridgeConfig.network}`);
       }
@@ -85,6 +90,12 @@ export class SATPBridgesManager {
         break;
       case SupportedChain.BESU:
         bridge = new BesuBridge(networkConfig as BesuConfig, this.level);
+        break;
+      case SupportedChain.EVM:
+        bridge = new EthereumBridge(
+          networkConfig as EthereumConfig,
+          this.level,
+        );
         break;
       default:
         throw new Error(`Unsupported network: ${networkConfig.network}`);

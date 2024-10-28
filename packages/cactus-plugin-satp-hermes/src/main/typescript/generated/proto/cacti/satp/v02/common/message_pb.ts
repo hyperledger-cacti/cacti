@@ -385,6 +385,26 @@ proto3.util.setEnumType(Error, "cacti.satp.v02.common.Error", [
 ]);
 
 /**
+ * @generated from enum cacti.satp.v02.common.ClaimFormat
+ */
+export enum ClaimFormat {
+  /**
+   * @generated from enum value: DEFAULT = 0;
+   */
+  DEFAULT = 0,
+
+  /**
+   * @generated from enum value: BUNGEE = 1;
+   */
+  BUNGEE = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ClaimFormat)
+proto3.util.setEnumType(ClaimFormat, "cacti.satp.v02.common.ClaimFormat", [
+  { no: 0, name: "DEFAULT" },
+  { no: 1, name: "BUNGEE" },
+]);
+
+/**
  * @generated from enum cacti.satp.v02.common.TokenType
  */
 export enum TokenType {
@@ -1405,9 +1425,51 @@ export class Payload extends Message<Payload> {
 }
 
 /**
+ * @generated from message cacti.satp.v02.common.WrapAssertionClaimFormat
+ */
+export class WrapAssertionClaimFormat extends Message<WrapAssertionClaimFormat> {
+  /**
+   * @generated from field: cacti.satp.v02.common.ClaimFormat format = 1;
+   */
+  format = ClaimFormat.DEFAULT;
+
+  constructor(data?: PartialMessage<WrapAssertionClaimFormat>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cacti.satp.v02.common.WrapAssertionClaimFormat";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "format", kind: "enum", T: proto3.getEnumType(ClaimFormat) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WrapAssertionClaimFormat {
+    return new WrapAssertionClaimFormat().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WrapAssertionClaimFormat {
+    return new WrapAssertionClaimFormat().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WrapAssertionClaimFormat {
+    return new WrapAssertionClaimFormat().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WrapAssertionClaimFormat | PlainMessage<WrapAssertionClaimFormat> | undefined, b: WrapAssertionClaimFormat | PlainMessage<WrapAssertionClaimFormat> | undefined): boolean {
+    return proto3.util.equals(WrapAssertionClaimFormat, a, b);
+  }
+}
+
+/**
  * @generated from message cacti.satp.v02.common.LockAssertionClaimFormat
  */
 export class LockAssertionClaimFormat extends Message<LockAssertionClaimFormat> {
+  /**
+   * @generated from field: cacti.satp.v02.common.ClaimFormat format = 1;
+   */
+  format = ClaimFormat.DEFAULT;
+
   constructor(data?: PartialMessage<LockAssertionClaimFormat>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1416,6 +1478,7 @@ export class LockAssertionClaimFormat extends Message<LockAssertionClaimFormat> 
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.LockAssertionClaimFormat";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "format", kind: "enum", T: proto3.getEnumType(ClaimFormat) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionClaimFormat {
@@ -1439,6 +1502,11 @@ export class LockAssertionClaimFormat extends Message<LockAssertionClaimFormat> 
  * @generated from message cacti.satp.v02.common.MintAssertionClaimFormat
  */
 export class MintAssertionClaimFormat extends Message<MintAssertionClaimFormat> {
+  /**
+   * @generated from field: cacti.satp.v02.common.ClaimFormat format = 1;
+   */
+  format = ClaimFormat.DEFAULT;
+
   constructor(data?: PartialMessage<MintAssertionClaimFormat>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1447,6 +1515,7 @@ export class MintAssertionClaimFormat extends Message<MintAssertionClaimFormat> 
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.MintAssertionClaimFormat";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "format", kind: "enum", T: proto3.getEnumType(ClaimFormat) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaimFormat {
@@ -1470,6 +1539,11 @@ export class MintAssertionClaimFormat extends Message<MintAssertionClaimFormat> 
  * @generated from message cacti.satp.v02.common.BurnAssertionClaimFormat
  */
 export class BurnAssertionClaimFormat extends Message<BurnAssertionClaimFormat> {
+  /**
+   * @generated from field: cacti.satp.v02.common.ClaimFormat format = 1;
+   */
+  format = ClaimFormat.DEFAULT;
+
   constructor(data?: PartialMessage<BurnAssertionClaimFormat>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1478,6 +1552,7 @@ export class BurnAssertionClaimFormat extends Message<BurnAssertionClaimFormat> 
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.BurnAssertionClaimFormat";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "format", kind: "enum", T: proto3.getEnumType(ClaimFormat) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BurnAssertionClaimFormat {
@@ -1501,6 +1576,11 @@ export class BurnAssertionClaimFormat extends Message<BurnAssertionClaimFormat> 
  * @generated from message cacti.satp.v02.common.AssignmentAssertionClaimFormat
  */
 export class AssignmentAssertionClaimFormat extends Message<AssignmentAssertionClaimFormat> {
+  /**
+   * @generated from field: cacti.satp.v02.common.ClaimFormat format = 1;
+   */
+  format = ClaimFormat.DEFAULT;
+
   constructor(data?: PartialMessage<AssignmentAssertionClaimFormat>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1509,6 +1589,7 @@ export class AssignmentAssertionClaimFormat extends Message<AssignmentAssertionC
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.common.AssignmentAssertionClaimFormat";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "format", kind: "enum", T: proto3.getEnumType(ClaimFormat) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssignmentAssertionClaimFormat {
@@ -1538,7 +1619,12 @@ export class LockAssertionClaim extends Message<LockAssertionClaim> {
   receipt = "";
 
   /**
-   * @generated from field: string signature = 2;
+   * @generated from field: string proof = 2;
+   */
+  proof = "";
+
+  /**
+   * @generated from field: string signature = 3;
    */
   signature = "";
 
@@ -1551,7 +1637,8 @@ export class LockAssertionClaim extends Message<LockAssertionClaim> {
   static readonly typeName = "cacti.satp.v02.common.LockAssertionClaim";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "proof", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssertionClaim {
@@ -1581,7 +1668,12 @@ export class MintAssertionClaim extends Message<MintAssertionClaim> {
   receipt = "";
 
   /**
-   * @generated from field: string signature = 2;
+   * @generated from field: string proof = 2;
+   */
+  proof = "";
+
+  /**
+   * @generated from field: string signature = 3;
    */
   signature = "";
 
@@ -1594,7 +1686,8 @@ export class MintAssertionClaim extends Message<MintAssertionClaim> {
   static readonly typeName = "cacti.satp.v02.common.MintAssertionClaim";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "proof", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MintAssertionClaim {
@@ -1624,7 +1717,12 @@ export class BurnAssertionClaim extends Message<BurnAssertionClaim> {
   receipt = "";
 
   /**
-   * @generated from field: string signature = 2;
+   * @generated from field: string proof = 2;
+   */
+  proof = "";
+
+  /**
+   * @generated from field: string signature = 3;
    */
   signature = "";
 
@@ -1637,7 +1735,8 @@ export class BurnAssertionClaim extends Message<BurnAssertionClaim> {
   static readonly typeName = "cacti.satp.v02.common.BurnAssertionClaim";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "proof", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BurnAssertionClaim {
@@ -1667,7 +1766,12 @@ export class AssignmentAssertionClaim extends Message<AssignmentAssertionClaim> 
   receipt = "";
 
   /**
-   * @generated from field: string signature = 2;
+   * @generated from field: string proof = 2;
+   */
+  proof = "";
+
+  /**
+   * @generated from field: string signature = 3;
    */
   signature = "";
 
@@ -1680,7 +1784,8 @@ export class AssignmentAssertionClaim extends Message<AssignmentAssertionClaim> 
   static readonly typeName = "cacti.satp.v02.common.AssignmentAssertionClaim";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "proof", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssignmentAssertionClaim {
@@ -1710,7 +1815,12 @@ export class WrapAssertionClaim extends Message<WrapAssertionClaim> {
   receipt = "";
 
   /**
-   * @generated from field: string signature = 2;
+   * @generated from field: string proof = 2;
+   */
+  proof = "";
+
+  /**
+   * @generated from field: string signature = 3;
    */
   signature = "";
 
@@ -1723,7 +1833,8 @@ export class WrapAssertionClaim extends Message<WrapAssertionClaim> {
   static readonly typeName = "cacti.satp.v02.common.WrapAssertionClaim";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "receipt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "proof", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "signature", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WrapAssertionClaim {

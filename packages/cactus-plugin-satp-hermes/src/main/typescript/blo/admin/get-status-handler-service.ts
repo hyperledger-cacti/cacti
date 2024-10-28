@@ -70,17 +70,31 @@ export async function GetStatusService(
       dltProtocol: "besu",
       dltSubnetworkID: "v24.4.0-RC1",
     };
-    destinationChain = {
+  } else if (sessionData.senderGatewayNetworkId === SupportedChain.FABRIC) {
+    originChain = {
       dltProtocol: "fabric",
       dltSubnetworkID: "v2.0.0",
     };
   } else {
     originChain = {
+      dltProtocol: "ethereum",
+      dltSubnetworkID: "v24.4.0-RC1",
+    };
+  }
+
+  if (sessionData.recipientGatewayNetworkId === SupportedChain.BESU) {
+    destinationChain = {
+      dltProtocol: "besu",
+      dltSubnetworkID: "v24.4.0-RC1",
+    };
+  } else if (sessionData.recipientGatewayNetworkId === SupportedChain.FABRIC) {
+    destinationChain = {
       dltProtocol: "fabric",
       dltSubnetworkID: "v2.0.0",
     };
+  } else {
     destinationChain = {
-      dltProtocol: "besu",
+      dltProtocol: "ethereum",
       dltSubnetworkID: "v24.4.0-RC1",
     };
   }

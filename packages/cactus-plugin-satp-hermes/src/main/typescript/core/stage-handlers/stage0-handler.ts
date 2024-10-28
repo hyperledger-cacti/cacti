@@ -7,6 +7,8 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_connect";
 import {
@@ -67,7 +69,7 @@ export class Stage0SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, New Session...`);
       this.Log.debug(
-        `${fnTag}, Request: ${JSON.stringify(req)}, Context: ${JSON.stringify(context)}`,
+        `${fnTag}, Request: ${safeStableStringify(req)}, Context: ${safeStableStringify(context)}`,
       );
 
       let session = this.sessions.get(req.sessionId);
@@ -111,7 +113,7 @@ export class Stage0SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, PreSATPTransfer...`);
       this.Log.debug(
-        `${fnTag}, Request: ${JSON.stringify(req)}, Context: ${JSON.stringify(context)}`,
+        `${fnTag}, Request: ${safeStableStringify(req)}, Context: ${safeStableStringify(context)}`,
       );
 
       const session = this.sessions.get(req.sessionId);

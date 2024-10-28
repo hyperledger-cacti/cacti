@@ -24,6 +24,7 @@ import {
 } from "../errors/satp-handler-errors";
 import { getSessionId } from "./handler-utils";
 import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
@@ -66,7 +67,7 @@ export class Stage1SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Transfer Proposal...`);
       this.Log.debug(
-        `${fnTag}, Request: ${JSON.stringify(req)}, Context: ${JSON.stringify(context)}`,
+        `${fnTag}, Request: ${safeStableStringify(req)}, Context: ${safeStableStringify(context)}`,
       );
 
       const session = this.sessions.get(getSessionId(req));
@@ -86,7 +87,7 @@ export class Stage1SATPHandler implements SATPHandler {
       );
 
       this.Log.debug(
-        `${fnTag}, Returning response: ${JSON.stringify(message)}`,
+        `${fnTag}, Returning response: ${safeStableStringify(message)}`,
       );
 
       if (!message) {
@@ -107,7 +108,7 @@ export class Stage1SATPHandler implements SATPHandler {
     try {
       this.Log.debug(`${fnTag}, Transfer Commence...`);
       this.Log.debug(
-        `${fnTag}, Request: ${JSON.stringify(req)}, Context: ${JSON.stringify(context)}`,
+        `${fnTag}, Request: ${safeStableStringify(req)}, Context: ${safeStableStringify(context)}`,
       );
 
       const session = this.sessions.get(getSessionId(req));
@@ -125,7 +126,7 @@ export class Stage1SATPHandler implements SATPHandler {
       );
 
       this.Log.debug(
-        `${fnTag}, Returning response: ${JSON.stringify(message)}`,
+        `${fnTag}, Returning response: ${safeStableStringify(message)}`,
       );
 
       if (!message) {

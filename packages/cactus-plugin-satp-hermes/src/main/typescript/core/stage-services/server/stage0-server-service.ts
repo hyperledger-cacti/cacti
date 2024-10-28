@@ -15,6 +15,8 @@ import {
   PreSATPTransferResponse,
   STATUS,
 } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
 import {
   AssetMissing,
@@ -284,7 +286,7 @@ export class Stage0ServerService extends SATPService {
     );
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(newSessionResponse)),
+      sign(this.Signer, safeStableStringify(newSessionResponse)),
     );
 
     newSessionResponse.serverSignature = messageSignature;
@@ -339,7 +341,7 @@ export class Stage0ServerService extends SATPService {
       sessionData.receiverAsset!.tokenId;
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(preSATPTransferResponse)),
+      sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
     );
 
     preSATPTransferResponse.serverSignature = messageSignature;
@@ -399,7 +401,6 @@ export class Stage0ServerService extends SATPService {
       sessionData.receiverWrapAssertionClaim = new WrapAssertionClaim();
       sessionData.receiverWrapAssertionClaim.receipt =
         await bridge.wrapAsset(token);
-
       sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
       );

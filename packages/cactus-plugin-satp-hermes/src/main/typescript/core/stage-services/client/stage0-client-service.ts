@@ -8,6 +8,8 @@ import {
   NewSessionResponse,
   PreSATPTransferRequest,
 } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import {
@@ -90,7 +92,7 @@ export class Stage0ClientService extends SATPService {
       sessionData.senderGatewayNetworkId;
     newSessionRequestMessage.gatewayId = thisGatewayId;
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(newSessionRequestMessage)),
+      sign(this.Signer, safeStableStringify(newSessionRequestMessage)),
     );
 
     newSessionRequestMessage.clientSignature = messageSignature;
@@ -251,7 +253,7 @@ export class Stage0ClientService extends SATPService {
     );
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(preSATPTransferRequest)),
+      sign(this.Signer, safeStableStringify(preSATPTransferRequest)),
     );
 
     preSATPTransferRequest.clientSignature = messageSignature;
@@ -303,7 +305,7 @@ export class Stage0ClientService extends SATPService {
       const assetId = token.tokenId;
       const amount = token.amount.toString();
 
-      this.Log.debug(`${fnTag}, Wrap: ${JSON.stringify(token)}`);
+      this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
 
       this.Log.debug(`${fnTag}, Wrap Asset ID: ${assetId} amount: ${amount}`);
       if (assetId == undefined) {

@@ -1,3 +1,5 @@
+import "jest-extended";
+
 import {
   IListenOptions,
   LogLevelDesc,
@@ -5,81 +7,142 @@ import {
   Secp256k1Keys,
   Servers,
 } from "@hyperledger/cactus-common";
-import "jest-extended";
+import { v4 as uuidv4 } from "uuid";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { DiscoveryOptions } from "fabric-network";
-import bodyParser from "body-parser";
-import path from "path";
-
-import http, { Server } from "http";
-
-import fs from "fs-extra";
-
 import {
+  ChainCodeProgrammingLanguage,
   Configuration,
   DefaultEventHandlerStrategy,
   FabricSigningCredential,
+  FileBase64,
   IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
   DefaultApi as FabricApi,
-  FileBase64,
-  ChainCodeProgrammingLanguage,
   FabricContractInvocationType,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import http, { Server } from "http";
+import fs from "fs-extra";
+
 import {
+  pruneDockerAllIfGithubAction,
   Containers,
+  FabricTestLedgerV1,
+  BesuTestLedger,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
-  FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
+import bodyParser from "body-parser";
 import express from "express";
+import { DiscoveryOptions, X509Identity } from "fabric-network";
 import { AddressInfo } from "net";
-
-import { v4 as uuidv4 } from "uuid";
-import { FabricBridge } from "../../../../main/typescript/core/stage-services/satp-bridge/fabric-bridge";
-import { FabricConfig } from "../../../../main/typescript/types/blockchain-interaction";
+import path from "path";
+import {
+  BesuConfig,
+  FabricConfig,
+} from "../../../main/typescript/types/blockchain-interaction";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
-import SATPInteraction from "../../../../test/typescript/fabric/satp-erc20-interact.json";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { Account } from "web3-core";
+import {
+  EthContractInvocationType,
+  IPluginLedgerConnectorBesuOptions,
+  PluginLedgerConnectorBesu,
+  ReceiptType,
+  Web3SigningCredentialType,
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import Web3 from "web3";
+import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
+import SATPWrapperContract from "../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
+import {
+  SATPGatewayConfig,
+  SATPGateway,
+  PluginFactorySATPGateway,
+  TransactRequest,
+  Asset,
+} from "../../../main/typescript";
+import {
+  Address,
+  GatewayIdentity,
+  SupportedChain,
+} from "../../../main/typescript/core/types";
+import {
+  IPluginFactoryOptions,
+  PluginImportType,
+} from "@hyperledger/cactus-core-api";
+import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
+import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
+import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+
+const logLevel: LogLevelDesc = "DEBUG";
+const log = LoggerProvider.getOrCreate({
+  level: logLevel,
+  label: "BUNGEE - Hermes",
+});
+
 let fabricServer: Server;
 
-let fabricSigningCredential: FabricSigningCredential;
-let bridgeFabricSigningCredential: FabricSigningCredential;
-const logLevel: LogLevelDesc = "DEBUG";
+let besuLedger: BesuTestLedger;
 
 let fabricLedger: FabricTestLedgerV1;
-let satpContractName: string;
-let satpWrapperContractName: string;
-let fabricChannelName: string;
-
+let fabricSigningCredential: FabricSigningCredential;
+let bridgeFabricSigningCredential: FabricSigningCredential;
 let configFabric: Configuration;
-let apiClient: FabricApi;
-
-let fabricConnector: PluginLedgerConnectorFabric;
-
-let pluginBungeeFabricOptions: IPluginBungeeHermesOptions;
-
-let fabricBridge: FabricBridge;
-let fabricConfig: FabricConfig;
-
-let clientId: string;
-
-let bridgeId: string;
+let fabricChannelName: string;
 
 const FABRIC_ASSET_ID = uuidv4();
 
 const BRIDGE_ID =
   "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "Satp - Hermes",
+let clientId: string;
+let fabricConfig: FabricConfig;
+let pluginBungeeFabricOptions: IPluginBungeeHermesOptions;
+
+let erc20TokenContract: string;
+let contractNameWrapper: string;
+
+let rpcApiHttpHost: string;
+let rpcApiWsHost: string;
+let web3: Web3;
+let firstHighNetWorthAccount: string;
+let testing_connector: PluginLedgerConnectorBesu;
+let besuKeyPair: { privateKey: string };
+let bridgeEthAccount: Account;
+let assigneeEthAccount: Account;
+const BESU_ASSET_ID = uuidv4();
+let assetContractAddress: string;
+let wrapperContractAddress: string;
+let satpContractName: string;
+
+let pluginBungeeBesuOptions: IPluginBungeeHermesOptions;
+
+let besuConfig: BesuConfig;
+let besuOptions: IPluginLedgerConnectorBesuOptions;
+
+let keychainPlugin1: PluginKeychainMemory;
+let keychainPlugin2: PluginKeychainMemory;
+let fabricUser: X509Identity;
+
+let apiClient: FabricApi;
+
+afterAll(async () => {
+  await besuLedger.stop();
+  await besuLedger.destroy();
+  await fabricLedger.stop();
+  await fabricLedger.destroy();
+  await Servers.shutdown(fabricServer);
+
+  await pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
 });
 
 beforeAll(async () => {
@@ -91,8 +154,14 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-
   {
+    besuLedger = new BesuTestLedger({
+      logLevel,
+      emitContainerLogs: true,
+      envVars: ["BESU_NETWORK=dev"],
+    });
+    await besuLedger.start();
+
     // Fabric ledger connection
     const channelId = "mychannel";
     fabricChannelName = channelId;
@@ -103,12 +172,16 @@ beforeAll(async () => {
       imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
-      logLevel,
+      logLevel: "INFO",
     });
 
     await fabricLedger.start();
-    log.info("Fabric Ledger started");
 
+    log.info("Both Ledgers started successfully");
+  }
+
+  {
+    // setup fabric ledger
     const connectionProfile = await fabricLedger.getConnectionProfileOrg1();
     expect(connectionProfile).not.toBeUndefined();
 
@@ -124,7 +197,7 @@ beforeAll(async () => {
     const bridgeWallet = enrollAdminBridgeOut[1];
 
     const [userIdentity] = await fabricLedger.enrollUser(adminWallet);
-
+    fabricUser = userIdentity;
     const opts = {
       enrollmentID: "bridge",
       organization: "org2",
@@ -199,7 +272,7 @@ beforeAll(async () => {
       },
     };
 
-    fabricConnector = new PluginLedgerConnectorFabric(pluginOptions);
+    const fabricConnector = new PluginLedgerConnectorFabric(pluginOptions);
 
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
@@ -225,11 +298,11 @@ beforeAll(async () => {
 
     // deploy contracts ...
     satpContractName = "satp-contract";
-    satpWrapperContractName = "satp-wrapper-contract";
+    const satpWrapperContractName = "satp-wrapper-contract";
     const satpContractRelPath =
-      "../../../../test/typescript/fabric/contracts/satp-contract/chaincode-typescript";
+      "../../../test/typescript/fabric/contracts/satp-contract/chaincode-typescript";
     const wrapperSatpContractRelPath =
-      "../../../../main/typescript/fabric-contracts/satp-wrapper/chaincode-typescript";
+      "../../../main/typescript/fabric-contracts/satp-wrapper/chaincode-typescript";
     const satpContractDir = path.join(__dirname, satpContractRelPath);
 
     // ├── package.json
@@ -443,7 +516,7 @@ beforeAll(async () => {
     }
 
     const res = await apiClient.deployContractV1({
-      channelId,
+      channelId: fabricChannelName,
       ccVersion: "1.0.0",
       sourceFiles: satpSourceFiles,
       ccName: satpContractName,
@@ -492,7 +565,7 @@ beforeAll(async () => {
     log.info("SATP Contract deployed");
 
     const res2 = await apiClient.deployContractV1({
-      channelId,
+      channelId: fabricChannelName,
       ccVersion: "1.0.0",
       sourceFiles: wrapperSourceFiles,
       ccName: satpWrapperContractName,
@@ -553,7 +626,6 @@ beforeAll(async () => {
       keychainId: keychainIdBridge,
       keychainRef: keychainEntryKeyBridge,
     };
-
     const mspId: string = userIdentity.mspId;
 
     const initializeResponse = await apiClient.runTransactionV1({
@@ -652,13 +724,13 @@ beforeAll(async () => {
     };
 
     fabricConfig = {
-      network: "FABRIC",
+      network: SupportedChain.FABRIC,
       signingCredential: bridgeFabricSigningCredential,
       channelName: fabricChannelName,
       contractName: satpWrapperContractName,
       options: pluginOptionsFabricBridge,
       bungeeOptions: pluginBungeeFabricOptions,
-      claimFormat: ClaimFormat.DEFAULT,
+      claimFormat: ClaimFormat.BUNGEE,
     } as FabricConfig;
 
     // networkDetails = {
@@ -669,165 +741,319 @@ beforeAll(async () => {
     //   participant: "Org1MSP",
     // };
   }
+
+  {
+    //setup besu ledger
+    rpcApiHttpHost = await besuLedger.getRpcApiHttpHost();
+    rpcApiWsHost = await besuLedger.getRpcApiWsHost();
+    web3 = new Web3(rpcApiHttpHost);
+    firstHighNetWorthAccount = besuLedger.getGenesisAccountPubKey();
+
+    bridgeEthAccount = await besuLedger.createEthTestAccount();
+
+    assigneeEthAccount = await besuLedger.createEthTestAccount();
+
+    besuKeyPair = {
+      privateKey: besuLedger.getGenesisAccountPrivKey(),
+    };
+
+    erc20TokenContract = "SATPContract";
+    contractNameWrapper = "SATPWrapperContract";
+
+    const keychainEntryValue = besuKeyPair.privateKey;
+    const keychainEntryKey = uuidv4();
+    keychainPlugin1 = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+
+      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+      logLevel,
+    });
+
+    keychainPlugin2 = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+
+      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+      logLevel,
+    });
+
+    keychainPlugin1.set(erc20TokenContract, JSON.stringify(SATPContract));
+    keychainPlugin2.set(
+      contractNameWrapper,
+      JSON.stringify(SATPWrapperContract),
+    );
+
+    const pluginRegistry = new PluginRegistry({
+      plugins: [keychainPlugin1, keychainPlugin2],
+    });
+
+    besuOptions = {
+      instanceId: uuidv4(),
+      rpcApiHttpHost,
+      rpcApiWsHost,
+      pluginRegistry,
+      logLevel,
+    };
+    testing_connector = new PluginLedgerConnectorBesu(besuOptions);
+    pluginRegistry.add(testing_connector);
+
+    await testing_connector.transact({
+      web3SigningCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NodeTxPoolAck,
+      },
+      transactionConfig: {
+        from: firstHighNetWorthAccount,
+        to: bridgeEthAccount.address,
+        value: 10e9,
+        gas: 1000000,
+      },
+    });
+
+    const balance = await web3.eth.getBalance(bridgeEthAccount.address);
+    expect(balance).toBeTruthy();
+    expect(parseInt(balance, 10)).toBeGreaterThan(10e9);
+    log.info("Connector initialized");
+
+    const deployOutSATPContract = await testing_connector.deployContract({
+      keychainId: keychainPlugin1.getKeychainId(),
+      contractName: erc20TokenContract,
+      contractAbi: SATPContract.abi,
+      constructorArgs: [firstHighNetWorthAccount, BESU_ASSET_ID],
+      web3SigningCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      bytecode: SATPContract.bytecode.object,
+      gas: 999999999999999,
+    });
+    expect(deployOutSATPContract).toBeTruthy();
+    expect(deployOutSATPContract.transactionReceipt).toBeTruthy();
+    expect(
+      deployOutSATPContract.transactionReceipt.contractAddress,
+    ).toBeTruthy();
+
+    assetContractAddress =
+      deployOutSATPContract.transactionReceipt.contractAddress ?? "";
+
+    log.info("SATPContract Deployed successfully");
+
+    const deployOutWrapperContract = await testing_connector.deployContract({
+      keychainId: keychainPlugin2.getKeychainId(),
+      contractName: contractNameWrapper,
+      contractAbi: SATPWrapperContract.abi,
+      constructorArgs: [bridgeEthAccount.address],
+      web3SigningCredential: {
+        ethAccount: bridgeEthAccount.address,
+        secret: bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      bytecode: SATPWrapperContract.bytecode.object,
+      gas: 999999999999999,
+    });
+    expect(deployOutWrapperContract).toBeTruthy();
+    expect(deployOutWrapperContract.transactionReceipt).toBeTruthy();
+    expect(
+      deployOutWrapperContract.transactionReceipt.contractAddress,
+    ).toBeTruthy();
+    log.info("SATPWrapperContract Deployed successfully");
+
+    wrapperContractAddress =
+      deployOutWrapperContract.transactionReceipt.contractAddress ?? "";
+
+    pluginBungeeBesuOptions = {
+      keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry(),
+      logLevel,
+    };
+
+    besuConfig = {
+      network: SupportedChain.BESU,
+      keychainId: keychainPlugin2.getKeychainId(),
+      signingCredential: {
+        ethAccount: bridgeEthAccount.address,
+        secret: bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      contractName: contractNameWrapper,
+      contractAddress: wrapperContractAddress,
+      options: besuOptions,
+      bungeeOptions: pluginBungeeBesuOptions,
+      gas: 999999999999999,
+      claimFormat: ClaimFormat.BUNGEE,
+    };
+
+    const giveRoleRes = await testing_connector.invokeContract({
+      contractName: erc20TokenContract,
+      keychainId: keychainPlugin1.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "giveRole",
+      params: [wrapperContractAddress],
+      signingCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 1000000,
+    });
+
+    expect(giveRoleRes).toBeTruthy();
+    expect(giveRoleRes.success).toBeTruthy();
+    log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
+  }
+
+  const responseMint = await testing_connector.invokeContract({
+    contractName: erc20TokenContract,
+    keychainId: keychainPlugin1.getKeychainId(),
+    invocationType: EthContractInvocationType.Send,
+    methodName: "mint",
+    params: [firstHighNetWorthAccount, "100"],
+    signingCredential: {
+      ethAccount: firstHighNetWorthAccount,
+      secret: besuKeyPair.privateKey,
+      type: Web3SigningCredentialType.PrivateKeyHex,
+    },
+    gas: 999999999,
+  });
+  expect(responseMint).toBeTruthy();
+  expect(responseMint.success).toBeTruthy();
+  log.info("Minted 100 tokens to firstHighNetWorthAccount");
+
+  const responseApprove = await testing_connector.invokeContract({
+    contractName: erc20TokenContract,
+    keychainId: keychainPlugin1.getKeychainId(),
+    invocationType: EthContractInvocationType.Send,
+    methodName: "approve",
+    params: [wrapperContractAddress, "100"],
+    signingCredential: {
+      ethAccount: firstHighNetWorthAccount,
+      secret: besuKeyPair.privateKey,
+      type: Web3SigningCredentialType.PrivateKeyHex,
+    },
+    gas: 999999999,
+  });
+  expect(responseApprove).toBeTruthy();
+  expect(responseApprove.success).toBeTruthy();
+  log.info("Approved 100 tokens to SATPWrapperContract");
 });
+describe("SATPGateway sending a token from Besu to Fabric", () => {
+  it("should realize a transfer", async () => {
+    //setup satp gateway
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
 
-describe("Fabric Bridge Test", () => {
-  it("Should Initialize the bridge", async () => {
-    fabricBridge = new FabricBridge(fabricConfig, logLevel);
-    expect(fabricBridge).not.toBeUndefined();
+    const gatewayIdentity = {
+      id: "mockID",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: "v02",
+          Architecture: "v02",
+          Crash: "v02",
+        },
+      ],
+      supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+    } as GatewayIdentity;
 
-    bridgeId = await fabricBridge.getClientId();
-    expect(bridgeId).not.toBeUndefined();
-    log.debug(`Bridge ID: ${bridgeId}`);
-  });
+    const options: SATPGatewayConfig = {
+      logLevel: "DEBUG",
+      gid: gatewayIdentity,
+      counterPartyGateways: [], //only knows itself
+      bridgesConfig: [besuConfig, fabricConfig],
+    };
+    const gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
 
-  it("Wrap asset", async () => {
-    const response = await fabricBridge.wrapAsset({
-      tokenId: FABRIC_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
+    const identity = gateway.Identity;
+    // default servers
+    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.address).toBe("http://localhost");
+    await gateway.startup();
+
+    const dispatcher = gateway.getBLODispatcher();
+
+    expect(dispatcher).toBeTruthy();
+    const sourceAsset: Asset = {
+      owner: firstHighNetWorthAccount,
+      ontology: JSON.stringify(BesuSATPInteraction),
+      contractName: erc20TokenContract,
+      contractAddress: assetContractAddress,
+    };
+    const receiverAsset: Asset = {
       owner: clientId,
-      mspId: "Org1MSP",
-      channelName: fabricChannelName,
+      ontology: JSON.stringify(FabricSATPInteraction),
       contractName: satpContractName,
-      amount: 0,
-      ontology: JSON.stringify(SATPInteraction),
-    });
-
-    expect(response).not.toBeUndefined();
-    expect(response.transactionId).not.toBeUndefined();
-    expect(response.output).not.toBeUndefined();
-
-    log.info(`Wrap asset response: ${JSON.stringify(response)}`);
-
-    const response2 = await fabricBridge.getAsset(FABRIC_ASSET_ID);
-
-    log.info(`GetAsset response: ${JSON.stringify(response2)}`);
-
-    expect(response2).not.toBeUndefined();
-    expect(response2.amount).toBe(0);
-    expect(response2.owner).toBe(clientId);
-    expect(response2.mspId).toBe("Org1MSP");
-    expect(response2.tokenType).toBe(TokenType.NONSTANDARD.toString());
-    expect(response2.tokenId).toBe(FABRIC_ASSET_ID);
-    expect(response2.contractName).toBe(satpContractName);
-    expect(response2.channelName).toBe(fabricChannelName);
-  });
-
-  it("lock asset", async () => {
-    const responseMint = await apiClient.runTransactionV1({
-      contractName: satpContractName,
+      mspId: fabricUser.mspId,
       channelName: fabricChannelName,
-      params: ["2"],
-      methodName: "Mint",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
+    };
+    const req: TransactRequest = {
+      contextID: "mockContext",
+      fromDLTNetworkID: SupportedChain.BESU,
+      toDLTNetworkID: SupportedChain.FABRIC,
+      fromAmount: "100",
+      toAmount: "1",
+      originatorPubkey: assigneeEthAccount.address,
+      beneficiaryPubkey: fabricUser.credentials.certificate,
+      sourceAsset,
+      receiverAsset,
+    };
+
+    const res = await dispatcher?.Transact(req);
+    log.info(res?.statusResponse);
+
+    const responseBalanceOwner = await testing_connector.invokeContract({
+      contractName: erc20TokenContract,
+      keychainId: keychainPlugin1.getKeychainId(),
+      invocationType: EthContractInvocationType.Call,
+      methodName: "checkBalance",
+      params: [firstHighNetWorthAccount],
+      signingCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 999999999,
     });
-    expect(responseMint).not.toBeUndefined();
-    expect(responseMint.status).toBeGreaterThan(199);
-    expect(responseMint.status).toBeLessThan(300);
-    expect(responseMint.data).not.toBeUndefined();
-
-    log.info(
-      `Mint 2 amount asset by the owner response: ${JSON.stringify(responseMint.data)}`,
-    );
-
-    const responseApprove = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [bridgeId, "2"],
-      methodName: "Approve",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseApprove).not.toBeUndefined();
-    expect(responseApprove.status).toBeGreaterThan(199);
-    expect(responseApprove.status).toBeLessThan(300);
-    expect(responseApprove.data).not.toBeUndefined();
-
-    log.info(
-      `Approve 2 amount asset by the owner response: ${JSON.stringify(responseApprove.data)}`,
-    );
-
-    const responseLock = await fabricBridge.lockAsset(FABRIC_ASSET_ID, 2);
-
-    expect(responseLock).not.toBeUndefined();
-    expect(responseLock.transactionId).not.toBeUndefined();
-    expect(responseLock.output).not.toBeUndefined();
-
-    log.info(`Lock asset response: ${JSON.stringify(responseLock)}`);
-
-    const response2 = await fabricBridge.getAsset(FABRIC_ASSET_ID);
-
-    expect(response2).not.toBeUndefined();
-    expect(response2.amount).toBe(2);
-    expect(response2.owner).toBe(clientId);
-    expect(response2.mspId).toBe("Org1MSP");
-    expect(response2.tokenType).toBe(TokenType.NONSTANDARD.toString());
-    expect(response2.tokenId).toBe(FABRIC_ASSET_ID);
-    expect(response2.contractName).toBe(satpContractName);
-    expect(response2.channelName).toBe(fabricChannelName);
-
-    log.info(`GetAsset response: ${JSON.stringify(response2)}`);
-
-    const responseBalance1 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [bridgeId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("2");
-    log.info("Amount was transfer correctly to the Bridge account");
-
-    const responseBalance2 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [clientId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-    expect(responseBalance2).not.toBeUndefined();
-    expect(responseBalance2.status).toBeGreaterThan(199);
-    expect(responseBalance2.status).toBeLessThan(300);
-    expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("0");
+    expect(responseBalanceOwner).toBeTruthy();
+    expect(responseBalanceOwner.success).toBeTruthy();
+    expect(responseBalanceOwner.callOutput).toBe("0");
     log.info("Amount was transfer correctly from the Owner account");
-  });
 
-  it("unlock asset", async () => {
-    const responseUnlock = await fabricBridge.unlockAsset(FABRIC_ASSET_ID, 2);
-
-    expect(responseUnlock).not.toBeUndefined();
-    expect(responseUnlock.transactionId).not.toBeUndefined();
-    expect(responseUnlock.output).not.toBeUndefined();
-
-    log.info(`Unlock asset response: ${JSON.stringify(responseUnlock)}`);
-
-    const response = await fabricBridge.getAsset(FABRIC_ASSET_ID);
-
-    expect(response).not.toBeUndefined();
-    expect(response.amount).toBe(0);
-    expect(response.owner).toBe(clientId);
-    expect(response.mspId).toBe("Org1MSP");
-    expect(response.tokenType).toBe(TokenType.NONSTANDARD.toString());
-    expect(response.tokenId).toBe(FABRIC_ASSET_ID);
-    expect(response.contractName).toBe(satpContractName);
-    expect(response.channelName).toBe(fabricChannelName);
-
-    log.info(`GetAsset response: ${JSON.stringify(response)}`);
+    const responseBalanceBridge = await testing_connector.invokeContract({
+      contractName: erc20TokenContract,
+      keychainId: keychainPlugin1.getKeychainId(),
+      invocationType: EthContractInvocationType.Call,
+      methodName: "checkBalance",
+      params: [wrapperContractAddress],
+      signingCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: besuKeyPair.privateKey,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gas: 999999999,
+    });
+    expect(responseBalanceBridge).toBeTruthy();
+    expect(responseBalanceBridge.success).toBeTruthy();
+    expect(responseBalanceBridge.callOutput).toBe("0");
+    log.info("Amount was transfer correctly to the Wrapper account");
 
     const responseBalance1 = await apiClient.runTransactionV1({
       contractName: satpContractName,
       channelName: fabricChannelName,
-      params: [bridgeId],
+      params: [BRIDGE_ID],
       methodName: "ClientIDAccountBalance",
       invocationType: FabricContractInvocationType.Send,
       signingCredential: fabricSigningCredential,
@@ -852,213 +1078,9 @@ describe("Fabric Bridge Test", () => {
     expect(responseBalance2.status).toBeGreaterThan(199);
     expect(responseBalance2.status).toBeLessThan(300);
     expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("2");
+    expect(responseBalance2.data.functionOutput).toBe("1");
     log.info("Amount was transfer correctly to the Owner account");
+    log.info(res?.statusResponse);
+    await gateway.shutdown();
   });
-
-  it("Should Burn a token", async () => {
-    const responseApprove = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [bridgeId, "2"],
-      methodName: "Approve",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseApprove).not.toBeUndefined();
-    expect(responseApprove.status).toBeGreaterThan(199);
-    expect(responseApprove.status).toBeLessThan(300);
-    expect(responseApprove.data).not.toBeUndefined();
-
-    log.info(
-      `Approve 2 amount asset by the owner response: ${JSON.stringify(responseApprove.data)}`,
-    );
-    const responseLock = await fabricBridge.lockAsset(FABRIC_ASSET_ID, 2);
-
-    expect(responseLock).not.toBeUndefined();
-    expect(responseLock.transactionId).not.toBeUndefined();
-    expect(responseLock.output).not.toBeUndefined();
-
-    log.info(`Lock asset response: ${JSON.stringify(responseLock)}`);
-
-    const responseBurn = await fabricBridge.burnAsset(FABRIC_ASSET_ID, 2);
-
-    expect(responseBurn).not.toBeUndefined();
-    expect(responseBurn.transactionId).not.toBeUndefined();
-    expect(responseBurn.output).not.toBeUndefined();
-
-    log.info(
-      `Burn 2 amount asset by the owner response: ${JSON.stringify(responseBurn)}`,
-    );
-
-    const response = await fabricBridge.getAsset(FABRIC_ASSET_ID);
-
-    expect(response).not.toBeUndefined();
-    expect(response.amount).toBe(0);
-    expect(response.owner).toBe(clientId);
-    expect(response.mspId).toBe("Org1MSP");
-    expect(response.tokenType).toBe(TokenType.NONSTANDARD.toString());
-    expect(response.tokenId).toBe(FABRIC_ASSET_ID);
-    expect(response.contractName).toBe(satpContractName);
-    expect(response.channelName).toBe(fabricChannelName);
-
-    log.info(`GetAsset response: ${JSON.stringify(response)}`);
-
-    const responseBalance1 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [bridgeId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("0");
-    log.info("Amount was burned correctly from the Bridge account");
-
-    const responseBalance2 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [clientId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseBalance2).not.toBeUndefined();
-    expect(responseBalance2.status).toBeGreaterThan(199);
-    expect(responseBalance2.status).toBeLessThan(300);
-    expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("0");
-    log.info("Amount was burned correctly from the Owner account");
-  });
-
-  it("Should Mint a token", async () => {
-    const responseMint = await fabricBridge.mintAsset(FABRIC_ASSET_ID, 2);
-    expect(responseMint).not.toBeUndefined();
-    expect(responseMint.transactionId).not.toBeUndefined();
-    expect(responseMint.output).not.toBeUndefined();
-
-    log.info(`Mint asset response: ${JSON.stringify(responseMint)}`);
-
-    const response = await fabricBridge.getAsset(FABRIC_ASSET_ID);
-
-    expect(response).not.toBeUndefined();
-    expect(response.amount).toBe(2);
-    expect(response.owner).toBe(clientId);
-    expect(response.mspId).toBe("Org1MSP");
-    expect(response.tokenType).toBe(TokenType.NONSTANDARD.toString());
-    expect(response.tokenId).toBe(FABRIC_ASSET_ID);
-    expect(response.contractName).toBe(satpContractName);
-    expect(response.channelName).toBe(fabricChannelName);
-
-    log.info(`GetAsset response: ${JSON.stringify(response)}`);
-
-    const responseBalance1 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [bridgeId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("2");
-    log.info("Amount was minted correctly to the Bridge account");
-  });
-
-  it("Should Assign a token", async () => {
-    const responseAssign = await fabricBridge.assignAsset(
-      FABRIC_ASSET_ID,
-      clientId,
-      2,
-    );
-    expect(responseAssign).not.toBeUndefined();
-    expect(responseAssign.transactionId).not.toBeUndefined();
-    expect(responseAssign.output).not.toBeUndefined();
-
-    log.info(`Assign asset response: ${JSON.stringify(responseAssign)}`);
-
-    const response = await fabricBridge.getAsset(FABRIC_ASSET_ID);
-
-    expect(response).not.toBeUndefined();
-    expect(response.amount).toBe(0);
-    expect(response.owner).toBe(clientId);
-    expect(response.mspId).toBe("Org1MSP");
-    expect(response.tokenType).toBe(TokenType.NONSTANDARD.toString());
-    expect(response.tokenId).toBe(FABRIC_ASSET_ID);
-    expect(response.contractName).toBe(satpContractName);
-    expect(response.channelName).toBe(fabricChannelName);
-
-    log.info(`GetAsset response: ${JSON.stringify(response)}`);
-
-    const responseBalance1 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [clientId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("2");
-    log.info("Amount was assigned correctly from the Bridge account");
-
-    const responseBalance2 = await apiClient.runTransactionV1({
-      contractName: satpContractName,
-      channelName: fabricChannelName,
-      params: [bridgeId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricSigningCredential,
-    });
-
-    expect(responseBalance2).not.toBeUndefined();
-    expect(responseBalance2.status).toBeGreaterThan(199);
-    expect(responseBalance2.status).toBeLessThan(300);
-    expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("0");
-    log.info("Amount was assigned correctly to the Owner account");
-  });
-
-  it("Should Unwrap a token", async () => {
-    const responseUnwrap = await fabricBridge.unwrapAsset(FABRIC_ASSET_ID);
-    expect(responseUnwrap).not.toBeUndefined();
-    expect(responseUnwrap.transactionId).not.toBeUndefined();
-    expect(responseUnwrap.output).not.toBeUndefined();
-
-    log.info(`Unwrap asset response: ${JSON.stringify(responseUnwrap)}`);
-
-    expect(
-      async () => await fabricBridge.getAsset(FABRIC_ASSET_ID),
-    ).rejects.toThrow();
-  });
-});
-
-afterAll(async () => {
-  await fabricLedger.stop();
-  await fabricLedger.destroy();
-  await Servers.shutdown(fabricServer);
-
-  await pruneDockerAllIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
 });
