@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   MessageStagesHashes,
   MessageStagesSignatures,
@@ -257,7 +259,7 @@ export class SATPSession {
       ) {
         throw new SessionDataNotLoadedCorrectlyError(
           tag,
-          JSON.stringify(sessionData),
+          safeStableStringify(sessionData)!,
         );
       }
       if (sessionData.version != SATP_VERSION) {
@@ -267,7 +269,7 @@ export class SATPSession {
       console.error(`${tag}, error: ${error}`);
       throw new SessionDataNotLoadedCorrectlyError(
         tag,
-        JSON.stringify(sessionData),
+        safeStableStringify(sessionData)!,
         error,
       );
     }

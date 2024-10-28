@@ -1,20 +1,19 @@
 import {
-  BesuConfig,
+  EthereumConfig,
   TransactionResponse,
 } from "../../../types/blockchain-interaction";
 import {
   EthContractInvocationType,
-  IPluginLedgerConnectorBesuOptions,
-  PluginLedgerConnectorBesu,
+  InvokeRawWeb3EthMethodV1Request,
+  IPluginLedgerConnectorEthereumOptions,
+  PluginLedgerConnectorEthereum,
   RunTransactionResponse,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { NetworkBridge } from "./network-bridge";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { PrivacyPolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/generated/openapi/typescript-axios";
+import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
 import { EvmAsset, getVarTypes } from "./types/evm-asset";
 import {
   Logger,
@@ -27,45 +26,45 @@ import { InteractionData } from "./types/interact";
 import { OntologyError, TransactionError } from "../../errors/bridge-erros";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 
-interface BesuResponse {
+interface EthereumResponse {
   success: boolean;
   out: RunTransactionResponse;
   callOutput: unknown;
 }
-export class BesuBridge implements NetworkBridge {
-  public static readonly CLASS_NAME = "BesuBridge";
+export class EthereumBridge implements NetworkBridge {
+  public static readonly CLASS_NAME = "EthereumBridge";
 
-  network: string = "BESU";
+  network: string = "ETHEREUM";
   claimFormat: ClaimFormat;
   public log: Logger;
 
-  private connector: PluginLedgerConnectorBesu;
+  private connector: PluginLedgerConnectorEthereum;
   private bungee: PluginBungeeHermes;
-  private options: IPluginLedgerConnectorBesuOptions;
-  private config: BesuConfig;
+  private options: IPluginLedgerConnectorEthereumOptions;
+  private config: EthereumConfig;
 
-  constructor(besuConfig: BesuConfig, level?: LogLevelDesc) {
-    this.config = besuConfig;
-    this.options = besuConfig.options;
-    const label = BesuBridge.CLASS_NAME;
+  constructor(ethereumConfig: EthereumConfig, level?: LogLevelDesc) {
+    this.config = ethereumConfig;
+    this.options = ethereumConfig.options;
+    const label = EthereumBridge.CLASS_NAME;
 
     level = level || "INFO";
     this.log = LoggerProvider.getOrCreate({ label, level });
-    this.claimFormat = besuConfig.claimFormat;
-    this.connector = new PluginLedgerConnectorBesu(besuConfig.options);
-    this.bungee = new PluginBungeeHermes(besuConfig.bungeeOptions);
-    this.bungee.addStrategy(this.network, new StrategyBesu(level));
+    this.claimFormat = ethereumConfig.claimFormat;
+    this.connector = new PluginLedgerConnectorEthereum(ethereumConfig.options);
+    this.bungee = new PluginBungeeHermes(ethereumConfig.bungeeOptions);
+    this.bungee.addStrategy(this.network, new StrategyEthereum(level));
 
     //TODO is this needed?
-    if (besuConfig.besuAssets) {
-      besuConfig.besuAssets.forEach(async (asset) => {
+    if (ethereumConfig.ethereumAssets) {
+      ethereumConfig.ethereumAssets.forEach(async (asset) => {
         await this.wrapAsset(asset);
       });
     }
   }
 
   public async wrapAsset(asset: EvmAsset): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#wrapAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#wrapAsset`;
     this.log.debug(
       `${fnTag}, Wrapping Asset: {${asset.tokenId}, ${asset.owner}, ${asset.contractAddress}, ${asset.tokenType}}`,
     );
@@ -77,8 +76,10 @@ export class BesuBridge implements NetworkBridge {
     const interactions = this.interactionList(asset.ontology);
 
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "wrap",
       params: [
@@ -88,9 +89,8 @@ export class BesuBridge implements NetworkBridge {
         asset.owner,
         interactions,
       ],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
 
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -103,17 +103,18 @@ export class BesuBridge implements NetworkBridge {
     };
   }
   public async unwrapAsset(assetId: string): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#unwrapAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#unwrapAsset`;
     this.log.debug(`${fnTag}, Unwrapping Asset: ${assetId}`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "unwrap",
       params: [assetId],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
@@ -127,18 +128,20 @@ export class BesuBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#lockAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#lockAsset`;
     this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "lock",
       params: [assetId, amount.toString()],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
     if (!response.success) {
+      this.log.debug(response);
       throw new TransactionError(fnTag);
     }
     return {
@@ -151,17 +154,18 @@ export class BesuBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#unlockAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#unlockAsset`;
     this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "unlock",
       params: [assetId, amount.toString()],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
@@ -175,17 +179,18 @@ export class BesuBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#mintAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#mintAsset`;
     this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
       params: [assetId, amount.toString()],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
@@ -199,17 +204,18 @@ export class BesuBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#burnAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#burnAsset`;
     this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "burn",
       params: [assetId, amount.toString()],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
@@ -224,19 +230,20 @@ export class BesuBridge implements NetworkBridge {
     to: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#assignAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#assignAsset`;
     this.log.debug(
       `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
     );
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Send,
       methodName: "assign",
       params: [assetId, to, amount],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
@@ -248,17 +255,18 @@ export class BesuBridge implements NetworkBridge {
   }
 
   public async getAssets(): Promise<string[]> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#getAssets`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#getAssets`;
     this.log.debug(`${fnTag}, Getting Assets`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Call,
       methodName: "getAllAssetsIDs",
       params: [],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
 
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -268,17 +276,18 @@ export class BesuBridge implements NetworkBridge {
   }
 
   public async getAsset(assetId: string): Promise<EvmAsset> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#getAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#getAsset`;
     this.log.debug(`${fnTag}, Getting Asset`);
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: EthContractInvocationType.Call,
       methodName: "getToken",
       params: [assetId],
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
 
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -296,19 +305,20 @@ export class BesuBridge implements NetworkBridge {
     params: string[],
     invocationType: EthContractInvocationType,
   ): Promise<TransactionResponse> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#runTransaction`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#runTransaction`;
     this.log.debug(
       `${fnTag}, Running Transaction: ${methodName} with params: ${params}`,
     );
     const response = (await this.connector.invokeContract({
-      contractName: this.config.contractName,
-      keychainId: this.config.keychainId,
+      contract: {
+        contractName: this.config.contractName,
+        keychainId: this.config.keychainId,
+      },
       invocationType: invocationType,
       methodName: methodName,
       params: params,
-      signingCredential: this.config.signingCredential,
-      gas: this.config.gas,
-    })) as BesuResponse;
+      web3SigningCredential: this.config.signingCredential,
+    })) as EthereumResponse;
 
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -355,19 +365,22 @@ export class BesuBridge implements NetworkBridge {
     //assetId: string,
     transactionId: string,
   ): Promise<string> {
-    const fnTag = `${BesuBridge.CLASS_NAME}}#getReceipt`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}}#getReceipt`;
     this.log.debug(
       `${fnTag}, Getting Receipt: transactionId: ${transactionId}`,
     );
     //TODO: implement getReceipt instead of transaction
-    const receipt = await this.connector.getTransaction({
-      transactionHash: transactionId,
-    });
+    const getTransactionReq: InvokeRawWeb3EthMethodV1Request = {
+      methodName: "getTransaction",
+      params: [transactionId],
+    };
+    const receipt =
+      await this.connector.invokeRawWeb3EthMethod(getTransactionReq);
 
-    return safeStableStringify(receipt.transaction);
+    return safeStableStringify(receipt) ?? "";
   }
 
-  private interactionList(jsonString: string): InteractionsRequest[] {
+  interactionList(jsonString: string): InteractionsRequest[] {
     const ontologyJSON = JSON.parse(jsonString);
 
     const interactions: InteractionsRequest[] = [];
