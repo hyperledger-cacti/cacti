@@ -5,6 +5,8 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   DefaultApi as BesuApi,
   EthContractInvocationType,
@@ -170,7 +172,7 @@ export class StrategyBesu implements ObtainLedgerStrategy {
         "Transaction: " +
           log.transactionHash +
           "\nData: " +
-          JSON.stringify(log.data) +
+          safeStableStringify(log.data) +
           "\n =========== \n",
       );
       const proof = new Proof({
@@ -185,7 +187,7 @@ export class StrategyBesu implements ObtainLedgerStrategy {
       transaction.setTarget(networkDetails.contractAddress as string);
       transaction.setPayload(txTx.input ? txTx.input : ""); //FIXME: payload = transaction input ?
       transactions.push(transaction);
-      values.push(JSON.stringify(log.data));
+      values.push(safeStableStringify(log.data));
 
       blocks.set(transaction.getId(), txBlock);
     }

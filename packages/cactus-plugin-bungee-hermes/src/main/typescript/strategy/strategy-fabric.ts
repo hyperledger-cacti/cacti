@@ -13,6 +13,7 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { Transaction } from "../view-creation/transaction";
 import { State } from "../view-creation/state";
 import { StateProof } from "../view-creation/state-proof";
@@ -101,7 +102,11 @@ export class StrategyFabric implements ObtainLedgerStrategy {
             mspid: receipt.transactionCreator.mspid,
           }),
         );
-        assetValues.push(JSON.parse(receipt.rwsetWriteData).Value.toString());
+        if (!receipt.rwsetWriteData) {
+          assetValues.push("");
+        } else {
+          assetValues.push(JSON.parse(receipt.rwsetWriteData).Value.toString());
+        }
         tx.setStateId(assetKey);
         tx.setTarget(receipt.channelID + ": " + receipt.chainCodeName);
 
@@ -135,10 +140,11 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       //only adding last block for each state, in the state proof
       stateProof.addBlock({
         blockHash: block.hash,
-        blockCreator: JSON.stringify({
-          mspid: last_receipt.blockMetaData.mspid,
-          id: last_receipt.blockMetaData.blockCreatorID,
-        }),
+        blockCreator:
+          safeStableStringify({
+            mspid: last_receipt.blockMetaData.mspid,
+            id: last_receipt.blockMetaData.blockCreatorID,
+          }) ?? "",
         blockSigners: block.signers,
       });
 
@@ -170,7 +176,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       if (!response) {
         throw new InternalServerError(`${fn} response is falsy`);
       }
-      const receiptLockRes = JSON.stringify(response);
+      const receiptLockRes = safeStableStringify(response);
       if (!receiptLockRes) {
         throw new InternalServerError(`${fn} receiptLockRes is falsy`);
       }
@@ -199,7 +205,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
         throw new InternalServerError(`${fn} response.data is falsy`);
       }
 
-      const receiptLockRes = JSON.stringify(data);
+      const receiptLockRes = safeStableStringify(data);
       if (!receiptLockRes) {
         throw new InternalServerError(`${fn} receiptLockRes is falsy`);
       }
@@ -275,7 +281,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       );
     }
 
-    const block = JSON.parse(JSON.stringify(block_data)).decodedBlock;
+    const block = JSON.parse(safeStableStringify(block_data)).decodedBlock;
 
     const blockSig = block.metadata.metadata[0].signatures;
     const sigs = [];
@@ -289,7 +295,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
         },
         signature: Buffer.from(sig.signature.data).toString("hex"),
       };
-      sigs.push(JSON.stringify(decoded));
+      sigs.push(safeStableStringify(decoded));
     }
     return {
       hash: Buffer.from(block.header.data_hash.data).toString("hex"),
@@ -440,7 +446,7 @@ export class StrategyFabric implements ObtainLedgerStrategy {
         ts,
         new TransactionProof(new Proof({ creator: "" }), txId), //transaction proof details are set in function 'generateLedgerStates'
       );
-      transaction.setPayload(JSON.stringify(tx.value));
+      transaction.setPayload(safeStableStringify(tx.value) ?? "");
       transactions.push(transaction);
     }
     return transactions.reverse();

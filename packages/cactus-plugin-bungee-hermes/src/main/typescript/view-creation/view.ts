@@ -5,6 +5,7 @@ import { Transaction } from "./transaction";
 import { IPrivacyPolicy, IPrivacyPolicyValue } from "./privacy-policies";
 import { PrivacyPolicyOpts } from "../generated/openapi/typescript-axios";
 import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export interface IViewMetadata {
   viewId: string;
@@ -87,9 +88,9 @@ export class View {
     const transactions: string[] = [];
 
     for (const state of this.snapshot.getStateBins()) {
-      states.push(JSON.stringify(state.getStateProof()));
+      states.push(safeStableStringify(state.getStateProof()));
       for (const transaction of state.getTransactions()) {
-        transactions.push(JSON.stringify(transaction.getProof()));
+        transactions.push(safeStableStringify(transaction.getProof()));
       }
     }
 
@@ -112,7 +113,7 @@ export class View {
       tF: this.tF,
       snapshot: this.snapshot,
     };
-    return JSON.stringify(viewStr);
+    return safeStableStringify(viewStr);
     // return this.snapshot.getSnapshotJson();
   }
   public getViewProof(): {
