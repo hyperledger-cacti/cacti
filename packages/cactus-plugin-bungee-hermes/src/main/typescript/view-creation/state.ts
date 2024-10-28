@@ -1,5 +1,6 @@
 import { StateProof } from "./state-proof";
 import { Transaction } from "./transaction";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class State {
   private id: string;
@@ -36,7 +37,7 @@ export class State {
 
     for (const tx of this.transactions) {
       txs.push(tx.getTxJson());
-      txEndorsements.push(JSON.stringify(tx.getProof()));
+      txEndorsements.push(safeStableStringify(tx.getProof()));
     }
 
     const jsonSnap = {
@@ -47,7 +48,7 @@ export class State {
       proofs: txEndorsements,
     };
 
-    return JSON.stringify(jsonSnap);
+    return safeStableStringify(jsonSnap);
   }
 
   public getTransactions() {
