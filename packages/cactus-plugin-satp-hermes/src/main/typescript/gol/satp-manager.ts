@@ -5,6 +5,8 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { Stage0SATPHandler } from "../core/stage-handlers/stage0-handler";
 import { Stage0ServerService } from "../core/stage-services/server/stage0-server-service";
 
@@ -350,7 +352,7 @@ export class SATPManager {
     this.logger.debug(`${fnTag}, Initiating Transfer`);
 
     const clientSessionData = session.getClientSessionData();
-    const clientSessionDataJson = JSON.stringify(clientSessionData);
+    const clientSessionDataJson = safeStableStringify(clientSessionData);
     this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
 
     if (!clientSessionData) {
@@ -411,7 +413,7 @@ export class SATPManager {
 
     const check = await clientSatpStage0.check({ check: "check" });
 
-    this.logger.info(`${fnTag}, check: ${JSON.stringify(check)}`);
+    this.logger.info(`${fnTag}, check: ${safeStableStringify(check)}`);
 
     if (!check) {
       throw new Error(`${fnTag}, Failed to check`);
@@ -442,7 +444,7 @@ export class SATPManager {
       await clientSatpStage0.newSession(newSessionRequest);
 
     this.logger.info(
-      `${fnTag}, responseNewSession: ${JSON.stringify(responseNewSession)}`,
+      `${fnTag}, responseNewSession: ${safeStableStringify(responseNewSession)}`,
     );
 
     if (!responseNewSession) {
@@ -462,7 +464,7 @@ export class SATPManager {
     );
 
     this.logger.info(
-      `${fnTag}, responsePreSATPTransfer: ${JSON.stringify(responsePreSATPTransfer)}`,
+      `${fnTag}, responsePreSATPTransfer: ${safeStableStringify(responsePreSATPTransfer)}`,
     );
 
     this.logger.info(`${fnTag}, Stage 0 completed`);
@@ -480,7 +482,7 @@ export class SATPManager {
     );
 
     this.logger.info(
-      `${fnTag}, responseTransferProposal: ${JSON.stringify(responseTransferProposal)}`,
+      `${fnTag}, responseTransferProposal: ${safeStableStringify(responseTransferProposal)}`,
     );
 
     const requestTransferCommence = await (
@@ -496,7 +498,7 @@ export class SATPManager {
     );
 
     this.logger.info(
-      `${fnTag}, responseTransferCommence: ${JSON.stringify(responseTransferCommence)}`,
+      `${fnTag}, responseTransferCommence: ${safeStableStringify(responseTransferCommence)}`,
     );
 
     this.logger.info(`${fnTag}, Stage 1 completed`);
@@ -513,7 +515,7 @@ export class SATPManager {
       await clientSatpStage2.lockAssertion(requestLockAssertion);
 
     this.logger.info(
-      `${fnTag}, responseLockAssertion: ${JSON.stringify(responseLockAssertion)}`,
+      `${fnTag}, responseLockAssertion: ${safeStableStringify(responseLockAssertion)}`,
     );
 
     this.logger.info(`${fnTag}, Stage 2 completed`);
@@ -530,7 +532,7 @@ export class SATPManager {
       requestCommitPreparation,
     );
     this.logger.info(
-      `${fnTag}, responseCommitPreparation: ${JSON.stringify(responseCommitPreparation)}`,
+      `${fnTag}, responseCommitPreparation: ${safeStableStringify(responseCommitPreparation)}`,
     );
 
     const requestCommitFinalAssertion = await (
@@ -544,7 +546,7 @@ export class SATPManager {
     const responseCommitFinalAssertion =
       await clientSatpStage3.commitFinalAssertion(requestCommitFinalAssertion);
     this.logger.info(
-      `${fnTag}, responseCommitFinalAssertion: ${JSON.stringify(responseCommitFinalAssertion)}`,
+      `${fnTag}, responseCommitFinalAssertion: ${safeStableStringify(responseCommitFinalAssertion)}`,
     );
 
     const RequestTransferComplete = await (
@@ -559,7 +561,7 @@ export class SATPManager {
       RequestTransferComplete,
     );
     this.logger.info(
-      `${fnTag}, responseTransferComplete: ${JSON.stringify(responseTransferComplete)}`,
+      `${fnTag}, responseTransferComplete: ${safeStableStringify(responseTransferComplete)}`,
     );
 
     this.logger.info(`${fnTag}, Stage 3 completed`);
