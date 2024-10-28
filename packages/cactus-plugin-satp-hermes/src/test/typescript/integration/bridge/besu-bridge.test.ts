@@ -23,11 +23,12 @@ import {
 import Web3 from "web3";
 import { Account } from "web3-core";
 import { BesuBridge } from "../../../../main/typescript/core/stage-services/satp-bridge/besu-bridge";
-import { BesuAsset } from "../../../../main/typescript/core/stage-services/satp-bridge/types/besu-asset";
+import { EvmAsset } from "../../../../main/typescript/core/stage-services/satp-bridge/types/evm-asset";
 import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { BesuConfig } from "../../../../main/typescript/types/blockchain-interaction";
 import SATPInteraction from "../../../solidity/satp-erc20-interact.json";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -223,6 +224,7 @@ beforeAll(async () => {
       options: besuOptions,
       bungeeOptions: pluginBungeeHermesOptions,
       gas: 9999999999999,
+      claimFormat: ClaimFormat.DEFAULT,
     };
 
     const giveRoleRes = await testing_connector.invokeContract({
@@ -272,7 +274,7 @@ describe("Besu Bridge Test", () => {
       contractName: erc20TokenContract,
       contractAddress: assetContractAddress,
       ontology: JSON.stringify(SATPInteraction),
-    } as BesuAsset;
+    } as EvmAsset;
 
     const response = await besuBridge.wrapAsset(asset);
     expect(response).toBeDefined();

@@ -48,13 +48,13 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
     address public bridge_address;
 
-    event Wrap(address contractAddress, TokenType tokenType, string tokenId, address owner);
-    event Unwrap(string tokenId);
-    event Lock(string tokenId, uint256 amount);
-    event Unlock(string tokenId, uint256 amount);
-    event Mint(string tokenId, uint256 amount);
-    event Burn(string tokenId, uint256 amount);
-    event Assign(string tokenId, address receiver_account, uint256 amount);
+    event Wrap(string indexed tokenId, address contractAddress, TokenType tokenType, address owner);
+    event Unwrap(string indexed tokenId);
+    event Lock(string indexed tokenId, uint256 amount);
+    event Unlock(string indexed tokenId, uint256 amount);
+    event Mint(string indexed tokenId, uint256 amount);
+    event Burn(string indexed tokenId, uint256 amount);
+    event Assign(string indexed tokenId, address receiver_account, uint256 amount);
 
     constructor(address _bridge_address)  Ownable(_bridge_address) {
         bridge_address = address(_bridge_address);
@@ -75,7 +75,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     
         ids.push(tokenId);
         
-        emit Wrap(contractAddress, tokenType, tokenId, owner);
+        emit Wrap(tokenId, contractAddress, tokenType, owner);
         return true;
     }
 

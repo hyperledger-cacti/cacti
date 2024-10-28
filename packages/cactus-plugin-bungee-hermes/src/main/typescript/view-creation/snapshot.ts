@@ -1,4 +1,5 @@
 import { State } from "./state";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class Snapshot {
   private id: string;
@@ -99,7 +100,7 @@ export class Snapshot {
       stateBins: this.stateBins,
     };
 
-    return JSON.stringify(snapshotJson);
+    return safeStableStringify(snapshotJson);
   }
 
   public removeState(stateId: string) {
