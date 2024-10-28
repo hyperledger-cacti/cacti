@@ -23,6 +23,8 @@ import {
   saveHash,
   saveSignature,
 } from "../../session-utils";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { SupportedChain } from "../../types";
 import { SATPSession } from "../../../core/satp-session";
 import {
@@ -126,7 +128,7 @@ export class Stage1ServerService extends SATPService {
     //TODO implement conditional reject
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(transferProposalReceiptMessage)),
+      sign(this.Signer, safeStableStringify(transferProposalReceiptMessage)),
     );
 
     transferProposalReceiptMessage.serverSignature = messageSignature;
@@ -145,7 +147,7 @@ export class Stage1ServerService extends SATPService {
       sessionID: sessionData.id,
       type: "transferProposalResponse",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
     this.Log.info(`${fnTag}, sending TransferProposalResponseMessage...`);
@@ -190,7 +192,7 @@ export class Stage1ServerService extends SATPService {
     transferCommenceResponseMessage.common = commonBody;
 
     const messageSignature = bufArray2HexStr(
-      sign(this.Signer, JSON.stringify(transferCommenceResponseMessage)),
+      sign(this.Signer, safeStableStringify(transferCommenceResponseMessage)),
     );
 
     transferCommenceResponseMessage.serverSignature = messageSignature;
@@ -212,7 +214,7 @@ export class Stage1ServerService extends SATPService {
       sessionID: sessionData.id,
       type: "transferCommenceResponse",
       operation: "lock",
-      data: JSON.stringify(sessionData),
+      data: safeStableStringify(sessionData),
     });
     */
 
