@@ -76,6 +76,7 @@ import {
   AdminApi,
   TransactionApi,
 } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/typescript-axios/api";
+import { ClaimFormat } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -439,6 +440,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       contractName: CbdcBridgingAppDummyInfrastructure.SATP_WRAPPER,
       options: this.fabricConnectorBridgeOptions,
       bungeeOptions: pluginBungeeFabricOptions,
+      claimFormat: ClaimFormat.DEFAULT,
     } as FabricConfig;
 
     const besuConfig = {
@@ -454,6 +456,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       options: this.besuOptions,
       bungeeOptions: pluginBungeeBesuOptions,
       gas: 999999999999999,
+      claimFormat: ClaimFormat.DEFAULT,
     };
 
     const besuGatewayOptions: SATPGatewayConfig = {
