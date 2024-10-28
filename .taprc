@@ -26,7 +26,10 @@ files:
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-block-endpoint.test.ts
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts
+<<<<<<< HEAD
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts
+=======
+>>>>>>> ff842d2a59ef898e734e1424ee6f26b52ba0af9b
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts
