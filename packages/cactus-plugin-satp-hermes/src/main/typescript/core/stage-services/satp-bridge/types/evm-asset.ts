@@ -1,6 +1,6 @@
 import { Asset } from "./asset";
 
-export interface BesuAsset extends Asset {
+export interface EvmAsset extends Asset {
   contractAddress: string;
 }
 
