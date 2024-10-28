@@ -18,6 +18,7 @@ import {
 } from "@connectrpc/connect";
 
 import { Express } from "express";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
@@ -156,7 +157,7 @@ export class GatewayOrchestrator {
     });
     if (!channel) {
       throw new Error(
-        `No channel found for DLT ${dlt} \n available channels: ${JSON.stringify(channels)}`,
+        `No channel found for DLT ${dlt} \n available channels: ${safeStableStringify(channels)}`,
       );
     }
     return channel;
@@ -269,7 +270,7 @@ export class GatewayOrchestrator {
   ): Map<string, PromiseConnectClient<SATPServiceInstance>> {
     // one function for each client type; aggregate in array
     this.logger.debug(
-      `Creating clients for gateway ${JSON.stringify(identity)}`,
+      `Creating clients for gateway ${safeStableStringify(identity)}`,
     );
     const transport0 = createGrpcWebTransport({
       baseUrl:

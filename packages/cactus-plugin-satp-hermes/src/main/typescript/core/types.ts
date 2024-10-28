@@ -40,6 +40,7 @@ export type ShutdownHook = {
 export enum SupportedChain {
   FABRIC = "FabricSATPGateway",
   BESU = "BesuSATPGateway",
+  EVM = "EthereumSATPGateway",
 }
 
 export type GatewayChannel = {
