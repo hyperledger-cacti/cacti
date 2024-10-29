@@ -170,15 +170,20 @@ To protect the Hyperledger Cacti source code, GitHub pull requests are accepted 
    git rebase main
    # Happy coding !
    ```
-5. Commit changes to your branch.
+5. Install the git hook scripts. (This command should only be run once)
+   ```
+   yarn run tools:install-pre-commit-secret-detection
+   # Now pre-commit will run automatically on git commit
+   ```
+6. Commit changes to your branch.
    ```
    # Commit and push your changes to your fork
    git add -A
    git commit -s -m "<type>[optional scope]: <description>"
    git push origin <newfeature>
    ```
-6. Once you've committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.
-7. Repeat step 3 to 6 when you need to prepare posting new pull request.
+7. Once you've committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.
+8. Repeat step 3 to 7 when you need to prepare posting new pull request.
 
 NOTE: Once you submitted pull request to Cacti repository, step 6 is not necessary when you made further changes with `git commit --amend` since your amends will be sent automatically.
 
