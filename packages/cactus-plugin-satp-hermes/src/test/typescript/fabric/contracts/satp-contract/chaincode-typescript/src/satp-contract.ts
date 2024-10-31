@@ -8,9 +8,13 @@ import { ITraceableContract } from "./ITraceableContract";
 import TokenERC20Contract from "./tokenERC20";
 import { SATPContractInterface } from "./satp-contract-interface";
 
+/**
+ * @title SATPContract
+ * The SATPContract is a example costum ERC20 token contract that implements the SATPContractInterface.
+ */
 @Info({
   title: "SATPContract",
-  description: "SATP ERC20 contract for trading asset",
+  description: "SATP Costum ERC20 contract for trading asset",
 })
 export class SATPContract
   extends TokenERC20Contract
@@ -20,6 +24,13 @@ export class SATPContract
     super("SATP-token");
   }
 
+  /**
+   * InitToken initializes the token contract.
+   * @param ctx The transaction context.
+   * @param owner The owner of the token.
+   * @param id The id of the token.
+   * @returns true if the token was initialized successfully.
+   */
   @Transaction()
   public async InitToken(
     ctx: Context,
@@ -33,6 +44,14 @@ export class SATPContract
     return true;
   }
 
+  /**
+   * @notice Set the bridge MSPID and bridge ID.
+   * So that the bridge can interact with the contract.
+   * This is an example on how to give certain permissions to a bridge.
+   * @param ctx The transaction context.
+   * @param bridgeID The bridge ID.
+   * @returns boolean
+   */
   @Transaction()
   public async setBridge(ctx: Context, bridge: string): Promise<boolean> {
     this.checkPermission(ctx);
@@ -76,6 +95,12 @@ export class SATPContract
     return JSON.stringify(allResults);
   }
 
+  /**
+   * @notice Mint creates new tokens and assigns them to the owner.
+   * @param ctx The transaction context.
+   * @param amount The amount of tokens to mint.
+   * @returns boolean
+   */
   @Transaction()
   public async mint(ctx: Context, amount: string): Promise<boolean> {
     this.checkPermission(ctx);
@@ -83,6 +108,12 @@ export class SATPContract
     return true;
   }
 
+  /**
+   * @notice Burn destroys tokens from the owner.
+   * @param ctx The transaction context.
+   * @param amount The amount of tokens to burn.
+   * @returns boolean
+   */
   @Transaction()
   public async burn(ctx: Context, amount: string): Promise<boolean> {
     this.checkPermission(ctx);
@@ -90,6 +121,14 @@ export class SATPContract
     return true;
   }
 
+  /**
+   * @notice Assign transfers tokens from one account to another.
+   * @param ctx The transaction context.
+   * @param from The account to transfer tokens from.
+   * @param to The account to transfer tokens to.
+   * @param amount The amount of tokens to transfer.
+   * @returns boolean
+   */
   @Transaction()
   public async assign(
     ctx: Context,
@@ -109,6 +148,14 @@ export class SATPContract
     return true;
   }
 
+  /**
+   * @notice TransferFrom transfers tokens from one account to another.
+   * @param ctx The transaction context.
+   * @param from The account to transfer tokens from.
+   * @param to The account to transfer tokens to.
+   * @param amount The amount of tokens to transfer.
+   * @returns boolean
+   */
   @Transaction()
   public async transferFrom(
     ctx: Context,
@@ -121,6 +168,13 @@ export class SATPContract
     return true;
   }
 
+  /**
+   * @notice Transfer transfers tokens from one account to another.
+   * @param ctx The transaction context.
+   * @param to The account to transfer tokens to.
+   * @param amount The amount of tokens to transfer.
+   * @returns boolean
+   */
   @Transaction()
   public async transfer(
     ctx: Context,
@@ -132,6 +186,10 @@ export class SATPContract
     return true;
   }
 
+  /**
+   * @notice Checks if the client has permission to perform the operation.
+   * @param ctx The transaction context.
+   */
   private async checkPermission(ctx: Context) {
     let owner = await ctx.stub.getState("owner");
     let bridge = await ctx.stub.getState("bridge");
@@ -150,6 +208,11 @@ export class SATPContract
     }
   }
 
+  /**
+   * @notice Checks if the client has permission to perform the operation. This is an example on how to use the hasPermission function. It is to be used from the client side.
+   * @param ctx The transaction context.
+   * @param clientMSPID The MSPID of the client.
+   */
   @Transaction()
   public async hasPermission(
     ctx: Context,

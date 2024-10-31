@@ -62,7 +62,7 @@ Firstly let us identify the different entities involved in the protocol and what
 
 The sequence diagram of SATP is pictured below.
 
-![satp-sequence-diagram](https://i.imgur.com/SOdXFEt.png)
+<img src="./images/SATP-Protocol.png" alt="drawing" width="700"/>
 
 ### Crash Recovery Integration
 The crash recovery protocol ensures session consistency across all stages of SATP. Each session's state, logs, hashes, timestamps, and signatures are stored and recovered using the following mechanisms:
@@ -76,34 +76,50 @@ The crash recovery protocol ensures session consistency across all stages of SAT
 Refer to the [Crash Recovery Sequence](https://datatracker.ietf.org/doc/html/draft-belchior-satp-gateway-recovery) for more details.
 
 ### Application-to-Gateway API (API Type 1)
-We
+The gateway’s Business Layer Orchestrator (BLO) exposes an API with the following endpoints:
+
+#### API Endpoints
+- **Transact**
+  - Triggers a SATP transaction.
+
+- **GetStatus**
+  - Reads status information of a specific SATP session.
+
+- **GetAllSessions**
+  - Retrieves all session IDs known by the bridge.
+
 
 ### Gateway-to-Gateway API (API Type 2)
-This plugin uses OpenAPI to generate the API paths.
-There are Client and Server Endpoints for each type of message detailed in the SATP protocol:
+This plugin in the Gateway-to-Gateway communication uses grpc.
 
-  - TransferInitializationV1Request
-  - TransferInitializationV1Response
-  - TransferCommenceV1Request
-  - TransferCommenceV1Response
-  - LockEvidenceV1Request
-  - LockEvidenceV1Response
-  - CommitPreparationV1Request
-  - CommitPreparationV1Response
-  - CommitFinalV1Request
-  - CommitFinalV1Response
-  - TransferCompleteV1Request
-  - ClientV1Request
-### Crash Recovery Endpoints
-There are Client and Server gRPC Endpoints for the recovery and rollback messages:
+There are Client and Server GRPC Endpoints for each type of message detailed in the SATP protocol:
 
-- **Recovery Messages:**
-  - `RecoverV2Message`
-  - `RecoverV2SuccessMessage`
-  - `RecoverUpdateMessage`
-- **Rollback Messages:**
-  - `RollbackV2Message`
-  - `RollbackAckMessage`
+  - Stage 0:
+    - NewSessionRequest
+    - NewSessionResponse
+    - PreSATPTransferRequest
+    - PreSATPTransferResponse
+  - Stage 1:
+    - TransferProposalRequestMessage
+    - TransferProposalReceiptMessage
+    - TransferCommenceRequestMessage
+    - TransferCommenceResponseMessage
+  - Stage 2:
+    - LockAssertionRequestMessage
+    - LockAssertionReceiptMessage
+  - Stage 3:
+    - CommitPreparationRequestMessage
+    - CommitReadyResponseMessage
+    - CommitFinalAssertionRequestMessage
+    - CommitFinalAcknowledgementReceiptResponseMessage
+    - TransferCompleteRequestMessage
+
+There are also defined the endpoints for the crash recovery procedure (there is still missing the endpoint to receive the Rollback mesage):
+  - RecoverV1Message
+  - RecoverUpdateV1Message
+  - RecoverUpdateAckV1Message
+  - RecoverSuccessV1Message
+  - RollbackV1Message
 
 ## Use case
 Alice and Bob, in blockchains A and B, respectively, want to make a transfer of an asset from one to the other. Gateway A represents the gateway connected to Alice's blockchain. Gateway B represents the gateway connected to Bob's blockchain. Alice and Bob will run SATP, which will execute the transfer of the asset from blockchain A to blockchain B. The above endpoints will be called in sequence. Notice that the asset will first be locked on blockchain A and a proof is sent to the server-side. Afterward, the asset on the original blockchain is extinguished, followed by its regeneration on blockchain B.
@@ -122,39 +138,44 @@ These features enhance reliability in scenarios where network or gateway disrupt
   The crash recovery and rollback mechanisms are implemented for configurations where client and server data are handled separately. For single-gateway setups, where both client and server data coexist in session, the current implementation of fetching a single log may not suffice. This requires to fetch multiple logs (X logs) `recoverSessions()` to differentiate and handle client and server-specific data accurately, to reconstruct the session back after the crash.
 
 ## Running the tests
+### **Unit**
+- #### **SATP Services***
+  - [SATP services test](./src/test/typescript/unit/services.test.ts)
+- #### **Gateway**
+  - [Gateway runner instantiation test](./src/test/typescript/unit/SATPGatewayRunner-instantiation.test.ts)
+- #### **Crash Management**
+  - [Crash detection using cron jobs](./src/test/typescript/unit/crash-management/cron-job.test.ts)
+  - [Rollback services test](./src/test/typescript/unit/crash-management/rollback-factory.test.ts)
+  - [Crash scenarios test](./src/test/typescript/unit/crash-management/scenarios.test.ts)
 
-[A test of the entire protocol with manual calls to the methods, i.e. without ledger connectors and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp.test.ts)
+### **Integration**
+- #### **End-to-End**
+  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer](./src/test/typescript/integration/satp-e2e-transfer-1-gateway.test.ts)
+  - [End-to-end testing of a single SATP Gateways realizing a cross-chain tranfer utilizing the Hyperledger Cacti Api Server](./src/test/typescript/integration/satp-e2e-transfer-1-gateway-with-api-server.test.ts)
+  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer - Docker](./src/test/typescript/integration/satp-e2e-transfer-1-gateways-dockerization.test.ts)
+  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer with Bungee Proofs](./src/test/typescript/integration/satp-e2e-transfer-1-gateway-with-bungee.test.ts)
+  - [End-to-end testing of two SATP Gateways realizing a cross-chain tranfer](./src/test/typescript/integration/satp-e2e-transfer-2-gateway.test.ts)
+  - [End-to-end testing of two SATP Gateways realizing a cross-chain tranfer, gateway create their OAPI server](./src/test/typescript/integration/satp-e2e-transfer-2-gateways-openapi.test.ts)
+  - [End-to-end testing of two SATP Gateways realizing a cross-chain tranfer utilizing the Hyperledger Cacti Api Server](./src/test/typescript/integration/satp-e2e-transfer-2-gateway-with-api-server.test.ts)
+  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer - Docker](./src/test/typescript/integration/satp-e2e-transfer-2-gateways-dockerization.test.ts)
+- #### **Bridge**
+  - [Besu Bridge Test](./src/test/typescript/integration/bridge/besu-bridge.test.ts)
+  - [Fabric Bridge Test](./src/test/typescript/integration/bridge/fabric-bridge.test.ts)
+  - [Ethereum Bridge Test](./src/test/typescript/integration/bridge/ethereum-bridge.test.ts)
+- #### **Crash Recovery**
+  - [Stage 1 recovery test](./src/test/typescript/integration/recovery/recovery-stage-1.test.ts)
+  - [Stage 2 recovery test](./src/test/typescript/integration/recovery/recovery-stage-2.test.ts)
+  - [Stage 3 recovery test](./src/test/typescript/integration/recovery/recovery-stage-3.test.ts)
+  - [Stage 0 rollback test](./src/test/typescript/integration/rollback/rollback-stage-0.test.ts)
+  - [Stage 1 rollback test](./src/test/typescript/integration/rollback/rollback-stage-1.test.ts)
+  - [Stage 2 rollback test](./src/test/typescript/integration/rollback/rollback-stage-2.test.ts)
+  - [Stage 3 rollback test](./src/test/typescript/integration/rollback/rollback-stage-3.test.ts)
+- #### **Business Logic Orchestrator**
+  - [Blo OAPI test](./src/test/typescript/integration/gateway-blo.test.ts)
+- #### **Gateway**
+  - [Gateway Startup Test](./src/test/typescript/integration/gateway-init-startup.test.ts)
 
-[A test of the entire protocol using Open API but with no ledger connectors.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp-api-call.test.ts)
-
-[A test of the entire protocol with ledger connectors (Fabric and Besu) and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp-api-call-with-ledger-connector.test.ts)
-
-[A test with a simulated crash of the client gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/client-crash-after-transfer-initiation.test.ts)
-
-[A test with a simulated crash of the client gateway after the lock of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/client-crash-after-lock-asset.test.ts)
-
-[A test with a simulated crash of the client gateway after the deletion of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/client-crash-after-delete-asset.test.ts)
-
-[A test with a simulated crash of the server gateway after the creation of the the asset in the recipient blockchain (Besu).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/server-crash-after-create-asset.test.ts)
-
-[A test with a simulated crash of the server gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/server-crash-after-transfer-initiation.test.ts)
-
-[A test with a rollback after a timeout (client crashed).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp-rollback.test.ts)
-
-[A test with a backup gateway resuming the protocol after the client gateway crashed.](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/backup-gateway-after-client-crash.test.ts)
-
-
-### Crash Recovery Tests
-- [Stage 1 Recovery Test](src/test/typescript/integration/recovery/recovery-stage-1.test.ts)
-- [Stage 2 Recovery Test](src/test/typescript/integration/recovery/recovery-stage-2.test.ts)
-- [Stage 3 Recovery Test](src/test/typescript/integration/recovery/recovery-stage-3.test.ts)
-- [Stage 0 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-0.test.ts)
-- [Stage 1 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-1.test.ts)
-- [Stage 2 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-2.test.ts)
-- [Stage 3 Rollback Test](src/test/typescript/integration/rollback/rollback-stage-3.test.ts)
   
-For developers that want to test separate steps/phases of the SATP protocol, please refer to [these](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/unit/) test files (client and server side along with the recovery procedure).
-
 ## Usage
 
 Let us consider two gateways. The client gateway connected to Hyperledger Fabric and the server gateway connected to Hyperledger Besu. Let us also consider:
@@ -210,17 +231,17 @@ yarn configure
 yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
 ```
 
-Build the image:
-
-```sh
-docker build  \
-  --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile \
-  ./packages/cactus-plugin-satp-hermes/ \
-  --tag shg \
-  --tag satp-hermes-gateway \
-  --tag ghcr.io/hyperledger/cacti-satp-hermes-gateway:$(date +"%Y-%m-%dT%H-%M-%S" --utc)-dev-$(git rev-parse --short HEAD)
-```
-
+### Build the image:
+ 
+  For stable builds:
+   ```
+  yarn docker:build:stable
+   ```
+  For dev builds:
+   ```
+    yarn docker:build:dev
+   ```
+  
 Run the image:
 
 ```sh
@@ -240,13 +261,12 @@ docker compose \
   --build
 ```
 
-
 > The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
 
 ## Contributing
-We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
+We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
+Please review [CONTRIBUTING.md](https://github.com/hyperledger/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
