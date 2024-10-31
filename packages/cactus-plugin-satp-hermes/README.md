@@ -55,27 +55,35 @@ Firstly let us identify the different entities involved in the protocol and what
 
 The sequence diagram of SATP is pictured below.
 
-![satp-sequence-diagram](https://i.imgur.com/SOdXFEt.png)
+![satp-sequence-diagram](images/SATP-Protocol.jpg))
 
 ### Application-to-Gateway API (API Type 1)
 We
 
 ### Gateway-to-Gateway API (API Type 2)
-This plugin uses OpenAPI to generate the API paths.
-There are Client and Server Endpoints for each type of message detailed in the SATP protocol:
+This plugin in the Gateway-to-Gateway communication uses grpc.
 
-  - TransferInitializationV1Request
-  - TransferInitializationV1Response
-  - TransferCommenceV1Request
-  - TransferCommenceV1Response
-  - LockEvidenceV1Request
-  - LockEvidenceV1Response
-  - CommitPreparationV1Request
-  - CommitPreparationV1Response
-  - CommitFinalV1Request
-  - CommitFinalV1Response
-  - TransferCompleteV1Request
-  - ClientV1Request
+There are Client and Server GRPC Endpoints for each type of message detailed in the SATP protocol:
+
+  - Stage 0:
+    - NewSessionRequest
+    - NewSessionResponse
+    - PreSATPTransferRequest
+    - PreSATPTransferResponse
+  - Stage 1:
+    - TransferProposalRequestMessage
+    - TransferProposalReceiptMessage
+    - TransferCommenceRequestMessage
+    - TransferCommenceResponseMessage
+  - Stage 2:
+    - LockAssertionRequestMessage
+    - LockAssertionReceiptMessage
+  - Stage 3:
+    - CommitPreparationRequestMessage
+    - CommitReadyResponseMessage
+    - CommitFinalAssertionRequestMessage
+    - CommitFinalAcknowledgementReceiptResponseMessage
+    - TransferCompleteRequestMessage
 
 There are also defined the endpoints for the crash recovery procedure (there is still missing the endpoint to receive the Rollback mesage):
   - RecoverV1Message
