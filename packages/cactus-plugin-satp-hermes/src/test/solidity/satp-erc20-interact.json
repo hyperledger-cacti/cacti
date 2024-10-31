@@ -32,9 +32,9 @@
             }
         ],
         "assign": [{
-            "functionSignature": "assign(address,address,uint256)",
-            "variables": ["bridge", "receiver", "amount"],
-            "available": true
+                "functionSignature": "assign(address,address,uint256)",
+                "variables": ["bridge", "receiver", "amount"],
+                "available": true
             }
         ],
         "checkPermission": [{
