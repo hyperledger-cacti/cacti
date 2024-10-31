@@ -2,6 +2,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * InteractionSignatureType is an enum that represents the type of the interaction signature.
+ */
 export enum InteractionSignatureType {
   MINT = 0,
   BURN = 1,
@@ -11,6 +14,9 @@ export enum InteractionSignatureType {
   UNLOCK = 5,
 }
 
+/**
+ * VarType is an enum that represents the type of the variables.
+ */
 export enum VarType {
   CONTRACTNAME = 0,
   CHANNELNAME = 1,
