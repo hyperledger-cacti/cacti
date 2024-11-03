@@ -101,7 +101,7 @@ beforeAll(async () => {
 });
 
 describe("Crash Recovery Services Testing", () => {
-  it("handle reover function test", async () => {
+  it("handle recover function test", async () => {
     mockSession = createMockSession();
 
     const testData = mockSession.hasClientSessionData()

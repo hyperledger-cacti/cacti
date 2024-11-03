@@ -29,10 +29,9 @@ export class CrashRecoveryService {
     request: RecoverMessage,
   ): Promise<RecoverUpdateMessage> {
     this.log.debug("Creating RecoverUpdateMessage...");
-    const recoveredLogs =
-      await this.logRepository.readLogsMoreRecentThanTimestamp(
-        request.lastEntryTimestamp.toString(),
-      );
+    const recoveredLogs = await this.logRepository.fetchLogsFromSequence(
+      request.sessionId,
+    );
     return new RecoverUpdateMessage({
       sessionId: request.sessionId,
       messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",

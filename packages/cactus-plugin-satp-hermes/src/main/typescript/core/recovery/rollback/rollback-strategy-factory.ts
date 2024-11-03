@@ -11,13 +11,6 @@ import {
 import { RollbackState } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { ILocalLogRepository } from "../../../repository/interfaces/repository";
 
-/*export interface RollbackState {
-  currentStage: string;
-  // todo add rollback state
-  // placeholder, should import RollbackLogEntry from protos.
-  // RollbackLogEntry in spec = RollbackState in code
-}*/
-
 export interface RollbackStrategy {
   execute(session: SATPSession): Promise<RollbackState>;
   // todo do we want to return any information?

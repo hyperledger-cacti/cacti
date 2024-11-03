@@ -352,34 +352,34 @@ export class RollbackAckMessage extends Message<RollbackAckMessage> {
  */
 export class LocalLog extends Message<LocalLog> {
   /**
-   * @generated from field: string key = 1;
+   * @generated from field: string sessionID = 1;
    */
-  key = "";
+  sessionID = "";
 
   /**
-   * @generated from field: string sessionId = 2;
-   */
-  sessionId = "";
-
-  /**
-   * @generated from field: string data = 3;
-   */
-  data = "";
-
-  /**
-   * @generated from field: string type = 4;
+   * @generated from field: string type = 2;
    */
   type = "";
 
   /**
-   * @generated from field: string operation = 5;
+   * @generated from field: string key = 3;
+   */
+  key = "";
+
+  /**
+   * @generated from field: string operation = 4;
    */
   operation = "";
 
   /**
-   * @generated from field: string timestamp = 6;
+   * @generated from field: string timestamp = 5;
    */
   timestamp = "";
+
+  /**
+   * @generated from field: string data = 6;
+   */
+  data = "";
 
   constructor(data?: PartialMessage<LocalLog>) {
     super();
@@ -389,12 +389,12 @@ export class LocalLog extends Message<LocalLog> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cacti.satp.v02.crash.LocalLog";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "sessionId", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "data", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "operation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "sessionID", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "operation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "data", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocalLog {

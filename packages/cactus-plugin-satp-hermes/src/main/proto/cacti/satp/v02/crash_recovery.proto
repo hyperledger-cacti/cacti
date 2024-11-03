@@ -63,12 +63,12 @@ message RollbackAckMessage {
 }
 
 message LocalLog {
-  string key=1;
-  string sessionId=2;
-  string data=3;
-  string type=4;
-  string operation=5;
-  string timestamp=6;
+  string sessionID = 1;
+  string type = 2;
+  string key = 3;
+  string operation = 4;
+  string timestamp = 5;
+  string data = 6;
 }
 
 message RollbackLogEntry {

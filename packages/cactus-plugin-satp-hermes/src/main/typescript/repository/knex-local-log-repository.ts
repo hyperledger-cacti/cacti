@@ -54,6 +54,16 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
       .groupBy("sessionID");
   }
 
+  fetchLogsFromSequence(sessionId: string): Promise<LocalLog[]> {
+    return this.getLogsTable().where("sessionID", sessionId);
+  }
+
+  readLogsBySessionId(sessionId: string): Promise<LocalLog[]> {
+    return this.getLogsTable()
+      .where({ sessionID: sessionId })
+      .orderBy("timestamp", "asc");
+  }
+
   async reset() {
     await this.database.migrate.rollback();
     await this.database.migrate.latest();

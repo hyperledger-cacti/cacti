@@ -23,6 +23,7 @@ import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import { knexClientConnection } from "../../knex.config";
 import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
 import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { RecoverUpdateMessage } from "../../../../main/typescript/generated/proto/cacti/satp/v02/crash_recovery_pb";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -86,6 +87,7 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
   sessionData.receiverAsset.contractName = "MOCK_RECEIVER_ASSET_CONTRACT_NAME";
   sessionData.receiverAsset.mspId = "MOCK_RECEIVER_ASSET_MSP_ID";
   sessionData.receiverAsset.channelName = "MOCK_CHANNEL_ID";
+  sessionData.lastSequenceNumber = BigInt(4);
 
   return mockSession;
 };
@@ -336,5 +338,39 @@ describe("CrashRecoveryManager Tests", () => {
 
     handleRecoverySpy.mockRestore();
     handleInitiateRollBackSpy.mockRestore();
+  });
+
+  it("should process recovered logs and reconstruct SessionData", async () => {
+    const mockSession = createMockSession("1000", "3");
+    const testData = mockSession.hasClientSessionData()
+      ? mockSession.getClientSessionData()
+      : mockSession.getServerSessionData();
+
+    const recoveredLogs: LocalLog[] = [
+      {
+        sessionID: sessionId,
+        type: "type_1",
+        key: getSatpLogKey(sessionId, "type_1", "init"),
+        operation: "init",
+        timestamp: new Date().toISOString(),
+        data: JSON.stringify(testData),
+      },
+    ];
+
+    const recoverUpdateMessage = {
+      sessionId: sessionId,
+      messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
+      hashRecoverMessage: "",
+      recoveredLogs: recoveredLogs,
+      senderSignature: "",
+    } as RecoverUpdateMessage;
+
+    const result =
+      await crashManager["processRecoverUpdate"](recoverUpdateMessage);
+
+    expect(result).toBeTrue();
+
+    const reconstructedSessionData = crashManager["sessions"].get(sessionId);
+    expect(reconstructedSessionData).toBeDefined();
   });
 });

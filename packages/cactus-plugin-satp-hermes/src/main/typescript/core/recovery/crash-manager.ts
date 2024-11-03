@@ -292,14 +292,49 @@ export class CrashRecoveryManager {
     }
   }
 
-  private processRecoverUpdate(
+  private async processRecoverUpdate(
     message: RecoverUpdateMessage,
   ): Promise<boolean> {
-    this.log.debug("Message received: ", message.messageType);
-    // get the logs from counterparty gateway and sync with current session
-    this.log.debug(`Session processed & updated with RecoverUpdateMessage`);
+    const fnTag = `${this.className}#processRecoverUpdate()`;
+    try {
+      const sessionId = message.sessionId;
+      const recoveredLogs = message.recoveredLogs;
 
-    return Promise.resolve(true);
+      if (!recoveredLogs || recoveredLogs.length === 0) {
+        this.log.warn(`${fnTag} No recovered logs to process.`);
+        return true;
+      }
+
+      for (const logEntry of recoveredLogs) {
+        await this.logRepository.create(logEntry);
+      }
+
+      const allLogs = await this.logRepository.readLogsBySessionId(sessionId);
+
+      if (!allLogs || allLogs.length === 0) {
+        this.log.error(`${fnTag} No logs found for session ID: ${sessionId}`);
+        return false;
+      }
+
+      let reconstructedSessionData = new SessionData();
+
+      for (const logEntry of allLogs) {
+        const data = JSON.parse(logEntry.data);
+        reconstructedSessionData = data;
+        this.sessions.set(sessionId, reconstructedSessionData);
+      }
+
+      this.log.info(
+        `${fnTag} Session data successfully reconstructed for session ID: ${sessionId}`,
+      );
+
+      return true;
+    } catch (error) {
+      this.log.error(
+        `${fnTag} Error processing RecoverUpdateMessage: ${error}`,
+      );
+      return false;
+    }
   }
 
   public async initiateRollback(
