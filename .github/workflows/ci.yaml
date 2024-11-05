@@ -17,10 +17,12 @@ env:
 jobs:
   ActionLint:
     needs: check-ci-skip
+    if: needs.check-ci-skip.outputs.should_skip == 'false'
     uses: ./.github/workflows/actionlint.yaml
   DCI-Lint:
     name: DCI-Lint
     needs: check-ci-skip
+    if: needs.check-ci-skip.outputs.should_skip == 'false'
     runs-on: ubuntu-22.04
     steps:
       - id: lint-git-repo
@@ -33,13 +35,18 @@ jobs:
 
   check-ci-skip:
     runs-on: ubuntu-22.04
+    outputs:
+      should_skip: ${{ steps.check.outputs.should_skip }}
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Check CI Skip
-        run: node tools/ci-skip-for-maintainers.js ${{ github.event.pull_request.url }} ${{ github.event.pull_request.user.login }}
+        run: node tools/ci-skip-for-maintainers.js
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
 
   check-coverage:
     needs: check-ci-skip
+    if: needs.check-ci-skip.outputs.should_skip == 'false'
     outputs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
@@ -51,6 +58,7 @@ jobs:
 
   compute_changed_packages:
     needs: check-ci-skip
+    if: needs.check-ci-skip.outputs.should_skip == 'false'
     outputs:
       cmd-api-server-changed: ${{ steps.changes.outputs.cmd-api-server-changed }}
       plugin-ledger-connector-polkadot-changed: ${{ steps.changes.outputs.plugin-ledger-connector-polkadot-changed }}
@@ -187,6 +195,7 @@ jobs:
 
   build-dev:
     needs: check-ci-skip
+    if: needs.check-ci-skip.outputs.should_skip == 'false'
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
