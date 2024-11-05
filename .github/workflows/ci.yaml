@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Check CI Skip
-        run: node tools/ci-skip-for-maintainers.js ${{ github.event.pull_request.url }} ${{ github.event.pull_request.user.login }}
+        run: node tools/ci-skip-for-maintainers.js
 
   check-coverage:
     needs: check-ci-skip
