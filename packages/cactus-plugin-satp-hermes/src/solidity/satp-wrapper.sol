@@ -114,7 +114,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
     /**
      * Wraps a token with the given parameters.
-     * With the given interactions it will call a method that will create the ontology of the token so the other methods (eg. lock, unlock, mint, burn, assign) can interact with the token.
+     * Given interactions will call a method that creates the ontology of the token so the other methods (eg. lock, unlock, mint, burn, assign) can interact with the token.
      * This interactions should be given by the bridge and be througly tested and checked before being used, as they can be used to call any function in the token contract.
      * @param contractAddress The address of the token contract.
      * @param tokenType The type of the token.
