@@ -1,15 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0
-/**
- * @title SATPWrapper
- * @dev This contract serves as a wrapper for the Secure Asset Transfer Protocol (SATP) using the Hermes plugin.
- * It provides functionalities to interact with the SATP protocol within the Cactus framework.
- * This contract provides a semantic layer to facilitate interactions with other contracts.
- *
- * @notice Ensure that the contract is deployed and configured correctly before interacting with it.
- * 
- * @dev The contract is part of the Cactus framework and is located at:
- * @hyperledger-cacti/packages/cactus-plugin-satp-hermes/src/solidity/satp-wrapper.sol
- */
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -44,7 +33,8 @@ struct Token {
     TokenType tokenType;
     string tokenId;
     address owner;
-    uint amount; //amount that is approved by the contract owner 
+    uint amount; //amount that is approved by the contract owner
+    //uint locked_amount; //amount that is approved by the contract owner 
 }
 
 /**
@@ -76,24 +66,30 @@ error InsuficientAmountLocked(string tokenId, uint256 amount);
 
 
 /**
-    * @title SATPWrapperContract
+ * @title SATPWrapper
+ * 
+ * This contract serves as a wrapper for the Secure Asset Transfer Protocol (SATP) using the Hermes plugin.
+ * It provides functionalities to interact with the SATP protocol within the Cactus framework.
+ * This contract provides a semantic layer to facilitate interactions with other contracts.
+ *
+ * @notice Ensure that the contract is deployed and configured correctly before interacting with it.
  */
 contract SATPWrapperContract is Ownable, ITraceableContract{
 
     /**
-     * @dev Maping of token IDs to Token structs.
+     * Maping of token IDs to Token structs.
      */
     mapping (string  => Token) public tokens; 
 
     /**
-     * @dev Mapping of token IDs to InteractionSignature structs.
+     * Mapping of token IDs to InteractionSignature structs.
      */
     mapping (string => mapping(InteractionType => InteractionSignature)) public tokensInteractions;
 
     string[] ids;
 
     /** 
-     * @dev The address of the bridge contract.
+     * The address of the bridge contract.
      * TODO: Change this to the Token Struct
      */
     address public bridge_address;
@@ -108,7 +104,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
 
     /**
-     * @dev Constructor for the SATPWrapperContract.
+     * Constructor for the SATPWrapperContract.
      * @param _bridge_address The address of the bridge contract. This needs to be changed, maybe the owner should not be a bridge but other account.
      */
     constructor(address _bridge_address)  Ownable(_bridge_address) {
@@ -117,7 +113,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
 
     /**
-     * @dev Wraps a token with the given parameters. This method receives the token contract address, the token type, the token ID, the owner, and the interactions to be used for the token.
+     * Wraps a token with the given parameters.
      * With the given interactions it will call a method that will create the ontology of the token so the other methods (eg. lock, unlock, mint, burn, assign) can interact with the token.
      * This interactions should be given by the bridge and be througly tested and checked before being used, as they can be used to call any function in the token contract.
      * @param contractAddress The address of the token contract.
@@ -147,7 +143,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Overloaded wrap method that does not receive interactions. This can be used for non-standard tokens.
+     * Overloaded wrap method that does not receive interactions. This can be used for non-standard tokens.
      * TODO: Implement that functionality for standard tokens. 
      */
     function wrap(address contractAddress, TokenType tokenType, string memory tokenId, address owner) external onlyOwner returns (bool wrapSuccess) {
@@ -155,7 +151,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Unwraps a token with the given token ID. This method deletes the token from the mapping and the array of token IDs. (Should they be deleted from the array?)
+     * Unwraps a token with the given token ID. This method deletes the token from the mapping and the array of token IDs. (Should they be deleted from the array?)
      * @param tokenId The unique identifier of the token.
      */
     function unwrap(string memory tokenId) external onlyOwner returns (bool success) {
@@ -173,7 +169,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Locks a given amount of tokens with the given token ID. This method calls the lock function of the token contract.
+     * Locks a given amount of tokens with the given token ID. This method calls the lock function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param amount The amount of tokens to be locked.
      */
@@ -195,7 +191,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     } 
 
     /**
-     * @dev Unlocks a given amount of tokens with the given token ID. This method calls the unlock function of the token contract.
+     * Unlocks a given amount of tokens with the given token ID. This method calls the unlock function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param amount The amount of tokens to be unlocked.
      */
@@ -221,7 +217,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     } 
 
     /**
-     * @dev Mints a given amount of tokens with the given token ID. This method calls the mint function of the token contract.
+     * Mints a given amount of tokens with the given token ID. This method calls the mint function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param amount The amount of tokens to be minted.
      */
@@ -238,7 +234,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Burns a given amount of tokens with the given token ID. This method calls the burn function of the token contract.
+     * Burns a given amount of tokens with the given token ID. This method calls the burn function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param amount The amount of tokens to be burned.
      */
@@ -254,7 +250,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Assigns a given amount of tokens with the given token ID to a receiver account. This method calls the assign function of the token contract.
+     * Assigns a given amount of tokens with the given token ID to a receiver account. This method calls the assign function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param receiver_account The address of the receiver account.
      * @param amount The amount of tokens to be assigned.
@@ -271,7 +267,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }   
 
     /**
-     * @dev Gets all the token IDs.
+     * Gets all the token IDs.
      * @return An array of token IDs.
      */
     function getAllAssetsIDs() external view returns (string[] memory) {
@@ -279,7 +275,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Deletes a token from the array of token IDs.
+     * Deletes a token from the array of token IDs.
      * @param id The unique identifier of the token.
      */
     function deleteFromArray(string memory id) internal  {
@@ -293,7 +289,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Gets a token with the given token ID.
+     * Gets a token with the given token ID.
      * @param tokenId The unique identifier of the token.
      * @return token the token with the given token ID.
      */
@@ -302,7 +298,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Creates the ontology of a non-standard token with the given token ID and interactions.
+     * Creates the ontology of a non-standard token with the given token ID and interactions.
      * @param tokenId The unique identifier of the token.
      * @param interactions The interactions to be used for the token.
      */
@@ -313,7 +309,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Interacts with the token contract using the given token ID and interaction type.
+     * Interacts with the token contract using the given token ID and interaction type.
      * @param tokenId The unique identifier of the token.
      * @param interactionType The type of the interaction.
      */
@@ -322,7 +318,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Interacts with the token contract using the given token ID, interaction type, and amount.
+     * Interacts with the token contract using the given token ID, interaction type, and amount.
      * @param tokenId The unique identifier of the token.
      * @param interactionType The type of the interaction.
      * @param amount The amount of tokens to be interacted with.
@@ -332,7 +328,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Interacts with the token contract using the given token ID, interaction type, amount, and receiver account.
+     * Interacts with the token contract using the given token ID, interaction type, amount, and receiver account.
      * This function allows modular interactions by dynamically calling contract functions based on the stored interactions. 
      * To mitigate the risk of attacks, this method only allows the usage of known variables and only variables that are assigned to the specific token.
      * @param tokenId The unique identifier of the token.
@@ -359,7 +355,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Encodes the dynamic parameters for the contract-to-contract calls. This function adds the function selector to the encoded parameters.
+     * Encodes the dynamic parameters for the contract-to-contract calls. This function adds the function selector to the encoded parameters.
      * @param functionSelector The function selector.
      * @param dynamicParams The dynamic parameters.
      */
@@ -372,7 +368,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     }
 
     /**
-     * @dev Encodes the parameters for the contract-to-contract calls.
+     * Encodes the parameters for the contract-to-contract calls.
      * This functions replaces the enum variables with the actual values from the Token struct.
      * @param variables The variables to be encoded.
      * @param tokenId The unique identifier of the token.
