@@ -1,5 +1,6 @@
 import os
 import os.path
+import re
 import subprocess
 import json
 import shutil
@@ -65,7 +66,7 @@ for package in package_list:
     for openapi_file in get_openapi_files(package['location']):
         if not package_group in apis_by_group:
             apis_by_group[package_group] = []
-        package_basename = package['name'].replace('@hyperledger/','')
+        package_basename = re.sub(r'@.*\/', '', package['name'])
         publish_openapi(package_basename, openapi_file)
         print(f"{package_group} : {package_basename}")
         apis_by_group[package_group].append(package_basename)
