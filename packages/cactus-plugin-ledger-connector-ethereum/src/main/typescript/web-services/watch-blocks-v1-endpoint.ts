@@ -5,7 +5,7 @@
  */
 
 import Web3, { BlockHeaderOutput, FMT_BYTES, FMT_NUMBER } from "web3";
-import { NewHeadsSubscription } from "web3-eth";
+import { NewHeadsSubscription, RegisteredSubscription } from "web3-eth";
 import type { Socket as SocketIoSocket } from "socket.io";
 
 import {
@@ -21,10 +21,7 @@ import {
   WatchBlocksV1,
   Web3Transaction,
 } from "../generated/openapi/typescript-axios";
-import {
-  ConvertWeb3ReturnToString,
-  Web3StringReturnFormat,
-} from "../types/util-types";
+import { ConvertWeb3ReturnToString } from "../types/util-types";
 
 const DEFAULT_HTTP_POLL_INTERVAL = 1000 * 5; // 5 seconds
 const LAST_SEEN_LATEST_BLOCK = -1; // must be negative number, will be replaced with latest block in code
@@ -337,7 +334,7 @@ export class WatchBlocksV1SubscriptionEndpoint extends WatchBlocksV1Endpoint {
   }
 
   public async subscribe() {
-    const { socket, log, web3, isGetBlockData } = this;
+    const { socket, log, isGetBlockData } = this;
     log.info(`${WatchBlocksV1.Subscribe} [WS Subscription] => ${socket.id}`);
 
     if (this.isSubscribed) {
@@ -352,46 +349,54 @@ export class WatchBlocksV1SubscriptionEndpoint extends WatchBlocksV1Endpoint {
     await this.emitAllSinceLastSeenBlock();
 
     log.debug("Subscribing to Web3 new block headers event...");
-    this.newBlocksSubscription = await web3.eth.subscribe(
-      "newBlockHeaders",
-      undefined,
-      Web3StringReturnFormat,
+    const options = {
+      subscription: "newBlockHeaders" as keyof RegisteredSubscription,
+      parameters: {},
+      formatter: (data: BlockHeaderOutput) => data,
+    };
+
+    this.newBlocksSubscription = (await this.web3.eth.subscribe(
+      options.subscription,
+      options.parameters,
+    )) as unknown as NewHeadsSubscription;
+
+    this.newBlocksSubscription?.on(
+      "data",
+      async (blockHeader: BlockHeaderOutput) => {
+        try {
+          log.debug("newBlockHeaders:", blockHeader);
+
+          if (blockHeader.number === undefined || blockHeader.number === null) {
+            throw new Error(
+              `Missing block number in received block header (number: ${blockHeader.number}, hash: ${blockHeader.hash})`,
+            );
+          }
+          const blockNumber = Number(blockHeader.number);
+          if (blockNumber - this.lastSeenBlock > 2) {
+            log.info(
+              `Detected missing blocks since latest one (blockNumber: ${blockNumber}, lastSeenBlock: ${this.lastSeenBlock})`,
+            );
+            await this.emitAllSinceLastSeenBlock();
+          }
+
+          let next: WatchBlocksV1Progress;
+          if (isGetBlockData) {
+            next = await this.getFullBlockProgress(blockNumber);
+          } else {
+            next = await this.headerDataToBlockProgress(blockHeader);
+          }
+
+          socket.emit(WatchBlocksV1.Next, next);
+
+          this.lastSeenBlock = blockNumber;
+        } catch (error) {
+          log.warn("Error when parsing subscribed block data:", error);
+        }
+      },
     );
 
-    this.newBlocksSubscription.on("data", async (blockHeader) => {
-      try {
-        log.debug("newBlockHeaders:", blockHeader);
-
-        if (typeof blockHeader.number === undefined) {
-          throw new Error(
-            `Missing block number in received block header (number: ${blockHeader.number}, hash: ${blockHeader.hash})`,
-          );
-        }
-        const blockNumber = Number(blockHeader.number);
-        if (blockNumber - this.lastSeenBlock > 2) {
-          log.info(
-            `Detected missing blocks since latest one (blockNumber: ${blockNumber}, lastSeenBlock: ${this.lastSeenBlock})`,
-          );
-          await this.emitAllSinceLastSeenBlock();
-        }
-
-        let next: WatchBlocksV1Progress;
-        if (isGetBlockData) {
-          next = await this.getFullBlockProgress(blockNumber);
-        } else {
-          next = await this.headerDataToBlockProgress(blockHeader);
-        }
-
-        socket.emit(WatchBlocksV1.Next, next);
-
-        this.lastSeenBlock = blockNumber;
-      } catch (error) {
-        log.warn("Error when parsing subscribed block data:", error);
-      }
-    });
-
-    this.newBlocksSubscription.on("error", async (error) => {
-      console.log("Error when subscribing to new block header: ", error);
+    this.newBlocksSubscription?.on("error", async (error: Error) => {
+      log.error("Error when subscribing to new block header: ", error);
       socket.emit(WatchBlocksV1.Error, safeStringifyException(error));
       await this.unsubscribe();
     });
