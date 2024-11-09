@@ -19,6 +19,7 @@ import { v4 as uuidV4 } from "uuid";
 import { AddressInfo } from "net";
 import { Server as SocketIoServer } from "socket.io";
 import Web3, { HexString } from "web3";
+import { Address } from "@ethereumjs/util";
 
 import {
   LogLevelDesc,
@@ -49,6 +50,7 @@ import {
   signTransaction,
 } from "../../../main/typescript/public-api";
 import { K_CACTI_ETHEREUM_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+import { AddressLike } from "ethers";
 
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";
@@ -351,11 +353,11 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
 
   test("invoke Web3SigningCredentialType.None", async () => {
     const testEthAccount2 = web3.eth.accounts.create();
-
+    const address = Address.fromString(testEthAccount2.address);
     const value = 10e6;
     const { serializedTransactionHex } = signTransaction(
       {
-        to: testEthAccount2.address,
+        to: address,
         value,
         maxPriorityFeePerGas: 0,
         maxFeePerGas: 0x40000000,
