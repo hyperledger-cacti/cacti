@@ -19,6 +19,8 @@ jobs:
 
   build-and-publish-packages:
     runs-on: ubuntu-22.04
+    permissions: 
+      id-token: write
     steps:
     - uses: actions/checkout@v4.1.7
       with:
@@ -28,7 +30,7 @@ jobs:
       with:
         always-auth: true
         node-version: ${{ env.NODEJS_VERSION }}
-        registry-url: 'https://registry.npmjs.org'
+        registry-url: 'https://registry.npmjs.org/'
     - name: ./tools/ci.sh
       run: ./tools/ci.sh
       env:
@@ -39,6 +41,7 @@ jobs:
     - name: lerna-publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_CONFIG_PROVENANCE: true
       run: |
         git config --global user.email "npm-ci@hyperledger.org"
         git config --global user.name "hyperledger-ghci"
