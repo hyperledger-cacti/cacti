@@ -21,6 +21,8 @@ concurrency:
 jobs:
   build-and-publish-packages:
     runs-on: ubuntu-22.04
+    permissions: 
+      id-token: write
     steps:
       - name: Print Workflow inputs.GIT_TAG_TO_PUBLISH
         run: |
@@ -58,6 +60,7 @@ jobs:
       - name: lerna-publish-npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
         run: |
           git config --global user.email "npm-ci@hyperledger.org"
           git config --global user.name "hyperledger-ghci"
