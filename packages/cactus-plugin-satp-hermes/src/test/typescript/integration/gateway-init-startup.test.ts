@@ -22,6 +22,9 @@ import {
   DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
+  SATP_ARCHITETURE_VERSION,
+  SATP_CORE_VERSION,
+  SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -58,9 +61,9 @@ describe("SATPGateway initialization", () => {
     expect(identity.name).toBeDefined();
     expect(identity.version).toEqual([
       {
-        Core: "v02",
-        Architecture: "v02",
-        Crash: "v02",
+        Core: SATP_CORE_VERSION,
+        Architecture: SATP_ARCHITETURE_VERSION,
+        Crash: SATP_CRASH_VERSION,
       },
     ]);
     expect(identity.supportedDLTs).toEqual([]);
@@ -121,9 +124,9 @@ describe("SATPGateway initialization", () => {
         name: "CustomGateway",
         version: [
           {
-            Core: "v02",
-            Architecture: "v02",
-            Crash: "v02",
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITETURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
           },
         ],
         supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
@@ -150,9 +153,9 @@ describe("SATPGateway initialization", () => {
         name: "CustomGateway",
         version: [
           {
-            Core: "v02",
-            Architecture: "v02",
-            Crash: "v02",
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITETURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
           },
         ],
         supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
@@ -212,9 +215,9 @@ describe("SATPGateway startup", () => {
     expect(identity.name).toBeDefined();
     expect(identity.version).toEqual([
       {
-        Core: "v02",
-        Architecture: "v02",
-        Crash: "v02",
+        Core: SATP_CORE_VERSION,
+        Architecture: SATP_ARCHITETURE_VERSION,
+        Crash: SATP_CRASH_VERSION,
       },
     ]);
     expect(identity.supportedDLTs).toEqual([]);
@@ -275,9 +278,9 @@ describe("SATPGateway startup", () => {
         name: "CustomGateway",
         version: [
           {
-            Core: "v02",
-            Architecture: "v02",
-            Crash: "v02",
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITETURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
           },
         ],
         supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
