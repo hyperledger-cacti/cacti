@@ -44,6 +44,7 @@ import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_con
 import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_connect";
 import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
 import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
+import { HealthCheckResponseStatusEnum } from "../generated/gateway-client/typescript-axios";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -60,6 +61,7 @@ export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
   private readonly logger: Logger;
   private readonly instanceId: string;
+  private status: HealthCheckResponseStatusEnum;
   private endpoints: any[] | undefined;
   private signer: JsObjectSigner;
   public supportedDLTs: SupportedChain[] = [];
@@ -87,6 +89,7 @@ export class SATPManager {
     this.logger = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
+    this.status = HealthCheckResponseStatusEnum.Available;
     this.supportedDLTs = options.supportedDLTs;
     this.signer = options.signer;
     this.bridgesManager = options.bridgeManager;
@@ -164,6 +167,10 @@ export class SATPManager {
 
   public get className(): string {
     return SATPManager.CLASS_NAME;
+  }
+
+  public healthCheck(): HealthCheckResponseStatusEnum {
+    return this.status;
   }
 
   public getSessions(): Map<string, SATPSession> {
