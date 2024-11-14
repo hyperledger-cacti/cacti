@@ -87,8 +87,8 @@ StatusResponse:
     - stage
     - step
     - startTime
-    - originChain
-    - destinationChain
+    - originNetwork
+    - destinationNetwork
   properties:
     status:
       type: string
@@ -157,14 +157,14 @@ StatusResponse:
       type: string
       format: date-time
       example: "2023-01-01T00:00:00Z"
-    originChain:
+    originNetwork:
       type: object
       properties:
         dltProtocol:
           example: HyperledgerFabric
         dltSubnetworkID:
           example: subnetwork1
-    destinationChain:
+    destinationNetwork:
       type: object
       properties:
         dltProtocol:
@@ -469,32 +469,36 @@ ContinueResponse:
       $ref: ./schemas.yml#/StatusResponse
   required:
     - statusResponse
-Chain:
+IntegrationsResponse:
+  description: "List of chains or systems and related metadata"
+  type: object
+  x-category: response
+  properties:
+    integrations:
+      type: array
+      items:
+        $ref: ./schemas.yml#/Integration
+  required:
+    - integrations
+Integration:
   type: object
   properties:
-    chainId:
+    id:
       type: string
-      description: A unique identifier for the blockchain network.
-    chainName:
+      description: A unique identifier for the blockchain network/system.
+    name:
       type: string
-      description: The name of the blockchain network.
-    chainType:
+      description: The name of the blockchain network/system.
+    type:
       type: string
-      description: The type of blockchain network (e.g., 'evm', 'fabric').
-    networkName:
+      description: The type of network (e.g., 'evm', 'fabric', 'SQL Database').
+    environment:
       type: string
-      description: The specific network name within the blockchain (e.g., 'mainnet', 'testnet').
+      description: The specific network name (e.g., 'mainnet', 'testnet').
   required:
-    - chainId
-    - chainName
-    - chainType
-    - networkName
-Chains:
-  title: Chains
-  type: array
-  description: List of chains and related metadata
-  items:
-    $ref: ./schemas.yml#/Chain
+    - id
+    - name
+    - type
 Token:
   type: object
   description: Metadata detailing a supported token
@@ -552,7 +556,9 @@ HealthCheckResponse:
   properties:
     status:
       type: string
-      example: 'OK'
+      enum:  
+        - AVAILABLE
+        - UNAVAILABLE
 BridgeInfo:
   type: object
   description: Information about the bridge used for the token transfer.
@@ -603,6 +609,16 @@ Insurance:
       description: The fee amount for insurance, represented in USD.
       example: "10.00"
       pattern: ^(0|[1-9]\d*)(\.\d+)?$
+# GatewayStatus:
+#   type: object
+#   properties:
+#     state:
+#       type: string
+#       description: The state of the gateway.
+#       example: ACTIVE
+#       enum:
+#         - AVAILABLE
+#         - UNAVAILABLE
 Action:
   type: object
   properties:

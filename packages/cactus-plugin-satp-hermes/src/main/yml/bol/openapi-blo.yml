@@ -165,6 +165,10 @@ paths:
       operationId: GetHealthCheck
       tags:
         - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck
       responses:
         '200':
           description: OK
@@ -237,10 +241,10 @@ paths:
  
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
     get:
+      description: Retrieves metadata about each supported blockchain networks, chains, and other systems.
+      summary: Get supported integrations
       tags:
         - transaction
-      summary: Get supported integrations
-      description: Retrieves metadata about each supported blockchain networks, chains, and other systems.
       operationId: GetIntegrations
       x-hyperledger-cacti:
         http:
@@ -252,13 +256,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/Chains
+                $ref: ./schemas.yml#/IntegrationsResponse
         default:
           description: An error occurred
           content:
             application/json:
               schema:
                 $ref: ./schemas.yml#/APIError
+
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
     get:
       description: Get a list of possible routes for swapping one asset for another across multiple exchanges
