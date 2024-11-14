@@ -1174,8 +1174,8 @@ export class CbdcBridgingAppDummyInfrastructure {
             id,
             status: sessionData.data.status,
             substatus: sessionData.data.substatus,
-            sourceLedger: sessionData.data.originChain.dltProtocol,
-            receiverLedger: sessionData.data.destinationChain.dltProtocol,
+            sourceLedger: sessionData.data.originNetwork.dltProtocol,
+            receiverLedger: sessionData.data.destinationNetwork.dltProtocol,
           };
 
           sessionsData.push(data);
