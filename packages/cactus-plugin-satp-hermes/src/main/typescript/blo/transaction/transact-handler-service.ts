@@ -7,20 +7,27 @@ import {
   LockType,
   SignatureAlgorithm,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { GatewayOrchestrator } from "../../gol/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
-import { GetStatusService } from "../admin/get-status-handler-service";
+import { getStatusService } from "../admin/get-status-handler-service";
+import { log } from "console";
 
 // todo
-export async function ExecuteTransact(
-  logger: Logger,
+export async function executeTransact(
+  logLevel: LogLevelDesc,
   req: TransactRequest,
   manager: SATPManager,
   orchestrator: GatewayOrchestrator,
 ): Promise<TransactResponse> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const fn = "BLO#transact-handler-service#ExecuteTransact";
+  const fnTag = `executeTransact()`;
+  const logger = LoggerProvider.getOrCreate({
+    label: fnTag,
+    level: logLevel,
+  });
+  
+  logger.info(`${fnTag}, executing transaction endpoint`);
 
   //TODO check input for valid strings...
   const ourGateway: GatewayIdentity = orchestrator.ourGateway;
@@ -79,14 +86,12 @@ export async function ExecuteTransact(
   );
   await manager.initiateTransfer(session);
 
-  logger.info(req);
-  // logger.error("GetStatusService not implemented");
-  // throw new GetStatusError(req.sessionID, "GetStatusService not implemented");
+  logger.info(`${fnTag}, ${req}`);
 
   return {
     sessionID: session.getSessionId(),
-    statusResponse: await GetStatusService(
-      logger,
+    statusResponse: await getStatusService(
+      logLevel,
       { sessionID: session.getSessionId() },
       manager,
     ),

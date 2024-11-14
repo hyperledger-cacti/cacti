@@ -5,23 +5,28 @@ import {
   StatusResponseStageEnum,
   StatusResponseStatusEnum,
   StatusResponseSubstatusEnum,
-  Transact200ResponseStatusResponseOriginChain,
+  Transact200ResponseStatusResponseOriginNetwork,
 } from "../../generated/gateway-client/typescript-axios/api";
-import { Logger } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPManager } from "../../gol/satp-manager";
 import { SupportedChain } from "../../core/types";
 
-export async function ExecuteGetStatus(
-  logger: Logger,
+export async function executeGetStatus(
+  logLevel: LogLevelDesc,
   req: StatusRequest,
   manager: SATPManager,
 ): Promise<StatusResponse> {
-  const fnTag = `GetStatusHandler`;
+  const fnTag = `executeGetStatus()`;
+  const logger = LoggerProvider.getOrCreate({
+    label: fnTag,
+    level: logLevel,
+  });
+  
   logger.info(`${fnTag}, Obtaining status for sessionID=${req.sessionID}`);
 
   try {
     const processedRequest = req;
-    const result = await GetStatusService(logger, processedRequest, manager);
+    const result = await getStatusService(logLevel, processedRequest, manager);
     return result;
   } catch (error) {
     if (error instanceof GetStatusError) {
@@ -35,11 +40,17 @@ export async function ExecuteGetStatus(
 }
 
 // TODO call SATP core, use try catch to propagate errors
-export async function GetStatusService(
-  logger: Logger,
+export async function getStatusService(
+  logLevel: LogLevelDesc,
   req: StatusRequest,
   manager: SATPManager,
 ): Promise<StatusResponse> {
+  const fnTag = `getStatusService()`;
+  const logger = LoggerProvider.getOrCreate({
+    label: fnTag,
+    level: logLevel,
+  });
+
   // Implement the logic for getting status here; call core
 
   const session = manager.getSession(req.sessionID);
@@ -63,37 +74,37 @@ export async function GetStatusService(
     StatusResponseSubstatusEnum.Completed;
   const startTime =
     sessionData.receivedTimestamps?.stage0?.newSessionRequestMessageTimestamp;
-  let originChain: Transact200ResponseStatusResponseOriginChain;
-  let destinationChain: Transact200ResponseStatusResponseOriginChain;
+  let originNetwork: Transact200ResponseStatusResponseOriginNetwork;
+  let destinationNetwork: Transact200ResponseStatusResponseOriginNetwork;
   if (sessionData.senderGatewayNetworkId === SupportedChain.BESU) {
-    originChain = {
+    originNetwork = {
       dltProtocol: "besu",
       dltSubnetworkID: "v24.4.0-RC1",
     };
   } else if (sessionData.senderGatewayNetworkId === SupportedChain.FABRIC) {
-    originChain = {
+    originNetwork = {
       dltProtocol: "fabric",
       dltSubnetworkID: "v2.0.0",
     };
   } else {
-    originChain = {
+    originNetwork = {
       dltProtocol: "ethereum",
       dltSubnetworkID: "v24.4.0-RC1",
     };
   }
 
   if (sessionData.recipientGatewayNetworkId === SupportedChain.BESU) {
-    destinationChain = {
+    destinationNetwork = {
       dltProtocol: "besu",
       dltSubnetworkID: "v24.4.0-RC1",
     };
   } else if (sessionData.recipientGatewayNetworkId === SupportedChain.FABRIC) {
-    destinationChain = {
+    destinationNetwork = {
       dltProtocol: "fabric",
       dltSubnetworkID: "v2.0.0",
     };
   } else {
-    destinationChain = {
+    destinationNetwork = {
       dltProtocol: "ethereum",
       dltSubnetworkID: "v24.4.0-RC1",
     };
@@ -105,8 +116,8 @@ export async function GetStatusService(
       stage: StatusResponseStageEnum.Stage0,
       step: "transfer-complete-message",
       startTime: startTime || "undefined",
-      originChain: originChain,
-      destinationChain: destinationChain,
+      originNetwork: originNetwork,
+      destinationNetwork: destinationNetwork,
     };
   }
   logger.info("completed? " + sessionData.completed);
@@ -140,13 +151,11 @@ export async function GetStatusService(
     stage: ("STAGE" + count) as StatusResponseStageEnum,
     step: "transfer-complete-message",
     startTime: startTime || "undefined",
-    originChain: originChain,
-    destinationChain: destinationChain,
+    originNetwork: originNetwork,
+    destinationNetwork: destinationNetwork,
   };
 
   logger.info(req);
-  // logger.error("GetStatusService not implemented");
-  // throw new GetStatusError(req.sessionID, "GetStatusService not implemented");
 
   return mock;
 }

@@ -194,8 +194,8 @@
                         "stage",
                         "step",
                         "startTime",
-                        "originChain",
-                        "destinationChain"
+                        "originNetwork",
+                        "destinationNetwork"
                       ],
                       "properties": {
                         "status": {
@@ -274,7 +274,7 @@
                           "format": "date-time",
                           "example": "2023-01-01T00:00:00Z"
                         },
-                        "originChain": {
+                        "originNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -285,7 +285,7 @@
                             }
                           }
                         },
-                        "destinationChain": {
+                        "destinationNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -413,8 +413,8 @@
                         "stage",
                         "step",
                         "startTime",
-                        "originChain",
-                        "destinationChain"
+                        "originNetwork",
+                        "destinationNetwork"
                       ],
                       "properties": {
                         "status": {
@@ -493,7 +493,7 @@
                           "format": "date-time",
                           "example": "2023-01-01T00:00:00Z"
                         },
-                        "originChain": {
+                        "originNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -504,7 +504,7 @@
                             }
                           }
                         },
-                        "destinationChain": {
+                        "destinationNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -625,8 +625,8 @@
                     "stage",
                     "step",
                     "startTime",
-                    "originChain",
-                    "destinationChain"
+                    "originNetwork",
+                    "destinationNetwork"
                   ],
                   "properties": {
                     "status": {
@@ -705,7 +705,7 @@
                       "format": "date-time",
                       "example": "2023-01-01T00:00:00Z"
                     },
-                    "originChain": {
+                    "originNetwork": {
                       "type": "object",
                       "properties": {
                         "dltProtocol": {
@@ -716,7 +716,7 @@
                         }
                       }
                     },
-                    "destinationChain": {
+                    "destinationNetwork": {
                       "type": "object",
                       "properties": {
                         "dltProtocol": {
@@ -804,6 +804,12 @@
         "tags": [
           "admin"
         ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -814,7 +820,10 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "OK"
+                      "enum": [
+                        "AVAILABLE",
+                        "UNAVAILABLE"
+                      ]
                     }
                   }
                 }
@@ -887,8 +896,8 @@
                         "stage",
                         "step",
                         "startTime",
-                        "originChain",
-                        "destinationChain"
+                        "originNetwork",
+                        "destinationNetwork"
                       ],
                       "properties": {
                         "status": {
@@ -967,7 +976,7 @@
                           "format": "date-time",
                           "example": "2023-01-01T00:00:00Z"
                         },
-                        "originChain": {
+                        "originNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -978,7 +987,7 @@
                             }
                           }
                         },
-                        "destinationChain": {
+                        "destinationNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -1106,8 +1115,8 @@
                         "stage",
                         "step",
                         "startTime",
-                        "originChain",
-                        "destinationChain"
+                        "originNetwork",
+                        "destinationNetwork"
                       ],
                       "properties": {
                         "status": {
@@ -1186,7 +1195,7 @@
                           "format": "date-time",
                           "example": "2023-01-01T00:00:00Z"
                         },
-                        "originChain": {
+                        "originNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -1197,7 +1206,7 @@
                             }
                           }
                         },
-                        "destinationChain": {
+                        "destinationNetwork": {
                           "type": "object",
                           "properties": {
                             "dltProtocol": {
@@ -1271,11 +1280,11 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations": {
       "get": {
+        "description": "Retrieves metadata about each supported blockchain networks, chains, and other systems.",
+        "summary": "Get supported integrations",
         "tags": [
           "transaction"
         ],
-        "summary": "Get supported integrations",
-        "description": "Retrieves metadata about each supported blockchain networks, chains, and other systems.",
         "operationId": "GetIntegrations",
         "x-hyperledger-cacti": {
           "http": {
@@ -1289,36 +1298,43 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Chains",
-                  "type": "array",
-                  "description": "List of chains and related metadata",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "chainId": {
-                        "type": "string",
-                        "description": "A unique identifier for the blockchain network."
-                      },
-                      "chainName": {
-                        "type": "string",
-                        "description": "The name of the blockchain network."
-                      },
-                      "chainType": {
-                        "type": "string",
-                        "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
-                      },
-                      "networkName": {
-                        "type": "string",
-                        "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
+                  "description": "List of chains or systems and related metadata",
+                  "type": "object",
+                  "x-category": "response",
+                  "properties": {
+                    "integrations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "A unique identifier for the blockchain network/system."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the blockchain network/system."
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "The type of network (e.g., 'evm', 'fabric', 'SQL Database')."
+                          },
+                          "environment": {
+                            "type": "string",
+                            "description": "The specific network name (e.g., 'mainnet', 'testnet')."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "type"
+                        ]
                       }
-                    },
-                    "required": [
-                      "chainId",
-                      "chainName",
-                      "chainType",
-                      "networkName"
-                    ]
-                  }
+                    }
+                  },
+                  "required": [
+                    "integrations"
+                  ]
                 }
               }
             }
@@ -2526,8 +2542,8 @@
           "stage",
           "step",
           "startTime",
-          "originChain",
-          "destinationChain"
+          "originNetwork",
+          "destinationNetwork"
         ],
         "properties": {
           "status": {
@@ -2606,7 +2622,7 @@
             "format": "date-time",
             "example": "2023-01-01T00:00:00Z"
           },
-          "originChain": {
+          "originNetwork": {
             "type": "object",
             "properties": {
               "dltProtocol": {
@@ -2617,7 +2633,7 @@
               }
             }
           },
-          "destinationChain": {
+          "destinationNetwork": {
             "type": "object",
             "properties": {
               "dltProtocol": {
@@ -2660,8 +2676,8 @@
               "stage",
               "step",
               "startTime",
-              "originChain",
-              "destinationChain"
+              "originNetwork",
+              "destinationNetwork"
             ],
             "properties": {
               "status": {
@@ -2740,7 +2756,7 @@
                 "format": "date-time",
                 "example": "2023-01-01T00:00:00Z"
               },
-              "originChain": {
+              "originNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -2751,7 +2767,7 @@
                   }
                 }
               },
-              "destinationChain": {
+              "destinationNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -2939,8 +2955,8 @@
               "stage",
               "step",
               "startTime",
-              "originChain",
-              "destinationChain"
+              "originNetwork",
+              "destinationNetwork"
             ],
             "properties": {
               "status": {
@@ -3019,7 +3035,7 @@
                 "format": "date-time",
                 "example": "2023-01-01T00:00:00Z"
               },
-              "originChain": {
+              "originNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -3030,7 +3046,7 @@
                   }
                 }
               },
-              "destinationChain": {
+              "destinationNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -3078,8 +3094,8 @@
               "stage",
               "step",
               "startTime",
-              "originChain",
-              "destinationChain"
+              "originNetwork",
+              "destinationNetwork"
             ],
             "properties": {
               "status": {
@@ -3158,7 +3174,7 @@
                 "format": "date-time",
                 "example": "2023-01-01T00:00:00Z"
               },
-              "originChain": {
+              "originNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -3169,7 +3185,7 @@
                   }
                 }
               },
-              "destinationChain": {
+              "destinationNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -4897,8 +4913,8 @@
               "stage",
               "step",
               "startTime",
-              "originChain",
-              "destinationChain"
+              "originNetwork",
+              "destinationNetwork"
             ],
             "properties": {
               "status": {
@@ -4977,7 +4993,7 @@
                 "format": "date-time",
                 "example": "2023-01-01T00:00:00Z"
               },
-              "originChain": {
+              "originNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -4988,7 +5004,7 @@
                   }
                 }
               },
-              "destinationChain": {
+              "destinationNetwork": {
                 "type": "object",
                 "properties": {
                   "dltProtocol": {
@@ -5006,64 +5022,70 @@
           "statusResponse"
         ]
       },
-      "Chain": {
+      "IntegrationsResponse": {
+        "description": "List of chains or systems and related metadata",
         "type": "object",
+        "x-category": "response",
         "properties": {
-          "chainId": {
-            "type": "string",
-            "description": "A unique identifier for the blockchain network."
-          },
-          "chainName": {
-            "type": "string",
-            "description": "The name of the blockchain network."
-          },
-          "chainType": {
-            "type": "string",
-            "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
-          },
-          "networkName": {
-            "type": "string",
-            "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
+          "integrations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "A unique identifier for the blockchain network/system."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the blockchain network/system."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "The type of network (e.g., 'evm', 'fabric', 'SQL Database')."
+                },
+                "environment": {
+                  "type": "string",
+                  "description": "The specific network name (e.g., 'mainnet', 'testnet')."
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "type"
+              ]
+            }
           }
         },
         "required": [
-          "chainId",
-          "chainName",
-          "chainType",
-          "networkName"
+          "integrations"
         ]
       },
-      "Chains": {
-        "title": "Chains",
-        "type": "array",
-        "description": "List of chains and related metadata",
-        "items": {
-          "type": "object",
-          "properties": {
-            "chainId": {
-              "type": "string",
-              "description": "A unique identifier for the blockchain network."
-            },
-            "chainName": {
-              "type": "string",
-              "description": "The name of the blockchain network."
-            },
-            "chainType": {
-              "type": "string",
-              "description": "The type of blockchain network (e.g., 'evm', 'fabric')."
-            },
-            "networkName": {
-              "type": "string",
-              "description": "The specific network name within the blockchain (e.g., 'mainnet', 'testnet')."
-            }
+      "Integration": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A unique identifier for the blockchain network/system."
           },
-          "required": [
-            "chainId",
-            "chainName",
-            "chainType",
-            "networkName"
-          ]
-        }
+          "name": {
+            "type": "string",
+            "description": "The name of the blockchain network/system."
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of network (e.g., 'evm', 'fabric', 'SQL Database')."
+          },
+          "environment": {
+            "type": "string",
+            "description": "The specific network name (e.g., 'mainnet', 'testnet')."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
       },
       "Token": {
         "type": "object",
@@ -5171,7 +5193,10 @@
         "properties": {
           "status": {
             "type": "string",
-            "example": "OK"
+            "enum": [
+              "AVAILABLE",
+              "UNAVAILABLE"
+            ]
           }
         }
       },
