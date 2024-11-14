@@ -176,7 +176,7 @@ export interface DeployContractSolidityBytecodeNoKeychainV1Request {
      */
     'web3SigningCredential': Web3SigningCredential;
     /**
-     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode. 2 + (24576 * 2) = 49154 meaning that hex stores each byte in 2 characters and that there is a 0x prefix (2 characters) which does not count towards the EVM 24576 bytecode limit.
      * @type {string}
      * @memberof DeployContractSolidityBytecodeNoKeychainV1Request
      */
@@ -237,7 +237,7 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     'web3SigningCredential': Web3SigningCredential;
     /**
-     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode. 2 + (24576 * 2) = 49154 meaning that hex stores each byte in 2 characters and that there is a 0x prefix (2 characters) which does not count towards the EVM 24576 bytecode limit.
      * @type {string}
      * @memberof DeployContractSolidityBytecodeV1Request
      */
