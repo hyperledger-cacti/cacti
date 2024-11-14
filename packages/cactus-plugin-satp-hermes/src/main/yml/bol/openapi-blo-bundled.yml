@@ -154,8 +154,8 @@ paths:
                       - stage
                       - step
                       - startTime
-                      - originChain
-                      - destinationChain
+                      - originNetwork
+                      - destinationNetwork
                     properties:
                       status:
                         type: string
@@ -224,14 +224,14 @@ paths:
                         type: string
                         format: date-time
                         example: '2023-01-01T00:00:00Z'
-                      originChain:
+                      originNetwork:
                         type: object
                         properties:
                           dltProtocol:
                             example: HyperledgerFabric
                           dltSubnetworkID:
                             example: subnetwork1
-                      destinationChain:
+                      destinationNetwork:
                         type: object
                         properties:
                           dltProtocol:
@@ -323,8 +323,8 @@ paths:
                       - stage
                       - step
                       - startTime
-                      - originChain
-                      - destinationChain
+                      - originNetwork
+                      - destinationNetwork
                     properties:
                       status:
                         type: string
@@ -393,14 +393,14 @@ paths:
                         type: string
                         format: date-time
                         example: '2023-01-01T00:00:00Z'
-                      originChain:
+                      originNetwork:
                         type: object
                         properties:
                           dltProtocol:
                             example: HyperledgerFabric
                           dltSubnetworkID:
                             example: subnetwork1
-                      destinationChain:
+                      destinationNetwork:
                         type: object
                         properties:
                           dltProtocol:
@@ -487,8 +487,8 @@ paths:
                   - stage
                   - step
                   - startTime
-                  - originChain
-                  - destinationChain
+                  - originNetwork
+                  - destinationNetwork
                 properties:
                   status:
                     type: string
@@ -557,14 +557,14 @@ paths:
                     type: string
                     format: date-time
                     example: '2023-01-01T00:00:00Z'
-                  originChain:
+                  originNetwork:
                     type: object
                     properties:
                       dltProtocol:
                         example: HyperledgerFabric
                       dltSubnetworkID:
                         example: subnetwork1
-                  destinationChain:
+                  destinationNetwork:
                     type: object
                     properties:
                       dltProtocol:
@@ -618,6 +618,10 @@ paths:
       operationId: GetHealthCheck
       tags:
         - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck
       responses:
         '200':
           description: OK
@@ -628,7 +632,9 @@ paths:
                 properties:
                   status:
                     type: string
-                    example: OK
+                    enum:
+                      - AVAILABLE
+                      - UNAVAILABLE
         '500':
           description: Internal server error
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
@@ -680,8 +686,8 @@ paths:
                       - stage
                       - step
                       - startTime
-                      - originChain
-                      - destinationChain
+                      - originNetwork
+                      - destinationNetwork
                     properties:
                       status:
                         type: string
@@ -750,14 +756,14 @@ paths:
                         type: string
                         format: date-time
                         example: '2023-01-01T00:00:00Z'
-                      originChain:
+                      originNetwork:
                         type: object
                         properties:
                           dltProtocol:
                             example: HyperledgerFabric
                           dltSubnetworkID:
                             example: subnetwork1
-                      destinationChain:
+                      destinationNetwork:
                         type: object
                         properties:
                           dltProtocol:
@@ -849,8 +855,8 @@ paths:
                       - stage
                       - step
                       - startTime
-                      - originChain
-                      - destinationChain
+                      - originNetwork
+                      - destinationNetwork
                     properties:
                       status:
                         type: string
@@ -919,14 +925,14 @@ paths:
                         type: string
                         format: date-time
                         example: '2023-01-01T00:00:00Z'
-                      originChain:
+                      originNetwork:
                         type: object
                         properties:
                           dltProtocol:
                             example: HyperledgerFabric
                           dltSubnetworkID:
                             example: subnetwork1
-                      destinationChain:
+                      destinationNetwork:
                         type: object
                         properties:
                           dltProtocol:
@@ -974,10 +980,10 @@ paths:
                     example: '2021-07-21T17:32:28Z'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
     get:
+      description: 'Retrieves metadata about each supported blockchain networks, chains, and other systems.'
+      summary: Get supported integrations
       tags:
         - transaction
-      summary: Get supported integrations
-      description: 'Retrieves metadata about each supported blockchain networks, chains, and other systems.'
       operationId: GetIntegrations
       x-hyperledger-cacti:
         http:
@@ -989,29 +995,33 @@ paths:
           content:
             application/json:
               schema:
-                title: Chains
-                type: array
-                description: List of chains and related metadata
-                items:
-                  type: object
-                  properties:
-                    chainId:
-                      type: string
-                      description: A unique identifier for the blockchain network.
-                    chainName:
-                      type: string
-                      description: The name of the blockchain network.
-                    chainType:
-                      type: string
-                      description: 'The type of blockchain network (e.g., ''evm'', ''fabric'').'
-                    networkName:
-                      type: string
-                      description: 'The specific network name within the blockchain (e.g., ''mainnet'', ''testnet'').'
-                  required:
-                    - chainId
-                    - chainName
-                    - chainType
-                    - networkName
+                description: List of chains or systems and related metadata
+                type: object
+                x-category: response
+                properties:
+                  integrations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: A unique identifier for the blockchain network/system.
+                        name:
+                          type: string
+                          description: The name of the blockchain network/system.
+                        type:
+                          type: string
+                          description: 'The type of network (e.g., ''evm'', ''fabric'', ''SQL Database'').'
+                        environment:
+                          type: string
+                          description: 'The specific network name (e.g., ''mainnet'', ''testnet'').'
+                      required:
+                        - id
+                        - name
+                        - type
+                required:
+                  - integrations
         default:
           description: An error occurred
           content:
@@ -1916,8 +1926,8 @@ components:
         - stage
         - step
         - startTime
-        - originChain
-        - destinationChain
+        - originNetwork
+        - destinationNetwork
       properties:
         status:
           type: string
@@ -1986,14 +1996,14 @@ components:
           type: string
           format: date-time
           example: '2023-01-01T00:00:00Z'
-        originChain:
+        originNetwork:
           type: object
           properties:
             dltProtocol:
               example: HyperledgerFabric
             dltSubnetworkID:
               example: subnetwork1
-        destinationChain:
+        destinationNetwork:
           type: object
           properties:
             dltProtocol:
@@ -2026,8 +2036,8 @@ components:
             - stage
             - step
             - startTime
-            - originChain
-            - destinationChain
+            - originNetwork
+            - destinationNetwork
           properties:
             status:
               type: string
@@ -2096,14 +2106,14 @@ components:
               type: string
               format: date-time
               example: '2023-01-01T00:00:00Z'
-            originChain:
+            originNetwork:
               type: object
               properties:
                 dltProtocol:
                   example: HyperledgerFabric
                 dltSubnetworkID:
                   example: subnetwork1
-            destinationChain:
+            destinationNetwork:
               type: object
               properties:
                 dltProtocol:
@@ -2239,8 +2249,8 @@ components:
             - stage
             - step
             - startTime
-            - originChain
-            - destinationChain
+            - originNetwork
+            - destinationNetwork
           properties:
             status:
               type: string
@@ -2309,14 +2319,14 @@ components:
               type: string
               format: date-time
               example: '2023-01-01T00:00:00Z'
-            originChain:
+            originNetwork:
               type: object
               properties:
                 dltProtocol:
                   example: HyperledgerFabric
                 dltSubnetworkID:
                   example: subnetwork1
-            destinationChain:
+            destinationNetwork:
               type: object
               properties:
                 dltProtocol:
@@ -2351,8 +2361,8 @@ components:
             - stage
             - step
             - startTime
-            - originChain
-            - destinationChain
+            - originNetwork
+            - destinationNetwork
           properties:
             status:
               type: string
@@ -2421,14 +2431,14 @@ components:
               type: string
               format: date-time
               example: '2023-01-01T00:00:00Z'
-            originChain:
+            originNetwork:
               type: object
               properties:
                 dltProtocol:
                   example: HyperledgerFabric
                 dltSubnetworkID:
                   example: subnetwork1
-            destinationChain:
+            destinationNetwork:
               type: object
               properties:
                 dltProtocol:
@@ -3745,8 +3755,8 @@ components:
             - stage
             - step
             - startTime
-            - originChain
-            - destinationChain
+            - originNetwork
+            - destinationNetwork
           properties:
             status:
               type: string
@@ -3815,14 +3825,14 @@ components:
               type: string
               format: date-time
               example: '2023-01-01T00:00:00Z'
-            originChain:
+            originNetwork:
               type: object
               properties:
                 dltProtocol:
                   example: HyperledgerFabric
                 dltSubnetworkID:
                   example: subnetwork1
-            destinationChain:
+            destinationNetwork:
               type: object
               properties:
                 dltProtocol:
@@ -3831,50 +3841,53 @@ components:
                   example: subnetwork2
       required:
         - statusResponse
-    Chain:
+    IntegrationsResponse:
+      description: List of chains or systems and related metadata
+      type: object
+      x-category: response
+      properties:
+        integrations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: A unique identifier for the blockchain network/system.
+              name:
+                type: string
+                description: The name of the blockchain network/system.
+              type:
+                type: string
+                description: 'The type of network (e.g., ''evm'', ''fabric'', ''SQL Database'').'
+              environment:
+                type: string
+                description: 'The specific network name (e.g., ''mainnet'', ''testnet'').'
+            required:
+              - id
+              - name
+              - type
+      required:
+        - integrations
+    Integration:
       type: object
       properties:
-        chainId:
+        id:
           type: string
-          description: A unique identifier for the blockchain network.
-        chainName:
+          description: A unique identifier for the blockchain network/system.
+        name:
           type: string
-          description: The name of the blockchain network.
-        chainType:
+          description: The name of the blockchain network/system.
+        type:
           type: string
-          description: 'The type of blockchain network (e.g., ''evm'', ''fabric'').'
-        networkName:
+          description: 'The type of network (e.g., ''evm'', ''fabric'', ''SQL Database'').'
+        environment:
           type: string
-          description: 'The specific network name within the blockchain (e.g., ''mainnet'', ''testnet'').'
+          description: 'The specific network name (e.g., ''mainnet'', ''testnet'').'
       required:
-        - chainId
-        - chainName
-        - chainType
-        - networkName
-    Chains:
-      title: Chains
-      type: array
-      description: List of chains and related metadata
-      items:
-        type: object
-        properties:
-          chainId:
-            type: string
-            description: A unique identifier for the blockchain network.
-          chainName:
-            type: string
-            description: The name of the blockchain network.
-          chainType:
-            type: string
-            description: 'The type of blockchain network (e.g., ''evm'', ''fabric'').'
-          networkName:
-            type: string
-            description: 'The specific network name within the blockchain (e.g., ''mainnet'', ''testnet'').'
-        required:
-          - chainId
-          - chainName
-          - chainType
-          - networkName
+        - id
+        - name
+        - type
     Token:
       type: object
       description: Metadata detailing a supported token
@@ -3956,7 +3969,9 @@ components:
       properties:
         status:
           type: string
-          example: OK
+          enum:
+            - AVAILABLE
+            - UNAVAILABLE
     BridgeInfo:
       type: object
       description: Information about the bridge used for the token transfer.

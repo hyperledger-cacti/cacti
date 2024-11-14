@@ -11,22 +11,27 @@ import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 //import { GatewayIdentity, GatewayChannel } from "../core/types";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
 import { GetStatusEndpointV1 } from "../web-services/status-endpoint";
-import { HealthCheckEndpointV1 } from "../web-services/health-check-endpoint";
 
 //import { GetAuditRequest, GetAuditResponse } from "../generated/gateway-client/typescript-axios";
 import {
+  HealthCheckResponse,
+  IntegrationsResponse,
   StatusRequest,
   StatusResponse,
   TransactRequest,
   TransactResponse,
 } from "../generated/gateway-client/typescript-axios/api";
-import { ExecuteGetStatus } from "./admin/get-status-handler-service";
+import { executeGetIntegrations } from "./admin/get-integrations-handler-service";
 import { ISATPManagerOptions, SATPManager } from "../gol/satp-manager";
 import { GatewayOrchestrator } from "../gol/gateway-orchestrator";
 import { SATPBridgesManager } from "../gol/satp-bridges-manager";
-import { ExecuteTransact } from "./transaction/transact-handler-service";
 import { TransactEndpointV1 } from "../web-services/transact-endpoint";
 import { GetSessionIdsEndpointV1 } from "../web-services/get-all-session-ids-endpoints";
+import { HealthCheckEndpointV1 } from "../web-services/healthcheck-endpoint";
+import { IntegrationsEndpointV1 } from "../web-services/integrations-endpoint";
+import { executeGetHealthCheck } from "./admin/get-healthcheck-handler-service";
+import { executeGetStatus } from "./admin/get-status-handler-service";
+import { executeTransact } from "./transaction/transact-handler-service";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -41,6 +46,8 @@ export interface BLODispatcherOptions {
 export class BLODispatcher {
   public static readonly CLASS_NAME = "BLODispatcher";
   private readonly logger: Logger;
+  private readonly level: LogLevelDesc;
+  private readonly label: string;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private OAPIEndpoints: IWebServiceEndpoint[] | undefined;
   private readonly instanceId: string;
@@ -52,9 +59,9 @@ export class BLODispatcher {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
 
-    const level = this.options.logLevel || "INFO";
-    const label = this.className;
-    this.logger = LoggerProvider.getOrCreate({ level, label });
+    this.level = this.options.logLevel || "INFO";
+    this.label = this.className;
+    this.logger = LoggerProvider.getOrCreate({ level: this.level, label: this.label });
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.orchestrator = options.orchestrator;
@@ -93,23 +100,30 @@ export class BLODispatcher {
       dispatcher: this,
       logLevel: this.options.logLevel,
     });
+
+    const getHealthCheckEndpoint = new HealthCheckEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
+    const getIntegrationsEndpointV1 = new IntegrationsEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
     const getSessionIdsEndpointV1 = new GetSessionIdsEndpointV1({
       dispatcher: this,
       logLevel: this.options.logLevel,
     });
 
-    const healthCheckEndpointV1 = new HealthCheckEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const theEndpoints = [
+    const endpoints = [
       getStatusEndpointV1,
+      getHealthCheckEndpoint,
+      getIntegrationsEndpointV1,
       getSessionIdsEndpointV1,
-      healthCheckEndpointV1,
     ];
-    this.endpoints = theEndpoints;
-    return theEndpoints;
+    this.endpoints = endpoints;
+    return endpoints;
   }
 
   public async getOrCreateOAPIWebServices(): Promise<IWebServiceEndpoint[]> {
@@ -127,9 +141,9 @@ export class BLODispatcher {
       logLevel: this.options.logLevel,
     });
 
-    const theEndpoints = [transactEndpointV1];
-    this.OAPIEndpoints = theEndpoints;
-    return theEndpoints;
+    const endpoints = [transactEndpointV1];
+    this.OAPIEndpoints = endpoints;
+    return endpoints;
   }
 
   private getTargetGatewayClient(id: string) {
@@ -149,15 +163,23 @@ export class BLODispatcher {
     }
   }
 
+  public async healthCheck(): Promise<HealthCheckResponse> {
+    return executeGetHealthCheck(this.level, this.manager);
+  }
+
+  public async getIntegrations(): Promise<IntegrationsResponse> {
+    return executeGetIntegrations(this.level, this.manager);
+  }
+
   public async GetStatus(req: StatusRequest): Promise<StatusResponse> {
-    return ExecuteGetStatus(this.logger, req, this.manager);
+    return executeGetStatus(this.level, req, this.manager);
   }
 
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
     this.logger.info(`Transact request: ${req}`);
-    const res = await ExecuteTransact(
-      this.logger,
+    const res = await executeTransact(
+      this.level,
       req,
       this.manager,
       this.orchestrator,
