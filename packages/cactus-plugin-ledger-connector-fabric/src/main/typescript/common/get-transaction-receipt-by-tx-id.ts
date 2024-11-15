@@ -157,7 +157,7 @@ export async function getTransactionReceiptByTxID(
       if (!extensionNsRwset.rwset) continue;
 
       const rwset = extensionNsRwset.rwset;
-      if (!rwset.writes) continue;
+      if (!rwset.writes || rwset.writes.length === 0) continue;
       const rwsetWrite = rwset.writes;
       if (!rwsetWrite[0].key) continue;
       const rwsetKey = rwsetWrite[0].key;

@@ -147,6 +147,7 @@ import {
   formatCactiFullBlockResponse,
   formatCactiTransactionsBlockResponse,
 } from "./get-block/cacti-block-formatters";
+
 import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
 import { GetChainInfoEndpointV1 } from "./get-chain-info/get-chain-info-endpoint-v1";
 import { querySystemChainCode } from "./common/query-system-chain-code";
@@ -158,9 +159,16 @@ import {
 } from "./common/utils";
 import { findAndReplaceFabricLoggingSpec } from "./common/find-and-replace-fabric-logging-spec";
 import { deployContractGoSourceImplFabricV256 } from "./deploy-contract-go-source/deploy-contract-go-source-impl-fabric-v2-5-6";
+import { Observable, ReplaySubject } from "rxjs";
 
 const { loadFromConfig } = require("fabric-network/lib/impl/ccp/networkconfig");
 assertFabricFunctionIsAvailable(loadFromConfig, "loadFromConfig");
+
+export interface IRunTxReqWithTxId {
+  request: RunTransactionRequest;
+  transactionId: string;
+  timestamp: Date;
+}
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
@@ -229,6 +237,7 @@ export class PluginLedgerConnectorFabric
   private readonly certStore: CertDatastore;
   private readonly sshDebugOn: boolean;
   private runningWatchBlocksMonitors = new Set<WatchBlocksV1Endpoint>();
+  private txSubject: ReplaySubject<IRunTxReqWithTxId> = new ReplaySubject();
 
   public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
@@ -337,6 +346,10 @@ export class PluginLedgerConnectorFabric
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-ledger-connector-fabric`;
+  }
+
+  public getTxSubjectObservable(): Observable<IRunTxReqWithTxId> {
+    return this.txSubject.asObservable();
   }
 
   public async onPluginInit(): Promise<unknown> {
@@ -1178,6 +1191,7 @@ export class PluginLedgerConnectorFabric
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
     this.log.debug("%s ENTER", fnTag);
+
     const {
       channelName,
       contractName,
@@ -1247,6 +1261,7 @@ export class PluginLedgerConnectorFabric
           const transactionProposal = await contract.createTransaction(fnName);
           transactionProposal.setEndorsingPeers(endorsingTargets);
           out = await transactionProposal.setTransient(transientMap).submit();
+          transactionId = transactionProposal.getTransactionId();
           break;
         }
         default: {
@@ -1254,6 +1269,17 @@ export class PluginLedgerConnectorFabric
           throw new Error(`${fnTag} unknown ${message}`);
         }
       }
+
+      // create IRunTxReqWithTxId for transaction monitoring
+      const receiptData: IRunTxReqWithTxId = {
+        request: req,
+        transactionId: transactionId == "" ? uuidv4() : transactionId,
+        timestamp: new Date(),
+      };
+      this.log.debug(
+        `IRunTxReqWithTxId created with ID: ${receiptData.transactionId}`,
+      );
+      this.txSubject.next(receiptData);
 
       const res: RunTransactionResponse = {
         functionOutput: this.convertToTransactionResponseType(
