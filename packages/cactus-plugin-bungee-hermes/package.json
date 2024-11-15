@@ -72,6 +72,7 @@
     "http-errors-enhanced-cjs": "2.0.1",
     "key-encoder": "2.0.3",
     "merkletreejs": "0.3.11",
+    "safe-stable-stringify": "2.5.0",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
     "web3": "1.6.1",

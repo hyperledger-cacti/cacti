@@ -1,5 +1,6 @@
 import { Proof } from "./proof";
 import { TransactionProof } from "./transaction-proof";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class Transaction {
   private id: string;
@@ -52,7 +53,7 @@ export class Transaction {
 
   public getTxJson(): string {
     const tx = { Id: this.id, TimeStamp: this.timeStamp };
-    return JSON.stringify(tx);
+    return safeStableStringify(tx);
   }
 
   public getProof(): TransactionProof {
