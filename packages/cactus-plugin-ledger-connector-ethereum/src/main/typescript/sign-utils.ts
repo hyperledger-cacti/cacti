@@ -32,13 +32,16 @@ export function signTransaction(
     | FeeMarketEIP1559Transaction
     | BlobEIP4844Transaction;
 } {
-  let chainConfiguration = new Common({ chain: Chain.Mainnet });
+  let chainConfiguration = new Common({
+    chain: Chain.Mainnet,
+    hardfork: "istanbul",
+  });
   if (customChainInfo) {
     chainConfiguration = Common.custom(customChainInfo);
   }
 
   const transaction = TransactionFactory.fromTxData(txData, {
-    common: chainConfiguration,
+    common: chainConfiguration as any,
   });
   if (privateKey.toLowerCase().startsWith("0x")) {
     privateKey = privateKey.slice(2);

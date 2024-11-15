@@ -88,6 +88,13 @@ import {
   Web3StringReturnFormat,
   convertWeb3ReceiptStatusToBool,
 } from "./types/util-types";
+import { Observable, ReplaySubject } from "rxjs";
+
+export interface RunTransactionV1Exchange {
+  request: InvokeContractV1Request;
+  response: RunTransactionResponse;
+  timestamp: Date;
+}
 
 // Used when waiting for WS requests to be send correctly before disconnecting
 const waitForWsProviderRequestsTimeout = 5 * 1000; // 5s
@@ -149,6 +156,9 @@ export class PluginLedgerConnectorEthereum
   public static readonly CLASS_NAME = "PluginLedgerConnectorEthereum";
   private watchBlocksSubscriptions: Map<string, WatchBlocksV1Endpoint> =
     new Map();
+
+  private txSubject: ReplaySubject<RunTransactionV1Exchange> =
+    new ReplaySubject();
 
   public get className(): string {
     return PluginLedgerConnectorEthereum.CLASS_NAME;
@@ -233,6 +243,10 @@ export class PluginLedgerConnectorEthereum
 
   public getInstanceId(): string {
     return this.instanceId;
+  }
+
+  public getTxSubjectObservable(): Observable<RunTransactionV1Exchange> {
+    return this.txSubject.asObservable();
   }
 
   private async removeWatchBlocksSubscriptionForSocket(socketId: string) {
@@ -655,6 +669,16 @@ export class PluginLedgerConnectorEthereum
       });
       const success = out.transactionReceipt.status;
       const data = { success, out };
+
+      // create RunTransactionV1Exchange for transaction monitoring
+      const receiptData: RunTransactionV1Exchange = {
+        request: req,
+        response: out,
+        timestamp: new Date(),
+      };
+      this.log.debug(`RunTransactionV1Exchange created ${receiptData}`);
+      this.txSubject.next(receiptData);
+
       return data;
     } else {
       throw new Error(
