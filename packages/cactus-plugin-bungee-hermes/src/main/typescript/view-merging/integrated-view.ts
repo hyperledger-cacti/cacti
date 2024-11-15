@@ -8,6 +8,7 @@ import { Transaction } from "../view-creation/transaction";
 import { IViewMetadata } from "../view-creation/view";
 import { MergePolicyOpts } from "../generated/openapi/typescript-axios";
 import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class IntegratedView {
   private id: string;
@@ -114,11 +115,11 @@ export class IntegratedView {
     const states: string[] = [];
     const transactions: string[] = [];
     this.getAllTransactions().forEach((transaction) => {
-      transactions.push(JSON.stringify(transaction.getProof()));
+      transactions.push(safeStableStringify(transaction.getProof()));
     });
 
     this.getAllStates().forEach((state) => {
-      states.push(JSON.stringify(state.getStateProof()));
+      states.push(safeStableStringify(state.getStateProof()));
     });
     const statesTree = new MerkleTree(states, undefined, {
       sort: true,
@@ -129,7 +130,7 @@ export class IntegratedView {
       hashLeaves: true,
     });
     const viewsTree = new MerkleTree(
-      this.viewsMetadata.map((x) => JSON.stringify(x)),
+      this.viewsMetadata.map((x) => safeStableStringify(x)),
       undefined,
       {
         sort: true,

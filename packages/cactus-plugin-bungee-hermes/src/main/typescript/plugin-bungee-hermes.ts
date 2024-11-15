@@ -7,6 +7,8 @@ import {
   LoggerProvider,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import { v4 as uuidV4 } from "uuid";
 import {
   ICactusPlugin,
@@ -215,9 +217,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
       )
     ) {
       this.log.info("Some signature was deemed invalid");
-      throw Error(
-        "At least one of they views does not include a valid signature",
-      );
+      throw Error("The provided view does not include a valid signature");
     }
     const prevVersionMetadata = {
       viewId: view.getKey(),
@@ -231,8 +231,8 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     view.setCreator(this.pubKeyBungee);
     view.setKey(uuidV4());
     return {
-      view: JSON.stringify(view),
-      signature: this.sign(JSON.stringify(view)),
+      view: safeStableStringify(view),
+      signature: this.sign(safeStableStringify(view)),
     };
   }
   onMergeViews(request: MergeViewsRequest): MergeViewsResponse {
@@ -267,7 +267,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
       request.policyArguments ? request.policyArguments : [],
     );
     return {
-      integratedView: JSON.stringify(integratedView),
+      integratedView: safeStableStringify(integratedView),
       signature: integratedView.signature,
     };
   }
@@ -287,7 +287,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     this.logger.info("Generating view for request: ", request);
     const response = this.generateView(snapshot, ti, tf, request.viewID);
     return {
-      view: JSON.stringify(response.view),
+      view: safeStableStringify(response.view),
       signature: response.signature,
     };
   }
@@ -308,12 +308,13 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     const view = new View(this.pubKeyBungee, tI, tF, snapshot, id);
     snapshot.pruneStates(tI, tF);
 
-    const signature = this.sign(JSON.stringify(view));
+    const signature = this.sign(safeStableStringify(view));
 
     return { view: view, signature: signature };
   }
 
   sign(msg: string): string {
+    this.logger.info(this.bungeeSigner.dataHash(msg));
     return Buffer.from(this.bungeeSigner.sign(msg)).toString("hex");
   }
 
@@ -414,7 +415,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
       integratedView: integratedView,
       //The paper specs suggest the integratedView should be jointly signed by all participants.
       //That process is left to be addressed in the future
-      signature: this.sign(JSON.stringify(integratedView)),
+      signature: this.sign(safeStableStringify(integratedView)),
     };
   }
 
@@ -437,6 +438,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     view: string,
     pubKey: string,
   ): boolean {
+    this.logger.info(this.bungeeSigner.dataHash(view));
     const sourceSignature = new Uint8Array(Buffer.from(signature, "hex"));
     const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
 
