@@ -104,6 +104,13 @@ import { getBlockV1Http } from "./impl/get-block-v1/get-block-v1-http";
 import { transactV1Impl } from "./impl/transact-v1/transact-v1-impl";
 import { deployContractV1Keychain } from "./impl/deploy-contract-v1/deploy-contract-v1-keychain";
 import { deployContractV1NoKeychain } from "./impl/deploy-contract-v1/deploy-contract-v1-no-keychain";
+import { ReplaySubject, Observable } from "rxjs";
+
+export interface IRunTransactionV1Exchange {
+  request: InvokeContractV1Request;
+  response: RunTransactionResponse;
+  timestamp: Date;
+}
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -141,6 +148,8 @@ export class PluginLedgerConnectorBesu
   } = {};
 
   private endpoints: IWebServiceEndpoint[] | undefined;
+  private txSubject: ReplaySubject<IRunTransactionV1Exchange> =
+    new ReplaySubject();
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorBesu";
 
@@ -194,6 +203,10 @@ export class PluginLedgerConnectorBesu
 
   public getInstanceId(): string {
     return this.instanceId;
+  }
+
+  public getTxSubjectObservable(): Observable<IRunTransactionV1Exchange> {
+    return this.txSubject.asObservable();
   }
 
   public async onPluginInit(): Promise<void> {
@@ -428,6 +441,7 @@ export class PluginLedgerConnectorBesu
     req: InvokeContractV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
+
     const contractName = req.contractName;
     let contractInstance: Contract;
 
@@ -606,6 +620,16 @@ export class PluginLedgerConnectorBesu
       const out = await this.transact(txReq);
       const success = out.transactionReceipt.status;
       const data = { success, out };
+
+      // create IRunTransactionV1Exchange for transaction monitoring
+      const receiptData: IRunTransactionV1Exchange = {
+        request: req,
+        response: out,
+        timestamp: new Date(),
+      };
+      this.log.debug(`IRunTransactionV1Exchange created ${receiptData}`);
+      this.txSubject.next(receiptData);
+
       return data;
     } else {
       throw new Error(
