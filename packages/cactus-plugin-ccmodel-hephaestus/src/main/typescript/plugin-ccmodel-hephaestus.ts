@@ -46,20 +46,21 @@ import {
   FabricV2TxReceipt,
 } from "./models/transaction-receipt";
 import { millisecondsLatency } from "./models/utils";
-import { IRunTransactionV1Exchange as IRunTransactionV1ExchangeBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { IRunTransactionV1Exchange as IRunTransactionV1ExchangeEth } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { IRunTransactionV1Exchange as RunTransactionV1ExchangeBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { RunTransactionV1Exchange as RunTransactionV1ExchangeEth } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IRunTxReqWithTxId } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
 import { Observable } from "rxjs";
 import { filter, tap } from "rxjs/operators";
+import { randomUUID } from "crypto";
 
 export interface IPluginCcModelHephaestusOptions extends ICactusPluginOptions {
   connectorRegistry?: PluginRegistry;
   logLevel?: LogLevelDesc;
   webAppOptions?: IWebAppOptions;
   instanceId: string;
-  ethTxObservable?: Observable<IRunTransactionV1ExchangeEth>;
-  besuTxObservable?: Observable<IRunTransactionV1ExchangeBesu>;
+  ethTxObservable?: Observable<RunTransactionV1ExchangeEth>;
+  besuTxObservable?: Observable<RunTransactionV1ExchangeBesu>;
   fabricTxObservable?: Observable<IRunTxReqWithTxId>;
   sourceLedger: LedgerType;
   targetLedger: LedgerType;
@@ -77,8 +78,8 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
   private crossChainModel: CrossChainModel;
   public readonly className = "plugin-ccmodel-hephaestus";
   private caseID: string;
-  private readonly besuTxObservable?: Observable<IRunTransactionV1ExchangeBesu>;
-  private readonly ethTxObservable?: Observable<IRunTransactionV1ExchangeEth>;
+  private readonly besuTxObservable?: Observable<RunTransactionV1ExchangeBesu>;
+  private readonly ethTxObservable?: Observable<RunTransactionV1ExchangeEth>;
   private readonly fabricTxObservable?: Observable<IRunTxReqWithTxId>;
   private readonly sourceLedger: LedgerType;
   private readonly targetLedger: LedgerType;
@@ -110,7 +111,7 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
       name: "HEPHAESTUS_NON_CONFORMANCE_LOGS",
     });
 
-    this.caseID = "UNDEFINED_CASE_ID";
+    this.caseID = randomUUID();
 
     this.ethTxObservable = options.ethTxObservable;
     this.besuTxObservable = options.besuTxObservable;
@@ -222,8 +223,8 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
     return `@hyperledger/cactus-plugin-ccmodel-hephaestus`;
   }
 
-  private createReceiptFromIRunTransactionV1ExchangeBesu(
-    data: IRunTransactionV1ExchangeBesu,
+  private createReceiptFromRunTransactionV1ExchangeBesu(
+    data: RunTransactionV1ExchangeBesu,
   ): BesuV2TxReceipt {
     return {
       caseID: this.caseID,
@@ -239,8 +240,8 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
     };
   }
 
-  private createReceiptFromIRunTransactionV1ExchangeEth(
-    data: IRunTransactionV1ExchangeEth,
+  private createReceiptFromRunTransactionV1ExchangeEth(
+    data: RunTransactionV1ExchangeEth,
   ): EthereumTxReceipt {
     return {
       caseID: this.caseID,
@@ -256,7 +257,7 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
     };
   }
 
-  private createReceiptFromIRunTxReqWithTxId(
+  private createReceiptFromRunTxReqWithTxId(
     data: IRunTxReqWithTxId,
   ): FabricV2TxReceipt {
     return {
@@ -273,8 +274,8 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
     };
   }
 
-  private watchIRunTransactionV1ExchangeBesu(duration: number = 0): void {
-    const fnTag = `${this.className}#watchIRunTransactionV1ExchangeBesu()`;
+  private watchRunTransactionV1ExchangeBesu(duration: number = 0): void {
+    const fnTag = `${this.className}#watchRunTransactionV1ExchangeBesu()`;
     this.log.debug(fnTag);
 
     if (!this.besuTxObservable) {
@@ -296,12 +297,12 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
           : tap(),
       )
       .subscribe({
-        next: async (data: IRunTransactionV1ExchangeBesu) => {
+        next: async (data: RunTransactionV1ExchangeBesu) => {
           // Handle the data whenever a new value is received by the observer:
           // this includes creating the receipt, then the cross-chain event
           // and check its conformance to the model, if the model is already defined
           const receipt =
-            this.createReceiptFromIRunTransactionV1ExchangeBesu(data);
+            this.createReceiptFromRunTransactionV1ExchangeBesu(data);
           const ccEvent = this.createCrossChainEventFromBesuReceipt(
             receipt,
             this.isModeling,
@@ -316,7 +317,7 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
           this.log.error(
             `${fnTag}- error`,
             error,
-            `receiving IRunTransactionV1ExchangeBesu by Besu transaction observable`,
+            `receiving RunTransactionV1ExchangeBesu by Besu transaction observable`,
             this.besuTxObservable,
           );
           throw error;
@@ -324,8 +325,8 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
       });
   }
 
-  private watchIRunTransactionV1ExchangeEth(duration: number = 0): void {
-    const fnTag = `${this.className}#watchIRunTransactionV1ExchangeEth()`;
+  private watchRunTransactionV1ExchangeEth(duration: number = 0): void {
+    const fnTag = `${this.className}#watchRunTransactionV1ExchangeEth()`;
     this.log.debug(fnTag);
 
     if (!this.ethTxObservable) {
@@ -347,12 +348,12 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
           : tap(),
       )
       .subscribe({
-        next: async (data: IRunTransactionV1ExchangeEth) => {
+        next: async (data: RunTransactionV1ExchangeEth) => {
           // Handle the data whenever a new value is received by the observer
           // this includes creating the receipt, then the cross-chain event
           // and check its conformance to the model, if the model is already defined
           const receipt =
-            this.createReceiptFromIRunTransactionV1ExchangeEth(data);
+            this.createReceiptFromRunTransactionV1ExchangeEth(data);
           const ccEvent = this.createCrossChainEventFromEthReceipt(
             receipt,
             this.isModeling,
@@ -366,7 +367,7 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
           this.log.error(
             `${fnTag}- error`,
             error,
-            `receiving IRunTransactionV1ExchangeEth by Ethereum transaction observable`,
+            `receiving RunTransactionV1ExchangeEth by Ethereum transaction observable`,
             this.ethTxObservable,
           );
           throw error;
@@ -374,8 +375,8 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
       });
   }
 
-  private watchIRunTxReqWithTxId(duration: number = 0): void {
-    const fnTag = `${this.className}#watchIRunTxReqWithTxId()`;
+  private watchRunTxReqWithTxId(duration: number = 0): void {
+    const fnTag = `${this.className}#watchRunTxReqWithTxId()`;
     this.log.debug(fnTag);
 
     if (!this.fabricTxObservable) {
@@ -401,7 +402,7 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
           // Handle the data whenever a new value is received by the observer
           // this includes creating the receipt, then the cross-chain event
           // and check its conformance to the model, if the model is already defined
-          const receipt = this.createReceiptFromIRunTxReqWithTxId(data);
+          const receipt = this.createReceiptFromRunTxReqWithTxId(data);
           const ccEvent = this.createCrossChainEventFromFabricReceipt(
             receipt,
             this.isModeling,
@@ -415,7 +416,7 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
           this.log.error(
             `${fnTag}- error`,
             error,
-            `receiving IRunTxReqWithTxId by Fabric transaction observable`,
+            `receiving RunTxReqWithTxId by Fabric transaction observable`,
             this.fabricTxObservable,
           );
           throw error;
@@ -428,9 +429,9 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
     this.log.debug(fnTag);
 
     this.startMonitoring = Date.now();
-    this.watchIRunTransactionV1ExchangeBesu(duration);
-    this.watchIRunTransactionV1ExchangeEth(duration);
-    this.watchIRunTxReqWithTxId(duration);
+    this.watchRunTransactionV1ExchangeBesu(duration);
+    this.watchRunTransactionV1ExchangeEth(duration);
+    this.watchRunTxReqWithTxId(duration);
     return;
   }
 
