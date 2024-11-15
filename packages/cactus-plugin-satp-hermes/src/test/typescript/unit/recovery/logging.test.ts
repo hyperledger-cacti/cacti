@@ -146,7 +146,11 @@ describe("CrashRecoveryManager Tests", () => {
 
     if (recoveredSession) {
       const parsedSessionData: SessionData = JSON.parse(mockLogEntry.data);
-      expect(recoveredSession).toEqual(parsedSessionData);
+      const sessionData = recoveredSession.hasClientSessionData()
+        ? recoveredSession.getClientSessionData()
+        : recoveredSession.getServerSessionData();
+
+      expect(sessionData).toEqual(parsedSessionData);
     }
   });
 

@@ -9151,6 +9151,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/google-protobuf": "npm:3.15.5"
     "@types/node": "npm:18.18.2"
+    "@types/node-cron": "npm:3.0.11"
     "@types/pg": "npm:8.6.5"
     "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
@@ -9179,10 +9180,12 @@ __metadata:
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
     make-dir-cli: "npm:3.1.0"
+    node-cron: "npm:3.0.2"
     npm-run-all: "npm:4.1.5"
     openzeppelin-solidity: "npm:3.4.2"
     pg: "npm:^8.13.0"
     protobufjs: "npm:7.2.5"
+    safe-stable-stringify: "npm:2.5.0"
     secp256k1: "npm:4.0.3"
     socket.io: "npm:4.6.2"
     sqlite3: "npm:5.1.5"
@@ -15929,6 +15932,13 @@ __metadata:
   dependencies:
     "@types/express": "npm:*"
   checksum: 10/3d2b32da58ddd67f972d4ef1021492f78d65f33f936b6fb25dd461bb6cc7b03bfd1de1a11562c4310680dac8054e4398038db51767a0ffbf1fe62457b3706e95
+  languageName: node
+  linkType: hard
+
+"@types/node-cron@npm:3.0.11":
+  version: 3.0.11
+  resolution: "@types/node-cron@npm:3.0.11"
+  checksum: 10/a73f69bcca52a5f3b1671cfb00a8e4a1d150d0aef36a611564a2f94e66b6981bade577e267ceeeca6fcee241768902d55eb8cf3a81f9ef4ed767a23112fdb16d
   languageName: node
   linkType: hard
 
@@ -38335,6 +38345,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-cron@npm:3.0.2":
+  version: 3.0.2
+  resolution: "node-cron@npm:3.0.2"
+  dependencies:
+    uuid: "npm:8.3.2"
+  checksum: 10/71d4ce22425d0f2a7bd9753149da475317725f6890d5a55e5e43a97062456faeda984d55c17aee9699552460525cee948662fb75124065810e4038b2f56a9d32
+  languageName: node
+  linkType: hard
+
 "node-domexception@npm:^1.0.0":
   version: 1.0.0
   resolution: "node-domexception@npm:1.0.0"
@@ -45003,6 +45022,13 @@ __metadata:
   version: 2.4.3
   resolution: "safe-stable-stringify@npm:2.4.3"
   checksum: 10/a6c192bbefe47770a11072b51b500ed29be7b1c15095371c1ee1dc13e45ce48ee3c80330214c56764d006c485b88bd0b24940d868948170dddc16eed312582d8
+  languageName: node
+  linkType: hard
+
+"safe-stable-stringify@npm:2.5.0":
+  version: 2.5.0
+  resolution: "safe-stable-stringify@npm:2.5.0"
+  checksum: 10/2697fa186c17c38c3ca5309637b4ac6de2f1c3d282da27cd5e1e3c88eca0fb1f9aea568a6aabdf284111592c8782b94ee07176f17126031be72ab1313ed46c5c
   languageName: node
   linkType: hard
 

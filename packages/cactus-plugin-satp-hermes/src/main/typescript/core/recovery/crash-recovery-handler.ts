@@ -14,20 +14,21 @@ import {
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
 import { Empty } from "@bufbuild/protobuf";
-import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+//import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import { ILocalLogRepository } from "../../repository/interfaces/repository";
 import { getSatpLogKey } from "../../gateway-utils";
+import { SATPSession } from "../satp-session";
 
 interface HandlerOptions {
   crashService: CrashRecoveryService;
   loggerOptions: ILoggerOptions;
-  sessions: Map<string, SessionData>;
+  sessions: Map<string, SATPSession>;
   logRepository: ILocalLogRepository;
 }
 
 export class CrashRecoveryHandler {
   public static readonly CLASS_NAME = "CrashRecoveryHandler";
-  public sessions: Map<string, SessionData>;
+  public sessions: Map<string, SATPSession>;
   private service: CrashRecoveryService;
   private log: Logger;
   private logRepository: ILocalLogRepository;
