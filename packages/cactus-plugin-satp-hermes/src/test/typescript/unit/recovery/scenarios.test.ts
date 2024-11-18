@@ -5,7 +5,7 @@ import {
 } from "../../../../main/typescript/core/recovery/crash-manager";
 import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
 import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/recovery/crash-manager";
-import knex from "knex";
+import { Knex, knex } from "knex";
 import {
   LocalLog,
   SupportedChain,
@@ -29,9 +29,9 @@ const logLevel: LogLevelDesc = "DEBUG";
 
 let mockSession: SATPSession;
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
-const sessionId = uuidv4();
 
 const createMockSession = (maxTimeout: string, maxRetries: string) => {
+  const sessionId = uuidv4();
   const mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
     server: false,
@@ -92,9 +92,10 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
   return mockSession;
 };
 let crashManager: CrashRecoveryManager;
+let knexInstance: Knex;
 
 beforeAll(async () => {
-  const knexInstance = knex(knexClientConnection);
+  knexInstance = knex(knexClientConnection);
   await knexInstance.migrate.latest();
 
   const crashManagerOptions: ICrashRecoveryManagerOptions = {
@@ -111,17 +112,64 @@ beforeAll(async () => {
   crashManager = new CrashRecoveryManager(crashManagerOptions);
 });
 
-afterEach(() => {
+afterEach(async () => {
+  crashManager["sessions"].clear();
   jest.clearAllMocks();
 });
 
+afterAll(async () => {
+  if (crashManager) {
+    crashManager.stopCrashDetection();
+    crashManager.logRepository.destroy();
+  }
+  if (knexInstance) {
+    await knexInstance.destroy();
+  }
+});
+
 describe("CrashRecoveryManager Tests", () => {
+  it("should invoke rollback based on session timeout", async () => {
+    mockSession = createMockSession("1000", "3"); // timeout of 1 sec
+
+    const testData = mockSession.hasClientSessionData()
+      ? mockSession.getClientSessionData()
+      : mockSession.getServerSessionData();
+    const sessionId = testData.id;
+
+    const handleRollbackSpy = jest
+      .spyOn(crashManager, "initiateRollback")
+      .mockImplementation(async () => true);
+
+    const key = getSatpLogKey(sessionId, "type_o", "done");
+
+    const pastTime = new Date(Date.now() - 10000).toISOString();
+
+    const mockLogEntry: LocalLog = {
+      sessionID: sessionId,
+      type: "type_o",
+      key: key,
+      operation: "done",
+      timestamp: pastTime,
+      data: JSON.stringify(testData),
+    };
+
+    const mockLogRepository = crashManager["logRepository"];
+
+    await mockLogRepository.create(mockLogEntry);
+
+    await crashManager.checkAndResolveCrash(mockSession);
+
+    expect(handleRollbackSpy).toHaveBeenCalled();
+
+    handleRollbackSpy.mockRestore();
+  });
   it("should reconstruct session by fetching logs", async () => {
     mockSession = createMockSession("1000", "3");
 
     const testData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
+    const sessionId = testData.id;
 
     // load sample log in database
     const key = getSatpLogKey(sessionId, "type", "operation");
@@ -152,6 +200,33 @@ describe("CrashRecoveryManager Tests", () => {
 
       expect(sessionData).toEqual(parsedSessionData);
     }
+  });
+
+  it("should not recover if no crash is detected", async () => {
+    mockSession = createMockSession("10000", "3");
+
+    const testData = mockSession.hasClientSessionData()
+      ? mockSession.getClientSessionData()
+      : mockSession.getServerSessionData();
+
+    const mockLogEntry: LocalLog = {
+      sessionID: testData.id,
+      type: "type",
+      key: getSatpLogKey(testData.id, "type", "done"),
+      operation: "done",
+      timestamp: new Date().toISOString(),
+      data: JSON.stringify(testData),
+    };
+
+    await crashManager.logRepository.create(mockLogEntry);
+
+    const handleRecoverySpy = jest.spyOn(crashManager, "handleRecovery");
+    const initiateRollbackSpy = jest.spyOn(crashManager, "initiateRollback");
+
+    await crashManager.checkAndResolveCrash(mockSession);
+
+    expect(handleRecoverySpy).not.toHaveBeenCalled();
+    expect(initiateRollbackSpy).not.toHaveBeenCalled();
   });
 
   it("should invoke handleRecovery when crash is initially detected", async () => {
@@ -202,6 +277,7 @@ describe("CrashRecoveryManager Tests", () => {
     const testData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
+    const sessionId = testData.id;
 
     const handleRecoverySpy = jest
       .spyOn(crashManager, "handleRecovery")
@@ -229,47 +305,13 @@ describe("CrashRecoveryManager Tests", () => {
     handleRecoverySpy.mockRestore();
   });
 
-  it("should detect crash based on session timeout", async () => {
-    mockSession = createMockSession("1000", "3"); // timeout of 1 sec
-
-    const testData = mockSession.hasClientSessionData()
-      ? mockSession.getClientSessionData()
-      : mockSession.getServerSessionData();
-
-    const handleRecoverySpy = jest
-      .spyOn(crashManager, "handleRecovery")
-      .mockImplementation(async () => true);
-
-    const key = getSatpLogKey(sessionId, "type", "done");
-
-    const pastTime = new Date(Date.now() - 10000).toISOString();
-
-    const mockLogEntry: LocalLog = {
-      sessionID: sessionId,
-      type: "type",
-      key: key,
-      operation: "done",
-      timestamp: pastTime,
-      data: JSON.stringify(testData),
-    };
-
-    const mockLogRepository = crashManager["logRepository"];
-
-    await mockLogRepository.create(mockLogEntry);
-
-    await crashManager.checkAndResolveCrash(mockSession);
-
-    expect(handleRecoverySpy).toHaveBeenCalled();
-
-    handleRecoverySpy.mockRestore();
-  });
-
   it("should detect crash based on incomplete operation in logs and initiate rollback when recovery fails", async () => {
     mockSession = createMockSession("10000", "3");
 
     const testData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
+    const sessionId = testData.id;
 
     const handleRecoverySpy = jest
       .spyOn(crashManager, "handleRecovery")
@@ -309,6 +351,7 @@ describe("CrashRecoveryManager Tests", () => {
     const testData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
+    const sessionId = testData.id;
 
     const handleRecoverySpy = jest
       .spyOn(crashManager, "handleRecovery")
@@ -344,11 +387,12 @@ describe("CrashRecoveryManager Tests", () => {
     handleInitiateRollBackSpy.mockRestore();
   });
 
-  it("should process recovered logs and reconstruct SessionData", async () => {
+  it("should process recovered logs and add missing logs", async () => {
     const mockSession = createMockSession("1000", "3");
     const testData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
+    const sessionId = testData.id;
 
     const recoveredLogs: LocalLog[] = [
       {

@@ -23,22 +23,22 @@ import {
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { SessionType } from "../session-utils";
 import { ISATPBridgesOptions } from "../../gol/satp-bridges-manager";
-import cron from "node-cron";
-
+import cron, { ScheduledTask } from "node-cron";
 export enum CrashStatus {
   IN_RECOVERY = "IN_RECOVERY",
   RECOVERED = "RECOVERED",
   NO_CRASH = "NO_CRASH",
+  ROLLBACK = "ROLLBACK_REQUIRED",
   ERROR = "ERROR",
 }
 
-class CrashOccurrence {
+/*class CrashOccurrence {
   constructor(
     public status: CrashStatus,
     public time: Date,
     public lastUpdate: Date,
   ) {}
-}
+}*/
 
 export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
@@ -54,7 +54,8 @@ export class CrashRecoveryManager {
   private sessions: Map<string, SATPSession>;
   private crashRecoveryHandler: CrashRecoveryHandler;
   private factory: RollbackStrategyFactory;
-  private logRepository: ILocalLogRepository;
+  public logRepository: ILocalLogRepository;
+  private crashDetectionTask!: ScheduledTask;
 
   constructor(public readonly options: ICrashRecoveryManagerOptions) {
     const fnTag = `${CrashRecoveryManager.CLASS_NAME}#constructor()`;
@@ -125,18 +126,51 @@ export class CrashRecoveryManager {
   }
 
   private detectCrash() {
-    const fnTag = `${this.className}#startCrashDetectionCron()`;
-    cron.schedule("*/10 * * * * *", async () => {
+    const fnTag = `${this.className}#detectCrash()`;
+
+    if (this.sessions.size === 0) {
+      this.log.warn(
+        `${fnTag} No active sessions. skipping cron job scheduling.`,
+      );
+      return;
+    }
+
+    this.crashDetectionTask = cron.schedule("*/15 * * * * *", async () => {
       this.log.debug(`${fnTag} Running crash detection cron job.`);
-      // helper function
       await this.checkAndResolveCrashes();
+
+      // stop the cron job if all sessions are resolved
+      if (this.sessions.size === 0) {
+        this.log.info(`${fnTag} all sessions resolved. Stopping cron job.`);
+        this.stopCrashDetection();
+      }
     });
-    this.log.info(`${fnTag} Crash detection cron job scheduled.`);
+
+    this.log.info(`${fnTag} crash detection cron job scheduled.`);
+  }
+
+  public stopCrashDetection() {
+    if (this.crashDetectionTask) {
+      this.crashDetectionTask.stop();
+      this.log.info(`${this.className}#stopCrashDetection() Cron job stopped.`);
+    }
   }
 
   public async checkAndResolveCrashes(): Promise<void> {
-    for (const session of this.sessions.values()) {
+    const fnTag = `${this.className}#checkAndResolveCrashes()`;
+
+    for (const [sessionId, session] of this.sessions.entries()) {
       await this.checkAndResolveCrash(session);
+
+      const sessionData = session.hasClientSessionData()
+        ? session.getClientSessionData()
+        : session.getServerSessionData();
+
+      // remove resolved sessions
+      if (sessionData?.completed) {
+        this.sessions.delete(sessionId);
+        this.log.info(`${fnTag} session ${sessionId} resolved and removed.`);
+      }
     }
   }
 
@@ -153,51 +187,47 @@ export class CrashRecoveryManager {
 
     try {
       let attempts = 0;
-      let crashOccurrence: CrashOccurrence | undefined;
+      const maxRetries = Number(sessionData.maxRetries);
 
-      while (attempts < BigInt(sessionData.maxRetries)) {
+      while (attempts < maxRetries) {
         const crashStatus = await this.checkCrash(session);
 
         if (crashStatus === CrashStatus.IN_RECOVERY) {
           this.log.info(`${fnTag} Crash detected! Attempting recovery`);
 
-          if (!crashOccurrence) {
-            crashOccurrence = new CrashOccurrence(
-              CrashStatus.IN_RECOVERY,
-              new Date(),
-              new Date(),
-            );
-          } else {
-            crashOccurrence.lastUpdate = new Date();
-          }
-
-          const status = await this.handleRecovery(session);
-          if (status) {
-            crashOccurrence.status = CrashStatus.RECOVERED;
+          const recoverySuccess = await this.handleRecovery(session);
+          if (recoverySuccess) {
             this.log.info(
               `${fnTag} Recovery successful for sessionID: ${session.getSessionId()}`,
             );
             return;
+          } else {
+            attempts++;
+            this.log.info(
+              `${fnTag} Recovery attempt ${attempts} failed for sessionID: ${session.getSessionId()}`,
+            );
           }
-        }
-        attempts++;
-        this.log.info(
-          `${fnTag} Retry attempt ${attempts} for sessionID: ${session.getSessionId()}`,
-        );
-      }
-      if (attempts !== 0) {
-        this.log.warn(`${fnTag} All retries exhausted! Initiating Rollback`);
-        const rollBackStatus = await this.initiateRollback(session, true);
-        if (rollBackStatus) {
+        } else if (crashStatus === CrashStatus.ROLLBACK) {
+          this.log.warn(
+            `${fnTag} Crash requires rollback. Initiating rollback.`,
+          );
+          await this.initiateRollback(session, true);
+          return; // Exit after rollback
+        } else if (crashStatus === CrashStatus.NO_CRASH) {
           this.log.info(
-            `${fnTag} Rollback was successful for sessionID: ${session.getSessionId()}`,
+            `${fnTag} No crash detected for session ID: ${session.getSessionId()}`,
           );
+          return; // Exit if no crash
         } else {
-          this.log.error(
-            `${fnTag} Rollback failed for sessionID: ${session.getSessionId()}`,
-          );
+          this.log.warn(`${fnTag} Unexpected crash status: ${crashStatus}`);
+          return;
         }
       }
+
+      this.log.warn(
+        `${fnTag} All recovery attempts exhausted. Initiating rollback.`,
+      );
+      await this.initiateRollback(session, true);
     } catch (error) {
       this.log.error(`${fnTag} Error during crash resolution: ${error}`);
     }
@@ -236,12 +266,9 @@ export class CrashRecoveryManager {
         this.log.warn(
           `${fnTag} Timeout exceeded by ${timeDifference} ms for session ID: ${session.getSessionId()}`,
         );
-        return CrashStatus.IN_RECOVERY;
+        return CrashStatus.ROLLBACK;
       }
 
-      this.log.info(
-        `${fnTag} No crash detected for session ID: ${session.getSessionId()}`,
-      );
       return CrashStatus.NO_CRASH;
     } catch (error) {
       this.log.error(`${fnTag} Error occurred during crash check: ${error}`);

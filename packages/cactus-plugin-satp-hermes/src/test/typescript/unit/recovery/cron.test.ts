@@ -2,7 +2,7 @@ import "jest-extended";
 import { CrashRecoveryManager } from "../../../../main/typescript/core/recovery/crash-manager";
 import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
 import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/recovery/crash-manager";
-import knex from "knex";
+import { Knex, knex } from "knex";
 import {
   LocalLog,
   SupportedChain,
@@ -22,11 +22,14 @@ import { TokenType } from "../../../../main/typescript/core/stage-services/satp-
 
 const logLevel: LogLevelDesc = "DEBUG";
 
-let mockSession: SATPSession;
-const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
-const sessionId = uuidv4();
+let crashManager: CrashRecoveryManager;
+let knexInstance: Knex;
 
-const createMockSession = (maxTimeout: string, maxRetries: string) => {
+const createMockSession = (
+  sessionId: string,
+  maxTimeout: string,
+  maxRetries: string,
+) => {
   const mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
     server: false,
@@ -41,6 +44,7 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
   sessionData.maxTimeout = maxTimeout;
   sessionData.maxRetries = maxRetries;
   sessionData.version = SATP_VERSION;
+  const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
   sessionData.clientGatewayPubkey = Buffer.from(keyPairs.publicKey).toString(
     "hex",
   );
@@ -86,10 +90,9 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
 
   return mockSession;
 };
-let crashManager: CrashRecoveryManager;
 
 beforeAll(async () => {
-  const knexInstance = knex(knexClientConnection);
+  knexInstance = knex(knexClientConnection);
   await knexInstance.migrate.latest();
 
   const crashManagerOptions: ICrashRecoveryManagerOptions = {
@@ -106,21 +109,36 @@ beforeAll(async () => {
   crashManager = new CrashRecoveryManager(crashManagerOptions);
 });
 
-afterEach(() => {
+beforeEach(async () => {
+  crashManager["sessions"].clear();
+});
+
+afterEach(async () => {
   jest.clearAllMocks();
   jest.useRealTimers();
+  crashManager["sessions"].clear();
+});
+
+afterAll(async () => {
+  if (crashManager) {
+    crashManager.stopCrashDetection();
+    crashManager.logRepository.destroy();
+  }
+  if (knexInstance) {
+    await knexInstance.destroy();
+  }
 });
 
 describe("CrashRecoveryManager Tests", () => {
-  it("should trigger checkAndResolveCrashes via cron schedule every 10 seconds for 30 seconds", async () => {
+  it("should trigger checkAndResolveCrashes via cron schedule every 15 seconds for 75 seconds", async () => {
     jest.useFakeTimers();
 
-    mockSession = createMockSession("10000", "3");
+    const sessionId = uuidv4();
+    const mockSession = createMockSession(sessionId, "10000", "3");
     const sessionData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
 
-    const sessionId = sessionData.id;
     const key = getSatpLogKey(sessionId, "type", "operation");
     const mockLogEntry: LocalLog = {
       sessionID: sessionId,
@@ -140,12 +158,12 @@ describe("CrashRecoveryManager Tests", () => {
 
     await crashManager.recoverSessions();
 
-    for (let i = 1; i <= 3; i++) {
-      jest.advanceTimersByTime(10000);
+    for (let i = 1; i <= 5; i++) {
+      jest.advanceTimersByTime(15000);
       await Promise.resolve();
     }
 
-    expect(mockCheckAndResolveCrash).toHaveBeenCalledTimes(3);
+    expect(mockCheckAndResolveCrash).toHaveBeenCalledTimes(5);
     expect(mockCheckAndResolveCrash).toHaveBeenCalledWith(
       expect.any(SATPSession),
     );

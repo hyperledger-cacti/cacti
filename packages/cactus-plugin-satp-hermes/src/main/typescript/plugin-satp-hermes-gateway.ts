@@ -179,11 +179,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
     this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
 
-    const specPath = path.join(__dirname, "../json/openapi-blo-bundled.json");
-    this.OAS = JSON.parse(fs.readFileSync(specPath, "utf8"));
-    if (!this.OAS) {
-      this.logger.warn("Error loading OAS");
-    }
+    this.OAS = OAS;
 
     // After setup, initialize crash manager and check if we crashed;
     const crashOptions: ICrashRecoveryManagerOptions = {

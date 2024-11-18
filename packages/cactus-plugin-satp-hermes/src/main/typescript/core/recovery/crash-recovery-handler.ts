@@ -54,6 +54,9 @@ export class CrashRecoveryHandler {
       if (!sessionData) {
         throw new Error(`${fnTag}, Session not found`);
       }
+      const logData = sessionData.hasClientSessionData()
+        ? sessionData.getClientSessionData()
+        : sessionData.getServerSessionData();
 
       const updateMessage = await this.service.createRecoverUpdateMessage(req);
       this.log.debug(`${fnTag}, Created RecoverUpdateMessage`);
@@ -64,7 +67,7 @@ export class CrashRecoveryHandler {
         key: getSatpLogKey(req.sessionId, "RECOVER", "init"),
         operation: "init",
         timestamp: new Date().toISOString(),
-        data: JSON.stringify(sessionData),
+        data: JSON.stringify(logData),
       };
 
       await this.logRepository.create(logEntry);
@@ -84,6 +87,9 @@ export class CrashRecoveryHandler {
       if (!sessionData) {
         throw new Error(`${fnTag}, Session not found`);
       }
+      const logData = sessionData.hasClientSessionData()
+        ? sessionData.getClientSessionData()
+        : sessionData.getServerSessionData();
 
       const logEntry = {
         sessionID: req.sessionId,
@@ -91,7 +97,7 @@ export class CrashRecoveryHandler {
         key: getSatpLogKey(req.sessionId, "RECOVER_SUCCESS", "init"),
         operation: "RECOVER_SUCCESS_MESSAGE_SENT",
         timestamp: new Date().toISOString(),
-        data: JSON.stringify(sessionData),
+        data: JSON.stringify(logData),
       };
 
       await this.logRepository.create(logEntry);
@@ -113,6 +119,9 @@ export class CrashRecoveryHandler {
       if (!sessionData) {
         throw new Error(`${fnTag}, Session not found`);
       }
+      const logData = sessionData.hasClientSessionData()
+        ? sessionData.getClientSessionData()
+        : sessionData.getServerSessionData();
 
       const ackMessage = this.service.createRollbackAckMessage(req);
 
@@ -122,7 +131,7 @@ export class CrashRecoveryHandler {
         key: getSatpLogKey(req.sessionId, "ROLLBACK", "init"),
         operation: "ROLLBACK_MESSAGE_SENT",
         timestamp: new Date().toISOString(),
-        data: JSON.stringify(sessionData),
+        data: JSON.stringify(logData),
       };
 
       await this.logRepository.create(logEntry);
@@ -142,6 +151,9 @@ export class CrashRecoveryHandler {
       if (!sessionData) {
         throw new Error(`${fnTag}, Session not found`);
       }
+      const logData = sessionData.hasClientSessionData()
+        ? sessionData.getClientSessionData()
+        : sessionData.getServerSessionData();
 
       const logEntry = {
         sessionID: req.sessionId,
@@ -149,7 +161,7 @@ export class CrashRecoveryHandler {
         key: getSatpLogKey(req.sessionId, "ROLLBACK_ACK", "init"),
         operation: "ROLLBACK_ACK",
         timestamp: new Date().toISOString(),
-        data: JSON.stringify(sessionData),
+        data: JSON.stringify(logData),
       };
 
       await this.logRepository.create(logEntry);

@@ -35,7 +35,7 @@ export class Stage0RollbackStrategy implements RollbackStrategy {
       currentStage: String(sessionData.hashes?.stage0),
       stepsRemaining: 0,
       rollbackLogEntries: [],
-      estimatedTimeToCompletion: "0",
+      estimatedTimeToCompletion: "",
       status: "IN_PROGRESS",
       details: "",
     });
@@ -54,7 +54,7 @@ export class Stage0RollbackStrategy implements RollbackStrategy {
       rollbackState.details = "Rollback of Stage 0 completed successfully";
 
       this.log.info(`${fnTag} Rollback of Stage 0 completed successfully`);
-
+      // todo: add logs for rollback
       //await this.logRepository.create(logEntry);
 
       return rollbackState;

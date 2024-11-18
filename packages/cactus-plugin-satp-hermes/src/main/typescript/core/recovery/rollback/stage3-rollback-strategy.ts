@@ -81,12 +81,13 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
       rollbackState.rollbackLogEntries.push(rollbackLogEntry);
       rollbackState.stepsRemaining = 2;
       rollbackState.status = "COMPLETED";
-      rollbackState.estimatedTimeToCompletion = "0";
+      rollbackState.estimatedTimeToCompletion = "";
       rollbackState.details = "Rollback of Stage 3 completed successfully";
 
       this.log.info(
         `${fnTag} Successfully rolled back Stage 3 for session ${session.getSessionId()}`,
       );
+      // todo: add logs for rollback
       //await this.logRepository.create(logEntry);
       return rollbackState;
     } catch (error) {

@@ -48,7 +48,7 @@ export class Stage2RollbackStrategy implements RollbackStrategy {
       currentStage: String(sessionData.hashes?.stage2),
       stepsRemaining: 1,
       rollbackLogEntries: [],
-      estimatedTimeToCompletion: "0",
+      estimatedTimeToCompletion: "",
       status: "IN_PROGRESS",
       details: "",
     });
@@ -80,12 +80,13 @@ export class Stage2RollbackStrategy implements RollbackStrategy {
       rollbackState.rollbackLogEntries.push(rollbackLogEntry);
       rollbackState.stepsRemaining = 1;
       rollbackState.status = "COMPLETED";
-      rollbackState.estimatedTimeToCompletion = "0";
+      rollbackState.estimatedTimeToCompletion = "";
       rollbackState.details = "Rollback of Stage 2 completed successfully";
 
       this.log.info(
         `${fnTag} Successfully rolled back Stage 2 for session ${session.getSessionId()}`,
       );
+      // todo: add logs for rollback
       //await this.logRepository.create(logEntry);
       return rollbackState;
     } catch (error) {
