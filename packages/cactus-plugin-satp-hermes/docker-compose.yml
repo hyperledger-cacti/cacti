@@ -9,3 +9,18 @@ services:
       - 3010:3010/tcp # SERVER_PORT
       - 3011:3011/tcp # CLIENT_PORT
       - 4010:4010/tcp # API_PORT
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      PGPORT: ${DB_PORT}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

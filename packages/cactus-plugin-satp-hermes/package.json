@@ -85,7 +85,16 @@
     "pretsc": "npm run generate-sdk",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
     "tsc": "tsc --project ./tsconfig.json",
-    "watch": "tsc --build --watch"
+    "watch": "tsc --build --watch",
+    "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
+    "db:destroy": "docker-compose down -v && npm run db:cleanup",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "db:reset": "run-s db:destroy db:start db:migrate db:seed",
+    "db:migrate": "knex migrate:latest --knexfile src/knex/knexfile.js",
+    "db:migrate:production": "knex migrate:latest --env production --knexfile src/knex/knexfile.ts",
+    "db:seed": "knex seed:run --knexfile src/knex/knexfile.ts",
+    "db:cleanup": "find src/knex/data -name '.dev-*.sqlite3' -delete"
   },
   "jest": {
     "moduleNameMapper": {
