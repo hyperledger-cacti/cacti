@@ -58,8 +58,6 @@ export async function getAllTgzPath(): Promise<IGetAllTgzPathResponse> {
       "packages/cactus-verifier-client/hyperledger-cactus-verifier-client-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3634
       "packages/cactus-plugin-ledger-connector-polkadot/hyperledger-cactus-plugin-ledger-connector-polkadot-*.tgz",
-      // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3635
-      "packages/cactus-common/hyperledger-cactus-common-*.tgz",
     ],
   };
 
