@@ -32,6 +32,16 @@ In the root of the project to install the dependencies execute the command:
 npm run configure
 ```
 
+The plugin requires Python and packages for process mining functionality. Install the following prerequisites:
+1. Python 3.x and pip:
+```sh
+sudo apt install python3 python3-pip
+```
+2. Required Python packages:
+```sh
+pip3 install pm4py pandas
+```
+
 Know how to use the following plugins of the project:
 
   - [cactus-plugin-ledger-connector-besu](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu)

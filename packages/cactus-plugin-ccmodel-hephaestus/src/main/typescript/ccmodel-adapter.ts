@@ -2,9 +2,9 @@ import { execSync } from "child_process";
 
 import path from "path";
 
-export function createModelPM4PY(file_name: string): string {
-  const createModelScript = path.join(__dirname, "create_model.py");
-  const command = `python3 ${createModelScript} ${file_name}`;
+export function createModelPM4PY(logPath: string): string {
+  const createModelScript = path.join(__dirname, "../python/create_model.py");
+  const command = `python3 ${createModelScript} ${logPath}`;
 
   try {
     const startTime = new Date();
@@ -21,11 +21,14 @@ export function createModelPM4PY(file_name: string): string {
 }
 
 export function checkConformancePM4PY(
-  file_name: string,
+  logPath: string,
   serializedCCModel: string,
 ): string {
-  const checkConformanceScript = path.join(__dirname, "check_conformance.py");
-  const command = `python3 ${checkConformanceScript} ${file_name} \'${serializedCCModel}\'`;
+  const checkConformanceScript = path.join(
+    __dirname,
+    "../python/check_conformance.py",
+  );
+  const command = `python3 ${checkConformanceScript} ${logPath} \'${serializedCCModel}\'`;
 
   // console.log(command);
   try {

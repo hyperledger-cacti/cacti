@@ -271,7 +271,7 @@ describe("Test cross-chain model serialization and conformance checking", () => 
     hephaestus.setIsModeling(false);
   });
 
-  test("Check confomity of unmodeled transaction when they happen", async () => {
+  test("Check conformance of unmodeled transaction when they happen", async () => {
     const createResEth = await apiClient.invokeContractV1({
       contract: {
         contractName: LockAssetContractJson.contractName,

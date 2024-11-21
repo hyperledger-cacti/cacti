@@ -9,19 +9,19 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
-    "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "email": "cacti@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -88,7 +88,7 @@
     "web3-core": "1.6.1"
   },
   "engines": {
-    "node": ">=10",
+    "node": ">=18",
     "npm": ">=6"
   },
   "publishConfig": {
