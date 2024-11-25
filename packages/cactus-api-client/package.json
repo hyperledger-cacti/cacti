@@ -54,7 +54,7 @@
     "@hyperledger/cactus-core": "2.0.0",
     "@hyperledger/cactus-core-api": "2.0.0",
     "@hyperledger/cactus-plugin-consortium-manual": "2.0.0",
-    "jsonwebtoken": "9.0.0",
+    "jsonwebtoken": "9.0.2",
     "rxjs": "7.8.1",
     "socket.io-client-fixed-types": "4.5.4"
   },

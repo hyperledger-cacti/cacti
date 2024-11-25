@@ -70,7 +70,7 @@
     "rxjs": "7.8.1",
     "tls-browserify": "0.2.2",
     "tslib": "2.6.2",
-    "zone.js": "0.13.1"
+    "zone.js": "0.14.7"
   },
   "devDependencies": {
     "@angular-builders/custom-webpack": "16.0.1",

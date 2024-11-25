@@ -57,7 +57,7 @@
     "http-errors": "1.6.3",
     "js-yaml": "3.14.1",
     "jsonwebtoken": "9.0.2",
-    "log4js": "6.4.1",
+    "log4js": "6.9.1",
     "morgan": "1.10.0",
     "shelljs": "0.8.5",
     "socket.io": "4.6.2",
@@ -81,7 +81,7 @@
     "@types/shelljs": "0.8.11",
     "http-terminator": "3.2.0",
     "lodash": "4.17.21",
-    "ts-node": "8.9.1"
+    "ts-node": "10.9.1"
   },
   "engines": {
     "node": ">=18",

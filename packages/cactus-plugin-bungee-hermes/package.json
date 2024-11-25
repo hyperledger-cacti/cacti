@@ -71,7 +71,7 @@
     "fs-extra": "11.2.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "key-encoder": "2.0.3",
-    "merkletreejs": "0.3.11",
+    "merkletreejs": "0.4.0",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
     "web3": "1.6.1",
