@@ -33,6 +33,8 @@ RUN mkdir -p "${APP}/log/" && \
 USER ${APP_USER}
 WORKDIR ${APP}
 
+COPY --chown=${APP_USER}:${APP_USER} /.yarn/patches/@ionic-native-* /usr/src/app/.yarn/patches/
+
 # COPY --chown=${APP_USER}:${APP_USER} examples/cactus-example-supply-chain-backend/tpl.package.json /usr/src/app/package.json
 
 # RUN touch /usr/src/app/package.json
