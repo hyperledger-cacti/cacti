@@ -1,18 +1,21 @@
 import {
   CommitFinalAcknowledgementReceiptResponseMessage,
+  CommitFinalAcknowledgementReceiptResponseMessageSchema,
   CommitFinalAssertionRequestMessage,
   CommitPreparationRequestMessage,
   CommitReadyResponseMessage,
+  CommitReadyResponseMessageSchema,
   TransferCompleteRequestMessage,
+  TransferCompleteResponseMessage,
+  TransferCompleteResponseMessageSchema,
 } from "../../../generated/proto/cacti/satp/v02/stage_3_pb";
-import { SATP_VERSION } from "../../constants";
 import {
-  AssignmentAssertionClaim,
-  AssignmentAssertionClaimFormat,
-  CommonSatp,
+  AssignmentAssertionClaimFormatSchema,
+  AssignmentAssertionClaimSchema,
+  CommonSatpSchema,
   MessageType,
-  MintAssertionClaim,
-  MintAssertionClaimFormat,
+  MintAssertionClaimFormatSchema,
+  MintAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
@@ -41,7 +44,13 @@ import {
   SessionError,
   TokenIdMissingError,
 } from "../../errors/satp-service-errors";
-import { FailedToProcessError } from "../../errors/satp-handler-errors";
+import {
+  FailedToProcessError,
+  SessionNotFoundError,
+} from "../../errors/satp-handler-errors";
+import { SATPInternalError } from "../../errors/satp-errors";
+import { State } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { create } from "@bufbuild/protobuf";
 
 export class Stage3ServerService extends SATPService {
   public static readonly SATP_STAGE = "3";
@@ -68,7 +77,7 @@ export class Stage3ServerService extends SATPService {
     this.bridgeManager = ops.bridgeManager;
   }
 
-  async commitReady(
+  async commitReadyResponse(
     request: CommitPreparationRequestMessage,
     session: SATPSession,
   ): Promise<void | CommitReadyResponseMessage> {
@@ -84,23 +93,25 @@ export class Stage3ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    const commonBody = new CommonSatp();
-    commonBody.version = SATP_VERSION;
-    commonBody.messageType = MessageType.COMMIT_READY;
-    commonBody.sequenceNumber = request.common!.sequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.COMMIT_PREPARE,
-    );
-    commonBody.sessionId = request.common!.sessionId;
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.resourceUrl = sessionData.resourceUrl;
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      messageType: MessageType.COMMIT_READY,
+      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.COMMIT_PREPARE,
+      ),
+      sessionId: request.common!.sessionId,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      resourceUrl: sessionData.resourceUrl,
+    });
 
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
-    const commitReadyMessage = new CommitReadyResponseMessage();
-    commitReadyMessage.common = commonBody;
+    const commitReadyMessage = create(CommitReadyResponseMessageSchema, {
+      common: commonBody,
+    });
 
     if (sessionData.mintAssertionClaim == undefined) {
       throw new MintAssertionClaimError(fnTag);
@@ -111,7 +122,7 @@ export class Stage3ServerService extends SATPService {
       sessionData.mintAssertionClaimFormat;
 
     if (sessionData.transferContextId != undefined) {
-      commitReadyMessage.common.transferContextId =
+      commitReadyMessage.common!.transferContextId =
         sessionData.transferContextId;
     }
 
@@ -147,6 +158,31 @@ export class Stage3ServerService extends SATPService {
     return commitReadyMessage;
   }
 
+  async commitReadyErrorResponse(
+    error: SATPInternalError,
+    session?: SATPSession,
+  ): Promise<CommitReadyResponseMessage> {
+    const errorResponse = create(CommitReadyResponseMessageSchema, {});
+    const commonBody = create(CommonSatpSchema, {
+      messageType: MessageType.COMMIT_READY,
+      error: true,
+      errorCode: error.getSATPErrorType(),
+    });
+
+    if (!(error instanceof SessionNotFoundError) && session != undefined) {
+      commonBody.sessionId = session.getServerSessionData().id;
+    }
+    errorResponse.common = commonBody;
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(errorResponse)),
+    );
+
+    errorResponse.serverSignature = messageSignature;
+
+    return errorResponse;
+  }
+
   async commitFinalAcknowledgementReceiptResponse(
     request: CommitFinalAssertionRequestMessage,
     session: SATPSession,
@@ -163,24 +199,28 @@ export class Stage3ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    const commonBody = new CommonSatp();
-    commonBody.version = SATP_VERSION;
-    commonBody.messageType = MessageType.ACK_COMMIT_FINAL;
-    commonBody.sequenceNumber = request.common!.sequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.COMMIT_FINAL,
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      messageType: MessageType.ACK_COMMIT_FINAL,
+      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.COMMIT_FINAL,
+      ),
+      sessionId: request.common!.sessionId,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      resourceUrl: sessionData.resourceUrl,
+    });
+
+    sessionData.lastSequenceNumber = request.common!.sequenceNumber + BigInt(1);
+
+    const commitFinalAcknowledgementReceiptResponseMessage = create(
+      CommitFinalAcknowledgementReceiptResponseMessageSchema,
+      {
+        common: commonBody,
+      },
     );
-    commonBody.sessionId = request.common!.sessionId;
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.resourceUrl = sessionData.resourceUrl;
-
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
-
-    const commitFinalAcknowledgementReceiptResponseMessage =
-      new CommitFinalAcknowledgementReceiptResponseMessage();
-    commitFinalAcknowledgementReceiptResponseMessage.common = commonBody;
 
     if (sessionData.assignmentAssertionClaim == undefined) {
       throw new AssignmentAssertionClaimError(fnTag);
@@ -195,7 +235,7 @@ export class Stage3ServerService extends SATPService {
     }
 
     if (sessionData.transferContextId != undefined) {
-      commitFinalAcknowledgementReceiptResponseMessage.common.transferContextId =
+      commitFinalAcknowledgementReceiptResponseMessage.common!.transferContextId =
         sessionData.transferContextId;
     }
 
@@ -235,6 +275,34 @@ export class Stage3ServerService extends SATPService {
     );
 
     return commitFinalAcknowledgementReceiptResponseMessage;
+  }
+
+  async commitFinalAcknowledgementReceiptErrorResponse(
+    error: SATPInternalError,
+    session?: SATPSession,
+  ): Promise<CommitFinalAcknowledgementReceiptResponseMessage> {
+    const errorResponse = create(
+      CommitFinalAcknowledgementReceiptResponseMessageSchema,
+      {},
+    );
+    const commonBody = create(CommonSatpSchema, {
+      messageType: MessageType.ACK_COMMIT_FINAL,
+      error: true,
+      errorCode: error.getSATPErrorType(),
+    });
+
+    if (!(error instanceof SessionNotFoundError) && session != undefined) {
+      commonBody.sessionId = session.getServerSessionData().id;
+    }
+    errorResponse.common = commonBody;
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(errorResponse)),
+    );
+
+    errorResponse.serverSignature = messageSignature;
+
+    return errorResponse;
   }
 
   async checkCommitPreparationRequestMessage(
@@ -378,7 +446,8 @@ export class Stage3ServerService extends SATPService {
     this.Log.info(
       `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
     );
-    sessionData.completed = true;
+
+    sessionData.state = State.COMPLETED;
 
     saveHash(
       sessionData,
@@ -389,6 +458,103 @@ export class Stage3ServerService extends SATPService {
     this.Log.info(
       `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
     );
+  }
+
+  async transferCompleteResponse(
+    request: TransferCompleteRequestMessage,
+    session: SATPSession,
+  ): Promise<TransferCompleteResponseMessage> {
+    const stepTag = `createTransferCompleteResponseMessage()`;
+    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.debug(`${fnTag}, createTransferCompleteResponseMessage...`);
+
+    if (session == undefined) {
+      throw new SessionError(fnTag);
+    }
+
+    session.verify(fnTag, SessionType.SERVER, false, true);
+
+    const sessionData = session.getServerSessionData();
+
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      messageType: MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.COMMIT_TRANSFER_COMPLETE,
+      ),
+      sessionId: request.common!.sessionId,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      resourceUrl: sessionData.resourceUrl,
+    });
+
+    sessionData.lastSequenceNumber = request.common!.sequenceNumber + BigInt(1);
+
+    const transferCompleteResponseMessage = create(
+      TransferCompleteResponseMessageSchema,
+      {
+        common: commonBody,
+      },
+    );
+
+    if (sessionData.transferContextId != undefined) {
+      transferCompleteResponseMessage.common!.transferContextId =
+        sessionData.transferContextId;
+    }
+
+    if (sessionData.serverTransferNumber != undefined) {
+      transferCompleteResponseMessage.serverTransferNumber =
+        sessionData.serverTransferNumber;
+    }
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(transferCompleteResponseMessage)),
+    );
+
+    transferCompleteResponseMessage.serverSignature = messageSignature;
+
+    saveSignature(
+      sessionData,
+      MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+      messageSignature,
+    );
+
+    saveHash(
+      sessionData,
+      MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+      getHash(transferCompleteResponseMessage),
+    );
+
+    this.Log.info(`${fnTag}, sending transferCompleteResponseMessage...`);
+
+    return transferCompleteResponseMessage;
+  }
+
+  async transferCompleteErrorResponse(
+    error: SATPInternalError,
+    session?: SATPSession,
+  ): Promise<TransferCompleteResponseMessage> {
+    const errorResponse = create(TransferCompleteResponseMessageSchema, {});
+    const commonBody = create(CommonSatpSchema, {
+      messageType: MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+      error: true,
+      errorCode: error.getSATPErrorType(),
+    });
+
+    if (!(error instanceof SessionNotFoundError) && session != undefined) {
+      commonBody.sessionId = session.getServerSessionData().id;
+    }
+    errorResponse.common = commonBody;
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(errorResponse)),
+    );
+
+    errorResponse.serverSignature = messageSignature;
+
+    return errorResponse;
   }
 
   async mintAsset(session: SATPSession): Promise<void> {
@@ -423,20 +589,23 @@ export class Stage3ServerService extends SATPService {
         sessionData.recipientGatewayNetworkId,
       );
 
-      sessionData.mintAssertionClaim = new MintAssertionClaim();
+      sessionData.mintAssertionClaim = create(MintAssertionClaimSchema, {});
       sessionData.mintAssertionClaim.receipt = await bridge.mintAsset(
         assetId,
         Number(amount),
       );
       sessionData.mintAssertionClaim.proof = await bridge.getProof(assetId);
-      sessionData.mintAssertionClaimFormat = new MintAssertionClaimFormat();
-      sessionData.mintAssertionClaimFormat.format = bridge.getReceiptFormat();
+      sessionData.mintAssertionClaimFormat = create(
+        MintAssertionClaimFormatSchema,
+        {
+          format: bridge.getReceiptFormat(),
+        },
+      );
       sessionData.mintAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.mintAssertionClaim.receipt),
       );
     } catch (error) {
-      this.logger.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(fnTag, "MintAsset");
+      throw new FailedToProcessError(fnTag, "MintAsset", error);
     }
   }
 
@@ -476,7 +645,10 @@ export class Stage3ServerService extends SATPService {
         sessionData.recipientGatewayNetworkId,
       );
 
-      sessionData.assignmentAssertionClaim = new AssignmentAssertionClaim();
+      sessionData.assignmentAssertionClaim = create(
+        AssignmentAssertionClaimSchema,
+        {},
+      );
       sessionData.assignmentAssertionClaim.receipt = await bridge.assignAsset(
         assetId,
         recipient,
@@ -484,16 +656,17 @@ export class Stage3ServerService extends SATPService {
       );
       sessionData.assignmentAssertionClaim.proof =
         await bridge.getProof(assetId);
-      sessionData.assignmentAssertionClaimFormat =
-        new AssignmentAssertionClaimFormat();
-      sessionData.assignmentAssertionClaimFormat.format =
-        bridge.getReceiptFormat();
+      sessionData.assignmentAssertionClaimFormat = create(
+        AssignmentAssertionClaimFormatSchema,
+        {
+          format: bridge.getReceiptFormat(),
+        },
+      );
       sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
       );
     } catch (error) {
-      this.logger.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(fnTag, "AssignAsset");
+      throw new FailedToProcessError(fnTag, "AssignAsset", error);
     }
   }
 }

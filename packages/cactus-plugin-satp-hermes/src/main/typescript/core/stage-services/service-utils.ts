@@ -1,4 +1,8 @@
-import { Asset as ProtoAsset } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { create } from "@bufbuild/protobuf";
+import {
+  AssetSchema as ProtoAssetSchema,
+  Asset as ProtoAsset,
+} from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SupportedChain } from "../types";
 import { Asset } from "./satp-bridge/types/asset";
 import { EvmAsset } from "./satp-bridge/types/evm-asset";
@@ -8,11 +12,12 @@ export function assetToProto(
   asset: Asset,
   networkId: SupportedChain,
 ): ProtoAsset {
-  const protoAsset = new ProtoAsset();
-  protoAsset.tokenId = asset.tokenId;
-  protoAsset.tokenType = asset.tokenType;
-  protoAsset.owner = asset.owner;
-  protoAsset.amount = BigInt(asset.amount);
+  const protoAsset = create(ProtoAssetSchema, {
+    tokenId: asset.tokenId,
+    tokenType: asset.tokenType,
+    owner: asset.owner,
+    amount: BigInt(asset.amount),
+  });
 
   switch (networkId) {
     case SupportedChain.BESU:
