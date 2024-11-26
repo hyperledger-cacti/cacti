@@ -1,11 +1,14 @@
 import { TransferCommenceResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
 import {
-  CommonSatp,
-  LockAssertionClaim,
-  LockAssertionClaimFormat,
+  CommonSatpSchema,
+  LockAssertionClaimFormatSchema,
+  LockAssertionClaimSchema,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { LockAssertionRequestMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
+import {
+  LockAssertionRequestMessage,
+  LockAssertionRequestMessageSchema,
+} from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
   getMessageHash,
@@ -33,6 +36,7 @@ import {
   TokenIdMissingError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
+import { create } from "@bufbuild/protobuf";
 
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
@@ -76,25 +80,28 @@ export class Stage2ClientService extends SATPService {
 
     const sessionData = session.getClientSessionData();
 
-    const commonBody = new CommonSatp();
-    commonBody.version = sessionData.version;
-    commonBody.messageType = MessageType.LOCK_ASSERT;
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      messageType: MessageType.LOCK_ASSERT,
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_RESPONSE,
+      ),
+      sessionId: response.common!.sessionId,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      resourceUrl: sessionData.resourceUrl,
+    });
+
     sessionData.lastSequenceNumber = commonBody.sequenceNumber =
       response.common!.sequenceNumber + BigInt(1);
 
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.TRANSFER_COMMENCE_RESPONSE,
+    const lockAssertionRequestMessage = create(
+      LockAssertionRequestMessageSchema,
+      {
+        common: commonBody,
+      },
     );
-
-    //response was already verified in the check function so we can use ! to tell TS to trust us
-    commonBody.sessionId = response.common!.sessionId;
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.resourceUrl = sessionData.resourceUrl;
-
-    const lockAssertionRequestMessage = new LockAssertionRequestMessage();
-    lockAssertionRequestMessage.common = commonBody;
 
     if (sessionData.lockAssertionClaim == undefined) {
       throw new LockAssertionClaimError(fnTag);
@@ -118,7 +125,7 @@ export class Stage2ClientService extends SATPService {
       sessionData.lockAssertionExpiration;
 
     if (sessionData.transferContextId != undefined) {
-      lockAssertionRequestMessage.common.transferContextId =
+      lockAssertionRequestMessage.common!.transferContextId =
         sessionData.transferContextId;
     }
     if (sessionData.clientTransferNumber != undefined) {
@@ -225,15 +232,19 @@ export class Stage2ClientService extends SATPService {
         sessionData.senderGatewayNetworkId,
       );
 
-      sessionData.lockAssertionClaim = new LockAssertionClaim();
+      sessionData.lockAssertionClaim = create(LockAssertionClaimSchema, {});
       sessionData.lockAssertionClaim.receipt = await bridge.lockAsset(
         assetId,
         Number(amount),
       );
       sessionData.lockAssertionClaim.proof = await bridge.getProof(assetId);
 
-      sessionData.lockAssertionClaimFormat = new LockAssertionClaimFormat();
-      sessionData.lockAssertionClaimFormat.format = bridge.getReceiptFormat();
+      sessionData.lockAssertionClaimFormat = create(
+        LockAssertionClaimFormatSchema,
+        {
+          format: bridge.getReceiptFormat(),
+        },
+      );
 
       sessionData.lockAssertionExpiration = BigInt(99999999999); //todo implement
 
@@ -241,8 +252,7 @@ export class Stage2ClientService extends SATPService {
         sign(this.Signer, sessionData.lockAssertionClaim.receipt),
       );
     } catch (error) {
-      this.logger.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(fnTag, "LockAsset");
+      throw new FailedToProcessError(fnTag, "LockAsset", error);
     }
   }
 }

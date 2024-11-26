@@ -20,23 +20,27 @@ import { Stage3ServerService } from "../../../main/typescript/core/stage-service
 import { SATPSession } from "../../../main/typescript/core/satp-session";
 import { SATP_VERSION } from "../../../main/typescript/core/constants";
 import {
-  Asset,
-  AssignmentAssertionClaim,
-  BurnAssertionClaim,
+  AssetSchema,
+  AssignmentAssertionClaimSchema,
+  BurnAssertionClaimSchema,
   ClaimFormat,
   CredentialProfile,
-  LockAssertionClaim,
-  LockAssertionClaimFormat,
+  LockAssertionClaimFormatSchema,
+  LockAssertionClaimSchema,
   LockType,
   MessageType,
-  MintAssertionClaim,
+  MintAssertionClaimSchema,
   SignatureAlgorithm,
+  WrapAssertionClaimSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   TransferCommenceRequestMessage,
+  TransferCommenceRequestMessageSchema,
   TransferCommenceResponseMessage,
   TransferProposalReceiptMessage,
+  TransferProposalReceiptMessageSchema,
   TransferProposalRequestMessage,
+  TransferProposalRequestMessageSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/stage_1_pb";
 import {
   LockAssertionRequestMessage,
@@ -49,19 +53,21 @@ import {
   CommitPreparationRequestMessage,
   CommitReadyResponseMessage,
   TransferCompleteRequestMessage,
+  TransferCompleteResponseMessage,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/stage_3_pb";
 
 import { getMessageHash } from "../../../main/typescript/core/session-utils";
 import { Stage0ClientService } from "../../../main/typescript/core/stage-services/client/stage0-client-service";
 import { Stage0ServerService } from "../../../main/typescript/core/stage-services/server/stage0-server-service";
 import {
-  NewSessionRequest,
-  NewSessionResponse,
-  PreSATPTransferRequest,
-  PreSATPTransferResponse,
+  NewSessionRequestMessage,
+  NewSessionResponseMessage,
+  PreSATPTransferRequestMessage,
+  PreSATPTransferResponseMessage,
   STATUS,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/stage_0_pb";
 import { TokenType } from "../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { create, isMessage } from "@bufbuild/protobuf";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -97,10 +103,10 @@ let satpServerService1: Stage1ServerService;
 let satpServerService2: Stage2ServerService;
 let satpServerService3: Stage3ServerService;
 
-let newSessionRequestMessage: NewSessionRequest;
-let newSessionResponseMessage: NewSessionResponse;
-let preSATPTransferRequestMessage: PreSATPTransferRequest;
-let preSATPTransferResponseMessage: PreSATPTransferResponse;
+let newSessionRequestMessage: NewSessionRequestMessage;
+let newSessionResponseMessage: NewSessionResponseMessage;
+let preSATPTransferRequestMessage: PreSATPTransferRequestMessage;
+let preSATPTransferResponseMessage: PreSATPTransferResponseMessage;
 let transferProposalRequestMessage: TransferProposalRequestMessage;
 let transferProposalResponseMessage: TransferProposalReceiptMessage;
 let transferCommenceRequestMessage: TransferCommenceRequestMessage;
@@ -112,6 +118,7 @@ let commitReadyResponseMessage: CommitReadyResponseMessage;
 let commitFinalAssertionRequestMessage: CommitFinalAssertionRequestMessage;
 let commitFinalAcknowledgementReceiptResponseMessage: CommitFinalAcknowledgementReceiptResponseMessage;
 let transferCompleteRequestMessage: TransferCompleteRequestMessage;
+let transferCompleteResponseMessage: TransferCompleteResponseMessage;
 
 const sessionIDs: string[] = [];
 
@@ -202,25 +209,26 @@ describe("SATP Services Testing", () => {
     sessionData.receiverContractOntology = "MOCK_RECEIVER_CONTRACT_ONTOLOGY"; //TODO when implemented verification of Contract Ontology change this
     sessionData.senderContractOntology = "MOCK_SENDER_CONTRACT_ONTOLOGY";
     sessionData.sourceLedgerAssetId = "MOCK_SOURCE_LEDGER_ASSET_ID";
-    sessionData.senderAsset = new Asset();
-    sessionData.senderAsset.tokenId = "MOCK_TOKEN_ID";
-    sessionData.senderAsset.tokenType = TokenType.ERC20;
-    sessionData.senderAsset.amount = BigInt(0);
-    sessionData.senderAsset.owner = "MOCK_SENDER_ASSET_OWNER";
-    sessionData.senderAsset.ontology = "MOCK_SENDER_ASSET_ONTOLOGY";
-    sessionData.senderAsset.contractName = "MOCK_SENDER_ASSET_CONTRACT_NAME";
-    sessionData.senderAsset.contractAddress =
-      "MOCK_SENDER_ASSET_CONTRACT_ADDRESS";
-    sessionData.receiverAsset = new Asset();
 
-    sessionData.receiverAsset.tokenType = TokenType.ERC20;
-    sessionData.receiverAsset.amount = BigInt(0);
-    sessionData.receiverAsset.owner = "MOCK_RECEIVER_ASSET_OWNER";
-    sessionData.receiverAsset.ontology = "MOCK_RECEIVER_ASSET_ONTOLOGY";
-    sessionData.receiverAsset.contractName =
-      "MOCK_RECEIVER_ASSET_CONTRACT_NAME";
-    sessionData.receiverAsset.mspId = "MOCK_RECEIVER_ASSET_MSP_ID";
-    sessionData.receiverAsset.channelName = "MOCK_CHANNEL_ID";
+    sessionData.senderAsset = create(AssetSchema, {
+      tokenId: "MOCK_TOKEN_ID",
+      tokenType: TokenType.ERC20,
+      amount: BigInt(0),
+      owner: "MOCK_SENDER_ASSET_OWNER",
+      ontology: "MOCK_SENDER_ASSET_ONTOLOGY",
+      contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
+      contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
+    });
+    sessionData.receiverAsset = create(AssetSchema, {
+      tokenType: TokenType.ERC20,
+      amount: BigInt(0),
+      owner: "MOCK_RECEIVER_ASSET_OWNER",
+      ontology: "MOCK_RECEIVER_ASSET_ONTOLOGY",
+      contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
+      mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
+      channelName: "MOCK_CHANNEL_ID",
+    });
+
     expect(satpClientService1).toBeDefined();
     expect(satpClientService1.getServiceIdentifier()).toBe(
       `${SATPServiceType.Client}#1`,
@@ -309,7 +317,7 @@ describe("SATP Services Testing", () => {
       throw new Error("Session data not found");
     }
 
-    sessionData.senderWrapAssertionClaim = new AssignmentAssertionClaim();
+    sessionData.senderWrapAssertionClaim = create(WrapAssertionClaimSchema, {});
 
     preSATPTransferRequestMessage =
       await satpClientService0.preSATPTransferRequest(mockSession);
@@ -356,7 +364,10 @@ describe("SATP Services Testing", () => {
       throw new Error("Session data not found");
     }
 
-    sessionData.receiverWrapAssertionClaim = new AssignmentAssertionClaim();
+    sessionData.receiverWrapAssertionClaim = create(
+      WrapAssertionClaimSchema,
+      {},
+    );
 
     preSATPTransferResponseMessage =
       await satpServerService0.preSATPTransferResponse(
@@ -409,9 +420,12 @@ describe("SATP Services Testing", () => {
         supportedDLTs,
       )) as TransferProposalRequestMessage;
 
-    expect(transferProposalRequestMessage).toBeInstanceOf(
-      TransferProposalRequestMessage,
-    );
+    expect(
+      isMessage(
+        transferProposalRequestMessage,
+        TransferProposalRequestMessageSchema,
+      ),
+    ).toBe(true);
 
     expect(transferProposalRequestMessage.common?.transferContextId).toBe(
       sessionData.transferContextId,
@@ -494,9 +508,13 @@ describe("SATP Services Testing", () => {
         mockSession,
       )) as TransferProposalReceiptMessage;
 
-    expect(transferProposalResponseMessage).toBeInstanceOf(
-      TransferProposalReceiptMessage,
-    );
+    expect(
+      isMessage(
+        transferProposalResponseMessage,
+        TransferProposalReceiptMessageSchema,
+      ),
+    ).toBe(true);
+
     expect(transferProposalResponseMessage.common?.transferContextId).toBe(
       transferProposalRequestMessage.common?.transferContextId,
     );
@@ -524,9 +542,12 @@ describe("SATP Services Testing", () => {
         mockSession,
       )) as TransferCommenceRequestMessage;
 
-    expect(transferCommenceRequestMessage).toBeInstanceOf(
-      TransferCommenceRequestMessage,
-    );
+    expect(
+      isMessage(
+        transferCommenceRequestMessage,
+        TransferCommenceRequestMessageSchema,
+      ),
+    ).toBe(true);
     expect(transferCommenceRequestMessage.common?.messageType).toBe(
       MessageType.TRANSFER_COMMENCE_REQUEST,
     );
@@ -597,11 +618,15 @@ describe("SATP Services Testing", () => {
   it("Service2Client lockAssertionRequest", async () => {
     //mock claims
 
-    mockSession.getClientSessionData().lockAssertionClaim =
-      new LockAssertionClaim();
+    mockSession.getClientSessionData().lockAssertionClaim = create(
+      LockAssertionClaimSchema,
+      {},
+    );
 
-    mockSession.getClientSessionData().lockAssertionClaimFormat =
-      new LockAssertionClaimFormat();
+    mockSession.getClientSessionData().lockAssertionClaimFormat = create(
+      LockAssertionClaimFormatSchema,
+      {},
+    );
     mockSession.getClientSessionData().lockAssertionClaimFormat!.format =
       ClaimFormat.DEFAULT;
     mockSession.getClientSessionData().lockExpirationTime = BigInt(1000);
@@ -738,9 +763,9 @@ describe("SATP Services Testing", () => {
     );
     //mock claims
     (mockSession.getServerSessionData() as SessionData).mintAssertionClaim =
-      new MintAssertionClaim();
+      create(MintAssertionClaimSchema, {});
 
-    commitReadyResponseMessage = (await satpServerService3.commitReady(
+    commitReadyResponseMessage = (await satpServerService3.commitReadyResponse(
       commitPreparationRequestMessage,
       mockSession,
     )) as CommitReadyResponseMessage;
@@ -785,7 +810,7 @@ describe("SATP Services Testing", () => {
 
     //mock claims
     (mockSession.getClientSessionData() as SessionData).burnAssertionClaim =
-      new BurnAssertionClaim();
+      create(BurnAssertionClaimSchema, {});
 
     commitFinalAssertionRequestMessage =
       (await satpClientService3.commitFinalAssertion(
@@ -838,7 +863,7 @@ describe("SATP Services Testing", () => {
     //mock claims
     (
       mockSession.getServerSessionData() as SessionData
-    ).assignmentAssertionClaim = new AssignmentAssertionClaim();
+    ).assignmentAssertionClaim = create(AssignmentAssertionClaimSchema, {});
 
     commitFinalAcknowledgementReceiptResponseMessage =
       (await satpServerService3.commitFinalAcknowledgementReceiptResponse(
@@ -942,6 +967,40 @@ describe("SATP Services Testing", () => {
       transferCompleteRequestMessage,
       mockSession,
     );
+  });
+  it("Service3Server transferCompleteResponse", async () => {
+    expect(satpServerService3).toBeDefined();
+    expect(satpServerService3.getServiceIdentifier()).toBe(
+      `${SATPServiceType.Server}#3`,
+    );
+
+    transferCompleteResponseMessage =
+      (await satpServerService3.transferCompleteResponse(
+        transferCompleteRequestMessage,
+        mockSession,
+      )) as TransferCompleteResponseMessage;
+
+    expect(transferCompleteResponseMessage).toBeDefined();
+    expect(transferCompleteResponseMessage.common?.sessionId).toBe(
+      transferCompleteRequestMessage.common?.sessionId,
+    );
+    expect(transferCompleteResponseMessage.common?.transferContextId).toBe(
+      transferCompleteRequestMessage.common?.transferContextId,
+    );
+    expect(transferCompleteResponseMessage.common?.version).toBe(SATP_VERSION);
+    expect(transferCompleteResponseMessage.common?.messageType).toBe(
+      MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+    );
+    expect(transferCompleteResponseMessage.common?.clientGatewayPubkey).toBe(
+      transferCompleteRequestMessage.common?.clientGatewayPubkey,
+    );
+    expect(transferCompleteResponseMessage.common?.serverGatewayPubkey).toBe(
+      transferCompleteRequestMessage.common?.serverGatewayPubkey,
+    );
+    expect(
+      transferCompleteResponseMessage.common?.hashPreviousMessage,
+    ).toBeDefined();
+    expect(transferCompleteResponseMessage.serverSignature).toBeDefined();
   });
 });
 
