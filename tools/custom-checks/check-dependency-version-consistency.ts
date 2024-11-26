@@ -7,7 +7,7 @@ export async function checkDependencyVersionConsistency(): Promise<
 > {
   const errors: string[] = [];
   const cdvc = new CDVC(process.cwd(), {
-    fix: false,
+    fix: true,
   });
   errors.push(cdvc.toMismatchSummary());
   return [errors.length === 0, errors];

@@ -59,7 +59,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0",
     "jose": "4.15.5",
     "uuid": "10.0.0",
-    "web3": "1.6.1"
+    "web3": "4.4.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0",

@@ -67,7 +67,7 @@
     "@hyperledger/cactus-core-api": "2.0.0",
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0",
     "async-mutex": "0.4.0",
-    "axios": "1.7.7",
+    "axios": ">=1.7.7",
     "pg": "8.8.0",
     "run-time-error-cjs": "1.4.0",
     "uuid": "10.0.0",
@@ -88,8 +88,8 @@
     "npm-run-all": "4.1.5",
     "rxjs": "7.8.1",
     "socket.io": "4.6.2",
-    "web3": "4.0.3",
-    "web3-eth-accounts": "4.0.3"
+    "web3": "4.4.0",
+    "web3-eth-accounts": "4.1.1"
   },
   "engines": {
     "node": ">=18",

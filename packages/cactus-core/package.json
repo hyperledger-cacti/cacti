@@ -65,7 +65,7 @@
   "devDependencies": {
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.0",
-    "@types/http-errors": "2.0.2",
+    "@types/http-errors": "2.0.4",
     "node-mocks-http": "1.14.0",
     "uuid": "10.0.0"
   },

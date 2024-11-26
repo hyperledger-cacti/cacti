@@ -59,7 +59,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0",
     "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0",
     "@hyperledger/cactus-test-tooling": "2.0.0",
-    "axios": "1.7.7",
+    "axios": ">=1.7.7",
     "crypto-js": "4.2.0",
     "fs-extra": "11.2.0",
     "knex": "2.5.1",
@@ -68,19 +68,19 @@
     "sqlite3": "5.1.5",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
-    "web3": "1.6.1",
-    "web3-utils": "1.6.1"
+    "web3": "4.4.0",
+    "web3-utils": "4.3.0"
   },
   "devDependencies": {
     "@types/body-parser": "1.19.4",
-    "@types/crypto-js": "4.0.1",
+    "@types/crypto-js": "4.1.1",
     "@types/express": "5.0.0",
     "@types/fs-extra": "11.0.4",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
     "express": "4.21.0",
-    "fabric-network": "2.2.20",
+    "fabric-network": "2.5.0-snapshot.23",
     "kubo-rpc-client": "3.0.1",
     "typescript": "5.5.2"
   },

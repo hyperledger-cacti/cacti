@@ -55,8 +55,8 @@
     "dockerode": "3.3.0",
     "internal-ip": "6.2.0",
     "run-time-error-cjs": "1.4.0",
-    "web3": "4.0.3",
-    "web3-eth-accounts": "4.0.3"
+    "web3": "4.4.0",
+    "web3-eth-accounts": "4.1.1"
   },
   "devDependencies": {
     "@types/dockerode": "3.2.7"

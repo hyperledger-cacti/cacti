@@ -58,13 +58,13 @@
     "@hyperledger/cactus-common": "2.0.0",
     "@hyperledger/cactus-core": "2.0.0",
     "@hyperledger/cactus-core-api": "2.0.0",
-    "axios": "1.7.7",
+    "axios": ">=1.7.7",
     "sanitize-html": "2.12.1"
   },
   "devDependencies": {
     "@types/express": "5.0.0",
-    "@types/node": "18.11.9",
-    "@types/sanitize-html": "2.6.2",
+    "@types/node": "18.19.0",
+    "@types/sanitize-html": "2.9.5",
     "body-parser": "1.20.3",
     "express": "4.21.0",
     "jest-extended": "4.0.1",

@@ -63,7 +63,7 @@
     "@hyperledger/cactus-common": "2.0.0",
     "@hyperledger/cactus-core": "2.0.0",
     "@hyperledger/cactus-core-api": "2.0.0",
-    "axios": "1.7.7",
+    "axios": ">=1.7.7",
     "express": "4.21.0",
     "google-protobuf": "3.21.4",
     "http-errors": "2.0.0",
@@ -75,11 +75,11 @@
     "rxjs": "7.8.1",
     "socket.io-client-fixed-types": "4.5.4",
     "typescript-optional": "2.0.1",
-    "web3": "1.6.1",
-    "web3-core": "1.6.1",
-    "web3-eth": "1.6.1",
-    "web3-eth-contract": "1.6.1",
-    "web3-utils": "1.6.1",
+    "web3": "4.4.0",
+    "web3-core": "4.1.1",
+    "web3-eth": "4.4.0",
+    "web3-eth-contract": "4.2.0",
+    "web3-utils": "4.3.0",
     "web3js-quorum": "22.4.0",
     "websocket-event-codes": "1.1.0"
   },
@@ -105,9 +105,9 @@
     "socket.io": "4.6.2",
     "tsx": "4.16.2",
     "uuid": "10.0.0",
-    "web3-core": "1.6.1",
-    "web3-eth": "1.6.1",
-    "web3-eth-accounts": "patch:web3-eth-accounts@npm%3A1.6.1#~/.yarn/patches/web3-eth-accounts-npm-1.6.1-c95f31ca81.patch"
+    "web3-core": "4.1.1",
+    "web3-eth": "4.4.0",
+    "web3-eth-accounts": "4.1.1"
   },
   "engines": {
     "node": ">=18",
