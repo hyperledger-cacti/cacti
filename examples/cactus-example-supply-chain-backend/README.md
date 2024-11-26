@@ -32,7 +32,7 @@ DOCKER_BUILDKIT=1 docker build --file \
   ./examples/cactus-example-supply-chain-backend/Dockerfile \
   . \
   --tag scaeb \
-  --tag ghcr.io/hyperledger/cactus-example-supply-chain-app:$(git describe --contains --all HEAD)_$(git rev-parse --short HEAD)_$(date -u +"%Y-%m-%dT%H-%M-%SZ")
+  --tag ghcr.io/hyperledger/cactus-example-supply-chain-app:$(git describe --contains --all HEAD | sed -r 's,/,-,g')_$(git rev-parse --short HEAD)_$(date -u +"%Y-%m-%dT%H-%M-%SZ")
 
 # Run the built image with ports mapped to the host machine as you see fit
 # The --privileged flag is required because we use Docker-in-Docker for pulling
