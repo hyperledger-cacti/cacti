@@ -6,7 +6,7 @@ import { SATPSession } from "./satp-session";
 import { ConnectRouter } from "@connectrpc/connect";
 import { SATPGateway } from "../plugin-satp-hermes-gateway";
 import { SATPService } from "../types/satp-protocol";
-import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
+import { Client as ConnectClient } from "@connectrpc/connect";
 import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
@@ -48,7 +48,7 @@ export type GatewayChannel = {
   toGatewayID: string;
   sessions: Map<string, SATPSession>;
   supportedDLTs: SupportedChain[];
-  clients: Map<string, PromiseConnectClient<SATPServiceInstance>>;
+  clients: Map<string, ConnectClient<SATPServiceInstance>>;
 };
 
 export type Address =

@@ -1,5 +1,5 @@
-import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
+import { ConnectRouter } from "@connectrpc/connect";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { SATPSession } from "../satp-session";
 import { SupportedChain } from "../types";
@@ -22,6 +22,9 @@ import {
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
 import { getSessionId } from "./handler-utils";
+import { getMessageTypeName } from "../satp-utils";
+import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { saveMessageInSessionData, setError } from "../session-utils";
 export class Stage2SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE2;
   private sessions: Map<string, SATPSession>;
@@ -57,20 +60,23 @@ export class Stage2SATPHandler implements SATPHandler {
 
   async LockAssertionImplementation(
     req: LockAssertionRequestMessage,
-    context: HandlerContext,
+    //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
   ): Promise<LockAssertionReceiptMessage> {
     const stepTag = `LockAssertionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    let session: SATPSession | undefined;
     try {
       this.Log.debug(`${fnTag}, Lock Assertion...`);
-      this.Log.debug(`${fnTag}, Request: ${req}, Context: ${context}`);
+      this.Log.debug(`${fnTag}, Request: ${req}`);
 
-      const session = this.sessions.get(getSessionId(req));
+      session = this.sessions.get(getSessionId(req));
       if (!session) {
         throw new SessionNotFoundError(fnTag);
       }
 
       await this.serverService.checkLockAssertionRequestMessage(req, session);
+
+      saveMessageInSessionData(session.getServerSessionData(), req);
 
       const message = await this.serverService.lockAssertionResponse(
         req,
@@ -82,16 +88,25 @@ export class Stage2SATPHandler implements SATPHandler {
       if (!message) {
         throw new FailedToCreateMessageError(
           fnTag,
-          "LockAssertionImplementation",
+          getMessageTypeName(MessageType.ASSERTION_RECEIPT),
         );
       }
+
+      saveMessageInSessionData(session.getServerSessionData(), message);
+
       return message;
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(
-        fnTag,
-        "LockAssertionImplementation",
+      this.Log.error(
+        `${fnTag}, Error: ${new FailedToProcessError(
+          fnTag,
+          getMessageTypeName(MessageType.ASSERTION_RECEIPT),
+          error,
+        )}`,
+      );
+      setError(session, MessageType.ASSERTION_RECEIPT, error);
+      return await this.serverService.lockAssertionErrorResponse(
         error,
+        session,
       );
     }
   }
@@ -100,10 +115,9 @@ export class Stage2SATPHandler implements SATPHandler {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     router.service(SatpStage2Service, {
-      async lockAssertion(req, context) {
-        return await that.LockAssertionImplementation(req, context);
+      async lockAssertion(req) {
+        return await that.LockAssertionImplementation(req);
       },
-      //lockAssertion: this.LockAssertionImplementation,
     });
   }
 
@@ -113,11 +127,12 @@ export class Stage2SATPHandler implements SATPHandler {
   ): Promise<LockAssertionRequestMessage> {
     const stepTag = `LockAssertionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    let session: SATPSession | undefined;
     try {
       this.Log.debug(`${fnTag}, Lock Assertion Request Message...`);
       this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      const session = this.sessions.get(getSessionId(response));
+      session = this.sessions.get(getSessionId(response));
       if (!session) {
         throw new SessionNotFoundError(fnTag);
       }
@@ -127,6 +142,8 @@ export class Stage2SATPHandler implements SATPHandler {
         session,
       );
 
+      saveMessageInSessionData(session.getClientSessionData(), response);
+
       await this.clientService.lockAsset(session);
 
       const request = await this.clientService.lockAssertionRequest(
@@ -135,12 +152,29 @@ export class Stage2SATPHandler implements SATPHandler {
       );
 
       if (!request) {
-        throw new FailedToCreateMessageError(fnTag, "LockAssertionRequest");
+        throw new FailedToCreateMessageError(
+          fnTag,
+          getMessageTypeName(MessageType.LOCK_ASSERT),
+        );
       }
+
+      saveMessageInSessionData(session.getClientSessionData(), request);
+
       return request;
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(fnTag, "LockAssertionRequest", error);
+      this.Log.error(
+        `${fnTag}, Error: ${new FailedToProcessError(
+          fnTag,
+          getMessageTypeName(MessageType.LOCK_ASSERT),
+          error,
+        )}`,
+      );
+      setError(session, MessageType.LOCK_ASSERT, error);
+      throw new FailedToProcessError(
+        fnTag,
+        getMessageTypeName(MessageType.LOCK_ASSERT),
+        error,
+      );
     }
   }
 }

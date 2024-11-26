@@ -42,9 +42,15 @@ message TransferCompleteRequestMessage {
   string client_transfer_number = 3;
   string client_signature = 4;
 }
+
+message TransferCompleteResponseMessage {
+  cacti.satp.v02.common.CommonSatp common = 1;
+  string server_transfer_number = 2;
+  string server_signature = 3;
+}
   
 service SatpStage3Service {
   rpc CommitPreparation(CommitPreparationRequestMessage) returns (CommitReadyResponseMessage) {}
   rpc CommitFinalAssertion(CommitFinalAssertionRequestMessage) returns (CommitFinalAcknowledgementReceiptResponseMessage) {}
-  rpc TransferComplete(TransferCompleteRequestMessage) returns (google.protobuf.Empty) {}
+  rpc TransferComplete(TransferCompleteRequestMessage) returns (TransferCompleteResponseMessage) {}
 }

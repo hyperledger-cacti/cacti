@@ -1,5 +1,6 @@
+import { create, isMessage } from "@bufbuild/protobuf";
 import {
-  Asset,
+  AssetSchema,
   CredentialProfile,
   LockType,
   MessageType,
@@ -7,8 +8,52 @@ import {
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   MessageStagesTimestamps,
+  SATPStage,
   SessionData,
+  State,
 } from "../generated/proto/cacti/satp/v02/common/session_pb";
+import {
+  NewSessionRequestMessage,
+  NewSessionRequestMessageSchema,
+  NewSessionResponseMessage,
+  NewSessionResponseMessageSchema,
+  PreSATPTransferRequestMessage,
+  PreSATPTransferRequestMessageSchema,
+  PreSATPTransferResponseMessage,
+  PreSATPTransferResponseMessageSchema,
+} from "../generated/proto/cacti/satp/v02/stage_0_pb";
+import {
+  TransferProposalRequestMessage,
+  TransferProposalReceiptMessage,
+  TransferCommenceRequestMessage,
+  TransferCommenceResponseMessage,
+  TransferProposalRequestMessageSchema,
+  TransferProposalReceiptMessageSchema,
+  TransferCommenceRequestMessageSchema,
+  TransferCommenceResponseMessageSchema,
+} from "../generated/proto/cacti/satp/v02/stage_1_pb";
+import {
+  LockAssertionRequestMessage,
+  LockAssertionReceiptMessage,
+  LockAssertionRequestMessageSchema,
+  LockAssertionReceiptMessageSchema,
+} from "../generated/proto/cacti/satp/v02/stage_2_pb";
+import {
+  CommitPreparationRequestMessage,
+  CommitReadyResponseMessage,
+  CommitFinalAssertionRequestMessage,
+  TransferCompleteRequestMessage,
+  TransferCompleteResponseMessage,
+  CommitFinalAcknowledgementReceiptResponseMessage,
+  CommitFinalAcknowledgementReceiptResponseMessageSchema,
+  CommitFinalAssertionRequestMessageSchema,
+  CommitPreparationRequestMessageSchema,
+  CommitReadyResponseMessageSchema,
+  TransferCompleteRequestMessageSchema,
+  TransferCompleteResponseMessageSchema,
+} from "../generated/proto/cacti/satp/v02/stage_3_pb";
+import { getEnumKeyByValue } from "../utils/utils";
+import { SATPInternalError } from "./errors/satp-errors";
 import { SATPSession } from "./satp-session";
 
 import { v4 as uuidv4 } from "uuid";
@@ -77,31 +122,27 @@ export function populateClientSessionData(
   sessionData.accessControlProfile = accessControlProfile;
   sessionData.senderContractOntology = senderContractOntology;
   sessionData.receiverContractOntology = receiverContractOntology;
-  const senderAsset: Asset = new Asset();
-  senderAsset.tokenId = uuidv4() + "-" + sessionData.transferContextId;
-  senderAsset.owner = sourceOwner;
-  senderAsset.ontology = senderContractOntology;
-  senderAsset.contractName = sourceContractName;
-  senderAsset.contractAddress = sourceContractAddress || "";
-  senderAsset.amount = BigInt(fromAmount);
+  sessionData.senderAsset = create(AssetSchema, {
+    tokenId: uuidv4() + "-" + sessionData.transferContextId,
+    owner: sourceOwner,
+    ontology: senderContractOntology,
+    contractName: sourceContractName,
+    contractAddress: sourceContractAddress || "",
+    amount: BigInt(fromAmount),
+    mspId: sourceMspId,
+    channelName: sourceChannelName,
+  });
 
-  senderAsset.mspId = sourceMspId;
-  senderAsset.channelName = sourceChannelName;
-  sessionData.senderAsset = senderAsset;
-
-  const receiverAsset: Asset = new Asset();
-  receiverAsset.tokenId = "";
-  receiverAsset.owner = receiverOwner;
-  receiverAsset.ontology = receiverContractOntology;
-  receiverAsset.contractName = receiverContractName;
-  receiverAsset.contractAddress = receiverContractAddress || "";
-  receiverAsset.amount = BigInt(toAmount);
-
-  receiverAsset.mspId = receiverMspId;
-  receiverAsset.channelName = receiverChannelName;
-  sessionData.receiverAsset = receiverAsset;
-
-  //todo check THis
+  sessionData.receiverAsset = create(AssetSchema, {
+    tokenId: "",
+    owner: receiverOwner,
+    ontology: receiverContractOntology,
+    contractName: receiverContractName,
+    contractAddress: receiverContractAddress || "",
+    amount: BigInt(toAmount),
+    mspId: receiverMspId,
+    channelName: receiverChannelName,
+  });
 
   sessionData.resourceUrl = "MOCK_RESOURCE_URL";
 
@@ -182,8 +223,6 @@ export function copySessionDataAttributes(
     srcSessionData.assignmentAssertionClaim;
   destSessionData.assignmentAssertionClaimFormat =
     srcSessionData.assignmentAssertionClaimFormat;
-  destSessionData.completed = srcSessionData.completed;
-  destSessionData.acceptance = srcSessionData.acceptance;
   destSessionData.lastMessageHash = srcSessionData.lastMessageHash;
   destSessionData.transferClaimsFormat = srcSessionData.transferClaimsFormat;
   destSessionData.clientTransferNumber = srcSessionData.clientTransferNumber;
@@ -202,6 +241,11 @@ export function copySessionDataAttributes(
     srcSessionData.receiverWrapAssertionClaim;
   destSessionData.senderAsset = srcSessionData.senderAsset;
   destSessionData.receiverAsset = srcSessionData.receiverAsset;
+  destSessionData.state = srcSessionData.state;
+  destSessionData.errorCode = srcSessionData.errorCode;
+  destSessionData.phaseError = srcSessionData.phaseError;
+  destSessionData.recoveredTried = srcSessionData.recoveredTried;
+  destSessionData.satpMessages = srcSessionData.satpMessages;
 }
 
 export function saveTimestamp(
@@ -294,6 +338,9 @@ export function saveTimestamp(
     case MessageType.COMMIT_TRANSFER_COMPLETE:
       timestamps.stage3.transferCompleteMessageTimestamp = timestamp;
       break;
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      timestamps.stage3.transferCompleteResponseMessageTimestamp = timestamp;
+      break;
   }
 }
 
@@ -366,6 +413,9 @@ export function saveHash(
       break;
     case MessageType.COMMIT_TRANSFER_COMPLETE:
       hashes.stage3.transferCompleteMessageHash = hash;
+      break;
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      hashes.stage3.transferCompleteResponseMessageHash = hash;
       break;
   }
 }
@@ -440,6 +490,9 @@ export function saveSignature(
       break;
     case MessageType.COMMIT_TRANSFER_COMPLETE:
       signatures.stage3.transferCompleteMessageSignature = signature;
+      break;
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      signatures.stage3.transferCompleteResponseMessageSignature = signature;
       break;
   }
 }
@@ -608,5 +661,279 @@ export function getMessageTimestamp(
       return timestamps.stage3.transferCompleteMessageTimestamp;
     default:
       throw new Error("Message hash not found");
+  }
+}
+
+export function setError(
+  session: SATPSession | undefined,
+  stageMessage: MessageType,
+  error: SATPInternalError,
+) {
+  if (session == undefined) {
+    return;
+  }
+
+  let sessionData: SessionData | undefined;
+  switch (stageMessage) {
+    case MessageType.NEW_SESSION_REQUEST:
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+    case MessageType.INIT_PROPOSAL:
+    case MessageType.TRANSFER_COMMENCE_REQUEST:
+    case MessageType.LOCK_ASSERT:
+    case MessageType.COMMIT_PREPARE:
+    case MessageType.COMMIT_FINAL:
+    case MessageType.COMMIT_TRANSFER_COMPLETE:
+      sessionData = session.getClientSessionData();
+      break;
+    case MessageType.NEW_SESSION_RESPONSE:
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+    case MessageType.INIT_RECEIPT:
+    case MessageType.INIT_REJECT:
+    case MessageType.TRANSFER_COMMENCE_RESPONSE:
+    case MessageType.ASSERTION_RECEIPT:
+    case MessageType.COMMIT_READY:
+    case MessageType.ACK_COMMIT_FINAL:
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      sessionData = session.getServerSessionData();
+      break;
+    default:
+      return;
+  }
+
+  sessionData.state = State.ERROR;
+  sessionData.errorCode = error.getSATPErrorType();
+  sessionData.phaseError = stageMessage;
+}
+
+export function getStateName(state: State): string {
+  return getEnumKeyByValue(State, state) || "Unknown";
+}
+
+export function getStageName(stage: SATPStage): string {
+  return getEnumKeyByValue(SATPStage, stage) || "Unknown";
+}
+
+export function getSessionActualStage(
+  sessionData: SessionData,
+): [SATPStage, MessageType] {
+  let stage: SATPStage = SATPStage.STAGE_UNKNOWN;
+  let messageType: MessageType = MessageType.UNSPECIFIED;
+
+  if (!sessionData.hashes) {
+    throw new Error("Session hashes are not initialized");
+  }
+  if (sessionData.hashes.stage0) {
+    stage = SATPStage.STAGE_0;
+    if (sessionData.hashes.stage0.newSessionRequestMessageHash) {
+      messageType = MessageType.NEW_SESSION_REQUEST;
+    }
+    if (sessionData.hashes.stage0.newSessionResponseMessageHash) {
+      messageType = MessageType.NEW_SESSION_RESPONSE;
+    }
+    if (sessionData.hashes.stage0.preSatpTransferRequestMessageHash) {
+      messageType = MessageType.PRE_SATP_TRANSFER_REQUEST;
+    }
+    if (sessionData.hashes.stage0.preSatpTransferResponseMessageHash) {
+      messageType = MessageType.PRE_SATP_TRANSFER_RESPONSE;
+    }
+  }
+  if (sessionData.hashes.stage1) {
+    stage = SATPStage.STAGE_1;
+    if (sessionData.hashes.stage1.transferProposalRequestMessageHash) {
+      messageType = MessageType.INIT_PROPOSAL;
+    }
+    if (sessionData.hashes.stage1.transferProposalReceiptMessageHash) {
+      messageType = MessageType.INIT_RECEIPT;
+    }
+    if (sessionData.hashes.stage1.transferProposalRejectMessageHash) {
+      messageType = MessageType.INIT_REJECT;
+    }
+    if (sessionData.hashes.stage1.transferCommenceRequestMessageHash) {
+      messageType = MessageType.TRANSFER_COMMENCE_REQUEST;
+    }
+    if (sessionData.hashes.stage1.transferCommenceResponseMessageHash) {
+      messageType = MessageType.TRANSFER_COMMENCE_RESPONSE;
+    }
+  }
+  if (sessionData.hashes.stage2) {
+    stage = SATPStage.STAGE_2;
+    if (sessionData.hashes.stage2.lockAssertionRequestMessageHash) {
+      messageType = MessageType.LOCK_ASSERT;
+    }
+    if (sessionData.hashes.stage2.lockAssertionReceiptMessageHash) {
+      messageType = MessageType.ASSERTION_RECEIPT;
+    }
+  }
+  if (sessionData.hashes.stage3) {
+    stage = SATPStage.STAGE_3;
+    if (sessionData.hashes.stage3.commitPreparationRequestMessageHash) {
+      messageType = MessageType.COMMIT_PREPARE;
+    }
+    if (sessionData.hashes.stage3.commitReadyResponseMessageHash) {
+      messageType = MessageType.COMMIT_READY;
+    }
+    if (sessionData.hashes.stage3.commitFinalAssertionRequestMessageHash) {
+      messageType = MessageType.COMMIT_FINAL;
+    }
+    if (
+      sessionData.hashes.stage3
+        .commitFinalAcknowledgementReceiptResponseMessageHash
+    ) {
+      messageType = MessageType.ACK_COMMIT_FINAL;
+    }
+    if (sessionData.hashes.stage3.transferCompleteMessageHash) {
+      messageType = MessageType.COMMIT_TRANSFER_COMPLETE;
+    }
+    if (sessionData.hashes.stage3.transferCompleteResponseMessageHash) {
+      messageType = MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE;
+    }
+  }
+  return [stage, messageType];
+}
+
+export function saveMessageInSessionData(
+  sessionData: SessionData,
+  message:
+    | NewSessionRequestMessage
+    | NewSessionResponseMessage
+    | PreSATPTransferRequestMessage
+    | PreSATPTransferResponseMessage
+    | TransferProposalRequestMessage
+    | TransferProposalReceiptMessage
+    | TransferCommenceRequestMessage
+    | TransferCommenceResponseMessage
+    | LockAssertionRequestMessage
+    | LockAssertionReceiptMessage
+    | CommitPreparationRequestMessage
+    | CommitReadyResponseMessage
+    | CommitFinalAssertionRequestMessage
+    | CommitFinalAcknowledgementReceiptResponseMessage
+    | TransferCompleteRequestMessage
+    | TransferCompleteResponseMessage,
+): void {
+  if (!sessionData) {
+    throw new Error("SessionData undefined");
+  }
+  if (
+    !sessionData.satpMessages ||
+    !sessionData.satpMessages.stage0 ||
+    !sessionData.satpMessages.stage1 ||
+    !sessionData.satpMessages.stage2 ||
+    !sessionData.satpMessages.stage3
+  ) {
+    throw new Error("Session messages are not initialized");
+  }
+
+  if (isMessage(message, NewSessionRequestMessageSchema)) {
+    sessionData.satpMessages.stage0.newSessionRequestMessage = message;
+  } else if (isMessage(message, NewSessionResponseMessageSchema)) {
+    sessionData.satpMessages.stage0.newSessionResponseMessage = message;
+  } else if (isMessage(message, PreSATPTransferRequestMessageSchema)) {
+    sessionData.satpMessages.stage0.preSatpTransferRequestMessage = message;
+  } else if (isMessage(message, PreSATPTransferResponseMessageSchema)) {
+    sessionData.satpMessages.stage0.preSatpTransferResponseMessage = message;
+  } else if (isMessage(message, TransferProposalRequestMessageSchema)) {
+    sessionData.satpMessages.stage1.transferProposalRequestMessage = message;
+  } else if (isMessage(message, TransferProposalReceiptMessageSchema)) {
+    sessionData.satpMessages.stage1.transferProposalReceiptMessage = message;
+  } else if (isMessage(message, TransferCommenceRequestMessageSchema)) {
+    sessionData.satpMessages.stage1.transferCommenceRequestMessage = message;
+  } else if (isMessage(message, TransferCommenceResponseMessageSchema)) {
+    sessionData.satpMessages.stage1.transferCommenceResponseMessage = message;
+  } else if (isMessage(message, LockAssertionRequestMessageSchema)) {
+    sessionData.satpMessages.stage2.lockAssertionRequestMessage = message;
+  } else if (isMessage(message, LockAssertionReceiptMessageSchema)) {
+    sessionData.satpMessages.stage2.lockAssertionReceiptMessage = message;
+  } else if (isMessage(message, CommitPreparationRequestMessageSchema)) {
+    sessionData.satpMessages.stage3.commitPreparationRequestMessage = message;
+  } else if (isMessage(message, CommitReadyResponseMessageSchema)) {
+    sessionData.satpMessages.stage3.commitReadyResponseMessage = message;
+  } else if (isMessage(message, CommitFinalAssertionRequestMessageSchema)) {
+    sessionData.satpMessages.stage3.commitFinalAssertionRequestMessage =
+      message;
+  } else if (
+    isMessage(message, CommitFinalAcknowledgementReceiptResponseMessageSchema)
+  ) {
+    sessionData.satpMessages.stage3.commitFinalAcknowledgementReceiptResponseMessage =
+      message;
+  } else if (isMessage(message, TransferCompleteRequestMessageSchema)) {
+    sessionData.satpMessages.stage3.transferCompleteMessage = message;
+  } else if (isMessage(message, TransferCompleteResponseMessageSchema)) {
+    sessionData.satpMessages.stage3.transferCompleteResponseMessage = message;
+  } else {
+    throw new Error("Message type not found");
+  }
+}
+
+export function getMessageInSessionData(
+  sessionData: SessionData,
+  messageType: MessageType,
+):
+  | NewSessionRequestMessage
+  | NewSessionResponseMessage
+  | PreSATPTransferRequestMessage
+  | PreSATPTransferResponseMessage
+  | TransferProposalRequestMessage
+  | TransferProposalReceiptMessage
+  | TransferCommenceRequestMessage
+  | TransferCommenceResponseMessage
+  | LockAssertionRequestMessage
+  | LockAssertionReceiptMessage
+  | CommitPreparationRequestMessage
+  | CommitReadyResponseMessage
+  | CommitFinalAssertionRequestMessage
+  | CommitFinalAcknowledgementReceiptResponseMessage
+  | TransferCompleteRequestMessage
+  | TransferCompleteResponseMessage
+  | undefined {
+  if (!sessionData) {
+    throw new Error("SessionData undefined");
+  }
+  if (
+    !sessionData.satpMessages ||
+    !sessionData.satpMessages.stage0 ||
+    !sessionData.satpMessages.stage1 ||
+    !sessionData.satpMessages.stage2 ||
+    !sessionData.satpMessages.stage3
+  ) {
+    throw new Error("Session messages are not initialized");
+  }
+  switch (messageType) {
+    case MessageType.NEW_SESSION_REQUEST:
+      return sessionData.satpMessages.stage0.newSessionRequestMessage;
+    case MessageType.NEW_SESSION_RESPONSE:
+      return sessionData.satpMessages.stage0.newSessionResponseMessage;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      return sessionData.satpMessages.stage0.preSatpTransferRequestMessage;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      return sessionData.satpMessages.stage0.preSatpTransferResponseMessage;
+    case MessageType.INIT_PROPOSAL:
+      return sessionData.satpMessages.stage1.transferProposalRequestMessage;
+    case MessageType.INIT_RECEIPT:
+    case MessageType.INIT_REJECT:
+      return sessionData.satpMessages.stage1.transferProposalReceiptMessage;
+    case MessageType.TRANSFER_COMMENCE_REQUEST:
+      return sessionData.satpMessages.stage1.transferCommenceRequestMessage;
+    case MessageType.TRANSFER_COMMENCE_RESPONSE:
+      return sessionData.satpMessages.stage1.transferCommenceResponseMessage;
+    case MessageType.LOCK_ASSERT:
+      return sessionData.satpMessages.stage2.lockAssertionRequestMessage;
+    case MessageType.ASSERTION_RECEIPT:
+      return sessionData.satpMessages.stage2.lockAssertionReceiptMessage;
+    case MessageType.COMMIT_PREPARE:
+      return sessionData.satpMessages.stage3.commitPreparationRequestMessage;
+    case MessageType.COMMIT_READY:
+      return sessionData.satpMessages.stage3.commitReadyResponseMessage;
+    case MessageType.COMMIT_FINAL:
+      return sessionData.satpMessages.stage3.commitFinalAssertionRequestMessage;
+    case MessageType.ACK_COMMIT_FINAL:
+      return sessionData.satpMessages.stage3
+        .commitFinalAcknowledgementReceiptResponseMessage;
+    case MessageType.COMMIT_TRANSFER_COMPLETE:
+      return sessionData.satpMessages.stage3.transferCompleteMessage;
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      return sessionData.satpMessages.stage3.transferCompleteResponseMessage;
+    default:
+      throw new Error("Message type not found");
   }
 }

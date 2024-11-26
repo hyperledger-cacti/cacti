@@ -310,6 +310,20 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       [ethereumConfigJSON, fabricConfigJSON],
     );
 
+    let initialBalance;
+    try {
+      initialBalance = await fabricEnv.apiClient.runTransactionV1({
+        contractName: fabricEnv.satpContractName,
+        channelName: fabricEnv.fabricChannelName,
+        params: [fabricEnv.clientId],
+        methodName: "ClientIDAccountBalance",
+        invocationType: FabricContractInvocationType.Send,
+        signingCredential: fabricEnv.fabricSigningCredential,
+      });
+    } catch (error) {
+      initialBalance = { data: { functionOutput: "0" } };
+    }
+
     //TODO: when ready, change to official hyperledger image
     // -- for now use your local image (the name might be different)
     // gatewayRunner setup:
@@ -419,7 +433,9 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
     expect(responseBalance2.status).toBeGreaterThan(199);
     expect(responseBalance2.status).toBeLessThan(300);
     expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("2"); // one from each transfer
+    expect(responseBalance2.data.functionOutput).toBe(
+      (Number(initialBalance.data.functionOutput) + 1).toString(),
+    );
     log.info("Amount was transfer correctly to the Owner account");
 
     await gatewayRunner.stop();

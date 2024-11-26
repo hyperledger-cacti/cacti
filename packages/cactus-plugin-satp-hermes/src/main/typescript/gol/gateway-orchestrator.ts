@@ -13,7 +13,7 @@ import {
   SATPServiceInstance,
 } from "../core/types";
 import {
-  PromiseClient as PromiseConnectClient,
+  Client as ConnectClient,
   Transport as ConnectTransport,
 } from "@connectrpc/connect";
 
@@ -22,10 +22,10 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
-import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
-import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
-import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_connect";
-import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_connect";
+import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_pb";
+import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_pb";
+import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_pb";
+import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_pb";
 
 export interface IGatewayOrchestratorOptions {
   logLevel?: LogLevelDesc;
@@ -35,14 +35,13 @@ export interface IGatewayOrchestratorOptions {
 }
 
 //import { COREDispatcher, COREDispatcherOptions } from "../core/dispatcher";
-import { createPromiseClient } from "@connectrpc/connect";
+import { createClient } from "@connectrpc/connect";
 import { createGrpcWebTransport } from "@connectrpc/connect-node";
 import {
   getGatewaySeeds,
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
 import { SATPHandler, Stage } from "../types/satp-protocol";
-import { IExpressRequestHandler } from "@hyperledger/cactus-core-api";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -109,19 +108,31 @@ export class GatewayOrchestrator {
   }
 
   public startServices(): void {
-    for (const stage of this.handlers.keys()) {
-      const httpPath = `/${this.handlers.get(stage)!.getStage()}`;
-      this.logger.info(`Setting up routes for stage ${httpPath}`);
-      if (!this.expressServer) {
-        throw new Error(`${this.label}#startServices() expressServer falsy.`);
-      }
-      const theHandler = expressConnectMiddleware({
-        routes: this.handlers
-          .get(stage)!
-          .setupRouter.bind(this.handlers.get(stage)!),
-      }) as IExpressRequestHandler; // FIXME(petermetz) - unsafe cast
+    if (!this.expressServer) {
+      throw new Error(`${this.label}#startServices() expressServer falsy.`);
+    }
 
-      this.expressServer.use(httpPath, theHandler);
+    for (const stage of this.handlers.keys()) {
+      const handler = this.handlers.get(stage);
+      if (!handler) {
+        throw new Error(`Handler for stage ${stage} is undefined.`);
+      }
+
+      const httpPath = `/${handler.getStage()}`;
+      this.logger.info(`Setting up routes for stage ${httpPath}`);
+
+      if (typeof handler.setupRouter !== "function") {
+        throw new Error(
+          `Handler for stage ${stage} has an invalid setupRouter function.`,
+        );
+      }
+
+      this.expressServer.use(
+        expressConnectMiddleware({
+          routes: handler.setupRouter.bind(handler),
+          requestPathPrefix: httpPath,
+        }),
+      );
     }
   }
 
@@ -267,7 +278,7 @@ export class GatewayOrchestrator {
 
   private createConnectClients(
     identity: GatewayIdentity,
-  ): Map<string, PromiseConnectClient<SATPServiceInstance>> {
+  ): Map<string, ConnectClient<SATPServiceInstance>> {
     // one function for each client type; aggregate in array
     this.logger.debug(
       `Creating clients for gateway ${safeStableStringify(identity)}`,
@@ -316,10 +327,7 @@ export class GatewayOrchestrator {
       httpVersion: "1.1",
     });
 
-    const clients: Map<
-      string,
-      PromiseConnectClient<SATPServiceInstance>
-    > = new Map();
+    const clients: Map<string, ConnectClient<SATPServiceInstance>> = new Map();
 
     clients.set("0", this.createStage0ServiceClient(transport0));
     clients.set("1", this.createStage1ServiceClient(transport1));
@@ -332,45 +340,45 @@ export class GatewayOrchestrator {
 
   private createStage0ServiceClient(
     transport: ConnectTransport,
-  ): PromiseConnectClient<typeof SatpStage0Service> {
+  ): ConnectClient<typeof SatpStage0Service> {
     this.logger.debug(
       "Creating stage 0 service client, with transport: ",
       transport,
     );
-    const client = createPromiseClient(SatpStage0Service, transport);
+    const client = createClient(SatpStage0Service, transport);
     return client;
   }
 
   private createStage1ServiceClient(
     transport: ConnectTransport,
-  ): PromiseConnectClient<typeof SatpStage1Service> {
+  ): ConnectClient<typeof SatpStage1Service> {
     this.logger.debug(
       "Creating stage 1 service client, with transport: ",
       transport,
     );
-    const client = createPromiseClient(SatpStage1Service, transport);
+    const client = createClient(SatpStage1Service, transport);
     return client;
   }
 
   private createStage2ServiceClient(
     transport: ConnectTransport,
-  ): PromiseConnectClient<typeof SatpStage2Service> {
+  ): ConnectClient<typeof SatpStage2Service> {
     this.logger.debug(
       "Creating stage 2 service client, with transport: ",
       transport,
     );
-    const client = createPromiseClient(SatpStage2Service, transport);
+    const client = createClient(SatpStage2Service, transport);
     return client;
   }
 
   private createStage3ServiceClient(
     transport: ConnectTransport,
-  ): PromiseConnectClient<typeof SatpStage3Service> {
+  ): ConnectClient<typeof SatpStage3Service> {
     this.logger.debug(
       "Creating stage 3 service client, with transport: ",
       transport,
     );
-    const client = createPromiseClient(SatpStage3Service, transport);
+    const client = createClient(SatpStage3Service, transport);
     return client;
   }
 

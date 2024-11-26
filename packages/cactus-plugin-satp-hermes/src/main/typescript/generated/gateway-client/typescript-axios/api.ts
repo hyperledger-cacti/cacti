@@ -1584,15 +1584,19 @@ export const StatusResponseSubstatusEnum = {
     Completed: 'COMPLETED',
     Partial: 'PARTIAL',
     Refunded: 'REFUNDED',
-    NotProcessableRefundNeeded: 'NOT_PROCESSABLE_REFUND_NEEDED'
+    NotProcessableRefundNeeded: 'NOT_PROCESSABLE_REFUND_NEEDED',
+    Recovering: 'RECOVERING',
+    Recovered: 'RECOVERED',
+    RecoveryFailed: 'RECOVERY_FAILED',
+    Rejected: 'REJECTED'
 } as const;
 
 export type StatusResponseSubstatusEnum = typeof StatusResponseSubstatusEnum[keyof typeof StatusResponseSubstatusEnum];
 export const StatusResponseStageEnum = {
-    Stage0: 'STAGE0',
-    Stage1: 'STAGE1',
-    Stage2: 'STAGE2',
-    Stage3: 'STAGE3'
+    _0: 'STAGE_0',
+    _1: 'STAGE_1',
+    _2: 'STAGE_2',
+    _3: 'STAGE_3'
 } as const;
 
 export type StatusResponseStageEnum = typeof StatusResponseStageEnum[keyof typeof StatusResponseStageEnum];
@@ -1792,15 +1796,19 @@ export const Transact200ResponseStatusResponseSubstatusEnum = {
     Completed: 'COMPLETED',
     Partial: 'PARTIAL',
     Refunded: 'REFUNDED',
-    NotProcessableRefundNeeded: 'NOT_PROCESSABLE_REFUND_NEEDED'
+    NotProcessableRefundNeeded: 'NOT_PROCESSABLE_REFUND_NEEDED',
+    Recovering: 'RECOVERING',
+    Recovered: 'RECOVERED',
+    RecoveryFailed: 'RECOVERY_FAILED',
+    Rejected: 'REJECTED'
 } as const;
 
 export type Transact200ResponseStatusResponseSubstatusEnum = typeof Transact200ResponseStatusResponseSubstatusEnum[keyof typeof Transact200ResponseStatusResponseSubstatusEnum];
 export const Transact200ResponseStatusResponseStageEnum = {
-    Stage0: 'STAGE0',
-    Stage1: 'STAGE1',
-    Stage2: 'STAGE2',
-    Stage3: 'STAGE3'
+    _0: 'STAGE_0',
+    _1: 'STAGE_1',
+    _2: 'STAGE_2',
+    _3: 'STAGE_3'
 } as const;
 
 export type Transact200ResponseStatusResponseStageEnum = typeof Transact200ResponseStatusResponseStageEnum[keyof typeof Transact200ResponseStatusResponseStageEnum];

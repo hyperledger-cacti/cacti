@@ -38,12 +38,44 @@ import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { SATPBridgesManager } from "./satp-bridges-manager";
 import { GatewayOrchestrator } from "./gateway-orchestrator";
 import { SessionData } from "../generated/proto/cacti/satp/v02/common/session_pb";
-//import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
-import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_connect";
-import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_connect";
-import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_connect";
-import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
-import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_connect";
+import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_pb";
+import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_pb";
+import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_pb";
+import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_pb";
+import { Client as ConnectClient } from "@connectrpc/connect";
+import { MessageType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { getMessageInSessionData } from "../core/session-utils";
+import {
+  TransferProposalRequestMessage,
+  TransferProposalReceiptMessage,
+  TransferCommenceRequestMessage,
+  TransferCommenceResponseMessage,
+} from "../generated/proto/cacti/satp/v02/stage_1_pb";
+import {
+  LockAssertionRequestMessage,
+  LockAssertionReceiptMessage,
+} from "../generated/proto/cacti/satp/v02/stage_2_pb";
+import {
+  CommitPreparationRequestMessage,
+  CommitReadyResponseMessage,
+  CommitFinalAssertionRequestMessage,
+  CommitFinalAcknowledgementReceiptResponseMessage,
+  TransferCompleteRequestMessage,
+  TransferCompleteResponseMessage,
+} from "../generated/proto/cacti/satp/v02/stage_3_pb";
+import {
+  NewSessionRequestMessage,
+  NewSessionResponseMessage,
+  PreSATPTransferRequestMessage,
+  PreSATPTransferResponseMessage,
+} from "../generated/proto/cacti/satp/v02/stage_0_pb";
+import {
+  CreateSATPRequestError,
+  RecoverMessageError,
+  RetrieveSATPMessageError,
+  TransactError,
+} from "../core/errors/satp-errors";
+import { getMessageTypeName } from "../core/satp-utils";
 import { HealthCheckResponseStatusEnum } from "../generated/gateway-client/typescript-axios";
 
 export interface ISATPManagerOptions {
@@ -354,226 +386,6 @@ export class SATPManager {
     });
   }
 
-  public async initiateTransfer(session: SATPSession): Promise<void> {
-    const fnTag = `${SATPManager.CLASS_NAME}#initiateTransfer()`;
-    this.logger.debug(`${fnTag}, Initiating Transfer`);
-
-    const clientSessionData = session.getClientSessionData();
-    const clientSessionDataJson = safeStableStringify(clientSessionData);
-    this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
-
-    if (!clientSessionData) {
-      throw new Error(`${fnTag}, Session not found`);
-    }
-    //maybe get a suitable gateway first.
-    const channel = this.orchestrator.getChannel(
-      clientSessionData.recipientGatewayNetworkId as SupportedChain,
-    );
-
-    if (!channel) {
-      throw new Error(`${fnTag}, Channel not found`);
-    }
-    const counterGatewayID = this.orchestrator.getGatewayIdentity(
-      channel.toGatewayID,
-    );
-    if (!counterGatewayID) {
-      throw new Error(`${fnTag}, counterparty gateway ID not found`);
-    }
-    const sessionData: SessionData = clientSessionData;
-
-    sessionData.receiverGatewayOwnerId = channel.toGatewayID;
-
-    const clientSatpStage0: PromiseConnectClient<typeof SatpStage0Service> =
-      channel.clients.get("0") as PromiseConnectClient<
-        typeof SatpStage0Service
-      >;
-
-    if (!clientSatpStage0) {
-      throw new Error(`${fnTag}, Failed to get clientSatpStage0`);
-    }
-
-    const clientSatpStage1: PromiseConnectClient<typeof SatpStage1Service> =
-      channel.clients.get("1") as PromiseConnectClient<
-        typeof SatpStage1Service
-      >;
-
-    if (!clientSatpStage1) {
-      throw new Error(`${fnTag}, Failed to get clientSatpStage1`);
-    }
-
-    const clientSatpStage2: PromiseConnectClient<typeof SatpStage2Service> =
-      channel.clients.get("2") as PromiseConnectClient<
-        typeof SatpStage2Service
-      >;
-
-    if (!clientSatpStage2) {
-      throw new Error(`${fnTag}, Failed to get clientSatpStage2`);
-    }
-    const clientSatpStage3: PromiseConnectClient<typeof SatpStage3Service> =
-      channel.clients.get("3") as PromiseConnectClient<
-        typeof SatpStage3Service
-      >;
-
-    if (!clientSatpStage3) {
-      throw new Error(`${fnTag}, Failed to get clientSatpStage3`);
-    }
-
-    const check = await clientSatpStage0.check({ check: "check" });
-
-    this.logger.info(`${fnTag}, check: ${safeStableStringify(check)}`);
-
-    if (!check) {
-      throw new Error(`${fnTag}, Failed to check`);
-    }
-
-    if (check.check !== "check") {
-      throw new Error(`${fnTag}, check failed`);
-    }
-
-    //TODO: implement GetPubKey service
-    const serverGatewayPubkey = counterGatewayID.pubKey;
-
-    if (!serverGatewayPubkey) {
-      throw new Error(`${fnTag}, Failed to get serverGatewayPubkey`);
-    }
-
-    sessionData.serverGatewayPubkey = serverGatewayPubkey;
-
-    const newSessionRequest = await (
-      this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
-    ).NewSessionRequest(session.getSessionId());
-
-    if (!newSessionRequest) {
-      throw new Error(`${fnTag}, Failed to create NewSessionRequest`);
-    }
-
-    const responseNewSession =
-      await clientSatpStage0.newSession(newSessionRequest);
-
-    this.logger.info(
-      `${fnTag}, responseNewSession: ${safeStableStringify(responseNewSession)}`,
-    );
-
-    if (!responseNewSession) {
-      throw new Error(`${fnTag}, Failed to create NewSessionRequest`);
-    }
-
-    const requestPreSATPTransfer = await (
-      this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
-    ).PreSATPTransferRequest(responseNewSession, session.getSessionId());
-
-    if (!requestPreSATPTransfer) {
-      throw new Error(`${fnTag}, Failed to create PreSATPTransferRequest`);
-    }
-
-    const responsePreSATPTransfer = await clientSatpStage0.preSATPTransfer(
-      requestPreSATPTransfer,
-    );
-
-    this.logger.info(
-      `${fnTag}, responsePreSATPTransfer: ${safeStableStringify(responsePreSATPTransfer)}`,
-    );
-
-    this.logger.info(`${fnTag}, Stage 0 completed`);
-
-    const requestTransferProposal = await (
-      this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
-    ).TransferProposalRequest(session.getSessionId(), responsePreSATPTransfer);
-
-    if (!requestTransferProposal) {
-      throw new Error(`${fnTag}, Failed to create TransferProposalRequest`);
-    }
-
-    const responseTransferProposal = await clientSatpStage1.transferProposal(
-      requestTransferProposal,
-    );
-
-    this.logger.info(
-      `${fnTag}, responseTransferProposal: ${safeStableStringify(responseTransferProposal)}`,
-    );
-
-    const requestTransferCommence = await (
-      this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
-    ).TransferCommenceRequest(responseTransferProposal);
-
-    if (!requestTransferCommence) {
-      throw new Error(`${fnTag}, Failed to create TransferCommenceRequest`);
-    }
-
-    const responseTransferCommence = await clientSatpStage1.transferCommence(
-      requestTransferCommence,
-    );
-
-    this.logger.info(
-      `${fnTag}, responseTransferCommence: ${safeStableStringify(responseTransferCommence)}`,
-    );
-
-    this.logger.info(`${fnTag}, Stage 1 completed`);
-
-    const requestLockAssertion = await (
-      this.getSATPHandler(SATPHandlerType.STAGE2) as Stage2SATPHandler
-    ).LockAssertionRequest(responseTransferCommence);
-
-    if (!requestLockAssertion) {
-      throw new Error(`${fnTag}, Failed to create LockAssertionRequest`);
-    }
-
-    const responseLockAssertion =
-      await clientSatpStage2.lockAssertion(requestLockAssertion);
-
-    this.logger.info(
-      `${fnTag}, responseLockAssertion: ${safeStableStringify(responseLockAssertion)}`,
-    );
-
-    this.logger.info(`${fnTag}, Stage 2 completed`);
-
-    const requestCommitPreparation = await (
-      this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-    ).CommitPreparationRequest(responseLockAssertion);
-
-    if (!requestCommitPreparation) {
-      throw new Error(`${fnTag}, Failed to create CommitPreparationRequest`);
-    }
-
-    const responseCommitPreparation = await clientSatpStage3.commitPreparation(
-      requestCommitPreparation,
-    );
-    this.logger.info(
-      `${fnTag}, responseCommitPreparation: ${safeStableStringify(responseCommitPreparation)}`,
-    );
-
-    const requestCommitFinalAssertion = await (
-      this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-    ).CommitFinalAssertionRequest(responseCommitPreparation);
-
-    if (!requestCommitFinalAssertion) {
-      throw new Error(`${fnTag}, Failed to create CommitFinalAssertionRequest`);
-    }
-
-    const responseCommitFinalAssertion =
-      await clientSatpStage3.commitFinalAssertion(requestCommitFinalAssertion);
-    this.logger.info(
-      `${fnTag}, responseCommitFinalAssertion: ${safeStableStringify(responseCommitFinalAssertion)}`,
-    );
-
-    const RequestTransferComplete = await (
-      this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-    ).TransferCompleteRequest(responseCommitFinalAssertion);
-
-    if (!RequestTransferComplete) {
-      throw new Error(`${fnTag}, Failed to create TransferCompleteRequest`);
-    }
-
-    const responseTransferComplete = await clientSatpStage3.transferComplete(
-      RequestTransferComplete,
-    );
-    this.logger.info(
-      `${fnTag}, responseTransferComplete: ${safeStableStringify(responseTransferComplete)}`,
-    );
-
-    this.logger.info(`${fnTag}, Stage 3 completed`);
-  }
-
   private loadPubKeys(gateways: Map<string, GatewayIdentity>): void {
     gateways.forEach((gateway) => {
       if (gateway.pubKey) {
@@ -584,5 +396,593 @@ export class SATPManager {
       this.orchestrator.getSelfId(),
       this.orchestrator.ourGateway.pubKey!,
     );
+  }
+
+  public async transfer(
+    session: SATPSession,
+    stage?: MessageType,
+  ): Promise<void> {
+    const fnTag = `${SATPManager.CLASS_NAME}#transfer()`;
+    try {
+      if (!stage) {
+        this.logger.debug(
+          `${fnTag}, Initiating Transfer ${session.getSessionId()}`,
+        );
+      } else {
+        this.logger.debug(`${fnTag}, Recovering Transfer at stage ${stage}`);
+      }
+
+      const clientSessionData = session.getClientSessionData();
+      const clientSessionDataJson = safeStableStringify(clientSessionData);
+      this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
+
+      if (!clientSessionData) {
+        throw new Error(`${fnTag}, Session not found`);
+      }
+
+      //maybe get a suitable gateway first.
+      const channel = this.orchestrator.getChannel(
+        clientSessionData.recipientGatewayNetworkId as SupportedChain,
+      );
+
+      if (!channel) {
+        throw new Error(`${fnTag}, Channel not found`);
+      }
+      const counterGatewayID = this.orchestrator.getGatewayIdentity(
+        channel.toGatewayID,
+      );
+      if (!counterGatewayID) {
+        throw new Error(`${fnTag}, counterparty gateway ID not found`);
+      }
+
+      const sessionData: SessionData = clientSessionData;
+
+      sessionData.receiverGatewayOwnerId = channel.toGatewayID;
+
+      const clientSatpStage0: ConnectClient<typeof SatpStage0Service> =
+        channel.clients.get("0") as ConnectClient<typeof SatpStage0Service>;
+
+      if (!clientSatpStage0) {
+        throw new Error(`${fnTag}, Failed to get clientSatpStage0`);
+      }
+
+      const clientSatpStage1: ConnectClient<typeof SatpStage1Service> =
+        channel.clients.get("1") as ConnectClient<typeof SatpStage1Service>;
+
+      if (!clientSatpStage1) {
+        throw new Error(`${fnTag}, Failed to get clientSatpStage1`);
+      }
+
+      const clientSatpStage2: ConnectClient<typeof SatpStage2Service> =
+        channel.clients.get("2") as ConnectClient<typeof SatpStage2Service>;
+
+      if (!clientSatpStage2) {
+        throw new Error(`${fnTag}, Failed to get clientSatpStage2`);
+      }
+      const clientSatpStage3: ConnectClient<typeof SatpStage3Service> =
+        channel.clients.get("3") as ConnectClient<typeof SatpStage3Service>;
+
+      if (!clientSatpStage3) {
+        throw new Error(`${fnTag}, Failed to get clientSatpStage3`);
+      }
+
+      if (!counterGatewayID.pubKey) {
+        throw new Error(`${fnTag}, Failed to retrieve serverGatewayPubkey`);
+      }
+
+      sessionData.serverGatewayPubkey = counterGatewayID.pubKey;
+
+      let newSessionRequest: NewSessionRequestMessage | undefined;
+      let newSessionResponse: NewSessionResponseMessage | undefined;
+      let preSATPTransferRequest: PreSATPTransferRequestMessage | undefined;
+      let preSATPTransferResponse: PreSATPTransferResponseMessage | undefined;
+      let transferProposalRequest: TransferProposalRequestMessage | undefined;
+      let transferProposalResponse: TransferProposalReceiptMessage | undefined;
+      let transferCommenceRequest: TransferCommenceRequestMessage | undefined;
+      let transferCommenceResponse: TransferCommenceResponseMessage | undefined;
+      let lockAssertionRequest: LockAssertionRequestMessage | undefined;
+      let lockAssertionResponse: LockAssertionReceiptMessage | undefined;
+      let commitPreparationRequest: CommitPreparationRequestMessage | undefined;
+      let commitReadyResponse: CommitReadyResponseMessage | undefined;
+      let commitFinalAssertionRequest:
+        | CommitFinalAssertionRequestMessage
+        | undefined;
+      let commitFinalAcknowledgementReceiptResponse:
+        | CommitFinalAcknowledgementReceiptResponseMessage
+        | undefined;
+      let transferCompleteRequest: TransferCompleteRequestMessage | undefined;
+      let transferCompleteResponse: TransferCompleteResponseMessage | undefined;
+
+      switch (stage) {
+        case undefined:
+        case MessageType.NEW_SESSION_REQUEST:
+          this.logger.debug(`${fnTag}, Initiating Stage 0`);
+          newSessionRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
+          ).NewSessionRequest(session.getSessionId());
+
+          if (!newSessionRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
+            );
+          }
+
+        case MessageType.NEW_SESSION_RESPONSE:
+          if (!newSessionRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 0, NewSessionRequest`,
+            );
+            newSessionRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.NEW_SESSION_REQUEST,
+            ) as NewSessionRequestMessage;
+
+            if (!newSessionRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
+              );
+            }
+          }
+
+          newSessionResponse =
+            await clientSatpStage0.newSession(newSessionRequest);
+
+          this.logger.debug(
+            `${fnTag}, newSessionResponse: ${safeStableStringify(newSessionResponse)}`,
+          );
+
+          if (!newSessionResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+            );
+          }
+
+        case MessageType.PRE_SATP_TRANSFER_REQUEST:
+          if (!newSessionResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 0, NewSessionResponse`,
+            );
+            newSessionResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.NEW_SESSION_RESPONSE,
+            ) as NewSessionResponseMessage;
+
+            if (!newSessionResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+              );
+            }
+          }
+
+          preSATPTransferRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
+          ).PreSATPTransferRequest(newSessionResponse, session.getSessionId());
+
+          if (!preSATPTransferRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+            );
+          }
+
+        case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+          if (!preSATPTransferRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 0, PreSATPTransferRequest`,
+            );
+            preSATPTransferRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.PRE_SATP_TRANSFER_REQUEST,
+            ) as PreSATPTransferRequestMessage;
+
+            if (!preSATPTransferRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+              );
+            }
+          }
+
+          preSATPTransferResponse = await clientSatpStage0.preSATPTransfer(
+            preSATPTransferRequest,
+          );
+
+          this.logger.debug(
+            `${fnTag}, preSATPTransferResponse: ${safeStableStringify(preSATPTransferResponse)}`,
+          );
+
+          if (!preSATPTransferResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
+            );
+          }
+
+        case MessageType.INIT_PROPOSAL:
+          if (!preSATPTransferResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 0, PreSATPTransferResponse`,
+            );
+            preSATPTransferResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.PRE_SATP_TRANSFER_RESPONSE,
+            ) as PreSATPTransferResponseMessage;
+
+            if (!preSATPTransferResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
+              );
+            }
+          }
+
+          this.logger.debug(`${fnTag}, Initiating Stage 1`);
+
+          transferProposalRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
+          ).TransferProposalRequest(
+            session.getSessionId(),
+            preSATPTransferResponse,
+          );
+
+          if (!transferProposalRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.INIT_PROPOSAL),
+            );
+          }
+        case MessageType.INIT_RECEIPT:
+        case MessageType.INIT_REJECT:
+          if (!transferProposalRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 1, TransferProposalRequest`,
+            );
+            transferProposalRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.INIT_PROPOSAL,
+            ) as TransferProposalRequestMessage;
+
+            if (!transferProposalRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.INIT_PROPOSAL),
+              );
+            }
+          }
+
+          transferProposalResponse = await clientSatpStage1.transferProposal(
+            transferProposalRequest,
+          );
+
+          this.logger.debug(
+            `${fnTag}, transferProposalResponse: ${safeStableStringify(transferProposalResponse)}`,
+          );
+
+          if (!transferProposalResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.INIT_RECEIPT),
+            );
+          }
+        case MessageType.TRANSFER_COMMENCE_REQUEST:
+          if (!transferProposalResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 1, TransferProposalResponse`,
+            );
+            transferProposalResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.INIT_RECEIPT,
+            ) as TransferProposalReceiptMessage;
+
+            if (!transferProposalResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.INIT_RECEIPT),
+              );
+            }
+          }
+
+          transferCommenceRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
+          ).TransferCommenceRequest(transferProposalResponse);
+
+          if (!transferCommenceRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.TRANSFER_COMMENCE_REQUEST),
+            );
+          }
+        case MessageType.TRANSFER_COMMENCE_RESPONSE:
+          if (!transferCommenceRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 1, TransferCommenceRequest`,
+            );
+            transferCommenceRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.TRANSFER_COMMENCE_REQUEST,
+            ) as TransferCommenceRequestMessage;
+
+            if (!transferCommenceRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.TRANSFER_COMMENCE_REQUEST),
+              );
+            }
+          }
+
+          transferCommenceResponse = await clientSatpStage1.transferCommence(
+            transferCommenceRequest,
+          );
+
+          this.logger.debug(
+            `${fnTag}, transferCommenceResponse: ${safeStableStringify(transferCommenceResponse)}`,
+          );
+
+          if (!transferCommenceResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.TRANSFER_COMMENCE_RESPONSE),
+            );
+          }
+        case MessageType.LOCK_ASSERT:
+          if (!transferCommenceResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 1, TransferCommenceResponse`,
+            );
+            transferCommenceResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.TRANSFER_COMMENCE_RESPONSE,
+            ) as TransferCommenceResponseMessage;
+
+            if (!transferCommenceResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.TRANSFER_COMMENCE_RESPONSE),
+              );
+            }
+          }
+
+          this.logger.debug(`${fnTag}, Initiating Stage 2`);
+
+          lockAssertionRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE2) as Stage2SATPHandler
+          ).LockAssertionRequest(transferCommenceResponse);
+
+          if (!lockAssertionRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.LOCK_ASSERT),
+            );
+          }
+        case MessageType.ASSERTION_RECEIPT:
+          if (!lockAssertionRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 2, LockAssertionRequest`,
+            );
+            lockAssertionRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.LOCK_ASSERT,
+            ) as LockAssertionRequestMessage;
+
+            if (!lockAssertionRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.LOCK_ASSERT),
+              );
+            }
+          }
+
+          lockAssertionResponse =
+            await clientSatpStage2.lockAssertion(lockAssertionRequest);
+
+          this.logger.debug(
+            `${fnTag}, lockAssertionResponse: ${safeStableStringify(lockAssertionResponse)}`,
+          );
+
+          if (!lockAssertionResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.ASSERTION_RECEIPT),
+            );
+          }
+        case MessageType.COMMIT_PREPARE:
+          if (!lockAssertionResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 2, LockAssertionResponse`,
+            );
+            lockAssertionResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.ASSERTION_RECEIPT,
+            ) as LockAssertionReceiptMessage;
+
+            if (!lockAssertionResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.ASSERTION_RECEIPT),
+              );
+            }
+          }
+
+          this.logger.debug(`${fnTag}, Initiating Stage 3`);
+
+          commitPreparationRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+          ).CommitPreparationRequest(lockAssertionResponse);
+
+          if (!commitPreparationRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_PREPARE),
+            );
+          }
+        case MessageType.COMMIT_READY:
+          if (!commitPreparationRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 3, CommitPreparationRequest`,
+            );
+            commitPreparationRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.COMMIT_PREPARE,
+            ) as CommitPreparationRequestMessage;
+
+            if (!commitPreparationRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.COMMIT_PREPARE),
+              );
+            }
+          }
+
+          commitReadyResponse = await clientSatpStage3.commitPreparation(
+            commitPreparationRequest,
+          );
+
+          this.logger.debug(
+            `${fnTag}, commitReadyResponse: ${safeStableStringify(commitReadyResponse)}`,
+          );
+
+          if (!commitReadyResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_READY),
+            );
+          }
+        case MessageType.COMMIT_FINAL:
+          if (!commitReadyResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 3, CommitReadyResponse`,
+            );
+            commitReadyResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.COMMIT_READY,
+            ) as CommitReadyResponseMessage;
+
+            if (!commitReadyResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.COMMIT_READY),
+              );
+            }
+          }
+
+          commitFinalAssertionRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+          ).CommitFinalAssertionRequest(commitReadyResponse);
+
+          if (!commitFinalAssertionRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_FINAL),
+            );
+          }
+
+        case MessageType.ACK_COMMIT_FINAL:
+          if (!commitFinalAssertionRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 3, CommitFinalAssertionRequest`,
+            );
+            commitFinalAssertionRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.COMMIT_FINAL,
+            ) as CommitFinalAssertionRequestMessage;
+
+            if (!commitFinalAssertionRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.COMMIT_FINAL),
+              );
+            }
+          }
+
+          commitFinalAcknowledgementReceiptResponse =
+            await clientSatpStage3.commitFinalAssertion(
+              commitFinalAssertionRequest,
+            );
+
+          this.logger.debug(
+            `${fnTag}, commitFinalAcknowledgementReceiptResponse: ${safeStableStringify(commitFinalAcknowledgementReceiptResponse)}`,
+          );
+
+          if (!commitFinalAcknowledgementReceiptResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+            );
+          }
+        case MessageType.COMMIT_TRANSFER_COMPLETE:
+          if (!commitFinalAcknowledgementReceiptResponse) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 3, CommitFinalAcknowledgementReceiptResponse`,
+            );
+            commitFinalAcknowledgementReceiptResponse = getMessageInSessionData(
+              sessionData,
+              MessageType.ACK_COMMIT_FINAL,
+            ) as CommitFinalAcknowledgementReceiptResponseMessage;
+
+            if (!commitFinalAcknowledgementReceiptResponse) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+              );
+            }
+          }
+
+          transferCompleteRequest = await (
+            this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+          ).TransferCompleteRequest(commitFinalAcknowledgementReceiptResponse);
+
+          if (!transferCompleteRequest) {
+            throw new CreateSATPRequestError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE),
+            );
+          }
+        case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+          if (!transferCompleteRequest) {
+            this.logger.debug(
+              `${fnTag}, Recovering from Stage 3, TransferCompleteRequest`,
+            );
+            transferCompleteRequest = getMessageInSessionData(
+              sessionData,
+              MessageType.COMMIT_TRANSFER_COMPLETE,
+            ) as TransferCompleteRequestMessage;
+
+            if (!transferCompleteRequest) {
+              throw new RecoverMessageError(
+                fnTag,
+                getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE),
+              );
+            }
+          }
+
+          transferCompleteResponse = await clientSatpStage3.transferComplete(
+            transferCompleteRequest,
+          );
+
+          this.logger.debug(
+            `${fnTag}, transferCompleteResponse: ${safeStableStringify(transferCompleteResponse)}`,
+          );
+
+          if (!transferCompleteResponse) {
+            throw new RetrieveSATPMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
+            );
+          }
+          break;
+        default:
+          throw new Error("Invalid stage");
+      }
+      this.logger.debug(
+        `${fnTag}, Transfer Completed for session: ${session.getSessionId()}`,
+      );
+    } catch (error) {
+      this.logger.error(`${fnTag}, Failed to transact\nError: ${error}`);
+      throw new TransactError(fnTag, error);
+    }
   }
 }

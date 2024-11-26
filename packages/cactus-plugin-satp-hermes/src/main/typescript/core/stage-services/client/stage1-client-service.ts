@@ -2,12 +2,15 @@ import {
   TransferCommenceRequestMessage,
   TransferProposalRequestMessage,
   TransferProposalReceiptMessage,
+  TransferProposalRequestMessageSchema,
+  TransferCommenceRequestMessageSchema,
 } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
 import {
   MessageType,
-  CommonSatp,
   TransferClaims,
-  NetworkCapabilities,
+  CommonSatpSchema,
+  TransferClaimsSchema,
+  NetworkCapabilitiesSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
@@ -27,15 +30,17 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
-import { ACCEPTANCE } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import {
   HashError,
+  MessageTypeError,
   SessionError,
   TokenIdMissingError,
   TransferContextIdError,
   WrapAssertionClaimError,
 } from "../../errors/satp-service-errors";
-import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { PreSATPTransferResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { create } from "@bufbuild/protobuf";
 
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";
@@ -81,52 +86,49 @@ export class Stage1ClientService extends SATPService {
       );
     }
 
-    const commonBody = new CommonSatp();
-    commonBody.version = sessionData.version;
-    commonBody.messageType = MessageType.INIT_PROPOSAL;
-    commonBody.sessionId = sessionData.id;
-    commonBody.sequenceNumber = sessionData.lastSequenceNumber =
-      sessionData.lastSequenceNumber + BigInt(1);
-    commonBody.resourceUrl = sessionData.resourceUrl;
+    sessionData.lastSequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
+
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      messageType: MessageType.INIT_PROPOSAL,
+      sessionId: sessionData.id,
+      sequenceNumber: sessionData.lastSequenceNumber,
+      resourceUrl: sessionData.resourceUrl,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      hashPreviousMessage: "",
+    });
 
     if (sessionData.transferContextId != undefined) {
       commonBody.transferContextId = sessionData.transferContextId;
     }
 
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.hashPreviousMessage = "";
-
-    const transferInitClaims = new TransferClaims();
-    transferInitClaims.digitalAssetId = sessionData.digitalAssetId;
-    transferInitClaims.assetProfileId = sessionData.assetProfileId;
-    transferInitClaims.verifiedOriginatorEntityId =
-      sessionData.verifiedOriginatorEntityId;
-    transferInitClaims.verifiedBeneficiaryEntityId =
-      sessionData.verifiedBeneficiaryEntityId;
-    transferInitClaims.originatorPubkey = sessionData.originatorPubkey;
-    transferInitClaims.beneficiaryPubkey = sessionData.beneficiaryPubkey;
-    transferInitClaims.senderGatewayNetworkId =
-      sessionData.senderGatewayNetworkId;
-    transferInitClaims.recipientGatewayNetworkId =
-      sessionData.recipientGatewayNetworkId;
-    transferInitClaims.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    transferInitClaims.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    transferInitClaims.senderGatewayOwnerId = sessionData.senderGatewayOwnerId;
-    transferInitClaims.receiverGatewayOwnerId =
-      sessionData.receiverGatewayOwnerId;
+    const transferInitClaims = create(TransferClaimsSchema, {
+      digitalAssetId: sessionData.digitalAssetId,
+      assetProfileId: sessionData.assetProfileId,
+      verifiedOriginatorEntityId: sessionData.verifiedOriginatorEntityId,
+      verifiedBeneficiaryEntityId: sessionData.verifiedBeneficiaryEntityId,
+      originatorPubkey: sessionData.originatorPubkey,
+      beneficiaryPubkey: sessionData.beneficiaryPubkey,
+      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+      recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      senderGatewayOwnerId: sessionData.senderGatewayOwnerId,
+      receiverGatewayOwnerId: sessionData.receiverGatewayOwnerId,
+    });
 
     sessionData.hashTransferInitClaims = getHash(transferInitClaims);
 
-    const networkCapabilities = new NetworkCapabilities();
-    networkCapabilities.senderGatewayNetworkId =
-      sessionData.senderGatewayNetworkId;
-    networkCapabilities.signatureAlgorithm = sessionData.signatureAlgorithm;
-    networkCapabilities.lockType = sessionData.lockType;
-    networkCapabilities.lockExpirationTime = sessionData.lockExpirationTime;
-    networkCapabilities.credentialProfile = sessionData.credentialProfile;
-    networkCapabilities.loggingProfile = sessionData.loggingProfile;
-    networkCapabilities.accessControlProfile = sessionData.accessControlProfile;
+    const networkCapabilities = create(NetworkCapabilitiesSchema, {
+      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+      signatureAlgorithm: sessionData.signatureAlgorithm,
+      lockType: sessionData.lockType,
+      lockExpirationTime: sessionData.lockExpirationTime,
+      credentialProfile: sessionData.credentialProfile,
+      loggingProfile: sessionData.loggingProfile,
+      accessControlProfile: sessionData.accessControlProfile,
+    });
 
     if (sessionData.permissions != undefined) {
       this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);
@@ -155,10 +157,14 @@ export class Stage1ClientService extends SATPService {
       networkCapabilities.history = sessionData.history;
     }
 
-    const transferProposalRequestMessage = new TransferProposalRequestMessage();
-    transferProposalRequestMessage.common = commonBody;
-    transferProposalRequestMessage.transferInitClaims = transferInitClaims;
-    transferProposalRequestMessage.networkCapabilities = networkCapabilities;
+    const transferProposalRequestMessage = create(
+      TransferProposalRequestMessageSchema,
+      {
+        common: commonBody,
+        transferInitClaims: transferInitClaims,
+        networkCapabilities: networkCapabilities,
+      },
+    );
 
     if (sessionData.transferClaimsFormat != undefined) {
       this.Log.info(
@@ -225,29 +231,30 @@ export class Stage1ClientService extends SATPService {
 
     const sessionData = session.getClientSessionData();
 
-    const commonBody = new CommonSatp();
-    commonBody.version = sessionData.version;
-    commonBody.messageType = MessageType.TRANSFER_COMMENCE_REQUEST;
-    commonBody.sequenceNumber = response.common!.sequenceNumber + BigInt(1);
-
-    //todo check when reject
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.INIT_RECEIPT,
-    );
-
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.sessionId = sessionData.id;
-    commonBody.transferContextId = sessionData.transferContextId;
-    commonBody.resourceUrl = sessionData.resourceUrl;
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      messageType: MessageType.TRANSFER_COMMENCE_REQUEST,
+      sessionId: sessionData.id,
+      sequenceNumber: response.common!.sequenceNumber + BigInt(1),
+      resourceUrl: sessionData.resourceUrl,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.INIT_RECEIPT,
+      ),
+      transferContextId: sessionData.transferContextId,
+    });
 
     sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
-    const transferCommenceRequestMessage = new TransferCommenceRequestMessage();
-    transferCommenceRequestMessage.common = commonBody;
-    transferCommenceRequestMessage.hashTransferInitClaims =
-      sessionData.hashTransferInitClaims;
+    const transferCommenceRequestMessage = create(
+      TransferCommenceRequestMessageSchema,
+      {
+        common: commonBody,
+        hashTransferInitClaims: sessionData.hashTransferInitClaims,
+      },
+    );
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, safeStableStringify(transferCommenceRequestMessage)),
@@ -281,7 +288,7 @@ export class Stage1ClientService extends SATPService {
   }
 
   async checkPreSATPTransferResponse(
-    response: PreSATPTransferResponse,
+    response: PreSATPTransferResponseMessage,
     session: SATPSession,
   ): Promise<void> {
     const stepTag = `checkPreSATPTransferResponse()`;
@@ -313,6 +320,14 @@ export class Stage1ClientService extends SATPService {
 
     if (response.recipientTokenId == "") {
       throw new TokenIdMissingError(fnTag);
+    }
+
+    if (response.messageType != MessageType.PRE_SATP_TRANSFER_RESPONSE) {
+      throw new MessageTypeError(
+        fnTag,
+        response.messageType.toString(),
+        MessageType.PRE_SATP_TRANSFER_RESPONSE.toString(),
+      );
     }
 
     if (
@@ -368,15 +383,13 @@ export class Stage1ClientService extends SATPService {
       this.Log.info(
         `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
       );
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
-      sessionData.completed = true;
+      sessionData.state = State.REJECTED;
       saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
       return false;
     } else if (
       response.common!.messageType == MessageType.INIT_REJECT &&
       response.transferCounterClaims != undefined
     ) {
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_CONDITIONAL;
       saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
       if (
         await this.checkProposedTransferClaims(response.transferCounterClaims)
@@ -389,12 +402,11 @@ export class Stage1ClientService extends SATPService {
         this.Log.info(
           `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected conditional`,
         );
-        sessionData.completed = true;
+        sessionData.state = State.REJECTED;
         return false;
       }
     }
 
-    sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
     saveHash(sessionData, MessageType.INIT_RECEIPT, getHash(response));
 
     this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);

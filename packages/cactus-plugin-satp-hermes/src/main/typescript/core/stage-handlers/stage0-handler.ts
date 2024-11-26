@@ -9,15 +9,13 @@ import {
 } from "../../types/satp-protocol";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_connect";
+import { ConnectRouter } from "@connectrpc/connect";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
 import {
-  CheckRequest,
-  CheckResponse,
-  NewSessionRequest,
-  NewSessionResponse,
-  PreSATPTransferRequest,
-  PreSATPTransferResponse,
+  NewSessionRequestMessage,
+  NewSessionResponseMessage,
+  PreSATPTransferRequestMessage,
+  PreSATPTransferResponseMessage,
 } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
 import { Stage0ClientService } from "../stage-services/client/stage0-client-service";
 import {
@@ -27,6 +25,10 @@ import {
   SenderGatewayNetworkIdError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
+import { saveMessageInSessionData, setError } from "../session-utils";
+import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { getMessageTypeName } from "../satp-utils";
+
 export class Stage0SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE0;
   private sessions: Map<string, SATPSession>;
@@ -61,18 +63,18 @@ export class Stage0SATPHandler implements SATPHandler {
   }
 
   private async NewSessionImplementation(
-    req: NewSessionRequest,
-    context: HandlerContext,
-  ): Promise<NewSessionResponse> {
+    req: NewSessionRequestMessage,
+    //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
+  ): Promise<NewSessionResponseMessage> {
     const stepTag = `NewSessionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    let session: SATPSession | undefined;
     try {
       this.Log.debug(`${fnTag}, New Session...`);
-      this.Log.debug(
-        `${fnTag}, Request: ${safeStableStringify(req)}, Context: ${safeStableStringify(context)}`,
-      );
+      //console.log("aii: ", stringify(req));
+      this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
 
-      let session = this.sessions.get(req.sessionId);
+      session = this.sessions.get(req.sessionId);
 
       if (req.gatewayId == "") {
         throw new SenderGatewayNetworkIdError(fnTag);
@@ -90,40 +92,55 @@ export class Stage0SATPHandler implements SATPHandler {
 
       this.sessions.set(session.getSessionId(), session);
 
+      saveMessageInSessionData(session.getServerSessionData(), req);
+
       const message = await this.serverService.newSessionResponse(req, session);
 
       if (!message) {
-        throw new FailedToCreateMessageError(fnTag, "NewSessionResponse");
+        throw new FailedToCreateMessageError(
+          fnTag,
+          getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+        );
       }
 
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
 
+      saveMessageInSessionData(session.getServerSessionData(), message);
+
       return message;
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToCreateMessageError(fnTag, "NewSessionResponse", error);
+      this.Log.error(
+        `${fnTag}, Error: ${new FailedToProcessError(
+          fnTag,
+          getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+          error,
+        )}`,
+      );
+      setError(session, MessageType.NEW_SESSION_RESPONSE, error);
+      return await this.serverService.newSessionErrorResponse(error);
     }
   }
 
   private async PreSATPTransferImplementation(
-    req: PreSATPTransferRequest,
-    context: HandlerContext,
-  ): Promise<PreSATPTransferResponse> {
+    req: PreSATPTransferRequestMessage,
+    //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
+  ): Promise<PreSATPTransferResponseMessage> {
     const stepTag = `PreSATPTransferImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    let session: SATPSession | undefined;
     try {
       this.Log.debug(`${fnTag}, PreSATPTransfer...`);
-      this.Log.debug(
-        `${fnTag}, Request: ${safeStableStringify(req)}, Context: ${safeStableStringify(context)}`,
-      );
+      this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
 
-      const session = this.sessions.get(req.sessionId);
+      session = this.sessions.get(req.sessionId);
 
       if (!session) {
         throw new SessionNotFoundError(fnTag);
       }
 
       await this.serverService.checkPreSATPTransferRequest(req, session);
+
+      saveMessageInSessionData(session.getServerSessionData(), req);
 
       await this.serverService.wrapToken(session);
 
@@ -133,15 +150,30 @@ export class Stage0SATPHandler implements SATPHandler {
       );
 
       if (!message) {
-        throw new FailedToCreateMessageError(fnTag, "PreSATPTransferResponse");
+        throw new FailedToCreateMessageError(
+          fnTag,
+          getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
+        );
       }
 
       this.Log.debug(`${fnTag}, Returning response: ${message}`);
 
+      saveMessageInSessionData(session.getServerSessionData(), message);
+
       return message;
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToCreateMessageError(fnTag, "NewSessionResponse", error);
+      this.Log.error(
+        `${fnTag}, Error: ${new FailedToProcessError(
+          fnTag,
+          getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
+          error,
+        )}`,
+      );
+      setError(session, MessageType.PRE_SATP_TRANSFER_RESPONSE, error);
+      return await this.serverService.preSATPTransferErrorResponse(
+        error,
+        session,
+      );
     }
   }
 
@@ -149,17 +181,12 @@ export class Stage0SATPHandler implements SATPHandler {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     router.service(SatpStage0Service, {
-      async check(req: CheckRequest): Promise<CheckResponse> {
-        return new CheckResponse({ check: req.check });
+      async newSession(req): Promise<NewSessionResponseMessage> {
+        return await that.NewSessionImplementation(req);
       },
-      async newSession(req, context): Promise<NewSessionResponse> {
-        return await that.NewSessionImplementation(req, context);
+      async preSATPTransfer(req): Promise<PreSATPTransferResponseMessage> {
+        return await that.PreSATPTransferImplementation(req);
       },
-      async preSATPTransfer(req, context): Promise<PreSATPTransferResponse> {
-        return await that.PreSATPTransferImplementation(req, context);
-      },
-      // newSession: this.NewSessionImplementation,
-      //preSATPTransfer: this.PreSATPTransferImplementation,
     });
   }
 
@@ -167,13 +194,14 @@ export class Stage0SATPHandler implements SATPHandler {
 
   public async NewSessionRequest(
     sessionId: string,
-  ): Promise<NewSessionRequest> {
+  ): Promise<NewSessionRequestMessage> {
     const stepTag = `NewSessionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    let session: SATPSession | undefined;
     try {
       this.Log.debug(`${fnTag}, New Session Request...`);
 
-      const session = this.sessions.get(sessionId);
+      session = this.sessions.get(sessionId);
 
       if (!session) {
         throw new SessionNotFoundError(fnTag);
@@ -185,26 +213,43 @@ export class Stage0SATPHandler implements SATPHandler {
       );
 
       if (!message) {
-        throw new FailedToCreateMessageError(fnTag, "NewSessionRequest");
+        throw new FailedToCreateMessageError(
+          fnTag,
+          getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
+        );
       }
+
+      saveMessageInSessionData(session.getClientSessionData(), message);
 
       return message;
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(fnTag, "NewSessionRequest", error);
+      this.Log.error(
+        `${fnTag}, Error: ${new FailedToProcessError(
+          fnTag,
+          getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
+          error,
+        )}`,
+      );
+      setError(session, MessageType.NEW_SESSION_REQUEST, error);
+      throw new FailedToProcessError(
+        fnTag,
+        getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
+        error,
+      );
     }
   }
 
   public async PreSATPTransferRequest(
-    response: NewSessionResponse,
+    response: NewSessionResponseMessage,
     sessionId: string,
-  ): Promise<PreSATPTransferRequest> {
+  ): Promise<PreSATPTransferRequestMessage> {
     const stepTag = `PreSATPTransferRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
+    let session: SATPSession | undefined;
     try {
       this.Log.debug(`${fnTag}, Pre SATP Transfer Request...`);
 
-      const session = this.sessions.get(sessionId);
+      session = this.sessions.get(sessionId);
 
       if (!session) {
         throw new SessionNotFoundError(fnTag);
@@ -221,18 +266,36 @@ export class Stage0SATPHandler implements SATPHandler {
         this.sessions.delete(session.getSessionId());
       }
 
+      saveMessageInSessionData(session.getClientSessionData(), response);
+
       await this.clientService.wrapToken(session);
 
       const message = await this.clientService.preSATPTransferRequest(session);
 
       if (!message) {
-        throw new FailedToCreateMessageError(fnTag, "PreSATPTransferRequest");
+        throw new FailedToCreateMessageError(
+          fnTag,
+          getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+        );
       }
+
+      saveMessageInSessionData(session.getClientSessionData(), message);
 
       return message;
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new FailedToProcessError(fnTag, "PreSATPTransferRequest", error);
+      this.Log.error(
+        `${fnTag}, Error: ${new FailedToProcessError(
+          fnTag,
+          getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+          error,
+        )}`,
+      );
+      setError(session, MessageType.PRE_SATP_TRANSFER_REQUEST, error);
+      throw new FailedToProcessError(
+        fnTag,
+        getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+        error,
+      );
     }
   }
 }

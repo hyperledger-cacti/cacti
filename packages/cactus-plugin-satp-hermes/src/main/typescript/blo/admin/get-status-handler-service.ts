@@ -10,6 +10,12 @@ import {
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPManager } from "../../gol/satp-manager";
 import { SupportedChain } from "../../core/types";
+import {
+  getSessionActualStage,
+  getStageName,
+  getStateName,
+} from "../../core/session-utils";
+import { State } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 
 export async function executeGetStatus(
   logLevel: LogLevelDesc,
@@ -113,42 +119,48 @@ export async function getStatusService(
     return {
       status: StatusResponseStatusEnum.Invalid,
       substatus: StatusResponseSubstatusEnum.UnknownError,
-      stage: StatusResponseStageEnum.Stage0,
+      stage: StatusResponseStageEnum._0,
       step: "transfer-complete-message",
       startTime: startTime || "undefined",
       originNetwork: originNetwork,
       destinationNetwork: destinationNetwork,
     };
   }
-  logger.info("completed? " + sessionData.completed);
+  logger.info("Session State" + getStateName(sessionData.state));
   logger.info("stage0: " + sessionData.hashes.stage0);
   logger.info("stage1: " + sessionData.hashes.stage1);
   logger.info("stage2: " + sessionData.hashes.stage2);
   logger.info("stage3: " + sessionData.hashes.stage3);
-  if (sessionData.hashes?.stage3 && sessionData.completed) {
-    substatus = StatusResponseSubstatusEnum.Completed;
-    status = StatusResponseStatusEnum.Done;
-  } else {
-    status = StatusResponseStatusEnum.Pending;
-    if (sessionData.hashes?.stage0) {
+  //TODO connect SATP error with OAPI Errors
+  switch (sessionData.state) {
+    case State.ONGOING:
+      status = StatusResponseStatusEnum.Pending;
       substatus = StatusResponseSubstatusEnum.Partial;
-    } else {
+      break;
+    case State.COMPLETED:
+      status = StatusResponseStatusEnum.Done;
+      substatus = StatusResponseSubstatusEnum.Completed;
+      break;
+    case State.ERROR:
+      status = StatusResponseStatusEnum.Failed;
+      substatus = StatusResponseSubstatusEnum.UnknownError;
+      break;
+    case State.REJECTED:
+      status = StatusResponseStatusEnum.Failed;
+      substatus = StatusResponseSubstatusEnum.Rejected;
+      break;
+    default:
       status = StatusResponseStatusEnum.Invalid;
       substatus = StatusResponseSubstatusEnum.UnknownError;
-    }
+      break;
   }
-
-  let count = -1;
-  Object.entries(sessionData.hashes).forEach((stage) => {
-    if (stage[1]) {
-      ++count;
-    }
-  });
 
   const mock: StatusResponse = {
     status: status,
     substatus,
-    stage: ("STAGE" + count) as StatusResponseStageEnum,
+    stage: getStageName(
+      getSessionActualStage(sessionData)[0],
+    ) as StatusResponseStageEnum,
     step: "transfer-complete-message",
     startTime: startTime || "undefined",
     originNetwork: originNetwork,

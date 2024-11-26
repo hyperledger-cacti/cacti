@@ -6,13 +6,15 @@ import {
 } from "../../../gateway-utils";
 import {
   MessageType,
-  WrapAssertionClaim,
+  WrapAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  NewSessionRequest,
-  NewSessionResponse,
-  PreSATPTransferRequest,
-  PreSATPTransferResponse,
+  NewSessionRequestMessage,
+  NewSessionResponseMessage,
+  NewSessionResponseMessageSchema,
+  PreSATPTransferRequestMessage,
+  PreSATPTransferResponseMessage,
+  PreSATPTransferResponseMessageSchema,
   STATUS,
 } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -22,6 +24,7 @@ import {
   AssetMissing,
   GatewayNetworkIdError,
   LedgerAssetError,
+  MessageTypeError,
   MissingBridgeManagerError,
   NetworkIdError,
   SessionDataNotAvailableError,
@@ -45,6 +48,12 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { protoToAsset } from "../service-utils";
+import {
+  FailedToProcessError,
+  SessionNotFoundError,
+} from "../../errors/satp-handler-errors";
+import { SATPInternalError } from "../../errors/satp-errors";
+import { create } from "@bufbuild/protobuf";
 export class Stage0ServerService extends SATPService {
   public static readonly SATP_STAGE = "0";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -72,7 +81,7 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async checkNewSessionRequest(
-    request: NewSessionRequest,
+    request: NewSessionRequestMessage,
     session: SATPSession | undefined,
     clientPubKey: string,
   ): Promise<SATPSession> {
@@ -97,6 +106,14 @@ export class Stage0ServerService extends SATPService {
 
     if (request.recipientGatewayNetworkId == "") {
       throw new NetworkIdError(fnTag, "Recipient");
+    }
+
+    if (request.messageType != MessageType.NEW_SESSION_REQUEST) {
+      throw new MessageTypeError(
+        fnTag,
+        request.messageType.toString(),
+        MessageType.NEW_SESSION_REQUEST.toString(),
+      );
     }
 
     if (!verifySignature(this.Signer, request, clientPubKey)) {
@@ -150,7 +167,7 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async checkPreSATPTransferRequest(
-    request: PreSATPTransferRequest,
+    request: PreSATPTransferRequestMessage,
     session: SATPSession,
   ): Promise<void> {
     const stepTag = `checkPreSATPTransferRequest()`;
@@ -186,6 +203,14 @@ export class Stage0ServerService extends SATPService {
 
     if (request.receiverAsset == undefined) {
       throw new Error(`${fnTag}, Receiver Asset is missing`);
+    }
+
+    if (request.messageType != MessageType.PRE_SATP_TRANSFER_REQUEST) {
+      throw new MessageTypeError(
+        fnTag,
+        request.messageType.toString(),
+        MessageType.PRE_SATP_TRANSFER_REQUEST.toString(),
+      );
     }
 
     if (
@@ -251,9 +276,9 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async newSessionResponse(
-    request: NewSessionRequest,
+    request: NewSessionRequestMessage,
     session: SATPSession,
-  ): Promise<NewSessionResponse> {
+  ): Promise<NewSessionResponseMessage> {
     const stepTag = `newSessionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
@@ -266,24 +291,23 @@ export class Stage0ServerService extends SATPService {
     }
     const sessionData = session.getServerSessionData();
 
-    const newSessionResponse = new NewSessionResponse();
+    const newSessionResponse = create(NewSessionResponseMessageSchema, {
+      sessionId: sessionData.id,
+      contextId: sessionData.transferContextId,
+      recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+      messageType: MessageType.NEW_SESSION_RESPONSE,
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.NEW_SESSION_REQUEST,
+      ),
+    });
 
     if (sessionData.id != request.sessionId) {
       newSessionResponse.status = STATUS.STATUS_REJECTED;
     } else {
       newSessionResponse.status = STATUS.STATUS_ACCEPTED;
     }
-    newSessionResponse.sessionId = sessionData.id;
-    newSessionResponse.contextId = sessionData.transferContextId;
-    newSessionResponse.recipientGatewayNetworkId =
-      sessionData.recipientGatewayNetworkId;
-    newSessionResponse.senderGatewayNetworkId =
-      sessionData.senderGatewayNetworkId;
-
-    newSessionResponse.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.NEW_SESSION_REQUEST,
-    );
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, safeStableStringify(newSessionResponse)),
@@ -304,10 +328,57 @@ export class Stage0ServerService extends SATPService {
     return newSessionResponse;
   }
 
+  public async newSessionErrorResponse(
+    error: SATPInternalError,
+  ): Promise<NewSessionResponseMessage> {
+    let newSessionResponse = create(NewSessionResponseMessageSchema, {
+      messageType: MessageType.NEW_SESSION_RESPONSE,
+    });
+
+    newSessionResponse = this.setError(
+      newSessionResponse,
+      error,
+    ) as NewSessionResponseMessage;
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(newSessionResponse)),
+    );
+
+    newSessionResponse.serverSignature = messageSignature;
+
+    return newSessionResponse;
+  }
+
+  public async preSATPTransferErrorResponse(
+    error: SATPInternalError,
+    session?: SATPSession,
+  ): Promise<PreSATPTransferResponseMessage> {
+    let preSATPTransferResponse = create(PreSATPTransferResponseMessageSchema, {
+      messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+    });
+
+    preSATPTransferResponse = this.setError(
+      preSATPTransferResponse,
+      error,
+    ) as PreSATPTransferResponseMessage;
+
+    if (!(error instanceof SessionNotFoundError) && session != undefined) {
+      preSATPTransferResponse.sessionId = session.getServerSessionData().id;
+    }
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
+    );
+
+    preSATPTransferResponse.serverSignature = messageSignature;
+
+    return preSATPTransferResponse;
+  }
+
   public async preSATPTransferResponse(
-    request: PreSATPTransferRequest,
+    request: PreSATPTransferRequestMessage,
     session: SATPSession,
-  ): Promise<PreSATPTransferResponse> {
+  ): Promise<PreSATPTransferResponseMessage> {
     const stepTag = `preSATPTransferResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
@@ -321,24 +392,24 @@ export class Stage0ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    const preSATPTransferResponse = new PreSATPTransferResponse();
-
-    preSATPTransferResponse.sessionId = sessionData.id;
-    preSATPTransferResponse.contextId = sessionData.transferContextId;
-
-    preSATPTransferResponse.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.PRE_SATP_TRANSFER_REQUEST,
-    );
-
     if (request.receiverAsset == undefined) {
       throw new AssetMissing(fnTag);
     }
 
-    preSATPTransferResponse.wrapAssertionClaim =
-      sessionData.receiverWrapAssertionClaim;
-    preSATPTransferResponse.recipientTokenId =
-      sessionData.receiverAsset!.tokenId;
+    const preSATPTransferResponse = create(
+      PreSATPTransferResponseMessageSchema,
+      {
+        sessionId: sessionData.id,
+        contextId: sessionData.transferContextId,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.PRE_SATP_TRANSFER_REQUEST,
+        ),
+        wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
+        recipientTokenId: sessionData.receiverAsset!.tokenId,
+        messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+      },
+    );
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
@@ -398,15 +469,26 @@ export class Stage0ServerService extends SATPService {
         sessionData.recipientGatewayNetworkId,
       );
 
-      sessionData.receiverWrapAssertionClaim = new WrapAssertionClaim();
+      sessionData.receiverWrapAssertionClaim = create(
+        WrapAssertionClaimSchema,
+        {},
+      );
       sessionData.receiverWrapAssertionClaim.receipt =
         await bridge.wrapAsset(token);
       sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
       );
     } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-      throw new Error(`${fnTag}, Failed to process Wrap Asset ${error}`);
+      throw new FailedToProcessError(fnTag, "WrapAsset", error);
     }
+  }
+
+  private setError(
+    message: NewSessionResponseMessage | PreSATPTransferResponseMessage,
+    error: SATPInternalError,
+  ): NewSessionResponseMessage | PreSATPTransferResponseMessage {
+    message.error = true;
+    message.errorCode = error.getSATPErrorType();
+    return message;
   }
 }

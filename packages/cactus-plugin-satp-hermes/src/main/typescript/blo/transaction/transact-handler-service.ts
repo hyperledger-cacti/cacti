@@ -84,7 +84,7 @@ export async function executeTransact(
     req.sourceAsset.owner,
     req.receiverAsset.owner,
   );
-  await manager.initiateTransfer(session);
+  await manager.transfer(session);
 
   logger.info(`${fnTag}, ${req}`);
 
