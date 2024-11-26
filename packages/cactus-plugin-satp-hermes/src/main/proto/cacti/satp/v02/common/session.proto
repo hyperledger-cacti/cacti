@@ -4,8 +4,10 @@ package cacti.satp.v02.common;
 import "google/protobuf/empty.proto";
 
 import "cacti/satp/v02/common/message.proto";
-
-
+import "cacti/satp/v02/stage_0.proto";
+import "cacti/satp/v02/stage_1.proto";
+import "cacti/satp/v02/stage_2.proto";
+import "cacti/satp/v02/stage_3.proto";
 
 message SessionData {
     string id = 1;
@@ -60,23 +62,71 @@ message SessionData {
     cacti.satp.v02.common.BurnAssertionClaimFormat burn_assertion_claim_format = 50;
     cacti.satp.v02.common.AssignmentAssertionClaim assignment_assertion_claim = 51;
     cacti.satp.v02.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 52;
-    bool completed = 53;
-    ACCEPTANCE acceptance = 54;
-    string last_message_hash = 55;
-    cacti.satp.v02.common.TransferClaimsFormat transfer_claims_format = 56;
-    string client_transfer_number = 57;
-    string server_transfer_number = 58;
-    uint64 lock_assertion_expiration = 59;
-    cacti.satp.v02.common.AssetProfile asset_profile = 60;
-    string sender_contract_ontology = 61;
-    string receiver_contract_ontology = 62;
-    string resource_url = 63;
-    cacti.satp.v02.common.WrapAssertionClaim sender_wrap_assertion_claim = 64;
-    cacti.satp.v02.common.WrapAssertionClaim receiver_wrap_assertion_claim = 65;
-    cacti.satp.v02.common.Asset sender_asset = 66;
-    cacti.satp.v02.common.Asset receiver_asset = 67;
+    string last_message_hash = 53;
+    cacti.satp.v02.common.TransferClaimsFormat transfer_claims_format = 54;
+    string client_transfer_number = 55;
+    string server_transfer_number = 56;
+    uint64 lock_assertion_expiration = 57;
+    cacti.satp.v02.common.AssetProfile asset_profile = 58;
+    string sender_contract_ontology = 59;
+    string receiver_contract_ontology = 60;
+    string resource_url = 61;
+    cacti.satp.v02.common.WrapAssertionClaim sender_wrap_assertion_claim = 62;
+    cacti.satp.v02.common.WrapAssertionClaim receiver_wrap_assertion_claim = 63;
+    cacti.satp.v02.common.Asset sender_asset = 64;
+    cacti.satp.v02.common.Asset receiver_asset = 65;
+    State state = 66;
+    cacti.satp.v02.common.Error error_code = 67;
+    cacti.satp.v02.common.MessageType phase_error = 68;
+    bool recovered_tried = 69;
+    SATPMessages satp_Messages = 70; 
 }
 
+enum State {
+    STATE_UNKNOWN = 0;
+    STATE_ONGOING = 1;
+    STATE_COMPLETED = 2;
+    STATE_REJECTED = 3;
+    STATE_CONDITIONAL_REJECTED = 4;
+    STATE_ERROR = 5;
+    STATE_RECOVERED = 6;
+    STATE_RECOVERING = 7;
+}
+
+message SATPMessages {
+    Stage0Messages stage0 = 1;
+    Stage1Messages stage1 = 2;
+    Stage2Messages stage2 = 3;
+    Stage3Messages stage3 = 4;
+}
+
+message Stage0Messages {
+    cacti.satp.v02.NewSessionRequestMessage new_session_request_message = 1;
+    cacti.satp.v02.NewSessionResponseMessage new_session_response_message = 2;
+    cacti.satp.v02.PreSATPTransferRequestMessage pre_satp_transfer_request_message = 3;
+    cacti.satp.v02.PreSATPTransferResponseMessage pre_satp_transfer_response_message = 4;
+}
+
+message Stage1Messages {
+    cacti.satp.v02.TransferProposalRequestMessage transfer_proposal_request_message = 1;
+    cacti.satp.v02.TransferProposalReceiptMessage transfer_proposal_receipt_message = 2;
+    cacti.satp.v02.TransferCommenceRequestMessage transfer_commence_request_message = 4;
+    cacti.satp.v02.TransferCommenceResponseMessage transfer_commence_response_message = 5;
+}
+
+message Stage2Messages {
+    cacti.satp.v02.LockAssertionRequestMessage lock_assertion_request_message = 1;
+    cacti.satp.v02.LockAssertionReceiptMessage lock_assertion_receipt_message = 2;
+}
+
+message Stage3Messages {
+    cacti.satp.v02.CommitPreparationRequestMessage commit_preparation_request_message = 1;
+    cacti.satp.v02.CommitReadyResponseMessage commit_ready_response_message = 2;
+    cacti.satp.v02.CommitFinalAssertionRequestMessage commit_final_assertion_request_message = 3;
+    cacti.satp.v02.CommitFinalAcknowledgementReceiptResponseMessage commit_final_acknowledgement_receipt_response_message = 4;
+    cacti.satp.v02.TransferCompleteRequestMessage transfer_complete_message = 5;
+    cacti.satp.v02.TransferCompleteResponseMessage transfer_complete_response_message = 6;
+}
 
 message MessageStagesHashes {
     Stage0Hashes stage0 = 1;
@@ -111,6 +161,7 @@ message Stage3Hashes {
     string commit_final_assertion_request_message_hash = 3;
     string commit_final_acknowledgement_receipt_response_message_hash = 4;
     string transfer_complete_message_hash = 5;
+    string transfer_complete_response_message_hash = 6;
 }
 
 message MessageStagesSignatures {
@@ -146,6 +197,7 @@ message Stage3Signatures {
     string commit_final_assertion_request_message_signature = 3;
     string commit_final_acknowledgement_receipt_response_message_signature = 4;
     string transfer_complete_message_signature = 5;
+    string transfer_complete_response_message_signature = 6;
 }
 
 message MessageStagesTimestamps {
@@ -181,12 +233,7 @@ message Stage3Timestamps {
     string commit_final_assertion_request_message_timestamp = 3;
     string commit_final_acknowledgement_receipt_response_message_timestamp = 4;
     string transfer_complete_message_timestamp = 5;
-}
-
-enum ACCEPTANCE {
-    ACCEPTANCE_REJECTED = 0;
-    ACCEPTANCE_ACCEPTED = 1;
-    ACCEPTANCE_CONDITIONAL = 2;
+    string transfer_complete_response_message_timestamp = 6;
 }
 
 message SendStatusRequest {
@@ -199,6 +246,13 @@ message SendStatusResponse {
     bool has_backup = 2;
 }
 
+enum SATPStage {
+    STAGE_UNKNOWN = 0;
+    STAGE_0 = 1;
+    STAGE_1 = 2;
+    STAGE_2 = 3;
+    STAGE_3 = 4;
+}
 
 service SessionStatusService {
     rpc GetStatus(google.protobuf.Empty) returns (SendStatusResponse) {}
