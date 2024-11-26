@@ -3,16 +3,17 @@ import {
   TransferCommenceRequestMessage,
   TransferProposalRequestMessage,
   TransferProposalReceiptMessage,
+  TransferProposalReceiptMessageSchema,
+  TransferCommenceResponseMessageSchema,
 } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
 import {
   MessageType,
-  CommonSatp,
   NetworkCapabilities,
   SignatureAlgorithm,
   LockType,
+  CommonSatpSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 // eslint-disable-next-line prettier/prettier
-import { ACCEPTANCE } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
@@ -41,6 +42,10 @@ import {
   TransferInitClaimsError,
   TransferInitClaimsHashError,
 } from "../../errors/satp-service-errors";
+import { SATPInternalError } from "../../errors/satp-errors";
+import { SessionNotFoundError } from "../../errors/satp-handler-errors";
+import { State } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { create } from "@bufbuild/protobuf";
 export class Stage1ServerService extends SATPService {
   public static readonly SATP_STAGE = "1";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -71,12 +76,11 @@ export class Stage1ServerService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    if (
-      session.getServerSessionData().acceptance ==
-      ACCEPTANCE.ACCEPTANCE_ACCEPTED
-    ) {
-      session.verify(fnTag, SessionType.SERVER);
-    }
+    session.verify(
+      fnTag,
+      SessionType.SERVER,
+      session.getServerSessionData().state == State.REJECTED,
+    );
 
     const sessionData = session.getServerSessionData();
 
@@ -87,24 +91,27 @@ export class Stage1ServerService extends SATPService {
 
     sessionData.hashTransferInitClaims = getHash(request.transferInitClaims);
 
-    const commonBody = new CommonSatp();
-    commonBody.version = sessionData.version;
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      sessionId: sessionData.id,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      transferContextId: sessionData.transferContextId,
+      resourceUrl: sessionData.resourceUrl,
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.INIT_PROPOSAL,
+      ),
+      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+    });
 
-    commonBody.sessionId = sessionData.id;
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-      request.common!.sequenceNumber + BigInt(1);
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.transferContextId = sessionData.transferContextId;
-    commonBody.resourceUrl = sessionData.resourceUrl;
+    sessionData.lastSequenceNumber = request.common!.sequenceNumber + BigInt(1);
 
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.INIT_PROPOSAL,
+    const transferProposalReceiptMessage = create(
+      TransferProposalReceiptMessageSchema,
+      {},
     );
-
-    const transferProposalReceiptMessage = new TransferProposalReceiptMessage();
-    if (sessionData.acceptance == ACCEPTANCE.ACCEPTANCE_REJECTED) {
+    if (sessionData.state == State.REJECTED) {
       transferProposalReceiptMessage.common = commonBody;
       commonBody.messageType = MessageType.INIT_REJECT;
       transferProposalReceiptMessage.timestamp = getMessageTimestamp(
@@ -112,8 +119,10 @@ export class Stage1ServerService extends SATPService {
         MessageType.INIT_REJECT,
         TimestampType.RECEIVED,
       );
+    } else if (sessionData.state == State.CONDITIONAL_REJECTED) {
+      throw new Error("Not Implemented");
     } else {
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
+      sessionData.state = State.ONGOING;
       transferProposalReceiptMessage.common = commonBody;
       transferProposalReceiptMessage.hashTransferInitClaims =
         sessionData.hashTransferInitClaims;
@@ -155,6 +164,56 @@ export class Stage1ServerService extends SATPService {
     return transferProposalReceiptMessage;
   }
 
+  async transferProposalErrorResponse(
+    error: SATPInternalError,
+    session?: SATPSession,
+  ): Promise<TransferProposalReceiptMessage> {
+    const errorResponse = create(TransferProposalReceiptMessageSchema, {});
+    const commonBody = create(CommonSatpSchema, {
+      messageType: MessageType.PRE_INIT_RECEIPT,
+      error: true,
+      errorCode: error.getSATPErrorType(),
+    });
+
+    if (!(error instanceof SessionNotFoundError) && session != undefined) {
+      commonBody.sessionId = session.getServerSessionData().id;
+    }
+    errorResponse.common = commonBody;
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(errorResponse)),
+    );
+
+    errorResponse.serverSignature = messageSignature;
+
+    return errorResponse;
+  }
+
+  async transferCommenceErrorResponse(
+    error: SATPInternalError,
+    session?: SATPSession,
+  ): Promise<TransferCommenceResponseMessage> {
+    const errorResponse = create(TransferCommenceResponseMessageSchema, {});
+    const commonBody = create(CommonSatpSchema, {
+      messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
+      error: true,
+      errorCode: error.getSATPErrorType(),
+    });
+
+    if (!(error instanceof SessionNotFoundError) && session != undefined) {
+      commonBody.sessionId = session.getServerSessionData().id;
+    }
+    errorResponse.common = commonBody;
+
+    const messageSignature = bufArray2HexStr(
+      sign(this.Signer, safeStableStringify(errorResponse)),
+    );
+
+    errorResponse.serverSignature = messageSignature;
+
+    return errorResponse;
+  }
+
   async transferCommenceResponse(
     request: TransferCommenceRequestMessage,
     session: SATPSession,
@@ -171,25 +230,29 @@ export class Stage1ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    const commonBody = new CommonSatp();
-    commonBody.version = sessionData.version;
-    commonBody.messageType = MessageType.TRANSFER_COMMENCE_RESPONSE;
+    const commonBody = create(CommonSatpSchema, {
+      version: sessionData.version,
+      sessionId: sessionData.id,
+      clientGatewayPubkey: sessionData.clientGatewayPubkey,
+      serverGatewayPubkey: sessionData.serverGatewayPubkey,
+      transferContextId: sessionData.transferContextId,
+      resourceUrl: sessionData.resourceUrl,
+      hashPreviousMessage: getMessageHash(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_REQUEST,
+      ),
+      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+      messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
+    });
     sessionData.lastSequenceNumber = commonBody.sequenceNumber =
       request.common!.sequenceNumber + BigInt(1);
-    commonBody.hashPreviousMessage = getMessageHash(
-      sessionData,
-      MessageType.TRANSFER_COMMENCE_REQUEST,
+
+    const transferCommenceResponseMessage = create(
+      TransferCommenceResponseMessageSchema,
+      {
+        common: commonBody,
+      },
     );
-
-    commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-    commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-    commonBody.sessionId = sessionData.id;
-    commonBody.transferContextId = sessionData.transferContextId;
-    commonBody.resourceUrl = sessionData.resourceUrl;
-
-    const transferCommenceResponseMessage =
-      new TransferCommenceResponseMessage();
-    transferCommenceResponseMessage.common = commonBody;
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, safeStableStringify(transferCommenceResponseMessage)),
@@ -242,10 +305,12 @@ export class Stage1ServerService extends SATPService {
 
     if (this.checkTransferClaims(request.transferInitClaims, fnTag)) {
       this.Log.info(`${fnTag}, TransferProposalRequest was accepted...`);
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_ACCEPTED;
+    } else if (false) {
+      sessionData.state = State.CONDITIONAL_REJECTED;
+      //TODO Implement
     } else {
       this.Log.info(`${fnTag}, TransferProposalRequest was rejected...`);
-      sessionData.acceptance = ACCEPTANCE.ACCEPTANCE_REJECTED;
+      sessionData.state = State.REJECTED;
       return;
     }
 
@@ -348,6 +413,10 @@ export class Stage1ServerService extends SATPService {
       MessageType.TRANSFER_COMMENCE_REQUEST,
       getHash(request),
     );
+
+    //if the conditional parameters where accepted, the session state is still ongoing
+    //TODO timeout for accepting the parameters
+    sessionData.state = State.ONGOING;
 
     this.Log.info(`${fnTag}, TransferCommenceRequest passed all checks.`);
   }
