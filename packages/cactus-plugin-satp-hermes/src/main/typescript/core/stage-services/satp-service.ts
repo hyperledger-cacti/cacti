@@ -5,10 +5,10 @@ import {
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
 import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_connect";
-import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_connect";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_connect";
-import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_connect";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
 
 export enum SATPServiceType {
   Server = "Server",
