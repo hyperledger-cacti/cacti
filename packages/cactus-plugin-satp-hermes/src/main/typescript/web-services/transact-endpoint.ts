@@ -17,6 +17,9 @@ import {
   registerWebServiceEndpoint,
 } from "@hyperledger/cactus-core";
 import { TransactRequest } from "../generated/gateway-client/typescript-axios/api";
+import { SATPInternalError } from "../core/errors/satp-errors";
+import { getEnumKeyByValue } from "../utils/utils";
+import { Error as SATPErrorType } from "../generated/proto/cacti/satp/v02/common/message_pb";
 
 export class TransactEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "TransactEndpointV1";
@@ -81,7 +84,7 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
       const result = await this.options.dispatcher.Transact(reqBody);
       res.json(result);
     } catch (ex) {
-      const errorMsg = `${reqTag} ${fnTag} Failed to transact:`;
+      const errorMsg = `${reqTag} ${fnTag} Failed to transact: ${getEnumKeyByValue(SATPErrorType, (ex as SATPInternalError).getSATPErrorType())}`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
