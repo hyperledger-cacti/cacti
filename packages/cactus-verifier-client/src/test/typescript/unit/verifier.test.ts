@@ -18,12 +18,12 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: testLogLevel,
 });
 
-import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 import {
-  Verifier,
+  ISocketApiClient,
   IVerifierEventListener,
   LedgerEvent,
-} from "../../../main/typescript/verifier";
+} from "@hyperledger/cactus-core-api";
+import { Verifier } from "../../../main/typescript/verifier";
 
 //////////////////////////////////
 // Test Timeout

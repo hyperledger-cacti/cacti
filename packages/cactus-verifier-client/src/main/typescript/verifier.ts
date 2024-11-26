@@ -18,11 +18,6 @@ import {
   IVerifierEventListener,
 } from "@hyperledger/cactus-core-api";
 
-export {
-  IVerifierEventListener,
-  LedgerEvent,
-} from "@hyperledger/cactus-core-api";
-
 /**
  * Utility type for retrieving monitoring event / new block type from generic ISocketApiClient interface.
  */

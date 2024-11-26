@@ -1,4 +1,4 @@
-export { Verifier, IVerifierEventListener, LedgerEvent } from "./verifier";
+export { Verifier } from "./verifier";
 export { getValidatorApiClient } from "./get-validator-api-client";
 export {
   VerifierFactory,
