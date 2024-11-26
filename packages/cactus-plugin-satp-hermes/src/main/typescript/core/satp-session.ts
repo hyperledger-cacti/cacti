@@ -2,22 +2,29 @@ import { v4 as uuidv4 } from "uuid";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
-  MessageStagesHashes,
-  MessageStagesSignatures,
-  MessageStagesTimestamps,
+  MessageStagesHashesSchema,
+  MessageStagesSignaturesSchema,
+  MessageStagesTimestampsSchema,
+  SATPMessagesSchema,
   SessionData,
-  Stage0Hashes,
-  Stage0Signatures,
-  Stage0Timestamps,
-  Stage1Hashes,
-  Stage1Signatures,
-  Stage1Timestamps,
-  Stage2Hashes,
-  Stage2Signatures,
-  Stage2Timestamps,
-  Stage3Hashes,
-  Stage3Signatures,
-  Stage3Timestamps,
+  SessionDataSchema,
+  Stage0HashesSchema,
+  Stage0MessagesSchema,
+  Stage0SignaturesSchema,
+  Stage0TimestampsSchema,
+  Stage1HashesSchema,
+  Stage1MessagesSchema,
+  Stage1SignaturesSchema,
+  Stage1TimestampsSchema,
+  Stage2HashesSchema,
+  Stage2MessagesSchema,
+  Stage2SignaturesSchema,
+  Stage2TimestampsSchema,
+  Stage3HashesSchema,
+  Stage3MessagesSchema,
+  Stage3SignaturesSchema,
+  Stage3TimestampsSchema,
+  State,
 } from "../generated/proto/cacti/satp/v02/common/session_pb";
 import {
   AccessControlProfileError,
@@ -43,6 +50,7 @@ import {
   SignatureAlgorithm,
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { SessionType } from "./session-utils";
+import { create } from "@bufbuild/protobuf";
 
 // Define interface on protos
 export interface ISATPSessionOptions {
@@ -63,18 +71,18 @@ export class SATPSession {
     `);
     }
     if (ops.server) {
-      this.serverSessionData = new SessionData();
-      this.serverSessionData.transferContextId = ops.contextID;
-      this.serverSessionData.id =
-        ops.sessionID || this.generateSessionID(ops.contextID);
+      this.serverSessionData = create(SessionDataSchema, {
+        transferContextId: ops.contextID,
+        id: ops.sessionID || this.generateSessionID(ops.contextID),
+      });
       this.initialize(this.serverSessionData);
     }
 
     if (ops.client) {
-      this.clientSessionData = new SessionData();
-      this.clientSessionData.transferContextId = ops.contextID;
-      this.clientSessionData.id =
-        ops.sessionID || this.generateSessionID(ops.contextID);
+      this.clientSessionData = create(SessionDataSchema, {
+        transferContextId: ops.contextID,
+        id: ops.sessionID || this.generateSessionID(ops.contextID),
+      });
       this.initialize(this.clientSessionData);
     }
   }
@@ -84,30 +92,37 @@ export class SATPSession {
   }
 
   private initialize(sessionData: SessionData): void {
-    sessionData.hashes = new MessageStagesHashes();
-    sessionData.signatures = new MessageStagesSignatures();
-    sessionData.processedTimestamps = new MessageStagesTimestamps();
-    sessionData.receivedTimestamps = new MessageStagesTimestamps();
+    sessionData.hashes = create(MessageStagesHashesSchema, {});
+    sessionData.signatures = create(MessageStagesSignaturesSchema, {});
+    sessionData.processedTimestamps = create(MessageStagesTimestampsSchema, {});
+    sessionData.receivedTimestamps = create(MessageStagesTimestampsSchema, {});
+    sessionData.satpMessages = create(SATPMessagesSchema, {});
 
-    sessionData.processedTimestamps.stage0 = new Stage0Timestamps();
-    sessionData.processedTimestamps.stage1 = new Stage1Timestamps();
-    sessionData.processedTimestamps.stage2 = new Stage2Timestamps();
-    sessionData.processedTimestamps.stage3 = new Stage3Timestamps();
+    sessionData.processedTimestamps.stage0 = create(Stage0TimestampsSchema, {});
+    sessionData.processedTimestamps.stage1 = create(Stage1TimestampsSchema, {});
+    sessionData.processedTimestamps.stage2 = create(Stage2TimestampsSchema, {});
+    sessionData.processedTimestamps.stage3 = create(Stage3TimestampsSchema, {});
 
-    sessionData.receivedTimestamps.stage0 = new Stage0Timestamps();
-    sessionData.receivedTimestamps.stage1 = new Stage1Timestamps();
-    sessionData.receivedTimestamps.stage2 = new Stage2Timestamps();
-    sessionData.receivedTimestamps.stage3 = new Stage3Timestamps();
+    sessionData.receivedTimestamps.stage0 = create(Stage0TimestampsSchema, {});
+    sessionData.receivedTimestamps.stage1 = create(Stage1TimestampsSchema, {});
+    sessionData.receivedTimestamps.stage2 = create(Stage2TimestampsSchema, {});
+    sessionData.receivedTimestamps.stage3 = create(Stage3TimestampsSchema, {});
 
-    sessionData.hashes.stage0 = new Stage0Hashes();
-    sessionData.hashes.stage1 = new Stage1Hashes();
-    sessionData.hashes.stage2 = new Stage2Hashes();
-    sessionData.hashes.stage3 = new Stage3Hashes();
+    sessionData.hashes.stage0 = create(Stage0HashesSchema, {});
+    sessionData.hashes.stage1 = create(Stage1HashesSchema, {});
+    sessionData.hashes.stage2 = create(Stage2HashesSchema, {});
+    sessionData.hashes.stage3 = create(Stage3HashesSchema, {});
 
-    sessionData.signatures.stage0 = new Stage0Signatures();
-    sessionData.signatures.stage1 = new Stage1Signatures();
-    sessionData.signatures.stage2 = new Stage2Signatures();
-    sessionData.signatures.stage3 = new Stage3Signatures();
+    sessionData.signatures.stage0 = create(Stage0SignaturesSchema, {});
+    sessionData.signatures.stage1 = create(Stage1SignaturesSchema, {});
+    sessionData.signatures.stage2 = create(Stage2SignaturesSchema, {});
+    sessionData.signatures.stage3 = create(Stage3SignaturesSchema, {});
+
+    sessionData.satpMessages.stage0 = create(Stage0MessagesSchema, {});
+    sessionData.satpMessages.stage1 = create(Stage1MessagesSchema, {});
+    sessionData.satpMessages.stage2 = create(Stage2MessagesSchema, {});
+    sessionData.satpMessages.stage3 = create(Stage3MessagesSchema, {});
+    sessionData.state = State.ONGOING;
   }
 
   public getServerSessionData(): SessionData {
@@ -151,9 +166,11 @@ export class SATPSession {
       );
     }
 
-    const sessionData = new SessionData();
-    sessionData.transferContextId = contextId;
-    sessionData.id = sessionId;
+    const sessionData = create(SessionDataSchema, {
+      transferContextId: contextId,
+      id: sessionId,
+    });
+
     this.initialize(sessionData);
 
     switch (type) {
@@ -180,7 +197,12 @@ export class SATPSession {
     return this.serverSessionData?.id || this.clientSessionData?.id || "";
   }
 
-  public verify(tag: string, type: SessionType): void {
+  public verify(
+    tag: string,
+    type: SessionType,
+    rejected?: boolean,
+    completed?: boolean,
+  ): void {
     let sessionData: SessionData | undefined;
     try {
       if (type == SessionType.SERVER) {
@@ -196,8 +218,12 @@ export class SATPSession {
       if (sessionData == undefined) {
         throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
       }
-
-      if (sessionData.completed) {
+      if (sessionData.state == State.REJECTED && !rejected) {
+        throw new SessionCompletedError(
+          "Session already completed (transfer rejected)",
+        );
+      }
+      if (sessionData.state == State.COMPLETED && !completed) {
         throw new SessionCompletedError("Session already completed");
       }
       if (sessionData.id == "") {

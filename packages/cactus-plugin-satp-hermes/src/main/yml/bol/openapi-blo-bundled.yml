@@ -179,15 +179,19 @@ paths:
                           - PARTIAL
                           - REFUNDED
                           - NOT_PROCESSABLE_REFUND_NEEDED
+                          - RECOVERING
+                          - RECOVERED
+                          - RECOVERY_FAILED
+                          - REJECTED
                         example: COMPLETED
                       stage:
                         type: string
                         enum:
-                          - STAGE0
-                          - STAGE1
-                          - STAGE2
-                          - STAGE3
-                        example: STAGE3
+                          - STAGE_0
+                          - STAGE_1
+                          - STAGE_2
+                          - STAGE_3
+                        example: STAGE_3
                       step:
                         type: string
                         enum:
@@ -348,15 +352,19 @@ paths:
                           - PARTIAL
                           - REFUNDED
                           - NOT_PROCESSABLE_REFUND_NEEDED
+                          - RECOVERING
+                          - RECOVERED
+                          - RECOVERY_FAILED
+                          - REJECTED
                         example: COMPLETED
                       stage:
                         type: string
                         enum:
-                          - STAGE0
-                          - STAGE1
-                          - STAGE2
-                          - STAGE3
-                        example: STAGE3
+                          - STAGE_0
+                          - STAGE_1
+                          - STAGE_2
+                          - STAGE_3
+                        example: STAGE_3
                       step:
                         type: string
                         enum:
@@ -512,15 +520,19 @@ paths:
                       - PARTIAL
                       - REFUNDED
                       - NOT_PROCESSABLE_REFUND_NEEDED
+                      - RECOVERING
+                      - RECOVERED
+                      - RECOVERY_FAILED
+                      - REJECTED
                     example: COMPLETED
                   stage:
                     type: string
                     enum:
-                      - STAGE0
-                      - STAGE1
-                      - STAGE2
-                      - STAGE3
-                    example: STAGE3
+                      - STAGE_0
+                      - STAGE_1
+                      - STAGE_2
+                      - STAGE_3
+                    example: STAGE_3
                   step:
                     type: string
                     enum:
@@ -711,15 +723,19 @@ paths:
                           - PARTIAL
                           - REFUNDED
                           - NOT_PROCESSABLE_REFUND_NEEDED
+                          - RECOVERING
+                          - RECOVERED
+                          - RECOVERY_FAILED
+                          - REJECTED
                         example: COMPLETED
                       stage:
                         type: string
                         enum:
-                          - STAGE0
-                          - STAGE1
-                          - STAGE2
-                          - STAGE3
-                        example: STAGE3
+                          - STAGE_0
+                          - STAGE_1
+                          - STAGE_2
+                          - STAGE_3
+                        example: STAGE_3
                       step:
                         type: string
                         enum:
@@ -880,15 +896,19 @@ paths:
                           - PARTIAL
                           - REFUNDED
                           - NOT_PROCESSABLE_REFUND_NEEDED
+                          - RECOVERING
+                          - RECOVERED
+                          - RECOVERY_FAILED
+                          - REJECTED
                         example: COMPLETED
                       stage:
                         type: string
                         enum:
-                          - STAGE0
-                          - STAGE1
-                          - STAGE2
-                          - STAGE3
-                        example: STAGE3
+                          - STAGE_0
+                          - STAGE_1
+                          - STAGE_2
+                          - STAGE_3
+                        example: STAGE_3
                       step:
                         type: string
                         enum:
@@ -1951,15 +1971,19 @@ components:
             - PARTIAL
             - REFUNDED
             - NOT_PROCESSABLE_REFUND_NEEDED
+            - RECOVERING
+            - RECOVERED
+            - RECOVERY_FAILED
+            - REJECTED
           example: COMPLETED
         stage:
           type: string
           enum:
-            - STAGE0
-            - STAGE1
-            - STAGE2
-            - STAGE3
-          example: STAGE3
+            - STAGE_0
+            - STAGE_1
+            - STAGE_2
+            - STAGE_3
+          example: STAGE_3
         step:
           type: string
           enum:
@@ -2061,15 +2085,19 @@ components:
                 - PARTIAL
                 - REFUNDED
                 - NOT_PROCESSABLE_REFUND_NEEDED
+                - RECOVERING
+                - RECOVERED
+                - RECOVERY_FAILED
+                - REJECTED
               example: COMPLETED
             stage:
               type: string
               enum:
-                - STAGE0
-                - STAGE1
-                - STAGE2
-                - STAGE3
-              example: STAGE3
+                - STAGE_0
+                - STAGE_1
+                - STAGE_2
+                - STAGE_3
+              example: STAGE_3
             step:
               type: string
               enum:
@@ -2274,15 +2302,19 @@ components:
                 - PARTIAL
                 - REFUNDED
                 - NOT_PROCESSABLE_REFUND_NEEDED
+                - RECOVERING
+                - RECOVERED
+                - RECOVERY_FAILED
+                - REJECTED
               example: COMPLETED
             stage:
               type: string
               enum:
-                - STAGE0
-                - STAGE1
-                - STAGE2
-                - STAGE3
-              example: STAGE3
+                - STAGE_0
+                - STAGE_1
+                - STAGE_2
+                - STAGE_3
+              example: STAGE_3
             step:
               type: string
               enum:
@@ -2386,15 +2418,19 @@ components:
                 - PARTIAL
                 - REFUNDED
                 - NOT_PROCESSABLE_REFUND_NEEDED
+                - RECOVERING
+                - RECOVERED
+                - RECOVERY_FAILED
+                - REJECTED
               example: COMPLETED
             stage:
               type: string
               enum:
-                - STAGE0
-                - STAGE1
-                - STAGE2
-                - STAGE3
-              example: STAGE3
+                - STAGE_0
+                - STAGE_1
+                - STAGE_2
+                - STAGE_3
+              example: STAGE_3
             step:
               type: string
               enum:
@@ -3780,15 +3816,19 @@ components:
                 - PARTIAL
                 - REFUNDED
                 - NOT_PROCESSABLE_REFUND_NEEDED
+                - RECOVERING
+                - RECOVERED
+                - RECOVERY_FAILED
+                - REJECTED
               example: COMPLETED
             stage:
               type: string
               enum:
-                - STAGE0
-                - STAGE1
-                - STAGE2
-                - STAGE3
-              example: STAGE3
+                - STAGE_0
+                - STAGE_1
+                - STAGE_2
+                - STAGE_3
+              example: STAGE_3
             step:
               type: string
               enum:
