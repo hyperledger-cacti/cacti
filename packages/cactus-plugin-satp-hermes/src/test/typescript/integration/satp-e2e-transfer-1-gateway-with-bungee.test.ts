@@ -262,6 +262,21 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       counterPartyGateways: [], //only knows itself
       bridgesConfig: [ethereumEnv.ethereumConfig, fabricEnv.fabricConfig],
     };
+
+    let initialBalance;
+    try {
+      initialBalance = await fabricEnv.apiClient.runTransactionV1({
+        contractName: fabricEnv.satpContractName,
+        channelName: fabricEnv.fabricChannelName,
+        params: [fabricEnv.clientId],
+        methodName: "ClientIDAccountBalance",
+        invocationType: FabricContractInvocationType.Send,
+        signingCredential: fabricEnv.fabricSigningCredential,
+      });
+    } catch (error) {
+      initialBalance = { data: { functionOutput: "0" } };
+    }
+
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
 
@@ -352,7 +367,9 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
     expect(responseBalance2.status).toBeGreaterThan(199);
     expect(responseBalance2.status).toBeLessThan(300);
     expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("2"); // one from each transfer
+    expect(responseBalance2.data.functionOutput).toBe(
+      (Number(initialBalance.data.functionOutput) + 1).toString(),
+    );
     log.info("Amount was transfer correctly to the Owner account");
 
     await gateway.shutdown();

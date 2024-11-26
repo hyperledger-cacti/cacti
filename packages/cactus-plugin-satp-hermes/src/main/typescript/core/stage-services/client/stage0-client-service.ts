@@ -1,13 +1,16 @@
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
   MessageType,
-  WrapAssertionClaim,
+  WrapAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  NewSessionRequest,
-  NewSessionResponse,
-  PreSATPTransferRequest,
+  NewSessionRequestMessage,
+  NewSessionResponseMessage,
+  PreSATPTransferRequestMessage,
+  NewSessionRequestMessageSchema,
+  PreSATPTransferRequestMessageSchema,
 } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
@@ -17,6 +20,7 @@ import {
   HashError,
   LedgerAssetError,
   LedgerAssetIdError,
+  MessageTypeError,
   MissingBridgeManagerError,
   OntologyContractError,
   SessionError,
@@ -43,6 +47,7 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { protoToAsset } from "../service-utils";
+import { getMessageTypeName } from "../../satp-utils";
 
 export class Stage0ClientService extends SATPService {
   public static readonly SATP_STAGE = "0";
@@ -71,7 +76,7 @@ export class Stage0ClientService extends SATPService {
   public async newSessionRequest(
     session: SATPSession,
     thisGatewayId: string,
-  ): Promise<NewSessionRequest> {
+  ): Promise<NewSessionRequestMessage> {
     const stepTag = `newSessionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
@@ -83,14 +88,15 @@ export class Stage0ClientService extends SATPService {
 
     const sessionData = session.getClientSessionData();
 
-    const newSessionRequestMessage = new NewSessionRequest();
-    newSessionRequestMessage.sessionId = sessionData.id;
-    newSessionRequestMessage.contextId = sessionData.transferContextId;
-    newSessionRequestMessage.recipientGatewayNetworkId =
-      sessionData.recipientGatewayNetworkId;
-    newSessionRequestMessage.senderGatewayNetworkId =
-      sessionData.senderGatewayNetworkId;
-    newSessionRequestMessage.gatewayId = thisGatewayId;
+    const newSessionRequestMessage = create(NewSessionRequestMessageSchema, {
+      sessionId: sessionData.id,
+      contextId: sessionData.transferContextId,
+      recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+      gatewayId: thisGatewayId,
+      messageType: MessageType.NEW_SESSION_REQUEST,
+    });
+
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, safeStableStringify(newSessionRequestMessage)),
     );
@@ -115,7 +121,7 @@ export class Stage0ClientService extends SATPService {
   }
 
   public async checkNewSessionResponse(
-    response: NewSessionResponse,
+    response: NewSessionResponseMessage,
     session: SATPSession,
     sessionIds: string[],
   ): Promise<SATPSession> {
@@ -164,6 +170,14 @@ export class Stage0ClientService extends SATPService {
       throw new GatewayNetworkIdError(fnTag);
     }
 
+    if (response.messageType != MessageType.NEW_SESSION_RESPONSE) {
+      throw new MessageTypeError(
+        fnTag,
+        getMessageTypeName(response.messageType),
+        getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+      );
+    }
+
     if (
       response.hashPreviousMessage !=
       getMessageHash(sessionData, MessageType.NEW_SESSION_REQUEST)
@@ -201,7 +215,7 @@ export class Stage0ClientService extends SATPService {
 
   public async preSATPTransferRequest(
     session: SATPSession,
-  ): Promise<PreSATPTransferRequest> {
+  ): Promise<PreSATPTransferRequestMessage> {
     const stepTag = `preSATPTransferRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
@@ -234,19 +248,18 @@ export class Stage0ClientService extends SATPService {
       throw new LedgerAssetError(fnTag);
     }
 
-    const preSATPTransferRequest = new PreSATPTransferRequest();
-    preSATPTransferRequest.sessionId = sessionData.id;
-    preSATPTransferRequest.contextId = sessionData.transferContextId;
-    preSATPTransferRequest.clientTransferNumber =
-      sessionData.clientTransferNumber;
-    preSATPTransferRequest.senderGatewayNetworkId =
-      sessionData.senderGatewayNetworkId;
-    preSATPTransferRequest.recipientGatewayNetworkId =
-      sessionData.recipientGatewayNetworkId;
-    preSATPTransferRequest.senderAsset = sessionData.senderAsset;
-    preSATPTransferRequest.receiverAsset = sessionData.receiverAsset;
-    preSATPTransferRequest.wrapAssertionClaim =
-      sessionData.senderWrapAssertionClaim;
+    const preSATPTransferRequest = create(PreSATPTransferRequestMessageSchema, {
+      sessionId: sessionData.id,
+      contextId: sessionData.transferContextId,
+      clientTransferNumber: sessionData.clientTransferNumber,
+      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+      recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+      senderAsset: sessionData.senderAsset,
+      receiverAsset: sessionData.receiverAsset,
+      wrapAssertionClaim: sessionData.senderWrapAssertionClaim,
+      messageType: MessageType.PRE_SATP_TRANSFER_REQUEST,
+    });
+
     preSATPTransferRequest.hashPreviousMessage = getMessageHash(
       sessionData,
       MessageType.NEW_SESSION_RESPONSE,
@@ -316,7 +329,11 @@ export class Stage0ClientService extends SATPService {
         sessionData.senderGatewayNetworkId,
       );
 
-      sessionData.senderWrapAssertionClaim = new WrapAssertionClaim();
+      sessionData.senderWrapAssertionClaim = create(
+        WrapAssertionClaimSchema,
+        {},
+      );
+
       sessionData.senderWrapAssertionClaim.receipt =
         await bridge.wrapAsset(token);
 
