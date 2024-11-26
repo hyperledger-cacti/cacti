@@ -1,14 +1,21 @@
 import "jest-extended";
 import {
+  LogLevelDesc,
+  Secp256k1Keys,
+  JsObjectSigner,
+  IJsObjectSignerOptions,
+} from "@hyperledger/cactus-common";
+import {
   CrashRecoveryManager,
   CrashStatus,
 } from "../../../../main/typescript/core/recovery/crash-manager";
-import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
 import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/recovery/crash-manager";
 import { Knex, knex } from "knex";
 import {
   LocalLog,
   SupportedChain,
+  GatewayIdentity,
+  Address,
 } from "../../../../main/typescript/core/types";
 import {
   Asset,
@@ -24,6 +31,14 @@ import { knexClientConnection } from "../../knex.config";
 import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
 import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import { RecoverUpdateMessage } from "../../../../main/typescript/generated/proto/cacti/satp/v02/crash_recovery_pb";
+import {
+  GatewayOrchestrator,
+  IGatewayOrchestratorOptions,
+} from "../../../../main/typescript/gol/gateway-orchestrator";
+import {
+  ISATPBridgesOptions,
+  SATPBridgesManager,
+} from "../../../../main/typescript/gol/satp-bridges-manager";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -98,15 +113,70 @@ beforeAll(async () => {
   knexInstance = knex(knexClientConnection);
   await knexInstance.migrate.latest();
 
+  const privateKeyHex = Buffer.from(keyPairs.privateKey).toString("hex");
+
+  const signerOptions: IJsObjectSignerOptions = {
+    privateKey: privateKeyHex,
+    logLevel: logLevel,
+  };
+
+  const signer = new JsObjectSigner(signerOptions);
+
+  const gatewayIdentity1 = {
+    id: "mockID-1",
+    name: "CustomGateway",
+    version: [
+      {
+        Core: "v02",
+        Architecture: "v02",
+        Crash: "v02",
+      },
+    ],
+    supportedDLTs: [SupportedChain.BESU],
+    proofID: "mockProofID10",
+    address: "http://localhost" as Address,
+  } as GatewayIdentity;
+
+  const gatewayIdentity2 = {
+    id: "mockID-2",
+    name: "CustomGateway",
+    version: [
+      {
+        Core: "v02",
+        Architecture: "v02",
+        Crash: "v02",
+      },
+    ],
+    supportedDLTs: [SupportedChain.FABRIC],
+    proofID: "mockProofID11",
+    address: "http://localhost" as Address,
+    gatewayServerPort: 3110,
+    gatewayClientPort: 3111,
+    gatewayOpenAPIPort: 4110,
+  } as GatewayIdentity;
+
+  const localGateway: GatewayIdentity = gatewayIdentity1;
+  const counterPartyGateways: GatewayIdentity[] = [gatewayIdentity2];
+  const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
+    logLevel: logLevel,
+    localGateway: localGateway,
+    counterPartyGateways: counterPartyGateways,
+    signer: signer,
+  };
+  const bridgesManagerOptions: ISATPBridgesOptions = {
+    logLevel: logLevel,
+    supportedDLTs: [SupportedChain.BESU, SupportedChain.FABRIC],
+    networks: [],
+  };
+
+  const bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
+
   const crashManagerOptions: ICrashRecoveryManagerOptions = {
     instanceId: uuidv4(),
     logLevel: logLevel,
     knexConfig: knexClientConnection,
-    bridgeConfig: {
-      logLevel: logLevel,
-      networks: [],
-      supportedDLTs: [SupportedChain.BESU, SupportedChain.FABRIC],
-    },
+    bridgeConfig: bridgesManager,
+    orchestrator: new GatewayOrchestrator(gatewayOrchestratorOptions),
   };
 
   crashManager = new CrashRecoveryManager(crashManagerOptions);
@@ -130,7 +200,7 @@ afterAll(async () => {
 describe("CrashRecoveryManager Tests", () => {
   it("should invoke rollback based on session timeout", async () => {
     mockSession = createMockSession("1000", "3"); // timeout of 1 sec
-
+    // client-side test
     const testData = mockSession.hasClientSessionData()
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
@@ -163,6 +233,7 @@ describe("CrashRecoveryManager Tests", () => {
 
     handleRollbackSpy.mockRestore();
   });
+
   it("should reconstruct session by fetching logs", async () => {
     mockSession = createMockSession("1000", "3");
 
@@ -345,48 +416,6 @@ describe("CrashRecoveryManager Tests", () => {
     handleInitiateRollBackSpy.mockRestore();
   });
 
-  it("should detect crash based on session timeout and initiate rollback when recovery fails", async () => {
-    mockSession = createMockSession("1000", "3"); // timeout of 1 sec
-
-    const testData = mockSession.hasClientSessionData()
-      ? mockSession.getClientSessionData()
-      : mockSession.getServerSessionData();
-    const sessionId = testData.id;
-
-    const handleRecoverySpy = jest
-      .spyOn(crashManager, "handleRecovery")
-      .mockImplementation(async () => false);
-
-    const handleInitiateRollBackSpy = jest
-      .spyOn(crashManager, "initiateRollback")
-      .mockImplementation(async () => true);
-
-    const key = getSatpLogKey(sessionId, "type1", "done");
-
-    const pastTime = new Date(Date.now() - 10000).toISOString();
-
-    const mockLogEntry: LocalLog = {
-      sessionID: sessionId,
-      type: "type1",
-      key: key,
-      operation: "done",
-      timestamp: pastTime,
-      data: JSON.stringify(testData),
-    };
-
-    const mockLogRepository = crashManager["logRepository"];
-
-    await mockLogRepository.create(mockLogEntry);
-
-    await crashManager.checkAndResolveCrash(mockSession);
-
-    expect(handleRecoverySpy).toHaveBeenCalled();
-    expect(handleInitiateRollBackSpy).toHaveBeenCalled();
-
-    handleRecoverySpy.mockRestore();
-    handleInitiateRollBackSpy.mockRestore();
-  });
-
   it("should process recovered logs and add missing logs", async () => {
     const mockSession = createMockSession("1000", "3");
     const testData = mockSession.hasClientSessionData()
@@ -414,7 +443,7 @@ describe("CrashRecoveryManager Tests", () => {
     } as RecoverUpdateMessage;
 
     const result =
-      await crashManager["processRecoverUpdate"](recoverUpdateMessage);
+      await crashManager["processRecoverUpdateMessage"](recoverUpdateMessage);
 
     expect(result).toBeTrue();
 

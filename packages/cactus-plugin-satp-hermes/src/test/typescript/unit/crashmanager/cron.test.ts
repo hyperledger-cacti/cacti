@@ -1,11 +1,18 @@
 import "jest-extended";
 import { CrashRecoveryManager } from "../../../../main/typescript/core/recovery/crash-manager";
-import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  Secp256k1Keys,
+  JsObjectSigner,
+  IJsObjectSignerOptions,
+} from "@hyperledger/cactus-common";
 import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/recovery/crash-manager";
 import { Knex, knex } from "knex";
 import {
   LocalLog,
   SupportedChain,
+  GatewayIdentity,
+  Address,
 } from "../../../../main/typescript/core/types";
 import {
   Asset,
@@ -19,12 +26,20 @@ import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import { knexClientConnection } from "../../knex.config";
 import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
 import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import {
+  GatewayOrchestrator,
+  IGatewayOrchestratorOptions,
+} from "../../../../main/typescript/gol/gateway-orchestrator";
+import {
+  ISATPBridgesOptions,
+  SATPBridgesManager,
+} from "../../../../main/typescript/gol/satp-bridges-manager";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
 let crashManager: CrashRecoveryManager;
 let knexInstance: Knex;
-
+const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 const createMockSession = (
   sessionId: string,
   maxTimeout: string,
@@ -95,15 +110,71 @@ beforeAll(async () => {
   knexInstance = knex(knexClientConnection);
   await knexInstance.migrate.latest();
 
+  const privateKeyHex = Buffer.from(keyPairs.privateKey).toString("hex");
+
+  const signerOptions: IJsObjectSignerOptions = {
+    privateKey: privateKeyHex,
+    logLevel: logLevel,
+  };
+
+  const signer = new JsObjectSigner(signerOptions);
+
+  const gatewayIdentity1 = {
+    id: "mockID-1",
+    name: "CustomGateway",
+    version: [
+      {
+        Core: "v02",
+        Architecture: "v02",
+        Crash: "v02",
+      },
+    ],
+    supportedDLTs: [SupportedChain.BESU],
+    proofID: "mockProofID10",
+    address: "http://localhost" as Address,
+  } as GatewayIdentity;
+
+  const gatewayIdentity2 = {
+    id: "mockID-2",
+    name: "CustomGateway",
+    version: [
+      {
+        Core: "v02",
+        Architecture: "v02",
+        Crash: "v02",
+      },
+    ],
+    supportedDLTs: [SupportedChain.FABRIC],
+    proofID: "mockProofID11",
+    address: "http://localhost" as Address,
+    gatewayServerPort: 3110,
+    gatewayClientPort: 3111,
+    gatewayOpenAPIPort: 4110,
+  } as GatewayIdentity;
+
+  const localGateway: GatewayIdentity = gatewayIdentity1;
+  const counterPartyGateways: GatewayIdentity[] = [gatewayIdentity2];
+
+  const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
+    logLevel: logLevel,
+    localGateway: localGateway,
+    counterPartyGateways: counterPartyGateways,
+    signer: signer,
+  };
+  const bridgesManagerOptions: ISATPBridgesOptions = {
+    logLevel: logLevel,
+    supportedDLTs: [SupportedChain.BESU, SupportedChain.FABRIC],
+    networks: [],
+  };
+
+  const bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
+
   const crashManagerOptions: ICrashRecoveryManagerOptions = {
     instanceId: uuidv4(),
     logLevel: logLevel,
     knexConfig: knexClientConnection,
-    bridgeConfig: {
-      logLevel: logLevel,
-      networks: [],
-      supportedDLTs: [SupportedChain.BESU, SupportedChain.FABRIC],
-    },
+    bridgeConfig: bridgesManager,
+    orchestrator: new GatewayOrchestrator(gatewayOrchestratorOptions),
   };
 
   crashManager = new CrashRecoveryManager(crashManagerOptions);

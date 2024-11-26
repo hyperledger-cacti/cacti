@@ -4,10 +4,7 @@ import { Stage0RollbackStrategy } from "./stage0-rollback-strategy";
 import { Stage1RollbackStrategy } from "./stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "./stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "./stage3-rollback-strategy";
-import {
-  ISATPBridgesOptions,
-  SATPBridgesManager,
-} from "../../../gol/satp-bridges-manager";
+import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
 import { RollbackState } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { ILocalLogRepository } from "../../../repository/interfaces/repository";
 
@@ -22,9 +19,12 @@ export class RollbackStrategyFactory {
   private bridgesManager: SATPBridgesManager;
   private logRepository: ILocalLogRepository;
 
-  constructor(options: ISATPBridgesOptions, localLog: ILocalLogRepository) {
+  constructor(
+    bridgesManager: SATPBridgesManager,
+    localLog: ILocalLogRepository,
+  ) {
     this.log = LoggerProvider.getOrCreate({ label: "RollbackStrategyFactory" });
-    this.bridgesManager = new SATPBridgesManager(options);
+    this.bridgesManager = bridgesManager;
     this.logRepository = localLog;
   }
 

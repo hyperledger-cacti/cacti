@@ -1,5 +1,9 @@
-import { ConnectRouter } from "@connectrpc/connect";
+import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { CrashRecovery } from "../../generated/proto/cacti/satp/v02/crash_recovery_connect";
+import { CrashRecoveryServerService } from "./recovery-server-service";
+import { CrashRecoveryClientService } from "./recovery-client-service";
+import { SATPSession } from "../satp-session";
 import {
   RecoverMessage,
   RecoverUpdateMessage,
@@ -7,187 +11,117 @@ import {
   RollbackMessage,
   RollbackAckMessage,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
-import { CrashRecoveryService } from "./crash-utils";
-import {
-  Logger,
-  LoggerProvider,
-  ILoggerOptions,
-} from "@hyperledger/cactus-common";
-import { Empty } from "@bufbuild/protobuf";
-//import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
-import { ILocalLogRepository } from "../../repository/interfaces/repository";
-import { getSatpLogKey } from "../../gateway-utils";
-import { SATPSession } from "../satp-session";
-
-interface HandlerOptions {
-  crashService: CrashRecoveryService;
-  loggerOptions: ILoggerOptions;
-  sessions: Map<string, SATPSession>;
-  logRepository: ILocalLogRepository;
-}
 
 export class CrashRecoveryHandler {
-  public static readonly CLASS_NAME = "CrashRecoveryHandler";
-  public sessions: Map<string, SATPSession>;
-  private service: CrashRecoveryService;
-  private log: Logger;
-  private logRepository: ILocalLogRepository;
+  private readonly log: Logger;
 
-  constructor(ops: HandlerOptions) {
-    this.sessions = ops.sessions;
-    this.service = ops.crashService;
-    this.log = LoggerProvider.getOrCreate(ops.loggerOptions);
-    this.log.trace(`Initialized ${CrashRecoveryHandler.CLASS_NAME}`);
-    this.logRepository = ops.logRepository;
+  constructor(
+    private readonly serverService: CrashRecoveryServerService,
+    private readonly clientService: CrashRecoveryClientService,
+    loggerLabel: string = "CrashRecoveryHandler",
+  ) {
+    this.log = LoggerProvider.getOrCreate({ label: loggerLabel });
+    this.log.trace(`Initialized ${CrashRecoveryHandler.name}`);
   }
 
-  getHandlerIdentifier(): string {
-    return CrashRecoveryHandler.CLASS_NAME;
-  }
+  // Server-side
 
-  async handleRecover(req: RecoverMessage): Promise<RecoverUpdateMessage> {
-    const fnTag = `${this.getHandlerIdentifier()}#handleRecover`;
-    this.log.debug(`${fnTag}, handling RecoverMessage: ${JSON.stringify(req)}`);
-
+  private async recoverV2MessageImplementation(
+    req: RecoverMessage,
+    context: HandlerContext,
+  ): Promise<RecoverUpdateMessage> {
+    const fnTag = `${CrashRecoveryHandler.name}#recoverV2MessageImplementation`;
+    this.log.debug(
+      `${fnTag} - Handling RecoverMessage: ${req}, Context: ${context}`,
+    );
     try {
-      const sessionData = this.sessions.get(req.sessionId);
-      if (!sessionData) {
-        throw new Error(`${fnTag}, Session not found`);
-      }
-      const logData = sessionData.hasClientSessionData()
-        ? sessionData.getClientSessionData()
-        : sessionData.getServerSessionData();
-
-      const updateMessage = await this.service.createRecoverUpdateMessage(req);
-      this.log.debug(`${fnTag}, Created RecoverUpdateMessage`);
-
-      const logEntry = {
-        sessionID: req.sessionId,
-        type: "RECOVER",
-        key: getSatpLogKey(req.sessionId, "RECOVER", "init"),
-        operation: "init",
-        timestamp: new Date().toISOString(),
-        data: JSON.stringify(logData),
-      };
-
-      await this.logRepository.create(logEntry);
-      return updateMessage;
+      return await this.serverService.handleRecover(req);
     } catch (error) {
-      this.log.error(`${fnTag}, Failed to handle RecoverMessage: ${error}`);
+      this.log.error(`${fnTag} - Error:`, error);
       throw error;
     }
   }
 
-  async handleRecoverSuccess(req: RecoverSuccessMessage): Promise<Empty> {
-    const fnTag = `${this.getHandlerIdentifier()}#handleRecoverSuccess`;
-    this.log.debug(`${fnTag}, Handling RecoverSuccessMessage`);
-
+  private async recoverV2SuccessMessageImplementation(
+    req: RecoverSuccessMessage,
+    context: HandlerContext,
+  ): Promise<void> {
+    const fnTag = `${CrashRecoveryHandler.name}#recoverV2SuccessMessageImplementation`;
+    this.log.debug(
+      `${fnTag} - Handling RecoverSuccessMessage:${req}, Context: ${context}`,
+    );
     try {
-      const sessionData = this.sessions.get(req.sessionId);
-      if (!sessionData) {
-        throw new Error(`${fnTag}, Session not found`);
-      }
-      const logData = sessionData.hasClientSessionData()
-        ? sessionData.getClientSessionData()
-        : sessionData.getServerSessionData();
-
-      const logEntry = {
-        sessionID: req.sessionId,
-        type: "RECOVER_SUCCESS",
-        key: getSatpLogKey(req.sessionId, "RECOVER_SUCCESS", "init"),
-        operation: "RECOVER_SUCCESS_MESSAGE_SENT",
-        timestamp: new Date().toISOString(),
-        data: JSON.stringify(logData),
-      };
-
-      await this.logRepository.create(logEntry);
-      return new Empty();
+      await this.serverService.handleRecoverSuccess(req);
     } catch (error) {
-      this.log.error(
-        `${fnTag}, Error handling RecoverSuccessMessage: ${error}`,
-      );
+      this.log.error(`${fnTag} - Error:`, error);
       throw error;
     }
   }
 
-  async handleRollback(req: RollbackMessage): Promise<RollbackAckMessage> {
-    const fnTag = `${this.getHandlerIdentifier()}#handleRollback`;
-    this.log.debug(`${fnTag}, Handling RollbackMessage`);
-
+  private async rollbackV2MessageImplementation(
+    req: RollbackMessage,
+    context: HandlerContext,
+  ): Promise<RollbackAckMessage> {
+    const fnTag = `${CrashRecoveryHandler.name}#rollbackV2MessageImplementation`;
+    this.log.debug(
+      `${fnTag} - Handling RollbackMessage: ${req}, Context: ${context}`,
+    );
     try {
-      const sessionData = this.sessions.get(req.sessionId);
-      if (!sessionData) {
-        throw new Error(`${fnTag}, Session not found`);
-      }
-      const logData = sessionData.hasClientSessionData()
-        ? sessionData.getClientSessionData()
-        : sessionData.getServerSessionData();
-
-      const ackMessage = this.service.createRollbackAckMessage(req);
-
-      const logEntry = {
-        sessionID: req.sessionId,
-        type: "ROLLBACK",
-        key: getSatpLogKey(req.sessionId, "ROLLBACK", "init"),
-        operation: "ROLLBACK_MESSAGE_SENT",
-        timestamp: new Date().toISOString(),
-        data: JSON.stringify(logData),
-      };
-
-      await this.logRepository.create(logEntry);
-      return ackMessage;
+      return await this.serverService.handleRollback(req);
     } catch (error) {
-      this.log.error(`${fnTag}, Error handling RollbackMessage: ${error}`);
+      this.log.error(`${fnTag} - Error:`, error);
       throw error;
     }
   }
 
-  async handleRollbackAck(req: RollbackAckMessage): Promise<Empty> {
-    const fnTag = `${this.getHandlerIdentifier()}#handleRollbackAck`;
-    this.log.debug(`${fnTag}, Handling RollbackAckMessage`);
-
+  private async rollbackV2AckMessageImplementation(
+    req: RollbackAckMessage,
+    context: HandlerContext,
+  ): Promise<void> {
+    const fnTag = `${CrashRecoveryHandler.name}#rollbackV2AckMessageImplementation`;
+    this.log.debug(
+      `${fnTag} - Handling RollbackAckMessage: ${req}, Context: ${context}`,
+    );
     try {
-      const sessionData = this.sessions.get(req.sessionId);
-      if (!sessionData) {
-        throw new Error(`${fnTag}, Session not found`);
-      }
-      const logData = sessionData.hasClientSessionData()
-        ? sessionData.getClientSessionData()
-        : sessionData.getServerSessionData();
-
-      const logEntry = {
-        sessionID: req.sessionId,
-        type: "ROLLBACK_ACK",
-        key: getSatpLogKey(req.sessionId, "ROLLBACK_ACK", "init"),
-        operation: "ROLLBACK_ACK",
-        timestamp: new Date().toISOString(),
-        data: JSON.stringify(logData),
-      };
-
-      await this.logRepository.create(logEntry);
-      return new Empty();
+      await this.serverService.handleRollbackAck(req);
     } catch (error) {
-      this.log.error(`${fnTag}, Error handling RollbackAckMessage: ${error}`);
+      this.log.error(`${fnTag} - Error:`, error);
       throw error;
     }
   }
 
-  setupRouter(router: ConnectRouter): void {
+  public setupRouter(router: ConnectRouter): void {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     router.service(CrashRecovery, {
-      async recoverV2Message(req) {
-        return await that.handleRecover(req);
+      async recoverV2Message(req, context) {
+        return await that.recoverV2MessageImplementation(req, context);
       },
-      async recoverV2SuccessMessage(req) {
-        return await that.handleRecoverSuccess(req);
+      async recoverV2SuccessMessage(req, context) {
+        return await that.recoverV2SuccessMessageImplementation(req, context);
       },
-      async rollbackV2Message(req) {
-        return await that.handleRollback(req);
+      async rollbackV2Message(req, context) {
+        return await that.rollbackV2MessageImplementation(req, context);
       },
-      async rollbackV2AckMessage(req) {
-        return await that.handleRollbackAck(req);
+      async rollbackV2AckMessage(req, context) {
+        return await that.rollbackV2AckMessageImplementation(req, context);
       },
     });
+
+    this.log.info("Router setup completed for CrashRecoveryHandler");
+  }
+
+  // Client-side
+
+  public async createRecoverMessage(
+    session: SATPSession,
+  ): Promise<RecoverMessage> {
+    return this.clientService.createRecoverMessage(session);
+  }
+
+  public async createRecoverSuccessMessage(
+    session: SATPSession,
+  ): Promise<RecoverSuccessMessage> {
+    return this.clientService.createRecoverSuccessMessage(session);
   }
 }
