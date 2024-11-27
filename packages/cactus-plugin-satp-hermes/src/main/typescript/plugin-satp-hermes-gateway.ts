@@ -206,11 +206,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return this.BLOApplication;
   }
 
-  public async onPluginInit(): Promise<unknown> {
+  public async onPluginInit(): Promise<undefined> {
     const fnTag = `${this.className}#onPluginInit()`;
     this.logger.trace(`Entering ${fnTag}`);
     // resolve gateways on init
-    throw new Error("Not implemented");
+    await Promise.all([this.startupGOLServer()]);
   }
 
   /* IPluginWebService methods */
@@ -220,6 +220,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.debug(`Registering service ${ws.getPath()}`);
       ws.registerExpress(app);
     });
+    this.BLOApplication = app;
     return webServices;
   }
 
@@ -229,7 +230,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!this.BLODispatcher) {
       throw new Error(`Cannot ${fnTag} because BLODispatcher is erroneous`);
     }
-    return this.BLODispatcher?.getOrCreateWebServices();
+    let webServices = await this.BLODispatcher?.getOrCreateWebServices();
+    if (this.OAPIServerEnabled) {
+      webServices = webServices.concat(
+        await this.BLODispatcher?.getOrCreateOAPIWebServices(),
+      );
+    }
+    return webServices;
   }
 
   /* Getters */
@@ -251,7 +258,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public getOpenApiSpec(): unknown {
-    return this.OAS;
+    return undefined; //this.OAS;
+
+    /*
+    This needs to be fixed. api-server installs some validation middleware using this
+    and it was breaking the integration of the plugin with the api-server.
+      Error: 404 not found - on all api requests when the middleware is installed.
+    */
   }
 
   // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
@@ -535,7 +548,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     this.logger.info("Shutting down Node server - BOL");
     await this.shutdownBLOServer();
-
+    await this.shutdownGOLServer();
     this.logger.debug("Running shutdown hooks");
     for (const hook of this.shutdownHooks) {
       this.logger.debug(`Running shutdown hook: ${hook.name}`);
@@ -555,11 +568,28 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.debug(`Entering ${fnTag}`);
     if (this.BLOServer) {
       try {
-        await this.GOLServer?.close();
         await this.BLOServer.closeAllConnections();
         await this.BLOServer.close();
         this.BLOServer = undefined;
         this.logger.info("Server shut down");
+      } catch (error) {
+        this.logger.error(
+          `Error shutting down the gatewayApplication: ${error}`,
+        );
+      }
+    } else {
+      this.logger.warn("Server is not running.");
+    }
+  }
+
+  private async shutdownGOLServer(): Promise<void> {
+    const fnTag = `${this.className}#shutdownBLOServer()`;
+    this.logger.debug(`Entering ${fnTag}`);
+    if (this.GOLServer) {
+      try {
+        await this.GOLServer?.close();
+        await this.GOLServer?.closeAllConnections();
+        this.logger.info("GOL server shut down");
       } catch (error) {
         this.logger.error(
           `Error shutting down the gatewayApplication: ${error}`,
