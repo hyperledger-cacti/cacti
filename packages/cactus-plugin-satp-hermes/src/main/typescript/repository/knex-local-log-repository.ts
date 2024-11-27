@@ -54,8 +54,13 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
       .groupBy("sessionID");
   }
 
-  fetchLogsFromSequence(sessionId: string): Promise<LocalLog[]> {
-    return this.getLogsTable().where("sessionID", sessionId);
+  fetchLogsFromSequence(
+    sessionId: string,
+    sequenceNumber: number,
+  ): Promise<LocalLog[]> {
+    return this.getLogsTable()
+      .where("sessionID", sessionId)
+      .andWhere("sequenceNumber", ">", sequenceNumber);
   }
 
   readLogsBySessionId(sessionId: string): Promise<LocalLog[]> {

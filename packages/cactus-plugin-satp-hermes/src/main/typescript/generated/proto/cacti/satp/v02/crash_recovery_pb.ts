@@ -381,6 +381,11 @@ export class LocalLog extends Message<LocalLog> {
    */
   data = "";
 
+  /**
+   * @generated from field: int32 sequenceNumber = 7;
+   */
+  sequenceNumber = 0;
+
   constructor(data?: PartialMessage<LocalLog>) {
     super();
     proto3.util.initPartial(data, this);
@@ -395,6 +400,7 @@ export class LocalLog extends Message<LocalLog> {
     { no: 4, name: "operation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "timestamp", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "data", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "sequenceNumber", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocalLog {

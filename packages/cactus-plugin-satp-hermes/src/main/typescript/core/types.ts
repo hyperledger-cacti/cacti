@@ -110,6 +110,7 @@ export interface LocalLog {
   operation: string;
   timestamp?: string;
   data: string;
+  sequenceNumber: number;
 }
 export interface RemoteLog {
   key: string;

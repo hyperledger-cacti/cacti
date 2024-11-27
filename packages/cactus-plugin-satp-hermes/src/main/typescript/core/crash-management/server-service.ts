@@ -33,9 +33,9 @@ export class CrashRecoveryServerService {
       throw new Error(`Session not found: ${req.sessionId}`);
     }
 
-    // todo : create a method to get logs with sequence number
     const recoveredLogs = await this.logRepository.fetchLogsFromSequence(
       req.sessionId,
+      Number(session.getClientSessionData().lastSequenceNumber),
     );
 
     const recoverUpdateMessage = new RecoverUpdateMessage({

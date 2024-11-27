@@ -15,7 +15,10 @@ export interface ILocalLogRepository extends IRepository<LocalLog, string> {
   readLastestLog(sessionID: string): Promise<LocalLog>;
   create(log: LocalLog): Promise<LocalLog>;
   deleteBySessionId(log: string): any;
-  fetchLogsFromSequence(id: string): Promise<LocalLog[]>;
+  fetchLogsFromSequence(
+    sessionId: string,
+    sequenceNumber: number,
+  ): Promise<LocalLog[]>;
   readLogsBySessionId(sessionId: string): Promise<LocalLog[]>;
   destroy(): any;
   reset(): any;

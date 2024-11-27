@@ -67,6 +67,7 @@ message LocalLog {
   string operation = 4;
   string timestamp = 5;
   string data = 6;
+  int32 sequenceNumber = 7;
 }
 
 message RollbackLogEntry {

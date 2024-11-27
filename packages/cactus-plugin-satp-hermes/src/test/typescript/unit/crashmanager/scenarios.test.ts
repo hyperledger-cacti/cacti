@@ -221,6 +221,7 @@ describe("CrashRecoveryManager Tests", () => {
       operation: "done",
       timestamp: pastTime,
       data: JSON.stringify(testData),
+      sequenceNumber: Number(testData.lastSequenceNumber),
     };
 
     const mockLogRepository = crashManager["logRepository"];
@@ -251,6 +252,7 @@ describe("CrashRecoveryManager Tests", () => {
       operation: "operation",
       timestamp: new Date().toISOString(),
       data: JSON.stringify(testData),
+      sequenceNumber: Number(testData.lastSequenceNumber),
     };
     const mockLogRepository = crashManager["logRepository"];
 
@@ -287,6 +289,7 @@ describe("CrashRecoveryManager Tests", () => {
       operation: "done",
       timestamp: new Date().toISOString(),
       data: JSON.stringify(testData),
+      sequenceNumber: Number(testData.lastSequenceNumber),
     };
 
     await crashManager.logRepository.create(mockLogEntry);
@@ -363,6 +366,7 @@ describe("CrashRecoveryManager Tests", () => {
       operation: "init", // operation!=done
       timestamp: new Date().toISOString(),
       data: JSON.stringify(testData),
+      sequenceNumber: Number(testData.lastSequenceNumber),
     };
 
     const mockLogRepository = crashManager["logRepository"];
@@ -401,6 +405,7 @@ describe("CrashRecoveryManager Tests", () => {
       operation: "init", // operation!=done
       timestamp: new Date().toISOString(),
       data: JSON.stringify(testData),
+      sequenceNumber: Number(testData.lastSequenceNumber),
     };
 
     const mockLogRepository = crashManager["logRepository"];
@@ -431,6 +436,7 @@ describe("CrashRecoveryManager Tests", () => {
         operation: "init",
         timestamp: new Date().toISOString(),
         data: JSON.stringify(testData),
+        sequenceNumber: Number(testData.lastSequenceNumber),
       },
     ];
 
@@ -449,5 +455,122 @@ describe("CrashRecoveryManager Tests", () => {
 
     const reconstructedSessionData = crashManager["sessions"].get(sessionId);
     expect(reconstructedSessionData).toBeDefined();
+  });
+
+  it("should process logs received from gateway(server)", async () => {
+    mockSession = createMockSession("10000", "3");
+
+    const oldData = mockSession.hasClientSessionData()
+      ? mockSession.getClientSessionData()
+      : mockSession.getServerSessionData();
+    const sessionId = oldData.id;
+
+    // Create an existing log entry for client
+    const existingLogEntry: LocalLog = {
+      sessionID: sessionId,
+      type: "type_client",
+      key: getSatpLogKey(sessionId, "type_client", "operation_client"),
+      operation: "operation_client",
+      timestamp: new Date().toISOString(),
+      data: JSON.stringify(oldData),
+      sequenceNumber: Number(oldData.lastSequenceNumber),
+    };
+
+    await crashManager.logRepository.create(existingLogEntry);
+
+    const currentSessionData = new SessionData();
+    currentSessionData.lastSequenceNumber = BigInt(
+      Number(oldData.lastSequenceNumber) + 1,
+    );
+    currentSessionData.id = sessionId;
+    currentSessionData.maxTimeout = String(10000);
+    currentSessionData.maxRetries = String(3);
+    currentSessionData.version = SATP_VERSION;
+    currentSessionData.clientGatewayPubkey = Buffer.from(
+      keyPairs.publicKey,
+    ).toString("hex");
+    currentSessionData.serverGatewayPubkey =
+      currentSessionData.clientGatewayPubkey;
+    currentSessionData.originatorPubkey = "MOCK_ORIGINATOR_PUBKEY";
+    currentSessionData.beneficiaryPubkey = "MOCK_BENEFICIARY_PUBKEY";
+    currentSessionData.digitalAssetId = "MOCK_DIGITAL_ASSET_ID";
+    currentSessionData.assetProfileId = "MOCK_ASSET_PROFILE_ID";
+    currentSessionData.receiverGatewayOwnerId =
+      "MOCK_RECEIVER_GATEWAY_OWNER_ID";
+    currentSessionData.recipientGatewayNetworkId = SupportedChain.FABRIC;
+    currentSessionData.senderGatewayOwnerId = "MOCK_SENDER_GATEWAY_OWNER_ID";
+    currentSessionData.senderGatewayNetworkId = SupportedChain.BESU;
+    currentSessionData.signatureAlgorithm = SignatureAlgorithm.RSA;
+    currentSessionData.lockType = LockType.FAUCET;
+    currentSessionData.lockExpirationTime = BigInt(1000);
+    currentSessionData.credentialProfile = CredentialProfile.X509;
+    currentSessionData.loggingProfile = "MOCK_LOGGING_PROFILE";
+    currentSessionData.accessControlProfile = "MOCK_ACCESS_CONTROL_PROFILE";
+    currentSessionData.resourceUrl = "MOCK_RESOURCE_URL";
+    currentSessionData.lockAssertionExpiration = BigInt(99999);
+    currentSessionData.receiverContractOntology =
+      "MOCK_RECEIVER_CONTRACT_ONTOLOGY";
+    currentSessionData.senderContractOntology = "MOCK_SENDER_CONTRACT_ONTOLOGY";
+    currentSessionData.sourceLedgerAssetId = "MOCK_SOURCE_LEDGER_ASSET_ID";
+    currentSessionData.senderAsset = new Asset();
+    currentSessionData.senderAsset.tokenId = "MOCK_TOKEN_ID";
+    currentSessionData.senderAsset.tokenType = TokenType.ERC20;
+    currentSessionData.senderAsset.amount = BigInt(0);
+    currentSessionData.senderAsset.owner = "MOCK_SENDER_ASSET_OWNER";
+    currentSessionData.senderAsset.ontology = "MOCK_SENDER_ASSET_ONTOLOGY";
+    currentSessionData.senderAsset.contractName =
+      "MOCK_SENDER_ASSET_CONTRACT_NAME";
+    currentSessionData.senderAsset.contractAddress =
+      "MOCK_SENDER_ASSET_CONTRACT_ADDRESS";
+    currentSessionData.receiverAsset = new Asset();
+
+    currentSessionData.receiverAsset.tokenType = TokenType.ERC20;
+    currentSessionData.receiverAsset.amount = BigInt(0);
+    currentSessionData.receiverAsset.owner = "MOCK_RECEIVER_ASSET_OWNER";
+    currentSessionData.receiverAsset.ontology = "MOCK_RECEIVER_ASSET_ONTOLOGY";
+    currentSessionData.receiverAsset.contractName =
+      "MOCK_RECEIVER_ASSET_CONTRACT_NAME";
+    currentSessionData.receiverAsset.mspId = "MOCK_RECEIVER_ASSET_MSP_ID";
+    currentSessionData.receiverAsset.channelName = "MOCK_CHANNEL_ID";
+
+    // Create the log entry for server
+    const extraLogEntry: LocalLog = {
+      sessionID: sessionId,
+      type: "type_server",
+      key: getSatpLogKey(sessionId, "type_server", "operation_server"),
+      operation: "operation_server",
+      timestamp: new Date().toISOString(),
+      data: JSON.stringify(currentSessionData),
+      sequenceNumber: Number(currentSessionData.lastSequenceNumber),
+    };
+
+    // RecoverUpdateMessage to simulate receiving the log from server
+    const recoverUpdateMessage = {
+      sessionId: sessionId,
+      messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
+      hashRecoverMessage: "",
+      recoveredLogs: [extraLogEntry],
+      senderSignature: "",
+    } as RecoverUpdateMessage;
+
+    const result =
+      await crashManager["processRecoverUpdateMessage"](recoverUpdateMessage);
+
+    expect(result).toBeTrue();
+
+    const reconstructedSession = crashManager["sessions"].get(sessionId);
+    expect(reconstructedSession).toBeDefined();
+
+    if (reconstructedSession) {
+      const reconstructedSessionData =
+        reconstructedSession.hasClientSessionData()
+          ? reconstructedSession.getClientSessionData()
+          : reconstructedSession.getServerSessionData();
+
+      expect(reconstructedSessionData).toBeDefined();
+      expect(BigInt(reconstructedSessionData.lastSequenceNumber)).toEqual(
+        currentSessionData.lastSequenceNumber,
+      );
+    }
   });
 });

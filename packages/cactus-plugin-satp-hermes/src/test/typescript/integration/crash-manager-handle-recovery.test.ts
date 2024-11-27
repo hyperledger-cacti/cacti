@@ -233,6 +233,7 @@ describe("Crash Recovery Services Testing", () => {
       operation: "operation",
       timestamp: new Date().toISOString(),
       data: JSON.stringify(testData),
+      sequenceNumber: Number(testData.lastSequenceNumber),
     };
 
     const mockLogRepository = crashRecoveryManager1["logRepository"];
