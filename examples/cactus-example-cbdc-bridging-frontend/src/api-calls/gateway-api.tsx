@@ -3,6 +3,7 @@ import { SessionReference } from "@hyperledger/cactus-example-cbdc-bridging-back
 import {
   GetSessionsReferencesApi,
   TransactApi,
+  TransactRequest,
 } from "@hyperledger/cactus-example-cbdc-bridging-backend/src/main/typescript/generated/openapi/typescript-axios/api";
 import { Configuration } from "@hyperledger/cactus-example-cbdc-bridging-backend/src/main/typescript/generated/openapi/typescript-axios/configuration";
 
@@ -55,7 +56,7 @@ export async function transactTokens(
         assetType: receiverChain,
       },
       amount,
-    });
+    } as TransactRequest);
 
     if (response.status !== 200) {
       throw Error(response.status + " :" + response.data);
