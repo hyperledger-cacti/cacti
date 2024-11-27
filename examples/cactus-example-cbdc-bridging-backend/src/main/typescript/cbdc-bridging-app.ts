@@ -1,8 +1,10 @@
 import { AddressInfo } from "net";
 import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { v4 as uuidv4 } from "uuid";
+import CryptoMaterial from "../../crypto-material/crypto-material.json";
+
 import {
-  IListenOptions,
   LogLevelDesc,
   Logger,
   LoggerProvider,
@@ -21,13 +23,9 @@ import {
 import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import express from "express";
-import bodyParser from "body-parser";
-import http, { Server } from "http";
-import { Constants } from "@hyperledger/cactus-core-api";
-import cors from "cors";
+import { Server } from "http";
 
-import { Server as SocketIoServer } from "socket.io";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
 export interface ICbdcBridgingApp {
   apiHost: string;
@@ -92,48 +90,56 @@ export class CbdcBridgingApp {
       await this.infrastructure.createFabricLedgerConnector();
     this.log.info("Creating Besu Connector");
     const besuPlugin = await this.infrastructure.createBesuLedgerConnector();
+    const gatways = await this.infrastructure.createSATPGateways();
 
-    let addressInfoA: AddressInfo;
-    let addressInfoB: AddressInfo;
 
+    this.log.info(`SATP Gateways started.`);
     // Reserve the ports where the API Servers will run
-    {
-      const expressApp = express();
-      expressApp.use(cors());
-      expressApp.use(bodyParser.json({ limit: "250mb" }));
-      const fabricServer = http.createServer(expressApp);
-
-      const listenOptions: IListenOptions = {
-        hostname: this.options.apiHost,
-        port: this.options.apiServer1Port,
-        server: fabricServer,
-      };
-      addressInfoA = (await Servers.listen(listenOptions)) as AddressInfo;
-
-      await fabricPlugin.getOrCreateWebServices();
-      await fabricPlugin.registerWebServices(expressApp);
-    }
-
-    {
-      const expressApp = express();
-      expressApp.use(bodyParser.json({ limit: "250mb" }));
-      expressApp.use(cors());
-      const besuServer = http.createServer(expressApp);
-      const listenOptions: IListenOptions = {
-        hostname: this.options.apiHost,
-        port: this.options.apiServer2Port,
-        server: besuServer,
-      };
-      addressInfoB = (await Servers.listen(listenOptions)) as AddressInfo;
-      await besuPlugin.getOrCreateWebServices();
-      const wsApi = new SocketIoServer(besuServer, {
-        path: Constants.SocketIoConnectionPathV1,
-      });
-      await besuPlugin.registerWebServices(expressApp, wsApi);
-    }
-
+    const httpApiA = await Servers.startOnPort(
+      this.options.apiServer1Port,
+      this.options.apiHost,
+    );
+    const httpApiB = await Servers.startOnPort(
+      this.options.apiServer2Port,
+      this.options.apiHost,
+    );
+    const addressInfoA = httpApiA.address() as AddressInfo;
     const nodeApiHostA = `http://${this.options.apiHost}:${addressInfoA.port}`;
+
+    const addressInfoB = httpApiB.address() as AddressInfo;
     const nodeApiHostB = `http://${this.options.apiHost}:${addressInfoB.port}`;
+
+    const clientPluginRegistry = new PluginRegistry({
+      plugins: [
+        new PluginKeychainMemory({
+          keychainId: CryptoMaterial.keychains.keychain1.id,
+          instanceId: uuidv4(),
+          logLevel: "INFO",
+        }),
+      ],
+    });
+    const serverPluginRegistry = new PluginRegistry({
+      plugins: [
+        new PluginKeychainMemory({
+          keychainId: CryptoMaterial.keychains.keychain2.id,
+          instanceId: uuidv4(),
+          logLevel: "INFO",
+        }),
+      ],
+    });
+
+    clientPluginRegistry.add(fabricPlugin);
+    clientPluginRegistry.add(gatways[0]);
+    await gatways[0].onPluginInit();
+    serverPluginRegistry.add(besuPlugin);
+    serverPluginRegistry.add(gatways[1]);
+    await gatways[1].onPluginInit();
+
+    const crpcOptionsServer1 = {host: 'localhost', port: 6000};
+    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry, crpcOptionsServer1, 5101);
+    const crpcOptionsServer2 = {host: 'localhost', port: 6001};
+
+    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry,crpcOptionsServer2, 5100);
 
     const fabricApiClient = new FabricApi(
       new Configuration({ basePath: nodeApiHostA }),
@@ -158,13 +164,7 @@ export class CbdcBridgingApp {
 
     this.log.info(`Chaincode and smart Contracts deployed.`);
 
-    const gatways = await this.infrastructure.createSATPGateways();
-
-    for (const gateway of gatways) {
-      await gateway.startup();
-    }
-
-    this.log.info(`SATP Gateways started.`);
+    
 
     return {
       fabricApiClient,
@@ -186,33 +186,36 @@ export class CbdcBridgingApp {
     httpServerApi: Server,
     pluginRegistry: PluginRegistry,
     crpcOptions: ICrpcOptions,
+    grpcPort: number,
   ): Promise<ApiServer> {
     this.log.info(`Starting API Server node...`);
 
     const addressInfoApi = httpServerApi.address() as AddressInfo;
 
-    let config;
-    if (this.options.apiServerOptions) {
-      config = this.options.apiServerOptions;
-    } else {
-      const configService = new ConfigService();
-      const convictConfig = await configService.getOrCreate();
-      config = convictConfig.getProperties();
-      config.configFile = "";
-      config.apiCorsDomainCsv = `http://${process.env.API_HOST_FRONTEND}:${process.env.API_PORT_FRONTEND}`;
-      config.cockpitCorsDomainCsv = `http://${process.env.API_HOST_FRONTEND}:${process.env.API_PORT_FRONTEND}`;
-      config.apiPort = addressInfoApi.port;
-      config.apiHost = addressInfoApi.address;
-      config.grpcPort = 0;
-      config.logLevel = this.options.logLevel || "INFO";
-      config.authorizationProtocol = AuthorizationProtocol.NONE;
-      config.crpcHost = crpcOptions.host;
-      config.crpcPort = crpcOptions.port;
-    }
+    
 
+    const configService = new ConfigService();
+    const apiServerOptions = await configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiServerOptions.configFile = "";
+    apiServerOptions.apiCorsDomainCsv = "*";
+    apiServerOptions.apiPort = addressInfoApi.port;
+    apiServerOptions.apiHost = addressInfoApi.address;
+    apiServerOptions.logLevel = this.options.logLevel || "INFO";
+    apiServerOptions.apiTlsEnabled = false;
+    apiServerOptions.grpcPort = grpcPort;
+    apiServerOptions.crpcHost = crpcOptions.host;
+    apiServerOptions.crpcPort = crpcOptions.port;
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
+    const prop = config.getProperties();
+    prop.grpcPort = grpcPort
+    prop.apiPort = addressInfoApi.port;
+    prop.crpcPort = crpcOptions.port;
+    this.log.info(prop);
     const apiServer = new ApiServer({
-      config,
-      httpServerApi,
+      httpServerApi: httpServerApi,
+      config: prop,
       pluginRegistry,
     });
 
