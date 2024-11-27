@@ -9,11 +9,9 @@ service CrashRecovery   {
   // util RPCs
 
   // step RPCs
-  rpc RecoverV2Message (RecoverMessage) returns (RecoverUpdateMessage);
-  rpc RecoverV2UpdateMessage (RecoverUpdateMessage) returns (RecoverSuccessMessage);
-  rpc RecoverV2SuccessMessage (RecoverSuccessMessage) returns (google.protobuf.Empty) {};
-  rpc RollbackV2Message (RollbackMessage) returns (RollbackAckMessage);
-  rpc RollbackV2AckMessage (RollbackAckMessage) returns (google.protobuf.Empty) {};
+  rpc RecoverV2Message(RecoverMessage) returns (RecoverUpdateMessage);
+  rpc RecoverV2SuccessMessage(RecoverSuccessMessage) returns (google.protobuf.Empty);
+  rpc RollbackV2Message(RollbackMessage) returns (RollbackAckMessage);
 }
 
 message RecoverMessage  {

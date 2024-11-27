@@ -1,12 +1,12 @@
 import "jest-extended";
-import { CrashRecoveryManager } from "../../../../main/typescript/core/recovery/crash-manager";
+import { CrashRecoveryManager } from "../../../../main/typescript/core/crash-management/crash-manager";
 import {
   LogLevelDesc,
   Secp256k1Keys,
   JsObjectSigner,
   IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/recovery/crash-manager";
+import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/crash-management/crash-manager";
 import { Knex, knex } from "knex";
 import {
   LocalLog,

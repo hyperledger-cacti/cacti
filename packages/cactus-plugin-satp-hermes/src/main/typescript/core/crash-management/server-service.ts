@@ -97,17 +97,4 @@ export class CrashRecoveryServerService {
 
     return rollbackAckMessage;
   }
-
-  public async handleRollbackAck(req: RollbackAckMessage): Promise<void> {
-    const fnTag = `${CrashRecoveryServerService.name}#handleRollbackAck`;
-    this.log.debug(`${fnTag} - Handling RollbackAckMessage:`, req);
-
-    const session = this.sessions.get(req.sessionId);
-    if (!session) {
-      this.log.error(`${fnTag} - Session not found: ${req.sessionId}`);
-      throw new Error(`Session not found: ${req.sessionId}`);
-    }
-
-    this.log.info(`${fnTag} - Session marked as rolled back: ${req.sessionId}`);
-  }
 }

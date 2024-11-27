@@ -58,7 +58,7 @@ import bodyParser from "body-parser";
 import {
   CrashRecoveryManager,
   ICrashRecoveryManagerOptions,
-} from "./core/recovery/crash-manager";
+} from "./core/crash-management/crash-manager";
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";

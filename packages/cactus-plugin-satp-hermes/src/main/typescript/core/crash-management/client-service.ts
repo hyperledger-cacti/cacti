@@ -2,6 +2,7 @@ import {
   RecoverMessage,
   RecoverSuccessMessage,
   RollbackMessage,
+  RollbackState,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPSession } from "../satp-session";
@@ -63,12 +64,10 @@ export class CrashRecoveryClientService {
     return recoverSuccessMessage;
   }
 
-  public createRollbackMessage(
+  public async createRollbackMessage(
     session: SATPSession,
-    success: boolean,
-    actionsPerformed: string[],
-    proofs: string[],
-  ): RollbackMessage {
+    rollbackState: RollbackState,
+  ): Promise<RollbackMessage> {
     const fnTag = `${CrashRecoveryClientService.name}#createRollbackMessage`;
     this.log.debug(
       `${fnTag} - Creating RollbackMessage for sessionId: ${session.getSessionId()}`,
@@ -77,9 +76,9 @@ export class CrashRecoveryClientService {
     const rollbackMessage = new RollbackMessage({
       sessionId: session.getSessionId(),
       messageType: "urn:ietf:SATP-2pc:msgtype:rollback-msg",
-      success,
-      actionsPerformed,
-      proofs,
+      success: rollbackState.status === "completed",
+      actionsPerformed: [],
+      proofs: [],
       senderSignature: "",
     });
 

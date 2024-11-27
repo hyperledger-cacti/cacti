@@ -8,8 +8,8 @@ import {
 import {
   CrashRecoveryManager,
   CrashStatus,
-} from "../../../../main/typescript/core/recovery/crash-manager";
-import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/recovery/crash-manager";
+} from "../../../../main/typescript/core/crash-management/crash-manager";
+import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/core/crash-management/crash-manager";
 import { Knex, knex } from "knex";
 import {
   LocalLog,

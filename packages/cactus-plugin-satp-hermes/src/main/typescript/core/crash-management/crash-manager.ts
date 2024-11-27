@@ -5,7 +5,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
-import { CrashRecoveryHandler } from "./crash-recovery-handler";
+import { CrashRecoveryHandler } from "./crash-handler";
 import { SATPSession } from "../satp-session";
 import {
   RollbackStrategy,
@@ -17,12 +17,13 @@ import { Knex } from "knex";
 import {
   RecoverUpdateMessage,
   RollbackState,
+  RollbackAckMessage,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { SessionType } from "../session-utils";
 import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
 import cron, { ScheduledTask } from "node-cron";
-import { CrashRecoveryServerService } from "./recovery-server-service";
-import { CrashRecoveryClientService } from "./recovery-client-service";
+import { CrashRecoveryServerService } from "./server-service";
+import { CrashRecoveryClientService } from "./client-service";
 import { GatewayOrchestrator } from "../../gol/gateway-orchestrator";
 import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
 import { GatewayIdentity, SupportedChain } from "../types";
@@ -425,7 +426,12 @@ export class CrashRecoveryManager {
             session,
             rollbackState,
           );
-          return cleanupSuccess;
+
+          const rollbackSuccess = await this.sendRollbackMessage(
+            session,
+            rollbackState,
+          );
+          return cleanupSuccess && rollbackSuccess;
         } else {
           this.log.error(
             `${fnTag} Rollback execution failed for session ${session.getSessionId()}`,
@@ -458,6 +464,87 @@ export class CrashRecoveryManager {
     } catch (error) {
       this.log.error(`${fnTag} Error executing rollback strategy: ${error}`);
       return undefined;
+    }
+  }
+
+  private async sendRollbackMessage(
+    session: SATPSession,
+    rollbackState: RollbackState,
+  ): Promise<boolean> {
+    const fnTag = `${this.className}#sendRollbackMessage()`;
+    this.log.debug(
+      `${fnTag} - Starting to send RollbackMessage for sessionId: ${session.getSessionId()}`,
+    );
+
+    try {
+      const channel = this.orchestrator.getChannel(
+        session.getClientSessionData()
+          .recipientGatewayNetworkId as SupportedChain,
+      );
+
+      if (!channel) {
+        throw new Error(
+          `${fnTag} - Channel not found for the recipient gateway network ID.`,
+        );
+      }
+
+      const counterGatewayID = this.orchestrator.getGatewayIdentity(
+        channel.toGatewayID,
+      );
+      if (!counterGatewayID) {
+        throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
+      }
+
+      const clientCrashRecovery: PromiseConnectClient<typeof CrashRecovery> =
+        channel.clients.get("4") as PromiseConnectClient<typeof CrashRecovery>;
+
+      if (!clientCrashRecovery) {
+        throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
+      }
+
+      const rollbackMessage =
+        await this.crashRecoveryHandler.createRollbackMessage(
+          session,
+          rollbackState,
+        );
+
+      const rollbackAckMessage =
+        await clientCrashRecovery.rollbackV2Message(rollbackMessage);
+
+      this.log.info(
+        `${fnTag} - Received RollbackAckMessage: ${JSON.stringify(rollbackAckMessage)}`,
+      );
+
+      const success = await this.processRollbackAckMessage(rollbackAckMessage);
+
+      return success;
+    } catch (error) {
+      this.log.error(
+        `${fnTag} Error during rollback message sending: ${error}`,
+      );
+      return false;
+    }
+  }
+
+  private async processRollbackAckMessage(
+    message: RollbackAckMessage,
+  ): Promise<boolean> {
+    const fnTag = `${this.className}#processRollbackAckMessage()`;
+    try {
+      if (message.success) {
+        this.log.info(
+          `${fnTag} Rollback acknowledged by the counterparty for session ID: ${message.sessionId}`,
+        );
+        return true;
+      } else {
+        this.log.warn(
+          `${fnTag} Rollback failed at counterparty for session ID: ${message.sessionId}`,
+        );
+        return false;
+      }
+    } catch (error) {
+      this.log.error(`${fnTag} Error processing RollbackAckMessage: ${error}`);
+      return false;
     }
   }
 

@@ -1,6 +1,6 @@
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
-import { CrashRecoveryManager } from "../../../main/typescript/core/recovery/crash-manager";
+import { CrashRecoveryManager } from "../../../main/typescript/core/crash-management/crash-manager";
 //import { Knex, knex } from "knex";
 import {
   LocalLog,
@@ -122,9 +122,6 @@ beforeAll(async () => {
     supportedDLTs: [SupportedChain.BESU],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3008,
-    gatewayClientPort: 3009,
-    gatewayOpenAPIPort: 3011,
   };
 
   const gatewayIdentity2: GatewayIdentity = {
@@ -217,6 +214,7 @@ describe("Crash Recovery Services Testing", () => {
     const crashRecoveryManager1 = gateway1[
       "crashManager"
     ] as CrashRecoveryManager;
+    expect(crashRecoveryManager1).toBeInstanceOf(CrashRecoveryManager);
     gateway2["crashManager"] as CrashRecoveryManager;
 
     mockSession = createMockSession("1000", "3");

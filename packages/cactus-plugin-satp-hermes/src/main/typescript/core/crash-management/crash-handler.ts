@@ -1,8 +1,8 @@
 import { ConnectRouter, HandlerContext } from "@connectrpc/connect";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { CrashRecovery } from "../../generated/proto/cacti/satp/v02/crash_recovery_connect";
-import { CrashRecoveryServerService } from "./recovery-server-service";
-import { CrashRecoveryClientService } from "./recovery-client-service";
+import { CrashRecoveryServerService } from "./server-service";
+import { CrashRecoveryClientService } from "./client-service";
 import { SATPSession } from "../satp-session";
 import {
   RecoverMessage,
@@ -10,6 +10,7 @@ import {
   RecoverSuccessMessage,
   RollbackMessage,
   RollbackAckMessage,
+  RollbackState,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 
 export class CrashRecoveryHandler {
@@ -74,22 +75,6 @@ export class CrashRecoveryHandler {
     }
   }
 
-  private async rollbackV2AckMessageImplementation(
-    req: RollbackAckMessage,
-    context: HandlerContext,
-  ): Promise<void> {
-    const fnTag = `${CrashRecoveryHandler.name}#rollbackV2AckMessageImplementation`;
-    this.log.debug(
-      `${fnTag} - Handling RollbackAckMessage: ${req}, Context: ${context}`,
-    );
-    try {
-      await this.serverService.handleRollbackAck(req);
-    } catch (error) {
-      this.log.error(`${fnTag} - Error:`, error);
-      throw error;
-    }
-  }
-
   public setupRouter(router: ConnectRouter): void {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
@@ -103,9 +88,6 @@ export class CrashRecoveryHandler {
       async rollbackV2Message(req, context) {
         return await that.rollbackV2MessageImplementation(req, context);
       },
-      async rollbackV2AckMessage(req, context) {
-        return await that.rollbackV2AckMessageImplementation(req, context);
-      },
     });
 
     this.log.info("Router setup completed for CrashRecoveryHandler");
@@ -116,12 +98,42 @@ export class CrashRecoveryHandler {
   public async createRecoverMessage(
     session: SATPSession,
   ): Promise<RecoverMessage> {
-    return this.clientService.createRecoverMessage(session);
+    const fnTag = `${this.constructor.name}#createRecoverMessage`;
+    try {
+      return await this.clientService.createRecoverMessage(session);
+    } catch (error) {
+      this.log.error(`${fnTag} - Failed to create RecoverMessage: ${error}`);
+      throw new Error(`Error in createRecoverMessage: ${error}`);
+    }
   }
 
   public async createRecoverSuccessMessage(
     session: SATPSession,
   ): Promise<RecoverSuccessMessage> {
-    return this.clientService.createRecoverSuccessMessage(session);
+    const fnTag = `${this.constructor.name}#createRecoverSuccessMessage`;
+    try {
+      return await this.clientService.createRecoverSuccessMessage(session);
+    } catch (error) {
+      this.log.error(
+        `${fnTag} - Failed to create RecoverSuccessMessage: ${error}`,
+      );
+      throw new Error(`Error in createRecoverSuccessMessage: ${error}`);
+    }
+  }
+
+  public async createRollbackMessage(
+    session: SATPSession,
+    rollbackState: RollbackState,
+  ): Promise<RollbackMessage> {
+    const fnTag = `${this.constructor.name}#createRollbackMessage`;
+    try {
+      return await this.clientService.createRollbackMessage(
+        session,
+        rollbackState,
+      );
+    } catch (error) {
+      this.log.error(`${fnTag} - Failed to create RollbackMessage: ${error}`);
+      throw new Error(`Error in createRollbackMessage: ${error}`);
+    }
   }
 }
