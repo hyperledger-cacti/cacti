@@ -75,6 +75,7 @@ import { GetAmountApprovedEndpointV1 } from "../web-services/get-amount-approved
 import {
   AdminApi,
   TransactionApi,
+  TransactRequest,
 } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/typescript-axios/api";
 import { ClaimFormat } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
@@ -399,7 +400,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       address: `http://localhost`,
       gatewayServerPort: 3010,
       gatewayClientPort: 3011,
-      gatewayOpenAPIPort: 4010,
+      gatewayOpenAPIPort: 4000,
     } as GatewayIdentity;
 
     const besuGatewayIdentity = {
@@ -411,7 +412,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       address: `http://localhost`,
       gatewayServerPort: 3110,
       gatewayClientPort: 3111,
-      gatewayOpenAPIPort: 4110,
+      gatewayOpenAPIPort: 4100,
     } as GatewayIdentity;
 
     const pluginBungeeFabricOptions = {
@@ -472,7 +473,7 @@ export class CbdcBridgingAppDummyInfrastructure {
           address: `http://localhost`,
           gatewayServerPort: 3010,
           gatewayClientPort: 3011,
-          gatewayOpenAPIPort: 4010,
+          gatewayOpenAPIPort: 4000,
           pubKey: bufArray2HexStr(fabricGatewayKeyPair.publicKey),
         } as GatewayIdentity,
       ],
@@ -494,7 +495,7 @@ export class CbdcBridgingAppDummyInfrastructure {
           address: `http://localhost`,
           gatewayServerPort: 3110,
           gatewayClientPort: 3111,
-          gatewayOpenAPIPort: 4110,
+          gatewayOpenAPIPort: 4100,
           pubKey: bufArray2HexStr(besuGatewayKeyPair.publicKey),
         } as GatewayIdentity,
       ],
@@ -1256,7 +1257,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     }
 
     try {
-      await api.transact({
+      const request: TransactRequest = {
         contextID: "MockID",
         fromDLTNetworkID,
         toDLTNetworkID,
@@ -1265,11 +1266,12 @@ export class CbdcBridgingAppDummyInfrastructure {
         originatorPubkey: senderAddress,
         beneficiaryPubkey: receiverAddress,
         sourceAsset,
-        receiverAsset: receiverAsset,
-      });
+        receiverAsset,
+      }
+      await api.transact(request);
     } catch (error) {
       this.log.error(
-        `Error bridging tokens from ${sourceChain} to ${receiverAsset}`,
+        `Error bridging tokens from ${sourceChain} to ${destinationChain}`,
       );
       throw error;
     }
