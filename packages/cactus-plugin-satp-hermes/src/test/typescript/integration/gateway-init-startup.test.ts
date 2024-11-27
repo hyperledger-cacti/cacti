@@ -3,7 +3,18 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  LoggerProvider,
+  Servers,
+} from "@hyperledger/cactus-common";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
+import { ApiClient } from "@hyperledger/cactus-api-client";
+
 // import coordinator factory, coordinator and coordinator options
 import {
   SATPGateway,
@@ -11,6 +22,7 @@ import {
 } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
+  Configuration,
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
@@ -26,6 +38,9 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
+import { AddressInfo } from "net";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { AdminApi } from "../../../main/typescript";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -290,6 +305,7 @@ describe("SATPGateway startup", () => {
         gatewayOpenAPIPort: 4010,
         address: "http://localhost",
       },
+      enableOpenAPI: true,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -298,8 +314,43 @@ describe("SATPGateway startup", () => {
     expect(identity.gatewayServerPort).toBe(13010);
     expect(identity.gatewayClientPort).toBe(13011);
     expect(identity.address).toBe("http://localhost");
-    await gateway.startup();
-    await gateway.shutdown();
+    const httpServer2 = await Servers.startOnPreferredPort(
+      DEFAULT_PORT_GATEWAY_API,
+    );
+    const addressInfo1 = httpServer2.address() as AddressInfo;
+    const node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
+    const pluginRegistry = new PluginRegistry({ plugins: [] });
+
+    const configService = new ConfigService();
+    const apiServerOptions = await configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiServerOptions.configFile = "";
+    apiServerOptions.apiCorsDomainCsv = "*";
+    apiServerOptions.apiPort = addressInfo1.port;
+    apiServerOptions.cockpitPort = 0;
+    apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
+    apiServerOptions.apiTlsEnabled = false;
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
+    pluginRegistry.add(gateway);
+    await gateway.onPluginInit();
+    const apiServer1 = new ApiServer({
+      httpServerApi: httpServer2,
+      config: config.getProperties(),
+      pluginRegistry,
+    });
+
+    await apiServer1.start();
+    const config1 = new Configuration({ basePath: node1Host });
+    const mainApiClient = new ApiClient(config1);
+    const admin = mainApiClient.extendWith(AdminApi);
+
+    const result = await admin.getSessionIds();
+    expect(result).toBeDefined();
+    expect(result.status).toBe(200);
+    apiServer1.shutdown();
+    httpServer2.close();
   });
 });
 
