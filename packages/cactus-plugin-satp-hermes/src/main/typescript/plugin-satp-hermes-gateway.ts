@@ -186,9 +186,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       logLevel: this.config.logLevel,
       bridgeConfig: this.bridgesManager,
       orchestrator: this.gatewayOrchestrator,
+      knexConfig: this.config.knexConfig,
     };
     this.crashManager = new CrashRecoveryManager(crashOptions);
-    this.crashManager.recoverSessions();
   }
 
   /* ICactus Plugin methods */

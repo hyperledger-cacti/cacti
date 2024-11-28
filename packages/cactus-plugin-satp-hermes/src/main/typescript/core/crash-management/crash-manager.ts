@@ -28,6 +28,7 @@ import { GatewayOrchestrator } from "../../gol/gateway-orchestrator";
 import { PromiseClient as PromiseConnectClient } from "@connectrpc/connect";
 import { GatewayIdentity, SupportedChain } from "../types";
 import { CrashRecovery } from "../../generated/proto/cacti/satp/v02/crash_recovery_connect";
+import { SATPHandler } from "../../types/satp-protocol";
 
 export enum CrashStatus {
   IN_RECOVERY = "IN_RECOVERY",
@@ -101,6 +102,10 @@ export class CrashRecoveryManager {
       this.crashRecoveryServerService,
       this.crashRecoveryClientService,
     );
+
+    const crashRecoveryHandlers = new Map<string, SATPHandler>();
+    crashRecoveryHandlers.set("crash-handler", this.crashRecoveryHandler);
+    this.orchestrator.addHandlers(crashRecoveryHandlers);
   }
 
   get className(): string {
@@ -114,7 +119,9 @@ export class CrashRecoveryManager {
       const allLogs = await this.logRepository.readLogsNotProofs();
       for (const log of allLogs) {
         const sessionId = log.sessionID;
-        this.log.info(`${fnTag}, recovering session: ${sessionId}`);
+        this.log.info(
+          `${fnTag}, recovering session from database: ${sessionId}`,
+        );
 
         if (!log || !log.data) {
           throw new Error(`${fnTag}, invalid log`);
@@ -325,8 +332,11 @@ export class CrashRecoveryManager {
       const recoverUpdateMessage =
         await clientCrashRecovery.recoverV2Message(recoverMessage);
 
+      const sequenceNumbers = recoverUpdateMessage.recoveredLogs.map(
+        (log) => log.sequenceNumber,
+      );
       this.log.info(
-        `${fnTag} - Received RecoverUpdateMessage: ${JSON.stringify(recoverUpdateMessage)}`,
+        `${fnTag} - Received logs sequence numbers: ${sequenceNumbers}`,
       );
 
       await this.processRecoverUpdateMessage(recoverUpdateMessage);

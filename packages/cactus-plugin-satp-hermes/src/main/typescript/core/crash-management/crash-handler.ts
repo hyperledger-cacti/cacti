@@ -12,8 +12,9 @@ import {
   RollbackAckMessage,
   RollbackState,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
 
-export class CrashRecoveryHandler {
+export class CrashRecoveryHandler implements SATPHandler {
   private readonly log: Logger;
 
   constructor(
@@ -23,6 +24,18 @@ export class CrashRecoveryHandler {
   ) {
     this.log = LoggerProvider.getOrCreate({ label: loggerLabel });
     this.log.trace(`Initialized ${CrashRecoveryHandler.name}`);
+  }
+
+  public getHandlerIdentifier(): SATPHandlerType {
+    return SATPHandlerType.CRASH;
+  }
+
+  public getHandlerSessions(): string[] {
+    return [];
+  }
+
+  public getStage(): string {
+    return "crash";
   }
 
   // Server-side
@@ -100,7 +113,7 @@ export class CrashRecoveryHandler {
   ): Promise<RecoverMessage> {
     const fnTag = `${this.constructor.name}#createRecoverMessage`;
     try {
-      return await this.clientService.createRecoverMessage(session);
+      return this.clientService.createRecoverMessage(session);
     } catch (error) {
       this.log.error(`${fnTag} - Failed to create RecoverMessage: ${error}`);
       throw new Error(`Error in createRecoverMessage: ${error}`);

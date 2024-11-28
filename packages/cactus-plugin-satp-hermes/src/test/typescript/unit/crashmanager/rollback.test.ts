@@ -1,47 +1,58 @@
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
-import { CrashRecoveryManager } from "../../../main/typescript/core/crash-management/crash-manager";
-//import { Knex, knex } from "knex";
+import { CrashRecoveryManager } from "../../../../main/typescript/core/crash-management/crash-manager";
 import {
   LocalLog,
   SupportedChain,
   GatewayIdentity,
   Address,
-} from "../../../main/typescript/core/types";
+} from "../../../../main/typescript/core/types";
 import {
   Asset,
   CredentialProfile,
   LockType,
   SignatureAlgorithm,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { v4 as uuidv4 } from "uuid";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
-import { SATPSession } from "../../../main/typescript/core/satp-session";
-//import { knexClientConnection } from "../../knex.config";
-import { getSatpLogKey } from "../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { SATP_VERSION } from "../../../../main/typescript/core/constants";
+import { SATPSession } from "../../../../main/typescript/core/satp-session";
+import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
+import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import {
   SATPGatewayConfig,
   PluginFactorySATPGateway,
   SATPGateway,
-} from "../../../main/typescript";
+} from "../../../../main/typescript";
 import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { bufArray2HexStr } from "../../../main/typescript/gateway-utils";
+import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
+import { knexClientConnection, knexServerConnection } from "../../knex.config";
+import { Knex, knex } from "knex";
 
-let mockSession: SATPSession;
+let knexInstanceClient: Knex;
+let knexInstanceServer: Knex;
+
+let gateway1: SATPGateway;
+let gateway2: SATPGateway;
+
+let crashManager1: CrashRecoveryManager;
+let crashManager2: CrashRecoveryManager;
+
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 
-const createMockSession = (maxTimeout: string, maxRetries: string) => {
+const createMockSession = (
+  maxTimeout: string,
+  maxRetries: string,
+  isClient: boolean,
+): SATPSession => {
   const sessionId = uuidv4();
   const mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
-    server: false,
-    client: true,
+    server: !isClient,
+    client: isClient,
   });
-
   const sessionData = mockSession.hasClientSessionData()
     ? mockSession.getClientSessionData()
     : mockSession.getServerSessionData();
@@ -83,7 +94,6 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
   sessionData.senderAsset.contractAddress =
     "MOCK_SENDER_ASSET_CONTRACT_ADDRESS";
   sessionData.receiverAsset = new Asset();
-
   sessionData.receiverAsset.tokenType = TokenType.ERC20;
   sessionData.receiverAsset.amount = BigInt(0);
   sessionData.receiverAsset.owner = "MOCK_RECEIVER_ASSET_OWNER";
@@ -95,9 +105,6 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
 
   return mockSession;
 };
-
-let gateway1: SATPGateway;
-let gateway2: SATPGateway;
 
 beforeAll(async () => {
   const factoryOptions: IPluginFactoryOptions = {
@@ -122,6 +129,9 @@ beforeAll(async () => {
     supportedDLTs: [SupportedChain.BESU],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
+    gatewayServerPort: 3006,
+    gatewayClientPort: 3001,
+    gatewayOpenAPIPort: 3002,
   };
 
   const gatewayIdentity2: GatewayIdentity = {
@@ -138,61 +148,31 @@ beforeAll(async () => {
     supportedDLTs: [SupportedChain.FABRIC],
     proofID: "mockProofID11",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3110,
-    gatewayClientPort: 3111,
-    gatewayOpenAPIPort: 4110,
+    gatewayServerPort: 3228,
+    gatewayClientPort: 3211,
+    gatewayOpenAPIPort: 4210,
   };
+
+  knexInstanceClient = knex(knexClientConnection);
+  await knexInstanceClient.migrate.latest();
 
   const options1: SATPGatewayConfig = {
     logLevel: "DEBUG",
     gid: gatewayIdentity1,
-    counterPartyGateways: [
-      {
-        id: "mockID-2",
-        name: "CustomGateway2",
-        pubKey: bufArray2HexStr(gateway2KeyPair.publicKey),
-        version: [
-          {
-            Core: "v02",
-            Architecture: "v02",
-            Crash: "v02",
-          },
-        ],
-        supportedDLTs: [SupportedChain.FABRIC],
-        proofID: "mockProofID11",
-        address: "http://localhost" as Address,
-        gatewayServerPort: 3110,
-        gatewayClientPort: 3111,
-        gatewayOpenAPIPort: 4110,
-      },
-    ],
+    counterPartyGateways: [gatewayIdentity2],
     keyPair: gateway1KeyPair,
+    knexConfig: knexClientConnection,
   };
+
+  knexInstanceServer = knex(knexServerConnection);
+  await knexInstanceServer.migrate.latest();
 
   const options2: SATPGatewayConfig = {
     logLevel: "DEBUG",
     gid: gatewayIdentity2,
-    counterPartyGateways: [
-      {
-        id: "mockID-1",
-        name: "CustomGateway1",
-        pubKey: bufArray2HexStr(gateway1KeyPair.publicKey),
-        version: [
-          {
-            Core: "v02",
-            Architecture: "v02",
-            Crash: "v02",
-          },
-        ],
-        supportedDLTs: [SupportedChain.BESU],
-        proofID: "mockProofID10",
-        address: "http://localhost" as Address,
-        gatewayServerPort: 3000,
-        gatewayClientPort: 3001,
-        gatewayOpenAPIPort: 3002,
-      },
-    ],
+    counterPartyGateways: [gatewayIdentity1],
     keyPair: gateway2KeyPair,
+    knexConfig: knexServerConnection,
   };
 
   gateway1 = (await factory.create(options1)) as SATPGateway;
@@ -204,44 +184,77 @@ beforeAll(async () => {
   await gateway2.startup();
 });
 
-afterAll(async () => {
-  await gateway1.shutdown();
-  await gateway2.shutdown();
+afterEach(async () => {
+  jest.clearAllMocks();
 });
 
-describe("Crash Recovery Services Testing", () => {
-  it("handle recover function test", async () => {
-    const crashRecoveryManager1 = gateway1[
-      "crashManager"
-    ] as CrashRecoveryManager;
-    expect(crashRecoveryManager1).toBeInstanceOf(CrashRecoveryManager);
-    gateway2["crashManager"] as CrashRecoveryManager;
+afterAll(async () => {
+  if (gateway1) await gateway1.shutdown();
+  if (gateway2) await gateway2.shutdown();
 
-    mockSession = createMockSession("1000", "3");
+  if (crashManager1 || crashManager2) {
+    crashManager1.stopCrashDetection();
+    crashManager1.logRepository.destroy();
 
-    const testData = mockSession.hasClientSessionData()
-      ? mockSession.getClientSessionData()
-      : mockSession.getServerSessionData();
+    crashManager2.stopCrashDetection();
+    crashManager2.logRepository.destroy();
+  }
+  if (knexInstanceClient || knexInstanceServer) {
+    await knexInstanceClient.destroy();
+    await knexInstanceServer.destroy();
+  }
+});
 
-    const sessionId = testData.id;
+describe("Crash Recovery Manager - Rollback", () => {
+  it("should successfully initiate rollback and call unwrapAsset", async () => {
+    crashManager1 = gateway1["crashManager"] as CrashRecoveryManager;
+    expect(crashManager1).toBeInstanceOf(CrashRecoveryManager);
 
-    const key = getSatpLogKey(sessionId, "type", "operation");
-    const mockLogEntry: LocalLog = {
+    crashManager2 = gateway2["crashManager"] as CrashRecoveryManager;
+    expect(crashManager2).toBeInstanceOf(CrashRecoveryManager);
+
+    const clientSession = createMockSession("1000", "3", true);
+    const serverSession = createMockSession("1000", "3", false);
+    const clientSessionData = clientSession.getClientSessionData();
+    const serverSessionData = serverSession.getServerSessionData();
+    const sessionId = clientSessionData.id;
+
+    serverSessionData.id = sessionId;
+
+    // Incomplete logs on gateway1 (client)
+    const key1 = getSatpLogKey(sessionId, "type", "operation1");
+    const mockLogEntry1: LocalLog = {
       sessionID: sessionId,
       type: "type",
-      key: key,
-      operation: "operation",
+      key: key1,
+      operation: "operation1",
       timestamp: new Date().toISOString(),
-      data: JSON.stringify(testData),
-      sequenceNumber: Number(testData.lastSequenceNumber),
+      data: JSON.stringify(clientSessionData),
+      sequenceNumber: Number(clientSessionData.lastSequenceNumber),
     };
 
-    const mockLogRepository = crashRecoveryManager1["logRepository"];
-    await mockLogRepository.create(mockLogEntry);
+    const mockLogRepository1 = crashManager1["logRepository"];
+    await mockLogRepository1.create(mockLogEntry1);
 
-    await crashRecoveryManager1.recoverSessions();
+    // Logs on gateway2 (server)
+    const key2 = getSatpLogKey(sessionId, "type2", "done");
+    const mockLogEntry2: LocalLog = {
+      sessionID: sessionId,
+      type: "type2",
+      key: key2,
+      operation: "done",
+      timestamp: new Date().toISOString(),
+      data: JSON.stringify(serverSessionData),
+      sequenceNumber: Number(serverSessionData.lastSequenceNumber) + 1,
+    };
 
-    const result = await crashRecoveryManager1.handleRecovery(mockSession);
-    expect(result).toBe(true);
+    const mockLogRepository2 = crashManager2["logRepository"];
+    await mockLogRepository2.create(mockLogEntry2);
+
+    //await crashManager2.recoverSessions();
+
+    const result = await crashManager1.initiateRollback(clientSession, true);
+
+    expect(result).toBeTrue();
   });
 });

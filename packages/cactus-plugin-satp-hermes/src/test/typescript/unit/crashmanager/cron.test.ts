@@ -51,9 +51,7 @@ const createMockSession = (
     client: true,
   });
 
-  const sessionData = mockSession.hasClientSessionData()
-    ? mockSession.getClientSessionData()
-    : mockSession.getServerSessionData();
+  const sessionData = mockSession.getClientSessionData();
 
   sessionData.id = sessionId;
   sessionData.maxTimeout = maxTimeout;

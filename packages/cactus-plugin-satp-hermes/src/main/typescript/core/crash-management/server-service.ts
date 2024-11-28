@@ -25,40 +25,47 @@ export class CrashRecoveryServerService {
     req: RecoverMessage,
   ): Promise<RecoverUpdateMessage> {
     const fnTag = `${CrashRecoveryServerService.name}#handleRecover`;
-    this.log.debug(`${fnTag} - Handling RecoverMessage:`, req);
 
-    const session = this.sessions.get(req.sessionId);
-    if (!session) {
-      this.log.error(`${fnTag} - Session not found: ${req.sessionId}`);
-      throw new Error(`Session not found: ${req.sessionId}`);
+    try {
+      this.log.debug(`${fnTag} - Handling RecoverMessage:`, req);
+
+      const session = this.sessions.get(req.sessionId);
+      if (!session) {
+        this.log.error(`${fnTag} - Session not found: ${req.sessionId}`);
+        throw new Error(`Session not found: ${req.sessionId}`);
+      }
+
+      const recoveredLogs = await this.logRepository.fetchLogsFromSequence(
+        req.sessionId,
+        Number(session.getClientSessionData().lastSequenceNumber),
+      );
+
+      const recoverUpdateMessage = new RecoverUpdateMessage({
+        sessionId: req.sessionId,
+        messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
+        hashRecoverMessage: "",
+        recoveredLogs: recoveredLogs,
+        senderSignature: "",
+      });
+
+      this.log.debug(
+        `${fnTag} - RecoverUpdateMessage created:`,
+        recoverUpdateMessage,
+      );
+
+      return recoverUpdateMessage;
+    } catch (error) {
+      this.log.error(`${fnTag} - Error handling RecoverMessage: ${error}`);
+      throw error;
     }
-
-    const recoveredLogs = await this.logRepository.fetchLogsFromSequence(
-      req.sessionId,
-      Number(session.getClientSessionData().lastSequenceNumber),
-    );
-
-    const recoverUpdateMessage = new RecoverUpdateMessage({
-      sessionId: req.sessionId,
-      messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
-      hashRecoverMessage: "",
-      recoveredLogs: recoveredLogs,
-      senderSignature: "",
-    });
-
-    this.log.debug(
-      `${fnTag} - RecoverUpdateMessage created:`,
-      recoverUpdateMessage,
-    );
-
-    return recoverUpdateMessage;
   }
 
   public async handleRecoverSuccess(req: RecoverSuccessMessage): Promise<void> {
     const fnTag = `${CrashRecoveryServerService.name}#handleRecoverSuccess`;
-    this.log.debug(`${fnTag} - Handling RecoverSuccessMessage:`, req);
 
     try {
+      this.log.debug(`${fnTag} - Handling RecoverSuccessMessage:`, req);
+
       const session = this.sessions.get(req.sessionId);
       if (!session) {
         this.log.error(`${fnTag} - Session not found: ${req.sessionId}`);
@@ -68,7 +75,7 @@ export class CrashRecoveryServerService {
       this.log.info(`${fnTag} - Session marked as recovered: ${req.sessionId}`);
     } catch (error) {
       this.log.error(
-        `${fnTag}, Error handling RecoverSuccessMessage: ${error}`,
+        `${fnTag} - Error handling RecoverSuccessMessage: ${error}`,
       );
       throw error;
     }
@@ -78,23 +85,33 @@ export class CrashRecoveryServerService {
     req: RollbackMessage,
   ): Promise<RollbackAckMessage> {
     const fnTag = `${CrashRecoveryServerService.name}#handleRollback`;
-    this.log.debug(`${fnTag} - Handling RollbackMessage:`, req);
 
-    const session = this.sessions.get(req.sessionId);
-    if (!session) {
-      this.log.error(`${fnTag} - Session not found: ${req.sessionId}`);
-      throw new Error(`Session not found: ${req.sessionId}`);
+    try {
+      this.log.debug(`${fnTag} - Handling RollbackMessage:`, req);
+
+      const session = this.sessions.get(req.sessionId);
+      if (!session) {
+        this.log.error(`${fnTag} - Session not found: ${req.sessionId}`);
+        throw new Error(`Session not found: ${req.sessionId}`);
+      }
+
+      const rollbackAckMessage = new RollbackAckMessage({
+        sessionId: req.sessionId,
+        messageType: "urn:ietf:SATP-2pc:msgtype:rollback-ack-msg",
+        success: true,
+        actionsPerformed: [],
+        proofs: [],
+        senderSignature: "",
+      });
+
+      this.log.info(
+        `${fnTag} - Rollback successfully handled for session: ${req.sessionId}`,
+      );
+
+      return rollbackAckMessage;
+    } catch (error) {
+      this.log.error(`${fnTag} - Error handling RollbackMessage: ${error}`);
+      throw error;
     }
-
-    const rollbackAckMessage = new RollbackAckMessage({
-      sessionId: req.sessionId,
-      messageType: "urn:ietf:SATP-2pc:msgtype:rollback-ack-msg",
-      success: true,
-      actionsPerformed: [],
-      proofs: [],
-      senderSignature: "",
-    });
-
-    return rollbackAckMessage;
   }
 }

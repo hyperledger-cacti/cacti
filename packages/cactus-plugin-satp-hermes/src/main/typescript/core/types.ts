@@ -12,6 +12,7 @@ import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist
 import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkConfig } from "../types/blockchain-interaction";
+import { Knex } from "knex";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,
@@ -81,6 +82,7 @@ export interface SATPGatewayConfig {
   privacyPolicies?: IPrivacyPolicyValue[];
   mergePolicies?: IMergePolicyValue[];
   bridgesConfig?: NetworkConfig[];
+  knexConfig?: Knex.Config;
 }
 
 // export interface SATPBridgeConfig {
