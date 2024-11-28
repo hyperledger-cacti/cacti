@@ -3,8 +3,9 @@ import Docker, { Container, ContainerInfo } from "dockerode";
 import Joi from "joi";
 import tar from "tar-stream";
 import { EventEmitter } from "events";
-import Web3 from "web3";
-import { Account, TransactionReceipt } from "web3-core";
+import { TransactionReceipt, Web3 } from "web3";
+import Web3Account from "web3-eth-accounts";
+
 import {
   LogLevelDesc,
   Logger,
@@ -162,10 +163,12 @@ export class BesuTestLedger implements ITestLedger {
    *
    * @param [seedMoney=10e8] The amount of money to seed the new test account with.
    */
-  public async createEthTestAccount(seedMoney = 10e8): Promise<Account> {
+  public async createEthTestAccount(
+    seedMoney = 10e8,
+  ): Promise<Web3Account.Web3Account> {
     const rpcApiHttpHost = await this.getRpcApiHttpHost();
     const web3 = new Web3(rpcApiHttpHost);
-    const ethTestAccount = web3.eth.accounts.create(uuidv4());
+    const ethTestAccount = web3.eth.accounts.create();
 
     await this.sendEthToAccount(ethTestAccount.address, seedMoney);
 
