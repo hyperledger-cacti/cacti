@@ -22,16 +22,16 @@
     "@grpc/grpc-js": "1.11.3",
     "@hyperledger/cacti-weaver-protos-js": "2.0.0",
     "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0",
-    "dotenv": "8.6.0",
-    "fabric-ca-client": "2.2.20",
-    "fabric-common": "2.2.20",
-    "fabric-network": "2.2.20",
-    "fabric-protos": "2.2.20",
+    "dotenv": "16.3.1",
+    "fabric-ca-client": "2.5.0-snapshot.23",
+    "fabric-common": "2.5.0-snapshot.23",
+    "fabric-network": "2.5.0-snapshot.23",
+    "fabric-protos": "2.5.0-snapshot.23",
     "level": "8.0.0",
     "winston": "3.10.0"
   },
   "devDependencies": {
-    "@types/node": "18.11.9",
+    "@types/node": "18.19.0",
     "nodemon": "2.0.22",
     "typedoc": "0.26.2",
     "typescript": "5.5.2"

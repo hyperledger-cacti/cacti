@@ -11,6 +11,7 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { Containers } from "../common/containers";
+import { Stream } from "stream";
 
 /*
  * Contains options for Postgres container
@@ -288,7 +289,7 @@ export class PostgresTestContainer implements ITestLedger {
       const docker = new Docker();
       docker.pull(
         containerNameAndTag,
-        (pullError: unknown, stream: NodeJS.ReadableStream) => {
+        (pullError: unknown, stream: Stream) => {
           if (pullError) {
             reject(pullError);
           } else {

@@ -3,6 +3,7 @@ import isPortReachable from "is-port-reachable";
 import Joi from "joi";
 import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
+import { Stream } from "stream";
 
 const OPTS_SCHEMA: Joi.Schema = Joi.object().keys({
   imageVersion: Joi.string().min(5).required(),
@@ -212,7 +213,7 @@ export class HttpEchoContainer implements ITestLedger {
       const docker = new Docker();
       docker.pull(
         containerNameAndTag,
-        (pullError: unknown, stream: NodeJS.ReadableStream) => {
+        (pullError: unknown, stream: Stream) => {
           if (pullError) {
             reject(pullError);
           } else {

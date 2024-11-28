@@ -19,6 +19,7 @@ import {
   Logger,
 } from "@hyperledger/cactus-common";
 import { IDockerPullProgress } from "./i-docker-pull-progress";
+import { Stream } from "stream";
 
 export interface IPruneDockerResourcesRequest {
   logLevel?: LogLevelDesc;
@@ -445,7 +446,7 @@ export class Containers {
 
       const pullStreamStartedHandler = (
         pullError: unknown,
-        stream: NodeJS.ReadableStream,
+        stream: Stream,
       ) => {
         if (pullError) {
           log.error(`Could not even start ${imageFqn} pull:`, pullError);
