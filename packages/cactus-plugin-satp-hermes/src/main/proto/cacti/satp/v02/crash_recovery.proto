@@ -4,10 +4,86 @@ package cacti.satp.v02.crash;
 
 import "google/protobuf/empty.proto";
 
-// TODO: Rollback and crash-recovery related
 service CrashRecovery   {
   // util RPCs
 
   // step RPCs
+  rpc RecoverV2Message(RecoverMessage) returns (RecoverUpdateMessage);
+  rpc RecoverV2SuccessMessage(RecoverSuccessMessage) returns (google.protobuf.Empty);
+  rpc RollbackV2Message(RollbackMessage) returns (RollbackAckMessage);
+}
 
+message RecoverMessage {
+  string session_id = 1;
+  string message_type = 2;
+  string satp_phase = 3;
+  int32 sequence_number = 4;
+  bool is_backup = 5;
+  string new_identity_public_key = 6;
+  int64 last_entry_timestamp = 7;
+  string sender_signature = 8;
+}
+
+message RecoverUpdateMessage {
+  string session_id = 1;
+  string message_type = 2;
+  string hash_recover_message = 3;
+  repeated LocalLog recovered_logs = 4;
+  string sender_signature = 5;
+}
+
+message RecoverSuccessMessage {
+  string session_id = 1;
+  string message_type = 2;
+  string hash_recover_update_message = 3;
+  bool success = 4;
+  repeated string entries_changed = 5;
+  string sender_signature = 6;
+}
+
+message RollbackMessage {
+  string session_id = 1;
+  string message_type = 2;
+  bool success = 3;
+  repeated string actions_performed = 4;
+  repeated string proofs = 5;
+  string sender_signature = 6;
+}
+
+message RollbackAckMessage {
+  string session_id = 1;
+  string message_type = 2;
+  bool success = 3;
+  repeated string actions_performed = 4;
+  repeated string proofs = 5;
+  string sender_signature = 6;
+}
+
+message LocalLog {
+  string session_id = 1;
+  string type = 2;
+  string key = 3;
+  string operation = 4;
+  string timestamp = 5;
+  string data = 6;
+  int32 sequence_number = 7;
+}
+
+message RollbackLogEntry {
+  string session_id = 1;
+  string stage = 2;
+  string timestamp = 3;
+  string action = 4; // action performed during rollback
+  string status = 5; // status of rollback (e.g., SUCCESS, FAILED)
+  string details = 6; // Additional details or metadata about the rollback
+}
+
+message RollbackState {
+  string session_id = 1;
+  string current_stage = 2;
+  int32 steps_remaining = 3;
+  repeated RollbackLogEntry rollback_log_entries = 4;
+  string estimated_time_to_completion = 5;
+  string status = 6; // Overall status (e.g., IN_PROGRESS, COMPLETED, FAILED)
+  string details = 7; // Additional metadata or information
 }

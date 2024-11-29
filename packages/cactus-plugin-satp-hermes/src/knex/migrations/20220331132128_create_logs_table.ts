@@ -8,6 +8,7 @@ export function up(knex: Knex): Knex.SchemaBuilder {
     table.string("operation").notNullable();
     table.string("timestamp").notNullable();
     table.string("data").notNullable();
+    table.bigInteger("sequenceNumber").notNullable();
   });
 }
 
