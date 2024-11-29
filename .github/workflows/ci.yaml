@@ -499,7 +499,7 @@ jobs:
             --tag cmd-api-server \
             --tag "ghcr.io/hyperledger/cactus-cmd-api-server:$(date +"%Y-%m-%dT%H-%M-%S" --utc)-dev-$(git rev-parse --short HEAD)"
 
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
+      - if: ${{ env.RUN_TRIVY_SCAN == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cmd-api-server
         uses: aquasecurity/trivy-action@0.19.0
         with:
@@ -1423,7 +1423,7 @@ jobs:
         working-directory: packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/
         run: ./gradlew clean build -Pversion=dev -DrootProjectName=cacti-connector-corda-server
   
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
+      - if: ${{ env.RUN_TRIVY_SCAN == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cactus-connector-corda-server
         uses: aquasecurity/trivy-action@0.19.0
         with:
@@ -2283,7 +2283,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - name: ghcr.io/hyperledger/cactus-keychain-vault-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
-      - if: ${{ env.RUN_TRIVY_SCAN == 'true' }}
+      - if: ${{ env.RUN_TRIVY_SCAN == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cactus-keychain-vault-server
         uses: aquasecurity/trivy-action@0.19.0
         with:
@@ -2305,3 +2305,6 @@ name: Cactus_CI
     branches:
       - main
       - dev
+  schedule:
+    # Run at 8:00 AM UTC on weekends (Monday and Thursday)
+    - cron: "0 8 * * 1,4" 
