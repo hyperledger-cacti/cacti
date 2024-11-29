@@ -128,6 +128,29 @@ export class SATPSession {
     return this.clientSessionData;
   }
 
+  public static fromSessionData(sessionData: SessionData): SATPSession {
+    // Determine if it's a client or server session based on the presence of gateway pubkeys
+    const isServer = sessionData.serverGatewayPubkey !== "";
+    const isClient = sessionData.clientGatewayPubkey !== "";
+
+    const session = new SATPSession({
+      contextID: sessionData.transferContextId,
+      sessionID: sessionData.id,
+      server: isServer,
+      client: isClient,
+    });
+
+    // Assign the sessionData to the appropriate property
+    if (isServer) {
+      session.serverSessionData = sessionData;
+    }
+    if (isClient) {
+      session.clientSessionData = sessionData;
+    }
+
+    return session;
+  }
+
   public createSessionData(
     type: SessionType,
     sessionId: string,

@@ -9151,6 +9151,8 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/google-protobuf": "npm:3.15.5"
     "@types/node": "npm:18.18.2"
+    "@types/node-cron": "npm:3.0.11"
+    "@types/pg": "npm:8.6.5"
     "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
@@ -9178,8 +9180,10 @@ __metadata:
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
     make-dir-cli: "npm:3.1.0"
+    node-cron: "npm:3.0.2"
     npm-run-all: "npm:4.1.5"
     openzeppelin-solidity: "npm:3.4.2"
+    pg: "npm:^8.13.0"
     protobufjs: "npm:7.2.5"
     safe-stable-stringify: "npm:2.5.0"
     secp256k1: "npm:4.0.3"
@@ -15928,6 +15932,13 @@ __metadata:
   dependencies:
     "@types/express": "npm:*"
   checksum: 10/3d2b32da58ddd67f972d4ef1021492f78d65f33f936b6fb25dd461bb6cc7b03bfd1de1a11562c4310680dac8054e4398038db51767a0ffbf1fe62457b3706e95
+  languageName: node
+  linkType: hard
+
+"@types/node-cron@npm:3.0.11":
+  version: 3.0.11
+  resolution: "@types/node-cron@npm:3.0.11"
+  checksum: 10/a73f69bcca52a5f3b1671cfb00a8e4a1d150d0aef36a611564a2f94e66b6981bade577e267ceeeca6fcee241768902d55eb8cf3a81f9ef4ed767a23112fdb16d
   languageName: node
   linkType: hard
 
@@ -38334,6 +38345,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-cron@npm:3.0.2":
+  version: 3.0.2
+  resolution: "node-cron@npm:3.0.2"
+  dependencies:
+    uuid: "npm:8.3.2"
+  checksum: 10/71d4ce22425d0f2a7bd9753149da475317725f6890d5a55e5e43a97062456faeda984d55c17aee9699552460525cee948662fb75124065810e4038b2f56a9d32
+  languageName: node
+  linkType: hard
+
 "node-domexception@npm:^1.0.0":
   version: 1.0.0
   resolution: "node-domexception@npm:1.0.0"
@@ -40674,7 +40694,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-connection-string@npm:2.5.0":
+"pg-cloudflare@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "pg-cloudflare@npm:1.1.1"
+  checksum: 10/45ca0c7926967ec9e66a9efc73ca57e3e933671b541bc774631a02ce683e7f658d0a4e881119b3f61486f38e344ae1b008d3a20eb5e21701c5fa8ff8382c5538
+  languageName: node
+  linkType: hard
+
+"pg-connection-string@npm:2.5.0, pg-connection-string@npm:^2.5.0":
   version: 2.5.0
   resolution: "pg-connection-string@npm:2.5.0"
   checksum: 10/a6f3a068f7c9416a5b33a326811caf0dfaaee045c225b7c628b4c9b4e9a2b25bdd12a21e4c48940e1000ea223a4e608ca122d2ff3dd08c8b1db0fc9f5705133a
@@ -40688,7 +40715,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-connection-string@npm:^2.5.0":
+"pg-connection-string@npm:^2.7.0":
   version: 2.7.0
   resolution: "pg-connection-string@npm:2.7.0"
   checksum: 10/68015a8874b7ca5dad456445e4114af3d2602bac2fdb8069315ecad0ff9660ec93259b9af7186606529ac4f6f72a06831e6f20897a689b16cc7fda7ca0e247fd
@@ -40702,7 +40729,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-pool@npm:^3.5.2":
+"pg-pool@npm:^3.5.2, pg-pool@npm:^3.7.0":
   version: 3.7.0
   resolution: "pg-pool@npm:3.7.0"
   peerDependencies:
@@ -40711,7 +40738,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-protocol@npm:*, pg-protocol@npm:^1.5.0":
+"pg-protocol@npm:*, pg-protocol@npm:^1.5.0, pg-protocol@npm:^1.7.0":
   version: 1.7.0
   resolution: "pg-protocol@npm:1.7.0"
   checksum: 10/ffffdf74426c9357b57050f1c191e84447c0e8b2a701b3ab302ac7dd0eb27b862d92e5e3b2d38876a1051de83547eb9165d6a58b3a8e90bb050dae97f9993d54
@@ -40748,6 +40775,28 @@ __metadata:
     pg-native:
       optional: true
   checksum: 10/729b11893ea5fec63aef30c2cf8108ab25294e4939234ad5d569d40f5ecebcd8b9c5532536b61168b93b5312b7406da0aa2cac0b6119c9ae03d617fe7f4c9f65
+  languageName: node
+  linkType: hard
+
+"pg@npm:^8.13.0":
+  version: 8.13.1
+  resolution: "pg@npm:8.13.1"
+  dependencies:
+    pg-cloudflare: "npm:^1.1.1"
+    pg-connection-string: "npm:^2.7.0"
+    pg-pool: "npm:^3.7.0"
+    pg-protocol: "npm:^1.7.0"
+    pg-types: "npm:^2.1.0"
+    pgpass: "npm:1.x"
+  peerDependencies:
+    pg-native: ">=3.0.1"
+  dependenciesMeta:
+    pg-cloudflare:
+      optional: true
+  peerDependenciesMeta:
+    pg-native:
+      optional: true
+  checksum: 10/542aa49fcb37657cf5f779b4a31fe6eb336e683445ecca38e267eeb0ca85d873ffe51f04794f9f9e184187e9f74bf7895e932a0fa9507132ac0dfc76c7c73451
   languageName: node
   linkType: hard
 
@@ -44960,10 +45009,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safe-stable-stringify@npm:2.5.0, safe-stable-stringify@npm:^2.3.1, safe-stable-stringify@npm:^2.4.3":
+"safe-stable-stringify@npm:2.5.0, safe-stable-stringify@npm:^2.4.3":
   version: 2.5.0
   resolution: "safe-stable-stringify@npm:2.5.0"
   checksum: 10/2697fa186c17c38c3ca5309637b4ac6de2f1c3d282da27cd5e1e3c88eca0fb1f9aea568a6aabdf284111592c8782b94ee07176f17126031be72ab1313ed46c5c
+  languageName: node
+  linkType: hard
+
+"safe-stable-stringify@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "safe-stable-stringify@npm:2.3.1"
+  checksum: 10/8a6ed4e5fb80694970f1939538518c44a59c71c74305e12b5964cbe3850636212eddac881da1f676b0232015213676e07750fe75bc402afbfe29851c8b52381e
   languageName: node
   linkType: hard
 
