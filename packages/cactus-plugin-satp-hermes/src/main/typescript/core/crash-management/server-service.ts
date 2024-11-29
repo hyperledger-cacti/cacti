@@ -8,11 +8,14 @@ import {
 import { SATPSession } from "../satp-session";
 import { ILocalLogRepository } from "../../repository/interfaces/repository";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { RollbackStrategyFactory } from "./rollback/rollback-strategy-factory";
+import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
 
 export class CrashRecoveryServerService {
   private readonly log: Logger;
 
   constructor(
+    private readonly bridgesManager: SATPBridgesManager,
     private readonly logRepository: ILocalLogRepository,
     private readonly sessions: Map<string, SATPSession>,
     loggerLabel: string = "CrashRecoveryServerService",
@@ -95,17 +98,28 @@ export class CrashRecoveryServerService {
         throw new Error(`Session not found: ${req.sessionId}`);
       }
 
+      const factory = new RollbackStrategyFactory(
+        this.bridgesManager,
+        this.logRepository,
+      );
+
+      const strategy = factory.createStrategy(session);
+
+      const rollbackState = await strategy.execute(session);
+
       const rollbackAckMessage = new RollbackAckMessage({
         sessionId: req.sessionId,
         messageType: "urn:ietf:SATP-2pc:msgtype:rollback-ack-msg",
-        success: true,
-        actionsPerformed: [],
+        success: rollbackState.status === "COMPLETED",
+        actionsPerformed: rollbackState.rollbackLogEntries.map(
+          (entry) => entry.action,
+        ),
         proofs: [],
         senderSignature: "",
       });
 
       this.log.info(
-        `${fnTag} - Rollback successfully handled for session: ${req.sessionId}`,
+        `${fnTag} - Rollback performed for session: ${req.sessionId}`,
       );
 
       return rollbackAckMessage;

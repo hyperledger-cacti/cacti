@@ -6,11 +6,16 @@ import {
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { SATPSession } from "../satp-session";
+import { ILocalLogRepository } from "../../repository/interfaces/repository";
 
 export class CrashRecoveryClientService {
   private readonly log: Logger;
 
-  constructor(loggerLabel: string = "CrashRecoveryClientService") {
+  constructor(
+    private readonly logRepository: ILocalLogRepository,
+    private readonly sessions: Map<string, SATPSession>,
+    loggerLabel: string = "CrashRecoveryClientService",
+  ) {
     this.log = LoggerProvider.getOrCreate({ label: loggerLabel });
     this.log.trace(`Initialized ${CrashRecoveryClientService.name}`);
   }

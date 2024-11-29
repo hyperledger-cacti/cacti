@@ -129,7 +129,7 @@ beforeAll(async () => {
     supportedDLTs: [SupportedChain.BESU],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3006,
+    gatewayServerPort: 3005,
     gatewayClientPort: 3001,
     gatewayOpenAPIPort: 3002,
   };
@@ -148,7 +148,7 @@ beforeAll(async () => {
     supportedDLTs: [SupportedChain.FABRIC],
     proofID: "mockProofID11",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3228,
+    gatewayServerPort: 3225,
     gatewayClientPort: 3211,
     gatewayOpenAPIPort: 4210,
   };

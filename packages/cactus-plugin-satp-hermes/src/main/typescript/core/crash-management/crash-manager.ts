@@ -88,11 +88,15 @@ export class CrashRecoveryManager {
       this.logRepository,
     );
     this.crashRecoveryServerService = new CrashRecoveryServerService(
+      this.bridgesManager,
       this.logRepository,
       this.sessions,
     );
 
-    this.crashRecoveryClientService = new CrashRecoveryClientService();
+    this.crashRecoveryClientService = new CrashRecoveryClientService(
+      this.logRepository,
+      this.sessions,
+    );
 
     this.crashRecoveryHandler = new CrashRecoveryHandler(
       this.crashRecoveryServerService,
