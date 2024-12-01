@@ -94,7 +94,7 @@
     "db:migrate": "knex migrate:latest --knexfile src/knex/knexfile.js",
     "db:migrate:production": "knex migrate:latest --env production --knexfile src/knex/knexfile.ts",
     "db:seed": "knex seed:run --knexfile src/knex/knexfile.ts",
-    "db:cleanup": "find src/knex/data -name '.dev-*.sqlite3' -delete"
+    "db:cleanup": "find src/knex/ -name '.dev.local-*.sqlite3' -delete"
   },
   "jest": {
     "moduleNameMapper": {
@@ -133,6 +133,7 @@
     "kubo-rpc-client": "3.0.1",
     "npm-run-all": "4.1.5",
     "openzeppelin-solidity": "3.4.2",
+    "pg": "8.13.1",
     "safe-stable-stringify": "2.5.0",
     "socket.io": "4.6.2",
     "sqlite3": "5.1.5",
@@ -155,6 +156,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/google-protobuf": "3.15.12",
     "@types/node": "18.18.2",
+    "@types/pg": "8.11.10",
     "@types/swagger-ui-express": "4.1.6",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",
