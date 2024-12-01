@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-electricity-trade",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "license": "Apache-2.0",
   "main": "dist/www.js",
@@ -14,13 +14,13 @@
     "start-dockerless": "node ./dist/www.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0",
-    "@hyperledger/cactus-common-example-server": "2.0.0",
-    "@hyperledger/cactus-core": "2.0.0",
-    "@hyperledger/cactus-core-api": "2.0.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0",
-    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.0.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-common-example-server": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.1.0",
     "@types/node": "18.11.9",
     "body-parser": "1.20.3",
     "cookie-parser": "1.4.6",

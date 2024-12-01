@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
+
+### Bug Fixes
+
+* **besu:** deployContractSolBytecodeNoKeychainV1 requires keychainId ([11dacbc](https://github.com/hyperledger/cacti/commit/11dacbcef25ba3e7fa9f9880f60655be1e2396ef)), closes [#3586](https://github.com/hyperledger/cacti/issues/3586)
+* **connector-besu:** do not crash if ledger unreachable - send HTTP 503 ([394323e](https://github.com/hyperledger/cacti/commit/394323e91e3bd0df57c87d6bae406298c559fc7f))
+* **connector-besu:** set contract bytecode field's max length to 49154 ([33b2cf0](https://github.com/hyperledger/cacti/commit/33b2cf06eb239986aa0c50221ce390a3a27f3a45)), closes [#3636](https://github.com/hyperledger/cacti/issues/3636)
+
+### Features
+
+* **cactus-connector-besu:** add IRunTransactionV1Exchange to share receipt data ([3097c84](https://github.com/hyperledger/cacti/commit/3097c84895b73d44f8f61ec5e2a09abc1e8306e8))
+* **cactus-consortium:** add Ethereum ledger type ([4265725](https://github.com/hyperledger/cacti/commit/426572521646cd7391be66c09590991cf83fcf01))
+* **cactus-core-api:** add Ethereum ledger type ([a1be603](https://github.com/hyperledger/cacti/commit/a1be603c3ceea748579ad96a1d2b38a2438eec8b))
+* **copm:** add fabric COPM implementation ([7af9983](https://github.com/hyperledger/cacti/commit/7af99833f4db237d6aba7223a31add5723faba9d))
+
+### Performance Improvements
+
+* **github:** add knob/flag to manually override CI skip ([ed36bbe](https://github.com/hyperledger/cacti/commit/ed36bbe80b0b610761c976bc397fd011a423bf42))
+
 # [2.0.0](https://github.com/hyperledger-cacti/cacti/compare/v2.0.0-rc.7...v2.0.0) (2024-10-15)
 
 ### Bug Fixes

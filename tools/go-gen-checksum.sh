@@ -4,7 +4,7 @@
 ROOT_DIR=${2:-'..'}
 
 # Repo full go path
-REPO='github.com/hyperledger/cacti'
+REPO='github.com/hyperledger-cacti/cacti'
 
 # install go-checksum
 echo "Installing go-checksum..."
@@ -24,7 +24,7 @@ GOMODULE_PATHS=("weaver/core/network/fabric-interop-cc/libs/utils"
 "weaver/samples/fabric/simplestatewithacl"
 "weaver/samples/fabric/simplestate")
 
-VERSION=${1:-"2.0.0"}
+VERSION=${1:-"2.1.0"}
 
 echo "REPO: $REPO"
 echo "VERSION: $VERSION"

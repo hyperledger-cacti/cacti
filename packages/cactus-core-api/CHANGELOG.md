@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
+
+### Features
+
+* **cactus-core-api:** add Ethereum ledger type ([a1be603](https://github.com/hyperledger/cacti/commit/a1be603c3ceea748579ad96a1d2b38a2438eec8b))
+
 # [2.0.0](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.7...v2.0.0) (2024-10-15)
 
 **Note:** Version bump only for package @hyperledger/cactus-core-api

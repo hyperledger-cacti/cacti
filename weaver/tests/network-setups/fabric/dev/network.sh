@@ -55,7 +55,7 @@ function printHelp() {
   echo "	network.sh up"
   echo
   echo " Examples:"
-  echo "  network.sh up createChannel -ca -c mychannel -s couchdb -i 2.0.0"
+  echo "  network.sh up createChannel -ca -c mychannel -s couchdb -i 2.1.0"
   echo "  network.sh createChannel -c channelName"
   echo "  network.sh deployCC -l javascript"
 }
