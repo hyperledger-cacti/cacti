@@ -60,6 +60,7 @@ export class Stage1ServerService extends SATPService {
       serviceName: ops.serviceName,
       signer: ops.signer,
       serviceType: Stage1ServerService.SERVICE_TYPE,
+      dbLogger: ops.dbLogger,
     };
     super(commonOptions);
   }
@@ -70,6 +71,7 @@ export class Stage1ServerService extends SATPService {
   ): Promise<void | TransferProposalReceiptMessage> {
     const stepTag = `transferProposalResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    const messageType = MessageType[MessageType.INIT_RECEIPT];
     this.Log.debug(`${fnTag}, transferProposalResponse...`);
 
     if (session == undefined) {
@@ -84,84 +86,111 @@ export class Stage1ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    sessionData.sourceLedgerAssetId =
-      request.transferInitClaims!.verifiedOriginatorEntityId;
-    sessionData.recipientLedgerAssetId =
-      request.transferInitClaims!.verifiedBeneficiaryEntityId; // todo shouldn't be the server to create this id?
-
-    sessionData.hashTransferInitClaims = getHash(request.transferInitClaims);
-
-    const commonBody = create(CommonSatpSchema, {
-      version: sessionData.version,
-      sessionId: sessionData.id,
-      clientGatewayPubkey: sessionData.clientGatewayPubkey,
-      serverGatewayPubkey: sessionData.serverGatewayPubkey,
-      transferContextId: sessionData.transferContextId,
-      resourceUrl: sessionData.resourceUrl,
-      hashPreviousMessage: getMessageHash(
-        sessionData,
-        MessageType.INIT_PROPOSAL,
-      ),
-      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
-    });
-
-    sessionData.lastSequenceNumber = request.common!.sequenceNumber + BigInt(1);
-
-    const transferProposalReceiptMessage = create(
-      TransferProposalReceiptMessageSchema,
-      {},
-    );
-    if (sessionData.state == State.REJECTED) {
-      transferProposalReceiptMessage.common = commonBody;
-      commonBody.messageType = MessageType.INIT_REJECT;
-      transferProposalReceiptMessage.timestamp = getMessageTimestamp(
-        sessionData,
-        MessageType.INIT_REJECT,
-        TimestampType.RECEIVED,
-      );
-    } else if (sessionData.state == State.CONDITIONAL_REJECTED) {
-      throw new Error("Not Implemented");
-    } else {
-      sessionData.state = State.ONGOING;
-      transferProposalReceiptMessage.common = commonBody;
-      transferProposalReceiptMessage.hashTransferInitClaims =
-        sessionData.hashTransferInitClaims;
-      commonBody.messageType = MessageType.INIT_RECEIPT;
-      transferProposalReceiptMessage.timestamp = getMessageTimestamp(
-        sessionData,
-        MessageType.INIT_PROPOSAL,
-        TimestampType.RECEIVED,
-      );
-    }
-
-    //TODO implement conditional reject
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(transferProposalReceiptMessage)),
-    );
-
-    transferProposalReceiptMessage.serverSignature = messageSignature;
-
-    saveSignature(sessionData, commonBody.messageType, messageSignature);
-
-    saveHash(
-      sessionData,
-      commonBody.messageType,
-      getHash(transferProposalReceiptMessage),
-    );
-
-    // TODO: store logs in the database using session ID; refactor storelog not to need gateway as input
-    /*
-    await storeLog(gateway, {
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
-      type: "transferProposalResponse",
-      operation: "lock",
+      type: messageType,
+      operation: "init",
       data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
     });
-    */
-    this.Log.info(`${fnTag}, sending TransferProposalResponseMessage...`);
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      sessionData.sourceLedgerAssetId =
+        request.transferInitClaims!.verifiedOriginatorEntityId;
+      sessionData.recipientLedgerAssetId =
+        request.transferInitClaims!.verifiedBeneficiaryEntityId; // todo shouldn't be the server to create this id?
 
-    return transferProposalReceiptMessage;
+      sessionData.hashTransferInitClaims = getHash(request.transferInitClaims);
+
+      const commonBody = create(CommonSatpSchema, {
+        version: sessionData.version,
+        sessionId: sessionData.id,
+        clientGatewayPubkey: sessionData.clientGatewayPubkey,
+        serverGatewayPubkey: sessionData.serverGatewayPubkey,
+        transferContextId: sessionData.transferContextId,
+        resourceUrl: sessionData.resourceUrl,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.INIT_PROPOSAL,
+        ),
+        sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+      });
+
+      sessionData.lastSequenceNumber =
+        request.common!.sequenceNumber + BigInt(1);
+
+      const transferProposalReceiptMessage = create(
+        TransferProposalReceiptMessageSchema,
+        {},
+      );
+      if (sessionData.state == State.REJECTED) {
+        transferProposalReceiptMessage.common = commonBody;
+        commonBody.messageType = MessageType.INIT_REJECT;
+        transferProposalReceiptMessage.timestamp = getMessageTimestamp(
+          sessionData,
+          MessageType.INIT_REJECT,
+          TimestampType.RECEIVED,
+        );
+      } else if (sessionData.state == State.CONDITIONAL_REJECTED) {
+        throw new Error("Not Implemented");
+      } else {
+        sessionData.state = State.ONGOING;
+        transferProposalReceiptMessage.common = commonBody;
+        transferProposalReceiptMessage.hashTransferInitClaims =
+          sessionData.hashTransferInitClaims;
+        commonBody.messageType = MessageType.INIT_RECEIPT;
+        transferProposalReceiptMessage.timestamp = getMessageTimestamp(
+          sessionData,
+          MessageType.INIT_PROPOSAL,
+          TimestampType.RECEIVED,
+        );
+      }
+
+      //TODO implement conditional reject
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(transferProposalReceiptMessage)),
+      );
+
+      transferProposalReceiptMessage.serverSignature = messageSignature;
+
+      saveSignature(sessionData, commonBody.messageType, messageSignature);
+
+      saveHash(
+        sessionData,
+        commonBody.messageType,
+        getHash(transferProposalReceiptMessage),
+      );
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      this.Log.info(`${fnTag}, sending TransferProposalResponseMessage...`);
+
+      return transferProposalReceiptMessage;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
+    }
   }
 
   async transferProposalErrorResponse(
@@ -220,6 +249,7 @@ export class Stage1ServerService extends SATPService {
   ): Promise<void | TransferCommenceResponseMessage> {
     const stepTag = `transferCommenceResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    const messageType = MessageType[MessageType.TRANSFER_COMMENCE_RESPONSE];
     this.Log.debug(`${fnTag}, transferCommenceResponse...`);
 
     if (session == undefined) {
@@ -229,61 +259,88 @@ export class Stage1ServerService extends SATPService {
     session.verify(fnTag, SessionType.SERVER);
 
     const sessionData = session.getServerSessionData();
-
-    const commonBody = create(CommonSatpSchema, {
-      version: sessionData.version,
-      sessionId: sessionData.id,
-      clientGatewayPubkey: sessionData.clientGatewayPubkey,
-      serverGatewayPubkey: sessionData.serverGatewayPubkey,
-      transferContextId: sessionData.transferContextId,
-      resourceUrl: sessionData.resourceUrl,
-      hashPreviousMessage: getMessageHash(
-        sessionData,
-        MessageType.TRANSFER_COMMENCE_REQUEST,
-      ),
-      sequenceNumber: request.common!.sequenceNumber + BigInt(1),
-      messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
-    });
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-      request.common!.sequenceNumber + BigInt(1);
-
-    const transferCommenceResponseMessage = create(
-      TransferCommenceResponseMessageSchema,
-      {
-        common: commonBody,
-      },
-    );
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(transferCommenceResponseMessage)),
-    );
-
-    transferCommenceResponseMessage.serverSignature = messageSignature;
-
-    saveSignature(
-      sessionData,
-      MessageType.TRANSFER_COMMENCE_RESPONSE,
-      messageSignature,
-    );
-
-    saveHash(
-      sessionData,
-      MessageType.TRANSFER_COMMENCE_RESPONSE,
-      getHash(transferCommenceResponseMessage),
-    );
-
-    /*
-    await storeLog(gateway, {
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
-      type: "transferCommenceResponse",
-      operation: "lock",
+      type: messageType,
+      operation: "init",
       data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
     });
-    */
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
 
-    this.Log.info(`${fnTag}, sending TransferCommenceResponseMessage...`);
+      const commonBody = create(CommonSatpSchema, {
+        version: sessionData.version,
+        sessionId: sessionData.id,
+        clientGatewayPubkey: sessionData.clientGatewayPubkey,
+        serverGatewayPubkey: sessionData.serverGatewayPubkey,
+        transferContextId: sessionData.transferContextId,
+        resourceUrl: sessionData.resourceUrl,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.TRANSFER_COMMENCE_REQUEST,
+        ),
+        sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+        messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
+      });
+      sessionData.lastSequenceNumber = commonBody.sequenceNumber =
+        request.common!.sequenceNumber + BigInt(1);
 
-    return transferCommenceResponseMessage;
+      const transferCommenceResponseMessage = create(
+        TransferCommenceResponseMessageSchema,
+        {
+          common: commonBody,
+        },
+      );
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(transferCommenceResponseMessage)),
+      );
+
+      transferCommenceResponseMessage.serverSignature = messageSignature;
+
+      saveSignature(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_RESPONSE,
+        messageSignature,
+      );
+
+      saveHash(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_RESPONSE,
+        getHash(transferCommenceResponseMessage),
+      );
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      this.Log.info(`${fnTag}, sending TransferCommenceResponseMessage...`);
+
+      return transferCommenceResponseMessage;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
+    }
   }
 
   async checkTransferProposalRequestMessage(
