@@ -53,6 +53,7 @@ export class Stage2ClientService extends SATPService {
       signer: ops.signer,
       serviceType: Stage2ClientService.SERVICE_TYPE,
       bridgeManager: ops.bridgeManager,
+      dbLogger: ops.dbLogger,
     };
     super(commonOptions);
 
@@ -70,6 +71,7 @@ export class Stage2ClientService extends SATPService {
   ): Promise<void | LockAssertionRequestMessage> {
     const stepTag = `lockAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    const messageType = MessageType[MessageType.LOCK_ASSERT];
     this.Log.debug(`${fnTag}, lockAssertionRequest...`);
 
     if (session == undefined) {
@@ -79,85 +81,112 @@ export class Stage2ClientService extends SATPService {
     session.verify(fnTag, SessionType.CLIENT);
 
     const sessionData = session.getClientSessionData();
-
-    const commonBody = create(CommonSatpSchema, {
-      version: sessionData.version,
-      messageType: MessageType.LOCK_ASSERT,
-      hashPreviousMessage: getMessageHash(
-        sessionData,
-        MessageType.TRANSFER_COMMENCE_RESPONSE,
-      ),
-      sessionId: response.common!.sessionId,
-      clientGatewayPubkey: sessionData.clientGatewayPubkey,
-      serverGatewayPubkey: sessionData.serverGatewayPubkey,
-      resourceUrl: sessionData.resourceUrl,
-    });
-
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-      response.common!.sequenceNumber + BigInt(1);
-
-    const lockAssertionRequestMessage = create(
-      LockAssertionRequestMessageSchema,
-      {
-        common: commonBody,
-      },
-    );
-
-    if (sessionData.lockAssertionClaim == undefined) {
-      throw new LockAssertionClaimError(fnTag);
-    }
-    lockAssertionRequestMessage.lockAssertionClaim =
-      sessionData.lockAssertionClaim;
-
-    if (sessionData.lockAssertionClaimFormat == undefined) {
-      throw new LockAssertionClaimFormatError(fnTag);
-    }
-    lockAssertionRequestMessage.lockAssertionClaimFormat =
-      sessionData.lockAssertionClaimFormat;
-    if (
-      sessionData.lockAssertionExpiration == undefined ||
-      sessionData.lockAssertionExpiration == BigInt(0)
-    ) {
-      throw new LockAssertionExpirationError(fnTag);
-    }
-
-    lockAssertionRequestMessage.lockAssertionExpiration =
-      sessionData.lockAssertionExpiration;
-
-    if (sessionData.transferContextId != undefined) {
-      lockAssertionRequestMessage.common!.transferContextId =
-        sessionData.transferContextId;
-    }
-    if (sessionData.clientTransferNumber != undefined) {
-      lockAssertionRequestMessage.clientTransferNumber =
-        sessionData.clientTransferNumber;
-    }
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(lockAssertionRequestMessage)),
-    );
-
-    lockAssertionRequestMessage.clientSignature = messageSignature;
-
-    saveSignature(sessionData, MessageType.LOCK_ASSERT, messageSignature);
-
-    saveHash(
-      sessionData,
-      MessageType.LOCK_ASSERT,
-      getHash(lockAssertionRequestMessage),
-    );
-
-    /*
-    await storeLog(gateway, {
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
-      type: "lockAssertionRequest",
-      operation: "lock",
+      type: messageType,
+      operation: "init",
       data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
     });
-    */
-    this.Log.info(`${fnTag}, sending LockAssertionMessage...`);
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      const commonBody = create(CommonSatpSchema, {
+        version: sessionData.version,
+        messageType: MessageType.LOCK_ASSERT,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.TRANSFER_COMMENCE_RESPONSE,
+        ),
+        sessionId: response.common!.sessionId,
+        clientGatewayPubkey: sessionData.clientGatewayPubkey,
+        serverGatewayPubkey: sessionData.serverGatewayPubkey,
+        resourceUrl: sessionData.resourceUrl,
+      });
 
-    return lockAssertionRequestMessage;
+      sessionData.lastSequenceNumber = commonBody.sequenceNumber =
+        response.common!.sequenceNumber + BigInt(1);
+
+      const lockAssertionRequestMessage = create(
+        LockAssertionRequestMessageSchema,
+        {
+          common: commonBody,
+        },
+      );
+
+      if (sessionData.lockAssertionClaim == undefined) {
+        throw new LockAssertionClaimError(fnTag);
+      }
+      lockAssertionRequestMessage.lockAssertionClaim =
+        sessionData.lockAssertionClaim;
+
+      if (sessionData.lockAssertionClaimFormat == undefined) {
+        throw new LockAssertionClaimFormatError(fnTag);
+      }
+      lockAssertionRequestMessage.lockAssertionClaimFormat =
+        sessionData.lockAssertionClaimFormat;
+      if (
+        sessionData.lockAssertionExpiration == undefined ||
+        sessionData.lockAssertionExpiration == BigInt(0)
+      ) {
+        throw new LockAssertionExpirationError(fnTag);
+      }
+
+      lockAssertionRequestMessage.lockAssertionExpiration =
+        sessionData.lockAssertionExpiration;
+
+      if (sessionData.transferContextId != undefined) {
+        lockAssertionRequestMessage.common!.transferContextId =
+          sessionData.transferContextId;
+      }
+      if (sessionData.clientTransferNumber != undefined) {
+        lockAssertionRequestMessage.clientTransferNumber =
+          sessionData.clientTransferNumber;
+      }
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(lockAssertionRequestMessage)),
+      );
+
+      lockAssertionRequestMessage.clientSignature = messageSignature;
+
+      saveSignature(sessionData, MessageType.LOCK_ASSERT, messageSignature);
+
+      saveHash(
+        sessionData,
+        MessageType.LOCK_ASSERT,
+        getHash(lockAssertionRequestMessage),
+      );
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      this.Log.info(`${fnTag}, sending LockAssertionMessage...`);
+
+      return lockAssertionRequestMessage;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
+    }
   }
 
   async checkTransferCommenceResponseMessage(
@@ -204,17 +233,32 @@ export class Stage2ClientService extends SATPService {
   async lockAsset(session: SATPSession): Promise<void> {
     const stepTag = `lockAsset()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    this.Log.info(`${fnTag}, Locking Asset...`);
+    if (session == undefined) {
+      throw new SessionError(fnTag);
+    }
+
+    session.verify(fnTag, SessionType.CLIENT);
+
+    const sessionData = session.getClientSessionData();
+    this.Log.info(`init-${stepTag}`);
+    this.dbLogger.storeProof({
+      sessionID: sessionData.id,
+      type: "lock-asset",
+      operation: "init",
+      data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
+    });
     try {
+      this.Log.info(`exec-${stepTag}`);
+      this.dbLogger.storeProof({
+        sessionID: sessionData.id,
+        type: "lock-asset",
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
       this.Log.info(`${fnTag}, Locking Asset...`);
-
-      if (session == undefined) {
-        throw new SessionError(fnTag);
-      }
-
-      session.verify(fnTag, SessionType.CLIENT);
-
-      const sessionData = session.getClientSessionData();
-
       const assetId = sessionData.senderAsset?.tokenId;
       const amount = sessionData.senderAsset?.amount;
 
@@ -251,7 +295,23 @@ export class Stage2ClientService extends SATPService {
       sessionData.lockAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.lockAssertionClaim.receipt),
       );
+
+      this.dbLogger.storeProof({
+        sessionID: sessionData.id,
+        type: "lock-asset",
+        operation: "done",
+        data: safeStableStringify(sessionData.lockAssertionClaim.proof),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      this.Log.info(`${fnTag}, done-${fnTag}`);
     } catch (error) {
+      this.dbLogger.storeProof({
+        sessionID: sessionData.id,
+        type: "lock-asset",
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
       throw new FailedToProcessError(fnTag, "LockAsset", error);
     }
   }

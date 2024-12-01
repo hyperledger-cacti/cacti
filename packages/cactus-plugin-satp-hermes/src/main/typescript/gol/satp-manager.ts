@@ -77,6 +77,11 @@ import {
 } from "../core/errors/satp-errors";
 import { getMessageTypeName } from "../core/satp-utils";
 import { HealthCheckResponseStatusEnum } from "../generated/gateway-client/typescript-axios";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "../repository/interfaces/repository";
+import { ISATPLoggerConfig, SATPLogger } from "../logging";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -87,6 +92,8 @@ export interface ISATPManagerOptions {
   supportedDLTs: SupportedChain[];
   bridgeManager: SATPBridgesManager;
   orchestrator: GatewayOrchestrator;
+  localRepository: ILocalLogRepository;
+  remoteRepository: IRemoteLogRepository;
 }
 
 export class SATPManager {
@@ -111,6 +118,9 @@ export class SATPManager {
   private readonly orchestrator: GatewayOrchestrator;
 
   private gatewaysPubKeys: Map<string, string> = new Map();
+  private localRepository: ILocalLogRepository;
+  private remoteRepository: IRemoteLogRepository;
+  private readonly dbLogger: SATPLogger;
 
   constructor(public readonly options: ISATPManagerOptions) {
     const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
@@ -128,6 +138,8 @@ export class SATPManager {
     this.orchestrator = options.orchestrator;
     this._pubKey = options.pubKey;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
+    this.localRepository = options.localRepository;
+    this.remoteRepository = options.remoteRepository;
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
@@ -136,6 +148,16 @@ export class SATPManager {
       Stage2SATPHandler as unknown as SATPHandlerInstance,
       Stage3SATPHandler as unknown as SATPHandlerInstance,
     ];
+
+    const satpLoggerConfig: ISATPLoggerConfig = {
+      localRepository: this.localRepository,
+      remoteRepository: this.remoteRepository,
+      signer: this.signer,
+      pubKey: this.pubKey,
+    };
+
+    this.dbLogger = new SATPLogger(satpLoggerConfig);
+    this.logger.debug(`SATPManager dbLogger initialized: ${!!this.dbLogger}`);
 
     const serviceClasses = [
       Stage0ServerService as unknown as SATPServiceInstance,
@@ -272,6 +294,7 @@ export class SATPManager {
       serviceType: serviceClass.SERVICE_TYPE,
       serviceName: serviceClass.SATP_SERVICE_INTERNAL_NAME,
       bridgeManager: this.bridgesManager,
+      dbLogger: this.dbLogger,
     }));
   }
 

@@ -1,11 +1,12 @@
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
+import { Knex } from "knex";
 
 const envPath = process.env.ENV_PATH;
 dotenv.config({ path: envPath });
 
-module.exports = {
+const config: { [key: string]: Knex.Config } = {
   development: {
     client: "sqlite3",
     connection: {
@@ -20,7 +21,7 @@ module.exports = {
     client: "pg",
     connection: {
       host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
+      port: Number(process.env.DB_PORT),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
@@ -30,3 +31,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

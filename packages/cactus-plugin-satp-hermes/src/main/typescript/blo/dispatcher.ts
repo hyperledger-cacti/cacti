@@ -32,6 +32,10 @@ import { IntegrationsEndpointV1 } from "../web-services/integrations-endpoint";
 import { executeGetHealthCheck } from "./admin/get-healthcheck-handler-service";
 import { executeGetStatus } from "./admin/get-status-handler-service";
 import { executeTransact } from "./transaction/transact-handler-service";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "../repository/interfaces/repository";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -41,6 +45,8 @@ export interface BLODispatcherOptions {
   signer: JsObjectSigner;
   bridgesManager: SATPBridgesManager;
   pubKey: string;
+  localRepository: ILocalLogRepository;
+  remoteRepository: IRemoteLogRepository;
 }
 
 export class BLODispatcher {
@@ -54,6 +60,8 @@ export class BLODispatcher {
   private manager: SATPManager;
   private orchestrator: GatewayOrchestrator;
   private bridgeManager: SATPBridgesManager;
+  private localRepository: ILocalLogRepository;
+  private remoteRepository: IRemoteLogRepository;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -61,12 +69,17 @@ export class BLODispatcher {
 
     this.level = this.options.logLevel || "INFO";
     this.label = this.className;
-    this.logger = LoggerProvider.getOrCreate({ level: this.level, label: this.label });
+    this.logger = LoggerProvider.getOrCreate({
+      level: this.level,
+      label: this.label,
+    });
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.orchestrator = options.orchestrator;
     const signer = options.signer;
     const ourGateway = this.orchestrator.ourGateway;
+    this.localRepository = options.localRepository;
+    this.remoteRepository = options.remoteRepository;
 
     this.bridgeManager = options.bridgesManager;
 
@@ -78,6 +91,8 @@ export class BLODispatcher {
       bridgeManager: this.bridgeManager,
       orchestrator: this.orchestrator,
       pubKey: options.pubKey,
+      localRepository: this.localRepository,
+      remoteRepository: this.remoteRepository,
     };
 
     this.manager = new SATPManager(SATPManagerOpts);

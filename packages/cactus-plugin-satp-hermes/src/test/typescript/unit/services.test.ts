@@ -67,6 +67,18 @@ import {
   STATUS,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/stage_0_pb";
 import { TokenType } from "../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "../../../main/typescript/repository/interfaces/repository";
+import { knexClientConnection, knexRemoteConnection } from "../knex.config";
+import { Knex, knex } from "knex";
+import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/repository/knex-local-log-repository";
+import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/repository/knex-remote-log-repository";
+import { SATPLogger } from "../../../main/typescript/logging";
+
+let knexInstanceClient: Knex; // test as a client
+let knexInstanceRemote: Knex;
 import { create, isMessage } from "@bufbuild/protobuf";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -89,11 +101,13 @@ const signer = new JsObjectSigner({
 });
 
 const supportedDLTs = [SupportedChain.FABRIC, SupportedChain.BESU];
-
+let localRepository: ILocalLogRepository;
+let remoteRepository: IRemoteLogRepository;
+let dbLogger: SATPLogger;
+let persistLogEntrySpy: jest.SpyInstance;
 let bridgeManager: SATPBridgesManager;
 
 let mockSession: SATPSession;
-
 let satpClientService0: Stage0ClientService;
 let satpServerService0: Stage0ServerService;
 let satpClientService1: Stage1ClientService;
@@ -128,6 +142,23 @@ beforeAll(async () => {
     networks: [],
     logLevel: logLevel,
   });
+
+  knexInstanceClient = knex(knexClientConnection);
+  await knexInstanceClient.migrate.latest();
+
+  knexInstanceRemote = knex(knexRemoteConnection);
+  await knexInstanceRemote.migrate.latest();
+
+  localRepository = new LocalLogRepository(knexClientConnection);
+  remoteRepository = new RemoteLogRepository(knexRemoteConnection);
+  dbLogger = new SATPLogger({
+    localRepository,
+    remoteRepository,
+    signer,
+    pubKey: Buffer.from(keyPairs.publicKey).toString("hex"),
+  });
+
+  persistLogEntrySpy = jest.spyOn(dbLogger, "persistLogEntry");
 
   mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
@@ -174,6 +205,36 @@ beforeAll(async () => {
     }
   }
 });
+
+afterEach(() => {
+  persistLogEntrySpy.mockClear();
+});
+
+afterAll(async () => {
+  const services = [
+    satpClientService0,
+    satpServerService0,
+    satpClientService1,
+    satpServerService1,
+    satpClientService2,
+    satpServerService2,
+    satpClientService3,
+    satpServerService3,
+  ];
+
+  for (const service of services) {
+    await service.dbLogger.localRepository.destroy();
+    await service.dbLogger.remoteRepository.destroy();
+  }
+
+  if (knexInstanceClient) {
+    await knexInstanceClient.destroy();
+  }
+  if (knexInstanceRemote) {
+    await knexInstanceRemote.destroy();
+  }
+});
+
 describe("SATP Services Testing", () => {
   it("Service0Client newSessionRequest", async () => {
     const sessionData = mockSession.getClientSessionData();
@@ -238,6 +299,7 @@ describe("SATP Services Testing", () => {
       mockSession,
       SupportedChain.BESU,
     );
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
 
     expect(newSessionRequestMessage).toBeDefined();
     expect(newSessionRequestMessage.contextId).toBe(
@@ -280,6 +342,8 @@ describe("SATP Services Testing", () => {
       mockSession,
     );
 
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
+
     expect(newSessionResponseMessage).toBeDefined();
     expect(newSessionResponseMessage.contextId).toBe(
       mockSession.getClientSessionData()?.transferContextId,
@@ -321,6 +385,7 @@ describe("SATP Services Testing", () => {
 
     preSATPTransferRequestMessage =
       await satpClientService0.preSATPTransferRequest(mockSession);
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
 
     expect(preSATPTransferRequestMessage).toBeDefined();
     expect(preSATPTransferRequestMessage.sessionId).toBe(sessionData.id);
@@ -374,7 +439,7 @@ describe("SATP Services Testing", () => {
         preSATPTransferRequestMessage,
         mockSession,
       );
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(preSATPTransferResponseMessage).toBeDefined();
     expect(preSATPTransferResponseMessage.sessionId).toBe(
       preSATPTransferRequestMessage.sessionId,
@@ -419,7 +484,7 @@ describe("SATP Services Testing", () => {
         mockSession,
         supportedDLTs,
       )) as TransferProposalRequestMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(
       isMessage(
         transferProposalRequestMessage,
@@ -507,7 +572,7 @@ describe("SATP Services Testing", () => {
         transferProposalRequestMessage,
         mockSession,
       )) as TransferProposalReceiptMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(
       isMessage(
         transferProposalResponseMessage,
@@ -541,7 +606,7 @@ describe("SATP Services Testing", () => {
         transferProposalResponseMessage,
         mockSession,
       )) as TransferCommenceRequestMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(
       isMessage(
         transferCommenceRequestMessage,
@@ -585,7 +650,7 @@ describe("SATP Services Testing", () => {
         transferCommenceRequestMessage,
         mockSession,
       )) as TransferCommenceResponseMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(transferCommenceResponseMessage).toBeDefined();
     expect(transferCommenceResponseMessage.common?.transferContextId).toBe(
       transferCommenceRequestMessage.common?.transferContextId,
@@ -636,7 +701,7 @@ describe("SATP Services Testing", () => {
         transferCommenceResponseMessage,
         mockSession,
       )) as LockAssertionRequestMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(lockAssertionRequestMessage).toBeDefined();
     expect(lockAssertionRequestMessage.common?.messageType).toBe(
       MessageType.LOCK_ASSERT,
@@ -681,7 +746,7 @@ describe("SATP Services Testing", () => {
         lockAssertionRequestMessage,
         mockSession,
       )) as LockAssertionReceiptMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(lockAssertionReceiptMessage).toBeDefined();
     expect(lockAssertionReceiptMessage.common?.transferContextId).toBe(
       lockAssertionRequestMessage.common?.transferContextId,
@@ -722,7 +787,7 @@ describe("SATP Services Testing", () => {
         lockAssertionReceiptMessage,
         mockSession,
       )) as CommitPreparationRequestMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(commitPreparationRequestMessage).toBeDefined();
     expect(commitPreparationRequestMessage.common?.sessionId).toBe(
       mockSession.getSessionId(),
@@ -769,7 +834,7 @@ describe("SATP Services Testing", () => {
       commitPreparationRequestMessage,
       mockSession,
     )) as CommitReadyResponseMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(commitReadyResponseMessage).toBeDefined();
     expect(commitReadyResponseMessage.common?.sessionId).toBe(
       commitPreparationRequestMessage.common?.sessionId,
@@ -817,7 +882,7 @@ describe("SATP Services Testing", () => {
         commitReadyResponseMessage,
         mockSession,
       )) as CommitFinalAssertionRequestMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(commitFinalAssertionRequestMessage).toBeDefined();
     expect(commitFinalAssertionRequestMessage.common?.sessionId).toBe(
       commitReadyResponseMessage.common?.sessionId,
@@ -870,7 +935,7 @@ describe("SATP Services Testing", () => {
         commitFinalAssertionRequestMessage,
         mockSession,
       )) as CommitFinalAcknowledgementReceiptResponseMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(commitFinalAcknowledgementReceiptResponseMessage).toBeDefined();
     expect(
       commitFinalAcknowledgementReceiptResponseMessage.common?.sessionId,
@@ -925,6 +990,7 @@ describe("SATP Services Testing", () => {
       commitFinalAcknowledgementReceiptResponseMessage,
       mockSession,
     )) as TransferCompleteRequestMessage;
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
 
     expect(transferCompleteRequestMessage).toBeDefined();
     expect(transferCompleteRequestMessage.common?.sessionId).toBe(
@@ -979,7 +1045,7 @@ describe("SATP Services Testing", () => {
         transferCompleteRequestMessage,
         mockSession,
       )) as TransferCompleteResponseMessage;
-
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(transferCompleteResponseMessage).toBeDefined();
     expect(transferCompleteResponseMessage.common?.sessionId).toBe(
       transferCompleteRequestMessage.common?.sessionId,
@@ -1017,6 +1083,7 @@ function initializeServiceOptions(
     serviceType:
       index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
     bridgeManager: bridgeManager,
+    dbLogger: dbLogger,
   }));
 }
 

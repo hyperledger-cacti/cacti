@@ -12,6 +12,7 @@ import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist
 import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkConfig } from "../types/blockchain-interaction";
+import { Knex } from "knex";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,
@@ -81,6 +82,8 @@ export interface SATPGatewayConfig {
   privacyPolicies?: IPrivacyPolicyValue[];
   mergePolicies?: IMergePolicyValue[];
   bridgesConfig?: NetworkConfig[];
+  knexLocalConfig?: Knex.Config;
+  knexRemoteConfig?: Knex.Config;
 }
 
 // export interface SATPBridgeConfig {
@@ -106,10 +109,11 @@ export function isOfType<T>(
 export interface LocalLog {
   sessionID: string;
   type: string;
-  key?: string;
+  key: string;
   operation: string;
   timestamp?: string;
   data: string;
+  sequenceNumber: number;
 }
 export interface RemoteLog {
   key: string;

@@ -43,6 +43,8 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
+import { KnexRemoteLogRepository as RemoteLogRepository } from "./repository/knex-remote-log-repository";
+import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository";
 import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
 import swaggerUi, { JsonObject } from "swagger-ui-express";
 import {
@@ -109,6 +111,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
 
+    this.localRepository = new LocalLogRepository(options.knexLocalConfig);
+    this.remoteRepository = new RemoteLogRepository(options.knexRemoteConfig);
+
     if (this.config.keyPair == undefined) {
       throw new Error("Key pair is undefined");
     }
@@ -162,6 +167,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       signer: this.signer,
       bridgesManager: this.bridgesManager,
       pubKey: this.pubKey,
+      localRepository: this.localRepository,
+      remoteRepository: this.remoteRepository,
     };
 
     this.supportedDltIDs = this.config.gid!.supportedDLTs;

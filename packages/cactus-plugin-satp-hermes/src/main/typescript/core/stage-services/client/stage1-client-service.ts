@@ -56,6 +56,7 @@ export class Stage1ClientService extends SATPService {
       serviceName: ops.serviceName,
       signer: ops.signer,
       serviceType: Stage1ClientService.SERVICE_TYPE,
+      dbLogger: ops.dbLogger,
     };
     super(commonOptions);
   }
@@ -67,7 +68,7 @@ export class Stage1ClientService extends SATPService {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, transferProposalRequest...`);
-
+    const messageType = MessageType[MessageType.INIT_PROPOSAL];
     if (session == undefined) {
       throw new SessionError(fnTag);
     }
@@ -76,143 +77,172 @@ export class Stage1ClientService extends SATPService {
 
     const sessionData = session.getClientSessionData();
 
-    if (
-      !supportedDLTs.includes(
-        sessionData.senderGatewayNetworkId as SupportedChain,
-      )
-    ) {
-      throw new Error( //todo change this to the transferClaims check
-        `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
-      );
-    }
-
-    sessionData.lastSequenceNumber = sessionData.lastSequenceNumber + BigInt(1);
-
-    const commonBody = create(CommonSatpSchema, {
-      version: sessionData.version,
-      messageType: MessageType.INIT_PROPOSAL,
-      sessionId: sessionData.id,
-      sequenceNumber: sessionData.lastSequenceNumber,
-      resourceUrl: sessionData.resourceUrl,
-      clientGatewayPubkey: sessionData.clientGatewayPubkey,
-      serverGatewayPubkey: sessionData.serverGatewayPubkey,
-      hashPreviousMessage: "",
-    });
-
-    if (sessionData.transferContextId != undefined) {
-      commonBody.transferContextId = sessionData.transferContextId;
-    }
-
-    const transferInitClaims = create(TransferClaimsSchema, {
-      digitalAssetId: sessionData.digitalAssetId,
-      assetProfileId: sessionData.assetProfileId,
-      verifiedOriginatorEntityId: sessionData.verifiedOriginatorEntityId,
-      verifiedBeneficiaryEntityId: sessionData.verifiedBeneficiaryEntityId,
-      originatorPubkey: sessionData.originatorPubkey,
-      beneficiaryPubkey: sessionData.beneficiaryPubkey,
-      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
-      recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
-      clientGatewayPubkey: sessionData.clientGatewayPubkey,
-      serverGatewayPubkey: sessionData.serverGatewayPubkey,
-      senderGatewayOwnerId: sessionData.senderGatewayOwnerId,
-      receiverGatewayOwnerId: sessionData.receiverGatewayOwnerId,
-    });
-
-    sessionData.hashTransferInitClaims = getHash(transferInitClaims);
-
-    const networkCapabilities = create(NetworkCapabilitiesSchema, {
-      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
-      signatureAlgorithm: sessionData.signatureAlgorithm,
-      lockType: sessionData.lockType,
-      lockExpirationTime: sessionData.lockExpirationTime,
-      credentialProfile: sessionData.credentialProfile,
-      loggingProfile: sessionData.loggingProfile,
-      accessControlProfile: sessionData.accessControlProfile,
-    });
-
-    if (sessionData.permissions != undefined) {
-      this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);
-      networkCapabilities.permissions = sessionData.permissions;
-    }
-
-    if (sessionData.developerUrn != "") {
-      this.Log.info(`${fnTag}, Optional variable loaded: developerUrn...`);
-      networkCapabilities.developerUrn = sessionData.developerUrn;
-    }
-
-    if (sessionData.applicationProfile != "") {
-      this.Log.info(
-        `${fnTag}, Optional variable loaded: applicationProfile...`,
-      );
-      networkCapabilities.applicationProfile = sessionData.applicationProfile;
-    }
-
-    if (sessionData.subsequentCalls != undefined) {
-      this.Log.info(`${fnTag}, Optional variable loaded: subsequentCalls...`);
-      networkCapabilities.subsequentCalls = sessionData.subsequentCalls;
-    }
-
-    if (sessionData.history.length > 0) {
-      this.Log.info(`${fnTag}, Optional variable loaded: history...`);
-      networkCapabilities.history = sessionData.history;
-    }
-
-    const transferProposalRequestMessage = create(
-      TransferProposalRequestMessageSchema,
-      {
-        common: commonBody,
-        transferInitClaims: transferInitClaims,
-        networkCapabilities: networkCapabilities,
-      },
-    );
-
-    if (sessionData.transferClaimsFormat != undefined) {
-      this.Log.info(
-        `${fnTag}, Optional variable loaded: transferInitClaimsFormat...`,
-      );
-      transferProposalRequestMessage.transferInitClaimsFormat =
-        sessionData.transferClaimsFormat;
-    }
-    if (sessionData.multipleCancelsAllowed) {
-      this.Log.info(
-        `${fnTag}, Optional variable loaded: multipleCancelsAllowed...`,
-      );
-      transferProposalRequestMessage.multipleCancelsAllowed =
-        sessionData.multipleCancelsAllowed;
-    }
-    if (sessionData.multipleClaimsAllowed) {
-      this.Log.info(
-        `${fnTag}, Optional variable loaded: multipleClaimsAllowed...`,
-      );
-      transferProposalRequestMessage.multipleClaimsAllowed =
-        sessionData.multipleClaimsAllowed;
-    }
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(transferProposalRequestMessage)),
-    );
-
-    transferProposalRequestMessage.clientSignature = messageSignature;
-
-    saveSignature(sessionData, MessageType.INIT_PROPOSAL, messageSignature);
-
-    saveHash(
-      sessionData,
-      MessageType.INIT_PROPOSAL,
-      getHash(transferProposalRequestMessage),
-    );
-
-    /*
-    await storeLog(gateway, {
-      sessionID: sessionID,
-      type: "transferProposalRequest",
-      operation: "validate",
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
+      sessionID: sessionData.id,
+      type: messageType,
+      operation: "init",
       data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
     });
-    */
-    this.Log.info(`${fnTag}, sending TransferProposalRequest...`);
 
-    return transferProposalRequestMessage;
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      if (
+        !supportedDLTs.includes(
+          sessionData.senderGatewayNetworkId as SupportedChain,
+        )
+      ) {
+        throw new Error( //todo change this to the transferClaims check
+          `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
+        );
+      }
+
+      sessionData.lastSequenceNumber =
+        sessionData.lastSequenceNumber + BigInt(1);
+
+      const commonBody = create(CommonSatpSchema, {
+        version: sessionData.version,
+        messageType: MessageType.INIT_PROPOSAL,
+        sessionId: sessionData.id,
+        sequenceNumber: sessionData.lastSequenceNumber,
+        resourceUrl: sessionData.resourceUrl,
+        clientGatewayPubkey: sessionData.clientGatewayPubkey,
+        serverGatewayPubkey: sessionData.serverGatewayPubkey,
+        hashPreviousMessage: "",
+      });
+
+      if (sessionData.transferContextId != undefined) {
+        commonBody.transferContextId = sessionData.transferContextId;
+      }
+
+      const transferInitClaims = create(TransferClaimsSchema, {
+        digitalAssetId: sessionData.digitalAssetId,
+        assetProfileId: sessionData.assetProfileId,
+        verifiedOriginatorEntityId: sessionData.verifiedOriginatorEntityId,
+        verifiedBeneficiaryEntityId: sessionData.verifiedBeneficiaryEntityId,
+        originatorPubkey: sessionData.originatorPubkey,
+        beneficiaryPubkey: sessionData.beneficiaryPubkey,
+        senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+        recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+        clientGatewayPubkey: sessionData.clientGatewayPubkey,
+        serverGatewayPubkey: sessionData.serverGatewayPubkey,
+        senderGatewayOwnerId: sessionData.senderGatewayOwnerId,
+        receiverGatewayOwnerId: sessionData.receiverGatewayOwnerId,
+      });
+
+      sessionData.hashTransferInitClaims = getHash(transferInitClaims);
+
+      const networkCapabilities = create(NetworkCapabilitiesSchema, {
+        senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+        signatureAlgorithm: sessionData.signatureAlgorithm,
+        lockType: sessionData.lockType,
+        lockExpirationTime: sessionData.lockExpirationTime,
+        credentialProfile: sessionData.credentialProfile,
+        loggingProfile: sessionData.loggingProfile,
+        accessControlProfile: sessionData.accessControlProfile,
+      });
+
+      if (sessionData.permissions != undefined) {
+        this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);
+        networkCapabilities.permissions = sessionData.permissions;
+      }
+
+      if (sessionData.developerUrn != "") {
+        this.Log.info(`${fnTag}, Optional variable loaded: developerUrn...`);
+        networkCapabilities.developerUrn = sessionData.developerUrn;
+      }
+
+      if (sessionData.applicationProfile != "") {
+        this.Log.info(
+          `${fnTag}, Optional variable loaded: applicationProfile...`,
+        );
+        networkCapabilities.applicationProfile = sessionData.applicationProfile;
+      }
+
+      if (sessionData.subsequentCalls != undefined) {
+        this.Log.info(`${fnTag}, Optional variable loaded: subsequentCalls...`);
+        networkCapabilities.subsequentCalls = sessionData.subsequentCalls;
+      }
+
+      if (sessionData.history.length > 0) {
+        this.Log.info(`${fnTag}, Optional variable loaded: history...`);
+        networkCapabilities.history = sessionData.history;
+      }
+
+      const transferProposalRequestMessage = create(
+        TransferProposalRequestMessageSchema,
+        {
+          common: commonBody,
+          transferInitClaims: transferInitClaims,
+          networkCapabilities: networkCapabilities,
+        },
+      );
+
+      if (sessionData.transferClaimsFormat != undefined) {
+        this.Log.info(
+          `${fnTag}, Optional variable loaded: transferInitClaimsFormat...`,
+        );
+        transferProposalRequestMessage.transferInitClaimsFormat =
+          sessionData.transferClaimsFormat;
+      }
+      if (sessionData.multipleCancelsAllowed) {
+        this.Log.info(
+          `${fnTag}, Optional variable loaded: multipleCancelsAllowed...`,
+        );
+        transferProposalRequestMessage.multipleCancelsAllowed =
+          sessionData.multipleCancelsAllowed;
+      }
+      if (sessionData.multipleClaimsAllowed) {
+        this.Log.info(
+          `${fnTag}, Optional variable loaded: multipleClaimsAllowed...`,
+        );
+        transferProposalRequestMessage.multipleClaimsAllowed =
+          sessionData.multipleClaimsAllowed;
+      }
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(transferProposalRequestMessage)),
+      );
+
+      transferProposalRequestMessage.clientSignature = messageSignature;
+
+      saveSignature(sessionData, MessageType.INIT_PROPOSAL, messageSignature);
+
+      saveHash(
+        sessionData,
+        MessageType.INIT_PROPOSAL,
+        getHash(transferProposalRequestMessage),
+      );
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      this.Log.info(`${fnTag}, sending TransferProposalRequest...`);
+
+      return transferProposalRequestMessage;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
+    }
   }
 
   async transferCommenceRequest(
@@ -221,6 +251,7 @@ export class Stage1ClientService extends SATPService {
   ): Promise<void | TransferCommenceRequestMessage> {
     const stepTag = `transferCommenceRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    const messageType = MessageType[MessageType.TRANSFER_COMMENCE_REQUEST];
     this.Log.debug(`${fnTag}, transferCommenceRequest...`);
 
     if (session == undefined) {
@@ -231,60 +262,90 @@ export class Stage1ClientService extends SATPService {
 
     const sessionData = session.getClientSessionData();
 
-    const commonBody = create(CommonSatpSchema, {
-      version: sessionData.version,
-      messageType: MessageType.TRANSFER_COMMENCE_REQUEST,
-      sessionId: sessionData.id,
-      sequenceNumber: response.common!.sequenceNumber + BigInt(1),
-      resourceUrl: sessionData.resourceUrl,
-      clientGatewayPubkey: sessionData.clientGatewayPubkey,
-      serverGatewayPubkey: sessionData.serverGatewayPubkey,
-      hashPreviousMessage: getMessageHash(
-        sessionData,
-        MessageType.INIT_RECEIPT,
-      ),
-      transferContextId: sessionData.transferContextId,
-    });
-
-    sessionData.lastSequenceNumber = commonBody.sequenceNumber;
-
-    const transferCommenceRequestMessage = create(
-      TransferCommenceRequestMessageSchema,
-      {
-        common: commonBody,
-        hashTransferInitClaims: sessionData.hashTransferInitClaims,
-      },
-    );
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(transferCommenceRequestMessage)),
-    );
-
-    transferCommenceRequestMessage.clientSignature = messageSignature;
-
-    saveSignature(
-      sessionData,
-      MessageType.TRANSFER_COMMENCE_REQUEST,
-      messageSignature,
-    );
-
-    saveHash(
-      sessionData,
-      MessageType.TRANSFER_COMMENCE_REQUEST,
-      getHash(transferCommenceRequestMessage),
-    );
-
-    /*
-    await storeLog(gateway, {
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
-      type: "transferCommenceRequest",
-      operation: "validate",
+      type: messageType,
+      operation: "init",
       data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
     });
-    */
-    this.Log.info(`${fnTag}, sending TransferCommenceRequest...`);
 
-    return transferCommenceRequestMessage;
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      const commonBody = create(CommonSatpSchema, {
+        version: sessionData.version,
+        messageType: MessageType.TRANSFER_COMMENCE_REQUEST,
+        sessionId: sessionData.id,
+        sequenceNumber: response.common!.sequenceNumber + BigInt(1),
+        resourceUrl: sessionData.resourceUrl,
+        clientGatewayPubkey: sessionData.clientGatewayPubkey,
+        serverGatewayPubkey: sessionData.serverGatewayPubkey,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.INIT_RECEIPT,
+        ),
+        transferContextId: sessionData.transferContextId,
+      });
+
+      sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+
+      const transferCommenceRequestMessage = create(
+        TransferCommenceRequestMessageSchema,
+        {
+          common: commonBody,
+          hashTransferInitClaims: sessionData.hashTransferInitClaims,
+        },
+      );
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(transferCommenceRequestMessage)),
+      );
+
+      transferCommenceRequestMessage.clientSignature = messageSignature;
+
+      saveSignature(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_REQUEST,
+        messageSignature,
+      );
+
+      saveHash(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_REQUEST,
+        getHash(transferCommenceRequestMessage),
+      );
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      this.Log.info(`${fnTag}, sending TransferCommenceRequest...`);
+
+      return transferCommenceRequestMessage;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
+    }
   }
 
   async checkPreSATPTransferResponse(

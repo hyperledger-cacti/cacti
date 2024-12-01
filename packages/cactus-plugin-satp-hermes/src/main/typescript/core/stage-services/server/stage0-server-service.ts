@@ -70,6 +70,7 @@ export class Stage0ServerService extends SATPService {
       serviceName: ops.serviceName,
       signer: ops.signer,
       serviceType: Stage0ServerService.SERVICE_TYPE,
+      dbLogger: ops.dbLogger,
     };
     super(commonOptions);
     if (ops.bridgeManager == undefined) {
@@ -281,7 +282,7 @@ export class Stage0ServerService extends SATPService {
   ): Promise<NewSessionResponseMessage> {
     const stepTag = `newSessionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-
+    const messageType = MessageType[MessageType.NEW_SESSION_RESPONSE];
     if (session == undefined) {
       throw new SessionError(fnTag);
     }
@@ -291,41 +292,77 @@ export class Stage0ServerService extends SATPService {
     }
     const sessionData = session.getServerSessionData();
 
-    const newSessionResponse = create(NewSessionResponseMessageSchema, {
-      sessionId: sessionData.id,
-      contextId: sessionData.transferContextId,
-      recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
-      senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
-      messageType: MessageType.NEW_SESSION_RESPONSE,
-      hashPreviousMessage: getMessageHash(
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
+      sessionID: sessionData.id,
+      type: messageType,
+      operation: "init",
+      data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
+    });
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      const newSessionResponse = create(NewSessionResponseMessageSchema, {
+        sessionId: sessionData.id,
+        contextId: sessionData.transferContextId,
+        recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+        senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+        messageType: MessageType.NEW_SESSION_RESPONSE,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.NEW_SESSION_REQUEST,
+        ),
+      });
+
+      if (sessionData.id != request.sessionId) {
+        newSessionResponse.status = STATUS.STATUS_REJECTED;
+      } else {
+        newSessionResponse.status = STATUS.STATUS_ACCEPTED;
+      }
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(newSessionResponse)),
+      );
+
+      newSessionResponse.serverSignature = messageSignature;
+
+      saveSignature(
         sessionData,
         MessageType.NEW_SESSION_REQUEST,
-      ),
-    });
+        messageSignature,
+      );
 
-    if (sessionData.id != request.sessionId) {
-      newSessionResponse.status = STATUS.STATUS_REJECTED;
-    } else {
-      newSessionResponse.status = STATUS.STATUS_ACCEPTED;
+      saveHash(sessionData, MessageType.NEW_SESSION_REQUEST, fnTag);
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      this.Log.info(`${fnTag}, sending NewSessionRequest...`);
+
+      return newSessionResponse;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
     }
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(newSessionResponse)),
-    );
-
-    newSessionResponse.serverSignature = messageSignature;
-
-    saveSignature(
-      sessionData,
-      MessageType.NEW_SESSION_REQUEST,
-      messageSignature,
-    );
-
-    saveHash(sessionData, MessageType.NEW_SESSION_REQUEST, fnTag);
-
-    this.Log.info(`${fnTag}, sending NewSessionRequest...`);
-
-    return newSessionResponse;
   }
 
   public async newSessionErrorResponse(
@@ -381,7 +418,7 @@ export class Stage0ServerService extends SATPService {
   ): Promise<PreSATPTransferResponseMessage> {
     const stepTag = `preSATPTransferResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-
+    const messageType = MessageType[MessageType.PRE_TRANSFER_COMMENCE_RESPONSE];
     if (session == undefined) {
       throw new SessionError(fnTag);
     }
@@ -392,57 +429,111 @@ export class Stage0ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    if (request.receiverAsset == undefined) {
-      throw new AssetMissing(fnTag);
+    this.Log.info(`init-${messageType}`);
+    await this.dbLogger.persistLogEntry({
+      sessionID: sessionData.id,
+      type: messageType,
+      operation: "init",
+      data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
+    });
+
+    try {
+      this.Log.info(`exec-${messageType}`);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      if (request.receiverAsset == undefined) {
+        throw new AssetMissing(fnTag);
+      }
+
+      const preSATPTransferResponse = create(
+        PreSATPTransferResponseMessageSchema,
+        {
+          sessionId: sessionData.id,
+          contextId: sessionData.transferContextId,
+          hashPreviousMessage: getMessageHash(
+            sessionData,
+            MessageType.PRE_SATP_TRANSFER_REQUEST,
+          ),
+          wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
+          recipientTokenId: sessionData.receiverAsset!.tokenId,
+          messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+        },
+      );
+
+      const messageSignature = bufArray2HexStr(
+        sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
+      );
+
+      preSATPTransferResponse.serverSignature = messageSignature;
+
+      saveSignature(
+        sessionData,
+        MessageType.PRE_SATP_TRANSFER_REQUEST,
+        messageSignature,
+      );
+
+      saveHash(sessionData, MessageType.PRE_SATP_TRANSFER_REQUEST, fnTag);
+
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "done",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+
+      this.Log.info(`${fnTag},  sending PreSATPTransferResponse...`);
+
+      return preSATPTransferResponse;
+    } catch (error) {
+      this.Log.error(`fail-${messageType}`, error);
+      await this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: messageType,
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      throw error;
     }
-
-    const preSATPTransferResponse = create(
-      PreSATPTransferResponseMessageSchema,
-      {
-        sessionId: sessionData.id,
-        contextId: sessionData.transferContextId,
-        hashPreviousMessage: getMessageHash(
-          sessionData,
-          MessageType.PRE_SATP_TRANSFER_REQUEST,
-        ),
-        wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
-        recipientTokenId: sessionData.receiverAsset!.tokenId,
-        messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
-      },
-    );
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
-    );
-
-    preSATPTransferResponse.serverSignature = messageSignature;
-
-    saveSignature(
-      sessionData,
-      MessageType.PRE_SATP_TRANSFER_REQUEST,
-      messageSignature,
-    );
-
-    saveHash(sessionData, MessageType.PRE_SATP_TRANSFER_REQUEST, fnTag);
-
-    this.Log.info(`${fnTag}, sending PreSATPTransferResponse...`);
-
-    return preSATPTransferResponse;
   }
 
   public async wrapToken(session: SATPSession): Promise<void> {
     const stepTag = `wrapToken()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+
+    if (session == undefined) {
+      throw new SessionError(fnTag);
+    }
+
+    const sessionData = session.getServerSessionData();
+    this.Log.info(`init-${stepTag}`);
+    this.dbLogger.persistLogEntry({
+      sessionID: sessionData.id,
+      type: "wrap-token",
+      operation: "init",
+      data: safeStableStringify(sessionData),
+      sequenceNumber: Number(sessionData.lastSequenceNumber),
+    });
     try {
+      this.Log.info(`exec-${stepTag}`);
+      this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: "wrap-token",
+        operation: "exec",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
       this.Log.info(`${fnTag}, Wrapping Asset...`);
 
-      if (session == undefined) {
-        throw new SessionError(fnTag);
-      }
-
       //TODO: check if is necessary to verify more things
-
-      const sessionData = session.getServerSessionData();
 
       if (sessionData.recipientGatewayNetworkId == "") {
         throw new GatewayNetworkIdError(fnTag);
@@ -475,14 +566,33 @@ export class Stage0ServerService extends SATPService {
       );
       sessionData.receiverWrapAssertionClaim.receipt =
         await bridge.wrapAsset(token);
+      sessionData.receiverWrapAssertionClaim.proof =
+        await bridge.getProof(assetId);
       sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
       );
+
+      this.dbLogger.storeProof({
+        sessionID: sessionData.id,
+        type: "wrap-token",
+        operation: "done",
+        data: safeStableStringify(sessionData.receiverWrapAssertionClaim.proof),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
+      this.Log.info(`${fnTag}, done-${fnTag}`);
     } catch (error) {
+      this.Log.debug(`Crash in ${fnTag}`, error);
+
+      this.dbLogger.persistLogEntry({
+        sessionID: sessionData.id,
+        type: "wrap-token",
+        operation: "fail",
+        data: safeStableStringify(sessionData),
+        sequenceNumber: Number(sessionData.lastSequenceNumber),
+      });
       throw new FailedToProcessError(fnTag, "WrapAsset", error);
     }
   }
-
   private setError(
     message: NewSessionResponseMessage | PreSATPTransferResponseMessage,
     error: SATPInternalError,
