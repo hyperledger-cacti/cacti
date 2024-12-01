@@ -9,6 +9,7 @@ import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_
 import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
+import { SATPLogger } from "../../logging";
 
 export enum SATPServiceType {
   Server = "Server",
@@ -24,6 +25,7 @@ export type ISATPServiceOptions = {
   signer: JsObjectSigner;
   serviceType: SATPServiceType;
   bridgeManager?: SATPBridgesManager;
+  dbLogger: SATPLogger;
 };
 
 export interface SATPServiceStatic {
@@ -56,6 +58,7 @@ export abstract class SATPService {
   readonly serviceType: SATPServiceType;
   private readonly signer: JsObjectSigner;
   readonly serviceName: string;
+  public dbLogger: SATPLogger;
 
   constructor(ops: ISATPServiceOptions) {
     this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
@@ -63,6 +66,10 @@ export abstract class SATPService {
     this.serviceType = ops.serviceType;
     this.stage = ops.stage;
     this.signer = ops.signer;
+    if (!ops.dbLogger) {
+      throw new Error("dbLogger is required for SATPService");
+    }
+    this.dbLogger = ops.dbLogger;
     this.logger.trace(`Signer logger level: ${this.signer.options.logLevel}`);
   }
 
