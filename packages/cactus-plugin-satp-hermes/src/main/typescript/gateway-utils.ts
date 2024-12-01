@@ -1,6 +1,4 @@
 import { JsObjectSigner } from "@hyperledger/cactus-common";
-import { LocalLog, RemoteLog } from "./core/types";
-import { SATPGateway } from "./plugin-satp-hermes-gateway";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -58,89 +56,6 @@ export function verifySignature(
     return true;
   } else {
     throw new Error("No signature found in the object");
-  }
-}
-
-export async function storeProof(
-  gateway: SATPGateway,
-  localLog: LocalLog,
-): Promise<void> {
-  if (localLog.data == undefined) return;
-
-  localLog.key = getSatpLogKey(
-    localLog.sessionID,
-    localLog.type,
-    localLog.operation,
-  );
-  localLog.timestamp = Date.now().toString();
-
-  await storeInDatabase(gateway, localLog);
-
-  const hash = SHA256(localLog.data).toString();
-
-  await storeRemoteLog(gateway, localLog.key, hash);
-}
-
-export async function storeLog(
-  gateway: SATPGateway,
-  localLog: LocalLog,
-): Promise<void> {
-  localLog.key = getSatpLogKey(
-    localLog.sessionID,
-    localLog.type,
-    localLog.operation,
-  );
-  localLog.timestamp = Date.now().toString();
-
-  await storeInDatabase(gateway, localLog);
-
-  // Keep the order consistent with the order of the fields in the table
-  // so that the hash matches when retrieving from the database
-  const hash = SHA256(
-    safeStableStringify(localLog, [
-      "sessionID",
-      "type",
-      "key",
-      "operation",
-      "timestamp",
-      "data",
-    ]),
-  ).toString();
-
-  await storeRemoteLog(gateway, localLog.key, hash);
-}
-
-export async function storeInDatabase(
-  gateway: SATPGateway,
-  LocalLog: LocalLog,
-) {
-  await gateway.localRepository?.create(LocalLog);
-}
-
-export async function storeRemoteLog(
-  gateway: SATPGateway,
-  key: string,
-  hash: string,
-) {
-  const fnTag = `${gateway.className}#storeInDatabase()`;
-
-  const remoteLog: RemoteLog = {
-    key: key,
-    hash: hash,
-    signature: "",
-    signerPubKey: gateway.pubKey,
-  };
-
-  remoteLog.signature = bufArray2HexStr(
-    sign(gateway.Signer, safeStableStringify(remoteLog)),
-  );
-
-  const response = await gateway.remoteRepository?.create(remoteLog);
-
-  if (response.status < 200 && response.status > 299) {
-    throw new Error(
-      `${fnTag}, got response ${response.status} when logging to remote`,
-    );
   }
 }
 
