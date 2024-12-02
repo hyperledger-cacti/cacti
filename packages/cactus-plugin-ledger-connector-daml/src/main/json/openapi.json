@@ -1,0 +1,471 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cacti Plugin - Connector DAML",
+    "description": "Can perform basic tasks on a DAML ledger",
+    "version": "2.0.0-rc.3",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "QueryRawIOUEndpointRequest": {
+        "description": "This method is the request for querying a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "participantToken": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "GetPartiesInvolvedEndpointRequest": {
+        "description": "This method is the request for getting all of the parties involved upon starting daml.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "participantToken": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "QueryIOUEndpointRequest": {
+        "description": "This method is the request for querying a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "participantToken": {
+            "type": "string",
+            "nullable": false
+          },
+          "templateIds": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "query": {
+            "type": "object",
+            "nullable": false,
+            "properties": {
+              "amount": {
+                "type": "number",
+                "nullable": false
+              }
+            }
+          },
+          "readers": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        }
+      },
+      "QueryIOUEndpointResponse": {
+        "description": "This method is the response for querying a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "completionOffset": {
+            "type": "string",
+            "nullable": false
+          },
+          "events": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "object",
+              "nullable": false,
+              "properties": {
+                "archived": {
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "contractId": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "templateId": {
+                      "type": "string",
+                      "nullable": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateIOUEndpointRequest": {
+        "description": "This method is the request for creating a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "templateId": {
+            "type": "string",
+            "nullable": false
+          },
+          "participantToken": {
+            "type": "string",
+            "nullable": false
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "issuer": {
+                "type": "string",
+                "nullable": false
+              },
+              "owner": {
+                "type": "string",
+                "nullable": false
+              },
+              "currency": {
+                "type": "string",
+                "nullable": false
+              },
+              "amount": {
+                "type": "string",
+                "nullable": false
+              },
+              "observers": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateIOUEndpointResponse": {
+        "description": "This method is the response for creating a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "agreementText": {
+            "type": "string",
+            "nullable": false
+          },
+          "completionOffset": {
+            "type": "string",
+            "nullable": false
+          },
+          "contractId": {
+            "type": "string",
+            "nullable": false
+          },
+          "observers": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "templateId": {
+            "type": "string",
+            "nullable": false
+          },
+          "signatories": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "issuer": {
+                "type": "string",
+                "nullable": false
+              },
+              "owner": {
+                "type": "string",
+                "nullable": false
+              },
+              "currency": {
+                "type": "string",
+                "nullable": false
+              },
+              "amount": {
+                "type": "string",
+                "nullable": false
+              },
+              "observers": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "ExerciseIOUEndpointRequest": {
+        "description": "This method is the request for creating a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "previousParticipantToken": {
+            "type": "string",
+            "nullable": false
+          },
+          "templateId": {
+            "type": "string",
+            "nullable": false
+          },
+          "contractId": {
+            "type": "string",
+            "nullable": false
+          },
+          "choice": {
+            "type": "string",
+            "nullable": false
+          },
+          "argument": {
+            "type": "object",
+            "properties": {
+              "newOwner": {
+                "type": "string",
+                "nullable": false
+              }
+            }
+          }
+        }
+      },
+      "ExerciseIOUEndpointResponse": {
+        "description": "This method is the request for creating a simple IOU contract.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "completionOffset": {
+            "type": "string",
+            "nullable": false
+          },
+          "events": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "object",
+              "nullable": false,
+              "properties": {
+                "archived": {
+                  "type": "object",
+                  "nullable": false,
+                  "properties": {
+                    "contractId": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "templateId": {
+                      "type": "string",
+                      "nullable": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/create-iou-endpoint": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/create-iou-endpoint"
+          }
+        },
+        "operationId": "createIou",
+        "summary": "This method creates a simple iou countract",
+        "requestBody": {
+          "description": "Request body for creation of iou",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIOUEndpointRequest"
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateIOUEndpointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/exercise-iou-endpoint": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/exercise-iou-endpoint"
+          }
+        },
+        "operationId": "exerciseChoice",
+        "summary": "This method exercise choices(DAML term for function on contracts) for iou countract",
+        "requestBody": {
+          "description": "Request body for exercising choice(DAML term for function on contracts) of iou",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseIOUEndpointRequest"
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseIOUEndpointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-iou-endpoint": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-iou-endpoint"
+          }
+        },
+        "operationId": "queryContract",
+        "summary": "This method queries DAML contracts",
+        "requestBody": {
+          "description": "Request body for creation of iou",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryIOUEndpointRequest"
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryIOUEndpointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-raw-iou-endpoint": {
+      "get": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/query-raw-iou-endpoint"
+          }
+        },
+        "operationId": "queryRawContract",
+        "summary": "This method queries DAML contracts that does not include request body",
+        "requestBody": {
+          "description": "Request for querying IOU contracts",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRawIOUEndpointRequest"
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryIOUEndpointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/get-parties-involved-endpoint": {
+      "get": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-daml/get-parties-involved-endpoint"
+          }
+        },
+        "operationId": "getPartiesInvolved",
+        "summary": "This method queries all the parties that is included on IOU contract",
+        "requestBody": {
+          "description": "Request body for getting the parties involved in daml instance",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPartiesInvolvedEndpointRequest"
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryIOUEndpointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

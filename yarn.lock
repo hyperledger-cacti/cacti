@@ -10441,6 +10441,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cactus-plugin-ledger-connector-daml@workspace:packages/cactus-plugin-ledger-connector-daml":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cactus-plugin-ledger-connector-daml@workspace:packages/cactus-plugin-ledger-connector-daml"
+  dependencies:
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@hyperledger/cactus-core": "npm:2.0.0"
+    "@hyperledger/cactus-core-api": "npm:2.0.0"
+    "@hyperledger/cactus-test-tooling": "npm:2.0.0"
+    "@types/body-parser": "npm:1.19.4"
+    "@types/express": "npm:5.0.0"
+    "@types/multer": "npm:1.4.7"
+    "@types/temp": "npm:0.9.1"
+    "@types/uuid": "npm:10.0.0"
+    axios: "npm:1.7.7"
+    body-parser: "npm:1.20.2"
+    express: "npm:4.21.0"
+    express-openapi-validator: "npm:5.2.0"
+    http-errors-enhanced-cjs: "npm:2.0.1"
+    internal-ip: "npm:6.2.0"
+    joi: "npm:17.13.3"
+    node-fetch: "npm:2.7.0"
+    node-ssh: "npm:13.1.0"
+    prom-client: "npm:15.1.3"
+    rxjs: "npm:7.8.1"
+    temp: "npm:0.9.4"
+    typescript-optional: "npm:2.0.1"
+    uuid: "npm:10.0.0"
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/cactus-plugin-ledger-connector-ethereum@npm:2.0.0, @hyperledger/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum"
@@ -21541,6 +21571,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"body-parser@npm:1.20.2, body-parser@npm:^1.10.0, body-parser@npm:^1.18.2":
+  version: 1.20.2
+  resolution: "body-parser@npm:1.20.2"
+  dependencies:
+    bytes: "npm:3.1.2"
+    content-type: "npm:~1.0.5"
+    debug: "npm:2.6.9"
+    depd: "npm:2.0.0"
+    destroy: "npm:1.2.0"
+    http-errors: "npm:2.0.0"
+    iconv-lite: "npm:0.4.24"
+    on-finished: "npm:2.4.1"
+    qs: "npm:6.11.0"
+    raw-body: "npm:2.5.2"
+    type-is: "npm:~1.6.18"
+    unpipe: "npm:1.0.0"
+  checksum: 10/3cf171b82190cf91495c262b073e425fc0d9e25cc2bf4540d43f7e7bbca27d6a9eae65ca367b6ef3993eea261159d9d2ab37ce444e8979323952e12eb3df319a
+  languageName: node
+  linkType: hard
+
 "body-parser@npm:1.20.3":
   version: 1.20.3
   resolution: "body-parser@npm:1.20.3"
@@ -21558,26 +21608,6 @@ __metadata:
     type-is: "npm:~1.6.18"
     unpipe: "npm:1.0.0"
   checksum: 10/8723e3d7a672eb50854327453bed85ac48d045f4958e81e7d470c56bf111f835b97e5b73ae9f6393d0011cc9e252771f46fd281bbabc57d33d3986edf1e6aeca
-  languageName: node
-  linkType: hard
-
-"body-parser@npm:^1.10.0, body-parser@npm:^1.18.2":
-  version: 1.20.2
-  resolution: "body-parser@npm:1.20.2"
-  dependencies:
-    bytes: "npm:3.1.2"
-    content-type: "npm:~1.0.5"
-    debug: "npm:2.6.9"
-    depd: "npm:2.0.0"
-    destroy: "npm:1.2.0"
-    http-errors: "npm:2.0.0"
-    iconv-lite: "npm:0.4.24"
-    on-finished: "npm:2.4.1"
-    qs: "npm:6.11.0"
-    raw-body: "npm:2.5.2"
-    type-is: "npm:~1.6.18"
-    unpipe: "npm:1.0.0"
-  checksum: 10/3cf171b82190cf91495c262b073e425fc0d9e25cc2bf4540d43f7e7bbca27d6a9eae65ca367b6ef3993eea261159d9d2ab37ce444e8979323952e12eb3df319a
   languageName: node
   linkType: hard
 
@@ -54177,7 +54207,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web3-eth-accounts@npm:^4.0.3, web3-eth-accounts@npm:^4.0.5, web3-eth-accounts@npm:^4.1.0, web3-eth-accounts@npm:^4.1.1":
+"web3-eth-accounts@npm:^4.0.3, web3-eth-accounts@npm:^4.0.5, web3-eth-accounts@npm:^4.1.1":
   version: 4.1.3
   resolution: "web3-eth-accounts@npm:4.1.3"
   dependencies:
@@ -54189,6 +54219,21 @@ __metadata:
     web3-utils: "npm:^4.3.1"
     web3-validator: "npm:^2.0.6"
   checksum: 10/c5d4aa7b82517372666833e1752ffb2e768932833284de9388d710399dbdb609b129af76e4f658a0679ae18190b627e2b2331ad616ab3109c741dcd75a9e9524
+  languageName: node
+  linkType: hard
+
+"web3-eth-accounts@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "web3-eth-accounts@npm:4.1.0"
+  dependencies:
+    "@ethereumjs/rlp": "npm:^4.0.1"
+    crc-32: "npm:^1.2.2"
+    ethereum-cryptography: "npm:^2.0.0"
+    web3-errors: "npm:^1.1.3"
+    web3-types: "npm:^1.3.0"
+    web3-utils: "npm:^4.0.7"
+    web3-validator: "npm:^2.0.3"
+  checksum: 10/2048b3d1211593a44921a7cf200a2a407d82f832eae5751aa3b193012f4c084038814878c9423988636435f9b41967769a854ab643fb7d3cda8d898ad070be26
   languageName: node
   linkType: hard
 

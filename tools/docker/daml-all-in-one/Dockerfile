@@ -4,11 +4,22 @@ LABEL org.opencontainers.image.source = "https://github.com/hyperledger/cacti"
 RUN apt update && \
     apt install --no-install-recommends curl openjdk-21-jdk supervisor openssl xxd -y
 
-# Download and install DAML SDK 2.9.3
-RUN curl -L https://github.com/digital-asset/daml/releases/download/v2.9.3/daml-sdk-2.9.3-linux.tar.gz | tar -xz -C /opt && \
-    cd /opt/sdk-2.9.3 && \
-   ./install.sh && \
-   rm -rf /opt/sdk-2.9.3/
+# # Download and install DAML SDK 2.9.3
+# RUN curl -L https://github.com/digital-asset/daml/releases/download/v2.9.3/daml-sdk-2.9.3-linux.tar.gz | tar -xz -C /opt && \
+#     cd /opt/sdk-2.9.3 && \
+#    ./install.sh && \
+#    rm -rf /opt/sdk-2.9.3/
+# Step 1: Download the DAML SDK tarball
+RUN curl -L https://github.com/digital-asset/daml/releases/download/v2.9.3/daml-sdk-2.9.3-linux.tar.gz -o /tmp/daml-sdk-2.9.3-linux.tar.gz
+
+# Step 2: Extract the tarball to the /opt directory
+RUN tar -xz -C /opt -f /tmp/daml-sdk-2.9.3-linux.tar.gz
+
+# Step 3: Change to the extracted directory and install the DAML SDK
+RUN cd /opt/sdk-2.9.3 && ./install.sh
+
+# Step 4: Clean up temporary files
+RUN rm -rf /opt/sdk-2.9.3 /tmp/daml-sdk-2.9.3-linux.tar.gz
 
 ENV PATH="/root/.daml/bin:${PATH}"
 RUN daml new quickstart --template quickstart-java
