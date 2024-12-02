@@ -189,9 +189,11 @@ export interface IPluginLedgerConnectorFabricOptions
   cliContainerGoPath?: string;
   cliContainerEnv: NodeJS.ProcessEnv;
   pluginRegistry: PluginRegistry;
-  sshConfig: SshConfig;
+  sshConfig?: SshConfig;
+  sshConfigB64?: string;
   readonly sshDebugOn?: boolean;
-  connectionProfile: ConnectionProfile;
+  connectionProfile?: ConnectionProfile;
+  connectionProfileB64?: string;
   prometheusExporter?: PrometheusExporter;
   discoveryOptions?: GatewayDiscoveryOptions;
   eventHandlerOptions?: GatewayEventHandlerOptions;
@@ -219,6 +221,8 @@ export class PluginLedgerConnectorFabric
   private readonly peerBinary: string;
   private readonly goBinary: string;
   private readonly cliContainerGoPath: string;
+  private readonly sshConfig: SshConfig;
+  private readonly connectionProfile: ConnectionProfile;
   public prometheusExporter: PrometheusExporter;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private readonly secureIdentity: SecureIdentityProviders;
@@ -241,7 +245,6 @@ export class PluginLedgerConnectorFabric
     Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(opts.peerBinary, `${fnTag} options.peerBinary`);
     Checks.truthy(opts.pluginRegistry, `${fnTag} options.pluginRegistry`);
-    Checks.truthy(opts.connectionProfile, `${fnTag} options.connectionProfile`);
     this.prometheusExporter =
       opts.prometheusExporter ||
       new PrometheusExporter({ pollingIntervalInMin: 1 });
@@ -277,9 +280,33 @@ export class PluginLedgerConnectorFabric
     });
     this.certStore = new CertDatastore(opts.pluginRegistry);
 
+    if (this.opts.connectionProfile) {
+      this.connectionProfile = this.opts.connectionProfile;
+    } else if (this.opts.connectionProfileB64) {
+      const connectionProfileBuffer = Buffer.from(
+        this.opts.connectionProfileB64,
+        "base64",
+      );
+      const connectionProfileString = connectionProfileBuffer.toString("utf-8");
+      this.connectionProfile = JSON.parse(connectionProfileString);
+    } else {
+      throw new Error(
+        "Cannot instantiate Fabric connector without connection profile.",
+      );
+    }
+
     this.sshDebugOn = opts.sshDebugOn === true;
+    if (this.opts.sshConfig) {
+      this.sshConfig = this.opts.sshConfig;
+    } else if (this.opts.sshConfigB64) {
+      const sshConfigBuffer = Buffer.from(this.opts.sshConfigB64, "base64");
+      const sshConfigString = sshConfigBuffer.toString("utf-8");
+      this.sshConfig = JSON.parse(sshConfigString);
+    } else {
+      throw new Error("Cannot instantiate Fabric connector without SSH config");
+    }
     if (this.sshDebugOn) {
-      this.opts.sshConfig = this.enableSshDebugLogs(this.opts.sshConfig);
+      this.sshConfig = this.enableSshDebugLogs(this.sshConfig);
     }
 
     this.signCallback = opts.signCallback;
@@ -361,11 +388,11 @@ export class PluginLedgerConnectorFabric
     req: DeployContractV1Request,
   ): Promise<DeployContractV1Response> {
     const fnTag = `${this.className}#deployContract()`;
-    const { log, opts } = this;
+    const { log } = this;
 
     const ssh = new NodeSSH();
     this.log.debug(`${fnTag} Establishing SSH connection to peer...`);
-    await ssh.connect(opts.sshConfig);
+    await ssh.connect(this.sshConfig);
     this.log.debug(`${fnTag} Established SSH connection to peer OK.`);
 
     if (req.collectionsConfigFile) {
@@ -666,6 +693,7 @@ export class PluginLedgerConnectorFabric
       log,
       opts: this.opts,
       dockerBinary: this.dockerBinary,
+      sshConfig: this.sshConfig,
       className: this.className,
     };
     return deployContractGoSourceImplFabricV256(ctx, req);
@@ -910,7 +938,7 @@ export class PluginLedgerConnectorFabric
     return createGateway({
       logLevel: this.opts.logLevel,
       pluginRegistry: this.opts.pluginRegistry,
-      defaultConnectionProfile: this.opts.connectionProfile,
+      defaultConnectionProfile: this.connectionProfile,
       defaultDiscoveryOptions: this.opts.discoveryOptions || {
         enabled: true,
         asLocalhost: true,
@@ -935,7 +963,8 @@ export class PluginLedgerConnectorFabric
   protected async createGatewayLegacy(
     signingCredential: FabricSigningCredential,
   ): Promise<Gateway> {
-    const { connectionProfile, eventHandlerOptions: eho } = this.opts;
+    const { eventHandlerOptions: eho } = this.opts;
+    const connectionProfile = this.connectionProfile;
 
     const iType = signingCredential.type || FabricSigningCredentialType.X509;
 
@@ -1264,7 +1293,7 @@ export class PluginLedgerConnectorFabric
   public async createCaClient(caId: string): Promise<FabricCAServices> {
     const fnTag = `${this.className}#createCaClient()`;
     try {
-      const ccp = this.opts.connectionProfile;
+      const ccp = this.connectionProfile;
       if (!ccp.certificateAuthorities) {
         throw new Error(`${fnTag} conn. profile certificateAuthorities falsy.`);
       }
@@ -1669,7 +1698,7 @@ export class PluginLedgerConnectorFabric
     this.log.debug("Create Fabric Client without a signer with ID", clientId);
     const client = new Client(clientId);
     // Use fabric SDK methods for parsing connection profile into Client structure
-    await loadFromConfig(client, this.opts.connectionProfile);
+    await loadFromConfig(client, this.connectionProfile);
 
     // Create user
     const user = User.createUser("", "", signerMspID, signerCertificate);
