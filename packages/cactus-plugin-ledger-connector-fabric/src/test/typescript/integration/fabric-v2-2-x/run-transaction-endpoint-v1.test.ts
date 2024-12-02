@@ -251,6 +251,32 @@ describe(testCase, () => {
     }
 
     {
+      const connectionProfileString = JSON.stringify(connectionProfile);
+      const connectionProfileB64Buffer = Buffer.from(connectionProfileString);
+      const sshConfigString = JSON.stringify(sshConfig);
+      const connectionProfileB64 =
+        connectionProfileB64Buffer.toString("base64");
+      const sshConfigB64Buffer = Buffer.from(sshConfigString);
+      const sshConfigB64 = sshConfigB64Buffer.toString("base64");
+      const pluginOptionsSerialized: IPluginLedgerConnectorFabricOptions = {
+        instanceId: uuidv4(),
+        pluginRegistry,
+        sshConfigB64,
+        cliContainerEnv: {},
+        peerBinary: "/fabric-samples/bin/peer",
+        logLevel,
+        connectionProfileB64,
+        discoveryOptions,
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+        },
+      };
+      const pluginWithSerializedInputs = new PluginLedgerConnectorFabric(
+        pluginOptionsSerialized,
+      );
+      await pluginWithSerializedInputs.getOrCreateWebServices();
+      await pluginWithSerializedInputs.registerWebServices(expressApp);
       const req: RunTransactionRequest = {
         signingCredential,
         gatewayOptions: {
