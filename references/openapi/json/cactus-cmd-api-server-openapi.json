@@ -3,7 +3,7 @@
     "info": {
         "title": "Hyperledger Cactus API",
         "description": "Interact with a Cactus deployment through HTTP.",
-        "version": "2.0.0",
+        "version": "2.1.0",
         "license": {
             "name": "Apache-2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -75,9 +75,29 @@
             "GetOpenApiSpecV1EndpointResponse": {
                 "type": "string",
                 "nullable": false
+            },
+            "CmdApiServerEndpointErrorResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Forbidden - Valid token but missing correct scope\n"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerTokenAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JSON Web Tokens"
             }
         }
     },
+    "security": [
+        {
+            "bearerTokenAuth": ["read:health", "read:metrics", "read:spec"]
+        }
+    ],
     "paths": {
         "/api/v1/api-server/healthcheck": {
             "get": {
@@ -101,8 +121,33 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid token",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CmdApiServerEndpointErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Valid token but missing correct scope",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CmdApiServerEndpointErrorResponse"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerTokenAuth": ["read:health"]
+                    }
+                ]
             }
         },
         "/api/v1/api-server/get-prometheus-exporter-metrics": {
@@ -126,8 +171,33 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid token",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CmdApiServerEndpointErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Valid token but missing correct scope",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CmdApiServerEndpointErrorResponse"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerTokenAuth": ["read:metrics"]
+                    }
+                ]
             }
         },
         "/api/v1/api-server/get-open-api-spec": {
@@ -151,8 +221,33 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid token",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CmdApiServerEndpointErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Valid token but missing correct scope",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CmdApiServerEndpointErrorResponse"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerTokenAuth": ["read:spec"]
+                    }
+                ]
             }
         }
     }
