@@ -34,7 +34,6 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 
-import { Account } from "web3-core";
 import {
   IPluginConsortiumStaticOptions,
   PluginConsortiumStatic,
@@ -44,6 +43,7 @@ import {
   generateES256JWK,
   issueOrgToken,
 } from "../../../main/typescript/utils";
+import { Web3Account } from "web3-eth-accounts";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "Routes to correct node based on ledger ID";
@@ -74,7 +74,7 @@ describe(testCase, () => {
 
   let apiServer1: ApiServer;
   let apiServer2: ApiServer;
-  let testEthAccount1: Account;
+  let testEthAccount1: Web3Account;
 
   let entitiesJWK: any;
   let entity1JWK: any;
@@ -338,7 +338,7 @@ describe(testCase, () => {
         apiClient: mainApiClient.extendWith(ConsortiumStaticApi),
       }),
     );
-    const testAccount1 = new Web3().eth.accounts.create(uuidV4());
+    const testAccount1 = new Web3().eth.accounts.create();
     const res = await apiClient1.runTransactionV1({
       transactionConfig: {
         from: initialFundsAccount1,
@@ -371,7 +371,7 @@ describe(testCase, () => {
         apiClient: mainApiClient.extendWith(ConsortiumStaticApi),
       }),
     );
-    const testAccount2 = new Web3().eth.accounts.create(uuidV4());
+    const testAccount2 = new Web3().eth.accounts.create();
     const res = await apiClient2.runTransactionV1({
       transactionConfig: {
         from: initialFundsAccount2,

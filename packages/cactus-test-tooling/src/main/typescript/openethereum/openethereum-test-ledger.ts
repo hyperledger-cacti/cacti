@@ -285,9 +285,9 @@ export class OpenEthereumTestLedger {
    * @returns Contract deployment `TransactionReceipt`
    */
   public async deployContract(
-    abi: AbiItem | AbiItem[],
+    abi: any,
     bytecode: string,
-    args?: any[],
+    args?: [],
   ): Promise<TransactionReceipt> {
     // Encode ABI
     const contractProxy = new this.web3.eth.Contract(abi);

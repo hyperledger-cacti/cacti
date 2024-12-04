@@ -5,6 +5,7 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
+import { Readable } from "stream";
 
 export interface IBuildContainerImageRequest {
   readonly logLevel: LogLevelDesc;
@@ -89,7 +90,8 @@ export async function buildContainerImage(
   });
 
   const out = await new Promise((resolve, reject) => {
-    dockerEngine.modem.followProgress(stream, (err, res) =>
+    const nodeStream = Readable.from(stream)
+    dockerEngine.modem.followProgress(nodeStream, (err, res) =>
       err ? reject(err) : resolve(res),
     );
   });
