@@ -1,9 +1,9 @@
 import { readFileSync } from "fs";
+import { execSync } from "child_process";
 
-//A new tag exclusively for MAINTAINERS that allows skipping the CI check
+// Constants
 const SKIP_CACTI = "skip-cacti-ci";
 const MaintainersFile = "MAINTAINERS.md";
-//regular expression to get the maintainers in MAINTAINERS.md
 const NAMES_REGEX = /\|\s*([A-Za-z\s]+)\s*/;
 const LINKS_REGEX = /\|\s*\[([^\]]+)\]\[[^\]]+\]\s*/;
 const TAGS_REGEX = /\|\s*([A-Za-z0-9_-]+|-)*\s*/;
@@ -12,90 +12,82 @@ const MAINTAINERS_REGEX = new RegExp(
   "g",
 );
 
+const getMaintainersFileContent = () => readFileSync(MaintainersFile, "utf-8");
+
+// Function to get the latest commit message author
+const getCommitterLogin = () => {
+  const authorBuffer = execSync("git log -1 | grep Author | cut -d' ' -f2");
+  const authorString = authorBuffer.toString();
+  const authorStringTrim = authorString.trim();
+  return authorStringTrim;
+};
+
+// Function to get the latest commit message
+const getLatestCommitMessage = () => {
+  const commitMsgBuffer = execSync("git log -1 --pretty=%B");
+  const commitMsgString = commitMsgBuffer.toString();
+  const commitMsgTrim = commitMsgString.trim();
+  return commitMsgTrim;
+};
+
+// Function to check if SKIP_CACTI tag is in the commit message
+const checkSkipCI = (commitMessage) => {
+  if (commitMessage.includes(SKIP_CACTI)) {
+    console.log("Skip requested in commit message.");
+    return true;
+  }
+  console.log("No skip request found.");
+  return false;
+};
+
+// Function to extract maintainers from the MAINTAINERS.md file content
+const extractMaintainers = (maintainerMetaData) => {
+  let match;
+  const maintainers = [];
+  while ((match = MAINTAINERS_REGEX.exec(maintainerMetaData)) !== null) {
+    const github = match[2];
+    maintainers.push(github);
+  }
+  return maintainers;
+};
+
+// Function to check if committer is an active maintainer
+const checkCommitterIsMaintainer = (committerLogin, activeMaintainers) => {
+  if (activeMaintainers.includes(committerLogin)) {
+    console.log("The author of this PR is an active maintainer.");
+    return true;
+  }
+  console.log(
+    "CI will not be skipped. \nThe author of this PR is not an active maintainer.\nPlease refer to https://github.com/hyperledger/cacti/blob/main/MAINTAINERS.md for the list of active maintainers.",
+  );
+  return false;
+};
+
+// Main function to determine whether to skip CI or proceed
 const main = async () => {
-  const markdownContent = readFileSync(MaintainersFile, "utf-8");
+  const markdownContent = getMaintainersFileContent();
+  const committerLogin = getCommitterLogin();
+  const commitMessage = getLatestCommitMessage();
 
-  const args = process.argv.slice(2);
-  const pullReqUrl = args[0];
-  const committerLogin = args[1];
+  const shouldSkipCI = checkSkipCI(commitMessage);
+  if (!shouldSkipCI) {
+    console.log("No skip requested. Proceeding with CI.");
+    process.exit(0);
+  }
 
-  //Uncomment these lines and change it for local machine testing purposes:
-  //const pullReqUrl = "https://api.github.com/repos/<username>/cactus/pulls/<number>";
-  //const committerLogin = "<username>";
-
-  const fetchJsonFromUrl = async (url) => {
-    const fetchResponse = await fetch(url);
-    return fetchResponse.json();
-  };
-
-  let commitMessageList = [];
-  const commitMessagesMetadata = await fetchJsonFromUrl(
-    pullReqUrl + "/commits",
+  const activeMaintainers = extractMaintainers(markdownContent);
+  const isMaintainer = checkCommitterIsMaintainer(
+    committerLogin,
+    activeMaintainers,
   );
 
-  commitMessagesMetadata.forEach((commitMessageMetadata) => {
-    // get commit message body
-    commitMessageList.push(commitMessageMetadata["commit"]["message"]);
-  });
-
-  // Check if skip-ci is found in commit message
-  const checkSkipCI = () => {
-    for (let commitMessageListIndex in commitMessageList) {
-      let commitMessage = commitMessageList[commitMessageListIndex];
-      if (commitMessage.includes(SKIP_CACTI)) {
-        console.log("Skip requested in commit message.");
-        return true;
-      } else {
-        console.log("No skip request found.");
-      }
-      return false;
-    }
-  };
-
-  // Function to extract active maintainers
-  const extractMaintainers = (maintainerMetaData) => {
-    let match;
-    const maintainers = [];
-    while ((match = MAINTAINERS_REGEX.exec(maintainerMetaData)) !== null) {
-      const github = match[2];
-      maintainers.push(github);
-    }
-    return maintainers;
-  };
-  // Get the maintainers
-  const activeMaintainers = extractMaintainers(markdownContent);
-  activeMaintainers.forEach((maintainers) => {
-    maintainers;
-  });
-
-  // Check if committer is a trusted maintainer
-  const checkCommitterIsMaintainer = () => {
-    if (activeMaintainers.includes(committerLogin)) {
-      console.log("The author of this PR is an active maintainer.");
-      return true;
-    } else {
-      console.log(
-        "CI will not be skipped. \nThe author of this PR is not an active maintainer.\nPlease refer to https://github.com/hyperledger/cacti/blob/main/MAINTAINERS.md for the list of active maintainers.",
-      );
-      return false;
-    }
-  };
-
-  // Main logic
-
-  const shouldSkipCI = checkSkipCI();
-
-  if (shouldSkipCI) {
-    const isMaintainer = checkCommitterIsMaintainer();
-    if (isMaintainer) {
-      console.log(
-        "Exit with an error code so as to pause the dependent workflows. CI skipped as per request.",
-      );
-      process.exit(1); // Exit successfully to skip CI
-    }
+  if (isMaintainer) {
+    console.log(
+      "CI skipped as per request. Exit with an error to PAUSE dependent workflows.",
+    );
+    process.exit(1);
   } else {
-    console.log("No skip requested. Proceeding with CI.");
-    process.exit(0); // Exit successfully to run CI
+    process.exit(0);
   }
 };
 
