@@ -3,7 +3,6 @@ import temp from "temp";
 import fs from "fs/promises";
 
 import {
-  Config as SshConfig,
   NodeSSH,
   SSHExecCommandOptions,
   SSHExecCommandResponse,
@@ -36,7 +35,6 @@ export interface IDeployContractGoSourceImplFabricV256Context {
   readonly log: Logger;
   readonly className: string;
   readonly dockerBinary: string;
-  readonly sshConfig: SshConfig;
   readonly opts: IPluginLedgerConnectorFabricOptions;
 }
 
@@ -55,7 +53,7 @@ export async function deployContractGoSourceImplFabricV256(
     ctx.opts.cliContainerGoPath || K_DEFAULT_CLI_CONTAINER_GO_PATH;
 
   const ssh = new NodeSSH();
-  await ssh.connect(ctx.sshConfig);
+  await ssh.connect(ctx.opts.sshConfig);
   log.debug(`SSH connection OK`);
 
   try {
