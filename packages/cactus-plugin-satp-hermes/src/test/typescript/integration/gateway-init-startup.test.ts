@@ -41,6 +41,10 @@ import {
 import { AddressInfo } from "net";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { AdminApi } from "../../../main/typescript";
+import {
+  knexClientConnection,
+  knexSourceRemoteConnection,
+} from "../knex.config";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -65,7 +69,10 @@ beforeAll(async () => {
 
 describe("SATPGateway initialization", () => {
   it("should initiate gateway with default config", async () => {
-    const options: SATPGatewayConfig = {};
+    const options: SATPGatewayConfig = {
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
+    };
     const gateway = await factory.create(options);
 
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -106,6 +113,8 @@ describe("SATPGateway initialization", () => {
         gatewayServerPort: 3010,
         address: "https://localhost",
       },
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -148,6 +157,8 @@ describe("SATPGateway initialization", () => {
         proofID: "mockProofID10",
         address: "https://localhost",
       },
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -179,6 +190,8 @@ describe("SATPGateway initialization", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
 
     const gateway = await factory.create(options);
@@ -219,7 +232,10 @@ describe("SATPGateway initialization", () => {
 
 describe("SATPGateway startup", () => {
   it("initiates with default config", async () => {
-    const options: SATPGatewayConfig = {};
+    const options: SATPGatewayConfig = {
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
+    };
     const gateway = await factory.create(options);
 
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -260,6 +276,8 @@ describe("SATPGateway startup", () => {
         gatewayClientPort: 3001,
         address: "https://localhost",
       },
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -306,6 +324,8 @@ describe("SATPGateway startup", () => {
         address: "http://localhost",
       },
       enableOpenAPI: true,
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
