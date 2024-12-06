@@ -40,6 +40,13 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
+import {
+  knexClientConnection,
+  knexSourceRemoteConnection,
+  knexTargetRemoteConnection,
+  knexServerConnection,
+} from "../knex.config";
+import { Knex, knex } from "knex";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -47,16 +54,39 @@ const log = LoggerProvider.getOrCreate({
   label: "BUNGEE - Hermes",
 });
 
+let knexInstanceClient: Knex;
+let knexSourceRemoteInstance: Knex;
+let knexTargetRemoteInstance: Knex;
+let knexInstanceServer: Knex;
+
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
-let gateway1: SATPGateway;
-let gateway2: SATPGateway;
+let sourceGateway: SATPGateway;
+let targetGateway: SATPGateway;
 const bridge_id =
   "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
 afterAll(async () => {
-  await gateway1.shutdown();
-  await gateway2.shutdown();
+  if (sourceGateway) {
+    if (knexInstanceClient) {
+      await knexInstanceClient.destroy();
+    }
+    if (knexSourceRemoteInstance) {
+      await knexSourceRemoteInstance.destroy();
+    }
+    await sourceGateway.shutdown();
+  }
+
+  if (targetGateway) {
+    if (knexTargetRemoteInstance) {
+      await knexTargetRemoteInstance.destroy();
+    }
+    if (knexInstanceServer) {
+      await knexInstanceServer.destroy();
+    }
+    await targetGateway.shutdown();
+  }
+
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
 
@@ -150,6 +180,12 @@ describe("2 SATPGateway sending a token from Besu to Fabric", () => {
 
     const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
+    knexInstanceClient = knex(knexClientConnection);
+    await knexInstanceClient.migrate.latest();
+
+    knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
+    await knexSourceRemoteInstance.migrate.latest();
+
     const options1: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity1,
@@ -176,7 +212,15 @@ describe("2 SATPGateway sending a token from Besu to Fabric", () => {
       ],
       bridgesConfig: [besuEnv.besuConfig],
       keyPair: gateway1KeyPair,
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
+
+    knexInstanceServer = knex(knexServerConnection);
+    await knexInstanceServer.migrate.latest();
+
+    knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
+    await knexTargetRemoteInstance.migrate.latest();
 
     const options2: SATPGatewayConfig = {
       logLevel: "DEBUG",
@@ -200,28 +244,30 @@ describe("2 SATPGateway sending a token from Besu to Fabric", () => {
       ],
       bridgesConfig: [fabricEnv.fabricConfig],
       keyPair: gateway2KeyPair,
+      knexLocalConfig: knexServerConnection,
+      knexRemoteConfig: knexTargetRemoteConnection,
     };
-    gateway1 = await factory.create(options1);
-    expect(gateway1).toBeInstanceOf(SATPGateway);
+    sourceGateway = await factory.create(options1);
+    expect(sourceGateway).toBeInstanceOf(SATPGateway);
 
-    const identity1 = gateway1.Identity;
+    const identity1 = sourceGateway.Identity;
     // default servers
     expect(identity1.gatewayServerPort).toBe(3010);
     expect(identity1.gatewayClientPort).toBe(3011);
     expect(identity1.address).toBe("http://localhost");
-    await gateway1.startup();
+    await sourceGateway.startup();
 
-    gateway2 = await factory.create(options2);
-    expect(gateway2).toBeInstanceOf(SATPGateway);
+    targetGateway = await factory.create(options2);
+    expect(targetGateway).toBeInstanceOf(SATPGateway);
 
-    const identity2 = gateway2.Identity;
+    const identity2 = targetGateway.Identity;
     // default servers
     expect(identity2.gatewayServerPort).toBe(3110);
     expect(identity2.gatewayClientPort).toBe(3111);
     expect(identity2.address).toBe("http://localhost");
-    await gateway2.startup();
+    await targetGateway.startup();
 
-    const dispatcher = gateway1.getBLODispatcher();
+    const dispatcher = sourceGateway.getBLODispatcher();
 
     expect(dispatcher).toBeTruthy();
     const req = getTransactRequest(
