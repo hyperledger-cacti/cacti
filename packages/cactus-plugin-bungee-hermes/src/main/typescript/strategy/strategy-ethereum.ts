@@ -4,6 +4,8 @@ import {
   LoggerProvider,
   Checks,
 } from "@hyperledger/cactus-common";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   Web3SigningCredential,
   DefaultApi as EthereumApi,
@@ -214,7 +216,7 @@ export class StrategyEthereum implements ObtainLedgerStrategy {
         "Transaction: " +
           log.transactionHash +
           "\nData: " +
-          JSON.stringify(log.data) +
+          safeStableStringify(log.data) +
           "\n =========== \n",
       );
       const proof = new Proof({
@@ -229,7 +231,7 @@ export class StrategyEthereum implements ObtainLedgerStrategy {
       transaction.setTarget(networkDetails.contractAddress as string);
       transaction.setPayload(txTx.data.input ? txTx.data.input : ""); //FIXME: payload = transaction input ?
       transactions.push(transaction);
-      values.push(JSON.stringify(log.data));
+      values.push(safeStableStringify(log.data));
 
       blocks.set(transaction.getId(), txBlock.data);
     }

@@ -1,4 +1,5 @@
 import { Proof } from "./proof";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class TransactionProof {
   private transactionCreator: Proof;
@@ -27,7 +28,7 @@ export class TransactionProof {
       transactionCreator: this.transactionCreator,
       endorsements: this.endorsements,
     };
-    return JSON.stringify(proof);
+    return safeStableStringify(proof);
   }
 
   public getCreator(): Proof {
