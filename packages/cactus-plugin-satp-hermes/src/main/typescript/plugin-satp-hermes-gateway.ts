@@ -560,6 +560,18 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     this.logger.info(`Closed ${connectionsClosed} connections`);
     this.logger.info("Gateway Coordinator shut down");
+
+    if (this.localRepository) {
+      this.logger.debug("Destroying local repository...");
+      await this.localRepository.destroy();
+      this.logger.info("Local repository destroyed");
+    }
+
+    if (this.remoteRepository) {
+      this.logger.debug("Destroying remote repository...");
+      await this.remoteRepository.destroy();
+      this.logger.info("Remote repository destroyed");
+    }
     return;
   }
 
