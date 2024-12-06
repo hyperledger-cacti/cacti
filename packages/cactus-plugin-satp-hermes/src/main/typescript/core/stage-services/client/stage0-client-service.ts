@@ -381,7 +381,7 @@ export class Stage0ClientService extends SATPService {
     this.Log.info(`init-${stepTag}`);
     this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
-      type: "wrap-token",
+      type: "wrap-token-client",
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
@@ -390,7 +390,7 @@ export class Stage0ClientService extends SATPService {
       this.Log.info(`exec-${stepTag}`);
       this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
-        type: "wrap-token",
+        type: "wrap-token-client",
         operation: "exec",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
@@ -441,7 +441,7 @@ export class Stage0ClientService extends SATPService {
 
       this.dbLogger.storeProof({
         sessionID: sessionData.id,
-        type: "wrap-token",
+        type: "wrap-token-client",
         operation: "done",
         data: safeStableStringify(sessionData.senderWrapAssertionClaim.proof),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
@@ -451,7 +451,7 @@ export class Stage0ClientService extends SATPService {
       this.logger.debug(`Crash in ${fnTag}`, error);
       this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
-        type: "wrap-token",
+        type: "wrap-token-client",
         operation: "fail",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
