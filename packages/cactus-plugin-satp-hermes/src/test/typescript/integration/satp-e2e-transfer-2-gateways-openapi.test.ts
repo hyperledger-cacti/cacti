@@ -42,7 +42,18 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
+import {
+  knexClientConnection,
+  knexRemoteConnection1,
+  knexRemoteConnection2,
+  knexServerConnection,
+} from "../knex.config";
+import { Knex, knex } from "knex";
 
+let knexInstanceClient: Knex;
+let knexInstanceRemote1: Knex;
+let knexInstanceRemote2: Knex;
+let knexInstanceServer: Knex;
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
@@ -57,8 +68,31 @@ const bridge_id =
   "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
 afterAll(async () => {
-  await gateway1.shutdown();
-  await gateway2.shutdown();
+  if (gateway1) {
+    await gateway1.localRepository?.destroy();
+    await gateway1.remoteRepository?.destroy();
+
+    if (knexInstanceClient) {
+      await knexInstanceClient.destroy();
+    }
+    if (knexInstanceRemote1) {
+      await knexInstanceRemote1.destroy();
+    }
+    await gateway1.shutdown();
+  }
+
+  if (gateway2) {
+    await gateway2.localRepository?.destroy();
+    await gateway2.remoteRepository?.destroy();
+
+    if (knexInstanceRemote2) {
+      await knexInstanceRemote2.destroy();
+    }
+    if (knexInstanceServer) {
+      await knexInstanceServer.destroy();
+    }
+    await gateway2.shutdown();
+  }
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
 
@@ -152,6 +186,12 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
 
     const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
+    knexInstanceClient = knex(knexClientConnection);
+    await knexInstanceClient.migrate.latest();
+
+    knexInstanceRemote1 = knex(knexRemoteConnection1);
+    await knexInstanceRemote1.migrate.latest();
+
     const options1: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity1,
@@ -178,8 +218,15 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
       ],
       bridgesConfig: [besuEnv.besuConfig],
       keyPair: gateway1KeyPair,
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexRemoteConnection1,
     };
 
+    knexInstanceServer = knex(knexServerConnection);
+    await knexInstanceServer.migrate.latest();
+
+    knexInstanceRemote2 = knex(knexRemoteConnection2);
+    await knexInstanceRemote2.migrate.latest();
     const options2: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity2,
@@ -202,6 +249,8 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
       ],
       bridgesConfig: [fabricEnv.fabricConfig],
       keyPair: gateway2KeyPair,
+      knexLocalConfig: knexServerConnection,
+      knexRemoteConfig: knexRemoteConnection2,
     };
     gateway1 = await factory.create(options1);
     expect(gateway1).toBeInstanceOf(SATPGateway);

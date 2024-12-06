@@ -36,6 +36,8 @@ import {
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
 import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger/cactus-test-geth-ledger";
+import { knexClientConnection, knexRemoteConnection1 } from "../knex.config";
+import { knex } from "knex";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -132,11 +134,18 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       address: "http://localhost" as Address,
     } as GatewayIdentity;
 
+    const knexInstanceClient = knex(knexClientConnection);
+    await knexInstanceClient.migrate.latest();
+
+    const knexInstanceRemote1 = knex(knexRemoteConnection1);
+    await knexInstanceRemote1.migrate.latest();
     const options: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity,
       counterPartyGateways: [], //only knows itself
       bridgesConfig: [besuEnv.besuConfig, fabricEnv.fabricConfig],
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexRemoteConnection1,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -228,7 +237,18 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     expect(responseBalance2.data).not.toBeUndefined();
     expect(responseBalance2.data.functionOutput).toBe("1");
     log.info("Amount was transfer correctly to the Owner account");
+    if (gateway) {
+      await gateway.localRepository?.destroy();
+      await gateway.remoteRepository?.destroy();
 
+      if (knexInstanceClient) {
+        await knexInstanceClient.destroy();
+      }
+      if (knexInstanceRemote1) {
+        await knexInstanceRemote1.destroy();
+      }
+      await gateway.shutdown();
+    }
     await gateway.shutdown();
   });
 });
@@ -256,11 +276,18 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       address: "http://localhost" as Address,
     } as GatewayIdentity;
 
+    const knexInstanceClient = knex(knexClientConnection);
+    await knexInstanceClient.migrate.latest();
+
+    const knexInstanceRemote1 = knex(knexRemoteConnection1);
+    await knexInstanceRemote1.migrate.latest();
     const options: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity,
       counterPartyGateways: [], //only knows itself
       bridgesConfig: [ethereumEnv.ethereumConfig, fabricEnv.fabricConfig],
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexRemoteConnection1,
     };
 
     let initialBalance;
@@ -371,7 +398,18 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       (Number(initialBalance.data.functionOutput) + 1).toString(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+    if (gateway) {
+      await gateway.localRepository?.destroy();
+      await gateway.remoteRepository?.destroy();
 
+      if (knexInstanceClient) {
+        await knexInstanceClient.destroy();
+      }
+      if (knexInstanceRemote1) {
+        await knexInstanceRemote1.destroy();
+      }
+      await gateway.shutdown();
+    }
     await gateway.shutdown();
   });
 });

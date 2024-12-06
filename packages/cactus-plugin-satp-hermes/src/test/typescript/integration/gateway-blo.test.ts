@@ -16,6 +16,7 @@ import {
 } from "../../../main/typescript/core/types";
 import { createClient } from "../test-utils";
 import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
+import { knexClientConnection, knexRemoteConnection1 } from "../knex.config";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -57,6 +58,8 @@ const options: SATPGatewayConfig = {
     gatewayOpenAPIPort: 4010,
     address: "http://localhost",
   },
+  knexLocalConfig: knexClientConnection,
+  knexRemoteConfig: knexRemoteConnection1,
 };
 
 describe("GetStatus Endpoint and Functionality testing", () => {
