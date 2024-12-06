@@ -254,7 +254,7 @@ export class Stage2ClientService extends SATPService {
       this.dbLogger.storeProof({
         sessionID: sessionData.id,
         type: "lock-asset",
-        operation: "done",
+        operation: "exec",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });

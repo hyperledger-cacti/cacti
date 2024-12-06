@@ -34,6 +34,11 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
+import {
+  knexClientConnection,
+  knexSourceRemoteConnection,
+} from "../knex.config";
+import { Knex, knex } from "knex";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -41,6 +46,8 @@ const log = LoggerProvider.getOrCreate({
   label: "BUNGEE - Hermes",
 });
 
+let knexInstanceClient: Knex;
+let knexSourceRemoteInstance: Knex;
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
 let gateway: SATPGateway;
@@ -49,6 +56,16 @@ const bridge_id =
 
 afterAll(async () => {
   await gateway.shutdown();
+
+  if (gateway) {
+    if (knexInstanceClient) {
+      await knexInstanceClient.destroy();
+    }
+    if (knexSourceRemoteInstance) {
+      await knexSourceRemoteInstance.destroy();
+    }
+    await gateway.shutdown();
+  }
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
 
@@ -122,11 +139,19 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       address: "http://localhost" as Address,
     } as GatewayIdentity;
 
+    knexInstanceClient = knex(knexClientConnection);
+    await knexInstanceClient.migrate.latest();
+
+    knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
+    await knexSourceRemoteInstance.migrate.latest();
+
     const options: SATPGatewayConfig = {
       logLevel: "DEBUG",
       gid: gatewayIdentity,
       counterPartyGateways: [], //only knows itself
       bridgesConfig: [besuEnv.besuConfig, fabricEnv.fabricConfig],
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexSourceRemoteConnection,
     };
     gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);

@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cactus-plugin-satp-hermes",
   "version": "2.1.0",
-  "description": "Proof of concept of ODAP",
+  "description": "SATP implementation, based on the papers 1) HERMES: Fault-Tolerant Middleware for Blockchain Interoperability and 2) CBDC bridging between Hyperledger Fabric and permissioned EVM-based blockchains",
   "keywords": [
     "Hyperledger",
     "Cacti",
@@ -34,8 +34,8 @@
       "url": "https://github.com/AndreAugusto11"
     },
     {
-      "name": "Tzu-Shen, Wang",
-      "url": "https://github.com/jscode017"
+      "name": "Eduardo Vasques",
+      "url": "https://github.com/eduv07"
     },
     {
       "name": "Rafael Belchior",
@@ -102,15 +102,26 @@
     }
   },
   "dependencies": {
+    "@bufbuild/protobuf": "2.2.2",
+    "@connectrpc/connect": "2.0.0",
+    "@connectrpc/connect-express": "2.0.0",
+    "@connectrpc/connect-node": "2.0.0",
+    "@connectrpc/protoc-gen-connect-es": "1.6.1",
+    "@foundry-rs/hardhat-forge": "0.1.17",
+    "@grpc/grpc-js": "1.12.4",
+    "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-cmd-api-server": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-bungee-hermes": "2.1.0",
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
     "@hyperledger/cactus-plugin-object-store-ipfs": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@openzeppelin/contracts": "5.0.2",
     "axios": "1.8.4",
     "bignumber.js": "9.1.2",
     "bn.js": "5.2.1",
