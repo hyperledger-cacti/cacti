@@ -29,8 +29,8 @@ import {
   DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
+  SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
-  SATP_ARCHITETURE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
@@ -120,7 +120,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       version: [
         {
           Core: SATP_CORE_VERSION,
-          Architecture: SATP_ARCHITETURE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
           Crash: SATP_CRASH_VERSION,
         },
       ],
@@ -283,7 +283,7 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       version: [
         {
           Core: SATP_CORE_VERSION,
-          Architecture: SATP_ARCHITETURE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
           Crash: SATP_CRASH_VERSION,
         },
       ],
