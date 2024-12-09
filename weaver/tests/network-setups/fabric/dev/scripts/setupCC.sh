@@ -4,7 +4,7 @@
 
 directory=$(dirname $0)
 
-CACTI_VERSION=v2.0.0
+CACTI_VERSION="v$(head -n 1 $PWD/../../../../core/network/fabric-interop-cc/contracts/interop/VERSION)"
 TMP_PATH=$PWD/../shared/tmp
 CHAINCODE_PATH=$PWD/../shared/chaincode
 rm -rf $CHAINCODE_PATH/interop
