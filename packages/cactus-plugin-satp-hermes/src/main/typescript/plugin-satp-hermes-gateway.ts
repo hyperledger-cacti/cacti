@@ -57,6 +57,10 @@ import {
   SATPBridgesManager,
 } from "./gol/satp-bridges-manager";
 import bodyParser from "body-parser";
+import {
+  CrashRecoveryManager,
+  ICrashRecoveryManagerOptions,
+} from "./gol/crash-manager";
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
@@ -97,6 +101,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
+  private readonly crashManager: CrashRecoveryManager;
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -181,6 +186,19 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
 
     this.OAS = OAS;
+
+    // After setup, initialize crash manager and check if we crashed;
+    const crashOptions: ICrashRecoveryManagerOptions = {
+      instanceId: this.instanceId,
+      logLevel: this.config.logLevel,
+      bridgeConfig: this.bridgesManager,
+      orchestrator: this.gatewayOrchestrator,
+      localRepository: this.localRepository,
+      remoteRepository: this.remoteRepository,
+      signer: this.signer,
+      pubKey: this.pubKey,
+    };
+    this.crashManager = new CrashRecoveryManager(crashOptions);
   }
 
   /* ICactus Plugin methods */

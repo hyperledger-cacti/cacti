@@ -203,7 +203,6 @@ describe("2 SATPGateway sending a token from Besu to Fabric", () => {
     };
     gateway1 = await factory.create(options1);
     expect(gateway1).toBeInstanceOf(SATPGateway);
-
     const identity1 = gateway1.Identity;
     // default servers
     expect(identity1.gatewayServerPort).toBe(3010);
