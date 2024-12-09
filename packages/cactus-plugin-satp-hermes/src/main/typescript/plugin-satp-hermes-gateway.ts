@@ -34,7 +34,7 @@ import {
   DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
-  SATP_ARCHITETURE_VERSION,
+  SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "./core/constants";
@@ -294,7 +294,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         version: [
           {
             Core: SATP_CORE_VERSION,
-            Architecture: SATP_ARCHITETURE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
             Crash: SATP_CRASH_VERSION,
           },
         ],
@@ -324,7 +324,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.version = [
           {
             Core: SATP_CORE_VERSION,
-            Architecture: SATP_ARCHITETURE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
             Crash: SATP_CRASH_VERSION,
           },
         ];
