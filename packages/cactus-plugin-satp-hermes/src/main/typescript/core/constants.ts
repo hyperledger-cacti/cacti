@@ -4,5 +4,5 @@ export const DEFAULT_PORT_GATEWAY_UI = DEFAULT_PORT_GATEWAY_SERVER + 2;
 export const DEFAULT_PORT_GATEWAY_API = 4010;
 export const SATP_VERSION = "v02";
 export const SATP_CORE_VERSION = "v02";
-export const SATP_ARCHITETURE_VERSION = "v02";
+export const SATP_ARCHITECTURE_VERSION = "v02";
 export const SATP_CRASH_VERSION = "v02";
