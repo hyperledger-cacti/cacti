@@ -104,6 +104,7 @@
     "@connectrpc/protoc-gen-connect-es": "1.6.1",
     "@foundry-rs/hardhat-forge": "0.1.17",
     "@grpc/grpc-js": "1.12.4",
+    "@hyperledger/cactus-api-client": "2.0.0",
     "@hyperledger/cactus-cmd-api-server": "2.0.0",
     "@hyperledger/cactus-common": "2.0.0",
     "@hyperledger/cactus-core": "2.0.0",
