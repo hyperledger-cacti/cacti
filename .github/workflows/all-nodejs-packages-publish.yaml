@@ -62,8 +62,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         run: |
-          git config --global user.email "npm-ci@hyperledger.org"
-          git config --global user.name "hyperledger-ghci"
           npm whoami
           yarn lerna publish from-git --yes --loglevel=debug --ignore-scripts
 
@@ -98,7 +96,7 @@ jobs:
 
       - name: Configure git user and email
         run: |
-          git config --global user.email "npm-ci@hyperledger.org"
+          git config --global user.email "npm-ci@${{ github.repository_owner }}.org"
           git config --global user.name "hyperledger-ghci"
 
       # We run the publish script a second time after having reconfigured the registry to be GHCR
