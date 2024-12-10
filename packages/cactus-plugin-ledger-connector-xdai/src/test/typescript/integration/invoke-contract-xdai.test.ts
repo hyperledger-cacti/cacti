@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
-import { Account } from "web3-core";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   EthContractInvocationType,
@@ -15,6 +14,7 @@ import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
+import { Web3Account } from "web3-eth-accounts";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "TRACE";
@@ -35,7 +35,7 @@ describe(testCase, () => {
   let keychainPlugin: PluginKeychainMemory;
   let connector: PluginLedgerConnectorXdai;
   let web3: Web3;
-  let testEthAccount: Account;
+  let testEthAccount: Web3Account ;
   let keychainEntryKey: string;
   let keychainEntryValue: string, rpcApiHttpHost: string;
 
@@ -54,7 +54,7 @@ describe(testCase, () => {
     expect(rpcApiHttpHost).toBeString();
 
     web3 = new Web3(rpcApiHttpHost);
-    testEthAccount = web3.eth.accounts.create(uuidv4());
+    testEthAccount = web3.eth.accounts.create();
 
     keychainEntryKey = uuidv4();
     keychainEntryValue = testEthAccount.privateKey;
@@ -145,7 +145,7 @@ describe(testCase, () => {
   });
 
   it("invoke Web3SigningCredentialType.NONE", async () => {
-    const testEthAccount2 = web3.eth.accounts.create(uuidv4());
+    const testEthAccount2 = web3.eth.accounts.create();
 
     const { rawTransaction } = await web3.eth.accounts.signTransaction(
       {

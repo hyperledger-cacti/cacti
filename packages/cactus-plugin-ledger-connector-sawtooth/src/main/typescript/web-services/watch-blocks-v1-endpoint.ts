@@ -34,7 +34,7 @@ export class WatchBlocksV1Endpoint {
     Record<WatchBlocksV1, (next: WatchBlocksV1Progress | string) => void>
   >;
   private currentBlockHeight = 0;
-  private monitoringInterval?: NodeJS.Timer;
+  private monitoringInterval?: NodeJS.Timeout;
   private isRoutineRunning = false;
 
   public get className(): string {

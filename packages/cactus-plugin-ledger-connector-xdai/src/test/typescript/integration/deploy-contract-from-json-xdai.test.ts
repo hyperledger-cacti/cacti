@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Account } from "web3-core";
+import { Web3Account } from "web3-eth-accounts";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import "jest-extended";
 
@@ -57,7 +57,7 @@ describe(testCase, () => {
     web3: Web3,
     factory: PluginFactoryLedgerConnector,
     firstHighNetWorthAccount: string,
-    testEthAccount: Account,
+    testEthAccount: Web3Account,
     keychainEntryKey: string,
     keychainEntryValue: string,
     keychainPlugin: PluginKeychainMemory,
@@ -88,7 +88,7 @@ describe(testCase, () => {
     });
     rpcApiHttpHost = await ledger.getRpcApiHttpHost();
     web3 = new Web3(rpcApiHttpHost);
-    testEthAccount = web3.eth.accounts.create(uuidv4());
+    testEthAccount = web3.eth.accounts.create();
 
     keychainEntryKey = uuidv4();
     keychainEntryValue = testEthAccount.privateKey;
@@ -190,7 +190,7 @@ describe(testCase, () => {
   });
 
   test("invoke Web3SigningCredentialType.None", async () => {
-    const testEthAccount2 = web3.eth.accounts.create(uuidv4());
+    const testEthAccount2 = web3.eth.accounts.create();
 
     const { rawTransaction } = await web3.eth.accounts.signTransaction(
       {

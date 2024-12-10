@@ -16,7 +16,6 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
-import { Account } from "web3-core";
 
 describe("PluginLedgerConnectorBesu", () => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -30,7 +29,7 @@ describe("PluginLedgerConnectorBesu", () => {
   let rpcApiHttpHost: string;
   let rpcApiWsHost: string;
   let web3: Web3;
-  let testEthAccount: Account;
+  let testEthAccount: Web3Account.Web3Account ;
   let contractAddress: string;
   let firstHighNetWorthAccount: string;
   let connector: PluginLedgerConnectorBesu;

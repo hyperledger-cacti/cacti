@@ -5,12 +5,11 @@ import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
 
-import Web3 from "web3";
+import Web3, { Web3BaseProvider } from "web3";
 
-import type { WebsocketProvider } from "web3-core";
 import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
-import { Contract, ContractSendMethod } from "web3-eth-contract";
+import { Contract } from "web3-eth-contract";
 import {
   GetBalanceV1Request,
   GetBalanceV1Response,
@@ -132,12 +131,12 @@ export class PluginLedgerConnectorBesu
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
-  private readonly web3Provider: WebsocketProvider;
+  private readonly web3Provider: Web3BaseProvider;
   private readonly web3: Web3;
   private web3Quorum: IWeb3Quorum | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
-    [name: string]: Contract;
+    [name: string]: Contract<any>;
   } = {};
 
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -401,7 +400,7 @@ export class PluginLedgerConnectorBesu
    * @throws If the contract instance is falsy or it's methods object is falsy. Also throws if the method name is a blank string.
    */
   public async isSafeToCallContractMethod(
-    contract: Contract,
+    contract: Contract<any>,
     name: string,
   ): Promise<boolean> {
     Checks.truthy(
@@ -429,7 +428,7 @@ export class PluginLedgerConnectorBesu
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
     const contractName = req.contractName;
-    let contractInstance: Contract;
+    let contractInstance: Contract<any>;
 
     if (req.keychainId != undefined) {
       const networkId = await this.web3.eth.net.getId();
@@ -449,8 +448,8 @@ export class PluginLedgerConnectorBesu
       const contractJSON = JSON.parse(contractStr);
       if (
         contractJSON.networks === undefined ||
-        contractJSON.networks[networkId] === undefined ||
-        contractJSON.networks[networkId].address === undefined
+        contractJSON.networks[networkId.toString()] === undefined ||
+        contractJSON.networks[networkId.toString()].address === undefined
       ) {
         if (isWeb3SigningCredentialNone(req.signingCredential)) {
           throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
@@ -478,13 +477,13 @@ export class PluginLedgerConnectorBesu
         const address = {
           address: receipt.transactionReceipt.contractAddress,
         };
-        const network = { [networkId]: address };
+        const network = { [networkId.toString()]: address };
         contractJSON.networks = network;
         keychainPlugin.set(contractName, JSON.stringify(contractJSON));
       }
       const contract = new this.web3.eth.Contract(
         contractJSON.abi,
-        contractJSON.networks[networkId].address,
+        contractJSON.networks[networkId.toString()].address,
       );
 
       this.contracts[contractName] = contract;
@@ -523,7 +522,7 @@ export class PluginLedgerConnectorBesu
 
     const methodRef = contractInstance.methods[req.methodName];
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
-    const method: ContractSendMethod = methodRef(...req.params);
+    const method = methodRef(...req.params);
 
     if (req.invocationType === EthContractInvocationType.Call) {
       let callOutput;
@@ -709,10 +708,11 @@ export class PluginLedgerConnectorBesu
   public async getBalance(
     request: GetBalanceV1Request,
   ): Promise<GetBalanceV1Response> {
-    const balance = await this.web3.eth.getBalance(
+    const balanceBigInt = await this.web3.eth.getBalance(
       request.address,
       request.defaultBlock,
     );
+    const balance = balanceBigInt.toString();
     return { balance };
   }
 

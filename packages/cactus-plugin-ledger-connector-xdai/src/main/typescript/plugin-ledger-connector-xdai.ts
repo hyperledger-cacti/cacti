@@ -363,8 +363,8 @@ export class PluginLedgerConnectorXdai
     const networkId = await this.web3.eth.net.getId();
     if (
       !contractJSON.networks ||
-      !contractJSON.networks[networkId] ||
-      !contractJSON.networks[networkId].address
+      !contractJSON.networks[Number(networkId)] ||
+      !contractJSON.networks[Number(networkId)].address
     ) {
       if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
         throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
@@ -382,13 +382,13 @@ export class PluginLedgerConnectorXdai
       const address = {
         address: receipt.transactionReceipt.contractAddress,
       };
-      const network = { [networkId]: address };
+      const network = { [Number(networkId)]: address };
       contractJSON.networks = network;
       keychainPlugin.set(req.contractName, JSON.stringify(contractJSON));
     }
 
     const invokeBaseReq: InvokeRequestBaseV1 = {
-      contractAddress: contractJSON.networks[networkId].address,
+      contractAddress: contractJSON.networks[Number(networkId)].address,
       contractJSON,
       web3SigningCredential: req.web3SigningCredential,
       invocationType: req.invocationType,
@@ -610,7 +610,7 @@ export class PluginLedgerConnectorXdai
       }
 
       const latestBlockNo = await this.web3.eth.getBlockNumber();
-      confirmationCount = latestBlockNo - txReceipt.blockNumber;
+      confirmationCount = Number(latestBlockNo) - parseInt(txReceipt.blockNumber.toString(), 10);
     } while (confirmationCount < consistencyStrategy.blockConfirmations);
 
     if (!txReceipt) {
@@ -698,7 +698,7 @@ export class PluginLedgerConnectorXdai
     ) {
       const networkId = await this.web3.eth.net.getId();
       const address = { address: receipt.transactionReceipt.contractAddress };
-      const network = { [networkId]: address };
+      const network = { [Number(networkId)]: address };
       contractJSON.networks = network;
       keychainPlugin.set(req.contractName, JSON.stringify(contractJSON));
     }
@@ -731,3 +731,28 @@ export class PluginLedgerConnectorXdai
     return this.runDeploy(deployBaseReq);
   }
 }
+
+
+RUN bash -c ' \
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"; \
+  echo "$DIR" > /tmp/dir_path.txt \
+'
+
+# Step 2: Check for the version file and set the flag
+RUN bash -c ' \
+  DIR=$(cat /tmp/dir_path.txt); \
+  daml_version_file="$DIR/daml_version.txt"; \
+  if [ -f "$daml_version_file" ]; then \
+    echo "Installing with internal version file $daml_version_file: $(cat "$daml_version_file")" 1>&2; \
+    echo "--install-with-custom-version=$(cat "$daml_version_file")" > /tmp/install_flag.txt; \
+  else \
+    echo "" > /tmp/install_flag.txt; \
+  fi \
+'
+
+# Step 3: Run the DAML installation
+RUN bash -c ' \
+  DIR=$(cat /tmp/dir_path.txt); \
+  flag=$(cat /tmp/install_flag.txt); \
+  "$DIR/daml/daml" install "$DIR" ${flag:-} \
+'
