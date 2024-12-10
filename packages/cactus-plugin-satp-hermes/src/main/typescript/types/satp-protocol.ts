@@ -12,6 +12,7 @@ import { Stage0SATPHandler } from "../core/stage-handlers/stage0-handler";
 import { Stage1SATPHandler } from "../core/stage-handlers/stage1-handler";
 import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
+import { CrashRecoveryHandler } from "../core/crash-management/crash-handler";
 
 /**
  * Represents a handler for various stages of the SATP (Secure Asset Transfer Protocol).
@@ -24,6 +25,7 @@ export enum SATPHandlerType {
   STAGE1 = "stage-1-handler",
   STAGE2 = "stage-2-handler",
   STAGE3 = "stage-3-handler",
+  CRASH = "crash-handler",
 }
 
 export enum Stage {
@@ -52,7 +54,8 @@ export type SATPHandlerInstance =
   | (typeof Stage0SATPHandler & ISATPHandler)
   | (typeof Stage1SATPHandler & ISATPHandler)
   | (typeof Stage2SATPHandler & ISATPHandler)
-  | (typeof Stage3SATPHandler & ISATPHandler);
+  | (typeof Stage3SATPHandler & ISATPHandler)
+  | (typeof CrashRecoveryHandler & ISATPHandler);
 
 export interface SATPHandler {
   setupRouter(router: ConnectRouter): void;

@@ -2,24 +2,437 @@
 // @generated from file cacti/satp/v02/crash_recovery.proto (package cacti.satp.v02.crash, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_google_protobuf_empty } from "@bufbuild/protobuf/wkt";
+import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file cacti/satp/v02/crash_recovery.proto.
  */
 export const file_cacti_satp_v02_crash_recovery: GenFile = /*@__PURE__*/
-  fileDesc("CiNjYWN0aS9zYXRwL3YwMi9jcmFzaF9yZWNvdmVyeS5wcm90bxIUY2FjdGkuc2F0cC52MDIuY3Jhc2gyDwoNQ3Jhc2hSZWNvdmVyeWIGcHJvdG8z", [file_google_protobuf_empty]);
+  fileDesc("CiNjYWN0aS9zYXRwL3YwMi9jcmFzaF9yZWNvdmVyeS5wcm90bxIUY2FjdGkuc2F0cC52MDIuY3Jhc2gi0wEKDlJlY292ZXJNZXNzYWdlEhIKCnNlc3Npb25faWQYASABKAkSFAoMbWVzc2FnZV90eXBlGAIgASgJEhIKCnNhdHBfcGhhc2UYAyABKAkSFwoPc2VxdWVuY2VfbnVtYmVyGAQgASgFEhEKCWlzX2JhY2t1cBgFIAEoCBIfChduZXdfaWRlbnRpdHlfcHVibGljX2tleRgGIAEoCRIcChRsYXN0X2VudHJ5X3RpbWVzdGFtcBgHIAEoAxIYChBzZW5kZXJfc2lnbmF0dXJlGAggASgJIrABChRSZWNvdmVyVXBkYXRlTWVzc2FnZRISCgpzZXNzaW9uX2lkGAEgASgJEhQKDG1lc3NhZ2VfdHlwZRgCIAEoCRIcChRoYXNoX3JlY292ZXJfbWVzc2FnZRgDIAEoCRI2Cg5yZWNvdmVyZWRfbG9ncxgEIAMoCzIeLmNhY3RpLnNhdHAudjAyLmNyYXNoLkxvY2FsTG9nEhgKEHNlbmRlcl9zaWduYXR1cmUYBSABKAkiqgEKFVJlY292ZXJTdWNjZXNzTWVzc2FnZRISCgpzZXNzaW9uX2lkGAEgASgJEhQKDG1lc3NhZ2VfdHlwZRgCIAEoCRIjChtoYXNoX3JlY292ZXJfdXBkYXRlX21lc3NhZ2UYAyABKAkSDwoHc3VjY2VzcxgEIAEoCBIXCg9lbnRyaWVzX2NoYW5nZWQYBSADKAkSGAoQc2VuZGVyX3NpZ25hdHVyZRgGIAEoCSJfCh1SZWNvdmVyU3VjY2Vzc01lc3NhZ2VSZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhAKCHJlY2VpdmVkGAIgASgIEhgKEHNlbmRlcl9zaWduYXR1cmUYAyABKAkikQEKD1JvbGxiYWNrTWVzc2FnZRISCgpzZXNzaW9uX2lkGAEgASgJEhQKDG1lc3NhZ2VfdHlwZRgCIAEoCRIPCgdzdWNjZXNzGAMgASgIEhkKEWFjdGlvbnNfcGVyZm9ybWVkGAQgAygJEg4KBnByb29mcxgFIAMoCRIYChBzZW5kZXJfc2lnbmF0dXJlGAYgASgJIpQBChJSb2xsYmFja0Fja01lc3NhZ2USEgoKc2Vzc2lvbl9pZBgBIAEoCRIUCgxtZXNzYWdlX3R5cGUYAiABKAkSDwoHc3VjY2VzcxgDIAEoCBIZChFhY3Rpb25zX3BlcmZvcm1lZBgEIAMoCRIOCgZwcm9vZnMYBSADKAkSGAoQc2VuZGVyX3NpZ25hdHVyZRgGIAEoCSKGAQoITG9jYWxMb2cSEgoKc2Vzc2lvbl9pZBgBIAEoCRIMCgR0eXBlGAIgASgJEgsKA2tleRgDIAEoCRIRCglvcGVyYXRpb24YBCABKAkSEQoJdGltZXN0YW1wGAUgASgJEgwKBGRhdGEYBiABKAkSFwoPc2VxdWVuY2VfbnVtYmVyGAcgASgFInkKEFJvbGxiYWNrTG9nRW50cnkSEgoKc2Vzc2lvbl9pZBgBIAEoCRINCgVzdGFnZRgCIAEoCRIRCgl0aW1lc3RhbXAYAyABKAkSDgoGYWN0aW9uGAQgASgJEg4KBnN0YXR1cxgFIAEoCRIPCgdkZXRhaWxzGAYgASgJIuABCg1Sb2xsYmFja1N0YXRlEhIKCnNlc3Npb25faWQYASABKAkSFQoNY3VycmVudF9zdGFnZRgCIAEoCRIXCg9zdGVwc19yZW1haW5pbmcYAyABKAUSRAoUcm9sbGJhY2tfbG9nX2VudHJpZXMYBCADKAsyJi5jYWN0aS5zYXRwLnYwMi5jcmFzaC5Sb2xsYmFja0xvZ0VudHJ5EiQKHGVzdGltYXRlZF90aW1lX3RvX2NvbXBsZXRpb24YBSABKAkSDgoGc3RhdHVzGAYgASgJEg8KB2RldGFpbHMYByABKAky2AIKDUNyYXNoUmVjb3ZlcnkSZAoQUmVjb3ZlclYyTWVzc2FnZRIkLmNhY3RpLnNhdHAudjAyLmNyYXNoLlJlY292ZXJNZXNzYWdlGiouY2FjdGkuc2F0cC52MDIuY3Jhc2guUmVjb3ZlclVwZGF0ZU1lc3NhZ2USewoXUmVjb3ZlclYyU3VjY2Vzc01lc3NhZ2USKy5jYWN0aS5zYXRwLnYwMi5jcmFzaC5SZWNvdmVyU3VjY2Vzc01lc3NhZ2UaMy5jYWN0aS5zYXRwLnYwMi5jcmFzaC5SZWNvdmVyU3VjY2Vzc01lc3NhZ2VSZXNwb25zZRJkChFSb2xsYmFja1YyTWVzc2FnZRIlLmNhY3RpLnNhdHAudjAyLmNyYXNoLlJvbGxiYWNrTWVzc2FnZRooLmNhY3RpLnNhdHAudjAyLmNyYXNoLlJvbGxiYWNrQWNrTWVzc2FnZWIGcHJvdG8z", [file_google_protobuf_empty]);
 
 /**
- * TODO: Rollback and crash-recovery related
- *
+ * @generated from message cacti.satp.v02.crash.RecoverMessage
+ */
+export type RecoverMessage = Message<"cacti.satp.v02.crash.RecoverMessage"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string message_type = 2;
+   */
+  messageType: string;
+
+  /**
+   * @generated from field: string satp_phase = 3;
+   */
+  satpPhase: string;
+
+  /**
+   * @generated from field: int32 sequence_number = 4;
+   */
+  sequenceNumber: number;
+
+  /**
+   * @generated from field: bool is_backup = 5;
+   */
+  isBackup: boolean;
+
+  /**
+   * @generated from field: string new_identity_public_key = 6;
+   */
+  newIdentityPublicKey: string;
+
+  /**
+   * @generated from field: int64 last_entry_timestamp = 7;
+   */
+  lastEntryTimestamp: bigint;
+
+  /**
+   * @generated from field: string sender_signature = 8;
+   */
+  senderSignature: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RecoverMessage.
+ * Use `create(RecoverMessageSchema)` to create a new message.
+ */
+export const RecoverMessageSchema: GenMessage<RecoverMessage> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 0);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RecoverUpdateMessage
+ */
+export type RecoverUpdateMessage = Message<"cacti.satp.v02.crash.RecoverUpdateMessage"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string message_type = 2;
+   */
+  messageType: string;
+
+  /**
+   * @generated from field: string hash_recover_message = 3;
+   */
+  hashRecoverMessage: string;
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.crash.LocalLog recovered_logs = 4;
+   */
+  recoveredLogs: LocalLog[];
+
+  /**
+   * @generated from field: string sender_signature = 5;
+   */
+  senderSignature: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RecoverUpdateMessage.
+ * Use `create(RecoverUpdateMessageSchema)` to create a new message.
+ */
+export const RecoverUpdateMessageSchema: GenMessage<RecoverUpdateMessage> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 1);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RecoverSuccessMessage
+ */
+export type RecoverSuccessMessage = Message<"cacti.satp.v02.crash.RecoverSuccessMessage"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string message_type = 2;
+   */
+  messageType: string;
+
+  /**
+   * @generated from field: string hash_recover_update_message = 3;
+   */
+  hashRecoverUpdateMessage: string;
+
+  /**
+   * @generated from field: bool success = 4;
+   */
+  success: boolean;
+
+  /**
+   * @generated from field: repeated string entries_changed = 5;
+   */
+  entriesChanged: string[];
+
+  /**
+   * @generated from field: string sender_signature = 6;
+   */
+  senderSignature: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RecoverSuccessMessage.
+ * Use `create(RecoverSuccessMessageSchema)` to create a new message.
+ */
+export const RecoverSuccessMessageSchema: GenMessage<RecoverSuccessMessage> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 2);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RecoverSuccessMessageResponse
+ */
+export type RecoverSuccessMessageResponse = Message<"cacti.satp.v02.crash.RecoverSuccessMessageResponse"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: bool received = 2;
+   */
+  received: boolean;
+
+  /**
+   * @generated from field: string sender_signature = 3;
+   */
+  senderSignature: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RecoverSuccessMessageResponse.
+ * Use `create(RecoverSuccessMessageResponseSchema)` to create a new message.
+ */
+export const RecoverSuccessMessageResponseSchema: GenMessage<RecoverSuccessMessageResponse> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 3);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RollbackMessage
+ */
+export type RollbackMessage = Message<"cacti.satp.v02.crash.RollbackMessage"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string message_type = 2;
+   */
+  messageType: string;
+
+  /**
+   * @generated from field: bool success = 3;
+   */
+  success: boolean;
+
+  /**
+   * @generated from field: repeated string actions_performed = 4;
+   */
+  actionsPerformed: string[];
+
+  /**
+   * @generated from field: repeated string proofs = 5;
+   */
+  proofs: string[];
+
+  /**
+   * @generated from field: string sender_signature = 6;
+   */
+  senderSignature: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RollbackMessage.
+ * Use `create(RollbackMessageSchema)` to create a new message.
+ */
+export const RollbackMessageSchema: GenMessage<RollbackMessage> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 4);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RollbackAckMessage
+ */
+export type RollbackAckMessage = Message<"cacti.satp.v02.crash.RollbackAckMessage"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string message_type = 2;
+   */
+  messageType: string;
+
+  /**
+   * @generated from field: bool success = 3;
+   */
+  success: boolean;
+
+  /**
+   * @generated from field: repeated string actions_performed = 4;
+   */
+  actionsPerformed: string[];
+
+  /**
+   * @generated from field: repeated string proofs = 5;
+   */
+  proofs: string[];
+
+  /**
+   * @generated from field: string sender_signature = 6;
+   */
+  senderSignature: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RollbackAckMessage.
+ * Use `create(RollbackAckMessageSchema)` to create a new message.
+ */
+export const RollbackAckMessageSchema: GenMessage<RollbackAckMessage> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 5);
+
+/**
+ * @generated from message cacti.satp.v02.crash.LocalLog
+ */
+export type LocalLog = Message<"cacti.satp.v02.crash.LocalLog"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string type = 2;
+   */
+  type: string;
+
+  /**
+   * @generated from field: string key = 3;
+   */
+  key: string;
+
+  /**
+   * @generated from field: string operation = 4;
+   */
+  operation: string;
+
+  /**
+   * @generated from field: string timestamp = 5;
+   */
+  timestamp: string;
+
+  /**
+   * @generated from field: string data = 6;
+   */
+  data: string;
+
+  /**
+   * @generated from field: int32 sequence_number = 7;
+   */
+  sequenceNumber: number;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.LocalLog.
+ * Use `create(LocalLogSchema)` to create a new message.
+ */
+export const LocalLogSchema: GenMessage<LocalLog> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 6);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RollbackLogEntry
+ */
+export type RollbackLogEntry = Message<"cacti.satp.v02.crash.RollbackLogEntry"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string stage = 2;
+   */
+  stage: string;
+
+  /**
+   * @generated from field: string timestamp = 3;
+   */
+  timestamp: string;
+
+  /**
+   * action performed during rollback
+   *
+   * @generated from field: string action = 4;
+   */
+  action: string;
+
+  /**
+   * status of rollback (e.g., SUCCESS, FAILED)
+   *
+   * @generated from field: string status = 5;
+   */
+  status: string;
+
+  /**
+   * Additional details or metadata about the rollback
+   *
+   * @generated from field: string details = 6;
+   */
+  details: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RollbackLogEntry.
+ * Use `create(RollbackLogEntrySchema)` to create a new message.
+ */
+export const RollbackLogEntrySchema: GenMessage<RollbackLogEntry> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 7);
+
+/**
+ * @generated from message cacti.satp.v02.crash.RollbackState
+ */
+export type RollbackState = Message<"cacti.satp.v02.crash.RollbackState"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string current_stage = 2;
+   */
+  currentStage: string;
+
+  /**
+   * @generated from field: int32 steps_remaining = 3;
+   */
+  stepsRemaining: number;
+
+  /**
+   * @generated from field: repeated cacti.satp.v02.crash.RollbackLogEntry rollback_log_entries = 4;
+   */
+  rollbackLogEntries: RollbackLogEntry[];
+
+  /**
+   * @generated from field: string estimated_time_to_completion = 5;
+   */
+  estimatedTimeToCompletion: string;
+
+  /**
+   * Overall status (e.g., IN_PROGRESS, COMPLETED, FAILED)
+   *
+   * @generated from field: string status = 6;
+   */
+  status: string;
+
+  /**
+   * Additional metadata or information
+   *
+   * @generated from field: string details = 7;
+   */
+  details: string;
+};
+
+/**
+ * Describes the message cacti.satp.v02.crash.RollbackState.
+ * Use `create(RollbackStateSchema)` to create a new message.
+ */
+export const RollbackStateSchema: GenMessage<RollbackState> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_crash_recovery, 8);
+
+/**
  * util RPCs
  *
  * @generated from service cacti.satp.v02.crash.CrashRecovery
  */
 export const CrashRecovery: GenService<{
+  /**
+   * step RPCs
+   *
+   * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RecoverV2Message
+   */
+  recoverV2Message: {
+    methodKind: "unary";
+    input: typeof RecoverMessageSchema;
+    output: typeof RecoverUpdateMessageSchema;
+  },
+  /**
+   * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RecoverV2SuccessMessage
+   */
+  recoverV2SuccessMessage: {
+    methodKind: "unary";
+    input: typeof RecoverSuccessMessageSchema;
+    output: typeof RecoverSuccessMessageResponseSchema;
+  },
+  /**
+   * @generated from rpc cacti.satp.v02.crash.CrashRecovery.RollbackV2Message
+   */
+  rollbackV2Message: {
+    methodKind: "unary";
+    input: typeof RollbackMessageSchema;
+    output: typeof RollbackAckMessageSchema;
+  },
 }> = /*@__PURE__*/
   serviceDesc(file_cacti_satp_v02_crash_recovery, 0);
 
