@@ -28,11 +28,25 @@ export const knexServerConnection = {
   useNullAsDefault: true,
 };
 
-export const knexRemoteConnection = {
+export const knexSourceRemoteConnection = {
   client: "sqlite3",
   connection: {
     filename:
-      "./packages/cactus-plugin-satp-hermes/src/knex/.dev.remote-" +
+      "./packages/cactus-plugin-satp-hermes/src/knex/.dev.source-remote-" +
+      uuidv4() +
+      ".sqlite3",
+  },
+  migrations: {
+    directory: "./packages/cactus-plugin-satp-hermes/src/knex/migrations",
+  },
+  useNullAsDefault: true,
+};
+
+export const knexTargetRemoteConnection = {
+  client: "sqlite3",
+  connection: {
+    filename:
+      "./packages/cactus-plugin-satp-hermes/src/knex/.dev.target-remote-" +
       uuidv4() +
       ".sqlite3",
   },
