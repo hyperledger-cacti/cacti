@@ -1,6 +1,8 @@
 // Proof is a general purpose type, used to represent signatures of diverse elements.
 // Proof may be used, for example in Fabric, to represent an transaction endorsement
 // Or simply the signature of a transaction upon is creation (in Besu)
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 export class Proof {
   // The term creator refers to the ID of the entity who created the signature
   // For example endorserID in Fabric (when Proof represents an endorsement)
@@ -36,7 +38,7 @@ export class Proof {
       mspid: this.mspid,
       signature: this.signature,
     };
-    return JSON.stringify(proof);
+    return safeStableStringify(proof);
   }
 
   public getCreator(): string {
