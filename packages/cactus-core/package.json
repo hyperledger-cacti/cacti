@@ -53,7 +53,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
     "body-parser": "1.20.3",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "express-jwt-authz": "2.4.1",
     "express-openapi-validator": "5.2.0",
     "http-errors": "2.0.0",
