@@ -60,8 +60,8 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.7.7",
-    "express": "4.21.1",
+    "axios": "1.7.9",
+    "express": "4.21.2",
     "express-openapi-validator": "5.2.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "internal-ip": "6.2.0",
@@ -82,7 +82,7 @@
     "@types/temp": "0.9.1",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "uuid": "10.0.0"
   },
   "engines": {
