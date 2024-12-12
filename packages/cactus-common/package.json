@@ -62,7 +62,7 @@
     "loglevel-plugin-prefix": "0.8.4",
     "run-time-error-cjs": "1.4.0",
     "sanitize-html": "2.12.1",
-    "secp256k1": "4.0.3",
+    "secp256k1": "4.0.4",
     "sha3": "2.1.4"
   },
   "devDependencies": {

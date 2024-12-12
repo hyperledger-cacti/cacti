@@ -40,7 +40,7 @@
     "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
     "body-parser": "1.20.3",
     "dotenv": "8.6.0",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",

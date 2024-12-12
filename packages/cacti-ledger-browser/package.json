@@ -58,7 +58,7 @@
     "@supabase/supabase-js": "1.35.6",
     "@tanstack/react-query": "5.29.2",
     "apexcharts": "3.45.2",
-    "axios": "1.7.7",
+    "axios": "1.7.9",
     "buffer": "6.0.3",
     "ethers": "6.12.1",
     "react": "18.2.0",
@@ -74,7 +74,7 @@
     "@types/react-dom": "18.2.17",
     "@vitejs/plugin-react": "4.2.1",
     "typescript": "5.5.2",
-    "vite": "5.4.9"
+    "vite": "5.4.11"
   },
   "engines": {
     "node": ">=18",
