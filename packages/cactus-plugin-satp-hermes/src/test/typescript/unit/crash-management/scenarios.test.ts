@@ -11,7 +11,6 @@ import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gol/cr
 import { Knex, knex } from "knex";
 import {
   LocalLog,
-  SupportedChain,
   GatewayIdentity,
   Address,
 } from "../../../../main/typescript/core/types";
@@ -54,6 +53,7 @@ import {
   IRemoteLogRepository,
 } from "../../../../main/typescript/repository/interfaces/repository";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 let mockSession: SATPSession;
 
@@ -126,7 +126,12 @@ beforeAll(async () => {
         Crash: SATP_CRASH_VERSION,
       },
     ],
-    supportedDLTs: [SupportedChain.BESU],
+    connectedDLTs: [
+      {
+        id: "BESU",
+        ledgerType: LedgerType.Besu2X,
+      },
+    ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
   } as GatewayIdentity;
@@ -141,7 +146,7 @@ beforeAll(async () => {
 
   const bridgesManagerOptions: ISATPBridgesOptions = {
     logLevel: "DEBUG",
-    supportedDLTs: gatewayIdentity.supportedDLTs,
+    connectedDLTs: gatewayIdentity.connectedDLTs,
     networks: [],
   };
   const bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
