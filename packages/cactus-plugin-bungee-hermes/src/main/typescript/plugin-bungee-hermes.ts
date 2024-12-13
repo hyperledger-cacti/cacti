@@ -217,9 +217,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
       )
     ) {
       this.log.info("Some signature was deemed invalid");
-      throw Error(
-        "At least one of they views does not include a valid signature",
-      );
+      throw Error("The provided view does not include a valid signature");
     }
     const prevVersionMetadata = {
       viewId: view.getKey(),
@@ -316,6 +314,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
   }
 
   sign(msg: string): string {
+    this.logger.info(this.bungeeSigner.dataHash(msg));
     return Buffer.from(this.bungeeSigner.sign(msg)).toString("hex");
   }
 
@@ -439,6 +438,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     view: string,
     pubKey: string,
   ): boolean {
+    this.logger.info(this.bungeeSigner.dataHash(view));
     const sourceSignature = new Uint8Array(Buffer.from(signature, "hex"));
     const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
 

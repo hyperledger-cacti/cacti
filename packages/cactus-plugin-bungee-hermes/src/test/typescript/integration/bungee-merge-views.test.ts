@@ -7,6 +7,7 @@ import {
 } from "@hyperledger/cactus-common";
 import "jest-extended";
 import LockAssetContractJson from "../solidity/lock-asset-contract/LockAsset.json";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -120,7 +121,7 @@ beforeEach(async () => {
     });
     keychainPlugin.set(
       LockAssetContractJson.contractName,
-      JSON.stringify(LockAssetContractJson),
+      safeStableStringify(LockAssetContractJson),
     );
 
     const pluginRegistry = new PluginRegistry({
@@ -365,15 +366,15 @@ test.each([{ apiPath: true }, { apiPath: false }])(
 
     const mergeViewsNoPolicyReq = await bungeeApi.mergeViewsV1({
       serializedViews: [
-        JSON.stringify({
-          view: JSON.stringify(view.view as View),
+        safeStableStringify({
+          view: safeStableStringify(view.view as View),
           signature: view.signature,
-        }),
+        })!,
         // eslint-disable-next-line prettier/prettier
-        JSON.stringify({
-          view: JSON.stringify(view2.view as View),
+        safeStableStringify({
+          view: safeStableStringify(view2.view as View),
           signature: view2.signature,
-        }),
+        })!,
       ],
       mergePolicy: MergePolicyOpts.NONE,
     });
@@ -398,7 +399,7 @@ test.each([{ apiPath: true }, { apiPath: false }])(
     const transactionReceipts: string[] = [];
 
     mergeViewsNoPolicy.integratedView.getAllTransactions().forEach((t) => {
-      transactionReceipts.push(JSON.stringify(t.getProof()));
+      transactionReceipts.push(safeStableStringify(t.getProof()));
     });
     expect(
       (
