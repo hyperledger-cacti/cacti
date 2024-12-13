@@ -24,6 +24,8 @@ import {
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
+
 import {
   Web3SigningCredentialType,
   PluginLedgerConnectorBesu,
@@ -122,7 +124,7 @@ beforeEach(async () => {
     });
     keychainPlugin.set(
       LockAssetContractJson.contractName,
-      JSON.stringify(LockAssetContractJson),
+      safeStableStringify(LockAssetContractJson),
     );
 
     const pluginRegistry = new PluginRegistry({
@@ -352,10 +354,10 @@ test.each([{ apiPath: true }, { apiPath: false }])(
     const bungeeApi = new BungeeApi(config);
 
     const processed = await bungeeApi.processViewV1({
-      serializedView: JSON.stringify({
-        view: JSON.stringify(view.view as View),
+      serializedView: safeStableStringify({
+        view: safeStableStringify(view.view as View),
         signature: view.signature,
-      }),
+      })!,
       policyId: PrivacyPolicyOpts.PruneState,
       policyArguments: [BESU_ASSET_ID],
     });
@@ -364,10 +366,10 @@ test.each([{ apiPath: true }, { apiPath: false }])(
     expect(processed.data.view).toBeTruthy();
     expect(processed.data.signature).toBeTruthy();
 
-    const processedView = deserializeView(JSON.stringify(processed.data));
+    const processedView = deserializeView(safeStableStringify(processed.data));
 
     //check view deserializer
-    expect(JSON.stringify(processedView)).toEqual(processed.data.view);
+    expect(safeStableStringify(processedView)).toEqual(processed.data.view);
 
     expect(processedView.getPolicy()).toBeTruthy();
     expect(processedView.getOldVersionsMetadata().length).toBe(1);

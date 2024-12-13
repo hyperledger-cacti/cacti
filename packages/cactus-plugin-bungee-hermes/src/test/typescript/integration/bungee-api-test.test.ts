@@ -7,6 +7,7 @@ import {
 } from "@hyperledger/cactus-common";
 import "jest-extended";
 import LockAssetContractJson from "../solidity/lock-asset-contract/LockAsset.json";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -264,11 +265,11 @@ test("tests bungee api using different strategies", async () => {
   const stateProofs = viewFabric1.view
     ?.getSnapshot()
     .getStateBins()
-    .map((x) => JSON.stringify(x.getStateProof()));
+    .map((x) => safeStableStringify(x.getStateProof()));
   const transactionProofs: string[] = [];
   viewFabric1.view
     ?.getAllTransactions()
-    .forEach((t) => transactionProofs.push(JSON.stringify(t.getProof())));
+    .forEach((t) => transactionProofs.push(safeStableStringify(t.getProof())));
   const verifyStateRoot = await bungeeApi.verifyMerkleRoot({
     input: stateProofs?.reverse(), //check integrity, order should not matter
     root: proof?.statesMerkleRoot,
@@ -294,11 +295,11 @@ test("tests bungee api using different strategies", async () => {
   const stateProofs1 = viewEth1.view
     ?.getSnapshot()
     .getStateBins()
-    .map((x) => JSON.stringify(x.getStateProof()));
+    .map((x) => safeStableStringify(x.getStateProof()));
   const transactionProofs1: string[] = [];
   viewEth1.view
     ?.getAllTransactions()
-    .forEach((t) => transactionProofs1.push(JSON.stringify(t.getProof())));
+    .forEach((t) => transactionProofs1.push(safeStableStringify(t.getProof())));
   const verifyStateRoot1 = await bungeeApi.verifyMerkleRoot({
     input: stateProofs1?.reverse(), //check integrity, order should not matter
     root: proof1?.statesMerkleRoot,
@@ -577,7 +578,7 @@ async function setupFabricTestLedger(): Promise<string> {
   expect(createResponse.status).toBeLessThan(300);
 
   log.info(
-    `BassicAssetTransfer.Create(): ${JSON.stringify(createResponse.data)}`,
+    `BassicAssetTransfer.Create(): ${safeStableStringify(createResponse.data)}`,
   );
   return "Fabric Network setup successful";
 }
@@ -614,7 +615,7 @@ async function setupBesuTestLedger(): Promise<string> {
 
   besuKeychainPlugin.set(
     besuContractName,
-    JSON.stringify(LockAssetContractJson),
+    safeStableStringify(LockAssetContractJson),
   );
 
   const pluginRegistry = new PluginRegistry({
@@ -801,7 +802,7 @@ async function setupEthereumTestLedger(): Promise<string> {
   });
   keychainPlugin.set(
     LockAssetContractJson.contractName,
-    JSON.stringify(LockAssetContractJson),
+    safeStableStringify(LockAssetContractJson),
   );
   const connector = new PluginLedgerConnectorEthereum({
     instanceId: uuidv4(),
