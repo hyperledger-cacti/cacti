@@ -41,6 +41,12 @@
       "url": "https://www.fujitsu.com/global/"
     }
   ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
     "build": "yarn run tsc && yarn run build:prod:frontend",
     "build:dev:frontend": "vite build --mode=development",
