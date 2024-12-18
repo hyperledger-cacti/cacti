@@ -9,7 +9,6 @@ export {
   PluginLedgerConnectorFabric,
   IPluginLedgerConnectorFabricOptions,
   SignPayloadCallback,
-  IRunTxReqWithTxId,
 } from "./plugin-ledger-connector-fabric";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
