@@ -2,15 +2,14 @@ import { LocalLog } from "../core/types";
 import { ILocalLogRepository } from "./interfaces/repository";
 import knex, { Knex } from "knex";
 
+import knexFile from "../knex/knexfile";
+
 export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;
 
   public constructor(config: Knex.Config | undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const configFile = require("../../../knex/knexfile.ts")[
-      process.env.ENVIRONMENT || "development"
-    ];
-
+    const envName = process.env.ENVIRONMENT || "development";
+    const configFile = knexFile[envName];
     this.database = knex(config || configFile);
   }
 
