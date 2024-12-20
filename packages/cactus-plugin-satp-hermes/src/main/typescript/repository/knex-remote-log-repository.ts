@@ -2,6 +2,8 @@ import { IRemoteLogRepository } from "./interfaces/repository";
 import { RemoteLog } from "../core/types";
 import knex, { Knex } from "knex";
 
+import knexFileRemote from "../knex/knexfile-remote";
+
 export class KnexRemoteLogRepository implements IRemoteLogRepository {
   readonly database: Knex;
 
@@ -9,11 +11,8 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
   // so that both gateways can have access to the same database
   // simulating a remote log storage
   public constructor(config: Knex.Config | undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const configFile = require("../../../knex/knexfile-remote.ts")[
-      process.env.ENVIRONMENT || "development"
-    ];
-
+    const envName = process.env.ENVIRONMENT || "development";
+    const configFile = knexFileRemote[envName];
     this.database = knex(config || configFile);
   }
 
