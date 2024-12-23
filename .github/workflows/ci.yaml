@@ -16,10 +16,12 @@ env:
   RUN_CODE_COVERAGE: true
 jobs:
   ActionLint:
+    if: always()
     needs: check-ci-skip
     uses: ./.github/workflows/actionlint.yaml
   DCI-Lint:
     name: DCI-Lint
+    if: always()
     needs: check-ci-skip
     runs-on: ubuntu-22.04
     steps:
@@ -36,9 +38,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Check CI Skip
-        run: node tools/ci-skip-for-maintainers.js ${{ github.event.pull_request.url }} ${{ github.event.pull_request.user.login }}
+        run: node tools/ci-skip-for-maintainers.js
 
   check-coverage:
+    if: always()
     needs: check-ci-skip
     outputs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
@@ -50,6 +53,7 @@ jobs:
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
 
   compute_changed_packages:
+    if: always()
     needs: check-ci-skip
     outputs:
       cmd-api-server-changed: ${{ steps.changes.outputs.cmd-api-server-changed }}
@@ -186,6 +190,7 @@ jobs:
               - './weaver/**'
 
   build-dev:
+    if: always()
     needs: check-ci-skip
     continue-on-error: false
     env:
