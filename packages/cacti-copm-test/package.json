@@ -11,7 +11,7 @@
   ],
   "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti#issues"
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
-    "email": "cactus@lists.hyperledger.org",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "contributors": [

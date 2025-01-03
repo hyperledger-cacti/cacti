@@ -3,16 +3,36 @@
   "version": "2.1.0",
   "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
   "keywords": [
-    "hyperledger",
-    "blockchain",
-    "interoperability"
+    "Hyperledger",
+    "Cacti",
+    "Interoperability",
+    "Blockchain",
+    "Distributed Ledger Technology"
   ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
-  "author": "V. Ramakrishna",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "V. Ramakrishna"
+    }
+  ],
   "main": "index.js",
   "types": "./types/index.d.ts",
   "scripts": {
