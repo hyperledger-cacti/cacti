@@ -1,7 +1,6 @@
 {
   "name": "test-run-transaction",
   "license": "Apache-2.0",
-  "private": true,
   "scripts": {
     "start": "node ../cactus-common-example-server/dist/lib/main/typescript/routing-interface/www.js",
     "debug": "nodemon --inspect ../cactus-common-example-server/dist/lib/main/typescript/routing-interface/www.js",
