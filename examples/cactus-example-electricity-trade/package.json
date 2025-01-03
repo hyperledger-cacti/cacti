@@ -1,7 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-electricity-trade",
   "version": "2.1.0",
-  "private": true,
   "license": "Apache-2.0",
   "main": "dist/www.js",
   "module": "dist/www.js",
