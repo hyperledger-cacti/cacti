@@ -3,6 +3,8 @@
   "version": "2.1.0",
   "description": "Sample Besu Application for Storing Key Value Pairs",
   "keywords": [
+    "Hyperledger",
+    "Cacti",
     "ethereum",
     "besu",
     "interoperability",
@@ -10,12 +12,20 @@
     "solidity",
     "smart-contract"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti/weaver/samples/besu/simplestate",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
-  "repository": "https://github.com/hyperledger-cacti/cacti/samples/besu/simplestate",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
   "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
   "directories": {
     "doc": "docs",
     "test": "test"
@@ -44,5 +54,8 @@
   "engines": {
     "node": ">=18",
     "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
