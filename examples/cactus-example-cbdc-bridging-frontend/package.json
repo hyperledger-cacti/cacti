@@ -1,7 +1,6 @@
 {
   "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
   "version": "2.1.0",
-  "private": true,
   "license": "Apache-2.0",
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
