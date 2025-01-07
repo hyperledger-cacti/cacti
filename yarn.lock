@@ -61,13 +61,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@adraffy/ens-normalize@npm:1.9.0":
-  version: 1.9.0
-  resolution: "@adraffy/ens-normalize@npm:1.9.0"
-  checksum: 10/5257bbb45796720386a250ec2747f1c93b8fccd7063839ccda4aeb1b97ebec81caf5b435252dae1842c37175fe2e0ddcb89039f4ec1a4934fa4c6901a7f4992b
-  languageName: node
-  linkType: hard
-
 "@adraffy/ens-normalize@npm:^1.8.8":
   version: 1.9.4
   resolution: "@adraffy/ens-normalize@npm:1.9.4"
@@ -10151,13 +10144,13 @@ __metadata:
     "@hyperledger/cactus-core": "npm:2.1.0"
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
-    "@types/json-stable-stringify": "npm:1.0.33"
+    "@types/json-stable-stringify": "npm:1.0.34"
     "@types/uuid": "npm:10.0.0"
     axios: "npm:1.7.9"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     jose: "npm:4.15.5"
-    json-stable-stringify: "npm:1.0.1"
+    json-stable-stringify: "npm:1.0.2"
     prom-client: "npm:15.1.3"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
@@ -10226,9 +10219,9 @@ __metadata:
     "@types/express": "npm:5.0.0"
     axios: "npm:1.7.9"
     bn.js: "npm:5.2.1"
-    dotenv: "npm:16.0.3"
+    dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
-    ethers: "npm:6.3.0"
+    ethers: "npm:6.12.1"
     express: "npm:4.21.2"
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
     joi: "npm:17.13.3"
@@ -10254,7 +10247,7 @@ __metadata:
     axios: "npm:1.7.9"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
-    http-status-codes: "npm:2.1.4"
+    http-status-codes: "npm:2.3.0"
     internal-ip: "npm:6.2.0"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
@@ -13380,13 +13373,6 @@ __metadata:
   version: 1.7.3
   resolution: "@noble/ed25519@npm:1.7.3"
   checksum: 10/48d389a36ec5222366b477a22cfe33dc3837044b58232d99b3fff8ee8aba90877b8153eb60dd436869004f85c6101e8c907f17a48d818d218b4efecee1817237
-  languageName: node
-  linkType: hard
-
-"@noble/hashes@npm:1.1.2":
-  version: 1.1.2
-  resolution: "@noble/hashes@npm:1.1.2"
-  checksum: 10/2826c94ea30b8d2447fda549f4ffa97a637a480eeef5c96702a2f932c305038465f7436caf5b2bad41eb43c08c270b921e101488b18165feebe3854091b56d91
   languageName: node
   linkType: hard
 
@@ -19476,13 +19462,6 @@ __metadata:
   version: 3.0.0
   resolution: "aes-js@npm:3.0.0"
   checksum: 10/1b3772e5ba74abdccb6c6b99bf7f50b49057b38c0db1612b46c7024414f16e65ba7f1643b2d6e38490b1870bdf3ba1b87b35e2c831fd3fdaeff015f08aad19d1
-  languageName: node
-  linkType: hard
-
-"aes-js@npm:4.0.0-beta.3":
-  version: 4.0.0-beta.3
-  resolution: "aes-js@npm:4.0.0-beta.3"
-  checksum: 10/8cdf3542ac2acab1c7e934fff7f4093dfdc647c3ad15ecf013acc7170383d0109d95f203f0fb48a9d01af0a35a47e871a30e9a50cfc35415d7b4c9194ded46d2
   languageName: node
   linkType: hard
 
@@ -26550,13 +26529,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.0.3":
-  version: 16.0.3
-  resolution: "dotenv@npm:16.0.3"
-  checksum: 10/d6788c8e40b35ad9a9ca29249dccf37fa6b3ad26700fcbc87f2f41101bf914f5193a04e36a3d23de70b1dcb8e5d5a3b21e151debace2c4cd08d868be500a1b29
-  languageName: node
-  linkType: hard
-
 "dotenv@npm:16.3.1":
   version: 16.3.1
   resolution: "dotenv@npm:16.3.1"
@@ -28905,20 +28877,6 @@ __metadata:
     tslib: "npm:2.4.0"
     ws: "npm:8.5.0"
   checksum: 10/2995766164292b531499764d319d753b1f4e1cd7ddb4f26c6557a26e42947d5642a4b3bbeace0b8bb398b909dc22fafa4f52d5190a9bb8180bebf2dd3d4d48a9
-  languageName: node
-  linkType: hard
-
-"ethers@npm:6.3.0":
-  version: 6.3.0
-  resolution: "ethers@npm:6.3.0"
-  dependencies:
-    "@adraffy/ens-normalize": "npm:1.9.0"
-    "@noble/hashes": "npm:1.1.2"
-    "@noble/secp256k1": "npm:1.7.1"
-    aes-js: "npm:4.0.0-beta.3"
-    tslib: "npm:2.4.0"
-    ws: "npm:8.5.0"
-  checksum: 10/45c88344be8a8503ddb498a33a9baec6953809bdc6d424b9e02fe47b2530106f285020e3158857493779fa6b73eb4eec24547a0cb4d65501bf5218400d0a90e0
   languageName: node
   linkType: hard
 
