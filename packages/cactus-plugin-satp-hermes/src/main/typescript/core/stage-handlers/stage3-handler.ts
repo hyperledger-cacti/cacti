@@ -28,7 +28,11 @@ import {
 import { LockAssertionReceiptMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
-import { saveMessageInSessionData, setError } from "../session-utils";
+import {
+  saveMessageInSessionData,
+  setError,
+  setErrorChecking,
+} from "../session-utils";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
@@ -443,7 +447,11 @@ export class Stage3SATPHandler implements SATPHandler {
           error,
         )}`,
       );
-      setError(session, MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE, error);
+      setErrorChecking(
+        session,
+        MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+        error,
+      );
       throw new FailedToProcessError(
         fnTag,
         "Checking " +

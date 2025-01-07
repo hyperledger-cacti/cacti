@@ -46,7 +46,10 @@ import {
   LockAssertionRequestMessage,
   LockAssertionReceiptMessage,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/stage_2_pb";
-import { SessionData } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+import {
+  SessionData,
+  State as SessionState,
+} from "../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
 import {
   CommitFinalAcknowledgementReceiptResponseMessage,
   CommitFinalAssertionRequestMessage,
@@ -1070,6 +1073,20 @@ describe("SATP Services Testing", () => {
       transferCompleteResponseMessage.common?.hashPreviousMessage,
     ).toBeDefined();
     expect(transferCompleteResponseMessage.serverSignature).toBeDefined();
+  });
+  it("Service3Client checkTransferCompleteResponseMessage", async () => {
+    expect(satpClientService3).toBeDefined();
+    expect(satpClientService3.getServiceIdentifier()).toBe(
+      `${SATPServiceType.Client}#3`,
+    );
+
+    await satpClientService3.checkTransferCompleteResponseMessage(
+      transferCompleteResponseMessage,
+      mockSession,
+    );
+    expect(mockSession.getClientSessionData().state).toBe(
+      SessionState.COMPLETED,
+    );
   });
 });
 
