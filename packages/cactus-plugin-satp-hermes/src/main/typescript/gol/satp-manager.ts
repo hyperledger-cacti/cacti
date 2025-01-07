@@ -996,6 +996,10 @@ export class SATPManager {
               getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
             );
           }
+
+          (
+            this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
+          ).CheckTransferCompleteResponse(transferCompleteResponse);
           break;
         default:
           throw new Error("Invalid stage");
