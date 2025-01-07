@@ -137,14 +137,23 @@ export class MessageTypeError extends SATPInternalError {
   constructor(
     tag: string,
     received: string,
-    expected: string,
+    expected1: string,
+    expected2?: string,
     cause?: string | Error | null,
   ) {
-    super(
-      `${tag}, message type miss match \n received: ${received} \n expected: ${expected}`,
-      cause ?? null,
-      400,
-    );
+    if (expected2) {
+      super(
+        `${tag}, message type miss match \n received: ${received} \n expected: ${expected1} or ${expected2}`,
+        cause ?? null,
+        400,
+      );
+    } else {
+      super(
+        `${tag}, message type miss match \n received: ${received} \n expected: ${expected1}`,
+        cause ?? null,
+        400,
+      );
+    }
     this.errorType = SATPErrorType.MESSAGE_OUT_OF_SEQUENCE;
   }
 }
