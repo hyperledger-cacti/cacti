@@ -574,7 +574,7 @@ export class Stage3ClientService extends SATPService {
     response: TransferCompleteResponseMessage,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `chechTransferCompleteResponseMessage()`;
+    const stepTag = `checkTransferCompleteResponseMessage()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, TransferComplete...`);
 
@@ -590,7 +590,7 @@ export class Stage3ClientService extends SATPService {
       fnTag,
       response.common,
       sessionData,
-      MessageType.COMMIT_TRANSFER_COMPLETE,
+      MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
     );
 
     signatureVerifier(fnTag, this.Signer, response, sessionData);
@@ -605,13 +605,13 @@ export class Stage3ClientService extends SATPService {
       );
     }
 
+    sessionData.state = State.COMPLETED;
+
     saveHash(
       sessionData,
       MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
       getHash(response),
     );
-
-    sessionData.state = State.COMPLETED;
 
     this.Log.info(
       `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
