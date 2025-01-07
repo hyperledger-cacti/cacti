@@ -533,6 +533,8 @@ export function getPreviousMessageType(
       return MessageType.COMMIT_FINAL;
     case MessageType.COMMIT_TRANSFER_COMPLETE:
       return MessageType.ACK_COMMIT_FINAL;
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      return MessageType.COMMIT_TRANSFER_COMPLETE;
     default:
       throw new Error("Message type not found");
   }
@@ -695,6 +697,48 @@ export function setError(
     case MessageType.ACK_COMMIT_FINAL:
     case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
       sessionData = session.getServerSessionData();
+      break;
+    default:
+      return;
+  }
+
+  sessionData.state = State.ERROR;
+  sessionData.errorCode = error.getSATPErrorType();
+  sessionData.phaseError = stageMessage;
+}
+
+// The same as setError but the checking iccours in the opposite gateway.
+export function setErrorChecking(
+  session: SATPSession | undefined,
+  stageMessage: MessageType,
+  error: SATPInternalError,
+) {
+  if (session == undefined) {
+    return;
+  }
+
+  let sessionData: SessionData | undefined;
+  switch (stageMessage) {
+    case MessageType.NEW_SESSION_REQUEST:
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+    case MessageType.INIT_PROPOSAL:
+    case MessageType.TRANSFER_COMMENCE_REQUEST:
+    case MessageType.LOCK_ASSERT:
+    case MessageType.COMMIT_PREPARE:
+    case MessageType.COMMIT_FINAL:
+    case MessageType.COMMIT_TRANSFER_COMPLETE:
+      sessionData = session.getServerSessionData();
+      break;
+    case MessageType.NEW_SESSION_RESPONSE:
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+    case MessageType.INIT_RECEIPT:
+    case MessageType.INIT_REJECT:
+    case MessageType.TRANSFER_COMMENCE_RESPONSE:
+    case MessageType.ASSERTION_RECEIPT:
+    case MessageType.COMMIT_READY:
+    case MessageType.ACK_COMMIT_FINAL:
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      sessionData = session.getClientSessionData();
       break;
     default:
       return;
