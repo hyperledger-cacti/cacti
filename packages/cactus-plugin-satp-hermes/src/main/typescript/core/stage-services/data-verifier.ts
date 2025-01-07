@@ -23,6 +23,7 @@ import {
   TransferContextIdError,
 } from "../errors/satp-service-errors";
 import { getMessageHash, getPreviousMessageType } from "../session-utils";
+import { getMessageTypeName } from "../satp-utils";
 
 export function commonBodyVerifier(
   tag: string,
@@ -92,8 +93,9 @@ export function commonBodyVerifier(
   ) {
     throw new MessageTypeError(
       tag,
-      common.messageType.toString(),
-      messageStage.toString(),
+      getMessageTypeName(common.messageType),
+      getMessageTypeName(messageStage),
+      getMessageTypeName(messageStage2),
     );
   }
 

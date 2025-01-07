@@ -55,7 +55,7 @@ export async function launchApp(
     apiGateway2ServerPort: parseInt(process.env.API_GATEWAY_2_SERVER_PORT),
     apiGateway2ClientPort: parseInt(process.env.API_GATEWAY_2_CLIENT_PORT),
     apiGateway2BloPort: parseInt(process.env.API_GATEWAY_2_BLO_PORT),
-    logLevel: "DEBUG",
+    logLevel: "INFO",
   };
 
   const cbdcBridgingApp = new CbdcBridgingApp(appOptions);

@@ -73,6 +73,15 @@ import { TransferEndpointV1 } from "../web-services/transfer-endpoint";
 import { GetAmountApprovedEndpointV1 } from "../web-services/get-amount-approved-endpoint";
 
 import {
+  knexClientConnection as knexGateway1Connection,
+  knexServerConnection as knexGateway2Connection,
+  knexSourceRemoteConnection as knexRemote1Connection,
+  knexTargetRemoteConnection as knexRemote2Connection,
+} from "../../../knex/knex.config";
+
+import { Knex, knex } from "knex";
+
+import {
   AdminApi,
   TransactionApi,
   TransactRequest,
@@ -189,7 +198,7 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   public async start(): Promise<void> {
     try {
-      this.log.info(`Starting dummy infrastructure...`);
+      this.log.info(`Starting dummy infrastructure... (this can take a while)`);
       await Promise.all([this.besu.start(), this.fabric.start()]);
       this.besuFirstHighNetWorthAccount = this.besu.getGenesisAccountPubKey();
       this.besuFirstHighNetWorthAccountPriv =
@@ -460,6 +469,11 @@ export class CbdcBridgingAppDummyInfrastructure {
       claimFormat: ClaimFormat.DEFAULT,
     };
 
+    const knexInstanceGateway1: Knex = knex(knexGateway1Connection);
+    await knexInstanceGateway1.migrate.latest();
+    const knexInstanceRemoteConnection: Knex = knex(knexRemote1Connection);
+    await knexInstanceRemoteConnection.migrate.latest();
+
     const besuGatewayOptions: SATPGatewayConfig = {
       logLevel: logLevel,
       gid: besuGatewayIdentity,
@@ -480,7 +494,14 @@ export class CbdcBridgingAppDummyInfrastructure {
       bridgesConfig: [besuConfig],
       enableOpenAPI: true,
       keyPair: besuGatewayKeyPair,
+      knexLocalConfig: knexGateway1Connection,
+      knexRemoteConfig: knexRemote1Connection,
     };
+
+    const knexInstanceGateway2: Knex = knex(knexGateway2Connection);
+    await knexInstanceGateway2.migrate.latest();
+    const knexInstanceRemoteConnection2: Knex = knex(knexRemote2Connection);
+    await knexInstanceRemoteConnection2.migrate.latest();
 
     const fabricGatewayOptions = {
       logLevel: logLevel,
@@ -502,6 +523,8 @@ export class CbdcBridgingAppDummyInfrastructure {
       bridgesConfig: [fabricConfig],
       enableOpenAPI: true,
       keyPair: fabricGatewayKeyPair,
+      knexLocalConfig: knexGateway2Connection,
+      knexRemoteConfig: knexRemote2Connection,
     };
 
     const besuGateway = await this.gatewayFactory.create(besuGatewayOptions);

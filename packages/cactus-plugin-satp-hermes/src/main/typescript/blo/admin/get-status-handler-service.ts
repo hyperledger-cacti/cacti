@@ -27,7 +27,7 @@ export async function executeGetStatus(
     label: fnTag,
     level: logLevel,
   });
-  
+
   logger.info(`${fnTag}, Obtaining status for sessionID=${req.sessionID}`);
 
   try {
