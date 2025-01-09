@@ -67,7 +67,7 @@
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.7.9",
-    "http-status-codes": "2.1.4",
+    "http-status-codes": "2.3.0",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
