@@ -76,8 +76,6 @@ jobs:
 
       - run: yarn generate-api-server-config
 
-      - run: jq '.authorizationProtocol = "NONE"' .config.json > .config2.json && mv .config2.json .config.json
-      
       # Delete the first and the second items in the array (remove keychain and manual consortium plugins)
       - run: jq 'del(.plugins[0,1])' .config.json > .config2.json && mv .config2.json .config.json
 
@@ -104,22 +102,48 @@ jobs:
       - name: Print Nuclei URL List File - ./urls.txt
         run: cat urls.txt
 
+      - name: Generate Audience and Issuer
+        id: generate_ids
+        run: |
+          echo "audience=$(uuidgen)" >> "$GITHUB_ENV"
+          echo "issuer=$(uuidgen)" >> "$GITHUB_ENV"
+
+      - name: Generate RSA Keys
+        run: |
+          openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -in private_key.pem -pubout -out public_key.pem
+
+      - run: jq '.expressJwtOptions.secret = "$(cat public_key.pem)" |
+                 .expressJwtOptions.algorithms = ["RS256"] |
+                 .expressJwtOptions.issuer = "${{ env.issuer }}" |
+                 .expressJwtOptions.audience = "${{ env.audience }}"' .config.json > .config2.json && mv .config2.json .config.json
+
+      - name: Generate Auth Bearer Token
+        run: |
+          HEADER_B64=$(echo '{"alg":"RS256"}' | openssl base64 -e -A | tr -d '=' | tr '/+' '_-')
+          PAYLOAD_B64=$(echo '{"scope":"read:health","iss":"${{ env.issuer }}","aud":"${{ env.audience }}"}' | openssl base64 -e -A | tr -d '=' | tr '/+' '_-')
+
+          SIGNATURE=$(echo -n "$HEADER_B64.$PAYLOAD_B64" | openssl dgst -sha256 -sign private_key.pem | openssl base64 -e -A | tr -d '=' | tr '/+' '_-')
+          JWT="$HEADER_B64.$PAYLOAD_B64.$SIGNATURE"
+          echo "dast_jwt=$JWT" >> "$GITHUB_ENV"
+
       - name: Start API Server & Run DAST
         uses: BerniWittmann/background-server-action@v1.1.0
         env:
-            # Needed because the wait-on syntax otherwise keeps thinking that
-            # there is a problem due to our self signed certificates on the
-            # test instance of the API server
-            NODE_TLS_REJECT_UNAUTHORIZED: 0
+          # Needed because the wait-on syntax otherwise keeps thinking that
+          # there is a problem due to our self signed certificates on the
+          # test instance of the API server
+          NODE_TLS_REJECT_UNAUTHORIZED: 0
         with:
           build: yarn --version
           start: yarn start:api-server
           command: "nuclei -version"
           command-windows: echo "The project build is not supported on the Windows operating system. Please use Linux or macOS"
-          wait-on: "https://localhost:4000/api/v1/api-server/healthcheck"
           # wait for 10 minutes for the server to respond
           wait-on-timeout: 120
-      
+          wait-on-command: |
+            curl -X GET https://localhost:4000/api/v1/api-server/healthcheck -k -H "Authorization: Bearer ${{ env.dast_jwt }}"
+
       - name: Run the dast nuclei scan
         run: "nuclei -list=urls.txt -dast -severity=high,critical -sarif-export ~/nuclei.sarif -output=nuclei.log"
 
