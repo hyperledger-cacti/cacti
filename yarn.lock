@@ -9489,11 +9489,11 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
-    "@types/jsonwebtoken": "npm:9.0.0"
+    "@types/jsonwebtoken": "npm:9.0.6"
     "@types/lodash": "npm:4.14.195"
-    "@types/node": "npm:18.11.9"
+    "@types/node": "npm:18.19.0"
     http-status-codes: "npm:2.3.0"
-    jsonwebtoken: "npm:9.0.0"
+    jsonwebtoken: "npm:9.0.2"
     lodash: "npm:4.17.21"
     rxjs: "npm:7.8.1"
     socket.io-client-fixed-types: "npm:4.5.4"
@@ -9530,9 +9530,9 @@ __metadata:
     "@types/express-http-proxy": "npm:1.6.2"
     "@types/google-protobuf": "npm:3.15.5"
     "@types/json-stable-stringify": "npm:1.0.34"
-    "@types/jsonwebtoken": "npm:8.5.4"
+    "@types/jsonwebtoken": "npm:9.0.6"
     "@types/multer": "npm:1.4.7"
-    "@types/node-forge": "npm:1.0.1"
+    "@types/node-forge": "npm:1.3.0"
     "@types/passport": "npm:1.0.7"
     "@types/passport-oauth2": "npm:1.4.11"
     "@types/passport-saml": "npm:1.1.3"
@@ -9560,16 +9560,16 @@ __metadata:
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
-    http-status-codes: "npm:2.1.3"
+    http-status-codes: "npm:2.3.0"
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.2"
     lmify: "npm:0.3.0"
     node-forge: "npm:1.3.0"
     prom-client: "npm:15.1.3"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:>=7.4.0"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
-    safe-stable-stringify: "npm:2.4.3"
+    safe-stable-stringify: "npm:2.5.0"
     semver: "npm:7.6.2"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
@@ -9642,14 +9642,14 @@ __metadata:
   resolution: "@hyperledger/cactus-common@workspace:packages/cactus-common"
   dependencies:
     "@grpc/grpc-js": "npm:1.12.4"
-    "@types/json-stable-stringify": "npm:1.0.33"
+    "@types/json-stable-stringify": "npm:1.0.34"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/secp256k1": "npm:4.0.3"
     "@types/uuid": "npm:10.0.0"
     fast-safe-stringify: "npm:2.1.1"
-    json-stable-stringify: "npm:1.0.1"
+    json-stable-stringify: "npm:1.0.2"
     key-encoder: "npm:2.0.3"
-    loglevel: "npm:1.7.1"
+    loglevel: "npm:1.8.1"
     loglevel-plugin-prefix: "npm:0.8.4"
     run-time-error-cjs: "npm:1.4.0"
     sanitize-html: "npm:2.12.1"
@@ -17358,24 +17358,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsonwebtoken@npm:8.5.4":
-  version: 8.5.4
-  resolution: "@types/jsonwebtoken@npm:8.5.4"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/9326111efd601ab0594019714182b141ffd6f21fcc8bb565355230daa78baafc06ad5211ea404ca65aae4c353056b17643ebf78659f1535067f56e80eeb9c76f
-  languageName: node
-  linkType: hard
-
-"@types/jsonwebtoken@npm:9.0.0":
-  version: 9.0.0
-  resolution: "@types/jsonwebtoken@npm:9.0.0"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/f70b26ca2ec2d63a4c5e5e93bdee13aecfc74872361c04a17dacbe8df50a31b592e41f5f37cf6b4937ea42f47b2d8823a417be115a0f87d3db579be3689ecce3
-  languageName: node
-  linkType: hard
-
 "@types/jsonwebtoken@npm:9.0.6":
   version: 9.0.6
   resolution: "@types/jsonwebtoken@npm:9.0.6"
@@ -17557,15 +17539,6 @@ __metadata:
     "@types/node": "npm:*"
     form-data: "npm:^3.0.0"
   checksum: 10/088cd7de89383f18f21c7dc176f9613f946f7281757c9bb217224b5ee114a46a27a662ea0ae3b59ddf8b7a705066dec8e5109c23ff3c97892abadd9e9974cab2
-  languageName: node
-  linkType: hard
-
-"@types/node-forge@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@types/node-forge@npm:1.0.1"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/7d17d252f5bf126f871431e5a5c5d834107ba28b5be68cc70cce13d94774e5bb073774c22c2b5085731e414bc5a42e925aaf8394eb49555cfe63bcb81a0fb900
   languageName: node
   linkType: hard
 
@@ -32855,13 +32828,6 @@ __metadata:
     jsprim: "npm:^1.2.2"
     sshpk: "npm:^1.7.0"
   checksum: 10/2ff7112e6b0d8f08b382dfe705078c655501f2ddd76cf589d108445a9dd388a0a9be928c37108261519a7f53e6bbd1651048d74057b804807cce1ec49e87a95b
-  languageName: node
-  linkType: hard
-
-"http-status-codes@npm:2.1.3":
-  version: 2.1.3
-  resolution: "http-status-codes@npm:2.1.3"
-  checksum: 10/d5025903b41d88d35c1039e6fa4fe4061cce95119f58672d56ed8837bf91cc10c1b3dc47b73288398b55990e7a2c2147ae32feddc896b6863f020b44ef58ee6e
   languageName: node
   linkType: hard
 
