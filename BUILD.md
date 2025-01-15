@@ -1,6 +1,7 @@
 - [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
 - [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
 - [Getting Started](#getting-started)
+  - [Quickstart with VSC Devcontainer for Hyperledger Cactus](#quickstart-with-vsc-devcontainer-for-hyperledger-cactus)
   - [MacOS](#macos)
   - [Linux](#linux)
   - [Windows](#windows)
@@ -39,6 +40,44 @@ The `npm run watch` script in action:
 ![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
 
 ## Getting Started
+
+### Quickstart with VSC Devcontainer for Hyperledger Cactus
+
+* Opening the repo Within a Docker Container
+  * Install Prerequisites:
+    * Visual Studio Code (VSC)
+    * Docker Desktop (ensure it's running) https://docs.docker.com/desktop/setup/install/windows-install/
+    * The Remote - Containers VSC extension
+  * Clone the Repository:
+    ```
+    git clone https://github.com/hyperledger-cacti/cacti.git
+    cd cacti
+    ```
+  * Open in VSC and Reopen in Container:
+    * Launch VSC
+    * Open the cacti folder
+    * Press F1 and type and click "Dev Containers: Open Folder in Container."
+  * Wait for the Container Setup:
+    * The devcontainer will install all required dependencies inside the container.
+  * Start Developing:
+    * The container will have all necessary dependencies pre-installed.
+  
+* (This is optional) Cloning the repo to a Docker Volume 
+  * Clone the Repo Using Docker Volume:
+    ```
+    docker volume create cacti_volume
+    docker run -v cacti_volume:/workspace -w /workspace -it node:18.19.0 bash
+    git clone https://github.com/hyperledger-cacti/cacti.git
+    ```
+  * Attach VSC to the Running Container:
+    * Open VSC.
+    * Press F1 and type and click "Dev Containers: Open Folder in Container."
+    * Choose the container created earlier.
+  * Start Developing:
+    * The container will have all necessary dependencies pre-installed.
+  
+  _Optional: You can see an option on the bottom right part of the VSC window saying to Install the recommended extensions. Agreeing to that will install the optional extensions which will streamline the development process_
+
 
 ### MacOS 
 
