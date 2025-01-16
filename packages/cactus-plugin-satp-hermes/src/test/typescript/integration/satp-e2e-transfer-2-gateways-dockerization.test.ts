@@ -42,7 +42,7 @@ import { bufArray2HexStr } from "../../../main/typescript/gateway-utils";
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "BUNGEE - Hermes",
+  label: "SATP - Hermes",
 });
 
 let fabricEnv: FabricTestEnvironment;
@@ -180,6 +180,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
         },
       ],
       [besuConfigJSON],
+      false,
+      undefined,
+      undefined,
       "gateway1",
       {
         privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
@@ -213,6 +216,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
         },
       ],
       [fabricConfigJSON],
+      false,
+      undefined,
+      undefined,
       "gateway2",
       {
         privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
@@ -222,7 +228,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // gatewayRunner1 setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
+      containerImageVersion: "latest",
       containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
@@ -236,7 +242,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // gatewayRunner2 setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
+      containerImageVersion: "latest",
       containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
