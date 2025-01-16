@@ -9700,6 +9700,8 @@ __metadata:
     "@redocly/openapi-core": "npm:1.15.0"
     "@types/adm-zip": "npm:0.5.0"
     "@types/benchmark": "npm:2.1.5"
+    "@types/deasync": "npm:^0"
+    "@types/deasync-promise": "npm:^1"
     "@types/debug": "npm:4.1.12"
     "@types/fs-extra": "npm:11.0.4"
     "@types/jest": "npm:29.5.3"
@@ -9720,6 +9722,8 @@ __metadata:
     cross-env: "npm:7.0.3"
     crypto-browserify: "npm:3.12.0"
     cspell: "npm:8.10.4"
+    deasync: "npm:^0.1.30"
+    deasync-promise: "npm:^1.0.1"
     debug: "npm:4.3.5"
     del: "npm:7.1.0"
     del-cli: "npm:5.1.0"
@@ -15371,6 +15375,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/deasync-promise@npm:^1":
+  version: 1.0.2
+  resolution: "@types/deasync-promise@npm:1.0.2"
+  checksum: 10/976453a85053d9e7918b3b3d6a1e70890a15dd16ecfe53b35dd12f76a8f42513955e936e02784707bf47bfdd3d6903a1da68b4099d39f0f0d1baee58d03232d6
+  languageName: node
+  linkType: hard
+
+"@types/deasync@npm:^0":
+  version: 0.1.5
+  resolution: "@types/deasync@npm:0.1.5"
+  checksum: 10/5a8fec89572abc6fbcce7b4f5b5357ba58b2d6d6860b640eb452eb9e87a8d44f787a40450e456b6e2d7fa12cf52bac2ab0d2f9be431dd51bd40584e316ffaa2c
+  languageName: node
+  linkType: hard
+
 "@types/debug@npm:4.1.12, @types/debug@npm:^4.1.7":
   version: 4.1.12
   resolution: "@types/debug@npm:4.1.12"
@@ -19845,7 +19863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.3.1":
+"bindings@npm:^1.3.1, bindings@npm:^1.5.0":
   version: 1.5.0
   resolution: "bindings@npm:1.5.0"
   dependencies:
@@ -23732,6 +23750,25 @@ __metadata:
   version: 4.0.14
   resolution: "date-format@npm:4.0.14"
   checksum: 10/6b07fd1df247439c53b71244e3468b93e6dfebb5d409b9328dd7b7e9ed0d2e875018e20fb1a95ae6b677dea708ec06aaa5058a7a5faa1a7f649338aabf04991a
+  languageName: node
+  linkType: hard
+
+"deasync-promise@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "deasync-promise@npm:1.0.1"
+  dependencies:
+    deasync: "npm:^0.1.7"
+  checksum: 10/e2c29c5a4974e7090725ce3e11a02dd9f0143e8743ad2190ba38f4c84be3d9c8cb4eca26dfc0b4b8b3fe9edda4a16c8c308cea92138213ef59f6923816633590
+  languageName: node
+  linkType: hard
+
+"deasync@npm:^0.1.30, deasync@npm:^0.1.7":
+  version: 0.1.30
+  resolution: "deasync@npm:0.1.30"
+  dependencies:
+    bindings: "npm:^1.5.0"
+    node-addon-api: "npm:^1.7.1"
+  checksum: 10/5cb55096b89181c7305284a3eed5df3eb7a47563bb17f85ca7c22df185fb8837ea19a463dafd127dd912fdad9edbb068a1ae3d48d890ba2cfdc80d3fb654a11f
   languageName: node
   linkType: hard
 
@@ -38677,6 +38714,15 @@ __metadata:
   version: 3.1.1
   resolution: "node-abort-controller@npm:3.1.1"
   checksum: 10/0a2cdb7ec0aeaf3cb31e1ca0e192f5add48f1c5c9c9ed822129f9dddbd9432f69b7425982f94ce803c56a2104884530aa67cd57696e5774b2e5b8ec2f58de042
+  languageName: node
+  linkType: hard
+
+"node-addon-api@npm:^1.7.1":
+  version: 1.7.2
+  resolution: "node-addon-api@npm:1.7.2"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10/6bf8217a8cd8148f4bbfd319b46d33587e9fb2e63e3c856ded67a76715167f7a6b17e1d9b8bbf3b8508befeb6a4adb10d92b8998ed5c19ca8448343f4cea11d6
   languageName: node
   linkType: hard
 
