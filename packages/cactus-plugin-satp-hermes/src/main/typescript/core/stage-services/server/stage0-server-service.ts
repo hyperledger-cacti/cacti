@@ -292,7 +292,6 @@ export class Stage0ServerService extends SATPService {
     }
     const sessionData = session.getServerSessionData();
 
-    this.Log.info(`init-${messageType}`);
     await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
       type: messageType,
@@ -429,7 +428,6 @@ export class Stage0ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    this.Log.info(`init-${messageType}`);
     await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
       type: messageType,
@@ -514,7 +512,6 @@ export class Stage0ServerService extends SATPService {
     }
 
     const sessionData = session.getServerSessionData();
-    this.Log.info(`init-${stepTag}`);
     this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
       type: "wrap-token-server",

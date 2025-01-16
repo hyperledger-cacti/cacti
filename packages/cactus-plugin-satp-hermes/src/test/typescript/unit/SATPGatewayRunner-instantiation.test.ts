@@ -11,14 +11,13 @@ import {
   DEFAULT_PORT_GATEWAY_SERVER,
 } from "../../../main/typescript/core/constants";
 
-const testCase = "Instantiate SATP Gateway Runner";
 const logLevel: LogLevelDesc = "TRACE";
 
-describe(testCase, () => {
+describe("Instantiate SATP Gateway Runner", () => {
   let gatewayRunner: SATPGatewayRunner;
 
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
+    containerImageVersion: "latest",
     containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
     serverPort: DEFAULT_PORT_GATEWAY_SERVER,
     clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
@@ -38,7 +37,7 @@ describe(testCase, () => {
     await pruneDockerAllIfGithubAction({ logLevel });
   });
 
-  test(testCase, async () => {
+  test("Instantiate SATP Gateway Runner", async () => {
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
 
     await gatewayRunner.start();
