@@ -11,10 +11,9 @@ import {
   DEFAULT_PORT_GATEWAY_SERVER,
 } from "../../../main/typescript/core/constants";
 
-const testCase = "Instantiate SATP Gateway Runner";
 const logLevel: LogLevelDesc = "TRACE";
 
-describe(testCase, () => {
+describe("Instantiate SATP Gateway Runner", () => {
   let gatewayRunner: SATPGatewayRunner;
 
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
@@ -38,7 +37,7 @@ describe(testCase, () => {
     await pruneDockerAllIfGithubAction({ logLevel });
   });
 
-  test(testCase, async () => {
+  test("Instantiate SATP Gateway Runner", async () => {
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
 
     await gatewayRunner.start();
