@@ -22,20 +22,23 @@ interface SATPLogEntry {
 }
 
 export interface ISATPLoggerConfig {
+  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
-  remoteRepository: IRemoteLogRepository;
+  remoteRepository?: IRemoteLogRepository;
   signer: JsObjectSigner;
   pubKey: string;
 }
 
 export class SATPLogger {
+  private defaultRepository: boolean = true;
   public localRepository: ILocalLogRepository;
-  public remoteRepository: IRemoteLogRepository;
+  public remoteRepository: IRemoteLogRepository | undefined;
   private signer: JsObjectSigner;
   private pubKey: string;
   private readonly log: Logger;
 
   constructor(config: ISATPLoggerConfig) {
+    this.defaultRepository = config.defaultRepository;
     this.localRepository = config.localRepository;
     this.remoteRepository = config.remoteRepository;
     this.signer = config.signer;
@@ -136,38 +139,48 @@ export class SATPLogger {
     const fnTag = `SATPLogger#storeInDatabase()`;
     this.log.info(`${fnTag} - Storing log entry with key: ${localLog.key}`);
 
+    if (this.defaultRepository && !this.localRepository.getCreated()) {
+      this.log.info(
+        `${fnTag} - Default configuration detected. Creating local repository.`,
+      );
+      await this.localRepository.createKnex();
+      this.log.info(`${fnTag} - Local repository created.`);
+    }
+
     await this.localRepository.create(localLog);
   }
 
   private async storeRemoteLog(key: string, hash: string): Promise<void> {
     const fnTag = `SATPLogger#storeRemoteLog()`;
-    this.log.info(
-      `${fnTag} - Storing remote log with key: ${key} and hash: ${hash}`,
-    );
-
-    const remoteLog: RemoteLog = {
-      key: key,
-      hash: hash,
-      signature: "",
-      signerPubKey: this.pubKey,
-    };
-
-    remoteLog.signature = bufArray2HexStr(
-      sign(this.signer, safeStableStringify(remoteLog)),
-    );
-
-    this.log.debug(`${fnTag} - Generated signature: ${remoteLog.signature}`);
-    const response = await this.remoteRepository.create(remoteLog);
-
-    if (response.status < 200 || response.status > 299) {
-      this.log.error(
-        `${fnTag} - Failed to store remote log. Response status: ${response.status}`,
+    if (!!this.remoteRepository) {
+      this.log.info(
+        `${fnTag} - Storing remote log with key: ${key} and hash: ${hash}`,
       );
-      throw new Error(
-        `${fnTag} - Got response ${response.status} when logging to remote`,
+
+      const remoteLog: RemoteLog = {
+        key: key,
+        hash: hash,
+        signature: "",
+        signerPubKey: this.pubKey,
+      };
+
+      remoteLog.signature = bufArray2HexStr(
+        sign(this.signer, safeStableStringify(remoteLog)),
       );
+
+      this.log.debug(`${fnTag} - Generated signature: ${remoteLog.signature}`);
+      const response = await this.remoteRepository.create(remoteLog);
+
+      if (response.status < 200 || response.status > 299) {
+        this.log.error(
+          `${fnTag} - Failed to store remote log. Response status: ${response.status}`,
+        );
+        throw new Error(
+          `${fnTag} - Got response ${response.status} when logging to remote`,
+        );
+      }
+
+      this.log.info(`${fnTag} - Successfully stored remote log.`);
     }
-
-    this.log.info(`${fnTag} - Successfully stored remote log.`);
   }
 }

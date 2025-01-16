@@ -23,6 +23,7 @@ import { Type } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 export class CrashRecoveryServerService {
   constructor(
     private readonly bridgesManager: SATPBridgesManager,
+    private readonly defaultRepository: boolean,
     private readonly logRepository: ILocalLogRepository,
     private readonly sessions: Map<string, SATPSession>,
     private readonly signer: JsObjectSigner,
@@ -54,6 +55,10 @@ export class CrashRecoveryServerService {
 
       if (!verifySignature(this.signer, req, sessionData.serverGatewayPubkey)) {
         throw new SignatureVerificationError(fnTag);
+      }
+
+      if (this.defaultRepository && !this.logRepository.getCreated()) {
+        this.logRepository.createKnex();
       }
 
       const recoveredLogs = await this.logRepository.fetchLogsFromSequence(

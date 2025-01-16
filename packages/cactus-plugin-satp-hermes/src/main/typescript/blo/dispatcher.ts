@@ -45,8 +45,9 @@ export interface BLODispatcherOptions {
   signer: JsObjectSigner;
   bridgesManager: SATPBridgesManager;
   pubKey: string;
+  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
-  remoteRepository: IRemoteLogRepository;
+  remoteRepository?: IRemoteLogRepository;
 }
 
 export class BLODispatcher {
@@ -60,8 +61,9 @@ export class BLODispatcher {
   private manager: SATPManager;
   private orchestrator: GatewayOrchestrator;
   private bridgeManager: SATPBridgesManager;
+  private defaultRepository: boolean;
   private localRepository: ILocalLogRepository;
-  private remoteRepository: IRemoteLogRepository;
+  private remoteRepository: IRemoteLogRepository | undefined;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -78,6 +80,7 @@ export class BLODispatcher {
     this.orchestrator = options.orchestrator;
     const signer = options.signer;
     const ourGateway = this.orchestrator.ourGateway;
+    this.defaultRepository = options.defaultRepository;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
 
@@ -91,6 +94,7 @@ export class BLODispatcher {
       bridgeManager: this.bridgeManager,
       orchestrator: this.orchestrator,
       pubKey: options.pubKey,
+      defaultRepository: this.defaultRepository,
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
     };
