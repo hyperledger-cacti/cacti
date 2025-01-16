@@ -57,7 +57,7 @@ let knexInstanceServer: Knex;
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "BUNGEE - Hermes",
+  label: "SATP - Hermes",
 });
 
 let fabricEnv: FabricTestEnvironment;
