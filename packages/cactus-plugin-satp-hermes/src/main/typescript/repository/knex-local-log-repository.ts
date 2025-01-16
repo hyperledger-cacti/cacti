@@ -2,15 +2,20 @@ import { LocalLog } from "../core/types";
 import { ILocalLogRepository } from "./interfaces/repository";
 import knex, { Knex } from "knex";
 
-import knexFile from "../knex/knexfile";
+import { knexLocalInstance } from "../knex/knexfile";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;
+  private created: boolean = false;
 
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
-    const configFile = knexFile[envName];
+    const configFile = knexLocalInstance[envName];
     this.database = knex(config || configFile);
+  }
+
+  public getCreated(): boolean {
+    return this.created;
   }
 
   getLogsTable(): Knex.QueryBuilder {
@@ -60,6 +65,13 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
     return this.getLogsTable()
       .where("sessionId", sessionId)
       .andWhere("sequenceNumber", ">", sequenceNumber);
+  }
+
+  async createKnex() {
+    if (!this.created) {
+      await this.database.migrate.latest();
+      this.created = true;
+    }
   }
 
   async reset() {

@@ -86,7 +86,6 @@ export class Stage1ServerService extends SATPService {
 
     const sessionData = session.getServerSessionData();
 
-    this.Log.info(`init-${messageType}`);
     await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
       type: messageType,
@@ -259,7 +258,6 @@ export class Stage1ServerService extends SATPService {
     session.verify(fnTag, SessionType.SERVER);
 
     const sessionData = session.getServerSessionData();
-    this.Log.info(`init-${messageType}`);
     await this.dbLogger.persistLogEntry({
       sessionID: sessionData.id,
       type: messageType,

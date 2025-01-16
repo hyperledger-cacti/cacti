@@ -158,6 +158,7 @@ beforeAll(async () => {
   localRepository = new LocalLogRepository(knexClientConnection);
   remoteRepository = new RemoteLogRepository(knexSourceRemoteConnection);
   dbLogger = new SATPLogger({
+    defaultRepository: false,
     localRepository,
     remoteRepository,
     signer,
@@ -230,7 +231,7 @@ afterAll(async () => {
 
   for (const service of services) {
     await service.dbLogger.localRepository.destroy();
-    await service.dbLogger.remoteRepository.destroy();
+    await service.dbLogger.remoteRepository!.destroy();
   }
 
   if (knexInstanceClient) {

@@ -69,10 +69,7 @@ beforeAll(async () => {
 
 describe("SATPGateway initialization", () => {
   it("should initiate gateway with default config", async () => {
-    const options: SATPGatewayConfig = {
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
-    };
+    const options: SATPGatewayConfig = {};
     const gateway = await factory.create(options);
 
     expect(gateway).toBeInstanceOf(SATPGateway);

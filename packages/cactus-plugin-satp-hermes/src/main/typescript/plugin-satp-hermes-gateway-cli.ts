@@ -15,6 +15,8 @@ import { validateSatpMergePolicies } from "./config-validating-functions/validat
 import { validateSatpKeyPairJSON } from "./config-validating-functions/validateKeyPairJSON";
 import { validateSatpBridgesConfig } from "./config-validating-functions/validateSatpBridgesConfig";
 import path from "path";
+import { validateSatpEnableCrashRecovery } from "./config-validating-functions/validateSatpEnableCrashRecovery";
+import { validateKnexRepositoryConfig } from "./config-validating-functions/validateKnexRepositoryConfig";
 
 export async function launchGateway(): Promise<void> {
   const logger = LoggerProvider.getOrCreate({
@@ -113,6 +115,25 @@ export async function launchGateway(): Promise<void> {
   const bridgesConfig = validateSatpBridgesConfig({
     configValue: config.bridgesConfig,
   });
+
+  logger.debug("Validating Local Repository Config...");
+  const localRepository = validateKnexRepositoryConfig({
+    configValue: config.localRepository,
+  });
+  logger.debug("Local Repository Config is valid.");
+
+  logger.debug("Validating Remote Repository Config...");
+  const remoteRepository = validateKnexRepositoryConfig({
+    configValue: config.remoteRepository,
+  });
+  logger.debug("Remote Repository Config is valid.");
+
+  logger.debug("Validating SATP Enable Crash Recovery...");
+  const enableCrashRecovery = validateSatpEnableCrashRecovery({
+    configValue: config.enableCrashRecovery,
+  });
+  logger.debug("SATP Enable Crash Recovery is valid.");
+
   logger.debug("SATP Bridges Config is valid.");
 
   logger.debug("Creating SATPGatewayConfig...");
@@ -133,6 +154,9 @@ export async function launchGateway(): Promise<void> {
     privacyPolicies,
     mergePolicies,
     bridgesConfig,
+    enableCrashRecovery,
+    knexLocalConfig: localRepository,
+    knexRemoteConfig: remoteRepository,
   };
   logger.debug("SATPGatewayConfig created successfully");
 

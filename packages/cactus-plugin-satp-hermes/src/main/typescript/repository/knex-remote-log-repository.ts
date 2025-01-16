@@ -2,7 +2,7 @@ import { IRemoteLogRepository } from "./interfaces/repository";
 import { RemoteLog } from "../core/types";
 import knex, { Knex } from "knex";
 
-import knexFileRemote from "../knex/knexfile-remote";
+import { knexRemoteInstance } from "../knex/knexfile-remote";
 
 export class KnexRemoteLogRepository implements IRemoteLogRepository {
   readonly database: Knex;
@@ -12,7 +12,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
   // simulating a remote log storage
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
-    const configFile = knexFileRemote[envName];
+    const configFile = knexRemoteInstance[envName];
     this.database = knex(config || configFile);
   }
 

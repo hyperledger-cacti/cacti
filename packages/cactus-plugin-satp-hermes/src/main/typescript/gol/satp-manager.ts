@@ -92,8 +92,9 @@ export interface ISATPManagerOptions {
   supportedDLTs: SupportedChain[];
   bridgeManager: SATPBridgesManager;
   orchestrator: GatewayOrchestrator;
+  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
-  remoteRepository: IRemoteLogRepository;
+  remoteRepository?: IRemoteLogRepository;
 }
 
 export class SATPManager {
@@ -118,8 +119,9 @@ export class SATPManager {
   private readonly orchestrator: GatewayOrchestrator;
 
   private gatewaysPubKeys: Map<string, string> = new Map();
+  private defaultRepository: boolean;
   private localRepository: ILocalLogRepository;
-  private remoteRepository: IRemoteLogRepository;
+  private remoteRepository: IRemoteLogRepository | undefined;
   private readonly dbLogger: SATPLogger;
 
   constructor(public readonly options: ISATPManagerOptions) {
@@ -138,6 +140,7 @@ export class SATPManager {
     this.orchestrator = options.orchestrator;
     this._pubKey = options.pubKey;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
+    this.defaultRepository = options.defaultRepository;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
 
@@ -150,6 +153,7 @@ export class SATPManager {
     ];
 
     const satpLoggerConfig: ISATPLoggerConfig = {
+      defaultRepository: this.defaultRepository,
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
       signer: this.signer,

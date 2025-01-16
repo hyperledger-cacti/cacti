@@ -24,6 +24,8 @@ import {
   FabricTestEnvironment,
   getTransactRequest,
   EthereumTestEnvironment,
+  createPGDatabase,
+  setupDBTable,
 } from "../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_API,
@@ -35,11 +37,13 @@ import {
 } from "../../../main/typescript/core/constants";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger/cactus-test-geth-ledger";
+import { Container } from "dockerode";
+import { Knex } from "knex";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "BUNGEE - Hermes",
+  label: "SATP - Hermes",
 });
 
 let besuEnv: BesuTestEnvironment;
@@ -49,6 +53,11 @@ const erc20TokenContract = "SATPContract";
 const contractNameWrapper = "SATPWrapperContract";
 const bridge_id =
   "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
+
+let db_local_config: Knex.Config;
+let db_remote_config: Knex.Config;
+let db_local: Container;
+let db_remote: Container;
 
 afterAll(async () => {
   await besuEnv.tearDown();
@@ -74,6 +83,27 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
+
+  ({ config: db_local_config, container: db_local } = await createPGDatabase(
+    5432,
+    "user123123",
+    "password",
+  ));
+
+  console.log("eia pah");
+
+  ({ config: db_remote_config, container: db_remote } = await createPGDatabase(
+    5450,
+    "user123123",
+    "password",
+  ));
+
+  console.log("eia pah2");
+  await setupDBTable(db_local_config);
+  console.log("eia pah3");
+  console.log(db_remote_config);
+  await setupDBTable(db_remote_config);
+  console.log("eia pah4");
 
   {
     const satpContractName = "satp-contract";
@@ -143,11 +173,14 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       logLevel,
       [], //only knows itself
       [besuConfigJSON, fabricConfigJSON],
+      false, // Crash recovery disabled
+      db_local_config,
+      db_remote_config,
     );
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
+      containerImageVersion: "latest",
       containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
@@ -269,6 +302,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     await gatewayRunner.stop();
     await gatewayRunner.destroy();
+    await db_local.stop();
+    await db_local.remove();
+    await db_remote.stop();
+    await db_remote.remove();
   });
 });
 
@@ -308,6 +345,9 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       logLevel,
       [], //only knows itself
       [ethereumConfigJSON, fabricConfigJSON],
+      false, // Crash recovery disabled
+      db_local_config,
+      db_remote_config,
     );
 
     let initialBalance;
@@ -329,7 +369,7 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: "latest",
-      containerImageName: "satp-hermes-gateway",
+      containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
       configFile: files.configFile,
@@ -440,5 +480,9 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
 
     await gatewayRunner.stop();
     await gatewayRunner.destroy();
+    await db_local.stop();
+    await db_local.remove();
+    await db_remote.stop();
+    await db_remote.remove();
   });
 });

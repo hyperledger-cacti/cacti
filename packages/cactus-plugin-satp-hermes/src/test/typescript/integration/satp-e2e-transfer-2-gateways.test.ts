@@ -51,7 +51,7 @@ import { Knex, knex } from "knex";
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "BUNGEE - Hermes",
+  label: "SATP - Hermes",
 });
 
 let knexInstanceClient: Knex;

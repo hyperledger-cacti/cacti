@@ -85,7 +85,7 @@ import {
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "BUNGEE - Hermes",
+  label: "SATP - Hermes",
 });
 
 let fabricServer: Server;

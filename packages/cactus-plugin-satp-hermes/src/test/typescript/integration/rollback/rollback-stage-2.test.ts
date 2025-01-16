@@ -320,7 +320,7 @@ describe("Rollback Test stage 2", () => {
       bridgesConfig: [besuEnv.besuConfig],
       knexLocalConfig: knexClientConnection,
       knexRemoteConfig: knexSourceRemoteConnection,
-      enableCrashManager: true,
+      enableCrashRecovery: true,
     };
 
     knexInstanceServer = knex(knexServerConnection);
@@ -337,7 +337,7 @@ describe("Rollback Test stage 2", () => {
       bridgesConfig: [fabricEnv.fabricConfig],
       knexLocalConfig: knexServerConnection,
       knexRemoteConfig: knexTargetRemoteConnection,
-      enableCrashManager: true,
+      enableCrashRecovery: true,
     };
 
     gateway1 = (await factory.create(options1)) as SATPGateway;
