@@ -39,8 +39,9 @@ import { verifySignature } from "../gateway-utils";
 
 export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
+  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
-  remoteRepository: IRemoteLogRepository;
+  remoteRepository?: IRemoteLogRepository;
   instanceId: string;
   bridgeConfig: SATPBridgesManager;
   orchestrator: GatewayOrchestrator;
@@ -55,8 +56,9 @@ export class CrashManager {
   public sessions: Map<string, SATPSession>;
   private crashRecoveryHandler: CrashRecoveryHandler;
   private factory: RollbackStrategyFactory;
+  private defaultRepository: boolean;
   public localRepository: ILocalLogRepository;
-  public remoteRepository: IRemoteLogRepository;
+  public remoteRepository: IRemoteLogRepository | undefined;
   private crashScheduler?: Job;
   private isSchedulerPaused = false;
   private crashRecoveryServerService: CrashRecoveryServerService;
@@ -76,6 +78,7 @@ export class CrashManager {
     this.log.info(`Instantiated ${this.className} OK`);
     this.instanceId = options.instanceId;
     this.sessions = new Map<string, SATPSession>();
+    this.defaultRepository = options.defaultRepository;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
     this.signer = options.signer;
@@ -87,6 +90,7 @@ export class CrashManager {
 
     this.crashRecoveryServerService = new CrashRecoveryServerService(
       this.bridgesManager,
+      this.defaultRepository,
       this.localRepository,
       this.sessions,
       this.signer,

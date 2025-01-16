@@ -21,6 +21,8 @@ export interface ILocalLogRepository extends IRepository<LocalLog, string> {
   ): Promise<LocalLog[]>;
   destroy(): any;
   reset(): any;
+  createKnex(): any;
+  getCreated(): boolean;
 }
 
 export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
