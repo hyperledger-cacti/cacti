@@ -65,7 +65,6 @@ import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
 import { knexLocalInstance } from "../../knex/knexfile";
-import { knexRemoteInstance } from "../../knex/knexfile-remote";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -100,6 +99,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private signer: JsObjectSigner;
   private _pubKey: string;
 
+  // Flag to create a db repository when not given
+  public defaultRepository: boolean = true;
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
@@ -117,10 +118,23 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     };
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
-    this.localRepository = new LocalLogRepository(this.config.knexLocalConfig);
-    this.remoteRepository = new RemoteLogRepository(
-      this.config.knexRemoteConfig,
-    );
+
+    if (this.config.knexLocalConfig) {
+      this.defaultRepository = false;
+      this.localRepository = new LocalLogRepository(
+        this.config.knexLocalConfig,
+      );
+    } else {
+      this.localRepository = new LocalLogRepository(knexLocalInstance.default);
+    }
+
+    if (this.config.knexRemoteConfig) {
+      this.remoteRepository = new RemoteLogRepository(
+        this.config.knexRemoteConfig,
+      );
+    } else {
+      this.logger.warn("Remote repository is not defined");
+    }
 
     if (this.config.keyPair == undefined) {
       throw new Error("Key pair is undefined");
@@ -176,6 +190,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       signer: this.signer,
       bridgesManager: this.bridgesManager,
       pubKey: this.pubKey,
+      defaultRepository: this.defaultRepository,
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
     };
@@ -197,6 +212,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         logLevel: this.config.logLevel,
         bridgeConfig: this.bridgesManager,
         orchestrator: this.gatewayOrchestrator,
+        defaultRepository: this.defaultRepository,
         localRepository: this.localRepository,
         remoteRepository: this.remoteRepository,
         signer: this.signer,
@@ -406,14 +422,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     if (!pluginOptions.bridgesConfig) {
       pluginOptions.bridgesConfig = [];
-    }
-
-    if (!pluginOptions.knexLocalConfig) {
-      pluginOptions.knexLocalConfig = knexLocalInstance.default;
-    }
-
-    if (!pluginOptions.knexRemoteConfig) {
-      pluginOptions.knexRemoteConfig = knexRemoteInstance.default;
     }
 
     if (!pluginOptions.enableCrashManager) {
