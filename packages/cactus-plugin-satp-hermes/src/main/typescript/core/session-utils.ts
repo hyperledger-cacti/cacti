@@ -2,6 +2,7 @@ import { create, isMessage } from "@bufbuild/protobuf";
 import {
   AssetSchema,
   CredentialProfile,
+  Error as SATPError,
   LockType,
   MessageType,
   SignatureAlgorithm,
@@ -703,7 +704,12 @@ export function setError(
   }
 
   sessionData.state = State.ERROR;
-  sessionData.errorCode = error.getSATPErrorType();
+
+  try {
+    sessionData.errorCode = error.getSATPErrorType();
+  } catch (e) {
+    sessionData.errorCode = SATPError.UNSPECIFIED;
+  }
   sessionData.phaseError = stageMessage;
 }
 

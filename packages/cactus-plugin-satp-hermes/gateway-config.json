@@ -23,5 +23,25 @@
     "logLevel": "DEBUG",
     "counterPartyGateways": [],
     "environment": "development",
-    "enableOpenAPI": true
+    "enableOpenAPI": true,
+    "knexLocalConfig": {
+        "client": "sqlite3",
+        "connection": {
+        "filename": "${knex_dir}/.dev.client-123e4567-e89b-12d3-a456-426614174000.sqlite3"
+        },
+        "migrations": {
+            "directory": "./packages/cactus-plugin-satp-hermes/src/knex/migrations"
+        },
+        "useNullAsDefault": true
+    },
+    "knexRemoteConfig": {
+        "client": "sqlite3",
+        "connection": {
+        "filename": "./packages/cactus-plugin-satp-hermes/src/knex/.dev.server-123e4567-e89b-12d3-a456-426614174000.sqlite3"
+        },
+        "migrations": {
+            "directory": "./packages/cactus-plugin-satp-hermes/src/knex/migrations"
+        },
+        "useNullAsDefault": true
+    }
 }
