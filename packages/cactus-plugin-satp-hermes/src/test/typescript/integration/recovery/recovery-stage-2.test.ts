@@ -251,7 +251,7 @@ beforeAll(async () => {
     keyPair: gateway1KeyPair,
     knexLocalConfig: knexClientConnection,
     knexRemoteConfig: knexSourceRemoteConnection,
-    enableCrashManager: true,
+    enableCrashRecovery: true,
   };
 
   knexInstanceServer = knex(knexServerConnection);
@@ -267,7 +267,7 @@ beforeAll(async () => {
     keyPair: gateway2KeyPair,
     knexLocalConfig: knexServerConnection,
     knexRemoteConfig: knexTargetRemoteConnection,
-    enableCrashManager: true,
+    enableCrashRecovery: true,
   };
 
   gateway1 = (await factory.create(options1)) as SATPGateway;
