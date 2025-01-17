@@ -151,6 +151,7 @@ beforeAll(async () => {
     logLevel: "DEBUG" as LogLevelDesc,
     bridgeConfig: bridgesManager,
     orchestrator: gatewayOrchestrator,
+    defaultRepository: false,
     localRepository: localRepository,
     remoteRepository: remoteRepository,
     signer: signer,
@@ -167,7 +168,7 @@ afterAll(async () => {
   if (crashManager) {
     crashManager.stopScheduler();
     crashManager.localRepository.destroy();
-    crashManager.remoteRepository.destroy();
+    crashManager.remoteRepository!.destroy();
   }
   if (knexInstanceClient || knexInstanceRemote) {
     await knexInstanceClient.destroy();
