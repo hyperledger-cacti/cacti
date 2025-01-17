@@ -1200,6 +1200,218 @@ export interface GetChainInfoResponseV1 {
     'previousBlockHash': string;
 }
 /**
+ * Request for GetDiscoveryResults endpoint.
+ * @export
+ * @interface GetDiscoveryResultsRequestV1
+ */
+export interface GetDiscoveryResultsRequestV1 {
+    /**
+     * Fabric channel which we want to query.
+     * @type {string}
+     * @memberof GetDiscoveryResultsRequestV1
+     */
+    'channelName': string;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof GetDiscoveryResultsRequestV1
+     */
+    'gatewayOptions': GatewayOptions;
+}
+/**
+ * Response for GetDiscoveryResults endpoint.
+ * @export
+ * @interface GetDiscoveryResultsResponseV1
+ */
+export interface GetDiscoveryResultsResponseV1 {
+    /**
+     * Definitions of all MSP defined on the channel
+     * @type {{ [key: string]: GetDiscoveryResultsResponseV1MspsValue; }}
+     * @memberof GetDiscoveryResultsResponseV1
+     */
+    'msps': { [key: string]: GetDiscoveryResultsResponseV1MspsValue; };
+    /**
+     * List of orderers defined on the channel
+     * @type {{ [key: string]: GetDiscoveryResultsResponseV1OrderersValue; }}
+     * @memberof GetDiscoveryResultsResponseV1
+     */
+    'orderers': { [key: string]: GetDiscoveryResultsResponseV1OrderersValue; };
+    /**
+     * List of peers organized by owner MSP.
+     * @type {{ [key: string]: GetDiscoveryResultsResponseV1PeersByMSPValue; }}
+     * @memberof GetDiscoveryResultsResponseV1
+     */
+    'peersByMSP': { [key: string]: GetDiscoveryResultsResponseV1PeersByMSPValue; };
+    /**
+     * 
+     * @type {number}
+     * @memberof GetDiscoveryResultsResponseV1
+     */
+    'timestamp': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetDiscoveryResultsResponseV1MspsValue
+ */
+export interface GetDiscoveryResultsResponseV1MspsValue {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'name': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'organizationalUnitIdentifiers': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'rootCerts': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'intermediateCerts': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'admins': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'tlsRootCerts': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1MspsValue
+     */
+    'tlsIntermediateCerts': string;
+}
+/**
+ * 
+ * @export
+ * @interface GetDiscoveryResultsResponseV1OrderersValue
+ */
+export interface GetDiscoveryResultsResponseV1OrderersValue {
+    /**
+     * 
+     * @type {Array<GetDiscoveryResultsResponseV1OrderersValueEndpointsInner>}
+     * @memberof GetDiscoveryResultsResponseV1OrderersValue
+     */
+    'endpoints': Array<GetDiscoveryResultsResponseV1OrderersValueEndpointsInner>;
+}
+/**
+ * 
+ * @export
+ * @interface GetDiscoveryResultsResponseV1OrderersValueEndpointsInner
+ */
+export interface GetDiscoveryResultsResponseV1OrderersValueEndpointsInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1OrderersValueEndpointsInner
+     */
+    'host': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetDiscoveryResultsResponseV1OrderersValueEndpointsInner
+     */
+    'port': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1OrderersValueEndpointsInner
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
+ * @interface GetDiscoveryResultsResponseV1PeersByMSPValue
+ */
+export interface GetDiscoveryResultsResponseV1PeersByMSPValue {
+    /**
+     * 
+     * @type {Array<GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner>}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValue
+     */
+    'peers': Array<GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner>;
+}
+/**
+ * 
+ * @export
+ * @interface GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
+ */
+export interface GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
+     */
+    'mspid': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
+     */
+    'endpoint': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
+     */
+    'name': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
+     */
+    'ledgerHeight': number;
+    /**
+     * 
+     * @type {Array<GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner>}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
+     */
+    'chaincodes': Array<GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner>;
+}
+/**
+ * 
+ * @export
+ * @interface GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner
+ */
+export interface GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner
+     */
+    'version': string;
+}
+/**
  * 
  * @export
  * @interface GetTransactionReceiptResponse
@@ -1916,6 +2128,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get fabric ledger node structure (from the discovery service).
+         * @param {GetDiscoveryResultsRequestV1} [getDiscoveryResultsRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDiscoveryResultsV1: async (getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getDiscoveryResultsRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2108,6 +2354,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get fabric ledger node structure (from the discovery service).
+         * @param {GetDiscoveryResultsRequestV1} [getDiscoveryResultsRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDiscoveryResultsV1(getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetDiscoveryResultsResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDiscoveryResultsV1(getDiscoveryResultsRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2198,6 +2455,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getChainInfoV1(getChainInfoRequestV1?: GetChainInfoRequestV1, options?: any): AxiosPromise<GetChainInfoResponseV1> {
             return localVarFp.getChainInfoV1(getChainInfoRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get fabric ledger node structure (from the discovery service).
+         * @param {GetDiscoveryResultsRequestV1} [getDiscoveryResultsRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDiscoveryResultsV1(getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options?: any): AxiosPromise<GetDiscoveryResultsResponseV1> {
+            return localVarFp.getDiscoveryResultsV1(getDiscoveryResultsRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2294,6 +2561,18 @@ export class DefaultApi extends BaseAPI {
      */
     public getChainInfoV1(getChainInfoRequestV1?: GetChainInfoRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getChainInfoV1(getChainInfoRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get fabric ledger node structure (from the discovery service).
+     * @param {GetDiscoveryResultsRequestV1} [getDiscoveryResultsRequestV1] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getDiscoveryResultsV1(getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getDiscoveryResultsV1(getDiscoveryResultsRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
