@@ -17,7 +17,7 @@ describe("Instantiate SATP Gateway Runner", () => {
   let gatewayRunner: SATPGatewayRunner;
 
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
+    containerImageVersion: "latest",
     containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
     serverPort: DEFAULT_PORT_GATEWAY_SERVER,
     clientPort: DEFAULT_PORT_GATEWAY_CLIENT,

@@ -140,10 +140,11 @@ export class SATPLogger {
     this.log.info(`${fnTag} - Storing log entry with key: ${localLog.key}`);
 
     if (this.defaultRepository && !this.localRepository.getCreated()) {
-      this.log.debug(
+      this.log.info(
         `${fnTag} - Default configuration detected. Creating local repository.`,
       );
       await this.localRepository.createKnex();
+      this.log.info(`${fnTag} - Local repository created.`);
     }
 
     await this.localRepository.create(localLog);

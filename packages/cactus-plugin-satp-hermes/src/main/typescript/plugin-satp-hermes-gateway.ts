@@ -64,7 +64,7 @@ import {
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
-import { knexLocalInstance } from "../../knex/knexfile";
+import { knexLocalInstance } from "./knex/knexfile";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   // todo more checks; example port from config is between 3000 and 9000
@@ -119,21 +119,22 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
 
-    if (this.config.knexLocalConfig) {
+    if (!!this.config.knexLocalConfig) {
       this.defaultRepository = false;
       this.localRepository = new LocalLogRepository(
         this.config.knexLocalConfig,
       );
     } else {
+      this.logger.info("Local repository is not defined");
       this.localRepository = new LocalLogRepository(knexLocalInstance.default);
     }
 
-    if (this.config.knexRemoteConfig) {
+    if (!!this.config.knexRemoteConfig) {
       this.remoteRepository = new RemoteLogRepository(
         this.config.knexRemoteConfig,
       );
     } else {
-      this.logger.warn("Remote repository is not defined");
+      this.logger.info("Remote repository is not defined");
     }
 
     if (this.config.keyPair == undefined) {
@@ -155,7 +156,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       localGateway: this.config.gid!,
       counterPartyGateways: this.config.counterPartyGateways,
       signer: this.signer!,
-      enableCrashRecovery: this.config.enableCrashManager,
+      enableCrashRecovery: this.config.enableCrashRecovery,
     };
 
     const bridgesManagerOptions: ISATPBridgesOptions = {
@@ -206,7 +207,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     this.OAS = OAS;
 
-    if (this.config.enableCrashManager) {
+    if (this.config.enableCrashRecovery) {
       const crashOptions: ICrashRecoveryManagerOptions = {
         instanceId: this.instanceId,
         logLevel: this.config.logLevel,
@@ -424,8 +425,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       pluginOptions.bridgesConfig = [];
     }
 
-    if (!pluginOptions.enableCrashManager) {
-      pluginOptions.enableCrashManager = false;
+    if (!pluginOptions.enableCrashRecovery) {
+      pluginOptions.enableCrashRecovery = false;
     }
 
     return pluginOptions;
@@ -441,9 +442,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#startup()`;
     this.logger.trace(`Entering ${fnTag}`);
 
-    await Promise.all([this.startupBLOServer()]);
-
-    await Promise.all([this.startupGOLServer()]);
+    await Promise.all([this.startupBLOServer(), this.startupGOLServer()]);
   }
 
   protected async startupBLOServer(): Promise<void> {

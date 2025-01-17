@@ -84,7 +84,7 @@ export interface SATPGatewayConfig {
   bridgesConfig?: NetworkConfig[];
   knexLocalConfig?: Knex.Config;
   knexRemoteConfig?: Knex.Config;
-  enableCrashManager?: boolean;
+  enableCrashRecovery?: boolean;
 }
 
 // export interface SATPBridgeConfig {
