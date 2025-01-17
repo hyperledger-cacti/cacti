@@ -2,7 +2,7 @@ import { LocalLog } from "../core/types";
 import { ILocalLogRepository } from "./interfaces/repository";
 import knex, { Knex } from "knex";
 
-import knexFile from "../knex/knexfile";
+import { knexLocalInstance } from "../knex/knexfile";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;
@@ -10,7 +10,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
 
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
-    const configFile = knexFile[envName];
+    const configFile = knexLocalInstance[envName];
     this.database = knex(config || configFile);
   }
 
