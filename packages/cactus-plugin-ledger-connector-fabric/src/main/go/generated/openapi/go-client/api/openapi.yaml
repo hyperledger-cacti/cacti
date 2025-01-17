@@ -203,6 +203,33 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results:
+    post:
+      operationId: getDiscoveryResultsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetDiscoveryResultsRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDiscoveryResultsResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Get fabric ledger node structure (from the discovery service).
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results
   /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
@@ -1583,6 +1610,61 @@ components:
       - channelName
       - gatewayOptions
       type: object
+    GetDiscoveryResultsRequestV1:
+      description: Request for GetDiscoveryResults endpoint.
+      example:
+        gatewayOptions:
+          wallet:
+            keychain:
+              vaultTransitKey:
+                keyName: keyName
+                token: token
+              keychainId: keychainId
+              keychainRef: keychainRef
+              webSocketKey:
+                signature: signature
+                sessionId: sessionId
+              type: null
+            json: json
+          connectionProfile:
+            channels:
+              key: ""
+            certificateAuthorities:
+              key: ""
+            name: basic-network
+            organizations:
+              key: ""
+            peers:
+              key: ""
+            x-type: hlfv1
+            description: The basic network
+            client:
+              organization: Org1
+            orderers:
+              key: ""
+            version: "1.0"
+          discovery:
+            asLocalhost: true
+            enabled: true
+          identity: identity
+          eventHandlerOptions:
+            commitTimeout: 0.8008281904610115
+            strategy: null
+            endorseTimeout: 6.027456183070403
+        channelName: channelName
+      properties:
+        channelName:
+          description: Fabric channel which we want to query.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        gatewayOptions:
+          $ref: '#/components/schemas/GatewayOptions'
+      required:
+      - channelName
+      - gatewayOptions
+      type: object
     FabricFullBlockDataV1:
       description: Full hyperledger fabric block data.
     GetBlockResponseDecodedV1:
@@ -1632,6 +1714,81 @@ components:
       - currentBlockHash
       - height
       - previousBlockHash
+      type: object
+    GetDiscoveryResultsResponseV1:
+      description: Response for GetDiscoveryResults endpoint.
+      example:
+        peersByMSP:
+          key:
+            peers:
+            - mspid: Org1MSP
+              endpoint: peer0.org1.example.com:7051
+              chaincodes:
+              - name: _lifecycle
+                version: "1"
+              - name: _lifecycle
+                version: "1"
+              name: peer0.org1.example.com:7051
+              ledgerHeight: 123
+            - mspid: Org1MSP
+              endpoint: peer0.org1.example.com:7051
+              chaincodes:
+              - name: _lifecycle
+                version: "1"
+              - name: _lifecycle
+                version: "1"
+              name: peer0.org1.example.com:7051
+              ledgerHeight: 123
+        msps:
+          key:
+            tlsIntermediateCerts: tlsIntermediateCerts
+            name: OrdererMSP
+            tlsRootCerts: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'
+            intermediateCerts: intermediateCerts
+            id: OrdererMSP
+            organizationalUnitIdentifiers:
+            - organizationalUnitIdentifiers
+            - organizationalUnitIdentifiers
+            rootCerts: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'
+            admins: admins
+        orderers:
+          key:
+            endpoints:
+            - port: 7050
+              host: orderer.example.com
+              name: orderer.example.com:7050
+            - port: 7050
+              host: orderer.example.com
+              name: orderer.example.com:7050
+        timestamp: 1737125074324
+      properties:
+        msps:
+          additionalProperties:
+            $ref: '#/components/schemas/GetDiscoveryResultsResponseV1_msps_value'
+          description: Definitions of all MSP defined on the channel
+          nullable: false
+          type: object
+        orderers:
+          additionalProperties:
+            $ref: '#/components/schemas/GetDiscoveryResultsResponseV1_orderers_value'
+          description: List of orderers defined on the channel
+          nullable: false
+          type: object
+        peersByMSP:
+          additionalProperties:
+            $ref: '#/components/schemas/GetDiscoveryResultsResponseV1_peersByMSP_value'
+          description: List of peers organized by owner MSP.
+          nullable: false
+          type: object
+        timestamp:
+          example: 1737125074324
+          nullable: false
+          type: number
+      required:
+      - msps
+      - orderers
+      - peersByMSP
+      - timestamp
       type: object
     ErrorExceptionResponseV1:
       properties:
@@ -2087,4 +2244,176 @@ components:
           description: Select block by id of transaction that it contains.
           nullable: false
           type: string
+      type: object
+    GetDiscoveryResultsResponseV1_msps_value:
+      example:
+        tlsIntermediateCerts: tlsIntermediateCerts
+        name: OrdererMSP
+        tlsRootCerts: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'
+        intermediateCerts: intermediateCerts
+        id: OrdererMSP
+        organizationalUnitIdentifiers:
+        - organizationalUnitIdentifiers
+        - organizationalUnitIdentifiers
+        rootCerts: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'
+        admins: admins
+      properties:
+        id:
+          example: OrdererMSP
+          nullable: false
+          type: string
+        name:
+          example: OrdererMSP
+          nullable: false
+          type: string
+        organizationalUnitIdentifiers:
+          items:
+            type: string
+          nullable: false
+          type: array
+        rootCerts:
+          example: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'
+          nullable: false
+          type: string
+        intermediateCerts:
+          nullable: false
+          type: string
+        admins:
+          nullable: false
+          type: string
+        tlsRootCerts:
+          example: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'
+          nullable: false
+          type: string
+        tlsIntermediateCerts:
+          nullable: false
+          type: string
+      required:
+      - admins
+      - id
+      - intermediateCerts
+      - name
+      - organizationalUnitIdentifiers
+      - rootCerts
+      - tlsIntermediateCerts
+      - tlsRootCerts
+      type: object
+    GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner:
+      example:
+        port: 7050
+        host: orderer.example.com
+        name: orderer.example.com:7050
+      nullable: false
+      properties:
+        host:
+          example: orderer.example.com
+          type: string
+        port:
+          example: 7050
+          type: integer
+        name:
+          example: orderer.example.com:7050
+          type: string
+      required:
+      - host
+      - name
+      - port
+      type: object
+    GetDiscoveryResultsResponseV1_orderers_value:
+      example:
+        endpoints:
+        - port: 7050
+          host: orderer.example.com
+          name: orderer.example.com:7050
+        - port: 7050
+          host: orderer.example.com
+          name: orderer.example.com:7050
+      properties:
+        endpoints:
+          items:
+            $ref: '#/components/schemas/GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner'
+          type: array
+      required:
+      - endpoints
+      type: object
+    GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner:
+      example:
+        name: _lifecycle
+        version: "1"
+      nullable: false
+      properties:
+        name:
+          example: _lifecycle
+          type: string
+        version:
+          example: "1"
+          type: string
+      required:
+      - name
+      - version
+      type: object
+    GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner:
+      example:
+        mspid: Org1MSP
+        endpoint: peer0.org1.example.com:7051
+        chaincodes:
+        - name: _lifecycle
+          version: "1"
+        - name: _lifecycle
+          version: "1"
+        name: peer0.org1.example.com:7051
+        ledgerHeight: 123
+      nullable: false
+      properties:
+        mspid:
+          example: Org1MSP
+          type: string
+        endpoint:
+          example: peer0.org1.example.com:7051
+          type: string
+        name:
+          example: peer0.org1.example.com:7051
+          type: string
+        ledgerHeight:
+          example: 123
+          type: number
+        chaincodes:
+          items:
+            $ref: '#/components/schemas/GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner'
+          type: array
+      required:
+      - chaincodes
+      - endpoint
+      - ledgerHeight
+      - mspid
+      - name
+      type: object
+    GetDiscoveryResultsResponseV1_peersByMSP_value:
+      example:
+        peers:
+        - mspid: Org1MSP
+          endpoint: peer0.org1.example.com:7051
+          chaincodes:
+          - name: _lifecycle
+            version: "1"
+          - name: _lifecycle
+            version: "1"
+          name: peer0.org1.example.com:7051
+          ledgerHeight: 123
+        - mspid: Org1MSP
+          endpoint: peer0.org1.example.com:7051
+          chaincodes:
+          - name: _lifecycle
+            version: "1"
+          - name: _lifecycle
+            version: "1"
+          name: peer0.org1.example.com:7051
+          ledgerHeight: 123
+      properties:
+        peers:
+          items:
+            $ref: '#/components/schemas/GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner'
+          type: array
+      required:
+      - peers
       type: object
