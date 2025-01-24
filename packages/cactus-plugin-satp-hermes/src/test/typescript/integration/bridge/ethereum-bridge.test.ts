@@ -19,7 +19,6 @@ import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-he
 import { EthereumConfig } from "../../../../main/typescript/types/blockchain-interaction";
 import SATPInteraction from "../../../solidity/satp-erc20-interact.json";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { SupportedChain } from "../../../../main/typescript/core/types";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
@@ -31,6 +30,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { EthereumBridge } from "../../../../main/typescript/core/stage-services/satp-bridge/ethereum-bridge";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -199,7 +199,7 @@ beforeAll(async () => {
     };
 
     ethereumConfig = {
-      network: SupportedChain.EVM,
+      network: { id: "ETHEREUM", ledgerType: LedgerType.Ethereum },
       keychainId: keychainPlugin2.getKeychainId(),
       signingCredential: {
         ethAccount: bridgeEthAccount,

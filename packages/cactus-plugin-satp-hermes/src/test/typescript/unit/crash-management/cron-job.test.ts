@@ -7,7 +7,6 @@ import {
 } from "@hyperledger/cactus-common";
 import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gol/crash-manager";
 import {
-  SupportedChain,
   GatewayIdentity,
   Address,
 } from "../../../../main/typescript/core/types";
@@ -48,6 +47,7 @@ import { LocalLog } from "../../../../main/typescript/core/types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import knex, { Knex } from "knex";
 import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 let crashManager: CrashManager;
 let localRepository: ILocalLogRepository;
@@ -120,7 +120,12 @@ beforeAll(async () => {
         Crash: SATP_CRASH_VERSION,
       },
     ],
-    supportedDLTs: [SupportedChain.BESU],
+    connectedDLTs: [
+      {
+        id: "BESU",
+        ledgerType: LedgerType.Besu2X,
+      },
+    ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
   };
@@ -135,7 +140,7 @@ beforeAll(async () => {
 
   const bridgesManagerOptions: ISATPBridgesOptions = {
     logLevel: "DEBUG",
-    supportedDLTs: gatewayIdentity.supportedDLTs,
+    connectedDLTs: gatewayIdentity.connectedDLTs,
     networks: [],
   };
   const bridgesManager = new SATPBridgesManager(bridgesManagerOptions);

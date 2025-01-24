@@ -4,7 +4,6 @@ import {
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
 import { SATPBridgesManager } from "../../../main/typescript/gol/satp-bridges-manager";
-import { SupportedChain } from "../../../main/typescript/core/types";
 
 import {
   ISATPServiceOptions,
@@ -86,6 +85,7 @@ import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client
 let knexInstanceRemote: Knex;
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -106,7 +106,10 @@ const signer = new JsObjectSigner({
   privateKey: keyPairs.privateKey,
 });
 
-const supportedDLTs = [SupportedChain.FABRIC, SupportedChain.BESU];
+const connectedDLTs = [
+  { id: "BESU", ledgerType: LedgerType.Besu2X },
+  { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+];
 let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
 let dbLogger: SATPLogger;
@@ -144,9 +147,24 @@ const sessionIDs: string[] = [];
 
 beforeAll(async () => {
   bridgeManager = new SATPBridgesManager({
-    supportedDLTs: supportedDLTs,
+    connectedDLTs: connectedDLTs,
     networks: [],
     logLevel: logLevel,
+  });
+
+  jest.spyOn(bridgeManager, "getBridge").mockImplementation((id) => {
+    if (id === "BESU") {
+      return {
+        getNetworkType() {
+          return LedgerType.Besu2X;
+        },
+      } as any;
+    }
+    return {
+      getNetworkType() {
+        return LedgerType.Besu2X;
+      },
+    } as any;
   });
 
   knexInstanceClient = knex(knexClientConnection);
@@ -263,9 +281,9 @@ describe("SATP Services Testing", () => {
     sessionData.verifiedBeneficiaryEntityId =
       "MOCK_VERIFIED_BENEFICIARY_ENTITY_ID";
     sessionData.receiverGatewayOwnerId = "MOCK_RECEIVER_GATEWAY_OWNER_ID";
-    sessionData.recipientGatewayNetworkId = SupportedChain.FABRIC;
+    sessionData.recipientGatewayNetworkId = "FABRIC";
     sessionData.senderGatewayOwnerId = "MOCK_SENDER_GATEWAY_OWNER_ID";
-    sessionData.senderGatewayNetworkId = SupportedChain.BESU;
+    sessionData.senderGatewayNetworkId = "BESU";
     sessionData.signatureAlgorithm = SignatureAlgorithm.RSA;
     sessionData.lockType = LockType.FAUCET;
     sessionData.lockExpirationTime = BigInt(1000);
@@ -301,10 +319,9 @@ describe("SATP Services Testing", () => {
     expect(satpClientService1.getServiceIdentifier()).toBe(
       `${SATPServiceType.Client}#1`,
     );
-
     newSessionRequestMessage = await satpClientService0.newSessionRequest(
       mockSession,
-      SupportedChain.BESU,
+      "BESU",
     );
     expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
 
@@ -332,14 +349,14 @@ describe("SATP Services Testing", () => {
       Buffer.from(keyPairs.publicKey).toString("hex"),
     );
 
-    expect(mockSession.getServerSessionData()).toBeDefined();
-    expect(mockSession.getServerSessionData()?.transferContextId).toBe(
+    expect(mockSession.getClientSessionData()).toBeDefined();
+    expect(mockSession.getClientSessionData()?.transferContextId).toBe(
       newSessionRequestMessage.contextId,
     );
-    expect(mockSession.getServerSessionData()?.senderGatewayNetworkId).toBe(
+    expect(mockSession.getClientSessionData()?.senderGatewayNetworkId).toBe(
       newSessionRequestMessage.senderGatewayNetworkId,
     );
-    expect(mockSession.getServerSessionData()?.recipientGatewayNetworkId).toBe(
+    expect(mockSession.getClientSessionData()?.recipientGatewayNetworkId).toBe(
       newSessionRequestMessage.recipientGatewayNetworkId,
     );
   });
@@ -353,13 +370,13 @@ describe("SATP Services Testing", () => {
 
     expect(newSessionResponseMessage).toBeDefined();
     expect(newSessionResponseMessage.contextId).toBe(
-      mockSession.getClientSessionData()?.transferContextId,
+      mockSession.getServerSessionData()?.transferContextId,
     );
     expect(newSessionResponseMessage.senderGatewayNetworkId).toBe(
-      mockSession.getClientSessionData().senderGatewayNetworkId,
+      mockSession.getServerSessionData().senderGatewayNetworkId,
     );
     expect(newSessionResponseMessage.recipientGatewayNetworkId).toBe(
-      mockSession.getClientSessionData().recipientGatewayNetworkId,
+      mockSession.getServerSessionData().recipientGatewayNetworkId,
     );
     expect(newSessionResponseMessage.status).toBe(STATUS.STATUS_ACCEPTED);
     expect(newSessionResponseMessage.hashPreviousMessage).not.toBe("");
@@ -489,7 +506,7 @@ describe("SATP Services Testing", () => {
     transferProposalRequestMessage =
       (await satpClientService1.transferProposalRequest(
         mockSession,
-        supportedDLTs,
+        connectedDLTs,
       )) as TransferProposalRequestMessage;
     expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
     expect(
@@ -537,11 +554,11 @@ describe("SATP Services Testing", () => {
     ).toBe("MOCK_SENDER_GATEWAY_OWNER_ID");
     expect(
       transferProposalRequestMessage.transferInitClaims?.senderGatewayNetworkId,
-    ).toBe(SupportedChain.BESU);
+    ).toBe("BESU");
     expect(
       transferProposalRequestMessage.transferInitClaims
         ?.recipientGatewayNetworkId,
-    ).toBe(SupportedChain.FABRIC);
+    ).toBe("FABRIC");
     expect(
       transferProposalRequestMessage.networkCapabilities?.signatureAlgorithm,
     ).toBe(SignatureAlgorithm.RSA);
@@ -570,7 +587,7 @@ describe("SATP Services Testing", () => {
     await satpServerService1.checkTransferProposalRequestMessage(
       transferProposalRequestMessage,
       mockSession,
-      supportedDLTs,
+      connectedDLTs,
     );
   });
   it("Service1Server transferProposalResponse", async () => {

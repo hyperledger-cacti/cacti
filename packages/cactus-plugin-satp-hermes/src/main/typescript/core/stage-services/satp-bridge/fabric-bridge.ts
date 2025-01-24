@@ -25,13 +25,14 @@ import { InteractionData } from "./types/interact";
 import { getInteractionType } from "./types/asset";
 import { OntologyError, TransactionError } from "../../errors/bridge-erros";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export class FabricBridge implements NetworkBridge {
   public static readonly CLASS_NAME = "FabricBridge";
 
-  network: string = "FABRIC";
   claimFormat: ClaimFormat;
-
+  network: string;
+  networkType: LedgerType;
   public log: Logger;
 
   connector: PluginLedgerConnectorFabric;
@@ -45,12 +46,18 @@ export class FabricBridge implements NetworkBridge {
     this.connector = new PluginLedgerConnectorFabric(fabricConfig.options);
     this.claimFormat = fabricConfig.claimFormat;
     this.bungee = new PluginBungeeHermes(fabricConfig.bungeeOptions);
+    this.network = fabricConfig.network.id;
+    this.networkType = fabricConfig.network.ledgerType;
+
     level = level || "INFO";
     this.bungee.addStrategy(this.network, new StrategyFabric(level));
     this.log = LoggerProvider.getOrCreate({
       label: StrategyFabric.CLASS_NAME,
       level,
     });
+  }
+  public getNetworkType(): LedgerType {
+    return this.networkType;
   }
   public async wrapAsset(asset: FabricAsset): Promise<TransactionResponse> {
     const fnTag = `${FabricBridge.CLASS_NAME}}#wrapAsset`;

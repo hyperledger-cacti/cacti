@@ -1,13 +1,18 @@
+import { LedgerType } from "@hyperledger/cactus-core-api";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { TransactionResponse } from "../../../types/blockchain-interaction";
 import { Asset } from "./types/asset";
 
 export abstract class NetworkBridge {
   network!: string;
+  networkType!: LedgerType;
   claimFormat!: ClaimFormat;
 
   public networkName(): string {
     return this.network;
+  }
+  public getNetworkType(): LedgerType {
+    return this.networkType;
   }
 
   public abstract wrapAsset(asset: Asset): Promise<TransactionResponse>;

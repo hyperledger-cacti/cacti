@@ -47,6 +47,8 @@ import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-he
 import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import SATPInteraction from "../../../../test/typescript/fabric/satp-erc20-interact.json";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { FabricTestEnvironment } from "../../test-utils";
 let fabricServer: Server;
 
 let fabricSigningCredential: FabricSigningCredential;
@@ -652,7 +654,10 @@ beforeAll(async () => {
     };
 
     fabricConfig = {
-      network: "FABRIC",
+      network: {
+        id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+        ledgerType: LedgerType.Fabric2,
+      },
       signingCredential: bridgeFabricSigningCredential,
       channelName: fabricChannelName,
       contractName: satpWrapperContractName,

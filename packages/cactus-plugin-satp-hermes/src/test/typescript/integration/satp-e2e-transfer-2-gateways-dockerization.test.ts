@@ -16,11 +16,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
-import {
-  Address,
-  GatewayIdentity,
-  SupportedChain,
-} from "../../../main/typescript/core/types";
+import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
   createClient,
   setupGatewayDockerFiles,
@@ -38,6 +34,7 @@ import {
 } from "../../../main/typescript/core/constants";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { bufArray2HexStr } from "../../../main/typescript/gateway-utils";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -128,7 +125,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      supportedDLTs: [SupportedChain.BESU],
+      connectedDLTs: [
+        {
+          id: BesuTestEnvironment.BESU_NETWORK_ID,
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
       proofID: "mockProofID10",
       address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
@@ -146,7 +148,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      supportedDLTs: [SupportedChain.FABRIC],
+      connectedDLTs: [
+        {
+          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
       proofID: "mockProofID11",
       address,
       gatewayServerPort: 3110,
@@ -171,7 +178,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
               Crash: SATP_CRASH_VERSION,
             },
           ],
-          supportedDLTs: [SupportedChain.FABRIC],
+          connectedDLTs: [
+            {
+              id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+              ledgerType: LedgerType.Fabric2,
+            },
+          ],
           proofID: "mockProofID11",
           address,
           gatewayServerPort: 3110,
@@ -207,7 +219,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
               Crash: SATP_CRASH_VERSION,
             },
           ],
-          supportedDLTs: [SupportedChain.BESU],
+          connectedDLTs: [
+            {
+              id: BesuTestEnvironment.BESU_NETWORK_ID,
+              ledgerType: LedgerType.Besu2X,
+            },
+          ],
           proofID: "mockProofID10",
           address,
           gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,

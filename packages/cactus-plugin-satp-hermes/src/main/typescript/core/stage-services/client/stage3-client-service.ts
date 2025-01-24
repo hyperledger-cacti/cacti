@@ -382,7 +382,6 @@ export class Stage3ClientService extends SATPService {
       );
 
       transferCompleteRequestMessage.clientSignature = messageSignature;
-
       saveSignature(
         sessionData,
         MessageType.COMMIT_TRANSFER_COMPLETE,

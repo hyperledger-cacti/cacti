@@ -7,7 +7,7 @@ import { BesuBridge } from "../core/stage-services/satp-bridge/besu-bridge";
 import { FabricBridge } from "../core/stage-services/satp-bridge/fabric-bridge";
 import { NetworkBridge } from "../core/stage-services/satp-bridge/network-bridge";
 import { SATPBridgeManager } from "../core/stage-services/satp-bridge/satp-bridge-manager";
-import { SATPBridgeConfig, SupportedChain } from "../core/types";
+import { SATPBridgeConfig } from "../core/types";
 import {
   FabricConfig,
   BesuConfig,
@@ -16,17 +16,27 @@ import {
 } from "../types/blockchain-interaction";
 import { ValidatorOptions } from "class-validator";
 import { EthereumBridge } from "../core/stage-services/satp-bridge/ethereum-bridge";
+import { NetworkId } from "../network-identification/chainid-list";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
+export const DEFAULT_SUPPORTED_LEDGERS: LedgerType[] = [
+  //add supported ledgers as new bridges are implemented
+  LedgerType.Ethereum,
+  LedgerType.Fabric2,
+  LedgerType.Besu2X,
+  LedgerType.Besu1X,
+];
 export interface ISATPBridgesOptions {
   logLevel?: LogLevelDesc;
   networks: NetworkConfig[];
   validationOptions?: ValidatorOptions;
-  supportedDLTs: SupportedChain[];
+  connectedDLTs: NetworkId[];
+  supportedDLTs?: LedgerType[];
 }
 
 export class SATPBridgesManager {
   static CLASS_NAME: string = "SATPBridgesManager";
-
+  private supportedDLTs: LedgerType[];
   bridges: Map<string, SATPBridgeManager> = new Map<
     string,
     SATPBridgeManager
@@ -43,31 +53,14 @@ export class SATPBridgesManager {
     });
 
     this.level = this.config.logLevel;
-
+    if (this.config.supportedDLTs) {
+      this.supportedDLTs = this.config.supportedDLTs;
+    } else {
+      this.supportedDLTs = DEFAULT_SUPPORTED_LEDGERS;
+    }
     this.log.debug(`Creating ${SATPBridgesManager.CLASS_NAME}...`);
-
     config.networks.map((bridgeConfig) => {
-      let bridge: NetworkBridge;
-      switch (bridgeConfig.network) {
-        case SupportedChain.FABRIC:
-          bridge = new FabricBridge(bridgeConfig as FabricConfig, this.level);
-          break;
-        case SupportedChain.BESU:
-          bridge = new BesuBridge(bridgeConfig as BesuConfig, this.level);
-          break;
-        case SupportedChain.EVM:
-          bridge = new EthereumBridge(bridgeConfig as EthereumConfig);
-          break;
-        default:
-          throw new Error(`Unsupported network: ${bridgeConfig.network}`);
-      }
-
-      const config: SATPBridgeConfig = {
-        network: bridge,
-        logLevel: this.level,
-      };
-      const satp = new SATPBridgeManager(config);
-      this.bridges.set(bridgeConfig.network, satp);
+      this.addBridgeFromConfig(bridgeConfig);
     });
   }
 
@@ -78,34 +71,40 @@ export class SATPBridgesManager {
     return this.bridges.get(network) as SATPBridgeManager;
   }
 
+  public getSupportedDLTs(): LedgerType[] {
+    return this.supportedDLTs;
+  }
+
   public getBridgesList(): string[] {
     return Array.from(this.bridges.keys());
   }
 
   public addBridgeFromConfig(networkConfig: NetworkConfig) {
     let bridge: NetworkBridge;
-    switch (networkConfig.network) {
-      case SupportedChain.FABRIC:
+    switch (networkConfig.network.ledgerType) {
+      case LedgerType.Fabric2:
         bridge = new FabricBridge(networkConfig as FabricConfig, this.level);
         break;
-      case SupportedChain.BESU:
+      case LedgerType.Besu2X:
         bridge = new BesuBridge(networkConfig as BesuConfig, this.level);
         break;
-      case SupportedChain.EVM:
-        bridge = new EthereumBridge(
-          networkConfig as EthereumConfig,
-          this.level,
-        );
+      case LedgerType.Besu1X:
+        bridge = new BesuBridge(networkConfig as BesuConfig, this.level);
+        break;
+      case LedgerType.Ethereum:
+        bridge = new EthereumBridge(networkConfig as EthereumConfig);
         break;
       default:
-        throw new Error(`Unsupported network: ${networkConfig.network}`);
+        throw new Error(
+          `Unsupported network technology: ${networkConfig.network.ledgerType}`,
+        );
     }
     const config: SATPBridgeConfig = {
       network: bridge,
       logLevel: this.level,
     };
     const satp = new SATPBridgeManager(config);
-    this.bridges.set(networkConfig.network, satp);
+    this.bridges.set(networkConfig.network.id, satp);
   }
 
   public addBridge(network: string, bridge: SATPBridgeManager): void {

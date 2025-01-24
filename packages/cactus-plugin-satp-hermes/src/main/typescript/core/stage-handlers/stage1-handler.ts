@@ -9,7 +9,6 @@ import {
 import { SATPSession } from "../satp-session";
 import { Stage1ServerService } from "../stage-services/server/stage1-server-service";
 import { Stage1ClientService } from "../stage-services/client/stage1-client-service";
-import { SupportedChain } from "../types";
 import {
   SATPHandler,
   SATPHandlerOptions,
@@ -28,20 +27,21 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { saveMessageInSessionData, setError } from "../session-utils";
+import { NetworkId } from "../../network-identification/chainid-list";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
   private sessions: Map<string, SATPSession>;
   private serverService: Stage1ServerService;
   private clientService: Stage1ClientService;
-  private supportedDLTs: SupportedChain[];
+  private connectedDLTs: NetworkId[];
   private logger: Logger;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage1ServerService;
     this.clientService = ops.clientService as Stage1ClientService;
-    this.supportedDLTs = ops.supportedDLTs;
+    this.connectedDLTs = ops.connectedDLTs;
     this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
     this.logger.trace(`Initialized ${Stage1SATPHandler.CLASS_NAME}`);
   }
@@ -80,7 +80,7 @@ export class Stage1SATPHandler implements SATPHandler {
       await this.serverService.checkTransferProposalRequestMessage(
         req,
         session,
-        this.supportedDLTs,
+        this.connectedDLTs,
       );
 
       saveMessageInSessionData(session.getServerSessionData(), req);
@@ -216,7 +216,7 @@ export class Stage1SATPHandler implements SATPHandler {
       const requestTransferProposal =
         await this.clientService.transferProposalRequest(
           session,
-          this.supportedDLTs,
+          this.connectedDLTs,
         );
 
       if (!requestTransferProposal) {

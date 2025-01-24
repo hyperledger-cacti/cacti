@@ -37,7 +37,6 @@ import {
   saveSignature,
   SessionType,
 } from "../../session-utils";
-import { SupportedChain } from "../../types";
 import { signatureVerifier } from "../data-verifier";
 import { Asset } from "../satp-bridge/types/asset";
 import {
@@ -112,6 +111,7 @@ export class Stage0ClientService extends SATPService {
         contextId: sessionData.transferContextId,
         recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
         senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+        senderGatewayNetworkType: sessionData.senderGatewayNetworkType,
         gatewayId: thisGatewayId,
         messageType: MessageType.NEW_SESSION_REQUEST,
       });
@@ -200,14 +200,14 @@ export class Stage0ClientService extends SATPService {
     ) {
       throw new GatewayNetworkIdError(fnTag);
     }
-
     if (
       response.senderGatewayNetworkId == "" ||
       response.senderGatewayNetworkId != sessionData.senderGatewayNetworkId
     ) {
       throw new GatewayNetworkIdError(fnTag);
     }
-
+    sessionData.recipientGatewayNetworkType =
+      response.receiverGatewayNetworkType;
     if (response.messageType != MessageType.NEW_SESSION_RESPONSE) {
       throw new MessageTypeError(
         fnTag,
@@ -404,7 +404,7 @@ export class Stage0ClientService extends SATPService {
 
       const token: Asset = protoToAsset(
         sessionData.senderAsset,
-        sessionData.senderGatewayNetworkId as SupportedChain,
+        sessionData.senderGatewayNetworkId,
       );
 
       const assetId = token.tokenId;

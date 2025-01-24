@@ -22,10 +22,11 @@ import { randomUUID as uuidv4 } from "node:crypto";
 import { BesuConfig } from "../../../main/typescript/types/blockchain-interaction";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { expect } from "@jest/globals";
-import { SupportedChain } from "../../../main/typescript/core/types";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Asset } from "../../../main/typescript";
 import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { NetworkId } from "../../../main/typescript/network-identification/chainid-list";
 // import { v4 as internalIpV4 } from "internal-ip";
 
 // currently not used due to GatewayRunner being in NetworkMode: "host"
@@ -37,8 +38,11 @@ import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
 // Test environment for Besu ledger operations
 export class BesuTestEnvironment {
   public static readonly BESU_ASSET_ID: string = uuidv4();
-
-  public readonly network: SupportedChain = SupportedChain.BESU;
+  public static readonly BESU_NETWORK_ID: string = "BESU";
+  public readonly network: NetworkId = {
+    id: BesuTestEnvironment.BESU_NETWORK_ID,
+    ledgerType: LedgerType.Besu2X,
+  };
   public ledger!: BesuTestLedger;
   public connector!: PluginLedgerConnectorBesu;
   public connectorOptions!: IPluginLedgerConnectorBesuOptions;

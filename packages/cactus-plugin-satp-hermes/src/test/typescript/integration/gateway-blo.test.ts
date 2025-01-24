@@ -7,13 +7,11 @@ import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   IPluginFactoryOptions,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
-import {
-  SATPGatewayConfig,
-  SupportedChain,
-} from "../../../main/typescript/core/types";
+import { SATPGatewayConfig } from "../../../main/typescript/core/types";
 import { createClient } from "../test-utils";
 import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
 import {
@@ -54,7 +52,10 @@ const options: SATPGatewayConfig = {
         Crash: "v1",
       },
     ],
-    supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+    connectedDLTs: [
+      { id: "BESU", ledgerType: LedgerType.Besu2X },
+      { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+    ],
     proofID: "mockProofID10",
     gatewayServerPort: 3010,
     gatewayClientPort: 3011,
@@ -128,9 +129,9 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       expect(result.data.integrations).toBeDefined();
       expect(result.data.integrations).toHaveLength(2);
       // the type of the first integration is "fabric"
-      expect(result.data.integrations[0].type).toEqual("fabric");
+      expect(result.data.integrations[0].type).toEqual(LedgerType.Besu2X);
       // the type of the second integration is "besu"
-      expect(result.data.integrations[1].type).toEqual("besu");
+      expect(result.data.integrations[1].type).toEqual(LedgerType.Fabric2);
     } finally {
       await gateway.shutdown();
     }

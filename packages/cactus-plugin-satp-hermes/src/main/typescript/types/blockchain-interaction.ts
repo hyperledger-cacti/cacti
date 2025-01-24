@@ -18,6 +18,7 @@ import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-he
 import { EvmAsset } from "../core/stage-services/satp-bridge/types/evm-asset";
 import { FabricAsset } from "../core/stage-services/satp-bridge/types/fabric-asset";
 import { ClaimFormat } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { NetworkId } from "../network-identification/chainid-list";
 
 // inject gateway, get connectors
 export type SATPLedgerConnector = string;
@@ -25,7 +26,7 @@ export type SATPLedgerConnector = string;
 // TODO Define lock interfaces and strategy pattern for locking (as function of locking blockchain) (see what smart contract implementations return)
 
 export interface NetworkConfig {
-  network: string;
+  network: NetworkId;
   claimFormat: ClaimFormat;
 }
 export interface FabricConfig extends NetworkConfig {

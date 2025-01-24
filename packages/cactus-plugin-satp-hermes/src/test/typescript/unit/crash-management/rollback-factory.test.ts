@@ -15,8 +15,8 @@ import {
   Stage2HashesSchema,
   Stage3HashesSchema,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
-import { SupportedChain } from "../../../../main/typescript/core/types";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
   const mockSession = new SATPSession({
@@ -46,7 +46,16 @@ describe("RollbackStrategyFactory Tests", () => {
     bridgesManager = new SATPBridgesManager({
       logLevel: "DEBUG",
       networks: [],
-      supportedDLTs: [SupportedChain.BESU, SupportedChain.FABRIC],
+      connectedDLTs: [
+        {
+          id: "BESU",
+          ledgerType: LedgerType.Besu2X,
+        },
+        {
+          id: "FABRIC",
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
     });
 
     factory = new RollbackStrategyFactory(bridgesManager, log);

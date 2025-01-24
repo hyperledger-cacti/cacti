@@ -9,7 +9,6 @@ import {
 import {
   GatewayIdentity,
   GatewayChannel,
-  SupportedChain,
   SATPServiceInstance,
 } from "../core/types";
 import {
@@ -44,6 +43,7 @@ import {
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
 import { SATPHandler, Stage } from "../types/satp-protocol";
+import { NetworkId } from "../network-identification/chainid-list";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -166,14 +166,18 @@ export class GatewayOrchestrator {
     return this.counterPartyGateways.get(id);
   }
 
-  public getChannel(dlt: SupportedChain): GatewayChannel {
+  public getChannel(id: string): GatewayChannel {
     const channels = Array.from(this.channels.values());
     const channel = channels.find((channel) => {
-      return channel.supportedDLTs.includes(dlt);
+      return channel.connectedDLTs
+        .map((obj) => {
+          return obj.id;
+        })
+        .includes(id);
     });
     if (!channel) {
       throw new Error(
-        `No channel found for DLT ${dlt} \n available channels: ${safeStableStringify(channels)}`,
+        `No channel found for DLT ${id} \n available channels: ${safeStableStringify(channels)}`,
       );
     }
     return channel;
@@ -252,8 +256,8 @@ export class GatewayOrchestrator {
     return connected;
   }
 
-  get supportedDLTs(): SupportedChain[] {
-    return this.localGateway.supportedDLTs;
+  get connectedDLTs(): NetworkId[] {
+    return this.localGateway.connectedDLTs;
   }
 
   createChannel(identity: GatewayIdentity): GatewayChannel {
@@ -264,10 +268,10 @@ export class GatewayOrchestrator {
       toGatewayID: identity.id,
       sessions: new Map(),
       clients: clients,
-      supportedDLTs: identity.supportedDLTs,
+      connectedDLTs: identity.connectedDLTs,
     };
     this.logger.info(
-      `Created channel to gateway ${identity.id} \n supported DLTs: ${identity.supportedDLTs}`,
+      `Created channel to gateway ${identity.id} \n reachable DLTs: ${identity.connectedDLTs}`,
     );
     return channel;
   }

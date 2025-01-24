@@ -26,6 +26,7 @@ import { getInteractionType } from "./types/asset";
 import { InteractionData } from "./types/interact";
 import { OntologyError, TransactionError } from "../../errors/bridge-erros";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 interface BesuResponse {
   success: boolean;
@@ -35,7 +36,8 @@ interface BesuResponse {
 export class BesuBridge implements NetworkBridge {
   public static readonly CLASS_NAME = "BesuBridge";
 
-  network: string = "BESU";
+  network: string;
+  networkType: LedgerType;
   claimFormat: ClaimFormat;
   public log: Logger;
 
@@ -54,6 +56,8 @@ export class BesuBridge implements NetworkBridge {
     this.claimFormat = besuConfig.claimFormat;
     this.connector = new PluginLedgerConnectorBesu(besuConfig.options);
     this.bungee = new PluginBungeeHermes(besuConfig.bungeeOptions);
+    this.network = besuConfig.network.id;
+    this.networkType = besuConfig.network.ledgerType;
     this.bungee.addStrategy(this.network, new StrategyBesu(level));
 
     //TODO is this needed?
@@ -62,6 +66,9 @@ export class BesuBridge implements NetworkBridge {
         await this.wrapAsset(asset);
       });
     }
+  }
+  public getNetworkType(): LedgerType {
+    return this.networkType;
   }
 
   public async wrapAsset(asset: EvmAsset): Promise<TransactionResponse> {

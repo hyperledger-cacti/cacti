@@ -13,6 +13,8 @@ import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkConfig } from "../types/blockchain-interaction";
 import { Knex } from "knex";
+import { NetworkId } from "../network-identification/chainid-list";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,
@@ -38,17 +40,11 @@ export type ShutdownHook = {
   hook: () => Promise<void>;
 };
 
-export enum SupportedChain {
-  FABRIC = "FabricSATPGateway",
-  BESU = "BesuSATPGateway",
-  EVM = "EthereumSATPGateway",
-}
-
 export type GatewayChannel = {
   fromGatewayID: string;
   toGatewayID: string;
   sessions: Map<string, SATPSession>;
-  supportedDLTs: SupportedChain[];
+  connectedDLTs: NetworkId[];
   clients: Map<string, ConnectClient<SATPServiceInstance>>;
 };
 
@@ -62,7 +58,8 @@ export type GatewayIdentity = {
   pubKey?: string;
   name?: string;
   version: DraftVersions[];
-  supportedDLTs: SupportedChain[];
+  connectedDLTs: NetworkId[];
+  supportedDLTs?: LedgerType[];
   proofID?: string;
   gatewayServerPort?: number;
   gatewayClientPort?: number;

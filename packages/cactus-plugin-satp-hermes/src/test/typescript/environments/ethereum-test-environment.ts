@@ -18,7 +18,6 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { expect } from "@jest/globals";
-import { SupportedChain } from "../../../main/typescript/core/types";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
@@ -26,12 +25,17 @@ import {
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Asset } from "../../../main/typescript";
 import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { NetworkId } from "../../../main/typescript/network-identification/chainid-list";
 
 // Test environment for Ethereum ledger operations
 export class EthereumTestEnvironment {
   public static readonly ETH_ASSET_ID: string = uuidv4();
-
-  public readonly network: SupportedChain = SupportedChain.EVM;
+  public static readonly ETH_NETWORK_ID: string = "ETH";
+  public readonly network: NetworkId = {
+    id: EthereumTestEnvironment.ETH_NETWORK_ID,
+    ledgerType: LedgerType.Ethereum,
+  };
   public ledger!: GethTestLedger;
   public connector!: PluginLedgerConnectorEthereum;
   public connectorOptions!: IPluginLedgerConnectorEthereumOptions;

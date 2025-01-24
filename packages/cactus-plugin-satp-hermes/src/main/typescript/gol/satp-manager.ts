@@ -15,7 +15,7 @@ import { Stage1ServerService } from "../core/stage-services/server/stage1-server
 import { Stage2ServerService } from "../core/stage-services/server/stage2-server-service";
 import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../core/satp-session";
-import { GatewayIdentity, SupportedChain } from "../core/types";
+import { GatewayIdentity } from "../core/types";
 import { Stage0ClientService } from "../core/stage-services/client/stage0-client-service";
 import { Stage1ClientService } from "../core/stage-services/client/stage1-client-service";
 import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
@@ -82,6 +82,8 @@ import {
   IRemoteLogRepository,
 } from "../repository/interfaces/repository";
 import { ISATPLoggerConfig, SATPLogger } from "../logging";
+import { NetworkId } from "../network-identification/chainid-list";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -89,7 +91,7 @@ export interface ISATPManagerOptions {
   sessions?: Map<string, SATPSession>;
   signer: JsObjectSigner;
   pubKey: string;
-  supportedDLTs: SupportedChain[];
+  connectedDLTs: NetworkId[];
   bridgeManager: SATPBridgesManager;
   orchestrator: GatewayOrchestrator;
   defaultRepository: boolean;
@@ -104,7 +106,8 @@ export class SATPManager {
   private status: HealthCheckResponseStatusEnum;
   private endpoints: any[] | undefined;
   private signer: JsObjectSigner;
-  public supportedDLTs: SupportedChain[] = [];
+  public connectedDLTs: NetworkId[] = [];
+  private supportedDLTs: LedgerType[] = [];
   private sessions: Map<string, SATPSession>;
   // maps stage to client/service and service class
   private readonly satpServices: Map<
@@ -134,9 +137,10 @@ export class SATPManager {
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.status = HealthCheckResponseStatusEnum.Available;
-    this.supportedDLTs = options.supportedDLTs;
+    this.connectedDLTs = options.connectedDLTs;
     this.signer = options.signer;
     this.bridgesManager = options.bridgeManager;
+    this.supportedDLTs = this.bridgesManager.getSupportedDLTs();
     this.orchestrator = options.orchestrator;
     this._pubKey = options.pubKey;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
@@ -200,6 +204,10 @@ export class SATPManager {
     return this._pubKey;
   }
 
+  public getSupportedDLTs(): LedgerType[] {
+    return this.supportedDLTs;
+  }
+
   public getServiceByStage(
     serviceType: SATPServiceType,
     stageID: string,
@@ -242,8 +250,8 @@ export class SATPManager {
     return this.sessions.get(sessionId);
   }
 
-  get SupportedDLTs(): SupportedChain[] {
-    return this.supportedDLTs;
+  public getConnectedDLTs(): NetworkId[] {
+    return this.connectedDLTs;
   }
 
   public getSATPHandler(type: SATPHandlerType): SATPHandler | undefined {
@@ -364,7 +372,7 @@ export class SATPManager {
           sessions: this.sessions,
           serverService: serverService,
           clientService: clientService,
-          supportedDLTs: this.supportedDLTs,
+          connectedDLTs: this.connectedDLTs,
           pubkeys: this.gatewaysPubKeys,
           gatewayId: this.orchestrator.ourGateway.id,
           stage: serviceIndex,
@@ -440,6 +448,11 @@ export class SATPManager {
       }
 
       const clientSessionData = session.getClientSessionData();
+      const bridge = this.bridgesManager.getBridge(
+        clientSessionData.senderGatewayNetworkId,
+      );
+      clientSessionData.senderGatewayNetworkType =
+        bridge.getNetworkType() as string;
       const clientSessionDataJson = safeStableStringify(clientSessionData);
       this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
 
@@ -449,7 +462,7 @@ export class SATPManager {
 
       //maybe get a suitable gateway first.
       const channel = this.orchestrator.getChannel(
-        clientSessionData.recipientGatewayNetworkId as SupportedChain,
+        clientSessionData.recipientGatewayNetworkId,
       );
 
       if (!channel) {

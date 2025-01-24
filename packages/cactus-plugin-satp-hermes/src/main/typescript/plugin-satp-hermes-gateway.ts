@@ -17,12 +17,7 @@ import {
   Contains,
 } from "class-validator";
 
-import {
-  SATPGatewayConfig,
-  GatewayIdentity,
-  ShutdownHook,
-  SupportedChain,
-} from "./core/types";
+import { SATPGatewayConfig, GatewayIdentity, ShutdownHook } from "./core/types";
 import {
   GatewayOrchestrator,
   IGatewayOrchestratorOptions,
@@ -64,6 +59,7 @@ import {
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
+import { NetworkId } from "./network-identification/chainid-list";
 import { knexLocalInstance } from "./knex/knexfile";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
@@ -84,7 +80,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
   @IsString()
   public readonly instanceId: string;
-  private supportedDltIDs: SupportedChain[];
+  private connectedDLTs: NetworkId[];
   private gatewayOrchestrator: GatewayOrchestrator;
   private bridgesManager: SATPBridgesManager;
 
@@ -161,7 +157,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     const bridgesManagerOptions: ISATPBridgesOptions = {
       logLevel: this.config.logLevel,
-      supportedDLTs: this.config.gid!.supportedDLTs,
+      connectedDLTs: this.config.gid!.connectedDLTs,
       networks: options.bridgesConfig ? options.bridgesConfig : [],
     };
 
@@ -196,7 +192,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       remoteRepository: this.remoteRepository,
     };
 
-    this.supportedDltIDs = this.config.gid!.supportedDLTs;
+    this.connectedDLTs = this.config.gid!.connectedDLTs;
 
     if (!this.config.gid || !dispatcherOps.instanceId) {
       throw new Error("Invalid configuration");
@@ -287,8 +283,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return this.signer;
   }
 
-  public getSupportedDltIDs(): string[] {
-    return this.supportedDltIDs;
+  public getconnectedDLTs(): NetworkId[] {
+    return this.connectedDLTs;
   }
 
   public get gatewaySigner(): JsObjectSigner {
@@ -340,7 +336,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        supportedDLTs: [],
+        connectedDLTs: [],
         proofID: "mockProofID1",
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
@@ -372,8 +368,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         ];
       }
 
-      if (!pluginOptions.gid.supportedDLTs) {
-        pluginOptions.gid.supportedDLTs = [];
+      if (!pluginOptions.gid.connectedDLTs) {
+        pluginOptions.gid.connectedDLTs = [];
       }
 
       if (!pluginOptions.gid.proofID) {
