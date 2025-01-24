@@ -25,6 +25,7 @@ import { getInteractionType } from "./types/asset";
 import { InteractionData } from "./types/interact";
 import { OntologyError, TransactionError } from "../../errors/bridge-erros";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 interface EthereumResponse {
   success: boolean;
@@ -34,7 +35,8 @@ interface EthereumResponse {
 export class EthereumBridge implements NetworkBridge {
   public static readonly CLASS_NAME = "EthereumBridge";
 
-  network: string = "ETHEREUM";
+  network: string;
+  networkType: LedgerType;
   claimFormat: ClaimFormat;
   public log: Logger;
 
@@ -53,6 +55,8 @@ export class EthereumBridge implements NetworkBridge {
     this.claimFormat = ethereumConfig.claimFormat;
     this.connector = new PluginLedgerConnectorEthereum(ethereumConfig.options);
     this.bungee = new PluginBungeeHermes(ethereumConfig.bungeeOptions);
+    this.network = ethereumConfig.network.id;
+    this.networkType = ethereumConfig.network.ledgerType;
     this.bungee.addStrategy(this.network, new StrategyEthereum(level));
 
     //TODO is this needed?
@@ -61,6 +65,9 @@ export class EthereumBridge implements NetworkBridge {
         await this.wrapAsset(asset);
       });
     }
+  }
+  public getNetworkType(): LedgerType {
+    return this.networkType;
   }
 
   public async wrapAsset(asset: EvmAsset): Promise<TransactionResponse> {
