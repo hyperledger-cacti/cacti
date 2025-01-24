@@ -21,7 +21,6 @@ import {
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SupportedChain } from "../../types";
 import { SATPSession } from "../../../core/satp-session";
 import {
   SATPService,
@@ -41,6 +40,7 @@ import {
 } from "../../errors/satp-service-errors";
 import { PreSATPTransferResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
+import { NetworkId } from "../../../network-identification/chainid-list";
 
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";
@@ -63,7 +63,7 @@ export class Stage1ClientService extends SATPService {
 
   async transferProposalRequest(
     session: SATPSession,
-    supportedDLTs: SupportedChain[],
+    connectedDLTs: NetworkId[],
   ): Promise<void | TransferProposalRequestMessage> {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
@@ -95,9 +95,11 @@ export class Stage1ClientService extends SATPService {
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });
       if (
-        !supportedDLTs.includes(
-          sessionData.senderGatewayNetworkId as SupportedChain,
-        )
+        !connectedDLTs
+          .map((dlt) => {
+            return dlt.id;
+          })
+          .includes(sessionData.senderGatewayNetworkId)
       ) {
         throw new Error( //todo change this to the transferClaims check
           `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
