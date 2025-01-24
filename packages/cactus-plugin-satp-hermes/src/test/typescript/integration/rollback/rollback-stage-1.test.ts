@@ -3,7 +3,6 @@ import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { CrashManager } from "../../../../main/typescript/gol/crash-manager";
 import {
   LocalLog,
-  SupportedChain,
   GatewayIdentity,
   Address,
 } from "../../../../main/typescript/core/types";
@@ -24,6 +23,7 @@ import {
 } from "../../../../main/typescript";
 import {
   IPluginFactoryOptions,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
@@ -136,8 +136,8 @@ const createMockSession = (
     });
   }
 
-  sessionData.senderGatewayNetworkId = SupportedChain.BESU;
-  sessionData.recipientGatewayNetworkId = SupportedChain.FABRIC;
+  sessionData.senderGatewayNetworkId = "BESU";
+  sessionData.recipientGatewayNetworkId = "FABRIC";
 
   return mockSession;
 };
@@ -206,7 +206,12 @@ describe("Rollback Test stage 1", () => {
           Crash: "v02",
         },
       ],
-      supportedDLTs: [SupportedChain.BESU],
+      connectedDLTs: [
+        {
+          id: "BESU",
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
       gatewayServerPort: 3005,
@@ -225,7 +230,12 @@ describe("Rollback Test stage 1", () => {
           Crash: "v02",
         },
       ],
-      supportedDLTs: [SupportedChain.FABRIC],
+      connectedDLTs: [
+        {
+          id: "FABRIC",
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
       gatewayServerPort: 3225,

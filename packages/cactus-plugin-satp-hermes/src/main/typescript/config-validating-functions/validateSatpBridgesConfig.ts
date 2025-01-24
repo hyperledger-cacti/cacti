@@ -1,11 +1,10 @@
-import { SupportedChain } from "../core/types";
 import {
   BesuConfig,
   EthereumConfig,
   FabricConfig,
   NetworkConfig,
 } from "../types/blockchain-interaction";
-import { isSupportedChain } from "./validateSatpGatewayIdentity";
+import { isNetworkId } from "./validateSatpGatewayIdentity";
 import { isFabricConfigJSON } from "./bridges-config-validating-functions/validateFabricConfig";
 import { createFabricOptions } from "./bridges-config-validating-functions/validateFabricOptions";
 import { isBesuConfigJSON } from "./bridges-config-validating-functions/validateBesuConfig";
@@ -13,9 +12,10 @@ import { createBesuOptions } from "./bridges-config-validating-functions/validat
 import { isEthereumConfigJSON } from "./bridges-config-validating-functions/validateEthereumConfig";
 import { createEthereumOptions } from "./bridges-config-validating-functions/validateEthereumOptions";
 import { createBungeeOptions } from "./bridges-config-validating-functions/validateBungeeOptions";
+import { NetworkId } from "../network-identification/chainid-list";
 
 export interface NetworkConfigJSON {
-  network: SupportedChain;
+  network: NetworkId;
 }
 
 // Type guard for NetworkConfigJSON
@@ -24,7 +24,7 @@ function isNetworkConfigJSON(obj: unknown): obj is NetworkConfigJSON {
     return false;
   }
   const objRecord = obj as Record<string, unknown>;
-  if (!("network" in obj) || !isSupportedChain(objRecord.network)) {
+  if (!("network" in obj) || !isNetworkId(objRecord.network)) {
     return false;
   }
   return (
