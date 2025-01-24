@@ -7,6 +7,7 @@ import { SATPBridgeConfig } from "../../types";
 import { Asset } from "./types/asset";
 import { TransactionIdUndefinedError } from "../../errors/bridge-erros";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export class SATPBridgeManager implements BridgeManager {
   public static readonly CLASS_NAME = "SATPBridgeManager";
@@ -20,6 +21,9 @@ export class SATPBridgeManager implements BridgeManager {
   constructor(private config: SATPBridgeConfig) {
     const label = SATPBridgeManager.CLASS_NAME;
     this._log = LoggerProvider.getOrCreate({ level: config.logLevel, label });
+  }
+  public getNetworkType(): LedgerType {
+    return this.config.network.getNetworkType();
   }
 
   public async wrapAsset(asset: Asset): Promise<string> {
