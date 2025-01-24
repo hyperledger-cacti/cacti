@@ -3,7 +3,6 @@ import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { CrashManager } from "../../../../main/typescript/gol/crash-manager";
 import {
   LocalLog,
-  SupportedChain,
   GatewayIdentity,
   Address,
 } from "../../../../main/typescript/core/types";
@@ -28,6 +27,7 @@ import {
 } from "../../../../main/typescript";
 import {
   IPluginFactoryOptions,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
@@ -144,8 +144,8 @@ const createMockSession = (
     });
   }
 
-  sessionData.senderGatewayNetworkId = SupportedChain.BESU;
-  sessionData.recipientGatewayNetworkId = SupportedChain.FABRIC;
+  sessionData.senderGatewayNetworkId = "BESU";
+  sessionData.recipientGatewayNetworkId = "FABRIC";
 
   return mockSession;
 };
@@ -189,7 +189,16 @@ beforeAll(async () => {
   bridgesManager = new SATPBridgesManager({
     logLevel: "DEBUG",
     networks: [besuEnv.besuConfig, fabricEnv.fabricConfig],
-    supportedDLTs: [SupportedChain.BESU, SupportedChain.FABRIC],
+    connectedDLTs: [
+      {
+        id: "BESU",
+        ledgerType: LedgerType.Besu2X,
+      },
+      {
+        id: "FABRIC",
+        ledgerType: LedgerType.Fabric2,
+      },
+    ],
   });
 });
 
@@ -243,7 +252,7 @@ describe("Rollback Test stage 0", () => {
       ontology: JSON.stringify(SATPInteractionBesu),
     };
     const besuReceipt = await bridgesManager
-      .getBridge(SupportedChain.BESU)
+      .getBridge("BESU")
       .wrapAsset(besuAsset);
     expect(besuReceipt).toBeDefined();
     log.info(`Besu Asset Wrapped: ${besuReceipt}`);
@@ -259,7 +268,7 @@ describe("Rollback Test stage 0", () => {
       ontology: JSON.stringify(SATPInteractionFabric),
     };
     const fabricReceipt = await bridgesManager
-      .getBridge(SupportedChain.FABRIC)
+      .getBridge("FABRIC")
       .wrapAsset(fabricAsset);
     expect(fabricReceipt).toBeDefined();
     log.info(`Fabric Asset Wrapped: ${fabricReceipt}`);
@@ -280,7 +289,12 @@ describe("Rollback Test stage 0", () => {
           Crash: "v02",
         },
       ],
-      supportedDLTs: [SupportedChain.BESU],
+      connectedDLTs: [
+        {
+          id: "BESU",
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
       gatewayServerPort: 3005,
@@ -299,7 +313,12 @@ describe("Rollback Test stage 0", () => {
           Crash: "v02",
         },
       ],
-      supportedDLTs: [SupportedChain.FABRIC],
+      connectedDLTs: [
+        {
+          id: "FABRIC",
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
       gatewayServerPort: 3225,
