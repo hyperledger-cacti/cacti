@@ -5,7 +5,8 @@ import {
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPManager } from "../../gol/satp-manager";
-import { SupportedChain } from "../../core/types";
+import { NetworkId } from "../../network-identification/chainid-list";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export async function executeGetIntegrations(
   logLevel: LogLevelDesc,
@@ -48,32 +49,46 @@ export async function getIntegrationsService(
 
   logger.info(`${fnTag}, getting integrations service...`);
 
-  const supportedSystems = manager.supportedDLTs;
+  const supportedSystems = manager.connectedDLTs;
 
   return supportedSystems.map((supportedSystem) =>
-    convertSupportedChainsIntoIntegrations(supportedSystem),
+    convertconnectedDLTsIntoIntegrations(supportedSystem),
   );
 }
 
-function convertSupportedChainsIntoIntegrations(
-  supportedChain: SupportedChain,
+function convertconnectedDLTsIntoIntegrations(
+  networkId: NetworkId,
 ): Integration {
-  switch (supportedChain) {
-    case SupportedChain.FABRIC:
+  switch (networkId.ledgerType) {
+    case LedgerType.Fabric2:
       return {
-        id: "dummyId",
+        id: networkId.id,
         name: "Hyperledger Fabric",
-        type: "fabric",
+        type: LedgerType.Fabric2,
         environment: "testnet",
       } as Integration;
-    case SupportedChain.BESU:
+    case LedgerType.Besu1X:
       return {
-        id: "dummyId",
+        id: networkId.id,
         name: "Hyperledger Besu",
-        type: "besu",
+        type: LedgerType.Besu1X,
+        environment: "testnet",
+      } as Integration;
+    case LedgerType.Besu2X:
+      return {
+        id: networkId.id,
+        name: "Hyperledger Besu",
+        type: LedgerType.Besu2X,
+        environment: "testnet",
+      } as Integration;
+    case LedgerType.Ethereum:
+      return {
+        id: networkId.id,
+        name: "Ethereum",
+        type: LedgerType.Ethereum,
         environment: "testnet",
       } as Integration;
     default:
-      throw new Error(`Unsupported chain: ${supportedChain}`);
+      throw new Error(`Unsupported chain: ${networkId.ledgerType}`);
   }
 }
