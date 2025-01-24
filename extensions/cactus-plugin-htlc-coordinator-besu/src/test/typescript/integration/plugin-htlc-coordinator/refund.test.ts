@@ -32,7 +32,6 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-  LoggerProvider,
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
@@ -44,15 +43,9 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import HashTimeLockJSON from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
 import TestTokenJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/DemoHelpers.json";
-import axios from "axios";
 
 describe("HTLC Coordinator Besu", () => {
   const logLevel: LogLevelDesc = "DEBUG";
-  const log = LoggerProvider.getOrCreate({
-    label:
-      "plugin-htlc-coordinator-besu-plugin-htlc-coordinator/refund.test.ts",
-    level: logLevel,
-  });
   const estimatedGas = 6721975;
   const expiration = 2147483648;
   const receiver = "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
@@ -312,22 +305,22 @@ describe("HTLC Coordinator Besu", () => {
       gas: estimatedGas,
     };
 
-    try {
-      await htlcCoordinatorBesuApiClient.withdrawCounterpartyV1(
-        withdrawCounterparty,
-      );
-    } catch (exp: unknown) {
-      log.debug("Caught error as expected: %o", exp);
-      if (axios.isAxiosError(exp) && exp.response) {
-        log.debug("Caught response: %o", exp.response.data);
-        const revertReason = exp.response.data.cause.receipt.revertReason;
-        const regExp = new RegExp(/0e494e56414c49445f5345435245540/);
-        expect(revertReason).toMatch(regExp);
-        // t.match(revertReason, regExp, rejectMsg);
-      } else {
-        throw exp;
-      }
-    }
+    const withdrawCall =
+      htlcCoordinatorBesuApiClient.withdrawCounterpartyV1(withdrawCounterparty);
+
+    await expect(withdrawCall).rejects.toMatchObject({
+      response: expect.objectContaining({
+        data: expect.objectContaining({
+          cause: expect.objectContaining({
+            receipt: expect.objectContaining({
+              revertReason: expect.stringMatching(
+                /0e494e56414c49445f5345435245540/,
+              ),
+            }),
+          }),
+        }),
+      }),
+    });
 
     const responseFinalBalanceReceiver = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,
