@@ -35,7 +35,6 @@ import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-he
 import fs from "fs-extra";
 import path from "path";
 import { expect } from "@jest/globals";
-import { SupportedChain } from "../../../main/typescript/core/types";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import bodyParser from "body-parser";
 import express from "express";
@@ -43,12 +42,17 @@ import http, { Server } from "http";
 import { AddressInfo } from "net";
 import { Asset } from "../../../main/typescript";
 import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { NetworkId } from "../../../main/typescript/network-identification/chainid-list";
 
 // Test environment for Fabric ledger operations
 export class FabricTestEnvironment {
   public static readonly FABRIC_ASSET_ID: string = uuidv4();
-
-  public readonly network: SupportedChain = SupportedChain.FABRIC;
+  public static readonly FABRIC_NETWORK_ID: string = "FABRIC";
+  public readonly network: NetworkId = {
+    id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+    ledgerType: LedgerType.Fabric2,
+  };
   public ledger!: FabricTestLedgerV1;
   public connectorOptions!: IPluginLedgerConnectorFabricOptions;
   public connector!: PluginLedgerConnectorFabric;

@@ -21,6 +21,7 @@ message NewSessionRequestMessage {
   bool error = 8;
   cacti.satp.v02.common.Error error_code = 9;
   cacti.satp.v02.common.MessageType message_type = 10;
+  string sender_gateway_network_type = 11;
 }
 
 message NewSessionResponseMessage {
@@ -34,6 +35,8 @@ message NewSessionResponseMessage {
   bool error = 8;
   cacti.satp.v02.common.Error error_code = 9;
   cacti.satp.v02.common.MessageType message_type = 10;
+  string receiver_gateway_network_type = 11;
+
 }
 
 message PreSATPTransferRequestMessage {
