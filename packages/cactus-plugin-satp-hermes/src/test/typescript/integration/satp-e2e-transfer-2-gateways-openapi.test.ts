@@ -20,13 +20,10 @@ import {
   PluginFactorySATPGateway,
   TransactRequest,
 } from "../../../main/typescript";
-import {
-  Address,
-  GatewayIdentity,
-  SupportedChain,
-} from "../../../main/typescript/core/types";
+import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
   IPluginFactoryOptions,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import {
@@ -153,7 +150,12 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      supportedDLTs: [SupportedChain.BESU],
+      connectedDLTs: [
+        {
+          id: BesuTestEnvironment.BESU_NETWORK_ID,
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
     } as GatewayIdentity;
@@ -170,7 +172,12 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      supportedDLTs: [SupportedChain.FABRIC],
+      connectedDLTs: [
+        {
+          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
       gatewayServerPort: 3110,
@@ -202,7 +209,12 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
               Crash: SATP_CRASH_VERSION,
             },
           ],
-          supportedDLTs: [SupportedChain.FABRIC],
+          connectedDLTs: [
+            {
+              id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+              ledgerType: LedgerType.Fabric2,
+            },
+          ],
           proofID: "mockProofID11",
           address: "http://localhost" as Address,
           gatewayServerPort: 3110,
@@ -236,7 +248,12 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
               Crash: SATP_CRASH_VERSION,
             },
           ],
-          supportedDLTs: [SupportedChain.BESU],
+          connectedDLTs: [
+            {
+              id: BesuTestEnvironment.BESU_NETWORK_ID,
+              ledgerType: LedgerType.Besu2X,
+            },
+          ],
           proofID: "mockProofID10",
           address: "http://localhost" as Address,
         },

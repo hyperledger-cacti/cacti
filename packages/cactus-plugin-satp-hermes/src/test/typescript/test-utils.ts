@@ -129,8 +129,8 @@ export function getTransactRequest(
 ): TransactRequest {
   return {
     contextID,
-    fromDLTNetworkID: from.network,
-    toDLTNetworkID: to.network,
+    fromDLTNetworkID: from.network.id,
+    toDLTNetworkID: to.network.id,
     fromAmount,
     toAmount,
     originatorPubkey: from.transactRequestPubKey,
