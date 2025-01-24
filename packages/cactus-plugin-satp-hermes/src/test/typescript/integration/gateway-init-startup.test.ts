@@ -24,12 +24,10 @@ import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugi
 import {
   Configuration,
   IPluginFactoryOptions,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import {
-  ShutdownHook,
-  SupportedChain,
-} from "./../../../main/typescript/core/types";
+import { ShutdownHook } from "./../../../main/typescript/core/types";
 import {
   DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -85,7 +83,7 @@ describe("SATPGateway initialization", () => {
         Crash: SATP_CRASH_VERSION,
       },
     ]);
-    expect(identity.supportedDLTs).toEqual([]);
+    expect(identity.connectedDLTs).toEqual([]);
     expect(identity.gatewayServerPort).toBe(DEFAULT_PORT_GATEWAY_SERVER);
     expect(identity.gatewayClientPort).toBe(DEFAULT_PORT_GATEWAY_CLIENT);
     expect(identity.gatewayOpenAPIPort).toBe(DEFAULT_PORT_GATEWAY_API);
@@ -105,7 +103,10 @@ describe("SATPGateway initialization", () => {
             Crash: "v1",
           },
         ],
-        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+        connectedDLTs: [
+          { id: "BESU", ledgerType: LedgerType.Besu2X },
+          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+        ],
         proofID: "mockProofID10",
         gatewayServerPort: 3010,
         address: "https://localhost",
@@ -128,9 +129,9 @@ describe("SATPGateway initialization", () => {
         Crash: "v1",
       },
     ]);
-    expect(identity.supportedDLTs).toEqual([
-      SupportedChain.FABRIC,
-      SupportedChain.BESU,
+    expect(identity.connectedDLTs).toEqual([
+      { id: "BESU", ledgerType: LedgerType.Besu2X },
+      { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
     ]);
     expect(identity.proofID).toBe("mockProofID10");
     expect(identity.gatewayServerPort).toBe(3010);
@@ -150,7 +151,10 @@ describe("SATPGateway initialization", () => {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+        connectedDLTs: [
+          { id: "BESU", ledgerType: LedgerType.Besu2X },
+          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+        ],
         proofID: "mockProofID10",
         address: "https://localhost",
       },
@@ -181,7 +185,10 @@ describe("SATPGateway initialization", () => {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+        connectedDLTs: [
+          { id: "BESU", ledgerType: LedgerType.Besu2X },
+          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+        ],
         proofID: "mockProofID10",
         gatewayServerPort: 3014,
         gatewayClientPort: 3015,
@@ -248,7 +255,7 @@ describe("SATPGateway startup", () => {
         Crash: SATP_CRASH_VERSION,
       },
     ]);
-    expect(identity.supportedDLTs).toEqual([]);
+    expect(identity.connectedDLTs).toEqual([]);
     expect(identity.gatewayServerPort).toBe(DEFAULT_PORT_GATEWAY_SERVER);
     expect(identity.gatewayClientPort).toBe(DEFAULT_PORT_GATEWAY_CLIENT);
     expect(identity.gatewayOpenAPIPort).toBe(DEFAULT_PORT_GATEWAY_API);
@@ -268,7 +275,10 @@ describe("SATPGateway startup", () => {
             Crash: "v1",
           },
         ],
-        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+        connectedDLTs: [
+          { id: "BESU", ledgerType: LedgerType.Besu2X },
+          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+        ],
         proofID: "mockProofID10",
         gatewayClientPort: 3001,
         address: "https://localhost",
@@ -291,9 +301,9 @@ describe("SATPGateway startup", () => {
         Crash: "v1",
       },
     ]);
-    expect(identity.supportedDLTs).toEqual([
-      SupportedChain.FABRIC,
-      SupportedChain.BESU,
+    expect(identity.connectedDLTs).toEqual([
+      { id: "BESU", ledgerType: LedgerType.Besu2X },
+      { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
     ]);
     expect(identity.proofID).toBe("mockProofID10");
     expect(identity.gatewayClientPort).toBe(3001);
@@ -313,7 +323,10 @@ describe("SATPGateway startup", () => {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+        connectedDLTs: [
+          { id: "BESU", ledgerType: LedgerType.Besu2X },
+          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
+        ],
         proofID: "mockProofID10",
         gatewayServerPort: 13010,
         gatewayClientPort: 13011,

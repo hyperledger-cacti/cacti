@@ -4,6 +4,8 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs-extra";
 import bodyParser from "body-parser";
+import { Knex, knex } from "knex";
+
 import {
   Logger,
   Checks,
@@ -50,11 +52,11 @@ import {
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import {
   IWebServiceEndpoint,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 import {
-  SupportedChain,
   GatewayIdentity,
   DraftVersions,
 } from "@hyperledger/cactus-plugin-satp-hermes/src/main/typescript/core/types";
@@ -79,8 +81,6 @@ import {
   knexTargetRemoteConnection as knexRemote2Connection,
 } from "../../../knex/knex.config";
 
-import { Knex, knex } from "knex";
-
 import {
   AdminApi,
   TransactionApi,
@@ -102,6 +102,8 @@ export class CbdcBridgingAppDummyInfrastructure {
   public static readonly FABRIC_ASSET_ID = "FabricAssetID";
   public static readonly BESU_ASSET_ID = "BesuAssetID";
   private static readonly FABRIC_CHANNEL_NAME = "mychannel";
+  private knexSourceRemoteInstance!: Knex<any, unknown[]>;
+  private knexTargetRemoteInstance!: Knex<any, unknown[]>;
 
   private readonly besu: BesuTestLedger;
   private readonly fabric: FabricTestLedgerV1;
@@ -216,6 +218,8 @@ export class CbdcBridgingAppDummyInfrastructure {
       await Promise.all([
         this.besu.stop().then(() => this.besu.destroy()),
         this.fabric.stop().then(() => this.fabric.destroy()),
+        this.knexSourceRemoteInstance?.destroy(),
+        this.knexTargetRemoteInstance?.destroy(),
       ]);
       this.log.info(`Stopped OK`);
     } catch (ex) {
@@ -404,7 +408,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       id: "fabric-satp-gateway-id",
       name: "Fabric SATP Gateway",
       version: this.draftVersions,
-      supportedDLTs: [SupportedChain.FABRIC],
+      connectedDLTs: [{ id: "FABRIC", ledgerType: LedgerType.Fabric2 }],
       proofID: "fabricGatewayProofID",
       address: `http://localhost`,
       gatewayServerPort: 3010,
@@ -416,7 +420,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       id: "besu-satp-gateway-id",
       name: "Besu SATP Gateway",
       version: this.draftVersions,
-      supportedDLTs: [SupportedChain.BESU],
+      connectedDLTs: [{ id: "BESU", ledgerType: LedgerType.Besu2X }],
       proofID: "besuGatewayProofID",
       address: `http://localhost`,
       gatewayServerPort: 3110,
@@ -441,7 +445,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     };
 
     const fabricConfig = {
-      network: SupportedChain.FABRIC,
+      network: { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
       signingCredential: {
         keychainId: CryptoMaterial.keychains.keychain2.id,
         keychainRef: CryptoMaterial.keychains.keychain2.ref,
@@ -454,7 +458,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     } as FabricConfig;
 
     const besuConfig = {
-      network: SupportedChain.BESU,
+      network: { id: "BESU", ledgerType: LedgerType.Besu2X },
       keychainId: CryptoMaterial.keychains.keychain2.id,
       signingCredential: {
         ethAccount: CryptoMaterial.accounts.bridge.ethAddress,
@@ -474,6 +478,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     const knexInstanceRemoteConnection: Knex = knex(knexRemote1Connection);
     await knexInstanceRemoteConnection.migrate.latest();
 
+    this.knexSourceRemoteInstance = knexInstanceGateway1;
     const besuGatewayOptions: SATPGatewayConfig = {
       logLevel: logLevel,
       gid: besuGatewayIdentity,
@@ -482,7 +487,7 @@ export class CbdcBridgingAppDummyInfrastructure {
           id: "fabric-satp-gateway-id",
           name: "Fabric SATP Gateway",
           version: this.draftVersions,
-          supportedDLTs: [SupportedChain.FABRIC],
+          connectedDLTs: [{ id: "FABRIC", ledgerType: LedgerType.Fabric2 }],
           proofID: "fabricGatewayProofID",
           address: `http://localhost`,
           gatewayServerPort: 3010,
@@ -503,6 +508,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     const knexInstanceRemoteConnection2: Knex = knex(knexRemote2Connection);
     await knexInstanceRemoteConnection2.migrate.latest();
 
+    this.knexTargetRemoteInstance = knexInstanceGateway2;
     const fabricGatewayOptions = {
       logLevel: logLevel,
       gid: fabricGatewayIdentity,
@@ -511,7 +517,7 @@ export class CbdcBridgingAppDummyInfrastructure {
           id: "besu-satp-gateway-id",
           name: "Besu SATP Gateway",
           version: this.draftVersions,
-          supportedDLTs: [SupportedChain.BESU],
+          connectedDLTs: [{ id: "BESU", ledgerType: LedgerType.Besu2X }],
           proofID: "besuGatewayProofID",
           address: `http://localhost`,
           gatewayServerPort: 3110,
@@ -526,6 +532,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       knexLocalConfig: knexGateway2Connection,
       knexRemoteConfig: knexRemote2Connection,
     };
+    this.stop
 
     const besuGateway = await this.gatewayFactory.create(besuGatewayOptions);
 
@@ -1250,7 +1257,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     if (sourceChain === "FABRIC") {
       senderAddress = this.getFabricId(sender);
       sourceAsset = this.setFabricAsset(senderAddress as string);
-      fromDLTNetworkID = "FabricSATPGateway";
+      fromDLTNetworkID = "FABRIC";
       api = this.fabricApiTransactApi;
     } else {
       senderAddress = this.getEthAddress(sender);
@@ -1258,19 +1265,19 @@ export class CbdcBridgingAppDummyInfrastructure {
         senderAddress as string,
         this.besuContractAddress!,
       );
-      fromDLTNetworkID = "BesuSATPGateway";
+      fromDLTNetworkID = "BESU";
       api = this.besuApiTransactApi;
     }
 
     if (destinationChain === "BESU") {
-      toDLTNetworkID = "BesuSATPGateway";
+      toDLTNetworkID = "BESU";
       receiverAddress = this.getEthAddress(recipient);
       receiverAsset = this.setBesuAsset(
         receiverAddress as string,
         this.besuContractAddress!,
       );
     } else {
-      toDLTNetworkID = "FabricSATPGateway";
+      toDLTNetworkID = "FABRIC";
       receiverAddress = this.getFabricId(recipient);
       receiverAsset = this.setFabricAsset(receiverAddress as string);
     }
