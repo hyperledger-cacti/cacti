@@ -12,11 +12,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
-import {
-  Address,
-  GatewayIdentity,
-  SupportedChain,
-} from "../../../main/typescript/core/types";
+import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
   createClient,
   setupGatewayDockerFiles,
@@ -39,6 +35,7 @@ import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp
 import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger/cactus-test-geth-ledger";
 import { Container } from "dockerode";
 import { Knex } from "knex";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -154,7 +151,16 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      supportedDLTs: [SupportedChain.FABRIC, SupportedChain.BESU],
+      connectedDLTs: [
+        {
+          id: BesuTestEnvironment.BESU_NETWORK_ID,
+          ledgerType: LedgerType.Besu2X,
+        },
+        {
+          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
       proofID: "mockProofID10",
       address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
@@ -324,7 +330,16 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      supportedDLTs: [SupportedChain.FABRIC, SupportedChain.EVM],
+      connectedDLTs: [
+        {
+          id: EthereumTestEnvironment.ETH_NETWORK_ID,
+          ledgerType: LedgerType.Ethereum,
+        },
+        {
+          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
+          ledgerType: LedgerType.Fabric2,
+        },
+      ],
       proofID: "mockProofID10",
       address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,

@@ -9,13 +9,13 @@ import {
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPManager } from "../../gol/satp-manager";
-import { SupportedChain } from "../../core/types";
 import {
   getSessionActualStage,
   getStageName,
   getStateName,
 } from "../../core/session-utils";
 import { State } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export async function executeGetStatus(
   logLevel: LogLevelDesc,
@@ -45,6 +45,32 @@ export async function executeGetStatus(
   }
 }
 
+function getNetworkDetails(
+  networkType: LedgerType,
+): Transact200ResponseStatusResponseOriginNetwork {
+  switch (networkType) {
+    case LedgerType.Besu2X:
+      return {
+        dltProtocol: "besu",
+        dltSubnetworkID: "v24.4.0-RC1",
+      };
+    case LedgerType.Fabric2:
+      return {
+        dltProtocol: "fabric",
+        dltSubnetworkID: "v2.0.0",
+      };
+    case LedgerType.Ethereum:
+      return {
+        dltProtocol: "ethereum",
+        dltSubnetworkID: "v24.4.0-RC1",
+      };
+    default:
+      return {
+        dltProtocol: "unknown",
+        dltSubnetworkID: "unknown",
+      };
+  }
+}
 // TODO call SATP core, use try catch to propagate errors
 export async function getStatusService(
   logLevel: LogLevelDesc,
@@ -80,41 +106,10 @@ export async function getStatusService(
     StatusResponseSubstatusEnum.Completed;
   const startTime =
     sessionData.receivedTimestamps?.stage0?.newSessionRequestMessageTimestamp;
-  let originNetwork: Transact200ResponseStatusResponseOriginNetwork;
-  let destinationNetwork: Transact200ResponseStatusResponseOriginNetwork;
-  if (sessionData.senderGatewayNetworkId === SupportedChain.BESU) {
-    originNetwork = {
-      dltProtocol: "besu",
-      dltSubnetworkID: "v24.4.0-RC1",
-    };
-  } else if (sessionData.senderGatewayNetworkId === SupportedChain.FABRIC) {
-    originNetwork = {
-      dltProtocol: "fabric",
-      dltSubnetworkID: "v2.0.0",
-    };
-  } else {
-    originNetwork = {
-      dltProtocol: "ethereum",
-      dltSubnetworkID: "v24.4.0-RC1",
-    };
-  }
-
-  if (sessionData.recipientGatewayNetworkId === SupportedChain.BESU) {
-    destinationNetwork = {
-      dltProtocol: "besu",
-      dltSubnetworkID: "v24.4.0-RC1",
-    };
-  } else if (sessionData.recipientGatewayNetworkId === SupportedChain.FABRIC) {
-    destinationNetwork = {
-      dltProtocol: "fabric",
-      dltSubnetworkID: "v2.0.0",
-    };
-  } else {
-    destinationNetwork = {
-      dltProtocol: "ethereum",
-      dltSubnetworkID: "v24.4.0-RC1",
-    };
-  }
+  const originNetwork: Transact200ResponseStatusResponseOriginNetwork =
+    getNetworkDetails(sessionData.senderGatewayNetworkType as LedgerType);
+  const destinationNetwork: Transact200ResponseStatusResponseOriginNetwork =
+    getNetworkDetails(sessionData.recipientGatewayNetworkType as LedgerType);
   if (!sessionData.hashes) {
     return {
       status: StatusResponseStatusEnum.Invalid,

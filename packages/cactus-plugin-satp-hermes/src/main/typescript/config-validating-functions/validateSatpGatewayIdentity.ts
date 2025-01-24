@@ -1,10 +1,11 @@
+import { LedgerType } from "@hyperledger/cactus-core-api";
 import {
   Address,
   CurrentDrafts,
   DraftVersions,
   GatewayIdentity,
-  SupportedChain,
 } from "../core/types";
+import { NetworkId } from "../network-identification/chainid-list";
 
 // Type guard for Address
 function isAddress(input: unknown): input is Address {
@@ -42,18 +43,36 @@ function isPrivacyDraftVersionsArray(
   return Array.isArray(input) && input.every(isDraftVersions);
 }
 
-// Type guard for SupportedChain
-export function isSupportedChain(obj: unknown): obj is SupportedChain {
-  return (
-    typeof obj === "string" &&
-    obj !== null &&
-    Object.values(SupportedChain).includes(obj as SupportedChain)
-  );
+// Type guard for NetworkId
+export function isNetworkId(obj: unknown): obj is NetworkId {
+  try {
+    return (
+      typeof obj === "object" &&
+      obj !== null &&
+      "ledgerType" in obj &&
+      "id" in obj &&
+      typeof obj.id === "string" &&
+      Object.values(LedgerType).includes(obj.ledgerType as LedgerType)
+    );
+  } catch (error) {
+    return false;
+  }
 }
 
-// Type guard for an array of SupportedChain
-function isSupportedChainArray(input: unknown): input is Array<SupportedChain> {
-  return Array.isArray(input) && input.every(isSupportedChain);
+export function isSupportedDLT(obj: unknown): obj is LedgerType {
+  try {
+    return Object.values(LedgerType).includes(obj as LedgerType);
+  } catch (error) {
+    return false;
+  }
+}
+
+// Type guard for an array of NetworkId
+function isNetworkIdArray(input: unknown): input is Array<NetworkId> {
+  return Array.isArray(input) && input.every(isNetworkId);
+}
+function isSupportedDLTsArray(input: unknown): input is Array<NetworkId> {
+  return Array.isArray(input) && input.every(isSupportedDLT);
 }
 
 // Type guard for GatewayIdentity
@@ -65,8 +84,10 @@ export function isGatewayIdentity(obj: unknown): obj is GatewayIdentity {
     typeof (obj as Record<string, unknown>).id === "string" &&
     "version" in obj &&
     isPrivacyDraftVersionsArray((obj as Record<string, unknown>).version) &&
-    "supportedDLTs" in obj &&
-    isSupportedChainArray((obj as Record<string, unknown>).supportedDLTs) &&
+    "connectedDLTs" in obj &&
+    isNetworkIdArray((obj as Record<string, unknown>).connectedDLTs) &&
+    (!("supportedDLTs" in obj) ||
+      isSupportedDLTsArray((obj as Record<string, unknown>).supportedDLTs)) &&
     (!("pubKey" in obj) ||
       typeof (obj as Record<string, unknown>).pubKey === "string") &&
     (!("name" in obj) ||

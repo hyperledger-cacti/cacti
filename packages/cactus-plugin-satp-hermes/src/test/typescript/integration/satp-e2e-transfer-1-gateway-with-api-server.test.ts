@@ -1,5 +1,10 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  LoggerProvider,
+  Servers,
+} from "@hyperledger/cactus-common";
+import { v4 as uuidv4 } from "uuid";
 import { FabricContractInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import {
   pruneDockerAllIfGithubAction,
@@ -13,6 +18,8 @@ import {
   SATPGatewayConfig,
   SATPGateway,
   PluginFactorySATPGateway,
+  TransactionApi,
+  Configuration,
 } from "../../../main/typescript";
 import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
@@ -23,6 +30,7 @@ import {
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   BesuTestEnvironment,
+  EthereumTestEnvironment,
   FabricTestEnvironment,
   getTransactRequest,
 } from "../test-utils";
@@ -35,35 +43,33 @@ import {
   knexClientConnection,
   knexSourceRemoteConnection,
 } from "../knex.config";
-import { Knex, knex } from "knex";
+import { knex } from "knex";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { AddressInfo } from "net";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "SATP - Hermes",
+  label: "BUNGEE - Hermes",
 });
-
-let knexInstanceClient: Knex;
-let knexSourceRemoteInstance: Knex;
-let fabricEnv: FabricTestEnvironment;
+let apiServer: ApiServer;
 let besuEnv: BesuTestEnvironment;
-let gateway: SATPGateway;
+let ethereumEnv: EthereumTestEnvironment;
+let fabricEnv: FabricTestEnvironment;
+const erc20TokenContract = "SATPContract";
+const contractNameWrapper = "SATPWrapperContract";
 const bridge_id =
   "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
 afterAll(async () => {
-  await gateway.shutdown();
-
-  if (gateway) {
-    if (knexInstanceClient) {
-      await knexInstanceClient.destroy();
-    }
-    if (knexSourceRemoteInstance) {
-      await knexSourceRemoteInstance.destroy();
-    }
-    await gateway.shutdown();
-  }
   await besuEnv.tearDown();
+  await ethereumEnv.tearDown();
   await fabricEnv.tearDown();
 
   await pruneDockerAllIfGithubAction({ logLevel })
@@ -95,13 +101,10 @@ beforeAll(async () => {
     );
     log.info("Fabric Ledger started successfully");
 
-    await fabricEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+    await fabricEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   }
 
   {
-    const erc20TokenContract = "SATPContract";
-    const contractNameWrapper = "SATPWrapperContract";
-
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
       erc20TokenContract,
       contractNameWrapper,
@@ -109,7 +112,16 @@ beforeAll(async () => {
     );
     log.info("Besu Ledger started successfully");
 
-    await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+    await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
+  }
+  {
+    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+      erc20TokenContract,
+      contractNameWrapper,
+      logLevel,
+    );
+    log.info("Ethereum Ledger started successfully");
+    await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
 });
 
@@ -145,10 +157,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       address: "http://localhost" as Address,
     } as GatewayIdentity;
 
-    knexInstanceClient = knex(knexClientConnection);
+    const knexInstanceClient = knex(knexClientConnection);
     await knexInstanceClient.migrate.latest();
 
-    knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
+    const knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();
 
     const options: SATPGatewayConfig = {
@@ -159,19 +171,54 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       knexLocalConfig: knexClientConnection,
       knexRemoteConfig: knexSourceRemoteConnection,
     };
-    gateway = await factory.create(options);
+    const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
+    await gateway.onPluginInit();
 
     const identity = gateway.Identity;
     // default servers
     expect(identity.gatewayServerPort).toBe(3010);
     expect(identity.gatewayClientPort).toBe(3011);
     expect(identity.address).toBe("http://localhost");
-    await gateway.startup();
 
-    const dispatcher = gateway.getBLODispatcher();
+    const httpApiA = await Servers.startOnPort(4111, "localhost");
+    const addressInfoA = httpApiA.address() as AddressInfo;
+    const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
+    const clientPluginRegistry = new PluginRegistry({
+      plugins: [
+        new PluginKeychainMemory({
+          keychainId: uuidv4(),
+          instanceId: uuidv4(),
+          logLevel: "INFO",
+        }),
+      ],
+    });
 
-    expect(dispatcher).toBeTruthy();
+    clientPluginRegistry.add(gateway);
+
+    const addressInfoApi = httpApiA.address() as AddressInfo;
+
+    const configService = new ConfigService();
+    const apiServerOptions = await configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiServerOptions.configFile = "";
+    apiServerOptions.apiCorsDomainCsv = "*";
+    apiServerOptions.apiPort = addressInfoApi.port;
+    apiServerOptions.apiHost = addressInfoApi.address;
+    apiServerOptions.logLevel = logLevel || "INFO";
+    apiServerOptions.apiTlsEnabled = false;
+    apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
+    const prop = config.getProperties();
+    apiServer = new ApiServer({
+      httpServerApi: httpApiA,
+      config: prop,
+      pluginRegistry: clientPluginRegistry,
+    });
+    await apiServer.start();
+
     const req = getTransactRequest(
       "mockContext",
       besuEnv,
@@ -179,9 +226,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       "100",
       "1",
     );
-
-    const res = await dispatcher?.Transact(req);
-    log.info(res?.statusResponse);
+    const satpApi = new TransactionApi(
+      new Configuration({ basePath: nodeApiHostA }),
+    );
+    const res = await satpApi.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
 
     const responseBalanceOwner = await besuEnv.connector.invokeContract({
       contractName: besuEnv.erc20TokenContract,
@@ -249,5 +299,15 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     expect(responseBalance2.data).not.toBeUndefined();
     expect(responseBalance2.data.functionOutput).toBe("1");
     log.info("Amount was transfer correctly to the Owner account");
+    if (gateway) {
+      if (knexInstanceClient) {
+        await knexInstanceClient.destroy();
+      }
+      if (knexSourceRemoteInstance) {
+        await knexSourceRemoteInstance.destroy();
+      }
+    }
+    await gateway.shutdown();
+    await apiServer.shutdown();
   });
 });
