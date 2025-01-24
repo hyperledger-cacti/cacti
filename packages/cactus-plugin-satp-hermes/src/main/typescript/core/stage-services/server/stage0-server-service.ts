@@ -154,7 +154,12 @@ export class Stage0ServerService extends SATPService {
     newSessionData.senderGatewayNetworkId = request.senderGatewayNetworkId;
     newSessionData.recipientGatewayNetworkId =
       request.recipientGatewayNetworkId;
-
+    newSessionData.senderGatewayNetworkType = request.senderGatewayNetworkType;
+    const bridge = this.bridgeManager.getBridge(
+      newSessionData.recipientGatewayNetworkId,
+    );
+    newSessionData.recipientGatewayNetworkType =
+      bridge.getNetworkType() as string;
     saveSignature(
       newSessionData,
       MessageType.NEW_SESSION_REQUEST,
@@ -313,6 +318,7 @@ export class Stage0ServerService extends SATPService {
         contextId: sessionData.transferContextId,
         recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
         senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
+        receiverGatewayNetworkType: sessionData.recipientGatewayNetworkType,
         messageType: MessageType.NEW_SESSION_RESPONSE,
         hashPreviousMessage: getMessageHash(
           sessionData,

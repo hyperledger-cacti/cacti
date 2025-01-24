@@ -3,15 +3,13 @@ import {
   AssetSchema as ProtoAssetSchema,
   Asset as ProtoAsset,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
-import { SupportedChain } from "../types";
 import { Asset } from "./satp-bridge/types/asset";
 import { EvmAsset } from "./satp-bridge/types/evm-asset";
 import { FabricAsset } from "./satp-bridge/types/fabric-asset";
+import { NetworkId } from "../../network-identification/chainid-list";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
-export function assetToProto(
-  asset: Asset,
-  networkId: SupportedChain,
-): ProtoAsset {
+export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
   const protoAsset = create(ProtoAssetSchema, {
     tokenId: asset.tokenId,
     tokenType: asset.tokenType,
@@ -19,23 +17,27 @@ export function assetToProto(
     amount: BigInt(asset.amount),
   });
 
-  switch (networkId) {
-    case SupportedChain.BESU:
+  switch (networkId.ledgerType) {
+    case LedgerType.Besu1X:
       protoAsset.contractAddress = (asset as EvmAsset).contractAddress;
       break;
-    case SupportedChain.EVM:
+    case LedgerType.Besu2X:
       protoAsset.contractAddress = (asset as EvmAsset).contractAddress;
       break;
-    case SupportedChain.FABRIC:
+    case LedgerType.Ethereum:
+      protoAsset.contractAddress = (asset as EvmAsset).contractAddress;
+      break;
+    case LedgerType.Fabric2:
       protoAsset.mspId = (asset as FabricAsset).mspId;
       protoAsset.channelName = (asset as FabricAsset).channelName;
       break;
     default:
-      throw new Error(`Unsupported networkId: ${networkId}`);
+      throw new Error(`Unsupported networkId: ${networkId.ledgerType}`);
   }
   return protoAsset;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function protoToAsset(asset: ProtoAsset, networkId: string): Asset {
   const assetObj: Asset = {
     tokenId: asset.tokenId,
@@ -45,21 +47,14 @@ export function protoToAsset(asset: ProtoAsset, networkId: string): Asset {
     ontology: asset.ontology,
     contractName: asset.contractName,
   };
-
-  switch (networkId) {
-    case SupportedChain.EVM:
-      (assetObj as EvmAsset).contractAddress = asset.contractAddress;
-      break;
-    case SupportedChain.BESU:
-      (assetObj as EvmAsset).contractAddress = asset.contractAddress;
-      break;
-    case SupportedChain.FABRIC:
-      (assetObj as FabricAsset).mspId = asset.mspId;
-      (assetObj as FabricAsset).channelName = asset.channelName;
-      break;
-    default:
-      throw new Error(`Unsupported networkId: ${networkId}`);
+  if (asset.mspId) {
+    (assetObj as FabricAsset).mspId = asset.mspId;
+    (assetObj as FabricAsset).channelName = asset.channelName;
   }
+  if (asset.contractAddress) {
+    (assetObj as EvmAsset).contractAddress = asset.contractAddress;
+  }
+
   return assetObj;
 }
 
