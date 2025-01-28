@@ -15,6 +15,9 @@ export class LoggerProvider {
     if (!logger) {
       logger = new Logger(loggerOptions);
       LoggerProvider.loggers.set(loggerOptions.label, logger);
+    } else if (loggerOptions.stream) {
+      // Dynamically update the logger with a new stream if provided
+      logger["stream"] = loggerOptions.stream;
     }
     return logger;
   }
