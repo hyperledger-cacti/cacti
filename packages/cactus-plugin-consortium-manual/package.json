@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@types/express": "5.0.0",
-    "@types/json-stable-stringify": "1.0.34",
+    "@types/json-stable-stringify": "1.0.33",
     "@types/uuid": "10.0.0"
   },
   "engines": {
