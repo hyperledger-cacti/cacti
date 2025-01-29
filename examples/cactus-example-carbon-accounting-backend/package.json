@@ -76,7 +76,7 @@
   "devDependencies": {
     "@types/express": "5.0.0",
     "@types/fs-extra": "11.0.4",
-    "@types/json-stable-stringify": "1.0.34",
+    "@types/json-stable-stringify": "1.0.33",
     "@types/qs": "6.9.14",
     "@types/uuid": "10.0.0",
     "express-jwt": "8.4.1",

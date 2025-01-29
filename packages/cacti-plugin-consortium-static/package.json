@@ -75,7 +75,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/express": "5.0.0",
-    "@types/json-stable-stringify": "1.0.33",
+    "@types/json-stable-stringify": "1.2.0",
     "@types/uuid": "10.0.0",
     "web3": "1.6.1"
   },
