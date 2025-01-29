@@ -204,7 +204,7 @@
     "replace": "1.2.2",
     "run-time-error": "1.4.0",
     "run-time-error-cjs": "1.4.0",
-    "secp256k1": "4.0.4",
+    "secp256k1": "5.0.1",
     "semver-parser": "4.1.4",
     "shebang-loader": "0.0.1",
     "simple-git": "3.19.1",
@@ -223,7 +223,7 @@
     "web3-core": "4.1.1",
     "web3-eth": "4.1.1",
     "web3-utils": "4.3.0",
-    "webpack": "5.96.0",
+    "webpack": "5.96.1",
     "webpack-cli": "4.10.0",
     "wget-improved": "3.4.0",
     "yargs": "17.7.2"

@@ -8863,13 +8863,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:1.12.4":
-  version: 1.12.4
-  resolution: "@grpc/grpc-js@npm:1.12.4"
+"@grpc/grpc-js@npm:1.12.5":
+  version: 1.12.5
+  resolution: "@grpc/grpc-js@npm:1.12.5"
   dependencies:
     "@grpc/proto-loader": "npm:^0.7.13"
     "@js-sdsl/ordered-map": "npm:^4.4.2"
-  checksum: 10/b4cb9390e4b2c26cbdd831837513029f0e885de17cfc54f3518e9c49184e5d1978b3d1d2ea3022238bf58c22436a778af62521d59d9e898b133452ea8b2b4db0
+  checksum: 10/4f8ead236dcab4d94e15e62d65ad2d93732d37f5cc52ffafe67ae00f69eae4a4c97d6d34a1b9eac9f30206468f2d15302ea6649afcba1d38929afa9d1e7c12d5
   languageName: node
   linkType: hard
 
@@ -9169,7 +9169,7 @@ __metadata:
     "@types/react": "npm:^18.2.39"
     "@types/react-dom": "npm:^18.2.17"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-scripts: "npm:5.0.1"
@@ -9196,7 +9196,7 @@ __metadata:
     "@types/react-dom": "npm:18.2.17"
     "@vitejs/plugin-react": "npm:4.2.1"
     apexcharts: "npm:3.45.2"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     buffer: "npm:6.0.3"
     ethers: "npm:6.12.1"
     react: "npm:18.2.0"
@@ -9204,7 +9204,7 @@ __metadata:
     react-dom: "npm:18.2.0"
     react-router-dom: "npm:6.21.3"
     typescript: "npm:5.5.2"
-    vite: "npm:5.4.11"
+    vite: "npm:5.4.12"
     web3: "npm:4.1.1"
   languageName: unknown
   linkType: soft
@@ -9223,7 +9223,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -9250,7 +9250,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -9332,7 +9332,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-driver-fabric@workspace:weaver/core/drivers/fabric-driver"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.1.0"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.1.0"
     "@types/node": "npm:18.11.9"
@@ -9354,7 +9354,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-fabric-cli@workspace:weaver/samples/fabric/fabric-cli"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.1.0"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.1.0"
@@ -9386,7 +9386,7 @@ __metadata:
   resolution: "@hyperledger/cacti-weaver-iin-agent@workspace:weaver/core/identity-management/iin-agent"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.1.0"
     "@hyperledger/cacti-weaver-sdk-fabric": "npm:2.1.0"
     "@types/jsrsasign": "npm:10.5.11"
@@ -9417,7 +9417,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-protos-js@workspace:weaver/common/protos-js"
   dependencies:
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@grpc/proto-loader": "npm:0.7.13"
     "@types/node": "npm:18.19.0"
     google-protobuf: "npm:3.21.4"
@@ -9452,7 +9452,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-sdk-fabric@workspace:weaver/sdks/fabric/interoperation-node-sdk"
   dependencies:
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cacti-weaver-protos-js": "npm:2.1.0"
     "@types/node": "npm:18.11.9"
@@ -9512,7 +9512,7 @@ __metadata:
     "@connectrpc/connect-fastify": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cactus-common": "npm:2.1.0"
     "@hyperledger/cactus-core": "npm:2.1.0"
@@ -9542,7 +9542,7 @@ __metadata:
     "@types/xml2js": "npm:0.4.9"
     "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     benchmark: "npm:2.1.4"
     bluebird: "npm:3.7.2"
     body-parser: "npm:1.20.3"
@@ -9641,7 +9641,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-common@workspace:packages/cactus-common"
   dependencies:
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/secp256k1": "npm:4.0.3"
@@ -9653,7 +9653,7 @@ __metadata:
     loglevel-plugin-prefix: "npm:0.8.4"
     run-time-error-cjs: "npm:1.4.0"
     sanitize-html: "npm:2.12.1"
-    secp256k1: "npm:4.0.4"
+    secp256k1: "npm:5.0.1"
     sha3: "npm:2.1.4"
     uuid: "npm:10.0.0"
   languageName: unknown
@@ -9665,7 +9665,7 @@ __metadata:
   dependencies:
     "@bufbuild/protobuf": "npm:1.10.0"
     "@connectrpc/connect": "npm:1.4.0"
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@grpc/proto-loader": "npm:0.7.13"
     "@hyperledger/cactus-common": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
@@ -9673,7 +9673,7 @@ __metadata:
     ajv: "npm:8.17.1"
     ajv-draft-04: "npm:1.0.0"
     ajv-formats: "npm:3.0.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
@@ -9763,7 +9763,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     express: "npm:4.21.2"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
@@ -9837,7 +9837,7 @@ __metadata:
     "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     crypto-js: "npm:4.2.0"
     cucumber: "npm:5.0.3"
     dotenv: "npm:16.0.1"
@@ -9875,7 +9875,7 @@ __metadata:
     "@hyperledger/aries-askar-nodejs": "npm:0.2.0"
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.0"
     "@types/inquirer": "npm:8.2.6"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     inquirer: "npm:8.2.6"
     loglevel: "npm:1.8.1"
   bin:
@@ -9903,7 +9903,7 @@ __metadata:
     "@types/jsrsasign": "npm:10.5.8"
     "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     cookie-parser: "npm:1.4.6"
     debug: "npm:3.1.0"
@@ -9987,7 +9987,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     dotenv: "npm:16.0.0"
     express: "npm:4.21.2"
     express-jwt: "npm:8.4.1"
@@ -10018,7 +10018,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     express: "npm:4.21.2"
     openapi-types: "npm:12.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -10091,7 +10091,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     fabric-network: "npm:2.2.20"
@@ -10146,7 +10146,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/json-stable-stringify": "npm:1.0.34"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     jose: "npm:4.15.5"
@@ -10172,7 +10172,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     fast-safe-stringify: "npm:2.1.1"
@@ -10198,7 +10198,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     express: "npm:4.21.2"
     joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
@@ -10217,7 +10217,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     bn.js: "npm:5.2.1"
     dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
@@ -10244,7 +10244,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
     aws-sdk: "npm:2.965.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     http-status-codes: "npm:2.3.0"
@@ -10269,7 +10269,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
     "@types/request": "npm:2.48.7"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     http-status-codes: "npm:2.1.4"
@@ -10293,7 +10293,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     google-gax: "npm:4.0.5"
@@ -10314,7 +10314,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     cpy-cli: "npm:4.2.0"
     del-cli: "npm:5.1.0"
@@ -10338,7 +10338,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     npm-run-all2: "npm:6.1.2"
@@ -10362,7 +10362,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/tape-promise": "npm:4.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     http-status-codes: "npm:2.1.4"
@@ -10395,7 +10395,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     jest: "npm:29.6.2"
@@ -10411,7 +10411,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu"
   dependencies:
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@hyperledger/cactus-common": "npm:2.1.0"
     "@hyperledger/cactus-core": "npm:2.1.0"
     "@hyperledger/cactus-core-api": "npm:2.1.0"
@@ -10425,7 +10425,7 @@ __metadata:
     "@types/google-protobuf": "npm:3.15.5"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     benchmark: "npm:2.1.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
@@ -10469,7 +10469,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/node": "npm:18.11.9"
     "@types/sanitize-html": "npm:2.6.2"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     jest-extended: "npm:4.0.1"
@@ -10491,7 +10491,7 @@ __metadata:
     "@types/multer": "npm:1.4.7"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     express-openapi-validator: "npm:5.2.0"
@@ -10527,7 +10527,7 @@ __metadata:
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     chalk: "npm:4.1.2"
     ethers: "npm:6.8.1"
@@ -10573,8 +10573,8 @@ __metadata:
     "@types/sanitize-html": "npm:2.9.5"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
-    bl: "npm:6.0.16"
+    axios: "npm:1.7.4"
+    bl: "npm:6.0.17"
     bn.js: "npm:4.12.0"
     body-parser: "npm:1.20.3"
     elliptic: "npm:6.6.0"
@@ -10600,7 +10600,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     sanitize-filename: "npm:1.6.3"
     sanitize-html: "npm:2.12.1"
-    secp256k1: "npm:4.0.4"
+    secp256k1: "npm:5.0.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     temp: "npm:0.9.4"
@@ -10626,7 +10626,7 @@ __metadata:
     "@iroha2/data-model": "npm:4.0.0"
     "@types/express": "npm:5.0.0"
     "@types/sanitize-html": "npm:2.9.5"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     fast-safe-stringify: "npm:2.1.1"
@@ -10637,7 +10637,7 @@ __metadata:
     sanitize-html: "npm:2.12.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    undici: "npm:6.21.0"
+    undici: "npm:6.21.1"
     uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
@@ -10663,8 +10663,8 @@ __metadata:
     "@types/supertest": "npm:2.0.11"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
-    bl: "npm:6.0.16"
+    axios: "npm:1.7.4"
+    bl: "npm:6.0.17"
     express: "npm:4.21.2"
     express-openapi-validator: "npm:5.2.0"
     form-data: "npm:4.0.0"
@@ -10695,7 +10695,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     cbor: "npm:9.0.1"
     express: "npm:4.21.2"
@@ -10717,7 +10717,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     joi: "npm:17.13.3"
@@ -10745,7 +10745,7 @@ __metadata:
     "@multiformats/multiaddr": "npm:11.6.1"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     ipfs-core-types: "npm:0.14.1"
@@ -10776,7 +10776,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     jest-extended: "npm:4.0.1"
@@ -10808,7 +10808,7 @@ __metadata:
     "@types/express": "npm:5.0.0"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     fabric-network: "npm:2.5.0-snapshot.23"
@@ -10840,7 +10840,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     crypto-js: "npm:4.2.0"
     express: "npm:4.21.2"
@@ -10848,7 +10848,7 @@ __metadata:
     fs-extra: "npm:11.2.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.1"
-    secp256k1: "npm:4.0.4"
+    secp256k1: "npm:5.0.1"
     socket.io: "npm:4.6.2"
     sqlite3: "npm:5.1.5"
     typescript: "npm:5.5.2"
@@ -10921,7 +10921,7 @@ __metadata:
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.1.0"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     jose: "npm:4.15.5"
     uuid: "npm:10.0.0"
   languageName: unknown
@@ -10942,7 +10942,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     uuid: "npm:10.0.0"
@@ -10966,7 +10966,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     body-parser: "npm:1.20.3"
     express: "npm:4.21.2"
     key-encoder: "npm:2.0.3"
@@ -10997,7 +10997,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-test-plugin-ledger-connector-besu@workspace:packages/cactus-test-plugin-ledger-connector-besu"
   dependencies:
-    "@grpc/grpc-js": "npm:1.12.4"
+    "@grpc/grpc-js": "npm:1.12.5"
     "@hyperledger/cactus-cmd-api-server": "npm:2.1.0"
     "@hyperledger/cactus-common": "npm:2.1.0"
     "@hyperledger/cactus-core": "npm:2.1.0"
@@ -11008,7 +11008,7 @@ __metadata:
     "@hyperledger/cactus-verifier-client": "npm:2.1.0"
     "@types/express": "npm:5.0.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     express: "npm:4.21.2"
     http-status-codes: "npm:2.3.0"
     key-encoder: "npm:2.0.3"
@@ -11064,7 +11064,7 @@ __metadata:
     "@types/ssh2-streams": "npm:0.1.9"
     "@types/tar-stream": "npm:2.2.1"
     "@types/temp": "npm:0.9.1"
-    axios: "npm:1.7.9"
+    axios: "npm:1.7.4"
     compare-versions: "npm:3.6.0"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.0"
@@ -11256,7 +11256,7 @@ __metadata:
     replace: "npm:1.2.2"
     run-time-error: "npm:1.4.0"
     run-time-error-cjs: "npm:1.4.0"
-    secp256k1: "npm:4.0.4"
+    secp256k1: "npm:5.0.1"
     semver-parser: "npm:4.1.4"
     shebang-loader: "npm:0.0.1"
     simple-git: "npm:3.19.1"
@@ -11275,7 +11275,7 @@ __metadata:
     web3-core: "npm:4.1.1"
     web3-eth: "npm:4.1.1"
     web3-utils: "npm:4.3.0"
-    webpack: "npm:5.96.0"
+    webpack: "npm:5.96.1"
     webpack-cli: "npm:4.10.0"
     wget-improved: "npm:3.4.0"
     yargs: "npm:17.7.2"
@@ -16885,6 +16885,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/eslint-scope@npm:^3.7.7":
+  version: 3.7.7
+  resolution: "@types/eslint-scope@npm:3.7.7"
+  dependencies:
+    "@types/eslint": "npm:*"
+    "@types/estree": "npm:*"
+  checksum: 10/e2889a124aaab0b89af1bab5959847c5bec09809209255de0e63b9f54c629a94781daa04adb66bffcdd742f5e25a17614fb933965093c0eea64aacda4309380e
+  languageName: node
+  linkType: hard
+
 "@types/eslint@npm:*":
   version: 8.4.1
   resolution: "@types/eslint@npm:8.4.1"
@@ -21489,15 +21499,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bl@npm:6.0.16":
-  version: 6.0.16
-  resolution: "bl@npm:6.0.16"
+"bl@npm:6.0.17":
+  version: 6.0.17
+  resolution: "bl@npm:6.0.17"
   dependencies:
     "@types/readable-stream": "npm:^4.0.0"
     buffer: "npm:^6.0.3"
     inherits: "npm:^2.0.4"
     readable-stream: "npm:^4.2.0"
-  checksum: 10/6c4e5c01205b60263149ee37b896d078a9ae2302eabe52f0fdbc67f8ef6be46cae989e1711a53424a1db765bcc23a657e18909e5c63c8df20034e4da6601fe5d
+  checksum: 10/ad6157011dc78581dc6188a56ffd98550a4a9e29d53dea802e03721d1ec31f055e5e46449945fe71c9c93b08a9a7751d7d7338039cb7d261a3766480ed84593f
   languageName: node
   linkType: hard
 
@@ -26751,8 +26761,8 @@ __metadata:
   linkType: hard
 
 "elliptic@npm:>=6.5.7":
-  version: 6.5.7
-  resolution: "elliptic@npm:6.5.7"
+  version: 6.6.1
+  resolution: "elliptic@npm:6.6.1"
   dependencies:
     bn.js: "npm:^4.11.9"
     brorand: "npm:^1.1.0"
@@ -26761,7 +26771,7 @@ __metadata:
     inherits: "npm:^2.0.4"
     minimalistic-assert: "npm:^1.0.1"
     minimalistic-crypto-utils: "npm:^1.0.1"
-  checksum: 10/fbad1fad0a5cc07df83f80cc1f7a784247ef59075194d3e340eaeb2f4dd594825ee24c7e9b0cf279c9f1982efe610503bb3139737926428c4821d4fca1bcf348
+  checksum: 10/dc678c9febd89a219c4008ba3a9abb82237be853d9fd171cd602c8fb5ec39927e65c6b5e7a1b2a4ea82ee8e0ded72275e7932bb2da04a5790c2638b818e4e1c5
   languageName: node
   linkType: hard
 
@@ -48024,15 +48034,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"secp256k1@npm:4.0.4":
-  version: 4.0.4
-  resolution: "secp256k1@npm:4.0.4"
+"secp256k1@npm:5.0.1":
+  version: 5.0.1
+  resolution: "secp256k1@npm:5.0.1"
   dependencies:
     elliptic: "npm:^6.5.7"
     node-addon-api: "npm:^5.0.0"
     node-gyp: "npm:latest"
     node-gyp-build: "npm:^4.2.0"
-  checksum: 10/45000f348c853df7c1e2b67c48efb062ae78c0620ab1a5cfb02fa20d3aad39c641f4e7a18b3de3b54a7c0cc1e0addeb8ecd9d88bc332e92df17a92b60c36122a
+  checksum: 10/63fbd35624be4fd9cf3d39e5f79c5471b4a8aea6944453b2bea7b100bb1c77a25c55e6e08e2210cdabdf478c4c62d34c408b34214f2afd9367e19a52a3a4236c
   languageName: node
   linkType: hard
 
@@ -52550,10 +52560,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:6.21.0":
-  version: 6.21.0
-  resolution: "undici@npm:6.21.0"
-  checksum: 10/c8ff80dcadfcf613e7fe697c37519fca070fcf1cfccc69ffb6a7080a22e225eb79d232e9f70e32b099b3e67ac4216e8fd615e188cfb792e09df9233471ec17e0
+"undici@npm:6.21.1":
+  version: 6.21.1
+  resolution: "undici@npm:6.21.1"
+  checksum: 10/eeccc07e9073ae8e755fdc0dc8cdfaa426c01ec6f815425c3ecedba2e5394cea4993962c040dd168951714a82f0d001a13018c3ae3ad4534f0fa97afe425c08d
   languageName: node
   linkType: hard
 
@@ -56006,10 +56016,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.96.0":
-  version: 5.96.0
-  resolution: "webpack@npm:5.96.0"
+"webpack@npm:5.96.1":
+  version: 5.96.1
+  resolution: "webpack@npm:5.96.1"
   dependencies:
+    "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.6"
     "@webassemblyjs/ast": "npm:^1.12.1"
     "@webassemblyjs/wasm-edit": "npm:^1.12.1"
@@ -56037,7 +56048,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/b9a34539450c51d069d37fed89569f8115516d731326153251a636b25811c3860f972b4d14a4bb1b887be2a41812d4c2a15f3f269bbf9420810e9d5402c3551f
+  checksum: 10/d3419ffd198252e1d0301bd0c072cee93172f3e47937c745aa8202691d2f5d529d4ba4a1965d1450ad89a1bcd3c1f70ae09e57232b0d01dd38d69c1060e964d5
   languageName: node
   linkType: hard
 

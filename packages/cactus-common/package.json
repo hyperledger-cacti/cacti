@@ -62,11 +62,11 @@
     "loglevel-plugin-prefix": "0.8.4",
     "run-time-error-cjs": "1.4.0",
     "sanitize-html": "2.12.1",
-    "secp256k1": "4.0.4",
+    "secp256k1": "5.0.1",
     "sha3": "2.1.4"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.12.4",
+    "@grpc/grpc-js": "1.12.5",
     "@types/json-stable-stringify": "1.0.33",
     "@types/sanitize-html": "2.9.5",
     "@types/secp256k1": "4.0.3",
