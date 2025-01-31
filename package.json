@@ -359,7 +359,7 @@
       "built": false
     }
   },
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@4.6.0",
   "dependencies": {
     "deasync": "^0.1.30",
     "deasync-promise": "^1.0.1"
