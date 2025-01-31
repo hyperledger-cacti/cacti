@@ -263,14 +263,13 @@ describe("identity clients test", () => {
         expect(pub).toBeTruthy();
         expect((pub as any).curveName).toBe("secp384r1");
 
-        try {
-          await client.getPub(testNotFoundKey);
-          throw new Error("Should not get here");
-        } catch (error) {
-          expect((error as Error).message).toContain(
-            `keyName = ${testNotFoundKey} not found`,
-          );
-        }
+        await expect(client.getPub(testNotFoundKey)).rejects.toThrowError(
+          expect.objectContaining({
+            message: expect.stringContaining(
+              `keyName = ${testNotFoundKey} not found`,
+            ),
+          }),
+        );
       }
     }
   });
