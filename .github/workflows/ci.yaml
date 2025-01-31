@@ -207,7 +207,7 @@ jobs:
 
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -237,7 +237,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -306,7 +306,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -376,7 +376,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -403,7 +403,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -431,7 +431,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -472,7 +472,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -516,7 +516,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           path: .tmp/benchmark-results/cmd-api-server/
           key: ${{ runner.os }}-benchmark
@@ -562,7 +562,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -599,7 +599,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -634,7 +634,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -668,7 +668,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -704,7 +704,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -738,7 +738,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -773,7 +773,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -809,7 +809,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -843,7 +843,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -878,7 +878,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -912,7 +912,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -948,7 +948,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -982,7 +982,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1016,7 +1016,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1051,7 +1051,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1086,7 +1086,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1120,7 +1120,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1153,7 +1153,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1187,7 +1187,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1221,7 +1221,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1256,7 +1256,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1295,7 +1295,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1314,7 +1314,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           path: .tmp/benchmark-results/plugin-ledger-connector-besu/
           key: ${{ runner.os }}-benchmark
@@ -1363,7 +1363,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1403,7 +1403,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1458,7 +1458,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1507,7 +1507,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1544,7 +1544,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1579,7 +1579,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1611,7 +1611,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1646,7 +1646,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1679,7 +1679,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1712,7 +1712,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1746,7 +1746,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1779,7 +1779,7 @@ jobs:
   #       run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
   #     - id: yarn-cache
   #       name: Restore Yarn Cache
-  #       uses: actions/cache@v4.0.2
+  #       uses: actions/cache@v4.2.2
   #       with:
   #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
   #         path: ./.yarn/
@@ -1810,7 +1810,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1843,7 +1843,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1879,7 +1879,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1912,7 +1912,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1946,7 +1946,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1981,7 +1981,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2023,7 +2023,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2059,7 +2059,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2091,7 +2091,7 @@ jobs:
       - uses: actions/checkout@v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2129,7 +2129,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2162,7 +2162,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2195,7 +2195,7 @@ jobs:
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
