@@ -35,8 +35,15 @@ your local machine for development and testing purposes.
 
 In the root of the project to install the dependencies execute the command:
 ```sh
-npm run configure
+yarn run configure
 ```
+
+For Solidity smart contract development (SATP bridge development) install Foundry:
+```sh
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
 
 Know how to use the following plugins of the project:
 
