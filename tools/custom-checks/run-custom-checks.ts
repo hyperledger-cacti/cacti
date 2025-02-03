@@ -10,6 +10,7 @@ import {
 } from "./check-missing-node-deps";
 import { getAllPkgDirs } from "./get-all-pkg-dirs";
 import { runAttwOnTgz } from "./run-attw-on-tgz";
+import { checkDependencyVersionConsistency } from "./check-dependency-version-consistency";
 
 export async function runCustomChecks(
   argv: string[],
@@ -70,6 +71,12 @@ export async function runCustomChecks(
       pkgDirsToCheck,
     };
     const [success, errors] = await checkMissingNodeDeps(req);
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
+  {
+    const [success, errors] = await checkDependencyVersionConsistency();
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
