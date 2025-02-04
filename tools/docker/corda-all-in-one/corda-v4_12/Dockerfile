@@ -27,11 +27,11 @@ RUN mkdir /var/run/sshd
 WORKDIR /
 
 
-# The image has a bleeding edge version of corda baked in for testing conveniece
+# The image has a bleeding edge version of corda baked in for testing convenience
 RUN mkdir -p /opt/bin/
 COPY --from=builder /opt/corda/node/capsule/build/libs/corda-4.12-SNAPSHOT.jar /opt/bin/corda.jar
 
-# Make the "corda-shell" alias avaialble on the terminal
+# Make the "corda-shell" alias available on the terminal
 RUN java -jar /opt/bin/corda.jar install-shell-extensions
 
 RUN git clone https://github.com/corda/samples-kotlin.git
@@ -47,9 +47,15 @@ ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/negotiation-cordapp/"
 WORKDIR /samples-kotlin/${SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH}
 
 COPY ./negotiation-cordapp/build.gradle /samples-kotlin/Advanced/negotiation-cordapp/build.gradle
+COPY ./obligation-cordapp/build.gradle /samples-kotlin/Advanced/obligation-cordapp/build.gradle
 COPY ./negotiation-cordapp/contracts/build.gradle /samples-kotlin/Advanced/negotiation-cordapp/contracts/build.gradle
 COPY ./negotiation-cordapp/workflows/build.gradle /samples-kotlin/Advanced/negotiation-cordapp/workflows/build.gradle
 COPY ./constants.properties /samples-kotlin/Advanced/constants.properties
+
+# The kotlin-samples repo defines the gradle version as 7.6 not 7.6.3 and 
+# the build was failing wit ha message claiming that it needs exactly 7.6.3 so here it is.
+RUN sed -i 's|distributionUrl=.*|distributionUrl=https\://services.gradle.org/distributions/gradle-7.6.3-bin.zip|' /samples-kotlin/Advanced/negotiation-cordapp/gradle/wrapper/gradle-wrapper.properties
+RUN sed -i 's|distributionUrl=.*|distributionUrl=https\://services.gradle.org/distributions/gradle-7.6.3-bin.zip|' /samples-kotlin/Advanced/obligation-cordapp/gradle/wrapper/gradle-wrapper.properties
 
 RUN ./gradlew build deployNodes -x test
 

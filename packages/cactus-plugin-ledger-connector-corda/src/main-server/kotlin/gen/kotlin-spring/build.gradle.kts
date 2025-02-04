@@ -5,9 +5,9 @@ version = project.properties["version"]!!
 
 val corda_release_group = "net.corda"
 val corda_core_release_group =  "net.corda"
-val corda_release_version = "4.12"
-val corda_core_release_version = "4.12"
-val spring_boot_version = "3.3.1"
+val corda_release_version = "4.12.5"
+val corda_core_release_version = "4.12.5"
+val spring_boot_version = "3.4.2"
 val jackson_version = "2.16.1"
 
 tasks.named<Test>("test") {
@@ -36,9 +36,9 @@ tasks.withType<KotlinCompile> {
 }
 
 plugins {
-    val kotlinVersion = "1.9.24"
+    val kotlinVersion = "2.1.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.3.1"
+    id("org.springframework.boot") version "3.4.2"
 }
 
 dependencies {
@@ -77,25 +77,11 @@ configurations {
     all {
         exclude(group = "junit", module = "junit")
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-
-        resolutionStrategy.eachDependency {
-            if (requested.group == "org.yaml" && requested.name == "snakeyaml") {
-                useVersion("2.+")
-                because("CVE-2022-1471, CVE-2022-25857, CVE-2022-1471 - SnakeYaml: Constructor Deserialization Remote Code Execution, snakeyaml: Denial of Service due to missing nested depth limitation for collections")
-            } else if (requested.group == "org.springframework" && requested.name == "spring-web") {
-                useVersion("[6.0.0,99[")
-                because("CVE-2016-1000027 - https://avd.aquasec.com/nvd/cve-2016-1000027 spring: HttpInvokerServiceExporter readRemoteInvocation method untrusted java deserialization")
-            } else if (requested.group == "org.apache.commons" && requested.name == "commons-configuration2") {
-                useVersion("[2.8.0,99[")
-                because("CVE-2022-33980 - CRITICAL - https://avd.aquasec.com/nvd/cve-2022-33980 - apache-commons-configuration: Apache Commons Configuration insecure interpolation defaults")
-            }
-        }
     }
 }
 
 repositories {
 	maven { url = uri("https://repo1.maven.org/maven2") }
-	maven { url = uri("https://repo.spring.io/snapshot") }
 	maven { url = uri("https://repo.spring.io/milestone") }
 
     mavenLocal()

@@ -14,9 +14,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
-import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 
 private const val ThreadPoolCount = "cactus.threadCount"
 private const val ThreadPoolCountDefault = "3"
@@ -37,13 +35,6 @@ open class Application(@Value("\${$ThreadPoolCount:$ThreadPoolCountDefault}") va
         val converter = MappingJackson2HttpMessageConverter()
         converter.objectMapper = mapper
         return converter
-    }
-
-    @Bean
-    open fun taskScheduler(): TaskScheduler? {
-        val taskScheduler = ThreadPoolTaskScheduler()
-        taskScheduler.poolSize = this.threadCount
-        return taskScheduler
     }
 
     @Bean

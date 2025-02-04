@@ -577,7 +577,7 @@ DOCKER_BUILDKIT=1 docker build \
   --progress=plain \
   --tag cccs \
   --tag cccs:latest \
-  --tag "ghcr.io/hyperledger/cactus-connector-corda-server:$(date +%F)-$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)-$(git rev-parse --short HEAD)"
+  --tag "ghcr.io/hyperledger-cacti/cacti-connector-corda-server:$(date -u +"%Y-%m-%dT%H-%M-%SZ")-$(git describe --contains --all HEAD | sed -r 's,/,-,g')_$(git rev-parse --short HEAD)"
 ```
 
 ## Scan The Locally Built Container Image for Vulnerabilities with Trivy
