@@ -87,20 +87,14 @@ beforeAll(async () => {
     "password",
   ));
 
-  console.log("eia pah");
-
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase(
     5450,
     "user123123",
     "password",
   ));
 
-  console.log("eia pah2");
   await setupDBTable(db_local_config);
-  console.log("eia pah3");
-  console.log(db_remote_config);
   await setupDBTable(db_remote_config);
-  console.log("eia pah4");
 
   {
     const satpContractName = "satp-contract";
