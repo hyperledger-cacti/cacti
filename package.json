@@ -46,6 +46,7 @@
     "tools:sort-package-json": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/sort-package-json.ts",
     "tools:check-missing-node-deps": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/check-missing-node-deps.ts",
     "tools:are-the-types-wrong": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-attw-on-tgz.ts",
+    "tools:check-package-json-public": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/check-pkg-json-public.ts",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "sync-ts-config": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --loader ts-node/esm ./tools/sync-npm-deps-to-tsc-projects.ts",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",

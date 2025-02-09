@@ -10,7 +10,7 @@ import {
 } from "./check-missing-node-deps";
 import { getAllPkgDirs } from "./get-all-pkg-dirs";
 import { runAttwOnTgz } from "./run-attw-on-tgz";
-
+import { checkPkgJsonPublic } from "./check-pkg-json-public";
 export async function runCustomChecks(
   argv: string[],
   env: NodeJS.ProcessEnv,
@@ -76,6 +76,12 @@ export async function runCustomChecks(
 
   {
     const [success, errors] = await runAttwOnTgz();
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
+  {
+    const [success, errors] = await checkPkgJsonPublic();
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
