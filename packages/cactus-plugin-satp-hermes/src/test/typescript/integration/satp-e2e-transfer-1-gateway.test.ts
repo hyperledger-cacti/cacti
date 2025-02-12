@@ -169,7 +169,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     expect(identity.address).toBe("http://localhost");
     await gateway.startup();
 
-    const dispatcher = gateway.getBLODispatcher();
+    const dispatcher = gateway.BLODispatcherInstance;
 
     expect(dispatcher).toBeTruthy();
     const req = getTransactRequest(
