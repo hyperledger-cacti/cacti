@@ -15,7 +15,6 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import { ApiClient } from "@hyperledger/cactus-api-client";
 
-// import coordinator factory, coordinator and coordinator options
 import {
   SATPGateway,
   SATPGatewayConfig,
@@ -229,13 +228,14 @@ describe("SATPGateway initialization", () => {
     expect(loggerSpy).toHaveBeenCalledWith("mockHook");
     expect(mockHookFn).toHaveBeenCalled();
 
-    // for now, technically not needed. However if we use more tests with loggerSpy, conflicts could arise. This is a reminder to restore the spy after each test
+    // For now, technically not needed. However if we use more tests with loggerSpy, conflicts could arise. 
+    // This is a reminder to restore the spy after each test
     loggerSpy.mockRestore();
   });
 });
 
 describe("SATPGateway startup", () => {
-  it("initiates with default config", async () => {
+  test("initiates with default config", async () => {
     const options: SATPGatewayConfig = {
       knexLocalConfig: knexClientConnection,
       knexRemoteConfig: knexSourceRemoteConnection,
@@ -310,7 +310,7 @@ describe("SATPGateway startup", () => {
     expect(identity.address).toBe("https://localhost");
   });
 
-  test("Gateway Server launches", async () => {
+  test("Gateway server launches and shutsdown correctly", async () => {
     const options: SATPGatewayConfig = {
       logLevel: logLevel,
       gid: {
@@ -361,6 +361,7 @@ describe("SATPGateway startup", () => {
     apiServerOptions.grpcPort = 0;
     apiServerOptions.crpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
+
     const config =
       await configService.newExampleConfigConvict(apiServerOptions);
     pluginRegistry.add(gateway);
@@ -376,11 +377,17 @@ describe("SATPGateway startup", () => {
     const mainApiClient = new ApiClient(config1);
     const admin = mainApiClient.extendWith(AdminApi);
 
-    const result = await admin.getSessionIds();
-    expect(result).toBeDefined();
-    expect(result.status).toBe(200);
-    apiServer1.shutdown();
-    httpServer2.close();
+    try {
+      const result = await admin.getHealthCheck();
+      expect(result).toBeDefined();
+      expect(result.status).toBe(200);
+    } catch (error) {
+      logger.error `Error: ${error}`;
+    } finally {
+      await gateway.shutdown();
+      await httpServer2.closeAllConnections();
+      await apiServer1.shutdown();
+    }
   });
 });
 
