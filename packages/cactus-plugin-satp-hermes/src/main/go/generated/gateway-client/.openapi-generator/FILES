@@ -16,8 +16,6 @@ docs/BridgeInfo.md
 docs/Cancel200Response.md
 docs/CancelRequest.md
 docs/CancelResponse.md
-docs/Chain.md
-docs/Chains1Inner.md
 docs/Continue200Response.md
 docs/ContinueRequest.md
 docs/ContinueResponse.md
@@ -30,6 +28,8 @@ docs/GetAudit200Response.md
 docs/GetAuditRequest.md
 docs/GetAuditResponse.md
 docs/GetHealthCheck200Response.md
+docs/GetIntegrations200Response.md
+docs/GetIntegrations200ResponseIntegrationsInner.md
 docs/GetRoutes200Response.md
 docs/GetRoutes200ResponseRoutesInner.md
 docs/GetRoutes200ResponseRoutesInnerFromToken.md
@@ -45,7 +45,9 @@ docs/GetRoutes200ResponseRoutesInnerStepsInnerToolDetails.md
 docs/HealthCheckResponse.md
 docs/IncludedStep.md
 docs/Insurance.md
+docs/Integration.md
 docs/IntegrationDetails.md
+docs/IntegrationsResponse.md
 docs/Pause200Response.md
 docs/PauseRequest.md
 docs/PauseResponse.md
@@ -56,8 +58,8 @@ docs/StatusResponse.md
 docs/Token.md
 docs/Transact200Response.md
 docs/Transact200ResponseStatusResponse.md
-docs/Transact200ResponseStatusResponseDestinationChain.md
-docs/Transact200ResponseStatusResponseOriginChain.md
+docs/Transact200ResponseStatusResponseDestinationNetwork.md
+docs/Transact200ResponseStatusResponseOriginNetwork.md
 docs/TransactDefaultResponse.md
 docs/TransactRequest.md
 docs/TransactRequestSourceAsset.md
@@ -75,8 +77,6 @@ model_bridge_info.go
 model_cancel_200_response.go
 model_cancel_request.go
 model_cancel_response.go
-model_chain.go
-model_chains_1_inner.go
 model_continue_200_response.go
 model_continue_request.go
 model_continue_response.go
@@ -89,6 +89,8 @@ model_get_audit_200_response.go
 model_get_audit_request.go
 model_get_audit_response.go
 model_get_health_check_200_response.go
+model_get_integrations_200_response.go
+model_get_integrations_200_response_integrations_inner.go
 model_get_routes_200_response.go
 model_get_routes_200_response_routes_inner.go
 model_get_routes_200_response_routes_inner_from_token.go
@@ -104,7 +106,9 @@ model_get_routes_200_response_routes_inner_steps_inner_tool_details.go
 model_health_check_response.go
 model_included_step.go
 model_insurance.go
+model_integration.go
 model_integration_details.go
+model_integrations_response.go
 model_pause_200_response.go
 model_pause_request.go
 model_pause_response.go
@@ -115,8 +119,8 @@ model_status_response.go
 model_token.go
 model_transact_200_response.go
 model_transact_200_response_status_response.go
-model_transact_200_response_status_response_destination_chain.go
-model_transact_200_response_status_response_origin_chain.go
+model_transact_200_response_status_response_destination_network.go
+model_transact_200_response_status_response_origin_network.go
 model_transact_default_response.go
 model_transact_request.go
 model_transact_request_source_asset.go
