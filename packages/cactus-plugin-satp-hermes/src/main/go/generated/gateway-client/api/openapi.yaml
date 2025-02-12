@@ -190,6 +190,10 @@ paths:
       summary: Health check endpoint
       tags:
       - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
     post:
       description: "Attempts to continue a previously paused transaction intent, resuming\
@@ -262,11 +266,7 @@ paths:
           content:
             application/json:
               schema:
-                description: List of chains and related metadata
-                items:
-                  $ref: '#/components/schemas/Chains_1_inner'
-                title: Chains
-                type: array
+                $ref: '#/components/schemas/GetIntegrations_200_response'
           description: A list of supported systems.
         default:
           content:
@@ -553,11 +553,11 @@ components:
           type: string
         stage:
           enum:
-          - STAGE0
-          - STAGE1
-          - STAGE2
-          - STAGE3
-          example: STAGE3
+          - STAGE_0
+          - STAGE_1
+          - STAGE_2
+          - STAGE_3
+          example: STAGE_3
           type: string
         step:
           enum:
@@ -595,13 +595,13 @@ components:
           example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
-        originChain:
-          $ref: '#/components/schemas/Transact_200_response_statusResponse_originChain'
-        destinationChain:
-          $ref: '#/components/schemas/Transact_200_response_statusResponse_destinationChain'
+        originNetwork:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_originNetwork'
+        destinationNetwork:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_destinationNetwork'
       required:
-      - destinationChain
-      - originChain
+      - destinationNetwork
+      - originNetwork
       - stage
       - startTime
       - status
@@ -964,33 +964,36 @@ components:
       required:
       - statusResponse
       type: object
-    Chain:
+    IntegrationsResponse:
+      description: List of chains or systems and related metadata
       properties:
-        chainId:
-          description: A unique identifier for the blockchain network.
+        integrations:
+          items:
+            $ref: '#/components/schemas/GetIntegrations_200_response_integrations_inner'
+          type: array
+      required:
+      - integrations
+      type: object
+      x-category: response
+    Integration:
+      properties:
+        id:
+          description: A unique identifier for the blockchain network/system.
           type: string
-        chainName:
-          description: The name of the blockchain network.
+        name:
+          description: The name of the blockchain network/system.
           type: string
-        chainType:
-          description: "The type of blockchain network (e.g., 'evm', 'fabric')."
+        type:
+          description: "The type of network (e.g., 'evm', 'fabric', 'SQL Database')."
           type: string
-        networkName:
-          description: "The specific network name within the blockchain (e.g., 'mainnet',\
-            \ 'testnet')."
+        environment:
+          description: "The specific network name (e.g., 'mainnet', 'testnet')."
           type: string
       required:
-      - chainId
-      - chainName
-      - chainType
-      - networkName
+      - id
+      - name
+      - type
       type: object
-    Chains:
-      description: List of chains and related metadata
-      items:
-        $ref: '#/components/schemas/Chains_1_inner'
-      title: Chains
-      type: array
     Token:
       description: Metadata detailing a supported token
       properties:
@@ -1057,7 +1060,9 @@ components:
     HealthCheckResponse:
       properties:
         status:
-          example: OK
+          enum:
+          - AVAILABLE
+          - UNAVAILABLE
           type: string
       type: object
     BridgeInfo:
@@ -1341,7 +1346,7 @@ components:
       - toAmount
       - toDLTNetworkID
       type: object
-    Transact_200_response_statusResponse_originChain:
+    Transact_200_response_statusResponse_originNetwork:
       example:
         dltSubnetworkID: subnetwork1
         dltProtocol: HyperledgerFabric
@@ -1351,7 +1356,7 @@ components:
         dltSubnetworkID:
           example: subnetwork1
       type: object
-    Transact_200_response_statusResponse_destinationChain:
+    Transact_200_response_statusResponse_destinationNetwork:
       example:
         dltSubnetworkID: subnetwork2
         dltProtocol: HyperledgerBesu
@@ -1366,17 +1371,17 @@ components:
         \ information on the progress, such as substatus, stage, and step, along with\
         \ the session start time and chain information."
       example:
-        stage: STAGE3
+        stage: STAGE_3
         substatus: COMPLETED
-        originChain:
-          dltSubnetworkID: subnetwork1
-          dltProtocol: HyperledgerFabric
         step: transfer-complete-message
         startTime: 2023-01-01T00:00:00Z
-        destinationChain:
+        originNetwork:
+          dltSubnetworkID: subnetwork1
+          dltProtocol: HyperledgerFabric
+        status: DONE
+        destinationNetwork:
           dltSubnetworkID: subnetwork2
           dltProtocol: HyperledgerBesu
-        status: DONE
       properties:
         status:
           enum:
@@ -1407,11 +1412,11 @@ components:
           type: string
         stage:
           enum:
-          - STAGE0
-          - STAGE1
-          - STAGE2
-          - STAGE3
-          example: STAGE3
+          - STAGE_0
+          - STAGE_1
+          - STAGE_2
+          - STAGE_3
+          example: STAGE_3
           type: string
         step:
           enum:
@@ -1449,13 +1454,13 @@ components:
           example: 2023-01-01T00:00:00Z
           format: date-time
           type: string
-        originChain:
-          $ref: '#/components/schemas/Transact_200_response_statusResponse_originChain'
-        destinationChain:
-          $ref: '#/components/schemas/Transact_200_response_statusResponse_destinationChain'
+        originNetwork:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_originNetwork'
+        destinationNetwork:
+          $ref: '#/components/schemas/Transact_200_response_statusResponse_destinationNetwork'
       required:
-      - destinationChain
-      - originChain
+      - destinationNetwork
+      - originNetwork
       - stage
       - startTime
       - status
@@ -1468,17 +1473,17 @@ components:
         ID and the current status of the transaction.
       example:
         statusResponse:
-          stage: STAGE3
+          stage: STAGE_3
           substatus: COMPLETED
-          originChain:
-            dltSubnetworkID: subnetwork1
-            dltProtocol: HyperledgerFabric
           step: transfer-complete-message
           startTime: 2023-01-01T00:00:00Z
-          destinationChain:
+          originNetwork:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          status: DONE
+          destinationNetwork:
             dltSubnetworkID: subnetwork2
             dltProtocol: HyperledgerBesu
-          status: DONE
         sessionID: 000003e8-e0b8-21ee-ba00-325096b39f47
       properties:
         sessionID:
@@ -1542,17 +1547,17 @@ components:
         cancel action was successful and includes the current session status.
       example:
         statusResponse:
-          stage: STAGE3
+          stage: STAGE_3
           substatus: COMPLETED
-          originChain:
-            dltSubnetworkID: subnetwork1
-            dltProtocol: HyperledgerFabric
           step: transfer-complete-message
           startTime: 2023-01-01T00:00:00Z
-          destinationChain:
+          originNetwork:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          status: DONE
+          destinationNetwork:
             dltSubnetworkID: subnetwork2
             dltProtocol: HyperledgerBesu
-          status: DONE
         cancelSuccessful: true
       properties:
         statusResponse:
@@ -1567,10 +1572,12 @@ components:
       type: object
     GetHealthCheck_200_response:
       example:
-        status: OK
+        status: AVAILABLE
       properties:
         status:
-          example: OK
+          enum:
+          - AVAILABLE
+          - UNAVAILABLE
           type: string
       type: object
     Continue_request:
@@ -1593,17 +1600,17 @@ components:
         \ the SATP session."
       example:
         statusResponse:
-          stage: STAGE3
+          stage: STAGE_3
           substatus: COMPLETED
-          originChain:
-            dltSubnetworkID: subnetwork1
-            dltProtocol: HyperledgerFabric
           step: transfer-complete-message
           startTime: 2023-01-01T00:00:00Z
-          destinationChain:
+          originNetwork:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          status: DONE
+          destinationNetwork:
             dltSubnetworkID: subnetwork2
             dltProtocol: HyperledgerBesu
-          status: DONE
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
@@ -1628,49 +1635,68 @@ components:
         of the SATP session post-pause action.
       example:
         statusResponse:
-          stage: STAGE3
+          stage: STAGE_3
           substatus: COMPLETED
-          originChain:
-            dltSubnetworkID: subnetwork1
-            dltProtocol: HyperledgerFabric
           step: transfer-complete-message
           startTime: 2023-01-01T00:00:00Z
-          destinationChain:
+          originNetwork:
+            dltSubnetworkID: subnetwork1
+            dltProtocol: HyperledgerFabric
+          status: DONE
+          destinationNetwork:
             dltSubnetworkID: subnetwork2
             dltProtocol: HyperledgerBesu
-          status: DONE
       properties:
         statusResponse:
           $ref: '#/components/schemas/Transact_200_response_statusResponse'
       required:
       - statusResponse
       type: object
-    Chains_1_inner:
+    GetIntegrations_200_response_integrations_inner:
       example:
-        chainName: chainName
-        chainId: chainId
-        networkName: networkName
-        chainType: chainType
+        environment: environment
+        name: name
+        id: id
+        type: type
       properties:
-        chainId:
-          description: A unique identifier for the blockchain network.
+        id:
+          description: A unique identifier for the blockchain network/system.
           type: string
-        chainName:
-          description: The name of the blockchain network.
+        name:
+          description: The name of the blockchain network/system.
           type: string
-        chainType:
-          description: "The type of blockchain network (e.g., 'evm', 'fabric')."
+        type:
+          description: "The type of network (e.g., 'evm', 'fabric', 'SQL Database')."
           type: string
-        networkName:
-          description: "The specific network name within the blockchain (e.g., 'mainnet',\
-            \ 'testnet')."
+        environment:
+          description: "The specific network name (e.g., 'mainnet', 'testnet')."
           type: string
       required:
-      - chainId
-      - chainName
-      - chainType
-      - networkName
+      - id
+      - name
+      - type
       type: object
+    GetIntegrations_200_response:
+      description: List of chains or systems and related metadata
+      example:
+        integrations:
+        - environment: environment
+          name: name
+          id: id
+          type: type
+        - environment: environment
+          name: name
+          id: id
+          type: type
+      properties:
+        integrations:
+          items:
+            $ref: '#/components/schemas/GetIntegrations_200_response_integrations_inner'
+          type: array
+      required:
+      - integrations
+      type: object
+      x-category: response
     GetRoutes_200_response_routes_inner_fromToken_extensions_bridgeInfo_value:
       description: Information about the bridge used for the token transfer.
       example:

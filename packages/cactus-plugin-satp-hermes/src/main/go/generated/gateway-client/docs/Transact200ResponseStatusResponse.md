@@ -9,14 +9,14 @@ Name | Type | Description | Notes
 **Stage** | **string** |  | 
 **Step** | **string** |  | 
 **StartTime** | **time.Time** |  | 
-**OriginChain** | [**Transact200ResponseStatusResponseOriginChain**](Transact200ResponseStatusResponseOriginChain.md) |  | 
-**DestinationChain** | [**Transact200ResponseStatusResponseDestinationChain**](Transact200ResponseStatusResponseDestinationChain.md) |  | 
+**OriginNetwork** | [**Transact200ResponseStatusResponseOriginNetwork**](Transact200ResponseStatusResponseOriginNetwork.md) |  | 
+**DestinationNetwork** | [**Transact200ResponseStatusResponseDestinationNetwork**](Transact200ResponseStatusResponseDestinationNetwork.md) |  | 
 
 ## Methods
 
 ### NewTransact200ResponseStatusResponse
 
-`func NewTransact200ResponseStatusResponse(status string, substatus string, stage string, step string, startTime time.Time, originChain Transact200ResponseStatusResponseOriginChain, destinationChain Transact200ResponseStatusResponseDestinationChain, ) *Transact200ResponseStatusResponse`
+`func NewTransact200ResponseStatusResponse(status string, substatus string, stage string, step string, startTime time.Time, originNetwork Transact200ResponseStatusResponseOriginNetwork, destinationNetwork Transact200ResponseStatusResponseDestinationNetwork, ) *Transact200ResponseStatusResponse`
 
 NewTransact200ResponseStatusResponse instantiates a new Transact200ResponseStatusResponse object
 This constructor will assign default values to properties that have it defined,
@@ -131,44 +131,44 @@ and a boolean to check if the value has been set.
 SetStartTime sets StartTime field to given value.
 
 
-### GetOriginChain
+### GetOriginNetwork
 
-`func (o *Transact200ResponseStatusResponse) GetOriginChain() Transact200ResponseStatusResponseOriginChain`
+`func (o *Transact200ResponseStatusResponse) GetOriginNetwork() Transact200ResponseStatusResponseOriginNetwork`
 
-GetOriginChain returns the OriginChain field if non-nil, zero value otherwise.
+GetOriginNetwork returns the OriginNetwork field if non-nil, zero value otherwise.
 
-### GetOriginChainOk
+### GetOriginNetworkOk
 
-`func (o *Transact200ResponseStatusResponse) GetOriginChainOk() (*Transact200ResponseStatusResponseOriginChain, bool)`
+`func (o *Transact200ResponseStatusResponse) GetOriginNetworkOk() (*Transact200ResponseStatusResponseOriginNetwork, bool)`
 
-GetOriginChainOk returns a tuple with the OriginChain field if it's non-nil, zero value otherwise
+GetOriginNetworkOk returns a tuple with the OriginNetwork field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOriginChain
+### SetOriginNetwork
 
-`func (o *Transact200ResponseStatusResponse) SetOriginChain(v Transact200ResponseStatusResponseOriginChain)`
+`func (o *Transact200ResponseStatusResponse) SetOriginNetwork(v Transact200ResponseStatusResponseOriginNetwork)`
 
-SetOriginChain sets OriginChain field to given value.
+SetOriginNetwork sets OriginNetwork field to given value.
 
 
-### GetDestinationChain
+### GetDestinationNetwork
 
-`func (o *Transact200ResponseStatusResponse) GetDestinationChain() Transact200ResponseStatusResponseDestinationChain`
+`func (o *Transact200ResponseStatusResponse) GetDestinationNetwork() Transact200ResponseStatusResponseDestinationNetwork`
 
-GetDestinationChain returns the DestinationChain field if non-nil, zero value otherwise.
+GetDestinationNetwork returns the DestinationNetwork field if non-nil, zero value otherwise.
 
-### GetDestinationChainOk
+### GetDestinationNetworkOk
 
-`func (o *Transact200ResponseStatusResponse) GetDestinationChainOk() (*Transact200ResponseStatusResponseDestinationChain, bool)`
+`func (o *Transact200ResponseStatusResponse) GetDestinationNetworkOk() (*Transact200ResponseStatusResponseDestinationNetwork, bool)`
 
-GetDestinationChainOk returns a tuple with the DestinationChain field if it's non-nil, zero value otherwise
+GetDestinationNetworkOk returns a tuple with the DestinationNetwork field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDestinationChain
+### SetDestinationNetwork
 
-`func (o *Transact200ResponseStatusResponse) SetDestinationChain(v Transact200ResponseStatusResponseDestinationChain)`
+`func (o *Transact200ResponseStatusResponse) SetDestinationNetwork(v Transact200ResponseStatusResponseDestinationNetwork)`
 
-SetDestinationChain sets DestinationChain field to given value.
+SetDestinationNetwork sets DestinationNetwork field to given value.
 
 
 

@@ -285,7 +285,7 @@ describe("2 SATPGateway sending a token from Besu to Fabric using openApi to req
     expect(identity2.address).toBe("http://localhost");
     await targetGateway.startup();
 
-    const dispatcher = sourceGateway.getBLODispatcher();
+    const dispatcher = sourceGateway.BLODispatcherInstance;
 
     expect(dispatcher).toBeTruthy();
     const req = getTransactRequest(

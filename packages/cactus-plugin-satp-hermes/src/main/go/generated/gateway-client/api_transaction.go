@@ -46,8 +46,8 @@ type TransactionApi interface {
 	GetIntegrations(ctx context.Context) ApiGetIntegrationsRequest
 
 	// GetIntegrationsExecute executes the request
-	//  @return []Chains1Inner
-	GetIntegrationsExecute(r ApiGetIntegrationsRequest) ([]Chains1Inner, *http.Response, error)
+	//  @return GetIntegrations200Response
+	GetIntegrationsExecute(r ApiGetIntegrationsRequest) (*GetIntegrations200Response, *http.Response, error)
 
 	/*
 	GetRoutes Get a list of routes for a gateway-to-gateway asset transfer
@@ -204,7 +204,7 @@ type ApiGetIntegrationsRequest struct {
 	ApiService TransactionApi
 }
 
-func (r ApiGetIntegrationsRequest) Execute() ([]Chains1Inner, *http.Response, error) {
+func (r ApiGetIntegrationsRequest) Execute() (*GetIntegrations200Response, *http.Response, error) {
 	return r.ApiService.GetIntegrationsExecute(r)
 }
 
@@ -224,13 +224,13 @@ func (a *TransactionApiService) GetIntegrations(ctx context.Context) ApiGetInteg
 }
 
 // Execute executes the request
-//  @return []Chains1Inner
-func (a *TransactionApiService) GetIntegrationsExecute(r ApiGetIntegrationsRequest) ([]Chains1Inner, *http.Response, error) {
+//  @return GetIntegrations200Response
+func (a *TransactionApiService) GetIntegrationsExecute(r ApiGetIntegrationsRequest) (*GetIntegrations200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  []Chains1Inner
+		localVarReturnValue  *GetIntegrations200Response
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TransactionApiService.GetIntegrations")

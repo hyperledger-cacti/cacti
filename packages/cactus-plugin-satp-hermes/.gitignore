@@ -3,3 +3,4 @@ src/main/typescript/.env
 packages/cactus-plugin-satp-hermes/cache/solidity-files-cache.json
 src/keys/
 src/test/typescript/gateway-info
+cache/
