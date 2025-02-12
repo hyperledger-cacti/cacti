@@ -50,6 +50,7 @@ export interface BLODispatcherOptions {
   remoteRepository?: IRemoteLogRepository;
 }
 
+  // TODO: addGateways as an admin endpoint, simply calls orchestrator
 export class BLODispatcher {
   public static readonly CLASS_NAME = "BLODispatcher";
   private readonly logger: Logger;
@@ -135,6 +136,7 @@ export class BLODispatcher {
       logLevel: this.options.logLevel,
     });
 
+    // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
     const endpoints = [
       getStatusEndpointV1,
       getHealthCheckEndpoint,
