@@ -79,7 +79,7 @@ No authorization required
 
 ## GetIntegrations
 
-> []Chains1Inner GetIntegrations(ctx).Execute()
+> GetIntegrations200Response GetIntegrations(ctx).Execute()
 
 Get supported integrations
 
@@ -106,7 +106,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `TransactionApi.GetIntegrations``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `GetIntegrations`: []Chains1Inner
+    // response from `GetIntegrations`: GetIntegrations200Response
     fmt.Fprintf(os.Stdout, "Response from `TransactionApi.GetIntegrations`: %v\n", resp)
 }
 ```
@@ -122,7 +122,7 @@ Other parameters are passed through a pointer to a apiGetIntegrationsRequest str
 
 ### Return type
 
-[**[]Chains1Inner**](Chains1Inner.md)
+[**GetIntegrations200Response**](GetIntegrations200Response.md)
 
 ### Authorization
 
