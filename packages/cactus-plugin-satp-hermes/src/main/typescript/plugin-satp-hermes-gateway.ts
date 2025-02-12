@@ -63,7 +63,6 @@ import { NetworkId } from "./network-identification/chainid-list";
 import { knexLocalInstance } from "./knex/knexfile";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
-  // todo more checks; example port from config is between 3000 and 9000
   @IsDefined()
   @IsNotEmptyObject()
   @IsObject()
@@ -95,7 +94,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private signer: JsObjectSigner;
   private _pubKey: string;
 
-  // Flag to create a db repository when not given
+  // Flag to create a db repository when not givenx
   public defaultRepository: boolean = true;
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
@@ -222,7 +221,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   /* ICactus Plugin methods */
-
   public getInstanceId(): string {
     return this.instanceId;
   }
@@ -231,25 +229,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return `@hyperledger/cactus-plugin-satp-hermes`;
   }
 
-  //for testing
-  public getBLODispatcher(): BLODispatcher | undefined {
-    return this.BLODispatcher;
-  }
-
-  getBLOServer(): http.Server | undefined {
-    return this.BLOServer;
-  }
-
-  getBLOApplication(): Express | undefined {
-    return this.BLOApplication;
-  }
-
   public async onPluginInit(): Promise<undefined> {
     const fnTag = `${this.className}#onPluginInit()`;
     this.logger.trace(`Entering ${fnTag}`);
-    // resolve gateways on init
     await Promise.all([this.startupGOLServer()]);
   }
+
 
   /* IPluginWebService methods */
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
@@ -276,17 +261,27 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     }
     return webServices;
   }
-
+  
   /* Getters */
+  public get BLODispatcherInstance(): BLODispatcher | undefined {
+    return this.BLODispatcher;
+  }
 
-  public get Signer(): JsObjectSigner {
+  public get BLOServerInstance(): http.Server | undefined {
+    return this.BLOServer;
+  }
+
+  public get BLOApplicationInstance(): Express | undefined {
+    return this.BLOApplication;
+  }
+
+  public get SignerInstance(): JsObjectSigner {
     return this.signer;
   }
 
-  public getconnectedDLTs(): NetworkId[] {
+  public get ConnectedDLTs(): NetworkId[] {
     return this.connectedDLTs;
   }
-
   public get gatewaySigner(): JsObjectSigner {
     return this.signer;
   }
@@ -295,17 +290,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return this._pubKey;
   }
 
-  public getOpenApiSpec(): unknown {
-    return undefined; //this.OAS;
-
-    /*
-    This needs to be fixed. api-server installs some validation middleware using this
-    and it was breaking the integration of the plugin with the api-server.
-      Error: 404 not found - on all api requests when the middleware is installed.
-    */
+  public getOpenApiSpec(): swaggerUi.JsonObject {
+    return this.OAS;
   }
 
-  // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
   public get Identity(): GatewayIdentity {
     const fnTag = `${this.className}#getIdentity()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -442,7 +430,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   protected async startupBLOServer(): Promise<void> {
-    // starts BOL
     const fnTag = `${this.className}#startupBLOServer()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting BOL server");
@@ -508,15 +495,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   protected async startupGOLServer(): Promise<void> {
-    // starts GOL
     const fnTag = `${this.className}#startupGOLServer()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Starting GOL server");
 
     const port =
       this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
-
-    //TODO create a server for the client part
 
     return new Promise(async (resolve, reject) => {
       if (!this.GOLServer) {
@@ -551,23 +535,21 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * These operations are fundamental for setting up and managing gateway connections within the system.
    */
 
-  // TODO: addGateways as an admin endpoint, simply calls orchestrator
+  // todo connect to gateway - stage 0
   public async resolveAndAddGateways(IDs: string[]): Promise<void> {
     const fnTag = `${this.className}#resolveAndAddGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
     this.gatewayOrchestrator.resolveAndAddGateways(IDs);
 
-    // todo connect to gateway
   }
 
+  // todo connect to gateway - stage 0
   public async addGateways(gateways: GatewayIdentity[]): Promise<void> {
     const fnTag = `${this.className}#addGateways()`;
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
     this.gatewayOrchestrator.addGateways(gateways);
-
-    // todo connect to gateway
   }
 
   /**

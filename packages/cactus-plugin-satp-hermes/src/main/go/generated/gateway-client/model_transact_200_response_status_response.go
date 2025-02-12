@@ -25,23 +25,23 @@ type Transact200ResponseStatusResponse struct {
 	Stage string `json:"stage"`
 	Step string `json:"step"`
 	StartTime time.Time `json:"startTime"`
-	OriginChain Transact200ResponseStatusResponseOriginChain `json:"originChain"`
-	DestinationChain Transact200ResponseStatusResponseDestinationChain `json:"destinationChain"`
+	OriginNetwork Transact200ResponseStatusResponseOriginNetwork `json:"originNetwork"`
+	DestinationNetwork Transact200ResponseStatusResponseDestinationNetwork `json:"destinationNetwork"`
 }
 
 // NewTransact200ResponseStatusResponse instantiates a new Transact200ResponseStatusResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransact200ResponseStatusResponse(status string, substatus string, stage string, step string, startTime time.Time, originChain Transact200ResponseStatusResponseOriginChain, destinationChain Transact200ResponseStatusResponseDestinationChain) *Transact200ResponseStatusResponse {
+func NewTransact200ResponseStatusResponse(status string, substatus string, stage string, step string, startTime time.Time, originNetwork Transact200ResponseStatusResponseOriginNetwork, destinationNetwork Transact200ResponseStatusResponseDestinationNetwork) *Transact200ResponseStatusResponse {
 	this := Transact200ResponseStatusResponse{}
 	this.Status = status
 	this.Substatus = substatus
 	this.Stage = stage
 	this.Step = step
 	this.StartTime = startTime
-	this.OriginChain = originChain
-	this.DestinationChain = destinationChain
+	this.OriginNetwork = originNetwork
+	this.DestinationNetwork = destinationNetwork
 	return &this
 }
 
@@ -173,52 +173,52 @@ func (o *Transact200ResponseStatusResponse) SetStartTime(v time.Time) {
 	o.StartTime = v
 }
 
-// GetOriginChain returns the OriginChain field value
-func (o *Transact200ResponseStatusResponse) GetOriginChain() Transact200ResponseStatusResponseOriginChain {
+// GetOriginNetwork returns the OriginNetwork field value
+func (o *Transact200ResponseStatusResponse) GetOriginNetwork() Transact200ResponseStatusResponseOriginNetwork {
 	if o == nil {
-		var ret Transact200ResponseStatusResponseOriginChain
+		var ret Transact200ResponseStatusResponseOriginNetwork
 		return ret
 	}
 
-	return o.OriginChain
+	return o.OriginNetwork
 }
 
-// GetOriginChainOk returns a tuple with the OriginChain field value
+// GetOriginNetworkOk returns a tuple with the OriginNetwork field value
 // and a boolean to check if the value has been set.
-func (o *Transact200ResponseStatusResponse) GetOriginChainOk() (*Transact200ResponseStatusResponseOriginChain, bool) {
+func (o *Transact200ResponseStatusResponse) GetOriginNetworkOk() (*Transact200ResponseStatusResponseOriginNetwork, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.OriginChain, true
+	return &o.OriginNetwork, true
 }
 
-// SetOriginChain sets field value
-func (o *Transact200ResponseStatusResponse) SetOriginChain(v Transact200ResponseStatusResponseOriginChain) {
-	o.OriginChain = v
+// SetOriginNetwork sets field value
+func (o *Transact200ResponseStatusResponse) SetOriginNetwork(v Transact200ResponseStatusResponseOriginNetwork) {
+	o.OriginNetwork = v
 }
 
-// GetDestinationChain returns the DestinationChain field value
-func (o *Transact200ResponseStatusResponse) GetDestinationChain() Transact200ResponseStatusResponseDestinationChain {
+// GetDestinationNetwork returns the DestinationNetwork field value
+func (o *Transact200ResponseStatusResponse) GetDestinationNetwork() Transact200ResponseStatusResponseDestinationNetwork {
 	if o == nil {
-		var ret Transact200ResponseStatusResponseDestinationChain
+		var ret Transact200ResponseStatusResponseDestinationNetwork
 		return ret
 	}
 
-	return o.DestinationChain
+	return o.DestinationNetwork
 }
 
-// GetDestinationChainOk returns a tuple with the DestinationChain field value
+// GetDestinationNetworkOk returns a tuple with the DestinationNetwork field value
 // and a boolean to check if the value has been set.
-func (o *Transact200ResponseStatusResponse) GetDestinationChainOk() (*Transact200ResponseStatusResponseDestinationChain, bool) {
+func (o *Transact200ResponseStatusResponse) GetDestinationNetworkOk() (*Transact200ResponseStatusResponseDestinationNetwork, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.DestinationChain, true
+	return &o.DestinationNetwork, true
 }
 
-// SetDestinationChain sets field value
-func (o *Transact200ResponseStatusResponse) SetDestinationChain(v Transact200ResponseStatusResponseDestinationChain) {
-	o.DestinationChain = v
+// SetDestinationNetwork sets field value
+func (o *Transact200ResponseStatusResponse) SetDestinationNetwork(v Transact200ResponseStatusResponseDestinationNetwork) {
+	o.DestinationNetwork = v
 }
 
 func (o Transact200ResponseStatusResponse) MarshalJSON() ([]byte, error) {
@@ -236,8 +236,8 @@ func (o Transact200ResponseStatusResponse) ToMap() (map[string]interface{}, erro
 	toSerialize["stage"] = o.Stage
 	toSerialize["step"] = o.Step
 	toSerialize["startTime"] = o.StartTime
-	toSerialize["originChain"] = o.OriginChain
-	toSerialize["destinationChain"] = o.DestinationChain
+	toSerialize["originNetwork"] = o.OriginNetwork
+	toSerialize["destinationNetwork"] = o.DestinationNetwork
 	return toSerialize, nil
 }
 
