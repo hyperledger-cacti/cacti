@@ -4,24 +4,24 @@
   "description": "HTLC Coordinator to exchange tokens between networks.",
   "keywords": [
     "Hyperledger",
-    "Cactus",
+    "Cacti",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cactus Contributors",
-    "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cacti"
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "contributors": [
     {

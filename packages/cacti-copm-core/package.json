@@ -2,6 +2,13 @@
   "name": "@hyperledger-cacti/cacti-copm-core",
   "version": "2.1.0",
   "description": "Cacti Common Operators",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
   "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
@@ -11,7 +18,21 @@
     "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
-  "author": "Jennifer Bell",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Jennifer Bell"
+    }
+  ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
@@ -38,5 +59,12 @@
     "@connectrpc/connect-node": "1.4.0",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@openapitools/openapi-generator-cli": "2.7.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
