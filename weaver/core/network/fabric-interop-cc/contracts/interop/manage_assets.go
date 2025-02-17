@@ -174,7 +174,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 	return nil
 }
 
-// IsAssetLocked cc is used to query the ledger and find out if an asset is locked or not (this uses the contractId)
+// IsAssetLockedQueryUsingContractId cc is used to query the ledger and find out if an asset is locked or not (this uses the contractId)
 func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {

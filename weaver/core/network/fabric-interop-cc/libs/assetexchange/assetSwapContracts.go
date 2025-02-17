@@ -463,7 +463,7 @@ func IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contract
 	return true, nil
 }
 
-// IsAssetLocked cc is used to query the ledger and find out if an asset is locked or not (this uses the contractId)
+// IsAssetLockedQueryUsingContractId cc is used to query the ledger and find out if an asset is locked or not (this uses the contractId)
 func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
 
 	_, assetLockVal, err := fetchLockStateUsingContractId(ctx, contractId)
