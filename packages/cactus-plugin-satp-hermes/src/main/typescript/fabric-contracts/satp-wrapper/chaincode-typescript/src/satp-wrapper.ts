@@ -569,7 +569,7 @@ export class SATPContractWrapper
 
   /**
    * @notice Interacts with the token contract.
-   * This function allows modular interactions by dynamically calling contract functions based on the stored interactions. 
+   * This function allows modular interactions by dynamically calling contract functions based on the stored interactions.
    * To mitigate the risk of attacks, this method only allows the usage of known variables and only variables that are assigned to the specific token.
    * @param ctx The transaction context.
    * @param interaction The interaction.

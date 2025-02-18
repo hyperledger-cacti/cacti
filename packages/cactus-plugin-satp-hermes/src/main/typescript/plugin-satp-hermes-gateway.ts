@@ -235,7 +235,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     await Promise.all([this.startupGOLServer()]);
   }
 
-
   /* IPluginWebService methods */
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
@@ -261,7 +260,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     }
     return webServices;
   }
-  
+
   /* Getters */
   public get BLODispatcherInstance(): BLODispatcher | undefined {
     return this.BLODispatcher;
@@ -290,8 +289,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return this._pubKey;
   }
 
-  public getOpenApiSpec(): swaggerUi.JsonObject {
-    return this.OAS;
+  public getOpenApiSpec(): unknown {
+    return undefined; //this.OAS;
+    /*
+    This needs to be fixed. api-server installs some validation middleware using this
+    and it was breaking the integration of the plugin with the api-server.
+      Error: 404 not found - on all api requests when the middleware is installed.
+    */
   }
 
   public get Identity(): GatewayIdentity {
@@ -541,7 +545,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.trace(`Entering ${fnTag}`);
     this.logger.info("Connecting to gateway");
     this.gatewayOrchestrator.resolveAndAddGateways(IDs);
-
   }
 
   // todo connect to gateway - stage 0
