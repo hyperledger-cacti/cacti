@@ -228,7 +228,7 @@ describe("SATPGateway initialization", () => {
     expect(loggerSpy).toHaveBeenCalledWith("mockHook");
     expect(mockHookFn).toHaveBeenCalled();
 
-    // For now, technically not needed. However if we use more tests with loggerSpy, conflicts could arise. 
+    // For now, technically not needed. However if we use more tests with loggerSpy, conflicts could arise.
     // This is a reminder to restore the spy after each test
     loggerSpy.mockRestore();
   });
@@ -382,8 +382,9 @@ describe("SATPGateway startup", () => {
       expect(result).toBeDefined();
       expect(result.status).toBe(200);
     } catch (error) {
-      logger.error `Error: ${error}`;
+      logger.error`Error: ${error}`;
     } finally {
+      // todo error in the test, something was not properly shutdown
       await gateway.shutdown();
       await httpServer2.closeAllConnections();
       await apiServer1.shutdown();

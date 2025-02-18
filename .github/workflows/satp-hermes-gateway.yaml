@@ -1,0 +1,127 @@
+name: SATP CI - tests and docker deployments
+on:
+  pull_request:
+    branches: [main, satp-dev]
+  push:
+    branches: [main, satp-dev]
+
+jobs:
+  run-satp-tests:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4.1.1
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v4.0.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: ./tools/ci.sh
+
+  set-docker-tags:
+    runs-on: ubuntu-22.04
+    needs: run-satp-tests
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
+    outputs:
+      tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
+      tag_version: ${{ steps.set_tags.outputs.tag_version }}
+      dockerhub_image: ${{ steps.set_tags.outputs.dockerhub_image }}
+      ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Set image tags
+        id: set_tags
+        run: |
+          TAG_SUFFIX=$(if [ "${{ github.ref }}" = "refs/heads/main" ]; then echo "prod"; else echo "dev"; fi)
+          TAG_VERSION="$(date -u +"%Y-%m-%dT%H-%M-%S")-${TAG_SUFFIX}-$(git rev-parse --short HEAD)"
+          DOCKERHUB_IMAGE="hyperledger/satp-hermes-gateway"
+          GHCR_IMAGE="ghcr.io/hyperledger-cacti/satp-hermes-gateway"
+          echo "tag_suffix=${TAG_SUFFIX}" >> $GITHUB_OUTPUT
+          echo "tag_version=${TAG_VERSION}" >> $GITHUB_OUTPUT
+          echo "dockerhub_image=${DOCKERHUB_IMAGE}" >> $GITHUB_OUTPUT
+          echo "ghcr_image=${GHCR_IMAGE}" >> $GITHUB_OUTPUT
+
+  build-and-push-dockerhub:
+    runs-on: ubuntu-22.04
+    needs: set-docker-tags
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Configure and build bundle
+        run: |
+          yarn configure
+          yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/cactus-plugin-satp-hermes/
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          push: true
+          labels: |
+            org.opencontainers.image.source=https://github.com/hyperledger/cacti
+            org.opencontainers.image.description=SATP Hermes Gateway
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Hyperledger
+            org.opencontainers.image.version=${{ needs.set-docker-tags.outputs.tag_version }}
+            org.opencontainers.image.visibility=public
+          tags: |
+            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest
+
+  build-and-push-ghcr:
+    runs-on: ubuntu-22.04
+    needs: set-docker-tags
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Configure and build bundle
+        run: |
+          yarn configure
+          yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/cactus-plugin-satp-hermes/
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          push: true
+          labels: |
+            org.opencontainers.image.source=https://github.com/hyperledger/cacti
+            org.opencontainers.image.description=SATP Hermes Gateway
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Hyperledger
+            org.opencontainers.image.version=${{ needs.set-docker-tags.outputs.tag_version }}
+            org.opencontainers.image.visibility=public
+          tags: |
+            ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+            ${{ needs.set-docker-tags.outputs.ghcr_image }}:latest

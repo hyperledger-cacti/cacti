@@ -261,6 +261,20 @@ docker compose \
   --build
 ```
 
+To push the current version to the official repo, run (tested in MacOS):
+```sh
+IMAGE_NAME=ghcr.io/hyperledger-cacti/satp-hermes-gateway
+DEV_TAG="$(date -u +"%Y-%m-%dT%H-%M-%S")-dev-$(git rev-parse --short HEAD)"
+
+echo "Building Docker image with name: $IMAGE_NAME:$DEV_TAG"
+
+docker build  \
+  --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile \
+  ./packages/cactus-plugin-satp-hermes/ \
+  --tag $IMAGE_NAME:$DEV_TAG \
+  --tag $IMAGE_NAME:latest
+```
+
 > The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
 
 ## Contributing
