@@ -181,7 +181,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: "latest",
-      containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
+      containerImageName: "rafaelapb/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
       configFile: files.configFile,
