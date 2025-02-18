@@ -50,7 +50,7 @@ export interface BLODispatcherOptions {
   remoteRepository?: IRemoteLogRepository;
 }
 
-  // TODO: addGateways as an admin endpoint, simply calls orchestrator
+// TODO: addGateways as an admin endpoint, simply calls orchestrator
 export class BLODispatcher {
   public static readonly CLASS_NAME = "BLODispatcher";
   private readonly logger: Logger;
