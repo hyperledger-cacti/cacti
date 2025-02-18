@@ -50,8 +50,6 @@ export async function getAllTgzPath(): Promise<IGetAllTgzPathResponse> {
       "examples/cactus-common-example-server/hyperledger-cactus-common-example-server-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3633
       "packages/cactus-verifier-client/hyperledger-cactus-verifier-client-*.tgz",
-      // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3740
-      "examples/cactus-example-discounted-asset-trade/hyperledger-cactus-example-discounted-asset-trade-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3741
       "examples/cactus-example-electricity-trade/hyperledger-cactus-example-electricity-trade-*.tgz",
     ],
