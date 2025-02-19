@@ -44,7 +44,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FabricBridge } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/fabric-bridge";
 import type { FabricConfig } from "../../../../main/typescript/types/blockchain-interaction";
 import type { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import SATPInteraction from "../../../../test/typescript/fabric/satp-erc20-interact.json";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";

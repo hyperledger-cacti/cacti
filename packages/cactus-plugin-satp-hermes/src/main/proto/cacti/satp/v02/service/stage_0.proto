@@ -1,6 +1,6 @@
 
 syntax = "proto3";
-package cacti.satp.v02;
+package cacti.satp.v02.service;
 
 import "cacti/satp/v02/common/message.proto";
 
@@ -10,7 +10,7 @@ enum STATUS {
   STATUS_REJECTED = 2;
 }
 
-message NewSessionRequestMessage {
+message NewSessionRequest {
   string session_id = 1;
   string context_id = 2;
   string client_transfer_number = 3;
@@ -24,7 +24,7 @@ message NewSessionRequestMessage {
   string sender_gateway_network_type = 11;
 }
 
-message NewSessionResponseMessage {
+message NewSessionResponse {
   string session_id = 1;
   string context_id = 2;
   STATUS status = 3;
@@ -39,7 +39,7 @@ message NewSessionResponseMessage {
 
 }
 
-message PreSATPTransferRequestMessage {
+message PreSATPTransferRequest {
   string session_id = 1;
   string context_id = 2;
   string client_transfer_number = 3;
@@ -55,7 +55,7 @@ message PreSATPTransferRequestMessage {
   cacti.satp.v02.common.MessageType message_type = 13;
 }
 
-message PreSATPTransferResponseMessage {
+message PreSATPTransferResponse {
   string session_id = 1;
   string context_id = 2;
   cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 3;
@@ -76,7 +76,7 @@ message CheckResponse {
 }
 
 service SatpStage0Service {
-  rpc NewSession(NewSessionRequestMessage) returns (NewSessionResponseMessage) {}
-  rpc PreSATPTransfer(PreSATPTransferRequestMessage) returns (PreSATPTransferResponseMessage) {}
+  rpc NewSession(NewSessionRequest) returns (NewSessionResponse) {}
+  rpc PreSATPTransfer(PreSATPTransferRequest) returns (PreSATPTransferResponse) {}
   rpc Check(CheckRequest) returns (CheckResponse) {}
 }

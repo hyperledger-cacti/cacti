@@ -9,14 +9,14 @@ import {
   WrapAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  type NewSessionRequestMessage,
-  type NewSessionResponseMessage,
-  NewSessionResponseMessageSchema,
-  type PreSATPTransferRequestMessage,
-  type PreSATPTransferResponseMessage,
-  PreSATPTransferResponseMessageSchema,
+  type NewSessionRequest,
+  type NewSessionResponse,
+  NewSessionResponseSchema,
+  type PreSATPTransferRequest,
+  type PreSATPTransferResponse,
+  PreSATPTransferResponseSchema,
   STATUS,
-} from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+} from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
@@ -85,7 +85,7 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async checkNewSessionRequest(
-    request: NewSessionRequestMessage,
+    request: NewSessionRequest,
     session: SATPSession | undefined,
     clientPubKey: string,
   ): Promise<SATPSession> {
@@ -176,7 +176,7 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async checkPreSATPTransferRequest(
-    request: PreSATPTransferRequestMessage,
+    request: PreSATPTransferRequest,
     session: SATPSession,
   ): Promise<void> {
     const stepTag = `checkPreSATPTransferRequest()`;
@@ -285,9 +285,9 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async newSessionResponse(
-    request: NewSessionRequestMessage,
+    request: NewSessionRequest,
     session: SATPSession,
-  ): Promise<NewSessionResponseMessage> {
+  ): Promise<NewSessionResponse> {
     const stepTag = `newSessionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.NEW_SESSION_RESPONSE];
@@ -316,7 +316,7 @@ export class Stage0ServerService extends SATPService {
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });
-      const newSessionResponse = create(NewSessionResponseMessageSchema, {
+      const newSessionResponse = create(NewSessionResponseSchema, {
         sessionId: sessionData.id,
         contextId: sessionData.transferContextId,
         recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
@@ -375,15 +375,15 @@ export class Stage0ServerService extends SATPService {
 
   public async newSessionErrorResponse(
     error: SATPInternalError,
-  ): Promise<NewSessionResponseMessage> {
-    let newSessionResponse = create(NewSessionResponseMessageSchema, {
+  ): Promise<NewSessionResponse> {
+    let newSessionResponse = create(NewSessionResponseSchema, {
       messageType: MessageType.NEW_SESSION_RESPONSE,
     });
 
     newSessionResponse = this.setError(
       newSessionResponse,
       error,
-    ) as NewSessionResponseMessage;
+    ) as NewSessionResponse;
 
     const messageSignature = bufArray2HexStr(
       sign(this.Signer, safeStableStringify(newSessionResponse)),
@@ -397,15 +397,15 @@ export class Stage0ServerService extends SATPService {
   public async preSATPTransferErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
-  ): Promise<PreSATPTransferResponseMessage> {
-    let preSATPTransferResponse = create(PreSATPTransferResponseMessageSchema, {
+  ): Promise<PreSATPTransferResponse> {
+    let preSATPTransferResponse = create(PreSATPTransferResponseSchema, {
       messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
     });
 
     preSATPTransferResponse = this.setError(
       preSATPTransferResponse,
       error,
-    ) as PreSATPTransferResponseMessage;
+    ) as PreSATPTransferResponse;
 
     if (!(error instanceof SessionNotFoundError) && session != undefined) {
       preSATPTransferResponse.sessionId = session.getServerSessionData().id;
@@ -421,9 +421,9 @@ export class Stage0ServerService extends SATPService {
   }
 
   public async preSATPTransferResponse(
-    request: PreSATPTransferRequestMessage,
+    request: PreSATPTransferRequest,
     session: SATPSession,
-  ): Promise<PreSATPTransferResponseMessage> {
+  ): Promise<PreSATPTransferResponse> {
     const stepTag = `preSATPTransferResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.PRE_TRANSFER_COMMENCE_RESPONSE];
@@ -459,20 +459,17 @@ export class Stage0ServerService extends SATPService {
         throw new AssetMissing(fnTag);
       }
 
-      const preSATPTransferResponse = create(
-        PreSATPTransferResponseMessageSchema,
-        {
-          sessionId: sessionData.id,
-          contextId: sessionData.transferContextId,
-          hashPreviousMessage: getMessageHash(
-            sessionData,
-            MessageType.PRE_SATP_TRANSFER_REQUEST,
-          ),
-          wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
-          recipientTokenId: sessionData.receiverAsset!.tokenId,
-          messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
-        },
-      );
+      const preSATPTransferResponse = create(PreSATPTransferResponseSchema, {
+        sessionId: sessionData.id,
+        contextId: sessionData.transferContextId,
+        hashPreviousMessage: getMessageHash(
+          sessionData,
+          MessageType.PRE_SATP_TRANSFER_REQUEST,
+        ),
+        wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
+        recipientTokenId: sessionData.receiverAsset!.tokenId,
+        messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+      });
 
       const messageSignature = bufArray2HexStr(
         sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
@@ -600,9 +597,9 @@ export class Stage0ServerService extends SATPService {
     }
   }
   private setError(
-    message: NewSessionResponseMessage | PreSATPTransferResponseMessage,
+    message: NewSessionResponse | PreSATPTransferResponse,
     error: SATPInternalError,
-  ): NewSessionResponseMessage | PreSATPTransferResponseMessage {
+  ): NewSessionResponse | PreSATPTransferResponse {
     message.error = true;
     message.errorCode = error.getSATPErrorType();
     return message;

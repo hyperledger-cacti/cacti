@@ -30,7 +30,7 @@ import {
   bufArray2HexStr,
   getSatpLogKey,
 } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
@@ -295,6 +295,7 @@ describe("CrashManager Tests", () => {
       .mockImplementation(async () => true);
 
     jest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .spyOn(crashManager as any, "checkCrash")
       .mockImplementation(() => Promise.resolve(CrashStatus.IN_RECOVERY));
     crashManager.sessions.set(
@@ -320,6 +321,7 @@ describe("CrashManager Tests", () => {
       .mockImplementation(async () => true);
 
     jest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .spyOn(crashManager as any, "checkCrash")
       .mockImplementation(() => Promise.resolve(CrashStatus.IN_RECOVERY));
 

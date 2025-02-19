@@ -4,28 +4,39 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
-import type { AckSchema } from "./message_pb";
-import { file_cacti_satp_v02_common_message } from "./message_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file cacti/satp/v02/common/health.proto.
  */
 export const file_cacti_satp_v02_common_health: GenFile = /*@__PURE__*/
-  fileDesc("CiJjYWN0aS9zYXRwL3YwMi9jb21tb24vaGVhbHRoLnByb3RvEhVjYWN0aS5zYXRwLnYwMi5jb21tb24iFAoSSGVhbHRoQ2hlY2tSZXF1ZXN0MmUKDUhlYWx0aFNlcnZpY2USVAoLQ2hlY2tIZWFsdGgSKS5jYWN0aS5zYXRwLnYwMi5jb21tb24uSGVhbHRoQ2hlY2tSZXF1ZXN0GhouY2FjdGkuc2F0cC52MDIuY29tbW9uLkFja2IGcHJvdG8z", [file_cacti_satp_v02_common_message]);
+  fileDesc("CiJjYWN0aS9zYXRwL3YwMi9jb21tb24vaGVhbHRoLnByb3RvEhVjYWN0aS5zYXRwLnYwMi5jb21tb24iFAoSQ2hlY2tIZWFsdGhSZXF1ZXN0IhUKE0NoZWNrSGVhbHRoUmVzcG9uc2UydQoNSGVhbHRoU2VydmljZRJkCgtDaGVja0hlYWx0aBIpLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5DaGVja0hlYWx0aFJlcXVlc3QaKi5jYWN0aS5zYXRwLnYwMi5jb21tb24uQ2hlY2tIZWFsdGhSZXNwb25zZWIGcHJvdG8z");
 
 /**
- * @generated from message cacti.satp.v02.common.HealthCheckRequest
+ * @generated from message cacti.satp.v02.common.CheckHealthRequest
  */
-export type HealthCheckRequest = Message<"cacti.satp.v02.common.HealthCheckRequest"> & {
+export type CheckHealthRequest = Message<"cacti.satp.v02.common.CheckHealthRequest"> & {
 };
 
 /**
- * Describes the message cacti.satp.v02.common.HealthCheckRequest.
- * Use `create(HealthCheckRequestSchema)` to create a new message.
+ * Describes the message cacti.satp.v02.common.CheckHealthRequest.
+ * Use `create(CheckHealthRequestSchema)` to create a new message.
  */
-export const HealthCheckRequestSchema: GenMessage<HealthCheckRequest> = /*@__PURE__*/
+export const CheckHealthRequestSchema: GenMessage<CheckHealthRequest> = /*@__PURE__*/
   messageDesc(file_cacti_satp_v02_common_health, 0);
+
+/**
+ * @generated from message cacti.satp.v02.common.CheckHealthResponse
+ */
+export type CheckHealthResponse = Message<"cacti.satp.v02.common.CheckHealthResponse"> & {
+};
+
+/**
+ * Describes the message cacti.satp.v02.common.CheckHealthResponse.
+ * Use `create(CheckHealthResponseSchema)` to create a new message.
+ */
+export const CheckHealthResponseSchema: GenMessage<CheckHealthResponse> = /*@__PURE__*/
+  messageDesc(file_cacti_satp_v02_common_health, 1);
 
 /**
  * @generated from service cacti.satp.v02.common.HealthService
@@ -36,8 +47,8 @@ export const HealthService: GenService<{
    */
   checkHealth: {
     methodKind: "unary";
-    input: typeof HealthCheckRequestSchema;
-    output: typeof AckSchema;
+    input: typeof CheckHealthRequestSchema;
+    output: typeof CheckHealthResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cacti_satp_v02_common_health, 0);
