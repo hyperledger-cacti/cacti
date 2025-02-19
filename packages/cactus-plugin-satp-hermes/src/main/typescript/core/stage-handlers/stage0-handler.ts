@@ -10,13 +10,13 @@ import {
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import {
-  NewSessionRequestMessage,
-  NewSessionResponseMessage,
-  PreSATPTransferRequestMessage,
-  PreSATPTransferResponseMessage,
-} from "../../generated/proto/cacti/satp/v02/stage_0_pb";
+  NewSessionRequest,
+  NewSessionResponse,
+  PreSATPTransferRequest,
+  PreSATPTransferResponse,
+} from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { Stage0ClientService } from "../stage-services/client/stage0-client-service";
 import {
   FailedToCreateMessageError,
@@ -63,9 +63,9 @@ export class Stage0SATPHandler implements SATPHandler {
   }
 
   private async NewSessionImplementation(
-    req: NewSessionRequestMessage,
+    req: NewSessionRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<NewSessionResponseMessage> {
+  ): Promise<NewSessionResponse> {
     const stepTag = `NewSessionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -122,9 +122,9 @@ export class Stage0SATPHandler implements SATPHandler {
   }
 
   private async PreSATPTransferImplementation(
-    req: PreSATPTransferRequestMessage,
+    req: PreSATPTransferRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<PreSATPTransferResponseMessage> {
+  ): Promise<PreSATPTransferResponse> {
     const stepTag = `PreSATPTransferImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -181,10 +181,10 @@ export class Stage0SATPHandler implements SATPHandler {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     router.service(SatpStage0Service, {
-      async newSession(req): Promise<NewSessionResponseMessage> {
+      async newSession(req): Promise<NewSessionResponse> {
         return await that.NewSessionImplementation(req);
       },
-      async preSATPTransfer(req): Promise<PreSATPTransferResponseMessage> {
+      async preSATPTransfer(req): Promise<PreSATPTransferResponse> {
         return await that.PreSATPTransferImplementation(req);
       },
     });
@@ -194,7 +194,7 @@ export class Stage0SATPHandler implements SATPHandler {
 
   public async NewSessionRequest(
     sessionId: string,
-  ): Promise<NewSessionRequestMessage> {
+  ): Promise<NewSessionRequest> {
     const stepTag = `NewSessionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -240,9 +240,9 @@ export class Stage0SATPHandler implements SATPHandler {
   }
 
   public async PreSATPTransferRequest(
-    response: NewSessionResponseMessage,
+    response: NewSessionResponse,
     sessionId: string,
-  ): Promise<PreSATPTransferRequestMessage> {
+  ): Promise<PreSATPTransferRequest> {
     const stepTag = `PreSATPTransferRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
