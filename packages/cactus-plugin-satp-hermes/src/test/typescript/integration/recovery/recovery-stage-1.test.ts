@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   SATPGatewayConfig,
   PluginFactorySATPGateway,

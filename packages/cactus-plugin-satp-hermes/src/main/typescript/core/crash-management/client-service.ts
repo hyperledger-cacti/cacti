@@ -1,13 +1,13 @@
 import {
-  type RecoverMessage,
-  RecoverMessageSchema,
-  type RecoverSuccessMessage,
-  RecoverSuccessMessageSchema,
-  type RollbackMessage,
-  RollbackMessageSchema,
-  type RollbackState,
-} from "../../../typescript/generated/proto/cacti/satp/v02/crash_recovery_pb";
-import type { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
+  RecoverRequest,
+  RecoverRequestSchema,
+  RecoverSuccessRequest,
+  RecoverSuccessRequestSchema,
+  RollbackRequest,
+  RollbackRequestSchema,
+  RollbackState,
+} from "../../../typescript/generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign } from "../../gateway-utils";
@@ -23,17 +23,17 @@ export class CrashRecoveryClientService {
     this.log.trace(`Initialized ${CrashRecoveryClientService.name}`);
   }
 
-  public async createRecoverMessage(
+  public async createRecoverRequest(
     sessionData: SessionData,
-  ): Promise<RecoverMessage> {
-    const fnTag = `${CrashRecoveryClientService.name}#createRecoverMessage`;
+  ): Promise<RecoverRequest> {
+    const fnTag = `${CrashRecoveryClientService.name}#createRecoverRequest`;
 
     this.log.debug(
-      `${fnTag} - Creating RecoverMessage for sessionId: ${sessionData.id}`,
+      `${fnTag} - Creating RecoverRequest for sessionId: ${sessionData.id}`,
     );
 
     const satpPhase = getCrashedStage(sessionData);
-    const recoverMessage = create(RecoverMessageSchema, {
+    const recoverMessage = create(RecoverRequestSchema, {
       sessionId: sessionData.id,
       messageType: "urn:ietf:SATP-2pc:msgtype:recover-msg",
       satpPhase: String(satpPhase),
@@ -50,20 +50,20 @@ export class CrashRecoveryClientService {
 
     recoverMessage.clientSignature = signature;
 
-    this.log.debug(`${fnTag} - RecoverMessage created:`, recoverMessage);
+    this.log.debug(`${fnTag} - RecoverRequest created:`, recoverMessage);
 
     return recoverMessage;
   }
 
-  public async createRecoverSuccessMessage(
+  public async createRecoverSuccessRequest(
     sessionData: SessionData,
-  ): Promise<RecoverSuccessMessage> {
-    const fnTag = `${CrashRecoveryClientService.name}#createRecoverSuccessMessage`;
+  ): Promise<RecoverSuccessRequest> {
+    const fnTag = `${CrashRecoveryClientService.name}#createRecoverSuccessRequest`;
     this.log.debug(
-      `${fnTag} - Creating RecoverSuccessMessage for sessionId: ${sessionData.id}`,
+      `${fnTag} - Creating RecoverSuccessRequest for sessionId: ${sessionData.id}`,
     );
 
-    const recoverSuccessMessage = create(RecoverSuccessMessageSchema, {
+    const recoverSuccessMessage = create(RecoverSuccessRequestSchema, {
       sessionId: sessionData.id,
       messageType: "urn:ietf:SATP-2pc:msgtype:recover-success-msg",
       // TODO: implement
@@ -80,23 +80,23 @@ export class CrashRecoveryClientService {
     recoverSuccessMessage.clientSignature = signature;
 
     this.log.debug(
-      `${fnTag} - RecoverSuccessMessage created:`,
+      `${fnTag} - RecoverSuccessRequest created:`,
       recoverSuccessMessage,
     );
 
     return recoverSuccessMessage;
   }
 
-  public async createRollbackMessage(
+  public async createRollbackRequest(
     sessionData: SessionData,
     rollbackState: RollbackState,
-  ): Promise<RollbackMessage> {
-    const fnTag = `${CrashRecoveryClientService.name}#createRollbackMessage`;
+  ): Promise<RollbackRequest> {
+    const fnTag = `${CrashRecoveryClientService.name}#createRollbackRequest`;
     this.log.debug(
-      `${fnTag} - Creating RollbackMessage for sessionId: ${sessionData.id}`,
+      `${fnTag} - Creating RollbackRequest for sessionId: ${sessionData.id}`,
     );
 
-    const rollbackMessage = create(RollbackMessageSchema, {
+    const rollbackMessage = create(RollbackRequestSchema, {
       sessionId: sessionData.id,
       messageType: "urn:ietf:SATP-2pc:msgtype:rollback-msg",
       success: rollbackState.status === "COMPLETED",
@@ -113,7 +113,7 @@ export class CrashRecoveryClientService {
 
     rollbackMessage.clientSignature = signature;
 
-    this.log.debug(`${fnTag} - RollbackMessage created:`, rollbackMessage);
+    this.log.debug(`${fnTag} - RollbackRequest created:`, rollbackMessage);
 
     return rollbackMessage;
   }
