@@ -185,38 +185,6 @@ Let us consider two gateways. The client gateway connected to Hyperledger Fabric
   - An IPFS API client on URL: http://localhost:8047
   - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/test/typescript/knex.config.ts)
 
-Then the SATP gateways should be created as follows:
-
-```typescript
-const clientGatewayOptions: IFabricSATPGatewayConstructorOptions = {
-  name: "cactus-plugin#clientOdapGateway",
-  dltIDs: ["DLT2"],
-  instanceId: uuidv4(),
-  ipfsPath: "http://localhost:8047",
-  fabricPath: "http://localhost:8045",
-  fabricSigningCredential: fabricSigningCredential,
-  fabricChannelName: fabricChannelName,
-  fabricContractName: fabricContractName,
-  clientHelper: new ClientGatewayHelper(),
-  serverHelper: new ServerGatewayHelper(),
-};
-
-const serverGatewayOptions: IBesuSATPGatewayConstructorOptions = {
-  name: "cactus-plugin#serverOdapGateway",
-  dltIDs: ["DLT1"],
-  instanceId: uuidv4(),
-  ipfsPath: "http://localhost:8047",
-  besuPath: "http://localhost:8046",
-  besuWeb3SigningCredential: besuWeb3SigningCredential,
-  besuContractName: besuContractName,
-  besuKeychainId: besuKeychainId,
-  clientHelper: new ClientGatewayHelper(),
-  serverHelper: new ServerGatewayHelper(),
-};
-   
-  const clientGateway = new FabricSATPGateway(clientGatewayOptions);
-  const serverGateway = new BesuSATPGateway(serverGatewayOptions);
-```
 
 Note that these gateways are extensions of the [default SATP Gateway class](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/main/typescript/gateway/plugin-satp-gateway.ts), that implements the gateway functionality. Each of these extensions implements ledger-specific operations.
 

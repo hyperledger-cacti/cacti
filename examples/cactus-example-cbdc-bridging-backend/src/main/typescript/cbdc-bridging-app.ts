@@ -92,7 +92,6 @@ export class CbdcBridgingApp {
     const besuPlugin = await this.infrastructure.createBesuLedgerConnector();
     const gatways = await this.infrastructure.createSATPGateways();
 
-
     this.log.info(`SATP Gateways started.`);
     // Reserve the ports where the API Servers will run
     const httpApiA = await Servers.startOnPort(
@@ -135,11 +134,16 @@ export class CbdcBridgingApp {
     serverPluginRegistry.add(gatways[1]);
     await gatways[1].onPluginInit();
 
-    const crpcOptionsServer1 = {host: 'localhost', port: 6000};
-    const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry, crpcOptionsServer1, 5101);
-    const crpcOptionsServer2 = {host: 'localhost', port: 6001};
+    const crpcOptionsServer1 = { host: "localhost", port: 6000 };
+    await this.startNode(
+      httpApiA,
+      clientPluginRegistry,
+      crpcOptionsServer1,
+      5101,
+    );
+    const crpcOptionsServer2 = { host: "localhost", port: 6001 };
 
-    const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry,crpcOptionsServer2, 5100);
+    this.startNode(httpApiB, serverPluginRegistry, crpcOptionsServer2, 5100);
 
     const fabricApiClient = new FabricApi(
       new Configuration({ basePath: nodeApiHostA }),
@@ -163,8 +167,6 @@ export class CbdcBridgingApp {
     await this.infrastructure.initializeContractsAndAddPermitions();
 
     this.log.info(`Chaincode and smart Contracts deployed.`);
-
-    
 
     return {
       fabricApiClient,
@@ -192,8 +194,6 @@ export class CbdcBridgingApp {
 
     const addressInfoApi = httpServerApi.address() as AddressInfo;
 
-    
-
     const configService = new ConfigService();
     const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
@@ -209,7 +209,7 @@ export class CbdcBridgingApp {
     const config =
       await configService.newExampleConfigConvict(apiServerOptions);
     const prop = config.getProperties();
-    prop.grpcPort = grpcPort
+    prop.grpcPort = grpcPort;
     prop.apiPort = addressInfoApi.port;
     prop.crpcPort = crpcOptions.port;
     this.log.info(prop);

@@ -21,11 +21,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
-import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_pb";
-import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_pb";
-import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_pb";
-import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_pb";
-import { CrashRecovery } from "../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
+import { CrashRecoveryService } from "../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 
 export interface IGatewayOrchestratorOptions {
   logLevel?: LogLevelDesc;
@@ -402,12 +402,12 @@ export class GatewayOrchestrator {
 
   private createCrashServiceClient(
     transport: ConnectTransport,
-  ): ConnectClient<typeof CrashRecovery> {
+  ): ConnectClient<typeof CrashRecoveryService> {
     this.logger.debug(
       "Creating crash-manager client, with transport: ",
       transport,
     );
-    const client = createClient(CrashRecovery, transport);
+    const client = createClient(CrashRecoveryService, transport);
     return client;
   }
 

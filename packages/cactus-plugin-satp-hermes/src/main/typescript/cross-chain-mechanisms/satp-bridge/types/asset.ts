@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
+import { TokenType } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+
 export interface Asset {
   tokenId: string;
   tokenType: TokenType;
@@ -6,14 +8,6 @@ export interface Asset {
   amount: number;
   ontology: string;
   contractName: string;
-}
-
-//When there is new token type, add it here or it will break the code
-export enum TokenType {
-  ERC20 = 0,
-  ERC721 = 1,
-  ERC1155 = 2,
-  NONSTANDARD = 3,
 }
 
 export enum InteractionType {

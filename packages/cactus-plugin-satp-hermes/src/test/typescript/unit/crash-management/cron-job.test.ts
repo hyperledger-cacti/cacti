@@ -22,6 +22,7 @@ import {
   bufArray2HexStr,
   getSatpLogKey,
 } from "../../../../main/typescript/gateway-utils";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   GatewayOrchestrator,
   IGatewayOrchestratorOptions,
@@ -47,7 +48,6 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import knex, { Knex } from "knex";
 import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 
 let crashManager: CrashManager;
 let localRepository: ILocalLogRepository;

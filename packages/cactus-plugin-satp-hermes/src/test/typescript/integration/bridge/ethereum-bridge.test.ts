@@ -14,7 +14,7 @@ import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import Web3 from "web3";
 import { EvmAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/evm-asset";
-import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { EthereumConfig } from "../../../../main/typescript/types/blockchain-interaction";
 import SATPInteraction from "../../../solidity/satp-erc20-interact.json";

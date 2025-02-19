@@ -6,16 +6,16 @@ import {
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATP_VERSION } from "../../constants";
 import {
-  CommitFinalAcknowledgementReceiptResponseMessage,
-  CommitFinalAssertionRequestMessage,
-  CommitFinalAssertionRequestMessageSchema,
-  CommitPreparationRequestMessage,
-  CommitPreparationRequestMessageSchema,
-  CommitReadyResponseMessage,
-  TransferCompleteRequestMessage,
-  TransferCompleteRequestMessageSchema,
-  TransferCompleteResponseMessage,
-} from "../../../generated/proto/cacti/satp/v02/stage_3_pb";
+  CommitFinalAssertionResponse,
+  CommitFinalAssertionRequest,
+  CommitFinalAssertionRequestSchema,
+  CommitPreparationRequest,
+  CommitPreparationRequestSchema,
+  CommitPreparationResponse,
+  TransferCompleteRequest,
+  TransferCompleteRequestSchema,
+  TransferCompleteResponse,
+} from "../../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
   getMessageHash,
@@ -32,7 +32,7 @@ import {
   SATPServiceType,
 } from "../satp-service";
 import { SATPSession } from "../../satp-session";
-import { LockAssertionReceiptMessage } from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
+import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
@@ -75,9 +75,9 @@ export class Stage3ClientService extends SATPService {
   }
 
   async commitPreparation(
-    response: LockAssertionReceiptMessage,
+    response: LockAssertionResponse,
     session: SATPSession,
-  ): Promise<void | CommitPreparationRequestMessage> {
+  ): Promise<void | CommitPreparationRequest> {
     const stepTag = `commitPreparation()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.COMMIT_PREPARE];
@@ -126,7 +126,7 @@ export class Stage3ClientService extends SATPService {
         response.common!.sequenceNumber + BigInt(1);
 
       const commitPreparationRequestMessage = create(
-        CommitPreparationRequestMessageSchema,
+        CommitPreparationRequestSchema,
         {
           common: commonBody,
         },
@@ -181,9 +181,9 @@ export class Stage3ClientService extends SATPService {
   }
 
   async commitFinalAssertion(
-    response: CommitReadyResponseMessage,
+    response: CommitPreparationResponse,
     session: SATPSession,
-  ): Promise<void | CommitFinalAssertionRequestMessage> {
+  ): Promise<void | CommitFinalAssertionRequest> {
     const stepTag = `commitFinalAssertion()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.COMMIT_FINAL];
@@ -236,7 +236,7 @@ export class Stage3ClientService extends SATPService {
       commonBody.resourceUrl = sessionData.resourceUrl;
 
       const commitFinalAssertionRequestMessage = create(
-        CommitFinalAssertionRequestMessageSchema,
+        CommitFinalAssertionRequestSchema,
         {
           common: commonBody,
         },
@@ -306,9 +306,9 @@ export class Stage3ClientService extends SATPService {
   }
 
   async transferComplete(
-    response: CommitFinalAcknowledgementReceiptResponseMessage,
+    response: CommitFinalAssertionResponse,
     session: SATPSession,
-  ): Promise<void | TransferCompleteRequestMessage> {
+  ): Promise<void | TransferCompleteRequest> {
     const stepTag = `transferComplete()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.COMMIT_TRANSFER_COMPLETE];
@@ -356,7 +356,7 @@ export class Stage3ClientService extends SATPService {
         response.common!.sequenceNumber + BigInt(1);
 
       const transferCompleteRequestMessage = create(
-        TransferCompleteRequestMessageSchema,
+        TransferCompleteRequestSchema,
         {
           common: commonBody,
         },
@@ -418,13 +418,13 @@ export class Stage3ClientService extends SATPService {
     }
   }
 
-  async checkLockAssertionReceiptMessage(
-    response: LockAssertionReceiptMessage,
+  async checkLockAssertionResponse(
+    response: LockAssertionResponse,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `checkLockAssertionReceiptMessage()`;
+    const stepTag = `checkLockAssertionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, CheckLockAssertionReceiptMessage...`);
+    this.Log.debug(`${fnTag}, CheckLockAssertionResponse...`);
 
     if (session == undefined) {
       throw new SessionError(fnTag);
@@ -455,16 +455,16 @@ export class Stage3ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
 
-    this.Log.info(`${fnTag}, LockAssertionReceiptMessage passed all checks.`);
+    this.Log.info(`${fnTag}, LockAssertionResponse passed all checks.`);
   }
 
-  async checkCommitReadyResponseMessage(
-    response: CommitReadyResponseMessage,
+  async checkCommitPreparationResponse(
+    response: CommitPreparationResponse,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `checkCommitReadyResponseMessage()`;
+    const stepTag = `checkCommitPreparationResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, CommitReadyResponse...`);
+    this.Log.debug(`${fnTag}, CommitPreparationResponse...`);
 
     if (session == undefined) {
       throw new SessionError(fnTag);
@@ -510,14 +510,14 @@ export class Stage3ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
 
-    this.Log.info(`${fnTag}, CommitReadyResponseMessage passed all checks.`);
+    this.Log.info(`${fnTag}, CommitPreparationResponse passed all checks.`);
   }
 
-  async checkCommitFinalAcknowledgementReceiptResponseMessage(
-    response: CommitFinalAcknowledgementReceiptResponseMessage,
+  async checkCommitFinalAssertionResponse(
+    response: CommitFinalAssertionResponse,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `checkCommitFinalAcknowledgementReceiptResponseMessage()`;
+    const stepTag = `checkCommitFinalAssertionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, CommitFinalAcknowledgementReceipt...`);
 
@@ -564,16 +564,14 @@ export class Stage3ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
 
-    this.Log.info(
-      `${fnTag}, CommitFinalAcknowledgementReceiptResponseMessage passed all checks.`,
-    );
+    this.Log.info(`${fnTag}, CommitFinalAssertionResponse passed all checks.`);
   }
 
-  async checkTransferCompleteResponseMessage(
-    response: TransferCompleteResponseMessage,
+  async checkTransferCompleteResponse(
+    response: TransferCompleteResponse,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `checkTransferCompleteResponseMessage()`;
+    const stepTag = `checkTransferCompleteResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, TransferComplete...`);
 
@@ -612,9 +610,7 @@ export class Stage3ClientService extends SATPService {
       getHash(response),
     );
 
-    this.Log.info(
-      `${fnTag}, TransferCompleteRequestMessage passed all checks.`,
-    );
+    this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
   }
 
   async burnAsset(session: SATPSession): Promise<void> {

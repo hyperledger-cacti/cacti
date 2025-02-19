@@ -1,10 +1,10 @@
 import {
-  TransferCommenceRequestMessage,
-  TransferProposalRequestMessage,
-  TransferProposalReceiptMessage,
-  TransferProposalRequestMessageSchema,
-  TransferCommenceRequestMessageSchema,
-} from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
+  TransferCommenceRequest,
+  TransferProposalRequest,
+  TransferProposalResponse,
+  TransferProposalRequestSchema,
+  TransferCommenceRequestSchema,
+} from "../../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
   MessageType,
   TransferClaims,
@@ -38,7 +38,7 @@ import {
   TransferContextIdError,
   WrapAssertionClaimError,
 } from "../../errors/satp-service-errors";
-import { PreSATPTransferResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../network-identification/chainid-list";
 
@@ -64,7 +64,7 @@ export class Stage1ClientService extends SATPService {
   async transferProposalRequest(
     session: SATPSession,
     connectedDLTs: NetworkId[],
-  ): Promise<void | TransferProposalRequestMessage> {
+  ): Promise<void | TransferProposalRequest> {
     const stepTag = `transferProposalRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     this.Log.debug(`${fnTag}, transferProposalRequest...`);
@@ -179,7 +179,7 @@ export class Stage1ClientService extends SATPService {
       }
 
       const transferProposalRequestMessage = create(
-        TransferProposalRequestMessageSchema,
+        TransferProposalRequestSchema,
         {
           common: commonBody,
           transferInitClaims: transferInitClaims,
@@ -247,9 +247,9 @@ export class Stage1ClientService extends SATPService {
   }
 
   async transferCommenceRequest(
-    response: TransferProposalReceiptMessage,
+    response: TransferProposalResponse,
     session: SATPSession,
-  ): Promise<void | TransferCommenceRequestMessage> {
+  ): Promise<void | TransferCommenceRequest> {
     const stepTag = `transferCommenceRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.TRANSFER_COMMENCE_REQUEST];
@@ -299,7 +299,7 @@ export class Stage1ClientService extends SATPService {
       sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
       const transferCommenceRequestMessage = create(
-        TransferCommenceRequestMessageSchema,
+        TransferCommenceRequestSchema,
         {
           common: commonBody,
           hashTransferInitClaims: sessionData.hashTransferInitClaims,
@@ -349,7 +349,7 @@ export class Stage1ClientService extends SATPService {
   }
 
   async checkPreSATPTransferResponse(
-    response: PreSATPTransferResponseMessage,
+    response: PreSATPTransferResponse,
     session: SATPSession,
   ): Promise<void> {
     const stepTag = `checkPreSATPTransferResponse()`;
@@ -411,13 +411,13 @@ export class Stage1ClientService extends SATPService {
     this.Log.info(`${fnTag}, PreSATPTransferResponse passed all checks.`);
   }
 
-  async checkTransferProposalReceiptMessage(
-    response: TransferProposalReceiptMessage,
+  async checkTransferProposalResponse(
+    response: TransferProposalResponse,
     session: SATPSession,
   ): Promise<boolean> {
-    const stepTag = `checkTransferProposalReceiptMessage()`;
+    const stepTag = `checkTransferProposalResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, checkTransferProposalReceiptMessage...`);
+    this.Log.debug(`${fnTag}, checkTransferProposalResponse...`);
 
     if (session == undefined) {
       throw new SessionError(fnTag);

@@ -1,8 +1,8 @@
 import {
-  LockAssertionReceiptMessage,
-  LockAssertionReceiptMessageSchema,
-  LockAssertionRequestMessage,
-} from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
+  LockAssertionResponse,
+  LockAssertionResponseSchema,
+  LockAssertionRequest,
+} from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import {
   CommonSatpSchema,
   MessageType,
@@ -51,9 +51,9 @@ export class Stage2ServerService extends SATPService {
   }
 
   async lockAssertionResponse(
-    request: LockAssertionRequestMessage,
+    request: LockAssertionRequest,
     session: SATPSession,
-  ): Promise<void | LockAssertionReceiptMessage> {
+  ): Promise<void | LockAssertionResponse> {
     const stepTag = `lockAssertionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.ASSERTION_RECEIPT];
@@ -98,12 +98,9 @@ export class Stage2ServerService extends SATPService {
 
       sessionData.lastSequenceNumber = commonBody.sequenceNumber;
 
-      const lockAssertionReceiptMessage = create(
-        LockAssertionReceiptMessageSchema,
-        {
-          common: commonBody,
-        },
-      );
+      const lockAssertionReceiptMessage = create(LockAssertionResponseSchema, {
+        common: commonBody,
+      });
 
       if (sessionData.transferContextId != undefined) {
         lockAssertionReceiptMessage.common!.transferContextId =
@@ -140,7 +137,7 @@ export class Stage2ServerService extends SATPService {
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });
-      this.Log.info(`${fnTag}, sending LockAssertionResponseMessage...`);
+      this.Log.info(`${fnTag}, sending LockAssertionResponse...`);
 
       return lockAssertionReceiptMessage;
     } catch (error) {
@@ -159,8 +156,8 @@ export class Stage2ServerService extends SATPService {
   async lockAssertionErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
-  ): Promise<LockAssertionReceiptMessage> {
-    const errorResponse = create(LockAssertionReceiptMessageSchema, {});
+  ): Promise<LockAssertionResponse> {
+    const errorResponse = create(LockAssertionResponseSchema, {});
     const commonBody = create(CommonSatpSchema, {
       messageType: MessageType.ASSERTION_RECEIPT,
       error: true,
@@ -181,13 +178,13 @@ export class Stage2ServerService extends SATPService {
     return errorResponse;
   }
 
-  async checkLockAssertionRequestMessage(
-    request: LockAssertionRequestMessage,
+  async checkLockAssertionRequest(
+    request: LockAssertionRequest,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `checkLockAssertionRequestMessage()`;
+    const stepTag = `checkLockAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, checkLockAssertionRequestMessage...`);
+    this.Log.debug(`${fnTag}, checkLockAssertionRequest...`);
 
     if (session == undefined) {
       throw new SessionError(fnTag);
