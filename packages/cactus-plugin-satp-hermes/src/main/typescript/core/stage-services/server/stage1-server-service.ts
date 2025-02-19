@@ -1,11 +1,11 @@
 import {
-  TransferCommenceResponseMessage,
-  TransferCommenceRequestMessage,
-  TransferProposalRequestMessage,
-  TransferProposalReceiptMessage,
-  TransferProposalReceiptMessageSchema,
-  TransferCommenceResponseMessageSchema,
-} from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
+  TransferCommenceResponse,
+  TransferCommenceRequest,
+  TransferProposalRequest,
+  TransferProposalResponse,
+  TransferProposalResponseSchema,
+  TransferCommenceResponseSchema,
+} from "../../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
   MessageType,
   NetworkCapabilities,
@@ -66,9 +66,9 @@ export class Stage1ServerService extends SATPService {
   }
 
   async transferProposalResponse(
-    request: TransferProposalRequestMessage,
+    request: TransferProposalRequest,
     session: SATPSession,
-  ): Promise<void | TransferProposalReceiptMessage> {
+  ): Promise<void | TransferProposalResponse> {
     const stepTag = `transferProposalResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.INIT_RECEIPT];
@@ -127,7 +127,7 @@ export class Stage1ServerService extends SATPService {
         request.common!.sequenceNumber + BigInt(1);
 
       const transferProposalReceiptMessage = create(
-        TransferProposalReceiptMessageSchema,
+        TransferProposalResponseSchema,
         {},
       );
       if (sessionData.state == State.REJECTED) {
@@ -195,8 +195,8 @@ export class Stage1ServerService extends SATPService {
   async transferProposalErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
-  ): Promise<TransferProposalReceiptMessage> {
-    const errorResponse = create(TransferProposalReceiptMessageSchema, {});
+  ): Promise<TransferProposalResponse> {
+    const errorResponse = create(TransferProposalResponseSchema, {});
     const commonBody = create(CommonSatpSchema, {
       messageType: MessageType.PRE_INIT_RECEIPT,
       error: true,
@@ -220,8 +220,8 @@ export class Stage1ServerService extends SATPService {
   async transferCommenceErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
-  ): Promise<TransferCommenceResponseMessage> {
-    const errorResponse = create(TransferCommenceResponseMessageSchema, {});
+  ): Promise<TransferCommenceResponse> {
+    const errorResponse = create(TransferCommenceResponseSchema, {});
     const commonBody = create(CommonSatpSchema, {
       messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
       error: true,
@@ -243,9 +243,9 @@ export class Stage1ServerService extends SATPService {
   }
 
   async transferCommenceResponse(
-    request: TransferCommenceRequestMessage,
+    request: TransferCommenceRequest,
     session: SATPSession,
-  ): Promise<void | TransferCommenceResponseMessage> {
+  ): Promise<void | TransferCommenceResponse> {
     const stepTag = `transferCommenceResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.TRANSFER_COMMENCE_RESPONSE];
@@ -293,7 +293,7 @@ export class Stage1ServerService extends SATPService {
         request.common!.sequenceNumber + BigInt(1);
 
       const transferCommenceResponseMessage = create(
-        TransferCommenceResponseMessageSchema,
+        TransferCommenceResponseSchema,
         {
           common: commonBody,
         },
@@ -342,7 +342,7 @@ export class Stage1ServerService extends SATPService {
   }
 
   async checkTransferProposalRequestMessage(
-    request: TransferProposalRequestMessage,
+    request: TransferProposalRequest,
     session: SATPSession,
     supportedDLTs: NetworkId[],
   ): Promise<void> {
@@ -431,7 +431,7 @@ export class Stage1ServerService extends SATPService {
   }
 
   async checkTransferCommenceRequestMessage(
-    request: TransferCommenceRequestMessage,
+    request: TransferCommenceRequest,
     session: SATPSession,
   ): Promise<void> {
     const stepTag = `checkTransferCommenceRequestMessage()`;
