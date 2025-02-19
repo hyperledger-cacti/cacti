@@ -532,7 +532,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       knexLocalConfig: knexGateway2Connection,
       knexRemoteConfig: knexRemote2Connection,
     };
-    this.stop
+    this.stop;
 
     const besuGateway = await this.gatewayFactory.create(besuGatewayOptions);
 
@@ -1297,7 +1297,7 @@ export class CbdcBridgingAppDummyInfrastructure {
         beneficiaryPubkey: receiverAddress,
         sourceAsset,
         receiverAsset,
-      }
+      };
       await api.transact(request);
     } catch (error) {
       this.log.error(

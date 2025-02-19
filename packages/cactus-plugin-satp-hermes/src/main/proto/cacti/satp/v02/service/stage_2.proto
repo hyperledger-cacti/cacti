@@ -1,12 +1,10 @@
 
 syntax = "proto3";
-package cacti.satp.v02;
+package cacti.satp.v02.service;
 
 import "cacti/satp/v02/common/message.proto";
 
-
-
-message LockAssertionRequestMessage {
+message LockAssertionRequest {
   cacti.satp.v02.common.CommonSatp common = 1;
   cacti.satp.v02.common.LockAssertionClaim lock_assertion_claim = 2;
   cacti.satp.v02.common.LockAssertionClaimFormat lock_assertion_claim_format = 3;
@@ -15,12 +13,12 @@ message LockAssertionRequestMessage {
   string client_signature = 6;
 }
 
-message LockAssertionReceiptMessage {
+message LockAssertionResponse {
   cacti.satp.v02.common.CommonSatp common = 1;
   string server_transfer_number = 2;
   string server_signature = 3;
 }
   
 service SatpStage2Service {
-  rpc LockAssertion(LockAssertionRequestMessage) returns (LockAssertionReceiptMessage) {}
+  rpc LockAssertion(LockAssertionRequest) returns (LockAssertionResponse) {}
 }
