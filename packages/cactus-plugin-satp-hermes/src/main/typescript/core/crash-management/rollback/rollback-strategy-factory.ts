@@ -5,7 +5,7 @@ import { Stage1RollbackStrategy } from "./stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "./stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "./stage3-rollback-strategy";
 import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
-import { RollbackState } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { RollbackState } from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import {
   Type,
   SATPStage,
@@ -36,16 +36,16 @@ export class RollbackStrategyFactory {
     this.log.debug(`${fnTag} Rolling back SATP phase: ${SATPStage[satpPhase]}`);
 
     switch (satpPhase) {
-      case SATPStage.STAGE_0:
+      case SATPStage.SATP_STAGE_0:
         this.log.debug(`${fnTag} Creating Stage0RollbackStrategy`);
         return new Stage0RollbackStrategy(this.bridgesManager, this.log);
-      case SATPStage.STAGE_1:
+      case SATPStage.SATP_STAGE_1:
         this.log.debug(`${fnTag} Creating Stage1RollbackStrategy`);
         return new Stage1RollbackStrategy(this.log);
-      case SATPStage.STAGE_2:
+      case SATPStage.SATP_STAGE_2:
         this.log.debug(`${fnTag} Creating Stage2RollbackStrategy`);
         return new Stage2RollbackStrategy(this.bridgesManager, this.log);
-      case SATPStage.STAGE_3:
+      case SATPStage.SATP_STAGE_3:
         this.log.debug(`${fnTag} Creating Stage3RollbackStrategy`);
         return new Stage3RollbackStrategy(this.bridgesManager, this.log);
       default:

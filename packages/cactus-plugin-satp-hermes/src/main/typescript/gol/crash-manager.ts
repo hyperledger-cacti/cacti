@@ -21,10 +21,10 @@ import {
   IRemoteLogRepository,
 } from "../repository/interfaces/repository";
 import {
-  RecoverUpdateMessage,
+  RecoverResponse,
   RollbackState,
-  RollbackAckMessage,
-} from "../generated/proto/cacti/satp/v02/crash_recovery_pb";
+  RollbackResponse,
+} from "../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import { SATPBridgesManager } from "./satp-bridges-manager";
 import schedule, { Job } from "node-schedule";
 import { CrashRecoveryServerService } from "../core/crash-management/server-service";
@@ -32,7 +32,7 @@ import { CrashRecoveryClientService } from "../core/crash-management/client-serv
 import { GatewayOrchestrator } from "./gateway-orchestrator";
 import { Client as PromiseConnectClient } from "@connectrpc/connect";
 import { GatewayIdentity } from "../core/types";
-import { CrashRecovery } from "../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import { CrashRecoveryService } from "../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import { SATPHandler } from "../types/satp-protocol";
 import { CrashStatus } from "../core/types";
 import { verifySignature } from "../gateway-utils";
@@ -460,20 +460,21 @@ export class CrashManager {
         throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
       }
 
-      const clientCrashRecovery: PromiseConnectClient<typeof CrashRecovery> =
-        channel.clients.get("crash") as PromiseConnectClient<
-          typeof CrashRecovery
-        >;
+      const clientCrashRecovery: PromiseConnectClient<
+        typeof CrashRecoveryService
+      > = channel.clients.get("crash") as PromiseConnectClient<
+        typeof CrashRecoveryService
+      >;
 
       if (!clientCrashRecovery) {
         throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
       }
 
       const recoverMessage =
-        await this.crashRecoveryHandler.sendRecoverMessage(sessionData);
+        await this.crashRecoveryHandler.sendRecoverRequest(sessionData);
 
       const recoverUpdateMessage =
-        await clientCrashRecovery.recoverV2Message(recoverMessage);
+        await clientCrashRecovery.recover(recoverMessage);
 
       const sequenceNumbers = recoverUpdateMessage.recoveredLogs.map(
         (log) => log.sequenceNumber,
@@ -482,19 +483,17 @@ export class CrashManager {
         `${fnTag} - Received logs sequence numbers: ${sequenceNumbers}`,
       );
 
-      const status = await this.processRecoverUpdateMessage(
+      const status = await this.processRecoverRequest(
         recoverUpdateMessage,
         sessionData,
       );
       if (status) {
         const recoverSuccessMessage =
-          await this.crashRecoveryHandler.sendRecoverSuccessMessage(
+          await this.crashRecoveryHandler.sendRecoverSuccessRequest(
             sessionData,
           );
 
-        await clientCrashRecovery.recoverV2SuccessMessage(
-          recoverSuccessMessage,
-        );
+        await clientCrashRecovery.recoverSuccess(recoverSuccessMessage);
 
         this.log.info(
           `${fnTag} - Crash recovery completed for sessionId: ${sessionData.id}`,
@@ -512,8 +511,8 @@ export class CrashManager {
     }
   }
 
-  private async processRecoverUpdateMessage(
-    message: RecoverUpdateMessage,
+  private async processRecoverRequest(
+    message: RecoverResponse,
     sessionData: SessionData,
   ): Promise<boolean> {
     const fnTag = `${this.className}#processRecoverUpdate()`;
@@ -564,9 +563,7 @@ export class CrashManager {
       }
       return true;
     } catch (error) {
-      this.log.error(
-        `${fnTag} Error processing RecoverUpdateMessage: ${error}`,
-      );
+      this.log.error(`${fnTag} Error processing RecoverRequest: ${error}`);
       return false;
     }
   }
@@ -663,30 +660,31 @@ export class CrashManager {
         throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
       }
 
-      const clientCrashRecovery: PromiseConnectClient<typeof CrashRecovery> =
-        channel.clients.get("crash") as PromiseConnectClient<
-          typeof CrashRecovery
-        >;
+      const clientCrashRecovery: PromiseConnectClient<
+        typeof CrashRecoveryService
+      > = channel.clients.get("crash") as PromiseConnectClient<
+        typeof CrashRecoveryService
+      >;
 
       if (!clientCrashRecovery) {
         throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
       }
 
       const rollbackMessage =
-        await this.crashRecoveryHandler.sendRollbackMessage(
+        await this.crashRecoveryHandler.sendRollbackRequest(
           sessionData,
           rollbackState,
         );
 
       const rollbackAckMessage =
-        await clientCrashRecovery.rollbackV2Message(rollbackMessage);
+        await clientCrashRecovery.rollback(rollbackMessage);
 
       this.log.info(
-        `${fnTag} - Received RollbackAckMessage: ${rollbackAckMessage}`,
+        `${fnTag} - Received RollbackResponse: ${rollbackAckMessage}`,
       );
 
       const rollbackStatus =
-        await this.processRollbackAckMessage(rollbackAckMessage);
+        await this.processRollbackResponse(rollbackAckMessage);
 
       return rollbackStatus;
     } catch (error) {
@@ -697,10 +695,10 @@ export class CrashManager {
     }
   }
 
-  private async processRollbackAckMessage(
-    message: RollbackAckMessage,
+  private async processRollbackResponse(
+    message: RollbackResponse,
   ): Promise<boolean> {
-    const fnTag = `${this.className}#processRollbackAckMessage()`;
+    const fnTag = `${this.className}#processRollbackResponse()`;
     try {
       if (message.success) {
         this.log.info(
@@ -714,7 +712,7 @@ export class CrashManager {
         return false;
       }
     } catch (error) {
-      this.log.error(`${fnTag} Error processing RollbackAckMessage: ${error}`);
+      this.log.error(`${fnTag} Error processing RollbackResponse: ${error}`);
       return false;
     }
   }

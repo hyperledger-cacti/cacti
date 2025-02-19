@@ -79,7 +79,7 @@
     "lint": "run-p 'lint:*'",
     "lint:eslint": "eslint './src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "lint:oapi": "vacuum lint -d -e ./src/main/yml/bol/openapi-blo-bundled.yml",
-    "lint:protobuf": "buf lint --path src/main/proto --verbose",
+    "lint:protobuf": "cd src/main/proto && buf lint --verbose",
     "preinstall": "curl -L https://foundry.paradigm.xyz | bash && foundryup",
     "pretsc": "npm run generate-sdk",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",

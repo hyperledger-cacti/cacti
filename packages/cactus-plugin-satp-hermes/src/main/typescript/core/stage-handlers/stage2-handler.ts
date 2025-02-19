@@ -1,5 +1,5 @@
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { SATPSession } from "../satp-session";
 import {
@@ -10,11 +10,11 @@ import {
 } from "../../types/satp-protocol";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
-  LockAssertionReceiptMessage,
-  LockAssertionRequestMessage,
-} from "../../generated/proto/cacti/satp/v02/stage_2_pb";
+  LockAssertionResponse,
+  LockAssertionRequest,
+} from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { Stage2ClientService } from "../stage-services/client/stage2-client-service";
-import { TransferCommenceResponseMessage } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
+import { TransferCommenceResponse } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
   FailedToCreateMessageError,
   FailedToProcessError,
@@ -59,9 +59,9 @@ export class Stage2SATPHandler implements SATPHandler {
   }
 
   async LockAssertionImplementation(
-    req: LockAssertionRequestMessage,
+    req: LockAssertionRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<LockAssertionReceiptMessage> {
+  ): Promise<LockAssertionResponse> {
     const stepTag = `LockAssertionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -74,7 +74,7 @@ export class Stage2SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.serverService.checkLockAssertionRequestMessage(req, session);
+      await this.serverService.checkLockAssertionRequest(req, session);
 
       saveMessageInSessionData(session.getServerSessionData(), req);
 
@@ -123,8 +123,8 @@ export class Stage2SATPHandler implements SATPHandler {
 
   //client side
   async LockAssertionRequest(
-    response: TransferCommenceResponseMessage,
-  ): Promise<LockAssertionRequestMessage> {
+    response: TransferCommenceResponse,
+  ): Promise<LockAssertionRequest> {
     const stepTag = `LockAssertionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -137,10 +137,7 @@ export class Stage2SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.clientService.checkTransferCommenceResponseMessage(
-        response,
-        session,
-      );
+      await this.clientService.checkTransferCommenceResponse(response, session);
 
       saveMessageInSessionData(session.getClientSessionData(), response);
 

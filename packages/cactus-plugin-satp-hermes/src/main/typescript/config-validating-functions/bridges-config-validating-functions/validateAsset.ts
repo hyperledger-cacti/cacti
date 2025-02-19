@@ -1,7 +1,6 @@
-import {
-  Asset,
-  TokenType,
-} from "../../core/stage-services/satp-bridge/types/asset";
+import { Asset } from "../../core/stage-services/satp-bridge/types/asset";
+
+import { TokenType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
 // Type guard for TokenType
 function isTokenType(obj: unknown): obj is TokenType {

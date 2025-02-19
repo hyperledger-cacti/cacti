@@ -22,7 +22,7 @@ import {
   bufArray2HexStr,
   getSatpLogKey,
 } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   GatewayOrchestrator,
   IGatewayOrchestratorOptions,
