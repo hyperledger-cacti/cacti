@@ -8,7 +8,12 @@ An all in one DAML docker image with the `sample ledger contracts`.
 
 To build the daml-all-in-one image locally, use:
 ```sh
-docker build ./tools/docker/daml-all-in-one/ -t daml-all-in-one
+DOCKER_BUILDKIT=1 docker build \
+  --file ./tools/docker/daml-all-in-one/Dockerfile \
+  ./tools/docker/daml-all-in-one/ \
+   --tag daio \
+   --tag daml-all-in-one \
+   --tag ghcr.io/hyperledger-cacti/daml-all-in-one:$(date +"%Y-%m-%dT%H-%M-%S" --utc)-dev-$(git rev-parse --short HEAD)
 ```
 
 ## Running daml-all-in-one container

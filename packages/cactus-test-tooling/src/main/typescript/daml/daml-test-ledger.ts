@@ -11,6 +11,11 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { Containers } from "../common/containers";
+import * as crypto from "crypto";
+import { hmac } from "node-forge";
+
+import { GenerateJWTToken } from "./generate-jwt-token"
+
 
 export interface IDamlTestLedgerOptions {
   imageVersion?: string;
@@ -50,7 +55,7 @@ export class DamlTestLedger implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
 
-  constructor(public readonly opts?: IDamlTestLedgerOptions) {
+  constructor(public readonly opts: IDamlTestLedgerOptions) {
     if (!opts) {
       throw new TypeError(`DAMLTestLedger#ctor options was falsy.`);
     }
@@ -273,21 +278,44 @@ export class DamlTestLedger implements ITestLedger {
       AttachStdin: false,
       AttachStdout: true,
       AttachStderr: true,
-      Tty: true,
+      Tty: false,
       Cmd: ["/bin/bash", "-c", "cat jwt"], // Command to execute
     });
     const stream = await exec.start({});
-
     return new Promise<string>((resolve, reject) => {
       let output = "";
       stream.on("data", (data: Buffer) => {
         output += data.toString(); // Accumulate the output
-        resolve(output);
+        // Remove the extra characters
+        const removettyvalues = output
+          .replace(/^[\u0001\u0000\u0000\u0000\u0000\u0000\u0000]*/, "")
+          .trim();
+        const removeunwantedcharacter = removettyvalues.replace(/�/g, "");
+        resolve(removeunwantedcharacter);
       });
       stream.on("error", (err: Error) => {
         reject(err);
       });
     });
+  }
+
+  public generateJwtToken(participant: string): string {
+    const generatejwt = new GenerateJWTToken();
+    const header = generatejwt.createHeader();
+    const payload = generatejwt.payload(participant);
+    const hmacSignature = generatejwt.hmacsignature(header,payload);
+
+    return `${header}.${payload}.${hmacSignature}`;
+  }
+  public getIdentifierByDisplayName(
+    payload: any,
+    displayName: string,
+  ): string {
+    const item = payload.find(
+      (obj: { displayName?: string; identifier: string }) =>
+        obj.displayName === displayName,
+    );
+    return item.identifier;
   }
 
   public async getContainerIpAddress(): Promise<string> {
