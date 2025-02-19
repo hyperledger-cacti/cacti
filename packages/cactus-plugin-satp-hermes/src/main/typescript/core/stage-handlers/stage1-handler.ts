@@ -1,11 +1,11 @@
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
-  TransferCommenceRequestMessage,
-  TransferCommenceResponseMessage,
-  TransferProposalReceiptMessage,
-  TransferProposalRequestMessage,
-} from "../../generated/proto/cacti/satp/v02/stage_1_pb";
+  TransferCommenceRequest,
+  TransferCommenceResponse,
+  TransferProposalResponse,
+  TransferProposalRequest,
+} from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import { SATPSession } from "../satp-session";
 import { Stage1ServerService } from "../stage-services/server/stage1-server-service";
 import { Stage1ClientService } from "../stage-services/client/stage1-client-service";
@@ -22,7 +22,7 @@ import {
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
 import { getSessionId } from "./handler-utils";
-import { PreSATPTransferResponseMessage } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
+import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -62,9 +62,9 @@ export class Stage1SATPHandler implements SATPHandler {
   }
 
   private async TransferProposalImplementation(
-    req: TransferProposalRequestMessage,
+    req: TransferProposalRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<TransferProposalReceiptMessage> {
+  ): Promise<TransferProposalResponse> {
     const stepTag = `TransferProposalImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -123,9 +123,9 @@ export class Stage1SATPHandler implements SATPHandler {
   }
 
   private async TransferCommenceImplementation(
-    req: TransferCommenceRequestMessage,
+    req: TransferCommenceRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<TransferCommenceResponseMessage> {
+  ): Promise<TransferCommenceResponse> {
     const stepTag = `TransferProposalImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -196,8 +196,8 @@ export class Stage1SATPHandler implements SATPHandler {
   //client side
   public async TransferProposalRequest(
     sessionId: string,
-    response: PreSATPTransferResponseMessage,
-  ): Promise<TransferProposalRequestMessage> {
+    response: PreSATPTransferResponse,
+  ): Promise<TransferProposalRequest> {
     const stepTag = `TransferProposalRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -251,8 +251,8 @@ export class Stage1SATPHandler implements SATPHandler {
 
   //client side
   public async TransferCommenceRequest(
-    response: TransferProposalReceiptMessage,
-  ): Promise<TransferCommenceRequestMessage> {
+    response: TransferProposalResponse,
+  ): Promise<TransferCommenceRequest> {
     const stepTag = `TransferProposalRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -269,10 +269,7 @@ export class Stage1SATPHandler implements SATPHandler {
         throw new Error(`${fnTag}, Session not found`);
       }
 
-      await this.clientService.checkTransferProposalReceiptMessage(
-        response,
-        session,
-      );
+      await this.clientService.checkTransferProposalResponse(response, session);
 
       saveMessageInSessionData(session.getClientSessionData(), response);
 

@@ -5,10 +5,10 @@ import {
   type ILoggerOptions,
 } from "@hyperledger/cactus-common";
 import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
-import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/stage_0_pb";
-import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/stage_1_pb";
-import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
-import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
+import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import type { SATPLogger } from "../../logging";
 
 export enum SATPServiceType {
