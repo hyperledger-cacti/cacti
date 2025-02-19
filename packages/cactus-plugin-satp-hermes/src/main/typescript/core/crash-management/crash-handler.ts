@@ -1,19 +1,19 @@
 import type { ConnectRouter } from "@connectrpc/connect";
 import type { Logger } from "@hyperledger/cactus-common";
 import {
-  CrashRecovery,
-  type RecoverSuccessMessageResponse,
-} from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+  CrashRecoveryService,
+  type RecoverSuccessResponse,
+} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import type { CrashRecoveryServerService } from "./server-service";
 import type { CrashRecoveryClientService } from "./client-service";
 import type {
-  RecoverMessage,
-  RecoverUpdateMessage,
-  RecoverSuccessMessage,
-  RollbackMessage,
-  RollbackAckMessage,
+  RecoverRequest,
+  RecoverResponse,
+  RecoverSuccessRequest,
+  RollbackRequest,
+  RollbackResponse,
   RollbackState,
-} from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import { type SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
 import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 
@@ -43,11 +43,11 @@ export class CrashRecoveryHandler implements SATPHandler {
 
   // Server-side
 
-  private async recoverV2MessageImplementation(
-    req: RecoverMessage,
-  ): Promise<RecoverUpdateMessage> {
+  private async recoverImplementation(
+    req: RecoverRequest,
+  ): Promise<RecoverResponse> {
     const fnTag = `${CrashRecoveryHandler.name}#recoverV2MessageImplementation`;
-    this.log.debug(`${fnTag} - Handling RecoverMessage: ${req}`);
+    this.log.debug(`${fnTag} - Handling RecoverRequest: ${req}`);
     try {
       return await this.serverService.handleRecover(req);
     } catch (error) {
@@ -56,11 +56,11 @@ export class CrashRecoveryHandler implements SATPHandler {
     }
   }
 
-  private async recoverV2SuccessMessageImplementation(
-    req: RecoverSuccessMessage,
-  ): Promise<RecoverSuccessMessageResponse> {
-    const fnTag = `${CrashRecoveryHandler.name}#recoverV2SuccessMessageImplementation`;
-    this.log.debug(`${fnTag} - Handling RecoverSuccessMessage:${req}`);
+  private async recoverSuccessImplementation(
+    req: RecoverSuccessRequest,
+  ): Promise<RecoverSuccessResponse> {
+    const fnTag = `${CrashRecoveryHandler.name}#recoverSuccessImplementation`;
+    this.log.debug(`${fnTag} - Handling RecoverSuccessRequest:${req}`);
     try {
       return await this.serverService.handleRecoverSuccess(req);
     } catch (error) {
@@ -69,11 +69,11 @@ export class CrashRecoveryHandler implements SATPHandler {
     }
   }
 
-  private async rollbackV2MessageImplementation(
-    req: RollbackMessage,
-  ): Promise<RollbackAckMessage> {
-    const fnTag = `${CrashRecoveryHandler.name}#rollbackV2MessageImplementation`;
-    this.log.debug(`${fnTag} - Handling RollbackMessage: ${req}`);
+  private async rollbackImplementation(
+    req: RollbackRequest,
+  ): Promise<RollbackResponse> {
+    const fnTag = `${CrashRecoveryHandler.name}#rollbackImplementation`;
+    this.log.debug(`${fnTag} - Handling RollbackRequest: ${req}`);
     try {
       return await this.serverService.handleRollback(req);
     } catch (error) {
@@ -85,15 +85,15 @@ export class CrashRecoveryHandler implements SATPHandler {
   public setupRouter(router: ConnectRouter): void {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
-    router.service(CrashRecovery, {
-      async recoverV2Message(req) {
-        return await that.recoverV2MessageImplementation(req);
+    router.service(CrashRecoveryService, {
+      async recover(req) {
+        return await that.recoverImplementation(req);
       },
-      async recoverV2SuccessMessage(req) {
-        return await that.recoverV2SuccessMessageImplementation(req);
+      async recoverSuccess(req) {
+        return await that.recoverSuccessImplementation(req);
       },
-      async rollbackV2Message(req) {
-        return await that.rollbackV2MessageImplementation(req);
+      async rollback(req) {
+        return await that.rollbackImplementation(req);
       },
     });
 
@@ -102,45 +102,45 @@ export class CrashRecoveryHandler implements SATPHandler {
 
   // Client-side
 
-  public async sendRecoverMessage(
+  public async sendRecoverRequest(
     session: SessionData,
-  ): Promise<RecoverMessage> {
-    const fnTag = `${this.constructor.name}#createRecoverMessage`;
+  ): Promise<RecoverRequest> {
+    const fnTag = `${this.constructor.name}#createRecoverRequest`;
     try {
-      return this.clientService.createRecoverMessage(session);
+      return this.clientService.createRecoverRequest(session);
     } catch (error) {
-      this.log.error(`${fnTag} - Failed to create RecoverMessage: ${error}`);
-      throw new Error(`Error in createRecoverMessage: ${error}`);
+      this.log.error(`${fnTag} - Failed to create RecoverRequest: ${error}`);
+      throw new Error(`Error in createRecoverRequest: ${error}`);
     }
   }
 
-  public async sendRecoverSuccessMessage(
+  public async sendRecoverSuccessRequest(
     session: SessionData,
-  ): Promise<RecoverSuccessMessage> {
-    const fnTag = `${this.constructor.name}#createRecoverSuccessMessage`;
+  ): Promise<RecoverSuccessRequest> {
+    const fnTag = `${this.constructor.name}#createRecoverSuccessRequest`;
     try {
-      return await this.clientService.createRecoverSuccessMessage(session);
+      return await this.clientService.createRecoverSuccessRequest(session);
     } catch (error) {
       this.log.error(
-        `${fnTag} - Failed to create RecoverSuccessMessage: ${error}`,
+        `${fnTag} - Failed to create RecoverSuccessRequest: ${error}`,
       );
-      throw new Error(`Error in createRecoverSuccessMessage: ${error}`);
+      throw new Error(`Error in createRecoverSuccessRequest: ${error}`);
     }
   }
 
-  public async sendRollbackMessage(
+  public async sendRollbackRequest(
     session: SessionData,
     rollbackState: RollbackState,
-  ): Promise<RollbackMessage> {
-    const fnTag = `${this.constructor.name}#createRollbackMessage`;
+  ): Promise<RollbackRequest> {
+    const fnTag = `${this.constructor.name}#createRollbackRequest`;
     try {
-      return await this.clientService.createRollbackMessage(
+      return await this.clientService.createRollbackRequest(
         session,
         rollbackState,
       );
     } catch (error) {
-      this.log.error(`${fnTag} - Failed to create RollbackMessage: ${error}`);
-      throw new Error(`Error in createRollbackMessage: ${error}`);
+      this.log.error(`${fnTag} - Failed to create RollbackRequest: ${error}`);
+      throw new Error(`Error in createRollbackRequest: ${error}`);
     }
   }
 }

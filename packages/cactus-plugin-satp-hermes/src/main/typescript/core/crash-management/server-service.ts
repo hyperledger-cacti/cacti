@@ -1,14 +1,14 @@
 import {
-  type RecoverMessage,
-  type RecoverUpdateMessage,
-  type RecoverSuccessMessage,
-  type RollbackMessage,
-  type RollbackAckMessage,
-  RecoverUpdateMessageSchema,
-  RollbackAckMessageSchema,
-  type RecoverSuccessMessageResponse,
-  RecoverSuccessMessageResponseSchema,
-} from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+  type RecoverRequest,
+  type RecoverResponse,
+  type RecoverSuccessRequest,
+  type RollbackRequest,
+  type RollbackResponse,
+  RecoverResponseSchema,
+  RollbackResponseSchema,
+  type RecoverSuccessResponse,
+  RecoverSuccessResponseSchema,
+} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import type { SATPSession } from "../satp-session";
 import type { ILocalLogRepository } from "../../repository/interfaces/repository";
 import type { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
@@ -33,13 +33,11 @@ export class CrashRecoveryServerService {
     this.log.trace(`Initialized ${CrashRecoveryServerService.name}`);
   }
 
-  public async handleRecover(
-    req: RecoverMessage,
-  ): Promise<RecoverUpdateMessage> {
+  public async handleRecover(req: RecoverRequest): Promise<RecoverResponse> {
     const fnTag = `${CrashRecoveryServerService.name}#handleRecover`;
 
     try {
-      this.log.debug(`${fnTag} - Handling RecoverMessage:`, req.sessionId);
+      this.log.debug(`${fnTag} - Handling RecoverRequest:`, req.sessionId);
 
       const session = this.sessions.get(req.sessionId);
       const sessionData = session?.getServerSessionData();
@@ -72,7 +70,7 @@ export class CrashRecoveryServerService {
         );
       }
 
-      const recoverUpdateMessage = create(RecoverUpdateMessageSchema, {
+      const recoverUpdateMessage = create(RecoverResponseSchema, {
         sessionId: req.sessionId,
         messageType: "urn:ietf:SATP-2pc:msgtype:recover-update-msg",
         hashRecoverMessage: "",
@@ -87,25 +85,25 @@ export class CrashRecoveryServerService {
       recoverUpdateMessage.serverSignature = signature;
 
       this.log.debug(
-        `${fnTag} - RecoverUpdateMessage created:`,
+        `${fnTag} - RecoverResponse created:`,
         recoverUpdateMessage,
       );
 
       return recoverUpdateMessage;
     } catch (error) {
-      this.log.error(`${fnTag} - Error handling RecoverMessage: ${error}`);
+      this.log.error(`${fnTag} - Error handling RecoverRequest: ${error}`);
       throw error;
     }
   }
 
   public async handleRecoverSuccess(
-    req: RecoverSuccessMessage,
-  ): Promise<RecoverSuccessMessageResponse> {
+    req: RecoverSuccessRequest,
+  ): Promise<RecoverSuccessResponse> {
     const fnTag = `${CrashRecoveryServerService.name}#handleRecoverSuccess`;
 
     try {
       this.log.debug(
-        `${fnTag} - Handling RecoverSuccessMessage:`,
+        `${fnTag} - Handling RecoverSuccessRequest:`,
         req.sessionId,
       );
 
@@ -126,7 +124,7 @@ export class CrashRecoveryServerService {
       }
 
       const recoverSuccessMessageResponse = create(
-        RecoverSuccessMessageResponseSchema,
+        RecoverSuccessResponseSchema,
         {
           sessionId: req.sessionId,
           received: true,
@@ -144,19 +142,17 @@ export class CrashRecoveryServerService {
       return recoverSuccessMessageResponse;
     } catch (error) {
       this.log.error(
-        `${fnTag} - Error handling RecoverSuccessMessage: ${error}`,
+        `${fnTag} - Error handling RecoverSuccessRequest: ${error}`,
       );
       throw error;
     }
   }
 
-  public async handleRollback(
-    req: RollbackMessage,
-  ): Promise<RollbackAckMessage> {
+  public async handleRollback(req: RollbackRequest): Promise<RollbackResponse> {
     const fnTag = `${CrashRecoveryServerService.name}#handleRollback`;
 
     try {
-      this.log.debug(`${fnTag} - Handling RollbackMessage:`, req.sessionId);
+      this.log.debug(`${fnTag} - Handling RollbackRequest:`, req.sessionId);
 
       const session = this.sessions.get(req.sessionId);
       const sessionData = session?.getServerSessionData();
@@ -183,7 +179,7 @@ export class CrashRecoveryServerService {
 
       const rollbackState = await strategy.execute(session, Type.SERVER);
 
-      const rollbackAckMessage = create(RollbackAckMessageSchema, {
+      const rollbackAckMessage = create(RollbackResponseSchema, {
         sessionId: req.sessionId,
         messageType: "urn:ietf:SATP-2pc:msgtype:rollback-ack-msg",
         success: rollbackState.status === "COMPLETED",
@@ -206,7 +202,7 @@ export class CrashRecoveryServerService {
 
       return rollbackAckMessage;
     } catch (error) {
-      this.log.error(`${fnTag} - Error handling RollbackMessage: ${error}`);
+      this.log.error(`${fnTag} - Error handling RollbackRequest: ${error}`);
       throw error;
     }
   }

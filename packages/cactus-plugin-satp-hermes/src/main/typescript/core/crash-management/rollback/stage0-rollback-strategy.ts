@@ -5,7 +5,7 @@ import {
   RollbackLogEntrySchema,
   type RollbackState,
   RollbackStateSchema,
-} from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+} from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import { create } from "@bufbuild/protobuf";
 import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import {

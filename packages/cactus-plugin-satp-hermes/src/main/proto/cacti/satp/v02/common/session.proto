@@ -1,13 +1,13 @@
 syntax = "proto3";
 package cacti.satp.v02.common;
 
-import "google/protobuf/empty.proto";
-
 import "cacti/satp/v02/common/message.proto";
-import "cacti/satp/v02/stage_0.proto";
-import "cacti/satp/v02/stage_1.proto";
-import "cacti/satp/v02/stage_2.proto";
-import "cacti/satp/v02/stage_3.proto";
+import "cacti/satp/v02/service/stage_0.proto";
+import "cacti/satp/v02/service/stage_1.proto";
+import "cacti/satp/v02/service/stage_2.proto";
+import "cacti/satp/v02/service/stage_3.proto";
+
+import "google/protobuf/empty.proto";
 
 message SessionData {
     string id = 1;
@@ -79,14 +79,14 @@ message SessionData {
     cacti.satp.v02.common.Error error_code = 67;
     cacti.satp.v02.common.MessageType phase_error = 68;
     bool recovered_tried = 69;
-    SATPMessages satp_Messages = 70; 
+    SATPMessages satp_messages = 70; 
     string sender_gateway_network_type = 71;
     string recipient_gateway_network_type = 72; 
     Type role = 73;
 }
 
 enum State {
-    STATE_UNKNOWN = 0;
+    STATE_UNSPECIFIED = 0;
     STATE_ONGOING = 1;
     STATE_COMPLETED = 2;
     STATE_REJECTED = 3;
@@ -97,9 +97,9 @@ enum State {
 }
 
 enum Type {
-    UNKNOWN = 0;
-    CLIENT = 1;
-    SERVER = 2;
+    TYPE_UNSPECIFIED = 0;
+    TYPE_CLIENT = 1;
+    TYPE_SERVER = 2;
 }
 
 message SATPMessages {
@@ -110,31 +110,31 @@ message SATPMessages {
 }
 
 message Stage0Messages {
-    cacti.satp.v02.NewSessionRequestMessage new_session_request_message = 1;
-    cacti.satp.v02.NewSessionResponseMessage new_session_response_message = 2;
-    cacti.satp.v02.PreSATPTransferRequestMessage pre_satp_transfer_request_message = 3;
-    cacti.satp.v02.PreSATPTransferResponseMessage pre_satp_transfer_response_message = 4;
+    cacti.satp.v02.service.NewSessionRequest new_session_request_message = 1;
+    cacti.satp.v02.service.NewSessionResponse new_session_response_message = 2;
+    cacti.satp.v02.service.PreSATPTransferRequest pre_satp_transfer_request_message = 3;
+    cacti.satp.v02.service.PreSATPTransferResponse pre_satp_transfer_response_message = 4;
 }
 
 message Stage1Messages {
-    cacti.satp.v02.TransferProposalRequestMessage transfer_proposal_request_message = 1;
-    cacti.satp.v02.TransferProposalReceiptMessage transfer_proposal_receipt_message = 2;
-    cacti.satp.v02.TransferCommenceRequestMessage transfer_commence_request_message = 4;
-    cacti.satp.v02.TransferCommenceResponseMessage transfer_commence_response_message = 5;
+    cacti.satp.v02.service.TransferProposalRequest transfer_proposal_request_message = 1;
+    cacti.satp.v02.service.TransferProposalResponse transfer_proposal_receipt_message = 2;
+    cacti.satp.v02.service.TransferCommenceRequest transfer_commence_request_message = 4;
+    cacti.satp.v02.service.TransferCommenceResponse transfer_commence_response_message = 5;
 }
 
 message Stage2Messages {
-    cacti.satp.v02.LockAssertionRequestMessage lock_assertion_request_message = 1;
-    cacti.satp.v02.LockAssertionReceiptMessage lock_assertion_receipt_message = 2;
+    cacti.satp.v02.service.LockAssertionRequest lock_assertion_request_message = 1;
+    cacti.satp.v02.service.LockAssertionResponse lock_assertion_receipt_message = 2;
 }
 
 message Stage3Messages {
-    cacti.satp.v02.CommitPreparationRequestMessage commit_preparation_request_message = 1;
-    cacti.satp.v02.CommitReadyResponseMessage commit_ready_response_message = 2;
-    cacti.satp.v02.CommitFinalAssertionRequestMessage commit_final_assertion_request_message = 3;
-    cacti.satp.v02.CommitFinalAcknowledgementReceiptResponseMessage commit_final_acknowledgement_receipt_response_message = 4;
-    cacti.satp.v02.TransferCompleteRequestMessage transfer_complete_message = 5;
-    cacti.satp.v02.TransferCompleteResponseMessage transfer_complete_response_message = 6;
+    cacti.satp.v02.service.CommitPreparationRequest commit_preparation_request_message = 1;
+    cacti.satp.v02.service.CommitPreparationResponse commit_ready_response_message = 2;
+    cacti.satp.v02.service.CommitFinalAssertionRequest commit_final_assertion_request_message = 3;
+    cacti.satp.v02.service.CommitFinalAssertionResponse commit_final_acknowledgement_receipt_response_message = 4;
+    cacti.satp.v02.service.TransferCompleteRequest transfer_complete_message = 5;
+    cacti.satp.v02.service.TransferCompleteResponse transfer_complete_response_message = 6;
 }
 
 message MessageStagesHashes {
@@ -250,27 +250,39 @@ message SendStatusRequest {
     bool has_backup = 2;
 }
 
-message SendStatusResponse {
+message GetStatusResponse {
     string status = 1;
     bool has_backup = 2;
 }
 
 enum SATPStage {
-    STAGE_UNKNOWN = 0;
-    STAGE_0 = 1;
-    STAGE_1 = 2;
-    STAGE_2 = 3;
-    STAGE_3 = 4;
+    SATP_STAGE_UNSPECIFIED = 0;
+    SATP_STAGE_0 = 1;
+    SATP_STAGE_1 = 2;
+    SATP_STAGE_2 = 3;
+    SATP_STAGE_3 = 4;
 }
 
+message PingResponse {
+    string message = 1;
+}
+
+message RollbackResponse {
+    string message = 1;
+}
+
+message GetStageVersionResponse {
+    string version = 1;
+};
+
 service SessionStatusService {
-    rpc GetStatus(google.protobuf.Empty) returns (SendStatusResponse) {}
+    rpc GetStatus(google.protobuf.Empty) returns (GetStatusResponse) {}
     rpc SendStatus(SendStatusRequest) returns (google.protobuf.Empty) {}
 }
 
 // TODO: define common RPC methods for each step. This is a draft
 service CommonService {
-    rpc Ping(google.protobuf.Empty) returns (cacti.satp.v02.common.MessageCore) {}
-    rpc Rollback(google.protobuf.Empty) returns (cacti.satp.v02.common.RollbackMessageCore) {}
-    rpc GetStageVersion(google.protobuf.Empty) returns (cacti.satp.v02.common.Ack) {};
+    rpc Ping(google.protobuf.Empty) returns (PingResponse) {}
+    rpc Rollback(google.protobuf.Empty) returns (RollbackResponse) {}
+    rpc GetStageVersion(google.protobuf.Empty) returns (GetStageVersionResponse) {};
 }
