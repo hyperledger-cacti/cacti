@@ -1,24 +1,10 @@
 syntax = "proto3";
 package cacti.satp.v02.common;
 
-// TODO: define the common parameters to every protocol message
-message MessageCore {
-    string message = 1;
-}
-
-// TODO: define the common parameters to every rollback message
-message RollbackMessageCore {
-    string message = 1;
-}
-
 enum STATUS {
   STATUS_UNSPECIFIED = 0;
   STATUS_OK = 1;
   STATUS_ERROR = 2;
-};
-
-message Ack {
-    STATUS status = 1;
 };
 
 message TransferClaims {
@@ -38,8 +24,8 @@ message TransferClaims {
     uint64 max_timeout = 14;
     string amount_from_originator = 15;
     string amount_to_beneficiary = 16;
-    repeated PrivacyPolicy processPolicies = 17;
-    repeated PrivacyPolicy mergePolicies = 18;
+    repeated PrivacyPolicy process_policies = 17;
+    repeated PrivacyPolicy merge_policies = 18;
 }
 
 message TransferClaimsFormat {
@@ -121,7 +107,7 @@ enum MessageType {
     MESSAGE_TYPE_PRE_SATP_TRANSFER_REQUEST = 20;
     MESSAGE_TYPE_PRE_SATP_TRANSFER_RESPONSE = 21;
     MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE_RESPONSE = 22;
-  }
+}
 
 message CommonSatp {
     string version = 1;
@@ -236,8 +222,9 @@ enum Error {
 }
 
 enum ClaimFormat {
-    DEFAULT = 0;
-    BUNGEE = 1;
+    CLAIM_FORMAT_UNSPECIFIED = 0;
+    CLAIM_FORMAT_DEFAULT = 1;
+    CLAIM_FORMAT_BUNGEE = 2;
 }
 message WrapAssertionClaimFormat {
     ClaimFormat format = 1;
@@ -289,10 +276,11 @@ message WrapAssertionClaim {
 }
 
 enum TokenType {
-    TOKEN_TYPE_ERC20 = 0;
-    TOKEN_TYPE_ERC721 = 1;
-    TOKEN_TYPE_ERC1155 = 2;
-    TOKEN_TYPE_NONSTANDARD = 3;
+    TOKEN_TYPE_UNSPECIFIED = 0;
+    TOKEN_TYPE_ERC20 = 1;
+    TOKEN_TYPE_ERC721 = 2;
+    TOKEN_TYPE_ERC1155 = 3;
+    TOKEN_TYPE_NONSTANDARD = 4;
 }
 
 message Asset {

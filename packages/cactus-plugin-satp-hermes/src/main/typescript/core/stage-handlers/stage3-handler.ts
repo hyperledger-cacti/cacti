@@ -1,13 +1,13 @@
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/stage_3_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import {
-  CommitFinalAcknowledgementReceiptResponseMessage,
-  CommitFinalAssertionRequestMessage,
-  CommitPreparationRequestMessage,
-  CommitReadyResponseMessage,
-  TransferCompleteRequestMessage,
-  TransferCompleteResponseMessage,
-} from "../../generated/proto/cacti/satp/v02/stage_3_pb";
+  CommitFinalAssertionResponse,
+  CommitFinalAssertionRequest,
+  CommitPreparationRequest,
+  CommitPreparationResponse,
+  TransferCompleteRequest,
+  TransferCompleteResponse,
+} from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import { Stage3ServerService } from "../stage-services/server/stage3-server-service";
 import { SATPSession } from "../satp-session";
 import {
@@ -24,7 +24,7 @@ import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { LockAssertionReceiptMessage } from "../../generated/proto/cacti/satp/v02/stage_2_pb";
+import { LockAssertionResponse } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
@@ -68,9 +68,9 @@ export class Stage3SATPHandler implements SATPHandler {
   }
 
   async CommitPreparationImplementation(
-    req: CommitPreparationRequestMessage,
+    req: CommitPreparationRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<CommitReadyResponseMessage> {
+  ): Promise<CommitPreparationResponse> {
     const stepTag = `CommitPreparationImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -83,10 +83,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.serverService.checkCommitPreparationRequestMessage(
-        req,
-        session,
-      );
+      await this.serverService.checkCommitPreparationRequest(req, session);
 
       saveMessageInSessionData(session.getServerSessionData(), req);
 
@@ -123,9 +120,9 @@ export class Stage3SATPHandler implements SATPHandler {
   }
 
   async CommitFinalAssertionImplementation(
-    req: CommitFinalAssertionRequestMessage,
+    req: CommitFinalAssertionRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<CommitFinalAcknowledgementReceiptResponseMessage> {
+  ): Promise<CommitFinalAssertionResponse> {
     const stepTag = `CommitFinalAssertionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -138,10 +135,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.serverService.checkCommitFinalAssertionRequestMessage(
-        req,
-        session,
-      );
+      await this.serverService.checkCommitFinalAssertionRequest(req, session);
 
       saveMessageInSessionData(session.getServerSessionData(), req);
 
@@ -182,9 +176,9 @@ export class Stage3SATPHandler implements SATPHandler {
   }
 
   async TransferCompleteImplementation(
-    req: TransferCompleteRequestMessage,
+    req: TransferCompleteRequest,
     //context: HandlerContext, This gives error when when trying to stringify will be commented until there is not usage of it
-  ): Promise<TransferCompleteResponseMessage> {
+  ): Promise<TransferCompleteResponse> {
     const stepTag = `CommitFinalAssertionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -197,10 +191,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.serverService.checkTransferCompleteRequestMessage(
-        req,
-        session,
-      );
+      await this.serverService.checkTransferCompleteRequest(req, session);
 
       saveMessageInSessionData(session.getServerSessionData(), req);
 
@@ -254,8 +245,8 @@ export class Stage3SATPHandler implements SATPHandler {
   //client side
 
   async CommitPreparationRequest(
-    response: LockAssertionReceiptMessage,
-  ): Promise<CommitPreparationRequestMessage> {
+    response: LockAssertionResponse,
+  ): Promise<CommitPreparationRequest> {
     const stepTag = `CommitPreparationRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -268,10 +259,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.clientService.checkLockAssertionReceiptMessage(
-        response,
-        session,
-      );
+      await this.clientService.checkLockAssertionResponse(response, session);
 
       saveMessageInSessionData(session.getClientSessionData(), response);
 
@@ -308,8 +296,8 @@ export class Stage3SATPHandler implements SATPHandler {
   }
 
   async CommitFinalAssertionRequest(
-    response: CommitReadyResponseMessage,
-  ): Promise<CommitFinalAssertionRequestMessage> {
+    response: CommitPreparationResponse,
+  ): Promise<CommitFinalAssertionRequest> {
     const stepTag = `CommitFinalAssertionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -322,7 +310,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.clientService.checkCommitReadyResponseMessage(
+      await this.clientService.checkCommitPreparationResponse(
         response,
         session,
       );
@@ -364,8 +352,8 @@ export class Stage3SATPHandler implements SATPHandler {
   }
 
   async TransferCompleteRequest(
-    response: CommitFinalAcknowledgementReceiptResponseMessage,
-  ): Promise<TransferCompleteRequestMessage> {
+    response: CommitFinalAssertionResponse,
+  ): Promise<TransferCompleteRequest> {
     const stepTag = `TransferCompleteRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     let session: SATPSession | undefined;
@@ -378,7 +366,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.clientService.checkCommitFinalAcknowledgementReceiptResponseMessage(
+      await this.clientService.checkCommitFinalAssertionResponse(
         response,
         session,
       );
@@ -418,7 +406,7 @@ export class Stage3SATPHandler implements SATPHandler {
   }
 
   async CheckTransferCompleteResponse(
-    response: TransferCompleteResponseMessage,
+    response: TransferCompleteResponse,
   ): Promise<void> {
     const stepTag = `CheckTransferCompleteResponse()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
@@ -432,10 +420,7 @@ export class Stage3SATPHandler implements SATPHandler {
         throw new SessionNotFoundError(fnTag);
       }
 
-      await this.clientService.checkTransferCompleteResponseMessage(
-        response,
-        session,
-      );
+      await this.clientService.checkTransferCompleteResponse(response, session);
 
       saveMessageInSessionData(session.getClientSessionData(), response);
     } catch (error) {
