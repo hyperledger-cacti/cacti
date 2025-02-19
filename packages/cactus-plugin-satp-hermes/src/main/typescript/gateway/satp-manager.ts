@@ -38,37 +38,37 @@ import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { SATPCrossChainManager } from "../cross-chain-mechanisms/satp-cc-manager";
 import { GatewayOrchestrator } from "./gateway-orchestrator";
 import type { SessionData } from "../generated/proto/cacti/satp/v02/common/session_pb";
-import type { SatpStage0Service } from "../generated/proto/cacti/satp/v02/stage_0_pb";
-import type { SatpStage1Service } from "../generated/proto/cacti/satp/v02/stage_1_pb";
-import type { SatpStage2Service } from "../generated/proto/cacti/satp/v02/stage_2_pb";
-import type { SatpStage3Service } from "../generated/proto/cacti/satp/v02/stage_3_pb";
+import type { SatpStage0Service } from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import type { SatpStage1Service } from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import type { SatpStage2Service } from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import type { SatpStage3Service } from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import type { Client as ConnectClient } from "@connectrpc/connect";
 import { MessageType } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { getMessageInSessionData } from "../core/session-utils";
 import {
-  TransferProposalRequestMessage,
-  TransferProposalReceiptMessage,
-  TransferCommenceRequestMessage,
-  TransferCommenceResponseMessage,
-} from "../generated/proto/cacti/satp/v02/stage_1_pb";
+  TransferProposalRequest,
+  TransferProposalResponse,
+  TransferCommenceRequest,
+  TransferCommenceResponse,
+} from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
-  LockAssertionRequestMessage,
-  LockAssertionReceiptMessage,
-} from "../generated/proto/cacti/satp/v02/stage_2_pb";
+  LockAssertionRequest,
+  LockAssertionResponse,
+} from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import {
-  CommitPreparationRequestMessage,
-  CommitReadyResponseMessage,
-  CommitFinalAssertionRequestMessage,
-  CommitFinalAcknowledgementReceiptResponseMessage,
-  TransferCompleteRequestMessage,
-  TransferCompleteResponseMessage,
-} from "../generated/proto/cacti/satp/v02/stage_3_pb";
+  CommitPreparationRequest,
+  CommitPreparationResponse,
+  CommitFinalAssertionRequest,
+  CommitFinalAssertionResponse,
+  TransferCompleteRequest,
+  TransferCompleteResponse,
+} from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import {
-  NewSessionRequestMessage,
-  NewSessionResponseMessage,
-  PreSATPTransferRequestMessage,
-  PreSATPTransferResponseMessage,
-} from "../generated/proto/cacti/satp/v02/stage_0_pb";
+  NewSessionRequest,
+  NewSessionResponse,
+  PreSATPTransferRequest,
+  PreSATPTransferResponse,
+} from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import {
   CreateSATPRequestError,
   RecoverMessageError,
@@ -512,26 +512,24 @@ export class SATPManager {
 
       sessionData.serverGatewayPubkey = counterGatewayID.pubKey;
 
-      let newSessionRequest: NewSessionRequestMessage | undefined;
-      let newSessionResponse: NewSessionResponseMessage | undefined;
-      let preSATPTransferRequest: PreSATPTransferRequestMessage | undefined;
-      let preSATPTransferResponse: PreSATPTransferResponseMessage | undefined;
-      let transferProposalRequest: TransferProposalRequestMessage | undefined;
-      let transferProposalResponse: TransferProposalReceiptMessage | undefined;
-      let transferCommenceRequest: TransferCommenceRequestMessage | undefined;
-      let transferCommenceResponse: TransferCommenceResponseMessage | undefined;
-      let lockAssertionRequest: LockAssertionRequestMessage | undefined;
-      let lockAssertionResponse: LockAssertionReceiptMessage | undefined;
-      let commitPreparationRequest: CommitPreparationRequestMessage | undefined;
-      let commitReadyResponse: CommitReadyResponseMessage | undefined;
-      let commitFinalAssertionRequest:
-        | CommitFinalAssertionRequestMessage
-        | undefined;
+      let newSessionRequest: NewSessionRequest | undefined;
+      let newSessionResponse: NewSessionResponse | undefined;
+      let preSATPTransferRequest: PreSATPTransferRequest | undefined;
+      let preSATPTransferResponse: PreSATPTransferResponse | undefined;
+      let transferProposalRequest: TransferProposalRequest | undefined;
+      let transferProposalResponse: TransferProposalResponse | undefined;
+      let transferCommenceRequest: TransferCommenceRequest | undefined;
+      let transferCommenceResponse: TransferCommenceResponse | undefined;
+      let lockAssertionRequest: LockAssertionRequest | undefined;
+      let lockAssertionResponse: LockAssertionResponse | undefined;
+      let commitPreparationRequest: CommitPreparationRequest | undefined;
+      let commitReadyResponse: CommitPreparationResponse | undefined;
+      let commitFinalAssertionRequest: CommitFinalAssertionRequest | undefined;
       let commitFinalAcknowledgementReceiptResponse:
-        | CommitFinalAcknowledgementReceiptResponseMessage
+        | CommitFinalAssertionResponse
         | undefined;
-      let transferCompleteRequest: TransferCompleteRequestMessage | undefined;
-      let transferCompleteResponse: TransferCompleteResponseMessage | undefined;
+      let transferCompleteRequest: TransferCompleteRequest | undefined;
+      let transferCompleteResponse: TransferCompleteResponse | undefined;
 
       switch (stage) {
         case undefined:
@@ -556,7 +554,7 @@ export class SATPManager {
             newSessionRequest = getMessageInSessionData(
               sessionData,
               MessageType.NEW_SESSION_REQUEST,
-            ) as NewSessionRequestMessage;
+            ) as NewSessionRequest;
 
             if (!newSessionRequest) {
               throw new RecoverMessageError(
@@ -588,7 +586,7 @@ export class SATPManager {
             newSessionResponse = getMessageInSessionData(
               sessionData,
               MessageType.NEW_SESSION_RESPONSE,
-            ) as NewSessionResponseMessage;
+            ) as NewSessionResponse;
 
             if (!newSessionResponse) {
               throw new RecoverMessageError(
@@ -617,7 +615,7 @@ export class SATPManager {
             preSATPTransferRequest = getMessageInSessionData(
               sessionData,
               MessageType.PRE_SATP_TRANSFER_REQUEST,
-            ) as PreSATPTransferRequestMessage;
+            ) as PreSATPTransferRequest;
 
             if (!preSATPTransferRequest) {
               throw new RecoverMessageError(
@@ -650,7 +648,7 @@ export class SATPManager {
             preSATPTransferResponse = getMessageInSessionData(
               sessionData,
               MessageType.PRE_SATP_TRANSFER_RESPONSE,
-            ) as PreSATPTransferResponseMessage;
+            ) as PreSATPTransferResponse;
 
             if (!preSATPTransferResponse) {
               throw new RecoverMessageError(
@@ -684,7 +682,7 @@ export class SATPManager {
             transferProposalRequest = getMessageInSessionData(
               sessionData,
               MessageType.INIT_PROPOSAL,
-            ) as TransferProposalRequestMessage;
+            ) as TransferProposalRequest;
 
             if (!transferProposalRequest) {
               throw new RecoverMessageError(
@@ -716,7 +714,7 @@ export class SATPManager {
             transferProposalResponse = getMessageInSessionData(
               sessionData,
               MessageType.INIT_RECEIPT,
-            ) as TransferProposalReceiptMessage;
+            ) as TransferProposalResponse;
 
             if (!transferProposalResponse) {
               throw new RecoverMessageError(
@@ -744,7 +742,7 @@ export class SATPManager {
             transferCommenceRequest = getMessageInSessionData(
               sessionData,
               MessageType.TRANSFER_COMMENCE_REQUEST,
-            ) as TransferCommenceRequestMessage;
+            ) as TransferCommenceRequest;
 
             if (!transferCommenceRequest) {
               throw new RecoverMessageError(
@@ -776,7 +774,7 @@ export class SATPManager {
             transferCommenceResponse = getMessageInSessionData(
               sessionData,
               MessageType.TRANSFER_COMMENCE_RESPONSE,
-            ) as TransferCommenceResponseMessage;
+            ) as TransferCommenceResponse;
 
             if (!transferCommenceResponse) {
               throw new RecoverMessageError(
@@ -806,7 +804,7 @@ export class SATPManager {
             lockAssertionRequest = getMessageInSessionData(
               sessionData,
               MessageType.LOCK_ASSERT,
-            ) as LockAssertionRequestMessage;
+            ) as LockAssertionRequest;
 
             if (!lockAssertionRequest) {
               throw new RecoverMessageError(
@@ -837,7 +835,7 @@ export class SATPManager {
             lockAssertionResponse = getMessageInSessionData(
               sessionData,
               MessageType.ASSERTION_RECEIPT,
-            ) as LockAssertionReceiptMessage;
+            ) as LockAssertionResponse;
 
             if (!lockAssertionResponse) {
               throw new RecoverMessageError(
@@ -867,7 +865,7 @@ export class SATPManager {
             commitPreparationRequest = getMessageInSessionData(
               sessionData,
               MessageType.COMMIT_PREPARE,
-            ) as CommitPreparationRequestMessage;
+            ) as CommitPreparationRequest;
 
             if (!commitPreparationRequest) {
               throw new RecoverMessageError(
@@ -899,7 +897,7 @@ export class SATPManager {
             commitReadyResponse = getMessageInSessionData(
               sessionData,
               MessageType.COMMIT_READY,
-            ) as CommitReadyResponseMessage;
+            ) as CommitPreparationResponse;
 
             if (!commitReadyResponse) {
               throw new RecoverMessageError(
@@ -928,7 +926,7 @@ export class SATPManager {
             commitFinalAssertionRequest = getMessageInSessionData(
               sessionData,
               MessageType.COMMIT_FINAL,
-            ) as CommitFinalAssertionRequestMessage;
+            ) as CommitFinalAssertionRequest;
 
             if (!commitFinalAssertionRequest) {
               throw new RecoverMessageError(
@@ -961,7 +959,7 @@ export class SATPManager {
             commitFinalAcknowledgementReceiptResponse = getMessageInSessionData(
               sessionData,
               MessageType.ACK_COMMIT_FINAL,
-            ) as CommitFinalAcknowledgementReceiptResponseMessage;
+            ) as CommitFinalAssertionResponse;
 
             if (!commitFinalAcknowledgementReceiptResponse) {
               throw new RecoverMessageError(
@@ -989,7 +987,7 @@ export class SATPManager {
             transferCompleteRequest = getMessageInSessionData(
               sessionData,
               MessageType.COMMIT_TRANSFER_COMPLETE,
-            ) as TransferCompleteRequestMessage;
+            ) as TransferCompleteRequest;
 
             if (!transferCompleteRequest) {
               throw new RecoverMessageError(
