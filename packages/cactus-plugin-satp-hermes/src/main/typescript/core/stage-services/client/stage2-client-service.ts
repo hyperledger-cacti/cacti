@@ -1,4 +1,4 @@
-import { TransferCommenceResponseMessage } from "../../../generated/proto/cacti/satp/v02/stage_1_pb";
+import { TransferCommenceResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
   CommonSatpSchema,
   LockAssertionClaimFormatSchema,
@@ -6,9 +6,9 @@ import {
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  LockAssertionRequestMessage,
-  LockAssertionRequestMessageSchema,
-} from "../../../generated/proto/cacti/satp/v02/stage_2_pb";
+  LockAssertionRequest,
+  LockAssertionRequestSchema,
+} from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
   getMessageHash,
@@ -66,9 +66,9 @@ export class Stage2ClientService extends SATPService {
   }
 
   async lockAssertionRequest(
-    response: TransferCommenceResponseMessage,
+    response: TransferCommenceResponse,
     session: SATPSession,
-  ): Promise<void | LockAssertionRequestMessage> {
+  ): Promise<void | LockAssertionRequest> {
     const stepTag = `lockAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const messageType = MessageType[MessageType.LOCK_ASSERT];
@@ -114,12 +114,9 @@ export class Stage2ClientService extends SATPService {
       sessionData.lastSequenceNumber = commonBody.sequenceNumber =
         response.common!.sequenceNumber + BigInt(1);
 
-      const lockAssertionRequestMessage = create(
-        LockAssertionRequestMessageSchema,
-        {
-          common: commonBody,
-        },
-      );
+      const lockAssertionRequestMessage = create(LockAssertionRequestSchema, {
+        common: commonBody,
+      });
 
       if (sessionData.lockAssertionClaim == undefined) {
         throw new LockAssertionClaimError(fnTag);
@@ -189,13 +186,13 @@ export class Stage2ClientService extends SATPService {
     }
   }
 
-  async checkTransferCommenceResponseMessage(
-    response: TransferCommenceResponseMessage,
+  async checkTransferCommenceResponse(
+    response: TransferCommenceResponse,
     session: SATPSession,
   ): Promise<void> {
-    const stepTag = `checkTransferCommenceResponseMessage()`;
+    const stepTag = `checkTransferCommenceResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, checkTransferCommenceResponseMessage...`);
+    this.Log.debug(`${fnTag}, checkTransferCommenceResponse...`);
 
     if (session == undefined) {
       throw new SessionError(fnTag);

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 /**
  * @dev Enum for the supported token types.
  */
-enum TokenType { ERC20, ERC721, ERC1155, OTHER }
+enum TokenType { UNSPECIFIED, ERC20, ERC721, ERC1155, OTHER } //TODO: FIX THIS ENUM TO BE THE SAME OF THE BRIDGE
 /**
  * @dev Enum for the supported interaction types.
  */
