@@ -43,7 +43,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   create(log: LocalLog): any {
     return this.getLogsTable().insert(log);
   }
-  
+
   // TODO fix any type
   deleteBySessionId(sessionID: string): any {
     return this.database().where({ sessionID: sessionID }).del();

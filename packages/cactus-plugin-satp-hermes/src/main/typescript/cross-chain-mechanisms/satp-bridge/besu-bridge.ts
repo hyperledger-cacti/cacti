@@ -4,9 +4,9 @@ import type {
 } from "../../types/blockchain-interaction";
 import {
   EthContractInvocationType,
-  IPluginLedgerConnectorBesuOptions,
+  type IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
-  RunTransactionResponse,
+  type RunTransactionResponse,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
