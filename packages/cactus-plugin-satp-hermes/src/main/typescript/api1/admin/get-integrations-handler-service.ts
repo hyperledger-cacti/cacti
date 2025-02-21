@@ -31,8 +31,8 @@ export async function executeGetIntegrations(
       logger.error(`${fnTag}, Error getting status: ${error.message}`);
       throw error;
     }
-      logger.error(`${fnTag}, Unexpected error: ${error.message}`);
-      throw new Error("An unexpected error occurred while obtaining status.");
+    logger.error(`${fnTag}, Unexpected error: ${error.message}`);
+    throw new Error("An unexpected error occurred while obtaining status.");
   }
 }
 

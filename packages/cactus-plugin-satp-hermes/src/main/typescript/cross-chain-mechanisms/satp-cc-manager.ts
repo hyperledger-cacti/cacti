@@ -35,7 +35,7 @@ export interface ISATPBridgesOptions {
 }
 
 // TODO extend to accomodate oracle
-// does specific on-chain operations by calling bridge manager or oracle manager 
+// does specific on-chain operations by calling bridge manager or oracle manager
 export class SATPCrossChainManager {
   static CLASS_NAME = "SATPCrossChainManager";
   private supportedDLTs: LedgerType[];
