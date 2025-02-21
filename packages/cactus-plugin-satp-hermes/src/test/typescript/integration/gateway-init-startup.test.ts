@@ -4,7 +4,7 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
-  LogLevelDesc,
+  type LogLevelDesc,
   LoggerProvider,
   Servers,
 } from "@hyperledger/cactus-common";
@@ -17,16 +17,16 @@ import { ApiClient } from "@hyperledger/cactus-api-client";
 
 import {
   SATPGateway,
-  SATPGatewayConfig,
+  type SATPGatewayConfig,
 } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   Configuration,
-  IPluginFactoryOptions,
+  type IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { ShutdownHook } from "./../../../main/typescript/core/types";
+import type { ShutdownHook } from "./../../../main/typescript/core/types";
 import {
   DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -35,7 +35,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
-import { AddressInfo } from "net";
+import type { AddressInfo } from "node:net";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { AdminApi } from "../../../main/typescript";
 import {

@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { SATPGateway, SATPGatewayConfig } from "./plugin-satp-hermes-gateway";
+import { SATPGateway, type SATPGatewayConfig } from "./plugin-satp-hermes-gateway";
 import fs from "fs-extra";
 
-import { validateSatpGatewayIdentity } from "./config-validating-functions/validateSatpGatewayIdentity";
-import { validateSatpCounterPartyGateways } from "./config-validating-functions/validateSatpCounterPartyGateways";
-import { validateSatpLogLevel } from "./config-validating-functions/validateSatpLogLevel";
-import { validateSatpEnvironment } from "./config-validating-functions/validateSatpEnvironment";
-import { validateSatpEnableOpenAPI } from "./config-validating-functions/validateSatpEnableOpenAPI";
-import { validateSatpValidationOptions } from "./config-validating-functions/validateSatpValidationOptions";
-import { validateSatpPrivacyPolicies } from "./config-validating-functions/validateSatpPrivacyPolicies";
-import { validateSatpMergePolicies } from "./config-validating-functions/validateSatpMergePolicies";
-import { validateSatpKeyPairJSON } from "./config-validating-functions/validateKeyPairJSON";
-import { validateSatpBridgesConfig } from "./config-validating-functions/validateSatpBridgesConfig";
-import path from "path";
-import { validateSatpEnableCrashRecovery } from "./config-validating-functions/validateSatpEnableCrashRecovery";
-import { validateKnexRepositoryConfig } from "./config-validating-functions/validateKnexRepositoryConfig";
+import { validateSatpGatewayIdentity } from "./utils/config-validating-functions/validateSatpGatewayIdentity";
+import { validateSatpCounterPartyGateways } from "./utils/config-validating-functions/validateSatpCounterPartyGateways";
+import { validateSatpLogLevel } from "./utils/config-validating-functions/validateSatpLogLevel";
+import { validateSatpEnvironment } from "./utils/config-validating-functions/validateSatpEnvironment";
+import { validateSatpEnableOpenAPI } from "./utils/config-validating-functions/validateSatpEnableOpenAPI";
+import { validateSatpValidationOptions } from "./utils/config-validating-functions/validateSatpValidationOptions";
+import { validateSatpPrivacyPolicies } from "./utils/config-validating-functions/validateSatpPrivacyPolicies";
+import { validateSatpMergePolicies } from "./utils/config-validating-functions/validateSatpMergePolicies";
+import { validateSatpKeyPairJSON } from "./utils/config-validating-functions/validateKeyPairJSON";
+import { validateSatpBridgesConfig } from "./utils/config-validating-functions/validateSatpBridgesConfig";
+import path from "node:path";
+import { validateSatpEnableCrashRecovery } from "./utils/config-validating-functions/validateSatpEnableCrashRecovery";
+import { validateKnexRepositoryConfig } from "./utils/config-validating-functions/validateKnexRepositoryConfig";
 
 export async function launchGateway(): Promise<void> {
   const logger = LoggerProvider.getOrCreate({
@@ -49,7 +49,7 @@ export async function launchGateway(): Promise<void> {
 
   logger.debug(`Reading configuration from: ${configFilePath}`);
   const config = await fs.readJson(configFilePath);
-  logger.debug(`Configuration read OK`);
+  logger.debug("Configuration read OK");
 
   // validating gateway-config.json
 
@@ -166,6 +166,7 @@ export async function launchGateway(): Promise<void> {
     await gateway.startup();
     logger.info("SATP Gateway started successfully");
   } catch (ex) {
+    // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
     logger.error(`SATP Gateway crashed. Exiting...`, ex);
     await gateway.shutdown();
     process.exit(-1);
