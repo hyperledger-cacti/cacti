@@ -1,17 +1,17 @@
 import {
-  RecoverMessage,
+  type RecoverMessage,
   RecoverMessageSchema,
-  RecoverSuccessMessage,
+  type RecoverSuccessMessage,
   RecoverSuccessMessageSchema,
-  RollbackMessage,
+  type RollbackMessage,
   RollbackMessageSchema,
-  RollbackState,
+  type RollbackState,
 } from "../../../typescript/generated/proto/cacti/satp/v02/crash_recovery_pb";
-import { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
+import type { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign } from "../../gateway-utils";
-import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import { getCrashedStage } from "../session-utils";
 
 export class CrashRecoveryClientService {
