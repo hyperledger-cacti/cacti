@@ -22,7 +22,10 @@ import { InteractionData } from "./types/interact";
 import { OntologyError, TransactionError } from "./bridge-errors";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { EthereumConfig, TransactionResponse } from "../../types/blockchain-interaction";
+import {
+  EthereumConfig,
+  TransactionResponse,
+} from "../../types/blockchain-interaction";
 
 interface EthereumResponse {
   success: boolean;
