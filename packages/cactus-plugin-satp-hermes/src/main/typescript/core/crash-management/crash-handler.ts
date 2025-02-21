@@ -1,12 +1,12 @@
-import { ConnectRouter } from "@connectrpc/connect";
-import { Logger } from "@hyperledger/cactus-common";
+import type { ConnectRouter } from "@connectrpc/connect";
+import type { Logger } from "@hyperledger/cactus-common";
 import {
   CrashRecovery,
-  RecoverSuccessMessageResponse,
+  type RecoverSuccessMessageResponse,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
-import { CrashRecoveryServerService } from "./server-service";
-import { CrashRecoveryClientService } from "./client-service";
-import {
+import type { CrashRecoveryServerService } from "./server-service";
+import type { CrashRecoveryClientService } from "./client-service";
+import type {
   RecoverMessage,
   RecoverUpdateMessage,
   RecoverSuccessMessage,
@@ -14,8 +14,8 @@ import {
   RollbackAckMessage,
   RollbackState,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
-import { SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
-import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { type SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
+import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 
 export class CrashRecoveryHandler implements SATPHandler {
   private readonly log: Logger;

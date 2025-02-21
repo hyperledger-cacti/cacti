@@ -1,12 +1,12 @@
-import { LocalLog } from "../core/types";
-import { ILocalLogRepository } from "./interfaces/repository";
-import knex, { Knex } from "knex";
+import type { LocalLog } from "../core/types";
+import type { ILocalLogRepository } from "./interfaces/repository";
+import knex, { type Knex } from "knex";
 
-import { knexLocalInstance } from "../knex/knexfile";
+import { knexLocalInstance } from "../database/knexfile";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;
-  private created: boolean = false;
+  private created = false;
 
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
@@ -39,10 +39,12 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
       .whereNot("type", "like", "%proof%");
   }
 
+  // TODO fix any type
   create(log: LocalLog): any {
     return this.getLogsTable().insert(log);
   }
-
+  
+  // TODO fix any type
   deleteBySessionId(sessionID: string): any {
     return this.database().where({ sessionID: sessionID }).del();
   }
