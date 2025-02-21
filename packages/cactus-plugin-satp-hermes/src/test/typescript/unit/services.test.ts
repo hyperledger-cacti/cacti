@@ -1,13 +1,13 @@
 import {
   JsObjectSigner,
-  LogLevelDesc,
+  type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
-import { SATPBridgesManager } from "../../../main/typescript/gol/satp-bridges-manager";
+import { SATPCrossChainManager } from "../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 
 import {
-  ISATPServiceOptions,
-  SATPService,
+  type ISATPServiceOptions,
+  type SATPService,
   SATPServiceType,
 } from "../../../main/typescript/core/stage-services/satp-service";
 import { Stage1ClientService } from "../../../main/typescript/core/stage-services/client/stage1-client-service";
@@ -68,7 +68,6 @@ import {
   PreSATPTransferResponseMessage,
   STATUS,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/stage_0_pb";
-import { TokenType } from "../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
@@ -86,6 +85,7 @@ import { create, isMessage } from "@bufbuild/protobuf";
 let knexInstanceClient: Knex; // test as a client
 let knexInstanceRemote: Knex;
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { TokenType } from "../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -114,7 +114,7 @@ let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
 let dbLogger: SATPLogger;
 let persistLogEntrySpy: jest.SpyInstance;
-let bridgeManager: SATPBridgesManager;
+let bridgeManager: SATPCrossChainManager;
 
 let mockSession: SATPSession;
 let satpClientService0: Stage0ClientService;
@@ -146,7 +146,7 @@ let transferCompleteResponseMessage: TransferCompleteResponseMessage;
 const sessionIDs: string[] = [];
 
 beforeAll(async () => {
-  bridgeManager = new SATPBridgesManager({
+  bridgeManager = new SATPCrossChainManager({
     connectedDLTs: connectedDLTs,
     networks: [],
     logLevel: logLevel,
