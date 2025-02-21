@@ -4,18 +4,18 @@ import { Stage0RollbackStrategy } from "../../../../main/typescript/core/crash-m
 import { Stage1RollbackStrategy } from "../../../../main/typescript/core/crash-management/rollback/stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "../../../../main/typescript/core/crash-management/rollback/stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "../../../../main/typescript/core/crash-management/rollback/stage3-rollback-strategy";
-import { SATPBridgesManager } from "../../../../main/typescript/gol/satp-bridges-manager";
+import { SATPCrossChainManager } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import {
-  MessageStagesHashes,
+  type MessageStagesHashes,
   MessageStagesHashesSchema,
   Stage0HashesSchema,
   Stage1HashesSchema,
   Stage2HashesSchema,
   Stage3HashesSchema,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
@@ -40,10 +40,10 @@ const log = LoggerProvider.getOrCreate({
 
 describe("RollbackStrategyFactory Tests", () => {
   let factory: RollbackStrategyFactory;
-  let bridgesManager: SATPBridgesManager;
+  let bridgesManager: SATPCrossChainManager;
 
   beforeAll(async () => {
-    bridgesManager = new SATPBridgesManager({
+    bridgesManager = new SATPCrossChainManager({
       logLevel: "DEBUG",
       networks: [],
       connectedDLTs: [

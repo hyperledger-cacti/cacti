@@ -1,6 +1,6 @@
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
-import { CrashManager } from "../../../../main/typescript/gol/crash-manager";
+import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
 import {
   LocalLog,
   GatewayIdentity,
@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 import {
   SATPGatewayConfig,
   PluginFactorySATPGateway,
@@ -49,9 +49,9 @@ import {
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
 import SATPInteractionFabric from "../../fabric/satp-erc20-interact.json";
 import SATPInteractionBesu from "../../../solidity/satp-erc20-interact.json";
-import { EvmAsset } from "../../../../main/typescript/core/stage-services/satp-bridge/types/evm-asset";
-import { FabricAsset } from "../../../../main/typescript/core/stage-services/satp-bridge/types/fabric-asset";
-import { SATPBridgesManager } from "../../../../main/typescript/gol/satp-bridges-manager";
+import { SATPCrossChainManager } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
+import { FabricAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/fabric-asset";
+import { EvmAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/evm-asset";
 
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
@@ -67,7 +67,7 @@ const bridge_id =
 
 let crashManager1: CrashManager;
 let crashManager2: CrashManager;
-let bridgesManager: SATPBridgesManager;
+let bridgesManager: SATPCrossChainManager;
 const sessionId = uuidv4();
 const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -186,7 +186,7 @@ beforeAll(async () => {
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
 
-  bridgesManager = new SATPBridgesManager({
+  bridgesManager = new SATPCrossChainManager({
     logLevel: "DEBUG",
     networks: [besuEnv.besuConfig, fabricEnv.fabricConfig],
     connectedDLTs: [

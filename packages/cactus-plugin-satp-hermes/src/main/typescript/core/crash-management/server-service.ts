@@ -1,19 +1,19 @@
 import {
-  RecoverMessage,
-  RecoverUpdateMessage,
-  RecoverSuccessMessage,
-  RollbackMessage,
-  RollbackAckMessage,
+  type RecoverMessage,
+  type RecoverUpdateMessage,
+  type RecoverSuccessMessage,
+  type RollbackMessage,
+  type RollbackAckMessage,
   RecoverUpdateMessageSchema,
   RollbackAckMessageSchema,
-  RecoverSuccessMessageResponse,
+  type RecoverSuccessMessageResponse,
   RecoverSuccessMessageResponseSchema,
 } from "../../generated/proto/cacti/satp/v02/crash_recovery_pb";
-import { SATPSession } from "../satp-session";
-import { ILocalLogRepository } from "../../repository/interfaces/repository";
-import { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
+import type { SATPSession } from "../satp-session";
+import type { ILocalLogRepository } from "../../repository/interfaces/repository";
+import type { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
 import { RollbackStrategyFactory } from "./rollback/rollback-strategy-factory";
-import { SATPBridgesManager } from "../../gol/satp-bridges-manager";
+import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign, verifySignature } from "../../gateway-utils";
@@ -22,7 +22,7 @@ import { Type } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 
 export class CrashRecoveryServerService {
   constructor(
-    private readonly bridgesManager: SATPBridgesManager,
+    private readonly bridgesManager: SATPCrossChainManager,
     private readonly defaultRepository: boolean,
     private readonly logRepository: ILocalLogRepository,
     private readonly sessions: Map<string, SATPSession>,

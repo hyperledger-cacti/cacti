@@ -1,11 +1,11 @@
 import "jest-extended";
-import { CrashManager } from "../../../../main/typescript/gol/crash-manager";
+import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
 import {
   Secp256k1Keys,
   JsObjectSigner,
   IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gol/crash-manager";
+import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gateway/crash-manager";
 import {
   GatewayIdentity,
   Address,
@@ -22,15 +22,14 @@ import {
   bufArray2HexStr,
   getSatpLogKey,
 } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import {
   GatewayOrchestrator,
   IGatewayOrchestratorOptions,
-} from "../../../../main/typescript/gol/gateway-orchestrator";
+} from "../../../../main/typescript/gateway/gateway-orchestrator";
 import {
   ISATPBridgesOptions,
-  SATPBridgesManager,
-} from "../../../../main/typescript/gol/satp-bridges-manager";
+  SATPCrossChainManager,
+} from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 import { KnexLocalLogRepository } from "../../../../main/typescript/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository } from "../../../../main/typescript/repository/knex-remote-log-repository";
@@ -48,6 +47,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import knex, { Knex } from "knex";
 import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 
 let crashManager: CrashManager;
 let localRepository: ILocalLogRepository;
@@ -143,7 +143,7 @@ beforeAll(async () => {
     connectedDLTs: gatewayIdentity.connectedDLTs,
     networks: [],
   };
-  const bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
+  const bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 
   const crashOptions: ICrashRecoveryManagerOptions = {
     instanceId: "test-instance",
