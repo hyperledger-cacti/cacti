@@ -1,22 +1,22 @@
 import { validateOrReject } from "class-validator";
 import {
-  IPluginFactoryOptions,
+  type IPluginFactoryOptions,
   PluginFactory,
 } from "@hyperledger/cactus-core-api";
 import {
-  SATPBridgesManager,
-  ISATPBridgesOptions,
-} from "../gol/satp-bridges-manager";
+  SATPCrossChainManager,
+  type ISATPBridgesOptions,
+} from "../cross-chain-mechanisms/satp-cc-manager";
 
 export class PluginFactorySATPBridge extends PluginFactory<
-  SATPBridgesManager,
+  SATPCrossChainManager,
   ISATPBridgesOptions,
   IPluginFactoryOptions
 > {
   async create(
     pluginOptions: ISATPBridgesOptions,
-  ): Promise<SATPBridgesManager> {
-    const manager = new SATPBridgesManager(pluginOptions);
+  ): Promise<SATPCrossChainManager> {
+    const manager = new SATPCrossChainManager(pluginOptions);
     try {
       const validationOptions = pluginOptions.validationOptions;
       await validateOrReject(manager, validationOptions);

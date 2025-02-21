@@ -1,6 +1,6 @@
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
-import { CrashManager } from "../../../../main/typescript/gol/crash-manager";
+import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
 import {
   LocalLog,
   GatewayIdentity,
@@ -10,12 +10,11 @@ import {
   pruneDockerAllIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
-import { AssetSchema } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { AssetSchema, TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { v4 as uuidv4 } from "uuid";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
 import {
   SATPGatewayConfig,
   PluginFactorySATPGateway,
