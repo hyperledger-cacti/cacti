@@ -1,14 +1,31 @@
-import { Logger, LoggerProvider, ILoggerOptions } from "some-logger-lib"; // adjust as needed
-import { safeStableStringify } from "safe-stable-stringify";
+import {
+  type ILoggerOptions,
+  type Logger,
+  LoggerProvider,
+  type LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
-import { OracleTaskScheduler } from "./oracle-task-scheduler";
 import { OracleRelayer } from "./oracle-relayer";
 
-// Replace these with the actual types defined in your project:
-import { FabricConnectorOptions } from "../ledger-connectors/fabric-connector-types";
-import { EthereumConnectorOptions } from "../ledger-connectors/ethereum-connector-types";
-import { PluginBungeeHermes } from "../ledger-connectors/plugin-bungee-hermes";
+import type {
+  FabricSigningCredential,
+  IPluginLedgerConnectorFabricOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import type {
+  IPluginLedgerConnectorBesuOptions,
+  Web3SigningCredential,
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import type {
+  IPluginBungeeHermesOptions,
+  PluginBungeeHermes,
+} from "@hyperledger/cactus-plugin-bungee-hermes";
+import { OracleFabric } from "./oracle-fabric";
+import { OracleEVM } from "./oracle-evm";
 
+export enum OracleTaskType {
+  READ = "READ",
+  UPDATE = "UPDATE",
+}
 // Task interface must include smart contract addresses, function or event parameters, session id, optional callback, etc.
 export interface IOracleTask {
   id: string;
@@ -23,13 +40,14 @@ export interface IOracleTask {
   // For data transfer
   sessionId: string;
   callbackUrl?: string;
+  type: OracleTaskType;
 }
 
 export interface IOracleManagerOptions {
   logLevel?: string;
   instanceId: string;
-  fabricConnectorConfig: FabricConnectorOptions;
-  ethereumConnectorConfig: EthereumConnectorOptions;
+  fabricConnectorConfig: IPluginLedgerConnectorFabricOptions;
+  ethereumConnectorConfig: IPluginLedgerConnectorBesuOptions;
   bungee: PluginBungeeHermes;
   initialTasks?: IOracleTask[];
 }
@@ -46,22 +64,24 @@ export enum OracleTaskStatusEnum {
 export interface OracleTaskStatus {
   taskId: string;
   status: OracleTaskStatusEnum;
-  details?: any; // e.g. proofs, tx hashes, etc.
+  details?: any;
+  conditions: Array<(params: string[]) => boolean>;
+  action: OracleTaskType;
+  arguments: string[];
 }
 
 export class OracleManager {
   public static readonly CLASS_NAME = "OracleManager";
   private readonly logger: Logger;
   private readonly instanceId: string;
-  private readonly fabricConnectorConfig: FabricConnectorOptions;
-  private readonly ethereumConnectorConfig: EthereumConnectorOptions;
+  private readonly fabricConnectorConfig: IPluginLedgerConnectorFabricOptions;
+  private readonly ethereumConnectorConfig: IPluginLedgerConnectorBesuOptions;
   private tasks: IOracleTask[];
 
   // Map to store the status for a given taskId
   private taskStatusMap: Map<string, OracleTaskStatus> = new Map();
 
   private readonly notificationDispatcher: OracleNotificationDispatcher;
-  private readonly taskScheduler: OracleTaskScheduler;
   private readonly relayer: OracleRelayer;
   private readonly bungee: PluginBungeeHermes;
 
@@ -71,10 +91,15 @@ export class OracleManager {
       throw new Error(`${fnTag}: OracleManager options are required`);
     }
     this.instanceId = options.instanceId;
-    const level = options.logLevel || "INFO";
-    const loggerOptions: ILoggerOptions = { level, label: OracleManager.CLASS_NAME };
+    const level = (options.logLevel || "INFO") as LogLevelDesc;
+    const loggerOptions: ILoggerOptions = {
+      level,
+      label: OracleManager.CLASS_NAME,
+    };
     this.logger = LoggerProvider.getOrCreate(loggerOptions);
-    this.logger.info(`${fnTag}: Initializing OracleManager with instanceId ${this.instanceId}`);
+    this.logger.info(
+      `${fnTag}: Initializing OracleManager with instanceId ${this.instanceId}`,
+    );
 
     this.fabricConnectorConfig = options.fabricConnectorConfig;
     this.ethereumConnectorConfig = options.ethereumConnectorConfig;
@@ -82,34 +107,59 @@ export class OracleManager {
     this.tasks = options.initialTasks || [];
 
     // Set initial status to PENDING for each provided task.
-    this.tasks.forEach((task) => {
+    for (const task of this.tasks) {
       this.taskStatusMap.set(task.id, {
         taskId: task.id,
         status: OracleTaskStatusEnum.PENDING,
+        conditions: [],
+        action: task.type,
+        arguments: [],
       });
+    }
+
+    this.notificationDispatcher = new OracleNotificationDispatcher({
+      logger: this.logger,
+    });
+    const oracleFabric = new OracleFabric({
+      oracleConfig: {
+        contractName: "fabricContract",
+        channelName: "mychannel",
+        keychainId: "fabricKeychain",
+        signingCredential: {} as FabricSigningCredential, // todo fix
+        network: {
+          id: "fabric-network-id",
+          ledgerType: "fabric",
+        },
+        options: {}, // Provide valid connector options
+        bungeeOptions: {} as IPluginBungeeHermesOptions, // todo fix
+      },
+      connectorConfig: this.fabricConnectorConfig,
+      bungee: this.bungee,
     });
 
-    // Initialize sub-components:
-    this.notificationDispatcher = new OracleNotificationDispatcher({ logger: this.logger });
-    this.taskScheduler = new OracleTaskScheduler({ logger: this.logger, tasks: this.tasks });
-    // Pass the bungee instance to the relayer so that it can generate proofs if needed.
-    this.relayer = new OracleRelayer({ logger: this.logger, bungee: this.bungee });
-  }
-
-  // Registers the task and schedules it for execution.
-  public addTask(task: IOracleTask): string {
-    const fnTag = `${OracleManager.CLASS_NAME}#addTask()`;
-    this.logger.info(`${fnTag}: Adding task ${safeStableStringify(task)}`);
-    this.tasks.push(task);
-    // Set initial status.
-    this.taskStatusMap.set(task.id, {
-      taskId: task.id,
-      status: OracleTaskStatusEnum.PENDING,
+    const oracleEVM = new OracleEVM({
+      oracleConfig: {
+        contractName: "evmContract",
+        keychainId: "evmKeychain",
+        signingCredential: {} as Web3SigningCredential, // todo fix
+        gas: 3000000,
+        network: {
+          id: "evm-network-id",
+          ledgerType: "evm",
+        },
+        options: {}, // Provide valid connector options
+        bungeeOptions: {} as IPluginBungeeHermesOptions, // todo fix
+      },
+      connectorConfig: this.ethereumConnectorConfig,
+      bungee: this.bungee,
     });
-    // Schedule the task asynchronously.
-    this.taskScheduler.scheduleTask(task);
-    // Returns the task id to be used in the status endpoint.
-    return task.id;
+
+    this.relayer = new OracleRelayer({
+      logger: this.logger,
+      fabric: oracleFabric,
+      evm: oracleEVM,
+      scheduledTasks: this.tasks, // todo, needed?
+    });
   }
 
   public getTasks(): IOracleTask[] {
@@ -126,26 +176,35 @@ export class OracleManager {
       throw new Error(`${fnTag}: Task with id ${taskId} not found`);
     }
 
-    // Update the status to PENDING (in case the execution is re-triggered).
-    this.taskStatusMap.set(task.id, { taskId: task.id, status: OracleTaskStatusEnum.PENDING });
+    this.taskStatusMap.set(task.id, {
+      taskId: task.id,
+      status: OracleTaskStatusEnum.PENDING,
+      conditions: [],
+      action:
+        task.type === OracleTaskType.READ
+          ? OracleTaskType.READ
+          : OracleTaskType.UPDATE,
+      arguments: [],
+    });
 
     try {
       // Execute the task via the relayer.
-      const resultDetails = await this.relayer.relayTask(
-        task,
-        this.fabricConnectorConfig,
-        this.ethereumConnectorConfig,
-        // bungee is passed to generate proofs for the task execution if needed
-        this.bungee,
-      );
+      const resultDetails = await this.relayer.relayTask(task);
+
       // Update the status to SUCCESS including any result details (e.g. tx hashes, generated proofs).
       this.taskStatusMap.set(task.id, {
         taskId: task.id,
         status: OracleTaskStatusEnum.SUCCESS,
         details: resultDetails,
+        conditions: [],
+        action:
+          task.type === OracleTaskType.READ
+            ? OracleTaskType.READ
+            : OracleTaskType.UPDATE,
+        arguments: [],
       });
       // Dispatch a success notification.
-      this.notificationDispatcher.dispatchNotification({
+      await this.notificationDispatcher.dispatchNotification({
         taskId: task.id,
         status: OracleTaskStatusEnum.SUCCESS,
         message: `Task ${task.id} executed successfully.`,
@@ -157,9 +216,15 @@ export class OracleManager {
         taskId: task.id,
         status: OracleTaskStatusEnum.FAILED,
         details: { error: error.message },
+        conditions: [],
+        action:
+          task.type === OracleTaskType.READ
+            ? OracleTaskType.READ
+            : OracleTaskType.UPDATE,
+        arguments: [],
       });
       // Dispatch a failure notification.
-      this.notificationDispatcher.dispatchNotification({
+      await this.notificationDispatcher.dispatchNotification({
         taskId: task.id,
         status: OracleTaskStatusEnum.FAILED,
         message: `Task ${task.id} failed to execute.`,
@@ -175,7 +240,13 @@ export class OracleManager {
     const status = this.taskStatusMap.get(taskId);
     if (!status) {
       this.logger.warn(`${fnTag}: Task status for id ${taskId} not found`);
-      return { taskId, status: OracleTaskStatusEnum.NOT_FOUND };
+      return {
+        taskId,
+        status: OracleTaskStatusEnum.NOT_FOUND,
+        conditions: [],
+        action: OracleTaskType.READ,
+        arguments: [],
+      };
     }
     return status;
   }
@@ -183,7 +254,6 @@ export class OracleManager {
   public async shutdown(): Promise<void> {
     const fnTag = `${OracleManager.CLASS_NAME}#shutdown()`;
     this.logger.info(`${fnTag}: Shutting down OracleManager`);
-    await this.taskScheduler.shutdown();
-    // Add shutdown operations for additional sub-components if needed.
+    // todo
   }
 }

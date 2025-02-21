@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { SATPGateway, type SATPGatewayConfig } from "./plugin-satp-hermes-gateway";
+import {
+  SATPGateway,
+  type SATPGatewayConfig,
+} from "./plugin-satp-hermes-gateway";
 import fs from "fs-extra";
 
 import { validateSatpGatewayIdentity } from "./utils/config-validating-functions/validateSatpGatewayIdentity";
