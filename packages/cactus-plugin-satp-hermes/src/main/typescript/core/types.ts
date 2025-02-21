@@ -1,6 +1,6 @@
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { ValidatorOptions } from "class-validator";
-import { BLODispatcher } from "../blo/dispatcher";
+import { BLODispatcher } from "../api1/dispatcher";
 import { ISignerKeyPairs } from "@hyperledger/cactus-common/dist/lib/main/typescript/signer-key-pairs";
 import { SATPSession } from "./satp-session";
 import { ConnectRouter } from "@connectrpc/connect";
@@ -9,7 +9,6 @@ import { SATPService } from "../types/satp-protocol";
 import { Client as ConnectClient } from "@connectrpc/connect";
 import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
-import { NetworkBridge } from "./stage-services/satp-bridge/network-bridge";
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkConfig } from "../types/blockchain-interaction";
 import { Knex } from "knex";
@@ -84,11 +83,6 @@ export interface SATPGatewayConfig {
   enableCrashRecovery?: boolean;
 }
 
-// export interface SATPBridgeConfig {
-//   logLevel?: LogLevelDesc;
-//   network: NetworkBridge;
-// }
-
 export type Immutable<T> = {
   readonly [K in keyof T]: Immutable<T[K]>;
 };
@@ -120,10 +114,6 @@ export interface RemoteLog {
   signerPubKey: string;
 }
 
-export interface SATPBridgeConfig {
-  network: NetworkBridge;
-  logLevel?: LogLevelDesc;
-}
 export { SATPServiceInstance };
 
 export enum CrashStatus {

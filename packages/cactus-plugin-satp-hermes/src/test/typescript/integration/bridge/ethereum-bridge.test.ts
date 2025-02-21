@@ -13,8 +13,8 @@ import SATPContract from "../../../solidity/generated/satp-erc20.sol/SATPContrac
 import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import Web3 from "web3";
-import { EvmAsset } from "../../../../main/typescript/core/stage-services/satp-bridge/types/evm-asset";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { EvmAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/evm-asset";
+import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { EthereumConfig } from "../../../../main/typescript/types/blockchain-interaction";
 import SATPInteraction from "../../../solidity/satp-erc20-interact.json";
@@ -29,7 +29,7 @@ import {
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { EthereumBridge } from "../../../../main/typescript/core/stage-services/satp-bridge/ethereum-bridge";
+import { EthereumBridge } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/ethereum-bridge";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "DEBUG";
