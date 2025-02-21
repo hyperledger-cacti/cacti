@@ -323,10 +323,10 @@ export class CrashManager {
             );
             break;
           }
-            attempts++;
-            this.log.info(
-              `${fnTag} Recovery attempt ${attempts} failed for sessionID: ${sessionData.id}`,
-            );
+          attempts++;
+          this.log.info(
+            `${fnTag} Recovery attempt ${attempts} failed for sessionID: ${sessionData.id}`,
+          );
         } else if (crashStatus === CrashStatus.IN_ROLLBACK) {
           this.log.warn(
             `${fnTag} Initiating rollback for session ${sessionData.id}!`,
@@ -501,7 +501,7 @@ export class CrashManager {
 
         return true;
       }
-        return false;
+      return false;
     } catch (error) {
       this.log.error(
         `${fnTag} Error during recovery process for session ID: ${sessionData.id} - ${error}`,
@@ -600,15 +600,15 @@ export class CrashManager {
           );
           return cleanupSuccess && rollbackSuccess;
         }
-          this.log.error(
-            `${fnTag} Rollback execution failed for session ${session.getSessionId()}`,
-          );
-          return false;
-      }
-        this.log.info(
-          `${fnTag} Rollback not needed for session ${session.getSessionId()}`,
+        this.log.error(
+          `${fnTag} Rollback execution failed for session ${session.getSessionId()}`,
         );
-        return true;
+        return false;
+      }
+      this.log.info(
+        `${fnTag} Rollback not needed for session ${session.getSessionId()}`,
+      );
+      return true;
     } catch (error) {
       this.log.error(`${fnTag} Error during rollback initiation: ${error}`);
       return false;
@@ -704,10 +704,10 @@ export class CrashManager {
         );
         return true;
       }
-        this.log.warn(
-          `${fnTag} Rollback failed at counterparty for session ID: ${message.sessionId}`,
-        );
-        return false;
+      this.log.warn(
+        `${fnTag} Rollback failed at counterparty for session ID: ${message.sessionId}`,
+      );
+      return false;
     } catch (error) {
       this.log.error(`${fnTag} Error processing RollbackAckMessage: ${error}`);
       return false;
@@ -745,7 +745,7 @@ export class CrashManager {
         this.gatewaysPubKeys.set(gateway.id, gateway.pubKey);
       }
     }
-    
+
     if (!this.orchestrator.ourGateway.pubKey) {
       throw new Error("Our gateway pubKey not found!");
     }
