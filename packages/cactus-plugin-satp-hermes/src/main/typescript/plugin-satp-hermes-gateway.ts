@@ -1,11 +1,11 @@
 import {
   Secp256k1Keys,
-  Logger,
+  type Logger,
   Checks,
   LoggerProvider,
-  ILoggerOptions,
+  type ILoggerOptions,
   JsObjectSigner,
-  IJsObjectSignerOptions,
+  type IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
 import { v4 as uuidv4 } from "uuid";
 
@@ -17,14 +17,14 @@ import {
   Contains,
 } from "class-validator";
 
-import { SATPGatewayConfig, GatewayIdentity, ShutdownHook } from "./core/types";
+import { SATPGatewayConfig, type GatewayIdentity, type ShutdownHook } from "./core/types";
 import {
   GatewayOrchestrator,
-  IGatewayOrchestratorOptions,
-} from "./gol/gateway-orchestrator";
+  type IGatewayOrchestratorOptions,
+} from "./gateway/gateway-orchestrator";
 export { SATPGatewayConfig };
-import express, { Express } from "express";
-import http from "http";
+import express, { type Express } from "express";
+import http from "node:http";
 import {
   DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -34,33 +34,33 @@ import {
   SATP_CRASH_VERSION,
 } from "./core/constants";
 import { bufArray2HexStr } from "./gateway-utils";
-import {
+import type {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "./repository/knex-remote-log-repository";
 import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository";
-import { BLODispatcher, BLODispatcherOptions } from "./blo/dispatcher";
-import swaggerUi, { JsonObject } from "swagger-ui-express";
-import {
+import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
+import swaggerUi, { type JsonObject } from "swagger-ui-express";
+import type {
   IPluginWebService,
   ICactusPlugin,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import {
-  ISATPBridgesOptions,
-  SATPBridgesManager,
-} from "./gol/satp-bridges-manager";
+  type ISATPBridgesOptions,
+  SATPCrossChainManager,
+} from "./cross-chain-mechanisms/satp-cc-manager";
 import bodyParser from "body-parser";
 import {
   CrashManager,
-  ICrashRecoveryManagerOptions,
-} from "./gol/crash-manager";
+  type ICrashRecoveryManagerOptions,
+} from "./gateway/crash-manager";
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
-import { NetworkId } from "./network-identification/chainid-list";
-import { knexLocalInstance } from "./knex/knexfile";
+import type { NetworkId } from "./network-identification/chainid-list";
+import { knexLocalInstance } from "./database/knexfile";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsDefined()
@@ -81,7 +81,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public readonly instanceId: string;
   private connectedDLTs: NetworkId[];
   private gatewayOrchestrator: GatewayOrchestrator;
-  private bridgesManager: SATPBridgesManager;
+  private bridgesManager: SATPCrossChainManager;
 
   private BLOApplication?: Express;
   private BLOServer?: http.Server;
@@ -89,13 +89,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private GOLApplication?: Express;
   private GOLServer?: http.Server;
   private readonly OAS: JsonObject;
-  public OAPIServerEnabled: boolean = false;
+  public OAPIServerEnabled = false;
 
   private signer: JsObjectSigner;
   private _pubKey: string;
 
   // Flag to create a db repository when not givenx
-  public defaultRepository: boolean = true;
+  public defaultRepository = true;
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
@@ -114,7 +114,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Coordinator");
 
-    if (!!this.config.knexLocalConfig) {
+    if (this.config.knexLocalConfig) {
       this.defaultRepository = false;
       this.localRepository = new LocalLogRepository(
         this.config.knexLocalConfig,
@@ -124,7 +124,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.localRepository = new LocalLogRepository(knexLocalInstance.default);
     }
 
-    if (!!this.config.knexRemoteConfig) {
+    if (this.config.knexRemoteConfig) {
       this.remoteRepository = new RemoteLogRepository(
         this.config.knexRemoteConfig,
       );
@@ -132,7 +132,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.info("Remote repository is not defined");
     }
 
-    if (this.config.keyPair == undefined) {
+    if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
     }
 
@@ -146,21 +146,29 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     };
     this.signer = new JsObjectSigner(signerOptions);
 
+    if (!this.signer) {
+      throw new Error("Signer is not defined");
+    }
+
+    if (!this.config.gid) {
+      throw new Error("GatewayIdentity is not defined");
+    }
+
     const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
       logLevel: this.config.logLevel,
-      localGateway: this.config.gid!,
+      localGateway: this.config.gid,
       counterPartyGateways: this.config.counterPartyGateways,
-      signer: this.signer!,
+      signer: this.signer,
       enableCrashRecovery: this.config.enableCrashRecovery,
     };
 
     const bridgesManagerOptions: ISATPBridgesOptions = {
       logLevel: this.config.logLevel,
-      connectedDLTs: this.config.gid!.connectedDLTs,
+      connectedDLTs: this.config.gid.connectedDLTs,
       networks: options.bridgesConfig ? options.bridgesConfig : [],
     };
 
-    this.bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
+    this.bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 
     if (!this.bridgesManager) {
       throw new Error("BridgesManager is not defined");
@@ -181,7 +189,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const dispatcherOps: BLODispatcherOptions = {
       logger: this.logger,
       logLevel: this.config.logLevel,
-      instanceId: this.config.gid!.id,
+      instanceId: this.config.gid.id,
       orchestrator: this.gatewayOrchestrator,
       signer: this.signer,
       bridgesManager: this.bridgesManager,
@@ -191,7 +199,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       remoteRepository: this.remoteRepository,
     };
 
-    this.connectedDLTs = this.config.gid!.connectedDLTs;
+    this.connectedDLTs = this.config.gid.connectedDLTs;
 
     if (!this.config.gid || !dispatcherOps.instanceId) {
       throw new Error("Invalid configuration");
@@ -226,7 +234,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-satp-hermes`;
+    return "@hyperledger/cactus-plugin-satp-hermes";
   }
 
   public async onPluginInit(): Promise<undefined> {
@@ -238,10 +246,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   /* IPluginWebService methods */
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
-    webServices.forEach((ws) => {
+    for (const ws of webServices) {
       this.logger.debug(`Registering service ${ws.getPath()}`);
       ws.registerExpress(app);
-    });
+    }
     this.BLOApplication = app;
     return webServices;
   }
@@ -304,7 +312,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!this.config.gid) {
       throw new Error("GatewayIdentity is not defined");
     }
-    return this.config.gid!;
+    return this.config.gid;
   }
 
   /* Gateway configuration helpers */
@@ -440,62 +448,60 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const port =
       this.options.gid?.gatewayOpenAPIPort ?? DEFAULT_PORT_GATEWAY_API;
 
-    return new Promise(async (resolve, reject) => {
-      if (!this.BLOApplication || !this.BLOServer) {
-        if (!this.BLODispatcher) {
-          throw new Error("BLODispatcher is not defined");
+    if (!this.BLOApplication || !this.BLOServer) {
+      if (!this.BLODispatcher) {
+        throw new Error("BLODispatcher is not defined");
+      }
+      this.BLOApplication = express();
+      this.BLOApplication.use(bodyParser.json({ limit: "250mb" }));
+      this.BLOApplication.use(cors());
+      try {
+        const webServices = await this.BLODispatcher.getOrCreateWebServices();
+        for (const service of webServices) {
+          this.logger.debug(`Registering web service: ${service.getPath()}`);
+          await service.registerExpress(this.BLOApplication);
         }
-        this.BLOApplication = express();
-        this.BLOApplication.use(bodyParser.json({ limit: "250mb" }));
-        this.BLOApplication.use(cors());
+      } catch (error) {
+        throw new Error(`Failed to register web services: ${error}`);
+      }
+
+      if (this.OAPIServerEnabled) {
+        this.logger.debug("OpenAPI server is enabled");
+
         try {
-          const webServices = await this.BLODispatcher.getOrCreateWebServices();
+          const webServices = await this.BLODispatcher.getOrCreateOAPIWebServices();
           for (const service of webServices) {
-            this.logger.debug(`Registering web service: ${service.getPath()}`);
+            this.logger.debug(`Registering OpenAPI web service: ${service.getPath()}`);
             await service.registerExpress(this.BLOApplication);
           }
+          this.BLOApplication.use(
+            "/api-docs",
+            swaggerUi.serve as express.RequestHandler[],
+            swaggerUi.setup(this.OAS) as express.RequestHandler,
+          );
         } catch (error) {
-          throw new Error(`Failed to register web services: ${error}`);
+          throw new Error(`Error to register OpenAPI web services: ${error}`);
         }
+      }
 
-        if (this.OAPIServerEnabled) {
-          this.logger.debug("OpenAPI server is enabled");
+      this.BLOServer = http.createServer(this.BLOApplication);
 
-          try {
-            const webServices =
-              await this.BLODispatcher.getOrCreateOAPIWebServices();
-            for (const service of webServices) {
-              this.logger.debug(
-                `Registering OpenAPI web service: ${service.getPath()}`,
-              );
-              await service.registerExpress(this.BLOApplication);
-            }
-            this.BLOApplication.use(
-              "/api-docs",
-              swaggerUi.serve as express.RequestHandler[],
-              swaggerUi.setup(this.OAS) as express.RequestHandler,
-            );
-          } catch (error) {
-            throw new Error(`Error to register OpenAPI web services: ${error}`);
-          }
+      await new Promise<void>((resolve, reject) => {
+        if (!this.BLOServer) {
+          throw new Error("BLOServer is not defined");
         }
-
-        this.BLOServer = http.createServer(this.BLOApplication);
-
         this.BLOServer.listen(port, () => {
           this.logger.info(`BLO server started and listening on port ${port}`);
           resolve();
         });
-
         this.BLOServer.on("error", (error) => {
           this.logger.error(`BLO server failed to start: ${error}`);
           reject(error);
         });
-      } else {
-        this.logger.warn("BLO Server already running.");
-        resolve();
-      }
-    });
+      });
+    } else {
+      this.logger.warn("BLO Server already running.");
+    }
   }
 
   protected async startupGOLServer(): Promise<void> {
@@ -506,11 +512,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const port =
       this.options.gid?.gatewayServerPort ?? DEFAULT_PORT_GATEWAY_SERVER;
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (!this.GOLServer) {
         this.GOLApplication = express();
 
-        this.gatewayOrchestrator.addGOLServer(this.GOLApplication!);
+        this.gatewayOrchestrator.addGOLServer(this.GOLApplication);
         this.gatewayOrchestrator.startServices();
 
         this.GOLServer = http.createServer(this.GOLApplication);
