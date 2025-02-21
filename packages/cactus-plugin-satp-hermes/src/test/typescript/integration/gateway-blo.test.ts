@@ -3,15 +3,15 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
-  IPluginFactoryOptions,
+  type IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
-import { SATPGatewayConfig } from "../../../main/typescript/core/types";
+import type { SATPGatewayConfig } from "../../../main/typescript/core/types";
 import { createClient } from "../test-utils";
 import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
 import {

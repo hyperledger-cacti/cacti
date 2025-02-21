@@ -1,12 +1,12 @@
 import { create } from "@bufbuild/protobuf";
 import {
   AssetSchema as ProtoAssetSchema,
-  Asset as ProtoAsset,
+  type Asset as ProtoAsset,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
-import { Asset } from "./satp-bridge/types/asset";
-import { EvmAsset } from "./satp-bridge/types/evm-asset";
-import { FabricAsset } from "./satp-bridge/types/fabric-asset";
-import { NetworkId } from "../../network-identification/chainid-list";
+import type { Asset } from "../../cross-chain-mechanisms/satp-bridge/types/asset";
+import type { EvmAsset } from "../../cross-chain-mechanisms/satp-bridge/types/evm-asset";
+import type { FabricAsset } from "../../cross-chain-mechanisms/satp-bridge/types/fabric-asset";
+import type { NetworkId } from "../../network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
