@@ -17,7 +17,11 @@ import {
   Contains,
 } from "class-validator";
 
-import { SATPGatewayConfig, type GatewayIdentity, type ShutdownHook } from "./core/types";
+import {
+  SATPGatewayConfig,
+  type GatewayIdentity,
+  type ShutdownHook,
+} from "./core/types";
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
@@ -469,9 +473,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.debug("OpenAPI server is enabled");
 
         try {
-          const webServices = await this.BLODispatcher.getOrCreateOAPIWebServices();
+          const webServices =
+            await this.BLODispatcher.getOrCreateOAPIWebServices();
           for (const service of webServices) {
-            this.logger.debug(`Registering OpenAPI web service: ${service.getPath()}`);
+            this.logger.debug(
+              `Registering OpenAPI web service: ${service.getPath()}`,
+            );
             await service.registerExpress(this.BLOApplication);
           }
           this.BLOApplication.use(
