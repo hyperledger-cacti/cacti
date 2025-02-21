@@ -168,7 +168,9 @@ export class BLODispatcher {
   }
 
   private getTargetGatewayClient(id: string) {
-    const channels: [string, { toGatewayID: string }][] = Array.from(this.orchestrator.getChannels());
+    const channels: [string, { toGatewayID: string }][] = Array.from(
+      this.orchestrator.getChannels(),
+    );
     const filtered = channels.filter((ch) => {
       return ch[0] === id && ch[1].toGatewayID === id;
     });

@@ -40,7 +40,10 @@ import {
   saveSignature,
   SessionType,
 } from "../../session-utils";
-import { type Asset, createAssetId } from "../../../cross-chain-mechanisms/satp-bridge/types/asset";
+import {
+  type Asset,
+  createAssetId,
+} from "../../../cross-chain-mechanisms/satp-bridge/types/asset";
 import {
   SATPService,
   SATPServiceType,
