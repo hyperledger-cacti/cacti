@@ -1,15 +1,15 @@
 import "jest-extended";
 import {
-  LogLevelDesc,
+  type LogLevelDesc,
   Secp256k1Keys,
   JsObjectSigner,
-  IJsObjectSignerOptions,
+  type IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { CrashManager } from "../../../../main/typescript/gol/crash-manager";
+import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
 import { CrashStatus } from "../../../../main/typescript/core/types";
-import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gol/crash-manager";
-import { Knex, knex } from "knex";
-import {
+import type { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gateway/crash-manager";
+import { type Knex, knex } from "knex";
+import type {
   LocalLog,
   GatewayIdentity,
   Address,
@@ -18,7 +18,7 @@ import { AssetSchema } from "../../../../main/typescript/generated/proto/cacti/s
 import { v4 as uuidv4 } from "uuid";
 import {
   Type,
-  SessionData,
+  type SessionData,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
@@ -30,15 +30,15 @@ import {
   bufArray2HexStr,
   getSatpLogKey,
 } from "../../../../main/typescript/gateway-utils";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 import {
   GatewayOrchestrator,
-  IGatewayOrchestratorOptions,
-} from "../../../../main/typescript/gol/gateway-orchestrator";
+  type IGatewayOrchestratorOptions,
+} from "../../../../main/typescript/gateway/gateway-orchestrator";
 import {
-  ISATPBridgesOptions,
-  SATPBridgesManager,
-} from "../../../../main/typescript/gol/satp-bridges-manager";
+  type ISATPBridgesOptions,
+  SATPCrossChainManager,
+} from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 
 import {
@@ -48,7 +48,7 @@ import {
 } from "../../../../main/typescript/core/constants";
 import { KnexLocalLogRepository } from "../../../../main/typescript/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository } from "../../../../main/typescript/repository/knex-remote-log-repository";
-import {
+import type {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../../../main/typescript/repository/interfaces/repository";
@@ -149,7 +149,7 @@ beforeAll(async () => {
     connectedDLTs: gatewayIdentity.connectedDLTs,
     networks: [],
   };
-  const bridgesManager = new SATPBridgesManager(bridgesManagerOptions);
+  const bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 
   const crashOptions: ICrashRecoveryManagerOptions = {
     instanceId: "test-instance",

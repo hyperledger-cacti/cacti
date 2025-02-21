@@ -13,7 +13,7 @@ import {
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import {
   GatewayNetworkIdError,
@@ -38,7 +38,7 @@ import {
   SessionType,
 } from "../../session-utils";
 import { signatureVerifier } from "../data-verifier";
-import { Asset } from "../satp-bridge/types/asset";
+import type { Asset } from "../../../cross-chain-mechanisms/satp-bridge/types/asset";
 import {
   SATPService,
   SATPServiceType,
@@ -53,7 +53,7 @@ export class Stage0ClientService extends SATPService {
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
-  private bridgeManager: SATPBridgesManager;
+  private bridgeManager: SATPCrossChainManager;
 
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {

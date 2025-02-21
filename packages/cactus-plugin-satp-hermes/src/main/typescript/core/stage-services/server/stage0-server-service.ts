@@ -9,17 +9,17 @@ import {
   WrapAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  NewSessionRequestMessage,
-  NewSessionResponseMessage,
+  type NewSessionRequestMessage,
+  type NewSessionResponseMessage,
   NewSessionResponseMessageSchema,
-  PreSATPTransferRequestMessage,
-  PreSATPTransferResponseMessage,
+  type PreSATPTransferRequestMessage,
+  type PreSATPTransferResponseMessage,
   PreSATPTransferResponseMessageSchema,
   STATUS,
 } from "../../../generated/proto/cacti/satp/v02/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import {
   AssetMissing,
   GatewayNetworkIdError,
@@ -40,26 +40,26 @@ import {
   saveSignature,
   SessionType,
 } from "../../session-utils";
-import { Asset, createAssetId } from "../satp-bridge/types/asset";
+import { type Asset, createAssetId } from "../../../cross-chain-mechanisms/satp-bridge/types/asset";
 import {
   SATPService,
   SATPServiceType,
-  ISATPServerServiceOptions,
-  ISATPServiceOptions,
+  type ISATPServerServiceOptions,
+  type ISATPServiceOptions,
 } from "../satp-service";
 import { protoToAsset } from "../service-utils";
 import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../../errors/satp-handler-errors";
-import { SATPInternalError } from "../../errors/satp-errors";
+import type { SATPInternalError } from "../../errors/satp-errors";
 import { create } from "@bufbuild/protobuf";
 export class Stage0ServerService extends SATPService {
   public static readonly SATP_STAGE = "0";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
-  private bridgeManager: SATPBridgesManager;
+  private bridgeManager: SATPCrossChainManager;
 
   constructor(ops: ISATPServerServiceOptions) {
     // for now stage1serverservice does not have any different options than the SATPService class
