@@ -1,15 +1,15 @@
-import { Logger } from "@hyperledger/cactus-common";
-import { SATPSession } from "../../satp-session";
+import type { Logger } from "@hyperledger/cactus-common";
+import type { SATPSession } from "../../satp-session";
 import { Stage0RollbackStrategy } from "./stage0-rollback-strategy";
 import { Stage1RollbackStrategy } from "./stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "./stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "./stage3-rollback-strategy";
-import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
-import { RollbackState } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
+import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
+import type { RollbackState } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import {
-  Type,
+  type Type,
   SATPStage,
-  SessionData,
+  type SessionData,
 } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 import { getCrashedStage } from "../../session-utils";
 
@@ -21,9 +21,9 @@ export interface RollbackStrategy {
 
 export class RollbackStrategyFactory {
   private log: Logger;
-  private bridgesManager: SATPBridgesManager;
+  private bridgesManager: SATPCrossChainManager;
 
-  constructor(bridgesManager: SATPBridgesManager, log: Logger) {
+  constructor(bridgesManager: SATPCrossChainManager, log: Logger) {
     this.log = log;
     this.bridgesManager = bridgesManager;
   }
