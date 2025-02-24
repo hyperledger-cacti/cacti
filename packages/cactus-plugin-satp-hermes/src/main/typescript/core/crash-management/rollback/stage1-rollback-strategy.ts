@@ -1,16 +1,16 @@
-import { Logger } from "@hyperledger/cactus-common";
-import { SATPSession } from "../../satp-session";
-import { RollbackStrategy } from "./rollback-strategy-factory";
+import type { Logger } from "@hyperledger/cactus-common";
+import type { SATPSession } from "../../satp-session";
+import type { RollbackStrategy } from "./rollback-strategy-factory";
 import {
   RollbackLogEntrySchema,
-  RollbackState,
+  type RollbackState,
   RollbackStateSchema,
 } from "../../../generated/proto/cacti/satp/v02/crash_recovery_pb";
 import { create } from "@bufbuild/protobuf";
 import {
   Type,
   SATPStage,
-  SessionData,
+  type SessionData,
 } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
 
 export class Stage1RollbackStrategy implements RollbackStrategy {
@@ -37,13 +37,13 @@ export class Stage1RollbackStrategy implements RollbackStrategy {
     });
 
     // client-rollback
-    if (session.hasClientSessionData() && role == Type.CLIENT) {
+    if (session.hasClientSessionData() && role === Type.CLIENT) {
       const clientSessionData = session.getClientSessionData();
       await this.handleClientSideRollback(clientSessionData, rollbackState);
     }
 
     // server-rollback
-    if (session.hasServerSessionData() && role == Type.SERVER) {
+    if (session.hasServerSessionData() && role === Type.SERVER) {
       const serverSessionData = session.getServerSessionData();
       await this.handleServerSideRollback(serverSessionData, rollbackState);
     }

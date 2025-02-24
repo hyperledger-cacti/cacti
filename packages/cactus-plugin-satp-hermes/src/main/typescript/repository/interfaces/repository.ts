@@ -1,4 +1,4 @@
-import { LocalLog, RemoteLog } from "../../core/types";
+import type { LocalLog, RemoteLog } from "../../core/types";
 
 export interface IRepository<T, K> {
   readById(id: K): Promise<T>;

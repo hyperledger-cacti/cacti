@@ -33,7 +33,7 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { SATPSession } from "../../../core/satp-session";
-import { SATPBridgesManager } from "../../../gol/satp-bridges-manager";
+import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
   AssignmentAssertionClaimError,
@@ -57,7 +57,7 @@ export class Stage3ServerService extends SATPService {
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
-  private bridgeManager: SATPBridgesManager;
+  private bridgeManager: SATPCrossChainManager;
 
   constructor(ops: ISATPServerServiceOptions) {
     const commonOptions: ISATPServiceOptions = {

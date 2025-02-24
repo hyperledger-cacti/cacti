@@ -22,9 +22,9 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import Web3 from "web3";
 import { Account } from "web3-core";
-import { BesuBridge } from "../../../../main/typescript/core/stage-services/satp-bridge/besu-bridge";
-import { EvmAsset } from "../../../../main/typescript/core/stage-services/satp-bridge/types/evm-asset";
-import { TokenType } from "../../../../main/typescript/core/stage-services/satp-bridge/types/asset";
+import { BesuBridge } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/besu-bridge";
+import { EvmAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/evm-asset";
+import { TokenType } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/asset";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { BesuConfig } from "../../../../main/typescript/types/blockchain-interaction";
 import SATPInteraction from "../../../solidity/satp-erc20-interact.json";

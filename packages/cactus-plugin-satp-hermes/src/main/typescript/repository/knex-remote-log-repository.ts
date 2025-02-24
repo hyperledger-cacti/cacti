@@ -1,8 +1,8 @@
-import { IRemoteLogRepository } from "./interfaces/repository";
-import { RemoteLog } from "../core/types";
-import knex, { Knex } from "knex";
+import type { IRemoteLogRepository } from "./interfaces/repository";
+import type { RemoteLog } from "../core/types";
+import knex, { type Knex } from "knex";
 
-import { knexRemoteInstance } from "../knex/knexfile-remote";
+import { knexRemoteInstance } from "../database/knexfile-remote";
 
 export class KnexRemoteLogRepository implements IRemoteLogRepository {
   readonly database: Knex;
@@ -24,6 +24,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
+  // TODO fix any type
   create(log: RemoteLog): any {
     return this.getLogsTable().insert(log);
   }
