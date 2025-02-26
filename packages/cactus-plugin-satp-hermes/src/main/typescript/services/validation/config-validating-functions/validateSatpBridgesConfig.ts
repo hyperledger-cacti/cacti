@@ -3,7 +3,7 @@ import type {
   EthereumConfig,
   FabricConfig,
   NetworkConfig,
-} from "../../types/blockchain-interaction";
+} from "../../../types/blockchain-interaction";
 import { isNetworkId } from "./validateSatpGatewayIdentity";
 import { isFabricConfigJSON } from "./bridges-config-validating-functions/validateFabricConfig";
 import { createFabricOptions } from "./bridges-config-validating-functions/validateFabricOptions";
