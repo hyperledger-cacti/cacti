@@ -9,6 +9,7 @@
 # cpp - cactus-plugin-persistence
 # ct - cactus-test
 # ctp - cactus-test-plugin
+# test
 ---
 env:
   NODEJS_VERSION: v18.18.2
@@ -214,10 +215,103 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
 
-      - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }}
+      - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }} #change this condition? or remove?
         name: tools_ci_sh
         run: ./tools/ci.sh
 
+  build-dev-proxy:
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v4.0.2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: |
+            ~/.npm
+            ~/.yarn
+            node_modules
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Run CI Script
+        run: ./tools/ci.sh
+
+      # - name: Upload Build and Test Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: build-artifacts
+      #     path: |
+      #       ./dist/**
+      - name: Upload Build and Test Artifacts
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: build-artifacts
+          path: ./dist/**/
+#test cache. merge this to build dev-----------
+#this will be the job that will be used across jobs
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Cache npm dependencies
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: ~/.npm
+  #         key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+  #         restore-keys: |
+  #           npm-${{ runner.os }}-
+
+  #     - name: Install Dependencies
+  #       run: npm ci
+
+  #     - name: Cache Build Output
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: dist
+  #         key: build-${{ runner.os }}-${{ github.sha }}
+  #         restore-keys: |
+  #           build-${{ runner.os }}-
+
+  #     - name: Build Project
+  #       run: npm run configure
+
+  # use-cache:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Restore Build Cache
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: dist
+  #         key: build-${{ runner.os }}-${{ github.sha }}
+  #         restore-keys: |
+  #           build-${{ runner.os }}-
+
+  #     - name: Run Some Command on Cached Build
+  #       run: ls -la dist
+#end------------
   yarn_lint:
     continue-on-error: false
     env:
@@ -410,6 +504,44 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  #test here------renren
+  # cactus-api-client:
+  #   continue-on-error: false
+  #   env:
+  #     DEV_BUILD_DISABLED: false
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-api-client
+  #     JEST_TEST_CODE_COVERAGE_ENABLED: true
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #     CONFIGURE_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
+  #       uses: actions/setup-node@v4.0.3
+  #       with:
+  #         node-version: ${{ env.NODEJS_VERSION }}
+  #     - uses: actions/checkout@v4.1.7
+
+  #     - id: yarn-cache
+  #       name: Restore Yarn Cache
+  #       uses: actions/cache@v4.0.2
+  #       with:
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+  #         path: ./.yarn/
+  #         restore-keys: |
+  #           ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+  #     - run: ./tools/ci.sh
+  #       if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
+  #     - name: Upload coverage reports as artifacts
+  #       uses: actions/upload-artifact@v4.3.3
+  #       with:
+  #         name: coverage-reports-1
+  #         path: ./code-coverage-ts/**/
+#test here------renren2
   cactus-api-client:
     continue-on-error: false
     env:
@@ -420,31 +552,45 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-api-client
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
+      CONFIGURE_DISABLED: true
+    needs: build-dev-proxy
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4.1.7
+
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@v4.0.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
+          path: |
+            ~/.npm
+            ~/.yarn
+            node_modules
           restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+            ${{ runner.os }}-yarn-
+
+      - name: Download Builds and Test Artifacts
+        uses: actions/download-artifact@v4.1.8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./dist/
 
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
-      - name: Upload coverage reports as artifacts
+
+      - name: Upload Coverage Reports as Artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-1
           path: ./code-coverage-ts/**/
+
 
   cactus-cmd-api-server:
     continue-on-error: false
