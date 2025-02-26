@@ -22,8 +22,8 @@ import type {
   TransactResponse,
 } from "../generated/gateway-client/typescript-axios/api";
 import { executeGetIntegrations } from "./admin/get-integrations-handler-service";
-import { type ISATPManagerOptions, SATPManager } from "../gateway/satp-manager";
-import type { GatewayOrchestrator } from "../gateway/gateway-orchestrator";
+import { type ISATPManagerOptions, SATPManager } from "../services/gateway/satp-manager";
+import type { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import type { SATPCrossChainManager } from "../cross-chain-mechanisms/satp-cc-manager";
 import { TransactEndpointV1 } from "./transaction/transact-endpoint";
 import { GetSessionIdsEndpointV1 } from "./admin/get-all-session-ids-endpoints";
@@ -35,7 +35,7 @@ import { executeTransact } from "./transaction/transact-handler-service";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "../repository/interfaces/repository";
+} from "../database/repository/interfaces/repository";
 
 export interface BLODispatcherOptions {
   logger: Logger;

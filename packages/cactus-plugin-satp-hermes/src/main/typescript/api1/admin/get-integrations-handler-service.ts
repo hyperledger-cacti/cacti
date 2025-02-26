@@ -4,8 +4,8 @@ import type {
   IntegrationsResponse,
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, type LogLevelDesc } from "@hyperledger/cactus-common";
-import type { SATPManager } from "../../gateway/satp-manager";
-import type { NetworkId } from "../../network-identification/chainid-list";
+import type { SATPManager } from "../../services/gateway/satp-manager";
+import type { NetworkId } from "../../services/network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export async function executeGetIntegrations(

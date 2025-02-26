@@ -1,6 +1,6 @@
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
-import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
+import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   LocalLog,
   GatewayIdentity,
