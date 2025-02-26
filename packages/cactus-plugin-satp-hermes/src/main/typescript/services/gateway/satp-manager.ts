@@ -7,19 +7,19 @@ import {
 } from "@hyperledger/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { Stage0SATPHandler } from "../core/stage-handlers/stage0-handler";
-import { Stage0ServerService } from "../core/stage-services/server/stage0-server-service";
+import { Stage0SATPHandler } from "../../core/stage-handlers/stage0-handler";
+import { Stage0ServerService } from "../../core/stage-services/server/stage0-server-service";
 
-import { Stage1SATPHandler } from "../core/stage-handlers/stage1-handler";
-import { Stage1ServerService } from "../core/stage-services/server/stage1-server-service";
-import { Stage2ServerService } from "../core/stage-services/server/stage2-server-service";
-import { Stage3ServerService } from "../core/stage-services/server/stage3-server-service";
-import { SATPSession } from "../core/satp-session";
-import { GatewayIdentity } from "../core/types";
-import { Stage0ClientService } from "../core/stage-services/client/stage0-client-service";
-import { Stage1ClientService } from "../core/stage-services/client/stage1-client-service";
-import { Stage2ClientService } from "../core/stage-services/client/stage2-client-service";
-import { Stage3ClientService } from "../core/stage-services/client/stage3-client-service";
+import { Stage1SATPHandler } from "../../core/stage-handlers/stage1-handler";
+import { Stage1ServerService } from "../../core/stage-services/server/stage1-server-service";
+import { Stage2ServerService } from "../../core/stage-services/server/stage2-server-service";
+import { Stage3ServerService } from "../../core/stage-services/server/stage3-server-service";
+import { SATPSession } from "../../core/satp-session";
+import { GatewayIdentity } from "../../core/types";
+import { Stage0ClientService } from "../../core/stage-services/client/stage0-client-service";
+import { Stage1ClientService } from "../../core/stage-services/client/stage1-client-service";
+import { Stage2ClientService } from "../../core/stage-services/client/stage2-client-service";
+import { Stage3ClientService } from "../../core/stage-services/client/stage3-client-service";
 import {
   SATPService,
   SATPHandler,
@@ -27,34 +27,34 @@ import {
   SATPHandlerOptions,
   SATPHandlerType,
   SATPHandlerInstance,
-} from "../types/satp-protocol";
+} from "../../types/satp-protocol";
 import {
   ISATPServiceOptions,
   SATPServiceInstance,
   SATPStagesV02,
-} from "../core/stage-services/satp-service";
-import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
-import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
-import { SATPCrossChainManager } from "../cross-chain-mechanisms/satp-cc-manager";
+} from "../../core/stage-services/satp-service";
+import { Stage2SATPHandler } from "../../core/stage-handlers/stage2-handler";
+import { Stage3SATPHandler } from "../../core/stage-handlers/stage3-handler";
+import { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import { GatewayOrchestrator } from "./gateway-orchestrator";
-import type { SessionData } from "../generated/proto/cacti/satp/v02/common/session_pb";
-import type { SatpStage0Service } from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import type { SatpStage1Service } from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import type { SatpStage2Service } from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import type { SatpStage3Service } from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import type { Client as ConnectClient } from "@connectrpc/connect";
-import { MessageType } from "../generated/proto/cacti/satp/v02/common/message_pb";
-import { getMessageInSessionData } from "../core/session-utils";
+import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { getMessageInSessionData } from "../../core/session-utils";
 import {
   TransferProposalRequest,
   TransferProposalResponse,
   TransferCommenceRequest,
   TransferCommenceResponse,
-} from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
   LockAssertionRequest,
   LockAssertionResponse,
-} from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
+} from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import {
   CommitPreparationRequest,
   CommitPreparationResponse,
@@ -62,28 +62,30 @@ import {
   CommitFinalAssertionResponse,
   TransferCompleteRequest,
   TransferCompleteResponse,
-} from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
+} from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import {
   NewSessionRequest,
   NewSessionResponse,
   PreSATPTransferRequest,
   PreSATPTransferResponse,
-} from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import {
   CreateSATPRequestError,
   RecoverMessageError,
   RetrieveSATPMessageError,
   TransactError,
-} from "../core/errors/satp-errors";
-import { getMessageTypeName } from "../core/satp-utils";
-import { HealthCheckResponseStatusEnum } from "../generated/gateway-client/typescript-axios";
+} from "../../core/errors/satp-errors";
+import { getMessageTypeName } from "../../core/satp-utils";
+import { HealthCheckResponseStatusEnum } from "../../generated/gateway-client/typescript-axios";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "../repository/interfaces/repository";
-import { ISATPLoggerConfig, SATPLogger } from "../logging";
+} from "../../database/repository/interfaces/repository";
+import { ISATPLoggerConfig, SATPLogger } from "../../logging";
 import { NetworkId } from "../network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { MonitorService } from "../monitoring/monitor";
+import { KnexMonitorRepository } from "../monitoring/monitor-repository";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -98,7 +100,6 @@ export interface ISATPManagerOptions {
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
 }
-
 export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
   private readonly logger: Logger;
@@ -126,6 +127,7 @@ export class SATPManager {
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
   private readonly dbLogger: SATPLogger;
+  private readonly monitorService: MonitorService;
 
   constructor(public readonly options: ISATPManagerOptions) {
     const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
@@ -167,6 +169,21 @@ export class SATPManager {
     this.dbLogger = new SATPLogger(satpLoggerConfig);
     this.logger.debug(`${fnTag} dbLogger initialized: ${!!this.dbLogger}`);
 
+    const monitorRepo = new KnexMonitorRepository();
+    this.monitorService = MonitorService.createOrGetMonitorService({
+      repo: monitorRepo,
+    });
+    this.monitorService.init().then(() => {
+      this.monitorService.exportLogs();
+      this.monitorService.createMetric("satp.active_sessions");
+      this.monitorService.createMetric("satp.transfer.count");
+      this.monitorService.createMetric("satp.transfer.success");
+      this.monitorService.createMetric("satp.transfer.failure");
+      this.logger.info(`${fnTag} Monitoring service initialized`);
+    }).catch(error => {
+      this.logger.error(`${fnTag} Failed to initialize monitoring service: ${error}`);
+    });
+
     const serviceClasses = [
       Stage0ServerService as unknown as SATPServiceInstance,
       Stage0ClientService as unknown as SATPServiceInstance,
@@ -204,6 +221,10 @@ export class SATPManager {
     return this._pubKey;
   }
 
+  public getMonitorService(): MonitorService {
+    return this.monitorService;
+  }
+
   public getSupportedDLTs(): LedgerType[] {
     return this.supportedDLTs;
   }
@@ -236,18 +257,47 @@ export class SATPManager {
   }
 
   public healthCheck(): HealthCheckResponseStatusEnum {
-    return this.status;
+    const fnTag = `${SATPManager.CLASS_NAME}#healthCheck`;
+    const span = this.monitorService.startSpan(fnTag);
+    try {
+      return this.status;
+    } finally {
+      span.end();
+    }
   }
-
   public getSessions(): Map<string, SATPSession> {
-    return this.sessions;
+    const fnTag = `${SATPManager.CLASS_NAME}#getSessions`;
+    const span = this.monitorService.startSpan(fnTag);
+    try {
+      const activeSessionsCount = this.sessions.size;
+      void this.monitorService.incrementMetric("satp.active_sessions", activeSessionsCount);
+      this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
+      return this.sessions;
+    } catch (error) {
+      span.recordException(error as Error);
+      throw error;
+    } finally {
+      span.end();
+    }
   }
 
   public getSession(sessionId: string): SATPSession | undefined {
-    if (this.sessions == undefined) {
-      return undefined;
+    const fnTag = `${SATPManager.CLASS_NAME}#getSession`;
+    const span = this.monitorService.startSpan(fnTag);
+    span.setAttributes({ sessionId });
+    
+    try {
+      this.logger.debug(`${fnTag} retrieving session: ${sessionId}`);
+      if (this.sessions == undefined) {
+        return undefined;
+      }
+      return this.sessions.get(sessionId);
+    } catch (error) {
+      span.recordException(error as Error);
+      throw error;
+    } finally {
+      span.end();
     }
-    return this.sessions.get(sessionId);
   }
 
   public getConnectedDLTs(): NetworkId[] {

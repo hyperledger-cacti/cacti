@@ -32,7 +32,7 @@ import {
   setError,
   setErrorChecking,
 } from "../session-utils";
-import { NetworkId } from "../../network-identification/chainid-list";
+import { NetworkId } from "../../services/network-identification/chainid-list";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
