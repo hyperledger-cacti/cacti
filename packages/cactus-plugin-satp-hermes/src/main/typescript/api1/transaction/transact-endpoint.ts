@@ -18,7 +18,7 @@ import {
 } from "@hyperledger/cactus-core";
 import { TransactRequest } from "../../generated/gateway-client/typescript-axios/api";
 import { SATPInternalError } from "../../core/errors/satp-errors";
-import { getEnumKeyByValue } from "../../utils/utils";
+import { getEnumKeyByValue } from "../../services/utils";
 import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export class TransactEndpointV1 implements IWebServiceEndpoint {
