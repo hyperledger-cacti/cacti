@@ -26,7 +26,7 @@ import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp
 import { Asset } from "../../../main/typescript";
 import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { NetworkId } from "../../../main/typescript/network-identification/chainid-list";
+import { NetworkId } from "../../../main/typescript/services/network-identification/chainid-list";
 // import { v4 as internalIpV4 } from "internal-ip";
 
 // currently not used due to GatewayRunner being in NetworkMode: "host"

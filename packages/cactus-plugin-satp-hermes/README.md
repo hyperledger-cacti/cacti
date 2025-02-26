@@ -245,6 +245,28 @@ docker build  \
 
 > The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
 
+## Running local Gateway with Docker Compose
+# Navigate to the directory containing the docker-compose file
+cd /Users/rafaelapb/Projects/blockchain-integration-framework/packages/cactus-plugin-satp-hermes/
+
+#### Build and start containers (interactive mode)
+docker-compose -f docker-compose-satp.yml up
+
+#### Build and start containers in background (detached mode)
+docker-compose -f docker-compose-satp.yml up -d
+
+#### Stop and remove containers
+docker-compose -f docker-compose-satp.yml down
+
+#### View container logs
+docker-compose -f docker-compose-satp.yml logs
+
+#### Build or rebuild services
+docker-compose -f docker-compose-satp.yml build
+
+#### List running containers
+docker-compose -f docker-compose-satp.yml ps
+
 ## Contributing
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 

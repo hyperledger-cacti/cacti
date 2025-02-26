@@ -7,19 +7,19 @@ import {
 } from "./plugin-satp-hermes-gateway";
 import fs from "fs-extra";
 
-import { validateSatpGatewayIdentity } from "./utils/config-validating-functions/validateSatpGatewayIdentity";
-import { validateSatpCounterPartyGateways } from "./utils/config-validating-functions/validateSatpCounterPartyGateways";
-import { validateSatpLogLevel } from "./utils/config-validating-functions/validateSatpLogLevel";
-import { validateSatpEnvironment } from "./utils/config-validating-functions/validateSatpEnvironment";
-import { validateSatpEnableOpenAPI } from "./utils/config-validating-functions/validateSatpEnableOpenAPI";
-import { validateSatpValidationOptions } from "./utils/config-validating-functions/validateSatpValidationOptions";
-import { validateSatpPrivacyPolicies } from "./utils/config-validating-functions/validateSatpPrivacyPolicies";
-import { validateSatpMergePolicies } from "./utils/config-validating-functions/validateSatpMergePolicies";
-import { validateSatpKeyPairJSON } from "./utils/config-validating-functions/validateKeyPairJSON";
-import { validateSatpBridgesConfig } from "./utils/config-validating-functions/validateSatpBridgesConfig";
+import { validateSatpGatewayIdentity } from "./services/validation//config-validating-functions/validateSatpGatewayIdentity";
+import { validateSatpCounterPartyGateways } from "./services/validation//config-validating-functions/validateSatpCounterPartyGateways";
+import { validateSatpLogLevel } from "./services/validation//config-validating-functions/validateSatpLogLevel";
+import { validateSatpEnvironment } from "./services/validation//config-validating-functions/validateSatpEnvironment";
+import { validateSatpEnableOpenAPI } from "./services/validation//config-validating-functions/validateSatpEnableOpenAPI";
+import { validateSatpValidationOptions } from "./services/validation//config-validating-functions/validateSatpValidationOptions";
+import { validateSatpPrivacyPolicies } from "./services/validation//config-validating-functions/validateSatpPrivacyPolicies";
+import { validateSatpMergePolicies } from "./services/validation//config-validating-functions/validateSatpMergePolicies";
+import { validateSatpKeyPairJSON } from "./services/validation//config-validating-functions/validateKeyPairJSON";
+import { validateSatpBridgesConfig } from "./services/validation//config-validating-functions/validateSatpBridgesConfig";
 import path from "node:path";
-import { validateSatpEnableCrashRecovery } from "./utils/config-validating-functions/validateSatpEnableCrashRecovery";
-import { validateKnexRepositoryConfig } from "./utils/config-validating-functions/validateKnexRepositoryConfig";
+import { validateSatpEnableCrashRecovery } from "./services/validation//config-validating-functions/validateSatpEnableCrashRecovery";
+import { validateKnexRepositoryConfig } from "./services/validation//config-validating-functions/validateKnexRepositoryConfig";
 
 export async function launchGateway(): Promise<void> {
   const logger = LoggerProvider.getOrCreate({
@@ -97,7 +97,7 @@ export async function launchGateway(): Promise<void> {
     configValue: config.validationOptions,
   });
   logger.debug("SATP Privacy Policies is valid.");
-  privacyPolicies.forEach((p, i) =>
+  privacyPolicies.forEach((p: unknown, i: unknown) =>
     logger.debug("Privacy Policy #%d => %o", i, p),
   );
 
@@ -106,7 +106,7 @@ export async function launchGateway(): Promise<void> {
     configValue: config.mergePolicies,
   });
   logger.debug("SATP Merge Policies is valid.");
-  mergePolicies.forEach((p, i) => logger.debug("Merge Policy #%d => %o", i, p));
+  mergePolicies.forEach((p: unknown, i: unknown) => logger.debug("Merge Policy #%d => %o", i, p));
 
   logger.debug("Validating SATP KeyPair...");
   const keyPair = validateSatpKeyPairJSON({

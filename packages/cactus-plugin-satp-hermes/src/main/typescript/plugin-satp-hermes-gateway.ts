@@ -25,7 +25,7 @@ import {
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
-} from "./gateway/gateway-orchestrator";
+} from "./services/gateway/gateway-orchestrator";
 export { SATPGatewayConfig };
 import express, { type Express } from "express";
 import http from "node:http";
@@ -41,9 +41,9 @@ import { bufArray2HexStr } from "./gateway-utils";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "./repository/interfaces/repository";
-import { KnexRemoteLogRepository as RemoteLogRepository } from "./repository/knex-remote-log-repository";
-import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository";
+} from "./database/repository/interfaces/repository";
+import { KnexRemoteLogRepository as RemoteLogRepository } from "./database/repository/knex-remote-log-repository";
+import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-local-log-repository";
 import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
 import swaggerUi, { type JsonObject } from "swagger-ui-express";
 import type {
@@ -59,11 +59,11 @@ import bodyParser from "body-parser";
 import {
   CrashManager,
   type ICrashRecoveryManagerOptions,
-} from "./gateway/crash-manager";
+} from "./services/gateway/crash-manager";
 import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
-import type { NetworkId } from "./network-identification/chainid-list";
+import type { NetworkId } from "./services/network-identification/chainid-list";
 import { knexLocalInstance } from "./database/knexfile";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {

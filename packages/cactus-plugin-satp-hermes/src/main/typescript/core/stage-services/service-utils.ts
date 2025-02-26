@@ -6,7 +6,7 @@ import {
 import type { Asset } from "../../cross-chain-mechanisms/satp-bridge/types/asset";
 import type { EvmAsset } from "../../cross-chain-mechanisms/satp-bridge/types/evm-asset";
 import type { FabricAsset } from "../../cross-chain-mechanisms/satp-bridge/types/fabric-asset";
-import type { NetworkId } from "../../network-identification/chainid-list";
+import type { NetworkId } from "../../services/network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {

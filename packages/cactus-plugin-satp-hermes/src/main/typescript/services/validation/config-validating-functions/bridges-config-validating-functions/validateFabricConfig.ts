@@ -5,7 +5,7 @@ import {
   type WebSocketKey,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
-import type { FabricAsset } from "../../../cross-chain-mechanisms/satp-bridge/types/fabric-asset";
+import type { FabricAsset } from "../../../../cross-chain-mechanisms/satp-bridge/types/fabric-asset";
 import { isAsset } from "./validateAsset";
 import type { NetworkConfigJSON } from "../validateSatpBridgesConfig";
 import {
@@ -17,7 +17,7 @@ import {
   isBungeeOptionsJSON,
   isClaimFormat,
 } from "./validateBungeeOptions";
-import type { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export interface FabricConfigJSON extends NetworkConfigJSON {
   signingCredential: FabricSigningCredential;

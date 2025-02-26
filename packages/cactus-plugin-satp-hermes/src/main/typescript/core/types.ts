@@ -12,7 +12,7 @@ import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkConfig } from "../types/blockchain-interaction";
 import { Knex } from "knex";
-import { NetworkId } from "../network-identification/chainid-list";
+import { NetworkId } from "../services/network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export type SATPConnectHandler = (

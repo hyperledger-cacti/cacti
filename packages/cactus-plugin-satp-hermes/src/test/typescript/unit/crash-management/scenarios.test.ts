@@ -5,9 +5,9 @@ import {
   JsObjectSigner,
   type IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
+import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import { CrashStatus } from "../../../../main/typescript/core/types";
-import type { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gateway/crash-manager";
+import type { ICrashRecoveryManagerOptions } from "../../../../main/typescript/services/gateway/crash-manager";
 import { type Knex, knex } from "knex";
 import type {
   LocalLog,
@@ -34,7 +34,7 @@ import { TokenType } from "../../../../main/typescript/generated/proto/cacti/sat
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
-} from "../../../../main/typescript/gateway/gateway-orchestrator";
+} from "../../../../main/typescript/services/gateway/gateway-orchestrator";
 import {
   type ISATPBridgesOptions,
   SATPCrossChainManager,
@@ -46,12 +46,12 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { KnexLocalLogRepository } from "../../../../main/typescript/repository/knex-local-log-repository";
-import { KnexRemoteLogRepository } from "../../../../main/typescript/repository/knex-remote-log-repository";
+import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-local-log-repository";
+import { KnexRemoteLogRepository } from "../../../../main/typescript/database/repository/knex-remote-log-repository";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "../../../../main/typescript/repository/interfaces/repository";
+} from "../../../../main/typescript/database/repository/interfaces/repository";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
