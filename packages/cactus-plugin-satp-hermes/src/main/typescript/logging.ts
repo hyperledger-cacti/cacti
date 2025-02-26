@@ -2,7 +2,7 @@ import { LocalLog, RemoteLog } from "./core/types";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "./repository/interfaces/repository";
+} from "./database/repository/interfaces/repository";
 import {
   JsObjectSigner,
   Logger,

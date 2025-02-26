@@ -1,11 +1,11 @@
 import "jest-extended";
-import { CrashManager } from "../../../../main/typescript/gateway/crash-manager";
+import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   Secp256k1Keys,
   JsObjectSigner,
   IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/gateway/crash-manager";
+import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   GatewayIdentity,
   Address,
@@ -26,18 +26,18 @@ import { TokenType } from "../../../../main/typescript/generated/proto/cacti/sat
 import {
   GatewayOrchestrator,
   IGatewayOrchestratorOptions,
-} from "../../../../main/typescript/gateway/gateway-orchestrator";
+} from "../../../../main/typescript/services/gateway/gateway-orchestrator";
 import {
   ISATPBridgesOptions,
   SATPCrossChainManager,
 } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
-import { KnexLocalLogRepository } from "../../../../main/typescript/repository/knex-local-log-repository";
-import { KnexRemoteLogRepository } from "../../../../main/typescript/repository/knex-remote-log-repository";
+import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-local-log-repository";
+import { KnexRemoteLogRepository } from "../../../../main/typescript/database/repository/knex-remote-log-repository";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "../../../../main/typescript/repository/interfaces/repository";
+} from "../../../../main/typescript/database/repository/interfaces/repository";
 import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,

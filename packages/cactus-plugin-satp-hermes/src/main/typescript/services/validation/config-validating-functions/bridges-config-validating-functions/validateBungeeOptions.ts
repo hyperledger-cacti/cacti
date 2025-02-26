@@ -7,7 +7,7 @@ import {
   PluginRegistryOptionsJSON,
 } from "./validatePluginRegistryOptions";
 import { iskeyPairJSON } from "../validateKeyPairJSON";
-import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export interface BungeeOptionsJSON {
   instanceId: string;
