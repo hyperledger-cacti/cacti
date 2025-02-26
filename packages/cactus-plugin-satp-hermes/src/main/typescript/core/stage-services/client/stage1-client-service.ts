@@ -40,7 +40,7 @@ import {
 } from "../../errors/satp-service-errors";
 import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
-import { NetworkId } from "../../../network-identification/chainid-list";
+import { NetworkId } from "../../../services/network-identification/chainid-list";
 
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";

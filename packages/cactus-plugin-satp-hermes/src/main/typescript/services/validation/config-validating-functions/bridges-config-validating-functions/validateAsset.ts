@@ -1,6 +1,6 @@
-import { type Asset } from "../../../cross-chain-mechanisms/satp-bridge/types/asset";
+import { type Asset } from "../../../../cross-chain-mechanisms/satp-bridge/types/asset";
 
-import { TokenType } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
 
 // Type guard for TokenType
 function isTokenType(obj: unknown): obj is TokenType {

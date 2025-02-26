@@ -24,7 +24,7 @@ import { getSessionId } from "./handler-utils";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { saveMessageInSessionData, setError } from "../session-utils";
-import { NetworkId } from "../../network-identification/chainid-list";
+import { NetworkId } from "../../services/network-identification/chainid-list";
 export class Stage2SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE2;
   private sessions: Map<string, SATPSession>;

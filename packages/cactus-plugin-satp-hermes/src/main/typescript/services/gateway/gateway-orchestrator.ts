@@ -10,7 +10,7 @@ import {
   GatewayIdentity,
   GatewayChannel,
   SATPServiceInstance,
-} from "../core/types";
+} from "../../core/types";
 import {
   Client as ConnectClient,
   Transport as ConnectTransport,
@@ -21,11 +21,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
-import { SatpStage0Service } from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import { SatpStage1Service } from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import { SatpStage2Service } from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import { SatpStage3Service } from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { CrashRecoveryService } from "../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 
 export interface IGatewayOrchestratorOptions {
   logLevel?: LogLevelDesc;
@@ -35,14 +35,14 @@ export interface IGatewayOrchestratorOptions {
   enableCrashRecovery?: boolean;
 }
 
-//import { COREDispatcher, COREDispatcherOptions } from "../core/dispatcher";
+//import { COREDispatcher, COREDispatcherOptions } from "../../core/dispatcher";
 import { createClient } from "@connectrpc/connect";
 import { createGrpcWebTransport } from "@connectrpc/connect-node";
 import {
   getGatewaySeeds,
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
-import { SATPHandler, Stage } from "../types/satp-protocol";
+import { SATPHandler, Stage } from "../../types/satp-protocol";
 import { NetworkId } from "../network-identification/chainid-list";
 
 export class GatewayOrchestrator {
@@ -170,7 +170,7 @@ export class GatewayOrchestrator {
     const channels = Array.from(this.channels.values());
     const channel = channels.find((channel) => {
       return channel.connectedDLTs
-        .map((obj) => {
+        .map((obj: any) => {
           return obj.id;
         })
         .includes(id);

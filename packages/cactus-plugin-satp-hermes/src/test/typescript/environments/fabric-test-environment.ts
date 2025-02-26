@@ -43,7 +43,7 @@ import { AddressInfo } from "net";
 import { Asset } from "../../../main/typescript";
 import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { NetworkId } from "../../../main/typescript/network-identification/chainid-list";
+import { NetworkId } from "../../../main/typescript/services/network-identification/chainid-list";
 
 // Test environment for Fabric ledger operations
 export class FabricTestEnvironment {

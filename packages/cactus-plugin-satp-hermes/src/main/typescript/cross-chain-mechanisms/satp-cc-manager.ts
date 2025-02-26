@@ -16,7 +16,7 @@ import type {
 } from "../types/blockchain-interaction";
 import type { ValidatorOptions } from "class-validator";
 import { EthereumBridge } from "./satp-bridge/ethereum-bridge";
-import type { NetworkId } from "../network-identification/chainid-list";
+import type { NetworkId } from "../services/network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export const DEFAULT_SUPPORTED_LEDGERS: LedgerType[] = [

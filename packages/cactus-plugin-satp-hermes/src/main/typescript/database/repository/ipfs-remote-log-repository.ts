@@ -1,7 +1,7 @@
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import { IRemoteLogRepository } from "./interfaces/repository";
-import { RemoteLog } from "../core/types";
+import { RemoteLog } from "../../core/types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class IPFSRemoteLogRepository implements IRemoteLogRepository {

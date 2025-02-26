@@ -12,7 +12,7 @@ import { Stage1SATPHandler } from "../core/stage-handlers/stage1-handler";
 import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { CrashRecoveryHandler } from "../core/crash-management/crash-handler";
-import { NetworkId } from "../network-identification/chainid-list";
+import { NetworkId } from "../services/network-identification/chainid-list";
 
 /**
  * Represents a handler for various stages of the SATP (Secure Asset Transfer Protocol).

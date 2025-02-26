@@ -1,8 +1,8 @@
 import type { IRemoteLogRepository } from "./interfaces/repository";
-import type { RemoteLog } from "../core/types";
+import type { RemoteLog } from "../../core/types";
 import knex, { type Knex } from "knex";
 
-import { knexRemoteInstance } from "../database/knexfile-remote";
+import { knexRemoteInstance } from "../../database/knexfile-remote";
 
 export class KnexRemoteLogRepository implements IRemoteLogRepository {
   readonly database: Knex;

@@ -18,7 +18,7 @@ import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-he
 import { EvmAsset } from "../cross-chain-mechanisms/satp-bridge/types/evm-asset";
 import { FabricAsset } from "../cross-chain-mechanisms/satp-bridge/types/fabric-asset";
 import { ClaimFormat } from "../generated/proto/cacti/satp/v02/common/message_pb";
-import { NetworkId } from "../network-identification/chainid-list";
+import { NetworkId } from "../services/network-identification/chainid-list";
 
 // inject gateway, get connectors
 export type SATPLedgerConnector = string;
