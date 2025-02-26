@@ -24,6 +24,18 @@ jobs:
     permissions: 
       id-token: write
     steps:
+      - name: Check Version Format in Tag
+        uses: nowsprinting/check-version-format-action@v4.0.5
+        id: version
+        with:
+          prefix: 'v'
+
+      - name: Fail if version is invalid
+        if: steps.version.outputs.is_valid != 'true'
+        run: |
+          echo "Error: Tag '${{ github.ref_name }}' is not a valid semantic version."
+          exit 1
+
       - name: Print Workflow inputs.GIT_TAG_TO_PUBLISH
         run: |
           echo "inputs.GIT_TAG_TO_PUBLISH=${{ inputs.GIT_TAG_TO_PUBLISH }}" 
