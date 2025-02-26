@@ -1,8 +1,8 @@
-import type { LocalLog } from "../core/types";
+import type { LocalLog } from "../../core/types";
 import type { ILocalLogRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
 
-import { knexLocalInstance } from "../database/knexfile";
+import { knexLocalInstance } from "../knexfile";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;

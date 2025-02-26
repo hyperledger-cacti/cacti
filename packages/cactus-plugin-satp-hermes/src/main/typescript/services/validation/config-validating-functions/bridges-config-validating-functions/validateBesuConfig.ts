@@ -1,50 +1,31 @@
-import type { EvmAsset } from "../../../cross-chain-mechanisms/satp-bridge/types/evm-asset";
+import type { EvmAsset } from "../../../../cross-chain-mechanisms/satp-bridge/types/evm-asset";
 import {
   type Web3SigningCredential,
-  type Web3SigningCredentialCactiKeychainRef,
-  type Web3SigningCredentialGethKeychainPassword,
+  type Web3SigningCredentialCactusKeychainRef,
   type Web3SigningCredentialNone,
   type Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { isAsset } from "./validateAsset";
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import type { NetworkConfigJSON } from "../validateSatpBridgesConfig";
-import {
-  type EthereumOptionsJSON,
-  isEthereumOptionsJSON,
-} from "./validateEthereumOptions";
+import { type BesuOptionsJSON, isBesuOptionsJSON } from "./validateBesuOptions";
 import {
   type BungeeOptionsJSON,
   isBungeeOptionsJSON,
   isClaimFormat,
 } from "./validateBungeeOptions";
-import type { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { isEvmAssetArray } from "./validateEthereumConfig";
 
-export interface EthereumConfigJSON extends NetworkConfigJSON {
+export interface BesuConfigJSON extends NetworkConfigJSON {
   keychainId: string;
   signingCredential: Web3SigningCredential;
   contractName: string;
   contractAddress: string;
   gas: number;
-  options: EthereumOptionsJSON;
+  options: BesuOptionsJSON;
   bungeeOptions: BungeeOptionsJSON;
-  ethereumAssets?: EvmAsset[];
+  besuAssets?: EvmAsset[];
   claimFormat: ClaimFormat;
-}
-
-// Type guard for EvmAsset
-function isEvmAsset(obj: unknown): obj is EvmAsset {
-  const objRecord = obj as Record<string, unknown>;
-  return (
-    isAsset(obj) &&
-    "contractAddress" in obj &&
-    typeof objRecord.contractAddress === "string"
-  );
-}
-
-// Type guard for an array of EvmAsset
-export function isEvmAssetArray(input: unknown): input is Array<EvmAsset> {
-  return Array.isArray(input) && input.every(isEvmAsset);
 }
 
 // Type guard for Web3SigningCredentialType
@@ -54,17 +35,16 @@ function isWeb3SigningCredentialType(
   return (
     typeof value === "string" &&
     value !== null &&
-    (value === Web3SigningCredentialType.CactiKeychainRef ||
-      value === Web3SigningCredentialType.GethKeychainPassword ||
+    (value === Web3SigningCredentialType.CactusKeychainRef ||
       value === Web3SigningCredentialType.PrivateKeyHex ||
       value === Web3SigningCredentialType.None)
   );
 }
 
-// Type guard for Web3SigningCredentialCactiKeychainRef
-function isWeb3SigningCredentialCactiKeychainRef(
+// Type guard for Web3SigningCredentialCactusKeychainRef
+function isWeb3SigningCredentialCactusKeychainRef(
   obj: unknown,
-): obj is Web3SigningCredentialCactiKeychainRef {
+): obj is Web3SigningCredentialCactusKeychainRef {
   const objRecord = obj as Record<string, unknown>;
   return (
     typeof obj === "object" &&
@@ -73,24 +53,8 @@ function isWeb3SigningCredentialCactiKeychainRef(
     typeof objRecord.ethAccount === "string" &&
     "keychainEntryKey" in obj &&
     typeof objRecord.keychainEntryKey === "string" &&
-    (!("keychainId" in obj) || typeof objRecord.keychainId === "string") &&
-    "type" in obj &&
-    isWeb3SigningCredentialType(objRecord.type)
-  );
-}
-
-// Type guard for Web3SigningCredentialGethKeychainPassword
-function isWeb3SigningCredentialGethKeychainPassword(
-  obj: unknown,
-): obj is Web3SigningCredentialGethKeychainPassword {
-  const objRecord = obj as Record<string, unknown>;
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "ethAccount" in obj &&
-    typeof objRecord.ethAccount === "string" &&
-    "secret" in obj &&
-    typeof objRecord.secret === "string" &&
+    "keychainId" in obj &&
+    typeof objRecord.keychainId === "string" &&
     "type" in obj &&
     isWeb3SigningCredentialType(objRecord.type)
   );
@@ -132,15 +96,14 @@ function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
     return false;
   }
   return (
-    isWeb3SigningCredentialCactiKeychainRef(obj) ||
-    isWeb3SigningCredentialGethKeychainPassword(obj) ||
+    isWeb3SigningCredentialCactusKeychainRef(obj) ||
     isWeb3SigningCredentialPrivateKeyHex(obj) ||
     isWeb3SigningCredentialNone(obj)
   );
 }
 
-// Type guard for EthereumConfigJSON
-export function isEthereumConfigJSON(obj: unknown): obj is EthereumConfigJSON {
+// Type guard for BesuConfigJSON
+export function isBesuConfigJSON(obj: unknown): obj is BesuConfigJSON {
   if (typeof obj !== "object" || obj === null) {
     return false;
   }
@@ -156,11 +119,11 @@ export function isEthereumConfigJSON(obj: unknown): obj is EthereumConfigJSON {
     typeof objRecord.gas === "number" &&
     "signingCredential" in obj &&
     isWeb3SigningCredential(objRecord.signingCredential) &&
-    (!("ethereumAssets" in obj) || isEvmAssetArray(objRecord.ethereumAssets)) &&
+    (!("besuAssets" in obj) || isEvmAssetArray(objRecord.besuAssets)) &&
     "bungeeOptions" in obj &&
     isBungeeOptionsJSON(objRecord.bungeeOptions) &&
     "options" in obj &&
-    isEthereumOptionsJSON(objRecord.options) &&
+    isBesuOptionsJSON(objRecord.options) &&
     "claimFormat" in obj &&
     isClaimFormat(objRecord.claimFormat)
   );

@@ -1,4 +1,4 @@
-import type { GatewayIdentity } from "../../core/types";
+import type { GatewayIdentity } from "../../../core/types";
 import { isGatewayIdentity } from "./validateSatpGatewayIdentity";
 
 // Type guard for an array of GatewayIdentity

@@ -4,7 +4,7 @@ import {
   CurrentDrafts,
   type DraftVersions,
   type GatewayIdentity,
-} from "../../core/types";
+} from "../../../core/types";
 import type { NetworkId } from "../../network-identification/chainid-list";
 
 // Type guard for Address
