@@ -8,7 +8,7 @@ import {
   Transact200ResponseStatusResponseOriginNetwork,
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { SATPManager } from "../../gateway/satp-manager";
+import { SATPManager } from "../../services/gateway/satp-manager";
 import {
   getSessionActualStage,
   getStageName,

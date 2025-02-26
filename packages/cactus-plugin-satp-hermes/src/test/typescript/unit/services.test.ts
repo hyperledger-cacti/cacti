@@ -72,14 +72,14 @@ import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "../../../main/typescript/repository/interfaces/repository";
+} from "../../../main/typescript/database/repository/interfaces/repository";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
 } from "../knex.config";
 import { Knex, knex } from "knex";
-import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/repository/knex-local-log-repository";
-import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/repository/knex-remote-log-repository";
+import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-local-log-repository";
+import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/database/repository/knex-remote-log-repository";
 import { SATPLogger } from "../../../main/typescript/logging";
 import { create, isMessage } from "@bufbuild/protobuf";
 

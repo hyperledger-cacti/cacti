@@ -53,7 +53,7 @@ import {
   TransferCompleteRequestSchema,
   TransferCompleteResponseSchema,
 } from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { getEnumKeyByValue } from "../utils/utils";
+import { getEnumKeyByValue } from "../services/utils";
 import { SATPInternalError } from "./errors/satp-errors";
 import { SATPSession } from "./satp-session";
 
