@@ -10,7 +10,7 @@ import {
   RecoverSuccessResponseSchema,
 } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import type { SATPSession } from "../satp-session";
-import type { ILocalLogRepository } from "../../repository/interfaces/repository";
+import type { ILocalLogRepository } from "../../database/repository/interfaces/repository";
 import type { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
 import { RollbackStrategyFactory } from "./rollback/rollback-strategy-factory";
 import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";

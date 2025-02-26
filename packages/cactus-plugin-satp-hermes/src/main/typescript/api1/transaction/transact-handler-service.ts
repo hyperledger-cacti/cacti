@@ -1,5 +1,5 @@
 import { TransactRequest, TransactResponse } from "../../public-api";
-import { SATPManager } from "../../gateway/satp-manager";
+import { SATPManager } from "../../services/gateway/satp-manager";
 import { populateClientSessionData } from "../../core/session-utils";
 import {
   CredentialProfile,
@@ -7,7 +7,7 @@ import {
   SignatureAlgorithm,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { GatewayOrchestrator } from "../../gateway/gateway-orchestrator";
+import { GatewayOrchestrator } from "../../services/gateway/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";

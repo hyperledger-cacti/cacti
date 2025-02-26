@@ -9,33 +9,33 @@ import {
   Type,
   type SessionData,
   State,
-} from "../generated/proto/cacti/satp/v02/common/session_pb";
-import { CrashRecoveryHandler } from "../core/crash-management/crash-handler";
-import { SATPSession } from "../core/satp-session";
+} from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { CrashRecoveryHandler } from "../../core/crash-management/crash-handler";
+import { SATPSession } from "../../core/satp-session";
 import {
   type RollbackStrategy,
   RollbackStrategyFactory,
-} from "../core/crash-management/rollback/rollback-strategy-factory";
+} from "../../core/crash-management/rollback/rollback-strategy-factory";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "../repository/interfaces/repository";
+} from "../../database/repository/interfaces/repository";
 import type {
   RecoverResponse,
   RollbackState,
   RollbackResponse,
-} from "../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
-import type { SATPCrossChainManager } from "../cross-chain-mechanisms/satp-cc-manager";
+} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import schedule, { type Job } from "node-schedule";
-import { CrashRecoveryServerService } from "../core/crash-management/server-service";
-import { CrashRecoveryClientService } from "../core/crash-management/client-service";
+import { CrashRecoveryServerService } from "../../core/crash-management/server-service";
+import { CrashRecoveryClientService } from "../../core/crash-management/client-service";
 import type { GatewayOrchestrator } from "./gateway-orchestrator";
 import type { Client as PromiseConnectClient } from "@connectrpc/connect";
-import type { GatewayIdentity } from "../core/types";
-import type { CrashRecoveryService } from "../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
-import type { SATPHandler } from "../types/satp-protocol";
-import { CrashStatus } from "../core/types";
-import { verifySignature } from "../gateway-utils";
+import type { GatewayIdentity } from "../../core/types";
+import type { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import type { SATPHandler } from "../../types/satp-protocol";
+import { CrashStatus } from "../../core/types";
+import { verifySignature } from "../../gateway-utils";
 
 export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
