@@ -297,7 +297,7 @@ export class FabricTestEnvironment {
     const satpContractRelPath =
       "./../fabric/contracts/satp-contract/chaincode-typescript";
     const wrapperSatpContractRelPath =
-      "../../../main/typescript/fabric-contracts/satp-wrapper/chaincode-typescript";
+      "../../../main/typescript/cross-chain-mechanisms/satp-bridge/fabric-contracts/satp-wrapper/chaincode-typescript";
     const satpContractDir = path.join(__dirname, satpContractRelPath);
 
     // ├── package.json
