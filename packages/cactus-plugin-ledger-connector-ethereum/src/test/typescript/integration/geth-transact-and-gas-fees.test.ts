@@ -133,29 +133,26 @@ describe("Running ethereum transactions with different gas configurations", () =
       web3.utils.toWei(2, "gwei"),
     );
 
-    try {
-      await apiClient.runTransactionV1({
-        web3SigningCredential: {
-          ethAccount: WHALE_ACCOUNT_ADDRESS,
-          secret: "",
-          type: Web3SigningCredentialType.GethKeychainPassword,
+    const mixedConfigTransaction = apiClient.runTransactionV1({
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+      transactionConfig: {
+        from: WHALE_ACCOUNT_ADDRESS,
+        to: testEthAccount.address,
+        value: transferValue,
+        gasConfig: {
+          gas: "300000",
+          maxFeePerGas: maxFee,
         },
-        transactionConfig: {
-          from: WHALE_ACCOUNT_ADDRESS,
-          to: testEthAccount.address,
-          value: transferValue,
-          gasConfig: {
-            gas: "300000",
-            maxFeePerGas: maxFee,
-          },
-        },
-      });
-      fail(
-        "Expected runTransactionV1 with mixed config to fail but it succeeded.",
-      );
-    } catch (error) {
-      console.log("runTransactionV1 with mixed config failed as expected");
-    }
+      },
+    });
+
+    await expect(mixedConfigTransaction).rejects.toMatchObject({
+      message: expect.stringContaining(""),
+    });
 
     const balance = await web3.eth.getBalance(testEthAccount.address);
     expect(balance.toString()).toEqual("0");

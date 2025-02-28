@@ -477,7 +477,13 @@ describe("watchBlocksDelegatedSignV1 of fabric connector tests", () => {
       () => undefined, // will never reach this because it is meant to error out
       false,
     );
-    await expect(monitorPromise).rejects.toMatchObject({
+
+    const monitorPromiseExecution = monitorPromise;
+    // Execution never reaches this point - I'm assuming because the
+    // testWatchBlock method somehow does not fulfil it's obligation of
+    // either succeeding or throwing (it seems to get stuck idling forever
+    // when I debug this in VSCode)
+    await expect(monitorPromiseExecution).rejects.toMatchObject({
       code: 500,
       errorMessage: expect.any(String),
     });

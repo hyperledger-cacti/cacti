@@ -568,13 +568,10 @@ describe("Verifier integration with ethereum connector tests", () => {
     const method = { type: "web3Eth", command: "foo" };
     const args = {};
 
-    try {
-      const verifier =
-        await globalVerifierFactory.getVerifier(ethereumValidatorId);
-      await verifier.sendSyncRequest(contract, method, args);
-      fail("Expected sendSyncRequest call to fail but it succeeded.");
-    } catch (error) {
-      console.log("sendSyncRequest failed as expected");
-    }
+    await expect(
+      (
+        await globalVerifierFactory.getVerifier(ethereumValidatorId)
+      ).sendSyncRequest(contract, method, args),
+    ).rejects.toThrow();
   });
 });

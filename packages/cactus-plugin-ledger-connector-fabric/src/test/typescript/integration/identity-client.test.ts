@@ -34,6 +34,34 @@ describe("identity clients test", () => {
   let vaultHost: string;
   // let wsPathPrefix: any;
   let wsUrl: string;
+
+  beforeAll(async () => {
+    // External client with private key
+    wsWallet256 = new WsWallet({
+      keyName: "256",
+      logLevel,
+      strictSSL: false,
+    });
+  });
+
+  afterAll(async () => {
+    wsWallet256.close();
+  });
+
+  beforeAll(async () => {
+    // establish session Id to be used by external client with p384 key
+    wsWallet384 = new WsWallet({
+      keyName: "384",
+      curve: "p384" as ECCurveTypeW,
+      logLevel,
+      strictSSL: false,
+    });
+  });
+
+  afterAll(async () => {
+    wsWallet384.close();
+  });
+
   beforeAll(async () => {
     IpAdd = (await internalIpV4()) as string;
 
@@ -58,21 +86,6 @@ describe("identity clients test", () => {
     );
     vaultHost = `http://${IpAdd}:${hostPort}`;
     wsUrl = `http://${IpAdd}:${wsHostPort}`;
-
-    // External client with private key
-    wsWallet256 = new WsWallet({
-      keyName: "256",
-      logLevel,
-      strictSSL: false,
-    });
-
-    // establish session Id to be used by external client with p384 key
-    wsWallet384 = new WsWallet({
-      keyName: "384",
-      curve: "p384" as ECCurveTypeW,
-      logLevel,
-      strictSSL: false,
-    });
 
     const mountPath = "/transit";
     const testToken = "myroot";

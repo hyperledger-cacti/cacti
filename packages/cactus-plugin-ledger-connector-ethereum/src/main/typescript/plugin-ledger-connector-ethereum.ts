@@ -1114,6 +1114,11 @@ export class PluginLedgerConnectorEthereum
     }
 
     const web3MethodArgs = args.params || [];
+    if (args.methodName === "getBlock" && web3MethodArgs.length === 0) {
+      throw new RuntimeError(
+        `Missing required parameters for method: ${args.methodName}`,
+      );
+    }
     return looseWeb3Eth[args.methodName](...web3MethodArgs);
   }
 

@@ -338,12 +338,9 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
   });
 
   test("insertBlockData atomic transaction is reverted on error", async () => {
-    try {
-      await dbClient.insertBlockData(invalidSampleBlock as any);
-      expect(true).toBe(false); // Block insertion should fail
-    } catch (error: unknown) {
-      log.info("insertBlockData was rejected as expected");
-    }
+    await expect(
+      dbClient.insertBlockData(invalidSampleBlock as any),
+    ).rejects.toThrow();
 
     // Assert no data was added
     expect((await getDbBlocks()).length).toBe(0);
