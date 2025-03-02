@@ -11,3 +11,25 @@ export function getMessageTypeName(
     "UNSPECIFIED"
   );
 }
+
+export function merge_receipt(
+  receipt1: string | undefined,
+  receipt2: string | undefined,
+): string {
+  let _receipt1 = receipt1;
+  let _receipt2 = receipt2;
+
+  if (!receipt1) {
+    _receipt1 = "{}";
+  }
+
+  if (!receipt2) {
+    _receipt2 = "{}";
+  }
+
+  const mergedReceipt = {
+    ...JSON.parse(_receipt1 as string),
+    ...JSON.parse(_receipt2 as string),
+  };
+  return JSON.stringify(mergedReceipt, null, 2);
+}

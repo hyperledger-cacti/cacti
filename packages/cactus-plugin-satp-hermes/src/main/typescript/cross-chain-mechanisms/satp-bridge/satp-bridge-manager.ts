@@ -8,6 +8,7 @@ import { Asset } from "./types/asset";
 import { TransactionIdUndefinedError } from "./bridge-errors";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { merge_receipt } from "../../core/satp-utils";
 
 export class SATPBridgeManager implements BridgeManager {
   public static readonly CLASS_NAME = "SATPBridgeManager";
@@ -41,7 +42,7 @@ export class SATPBridgeManager implements BridgeManager {
 
     this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(response.transactionReceipt, receipt);
   }
   public async unwrapAsset(assetId: string): Promise<string> {
     const fnTag = `${this.className}#unwrap()`;
@@ -58,7 +59,7 @@ export class SATPBridgeManager implements BridgeManager {
 
     this.log.info(`${fnTag}, proof of the asset unwrapping: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(response.transactionReceipt, receipt);
   }
 
   public get className(): string {
@@ -78,7 +79,7 @@ export class SATPBridgeManager implements BridgeManager {
     );
     this.log.info(`${fnTag}, proof of the asset lock: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(response.transactionReceipt, receipt);
   }
 
   public async unlockAsset(assetId: string, amount: number): Promise<string> {
@@ -96,13 +97,13 @@ export class SATPBridgeManager implements BridgeManager {
 
     this.log.info(`${fnTag}, proof of the asset unlock: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(response.transactionReceipt, receipt);
   }
 
   public async mintAsset(assetId: string, amount: number): Promise<string> {
     const fnTag = `${this.className}#mintAsset()`;
 
-    const transaction = await this.config.network.mintAsset(assetId, amount);
+    const transaction = await this.config.network.mintAsset(assetId, amount); // Why different name?
 
     if (transaction.transactionId == undefined) {
       throw new TransactionIdUndefinedError(fnTag);
@@ -113,7 +114,7 @@ export class SATPBridgeManager implements BridgeManager {
     );
     this.log.info(`${fnTag}, proof of the asset creation: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(transaction.transactionReceipt, receipt);
   }
 
   public async burnAsset(assetId: string, amount: number): Promise<string> {
@@ -131,7 +132,7 @@ export class SATPBridgeManager implements BridgeManager {
 
     this.log.info(`${fnTag}, proof of the asset deletion: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(transaction.transactionReceipt, receipt);
   }
 
   public async assignAsset(
@@ -156,7 +157,7 @@ export class SATPBridgeManager implements BridgeManager {
     );
     this.log.info(`${fnTag}, proof of the asset assignment: ${receipt}`);
 
-    return receipt;
+    return merge_receipt(response.transactionReceipt, receipt);
   }
   public async verifyAssetExistence(
     assetId: string,
