@@ -665,6 +665,11 @@ export class Stage3ClientService extends SATPService {
         assetId,
         Number(amount),
       );
+
+      this.Log.debug(
+        `${fnTag}, Burn Operation Receipt: ${sessionData.burnAssertionClaim.receipt}`,
+      );
+
       sessionData.burnAssertionClaim.proof = await bridge.getProof(assetId);
 
       sessionData.burnAssertionClaimFormat = create(
