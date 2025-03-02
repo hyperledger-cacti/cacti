@@ -37,6 +37,7 @@ import { Stage2SATPHandler } from "../../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../../core/stage-handlers/stage3-handler";
 import { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import { GatewayOrchestrator } from "./gateway-orchestrator";
+import { State } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
@@ -308,6 +309,21 @@ export class SATPManager {
 
   public getSATPHandler(type: SATPHandlerType): SATPHandler | undefined {
     return this.satpHandlers.get(type);
+  }
+
+  /*
+    * Function checks if all the sessions are in the completed state
+    * @returns boolean
+  */
+  public getSATPSessionState(): boolean {
+    const fnTag = `${SATPManager.CLASS_NAME}#getSATPSessionStatus()`;
+    this.logger.info(`${fnTag}, Getting SATP Session Status...`);
+    for (let value of this.sessions.values()) {
+      if (value.getSessionState() !== State.COMPLETED) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public getOrCreateSession(

@@ -36,6 +36,7 @@ import type {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../database/repository/interfaces/repository";
+import { GatewayShuttingDownError } from "./gateway-errors";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -65,6 +66,7 @@ export class BLODispatcher {
   private defaultRepository: boolean;
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
+  private isShuttingDown = false;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -198,9 +200,19 @@ export class BLODispatcher {
     return executeGetStatus(this.level, req, this.manager);
   }
 
+  /**
+   * @notice Transact request handler
+   * @param req TransactRequest
+   * @throws GatewayShuttingDownError when the flag isShuttingDown is true
+   * @returns TransactResponse
+  */
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
+    const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
     this.logger.info(`Transact request: ${req}`);
+    if (this.isShuttingDown) {
+      throw new GatewayShuttingDownError(fnTag);
+    }
     const res = await executeTransact(
       this.level,
       req,
@@ -214,6 +226,19 @@ export class BLODispatcher {
     this.logger.info("Get Session Ids request");
     const res = Array.from(await this.manager.getSessions().keys());
     return res;
+  }
+
+  public async getManager(): Promise<SATPManager> {
+    this.logger.info(`Get SATP Manager request`);
+    return this.manager;
+  }
+
+  /**
+   * Changes the isShuttingDown flag to true, stopping all new requests
+  */
+  public setInitiateShutdown(): void {
+    this.logger.info(`Stopping requests`);
+    this.isShuttingDown = true;
   }
   // get channel by caller; give needed client from orchestrator to handler to call
   // for all channels, find session id on request
