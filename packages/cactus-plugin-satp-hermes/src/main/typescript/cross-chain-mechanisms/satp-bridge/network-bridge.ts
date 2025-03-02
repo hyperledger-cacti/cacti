@@ -56,4 +56,16 @@ export abstract class NetworkBridge {
     transactionId: string,
   ): Promise<string>;
   public abstract getView(assetId: string): Promise<string>;
+
+  /**
+   * Merges two receipts into one.
+   *
+   * @param receipt1 - First receipt to merge.
+   * @param receipt2 - Second receipt to merge.
+   * @returns The merged receipt as a string.
+   */
+  public abstract merge_receipt(
+    receipt1: string | undefined,
+    receipt2: string | undefined,
+  ): string;
 }
