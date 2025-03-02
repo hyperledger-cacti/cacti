@@ -3,6 +3,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
   Checks,
+  JsObjectSigner,
   LogLevelDesc,
   Logger,
   LoggerProvider,
@@ -63,6 +64,7 @@ import { create } from "@bufbuild/protobuf";
 // Define interface on protos
 export interface ISATPSessionOptions {
   logLevel?: LogLevelDesc;
+  logLevel?: LogLevelDesc;
   contextID: string;
   sessionID?: string;
   server: boolean;
@@ -74,8 +76,16 @@ export class SATPSession {
   private clientSessionData: SessionData | undefined;
   private serverSessionData: SessionData | undefined;
   private readonly logger: Logger;
+  private readonly logger: Logger;
 
   constructor(ops: ISATPSessionOptions) {
+    const fnTag = `${SATPSession.CLASS_NAME}#constructor()`;
+    Checks.truthy(ops, `${fnTag} arg options`);
+
+    const level = ops.logLevel || "DEBUG";
+    const label = this.className;
+    this.logger = LoggerProvider.getOrCreate({ level, label });
+
     const fnTag = `${SATPSession.CLASS_NAME}#constructor()`;
     Checks.truthy(ops, `${fnTag} arg options`);
 
@@ -149,6 +159,10 @@ export class SATPSession {
       );
     }
     return this.serverSessionData;
+  }
+
+  public get className(): string {
+    return SATPSession.CLASS_NAME;
   }
 
   public get className(): string {
@@ -241,17 +255,15 @@ export class SATPSession {
   public getSessionId(): string {
     this.logger.info("serverSessionId: ", this.serverSessionData?.state);
     this.logger.info("clientSessionId: ", this.clientSessionData?.state);
+    this.logger.info("serverSessionId: ", this.serverSessionData?.state);
+    this.logger.info("clientSessionId: ", this.clientSessionData?.state);
     return this.serverSessionData?.id || this.clientSessionData?.id || "";
   }
 
   public getSessionState(): State {
     this.logger.info("serverSessionId: ", this.serverSessionData?.state);
     this.logger.info("clientSessionId: ", this.clientSessionData?.state);
-    return (
-      this.serverSessionData?.state ||
-      this.clientSessionData?.state ||
-      State.UNSPECIFIED
-    );
+    return this.serverSessionData?.state || this.clientSessionData?.state || State.UNSPECIFIED;
   }
 
   public verify(

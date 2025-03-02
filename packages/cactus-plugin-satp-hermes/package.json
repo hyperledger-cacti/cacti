@@ -106,8 +106,22 @@
     "docker:compose": "docker compose --project-directory ./ -f ./docker-compose.yml up --build"
   },
   "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
     "moduleNameMapper": {
-      "(.+)\\.js": "$1"
+      "^(\\.?\\.?/.*)\\.js$": "$1"
     }
   },
   "dependencies": {
