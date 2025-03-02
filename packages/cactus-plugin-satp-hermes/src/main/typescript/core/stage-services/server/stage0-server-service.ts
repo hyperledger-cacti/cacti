@@ -569,6 +569,11 @@ export class Stage0ServerService extends SATPService {
       );
       sessionData.receiverWrapAssertionClaim.receipt =
         await bridge.wrapAsset(token);
+
+      this.Log.debug(
+        `${fnTag}, Wrap Operation Receipt: ${sessionData.receiverWrapAssertionClaim.receipt}`,
+      );
+
       sessionData.receiverWrapAssertionClaim.proof =
         await bridge.getProof(assetId);
       sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
