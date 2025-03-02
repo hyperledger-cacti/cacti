@@ -99,5 +99,11 @@ export class RecoverMessageError extends SATPInternalError {
     super(`${tag}, failed to recover message: ${message}`, cause ?? null, 500);
   }
 }
+
+export class BLODispatcherErraneousError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(`${tag}, failed because BLODispatcher is erroneous`, cause ?? null, 500);
+  }
+}
 // TODO client-facing error logic, maps SATPInternalErrors to user friendly errors
 export class SATPError extends Error {}
