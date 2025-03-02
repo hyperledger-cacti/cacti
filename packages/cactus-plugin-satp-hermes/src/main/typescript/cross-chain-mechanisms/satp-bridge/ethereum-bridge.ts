@@ -71,7 +71,7 @@ export class EthereumBridge implements NetworkBridge {
   }
 
   public async wrapAsset(asset: EvmAsset): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#wrapAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#wrapAsset`;
     this.log.debug(
       `${fnTag}, Wrapping Asset: {${asset.tokenId}, ${asset.owner}, ${asset.contractAddress}, ${asset.tokenType}}`,
     );
@@ -110,7 +110,7 @@ export class EthereumBridge implements NetworkBridge {
     };
   }
   public async unwrapAsset(assetId: string): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#unwrapAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#unwrapAsset`;
     this.log.debug(`${fnTag}, Unwrapping Asset: ${assetId}`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -135,7 +135,7 @@ export class EthereumBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#lockAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#lockAsset`;
     this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -161,7 +161,7 @@ export class EthereumBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#unlockAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#unlockAsset`;
     this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -186,7 +186,7 @@ export class EthereumBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#mintAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#mintAsset`;
     this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -211,7 +211,7 @@ export class EthereumBridge implements NetworkBridge {
     assetId: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#burnAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#burnAsset`;
     this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -237,7 +237,7 @@ export class EthereumBridge implements NetworkBridge {
     to: string,
     amount: number,
   ): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#assignAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#assignAsset`;
     this.log.debug(
       `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
     );
@@ -262,7 +262,7 @@ export class EthereumBridge implements NetworkBridge {
   }
 
   public async getAssets(): Promise<string[]> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#getAssets`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#getAssets`;
     this.log.debug(`${fnTag}, Getting Assets`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -283,7 +283,7 @@ export class EthereumBridge implements NetworkBridge {
   }
 
   public async getAsset(assetId: string): Promise<EvmAsset> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#getAsset`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#getAsset`;
     this.log.debug(`${fnTag}, Getting Asset`);
     const response = (await this.connector.invokeContract({
       contract: {
@@ -312,7 +312,7 @@ export class EthereumBridge implements NetworkBridge {
     params: string[],
     invocationType: EthContractInvocationType,
   ): Promise<TransactionResponse> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#runTransaction`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#runTransaction`;
     this.log.debug(
       `${fnTag}, Running Transaction: ${methodName} with params: ${params}`,
     );
@@ -372,7 +372,7 @@ export class EthereumBridge implements NetworkBridge {
     //assetId: string,
     transactionId: string,
   ): Promise<string> {
-    const fnTag = `${EthereumBridge.CLASS_NAME}}#getReceipt`;
+    const fnTag = `${EthereumBridge.CLASS_NAME}#getReceipt`;
     this.log.debug(
       `${fnTag}, Getting Receipt: transactionId: ${transactionId}`,
     );
@@ -418,5 +418,28 @@ export class EthereumBridge implements NetworkBridge {
     }
 
     return interactions;
+  }
+
+  /**
+   * Merges two receipts into one.
+   *
+   * @param receipt1 - First receipt to merge.
+   * @param receipt2 - Second receipt to merge.
+   * @returns The merged receipt as a string.
+   */
+  merge_receipt(
+    receipt1: string | undefined,
+    receipt2: string | undefined,
+  ): string {
+    if (!receipt1 && !receipt2) return "";
+    if (!receipt1) return receipt2 as string;
+    if (!receipt2) return receipt1 as string;
+
+    const mergedReceipt = {
+      ...JSON.parse(receipt1 as string),
+      ...JSON.parse(receipt2 as string),
+    };
+
+    return safeStableStringify(mergedReceipt) || "";
   }
 }
