@@ -583,7 +583,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public async shutdown(): Promise<void> {
     const fnTag = `${this.className}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
-
+    
     this.logger.info("Shutting down Node server - BOL");
     await this.shutdownBLOServer();
     await this.shutdownGOLServer();
@@ -618,6 +618,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.debug(`Entering ${fnTag}`);
     if (this.BLOServer) {
       try {
+        await this.verifySessionsState();
         await this.BLOServer.closeAllConnections();
         await this.BLOServer.close();
         this.BLOServer = undefined;
@@ -648,5 +649,30 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     } else {
       this.logger.warn("Server is not running.");
     }
+  }
+
+  /**
+   * @notice Verify the state of the sessions before shutting down the server.
+   * This method is called before the server is shut down and awaits ensure that 
+   * all sessions are concluded before the server is terminated.
+  */
+  private async verifySessionsState(): Promise<void> {
+    const fnTag = `${this.className}#verifySessionsState()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    if (!this.BLODispatcher) {
+      throw new Error(`Cannot ${fnTag} because BLODispatcher is erroneous`);
+    }
+    this.BLODispatcher.setInitiateShutdown();
+    const manager = await this.BLODispatcher.getManager();
+    let status = false;
+    while (!status) {
+      this.logger.debug(`Inside: ${status}`);
+      status = await manager.getSATPSessionState();
+      if (!status) {
+        this.logger.info("Sessions are still pending");
+        await new Promise(resolve => setTimeout(resolve, 20000));
+      }
+    }
+    this.logger.info("All sessions are concluded");
   }
 }
