@@ -65,6 +65,8 @@ import cors from "cors";
 import * as OAS from "../json/openapi-blo-bundled.json";
 import type { NetworkId } from "./services/network-identification/chainid-list";
 import { knexLocalInstance } from "./database/knexfile";
+import schedule, { Job } from "node-schedule";
+import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsDefined()
@@ -104,6 +106,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
   private crashManager?: CrashManager;
+  private sessionVerificationJob: Job | null = null;
+  private activeJobs: Set<schedule.Job> = new Set();
+
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -262,7 +267,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#getOrCreateWebServices()`;
     this.logger.trace(`Entering ${fnTag}`);
     if (!this.BLODispatcher) {
-      throw new Error(`Cannot ${fnTag} because BLODispatcher is erroneous`);
+      throw new BLODispatcherErraneousError(fnTag);
     }
     let webServices = await this.BLODispatcher?.getOrCreateWebServices();
     if (this.OAPIServerEnabled) {
@@ -454,7 +459,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     if (!this.BLOApplication || !this.BLOServer) {
       if (!this.BLODispatcher) {
-        throw new Error("BLODispatcher is not defined");
+        throw new BLODispatcherErraneousError(fnTag);
       }
       this.BLOApplication = express();
       this.BLOApplication.use(bodyParser.json({ limit: "250mb" }));
@@ -583,7 +588,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public async shutdown(): Promise<void> {
     const fnTag = `${this.className}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
-
+    
     this.logger.info("Shutting down Node server - BOL");
     await this.shutdownBLOServer();
     await this.shutdownGOLServer();
@@ -618,6 +623,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.debug(`Entering ${fnTag}`);
     if (this.BLOServer) {
       try {
+        await this.verifySessionsState();
         await this.BLOServer.closeAllConnections();
         await this.BLOServer.close();
         this.BLOServer = undefined;
@@ -648,5 +654,77 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     } else {
       this.logger.warn("Server is not running.");
     }
+  }
+
+  /**
+   * Verify the state of the sessions before shutting down the server.
+   * This method is called before the server is shut down and awaits ensure that 
+   * all sessions are concluded before the server is terminated.
+   * After all sessions are concluded, the job is cancelled.
+  */
+  private async verifySessionsState(): Promise<void> {
+    const fnTag = `${this.className}#verifySessionsState()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    if (!this.BLODispatcher) {
+      throw new BLODispatcherErraneousError(fnTag);
+    }
+    this.BLODispatcher.setInitiateShutdown();
+    const manager = await this.BLODispatcher.getManager();
+
+    await this.startSessionVerificationJob(manager);
+  }
+
+  /**
+   * Verifies if the sessions are concluded before shutting down the server.
+   * If they aren't starts a scheduled job to verify session states.
+   * The job runs every 20 seconds until all sessions are concluded.
+  */
+  private async startSessionVerificationJob(manager: any): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const cleanup = () => {
+        if (this.sessionVerificationJob) {
+            this.sessionVerificationJob.cancel();
+            this.activeJobs.delete(this.sessionVerificationJob);
+            this.sessionVerificationJob = null;
+        }
+      };
+
+      const initialCheck = async () => {
+        try {
+          const status = await manager.getSATPSessionState();
+          if (status) {
+            this.logger.info("All sessions already concluded");
+            cleanup();
+            resolve();
+            return false;
+          }
+          this.logger.info("Initial check: sessions pending");
+        } catch (error) {
+          this.logger.error(`Session check failed: ${error}`);
+        }
+        return true;
+      };
+
+      initialCheck().then((needsRecurring) => {
+        if (needsRecurring) {
+          this.sessionVerificationJob = schedule.scheduleJob(
+            "*/20 * * * * *", async () => {
+            try {
+              const status = await manager.getSATPSessionState();
+              if (status) {
+                this.logger.info("All sessions concluded");
+                cleanup();
+                resolve();
+              } else {
+                this.logger.info("Sessions still pending");
+              }
+            } catch (error) {
+              this.logger.error(`Session check failed: ${error}`);
+            }
+          });
+          this.activeJobs.add(this.sessionVerificationJob);
+        }
+      });
+    });
   }
 }
