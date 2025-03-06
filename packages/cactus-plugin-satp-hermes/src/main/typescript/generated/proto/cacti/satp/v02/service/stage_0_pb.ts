@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cacti/satp/v02/service/stage_0.proto.
  */
 export const file_cacti_satp_v02_service_stage_0: GenFile = /*@__PURE__*/
-  fileDesc("CiRjYWN0aS9zYXRwL3YwMi9zZXJ2aWNlL3N0YWdlXzAucHJvdG8SFmNhY3RpLnNhdHAudjAyLnNlcnZpY2Ui8gIKEU5ld1Nlc3Npb25SZXF1ZXN0EhIKCnNlc3Npb25faWQYASABKAkSEgoKY29udGV4dF9pZBgCIAEoCRIeChZjbGllbnRfdHJhbnNmZXJfbnVtYmVyGAMgASgJEiEKGXNlbmRlcl9nYXRld2F5X25ldHdvcmtfaWQYBCABKAkSJAoccmVjaXBpZW50X2dhdGV3YXlfbmV0d29ya19pZBgFIAEoCRISCgpnYXRld2F5X2lkGAYgASgJEhgKEGNsaWVudF9zaWduYXR1cmUYByABKAkSDQoFZXJyb3IYCCABKAgSMAoKZXJyb3JfY29kZRgJIAEoDjIcLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5FcnJvchI4CgxtZXNzYWdlX3R5cGUYCiABKA4yIi5jYWN0aS5zYXRwLnYwMi5jb21tb24uTWVzc2FnZVR5cGUSIwobc2VuZGVyX2dhdGV3YXlfbmV0d29ya190eXBlGAsgASgJIpADChJOZXdTZXNzaW9uUmVzcG9uc2USEgoKc2Vzc2lvbl9pZBgBIAEoCRISCgpjb250ZXh0X2lkGAIgASgJEi4KBnN0YXR1cxgDIAEoDjIeLmNhY3RpLnNhdHAudjAyLnNlcnZpY2UuU1RBVFVTEh0KFWhhc2hfcHJldmlvdXNfbWVzc2FnZRgEIAEoCRIhChlzZW5kZXJfZ2F0ZXdheV9uZXR3b3JrX2lkGAUgASgJEiQKHHJlY2lwaWVudF9nYXRld2F5X25ldHdvcmtfaWQYBiABKAkSGAoQc2VydmVyX3NpZ25hdHVyZRgHIAEoCRINCgVlcnJvchgIIAEoCBIwCgplcnJvcl9jb2RlGAkgASgOMhwuY2FjdGkuc2F0cC52MDIuY29tbW9uLkVycm9yEjgKDG1lc3NhZ2VfdHlwZRgKIAEoDjIiLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5NZXNzYWdlVHlwZRIlCh1yZWNlaXZlcl9nYXRld2F5X25ldHdvcmtfdHlwZRgLIAEoCSKQBAoWUHJlU0FUUFRyYW5zZmVyUmVxdWVzdBISCgpzZXNzaW9uX2lkGAEgASgJEhIKCmNvbnRleHRfaWQYAiABKAkSHgoWY2xpZW50X3RyYW5zZmVyX251bWJlchgDIAEoCRIhChlzZW5kZXJfZ2F0ZXdheV9uZXR3b3JrX2lkGAQgASgJEiQKHHJlY2lwaWVudF9nYXRld2F5X25ldHdvcmtfaWQYBSABKAkSMgoMc2VuZGVyX2Fzc2V0GAYgASgLMhwuY2FjdGkuc2F0cC52MDIuY29tbW9uLkFzc2V0EjQKDnJlY2VpdmVyX2Fzc2V0GAcgASgLMhwuY2FjdGkuc2F0cC52MDIuY29tbW9uLkFzc2V0EkcKFHdyYXBfYXNzZXJ0aW9uX2NsYWltGAggASgLMikuY2FjdGkuc2F0cC52MDIuY29tbW9uLldyYXBBc3NlcnRpb25DbGFpbRIdChVoYXNoX3ByZXZpb3VzX21lc3NhZ2UYCSABKAkSGAoQY2xpZW50X3NpZ25hdHVyZRgKIAEoCRINCgVlcnJvchgLIAEoCBIwCgplcnJvcl9jb2RlGAwgASgOMhwuY2FjdGkuc2F0cC52MDIuY29tbW9uLkVycm9yEjgKDG1lc3NhZ2VfdHlwZRgNIAEoDjIiLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5NZXNzYWdlVHlwZSLaAgoXUHJlU0FUUFRyYW5zZmVyUmVzcG9uc2USEgoKc2Vzc2lvbl9pZBgBIAEoCRISCgpjb250ZXh0X2lkGAIgASgJEkcKFHdyYXBfYXNzZXJ0aW9uX2NsYWltGAMgASgLMikuY2FjdGkuc2F0cC52MDIuY29tbW9uLldyYXBBc3NlcnRpb25DbGFpbRIdChVoYXNoX3ByZXZpb3VzX21lc3NhZ2UYBCABKAkSGgoScmVjaXBpZW50X3Rva2VuX2lkGAUgASgJEhgKEHNlcnZlcl9zaWduYXR1cmUYBiABKAkSDQoFZXJyb3IYByABKAgSMAoKZXJyb3JfY29kZRgIIAEoDjIcLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5FcnJvchI4CgxtZXNzYWdlX3R5cGUYCSABKA4yIi5jYWN0aS5zYXRwLnYwMi5jb21tb24uTWVzc2FnZVR5cGUiHQoMQ2hlY2tSZXF1ZXN0Eg0KBWNoZWNrGAEgASgJIh4KDUNoZWNrUmVzcG9uc2USDQoFY2hlY2sYASABKAkqSgoGU1RBVFVTEhYKElNUQVRVU19VTlNQRUNJRklFRBAAEhMKD1NUQVRVU19BQ0NFUFRFRBABEhMKD1NUQVRVU19SRUpFQ1RFRBACMsgCChFTYXRwU3RhZ2UwU2VydmljZRJlCgpOZXdTZXNzaW9uEikuY2FjdGkuc2F0cC52MDIuc2VydmljZS5OZXdTZXNzaW9uUmVxdWVzdBoqLmNhY3RpLnNhdHAudjAyLnNlcnZpY2UuTmV3U2Vzc2lvblJlc3BvbnNlIgASdAoPUHJlU0FUUFRyYW5zZmVyEi4uY2FjdGkuc2F0cC52MDIuc2VydmljZS5QcmVTQVRQVHJhbnNmZXJSZXF1ZXN0Gi8uY2FjdGkuc2F0cC52MDIuc2VydmljZS5QcmVTQVRQVHJhbnNmZXJSZXNwb25zZSIAElYKBUNoZWNrEiQuY2FjdGkuc2F0cC52MDIuc2VydmljZS5DaGVja1JlcXVlc3QaJS5jYWN0aS5zYXRwLnYwMi5zZXJ2aWNlLkNoZWNrUmVzcG9uc2UiAGIGcHJvdG8z", [file_cacti_satp_v02_common_message]);
+  fileDesc("CiRjYWN0aS9zYXRwL3YwMi9zZXJ2aWNlL3N0YWdlXzAucHJvdG8SFmNhY3RpLnNhdHAudjAyLnNlcnZpY2UiqQIKEU5ld1Nlc3Npb25SZXF1ZXN0EhIKCnNlc3Npb25faWQYASABKAkSEgoKY29udGV4dF9pZBgCIAEoCRIeChZjbGllbnRfdHJhbnNmZXJfbnVtYmVyGAMgASgJEhIKCmdhdGV3YXlfaWQYBSABKAkSGAoQY2xpZW50X3NpZ25hdHVyZRgGIAEoCRINCgVlcnJvchgHIAEoCBIwCgplcnJvcl9jb2RlGAggASgOMhwuY2FjdGkuc2F0cC52MDIuY29tbW9uLkVycm9yEjgKDG1lc3NhZ2VfdHlwZRgJIAEoDjIiLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5NZXNzYWdlVHlwZRIjChtzZW5kZXJfZ2F0ZXdheV9uZXR3b3JrX3R5cGUYCiABKAkixwIKEk5ld1Nlc3Npb25SZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhIKCmNvbnRleHRfaWQYAiABKAkSLgoGc3RhdHVzGAMgASgOMh4uY2FjdGkuc2F0cC52MDIuc2VydmljZS5TVEFUVVMSHQoVaGFzaF9wcmV2aW91c19tZXNzYWdlGAQgASgJEhgKEHNlcnZlcl9zaWduYXR1cmUYBSABKAkSDQoFZXJyb3IYBiABKAgSMAoKZXJyb3JfY29kZRgHIAEoDjIcLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5FcnJvchI4CgxtZXNzYWdlX3R5cGUYCCABKA4yIi5jYWN0aS5zYXRwLnYwMi5jb21tb24uTWVzc2FnZVR5cGUSJQodcmVjZWl2ZXJfZ2F0ZXdheV9uZXR3b3JrX3R5cGUYCSABKAki6gMKFlByZVNBVFBUcmFuc2ZlclJlcXVlc3QSEgoKc2Vzc2lvbl9pZBgBIAEoCRISCgpjb250ZXh0X2lkGAIgASgJEh4KFmNsaWVudF90cmFuc2Zlcl9udW1iZXIYAyABKAkSIQoZc2VuZGVyX2dhdGV3YXlfbmV0d29ya19pZBgEIAEoCRIyCgxzZW5kZXJfYXNzZXQYBSABKAsyHC5jYWN0aS5zYXRwLnYwMi5jb21tb24uQXNzZXQSNAoOcmVjZWl2ZXJfYXNzZXQYBiABKAsyHC5jYWN0aS5zYXRwLnYwMi5jb21tb24uQXNzZXQSRwoUd3JhcF9hc3NlcnRpb25fY2xhaW0YByABKAsyKS5jYWN0aS5zYXRwLnYwMi5jb21tb24uV3JhcEFzc2VydGlvbkNsYWltEh0KFWhhc2hfcHJldmlvdXNfbWVzc2FnZRgIIAEoCRIYChBjbGllbnRfc2lnbmF0dXJlGAkgASgJEg0KBWVycm9yGAogASgIEjAKCmVycm9yX2NvZGUYCyABKA4yHC5jYWN0aS5zYXRwLnYwMi5jb21tb24uRXJyb3ISOAoMbWVzc2FnZV90eXBlGAwgASgOMiIuY2FjdGkuc2F0cC52MDIuY29tbW9uLk1lc3NhZ2VUeXBlIoADChdQcmVTQVRQVHJhbnNmZXJSZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhIKCmNvbnRleHRfaWQYAiABKAkSJAoccmVjaXBpZW50X2dhdGV3YXlfbmV0d29ya19pZBgDIAEoCRJHChR3cmFwX2Fzc2VydGlvbl9jbGFpbRgEIAEoCzIpLmNhY3RpLnNhdHAudjAyLmNvbW1vbi5XcmFwQXNzZXJ0aW9uQ2xhaW0SHQoVaGFzaF9wcmV2aW91c19tZXNzYWdlGAUgASgJEhoKEnJlY2lwaWVudF90b2tlbl9pZBgGIAEoCRIYChBzZXJ2ZXJfc2lnbmF0dXJlGAcgASgJEg0KBWVycm9yGAggASgIEjAKCmVycm9yX2NvZGUYCSABKA4yHC5jYWN0aS5zYXRwLnYwMi5jb21tb24uRXJyb3ISOAoMbWVzc2FnZV90eXBlGAogASgOMiIuY2FjdGkuc2F0cC52MDIuY29tbW9uLk1lc3NhZ2VUeXBlIh0KDENoZWNrUmVxdWVzdBINCgVjaGVjaxgBIAEoCSIeCg1DaGVja1Jlc3BvbnNlEg0KBWNoZWNrGAEgASgJKkoKBlNUQVRVUxIWChJTVEFUVVNfVU5TUEVDSUZJRUQQABITCg9TVEFUVVNfQUNDRVBURUQQARITCg9TVEFUVVNfUkVKRUNURUQQAjLIAgoRU2F0cFN0YWdlMFNlcnZpY2USZQoKTmV3U2Vzc2lvbhIpLmNhY3RpLnNhdHAudjAyLnNlcnZpY2UuTmV3U2Vzc2lvblJlcXVlc3QaKi5jYWN0aS5zYXRwLnYwMi5zZXJ2aWNlLk5ld1Nlc3Npb25SZXNwb25zZSIAEnQKD1ByZVNBVFBUcmFuc2ZlchIuLmNhY3RpLnNhdHAudjAyLnNlcnZpY2UuUHJlU0FUUFRyYW5zZmVyUmVxdWVzdBovLmNhY3RpLnNhdHAudjAyLnNlcnZpY2UuUHJlU0FUUFRyYW5zZmVyUmVzcG9uc2UiABJWCgVDaGVjaxIkLmNhY3RpLnNhdHAudjAyLnNlcnZpY2UuQ2hlY2tSZXF1ZXN0GiUuY2FjdGkuc2F0cC52MDIuc2VydmljZS5DaGVja1Jlc3BvbnNlIgBiBnByb3RvMw", [file_cacti_satp_v02_common_message]);
 
 /**
  * @generated from message cacti.satp.v02.service.NewSessionRequest
@@ -34,44 +34,34 @@ export type NewSessionRequest = Message<"cacti.satp.v02.service.NewSessionReques
   clientTransferNumber: string;
 
   /**
-   * @generated from field: string sender_gateway_network_id = 4;
-   */
-  senderGatewayNetworkId: string;
-
-  /**
-   * @generated from field: string recipient_gateway_network_id = 5;
-   */
-  recipientGatewayNetworkId: string;
-
-  /**
    * TODO FIX this change so it gets the gateway ID from channel
    *
-   * @generated from field: string gateway_id = 6;
+   * @generated from field: string gateway_id = 5;
    */
   gatewayId: string;
 
   /**
-   * @generated from field: string client_signature = 7;
+   * @generated from field: string client_signature = 6;
    */
   clientSignature: string;
 
   /**
-   * @generated from field: bool error = 8;
+   * @generated from field: bool error = 7;
    */
   error: boolean;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Error error_code = 9;
+   * @generated from field: cacti.satp.v02.common.Error error_code = 8;
    */
   errorCode: Error;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MessageType message_type = 10;
+   * @generated from field: cacti.satp.v02.common.MessageType message_type = 9;
    */
   messageType: MessageType;
 
   /**
-   * @generated from field: string sender_gateway_network_type = 11;
+   * @generated from field: string sender_gateway_network_type = 10;
    */
   senderGatewayNetworkType: string;
 };
@@ -108,37 +98,27 @@ export type NewSessionResponse = Message<"cacti.satp.v02.service.NewSessionRespo
   hashPreviousMessage: string;
 
   /**
-   * @generated from field: string sender_gateway_network_id = 5;
-   */
-  senderGatewayNetworkId: string;
-
-  /**
-   * @generated from field: string recipient_gateway_network_id = 6;
-   */
-  recipientGatewayNetworkId: string;
-
-  /**
-   * @generated from field: string server_signature = 7;
+   * @generated from field: string server_signature = 5;
    */
   serverSignature: string;
 
   /**
-   * @generated from field: bool error = 8;
+   * @generated from field: bool error = 6;
    */
   error: boolean;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Error error_code = 9;
+   * @generated from field: cacti.satp.v02.common.Error error_code = 7;
    */
   errorCode: Error;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MessageType message_type = 10;
+   * @generated from field: cacti.satp.v02.common.MessageType message_type = 8;
    */
   messageType: MessageType;
 
   /**
-   * @generated from field: string receiver_gateway_network_type = 11;
+   * @generated from field: string receiver_gateway_network_type = 9;
    */
   receiverGatewayNetworkType: string;
 };
@@ -175,47 +155,42 @@ export type PreSATPTransferRequest = Message<"cacti.satp.v02.service.PreSATPTran
   senderGatewayNetworkId: string;
 
   /**
-   * @generated from field: string recipient_gateway_network_id = 5;
-   */
-  recipientGatewayNetworkId: string;
-
-  /**
-   * @generated from field: cacti.satp.v02.common.Asset sender_asset = 6;
+   * @generated from field: cacti.satp.v02.common.Asset sender_asset = 5;
    */
   senderAsset?: Asset;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Asset receiver_asset = 7;
+   * @generated from field: cacti.satp.v02.common.Asset receiver_asset = 6;
    */
   receiverAsset?: Asset;
 
   /**
-   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 8;
+   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 7;
    */
   wrapAssertionClaim?: WrapAssertionClaim;
 
   /**
-   * @generated from field: string hash_previous_message = 9;
+   * @generated from field: string hash_previous_message = 8;
    */
   hashPreviousMessage: string;
 
   /**
-   * @generated from field: string client_signature = 10;
+   * @generated from field: string client_signature = 9;
    */
   clientSignature: string;
 
   /**
-   * @generated from field: bool error = 11;
+   * @generated from field: bool error = 10;
    */
   error: boolean;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Error error_code = 12;
+   * @generated from field: cacti.satp.v02.common.Error error_code = 11;
    */
   errorCode: Error;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MessageType message_type = 13;
+   * @generated from field: cacti.satp.v02.common.MessageType message_type = 12;
    */
   messageType: MessageType;
 };
@@ -242,37 +217,42 @@ export type PreSATPTransferResponse = Message<"cacti.satp.v02.service.PreSATPTra
   contextId: string;
 
   /**
-   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 3;
+   * @generated from field: string recipient_gateway_network_id = 3;
+   */
+  recipientGatewayNetworkId: string;
+
+  /**
+   * @generated from field: cacti.satp.v02.common.WrapAssertionClaim wrap_assertion_claim = 4;
    */
   wrapAssertionClaim?: WrapAssertionClaim;
 
   /**
-   * @generated from field: string hash_previous_message = 4;
+   * @generated from field: string hash_previous_message = 5;
    */
   hashPreviousMessage: string;
 
   /**
-   * @generated from field: string recipient_token_id = 5;
+   * @generated from field: string recipient_token_id = 6;
    */
   recipientTokenId: string;
 
   /**
-   * @generated from field: string server_signature = 6;
+   * @generated from field: string server_signature = 7;
    */
   serverSignature: string;
 
   /**
-   * @generated from field: bool error = 7;
+   * @generated from field: bool error = 8;
    */
   error: boolean;
 
   /**
-   * @generated from field: cacti.satp.v02.common.Error error_code = 8;
+   * @generated from field: cacti.satp.v02.common.Error error_code = 9;
    */
   errorCode: Error;
 
   /**
-   * @generated from field: cacti.satp.v02.common.MessageType message_type = 9;
+   * @generated from field: cacti.satp.v02.common.MessageType message_type = 10;
    */
   messageType: MessageType;
 };

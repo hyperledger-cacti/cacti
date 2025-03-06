@@ -4,7 +4,6 @@ import {
   type UpdateOracleEntryBase,
   type ReadEntryArgsBase,
 } from "./oracle-abstract";
-import type { TransactionResponse } from "../../types/blockchain-interaction";
 import {
   EthContractInvocationType,
   PluginLedgerConnectorBesu,
@@ -21,6 +20,7 @@ import type {
   PluginBungeeHermes,
 } from "@hyperledger/cactus-plugin-bungee-hermes";
 import type { IPluginLedgerConnectorEthereumOptions } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { OracleResponse } from "./oracle-types";
 
 export interface UpdateEVMOracleTransactionConfig {
   contractName: string;
@@ -64,7 +64,7 @@ export class OracleEVM extends OracleAbstract {
 
   public async updateEntry(
     entry: UpdateEVMOracleEntry,
-  ): Promise<{ transactionResponse: TransactionResponse; proof: any }> {
+  ): Promise<{ transactionResponse: OracleResponse; proof: any }> {
     const fnTag = `${OracleEVM.CLASS_NAME}#updateEntry`;
     this.logger.debug(
       `${fnTag}: Updating entry with header: ${safeStableStringify(entry.header)}`,
@@ -91,7 +91,7 @@ export class OracleEVM extends OracleAbstract {
       throw new Error(`${fnTag}: EVM transaction failed`);
     }
 
-    const transactionResponse: TransactionResponse = {
+    const transactionResponse: OracleResponse = {
       transactionId: response.out.transactionReceipt.transactionHash ?? "",
       transactionReceipt:
         safeStableStringify(response.out.transactionReceipt) ?? "",
