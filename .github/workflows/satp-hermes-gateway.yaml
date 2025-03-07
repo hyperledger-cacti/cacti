@@ -6,6 +6,39 @@ on:
     branches: [main, satp-dev]
 
 jobs:
+  # have to copy this from ci.yml as entrypoint to keep satp ci self contained
+  build-dev:
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+      NODEJS_VERSION: v18.18.2
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4.1.7
+
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4.0.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - if: steps.yarn-cache.outputs.cache-hit != 'true'
+        name: Run CI script
+        run: ./tools/ci.sh
   run-satp-tests:
     continue-on-error: false
     env:
@@ -21,19 +54,7 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.1
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
-
   set-docker-tags:
     runs-on: ubuntu-22.04
     needs: run-satp-tests
