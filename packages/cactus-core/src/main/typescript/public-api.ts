@@ -28,4 +28,8 @@ export { stringifyBigIntReplacer } from "./web-services/stringify-big-int-replac
 
 export { IConfigureExpressAppContext } from "./web-services/configure-express-app-base";
 export { configureExpressAppBase } from "./web-services/configure-express-app-base";
+export { IConfigureFastifyAppContext } from "./web-services/configure-fastify-app-base";
+export { configureFastifyAppBase } from "./web-services/configure-fastify-app-base";
+
 export { CACTI_CORE_CONFIGURE_EXPRESS_APP_BASE_MARKER } from "./web-services/configure-express-app-base";
+export { CACTI_CORE_CONFIGURE_FASTIFY_APP_BASE_MARKER } from "./web-services/configure-fastify-app-base";
