@@ -278,6 +278,11 @@ export class Stage2ClientService extends SATPService {
         assetId,
         Number(amount),
       );
+
+      this.Log.debug(
+        `${fnTag}, Lock Operation Receipt: ${sessionData.lockAssertionClaim.receipt}`,
+      );
+
       sessionData.lockAssertionClaim.proof = await bridge.getProof(assetId);
 
       sessionData.lockAssertionClaimFormat = create(
