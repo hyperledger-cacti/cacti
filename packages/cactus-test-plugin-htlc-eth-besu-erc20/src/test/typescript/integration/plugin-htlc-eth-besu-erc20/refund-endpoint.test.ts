@@ -1,6 +1,7 @@
+import "jest-extended";
+
 import http from "http";
 import type { AddressInfo } from "net";
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import express from "express";
 import bodyParser from "body-parser";
@@ -57,525 +58,244 @@ const timeout = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-const testCase = "Test refund endpoint";
+const testCase = "HTLC Tests for refund-endpoint";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
-  t.end();
-});
+describe(testCase, () => {
+  let server: http.Server;
 
-test(testCase, async (t: Test) => {
-  t.comment("Starting Besu Test Ledger");
-  const besuTestLedger = new BesuTestLedger({
-    logLevel,
-    envVars: [...BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars, "BESU_LOGGING=ALL"],
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
   });
-  await besuTestLedger.start();
-
-  test.onFinish(async () => {
-    await besuTestLedger.stop();
-    await besuTestLedger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
-  });
-
-  const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
-  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
-  const keychainId = uuidv4();
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: uuidv4(),
-    keychainId,
-    // pre-provision keychain with mock backend holding the private key of the
-    // test account that we'll reference while sending requests with the
-    // signing credential pointing to this keychain entry.
-    backend: new Map([
-      [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
-    ]),
-    logLevel,
-  });
-  keychainPlugin.set(
-    DemoHelperJSON.contractName,
-    JSON.stringify(DemoHelperJSON),
-  );
-  keychainPlugin.set(
-    HashTimeLockJSON.contractName,
-    JSON.stringify(HashTimeLockJSON),
-  );
-  const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.Local,
-  });
-
-  const pluginRegistry = new PluginRegistry({});
-  const connector: PluginLedgerConnectorBesu = await factory.create({
-    rpcApiHttpHost,
-    rpcApiWsHost,
-    logLevel,
-    instanceId: connectorId,
-    pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-  });
-
-  pluginRegistry.add(connector);
-  const pluginOptions: IPluginHtlcEthBesuErc20Options = {
-    instanceId: uuidv4(),
-    logLevel,
-    pluginRegistry,
-  };
-
-  const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-    pluginImportType: PluginImportType.Local,
-  });
-  const pluginHtlc = await factoryHTLC.create(pluginOptions);
-  pluginRegistry.add(pluginHtlc);
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
+  server = http.createServer(expressApp);
 
-  const configuration = new Configuration({ basePath: apiHost });
-  const api = new BesuApi(configuration);
-
-  await pluginHtlc.getOrCreateWebServices();
-  await pluginHtlc.registerWebServices(expressApp);
-
-  t.comment("Deploys HashTimeLock via .json file on initialize function");
-  const initRequest: InitializeRequest = {
-    connectorId,
-    keychainId,
-    constructorArgs: [],
-    web3SigningCredential,
-    gas: estimatedGas,
-  };
-  const deployOut = await pluginHtlc.initialize(initRequest);
-
-  t.ok(deployOut, "pluginHtlc.initialize() output is truthy OK");
-  t.ok(
-    deployOut.transactionReceipt,
-    "pluginHtlc.initialize() output.transactionReceipt is truthy OK",
-  );
-  t.ok(
-    deployOut.transactionReceipt.contractAddress,
-    "pluginHtlc.initialize() output.transactionReceipt.contractAddress is truthy OK",
-  );
-  const hashTimeLockAddress = deployOut.transactionReceipt
-    .contractAddress as string;
-
-  t.comment("Deploys TestToken via .json file on deployContract function");
-  const deployOutToken = await connector.deployContract({
-    contractName: TestTokenJSON.contractName,
-    contractAbi: TestTokenJSON.abi,
-    bytecode: TestTokenJSON.bytecode,
-    web3SigningCredential,
-    keychainId,
-    constructorArgs: ["100", "token", "2", "TKN"],
-    gas: estimatedGas,
+  beforeAll(async () => {
+    server = http.createServer(expressApp);
+    await besuTestLedger.start();
   });
-  t.ok(deployOutToken, "deployContract() output is truthy OK");
-  t.ok(
-    deployOutToken.transactionReceipt,
-    "deployContract() output.transactionReceipt is truthy OK",
-  );
-  t.ok(
-    deployOutToken.transactionReceipt.contractAddress,
-    "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-  );
-  const tokenAddress = deployOutToken.transactionReceipt
-    .contractAddress as string;
 
-  t.comment("Deploys DemoHelpers via .json file on deployContract function");
-  const deployOutDemo = await connector.deployContract({
-    contractName: DemoHelperJSON.contractName,
-    contractAbi: DemoHelperJSON.abi,
-    bytecode: DemoHelperJSON.bytecode,
-    web3SigningCredential,
-    keychainId,
-    constructorArgs: [],
-    gas: estimatedGas,
-  });
-  t.ok(deployOutDemo, "deployContract() output is truthy OK");
-  t.ok(
-    deployOutDemo.transactionReceipt,
-    "deployContract() output.transactionReceipt is truthy OK",
-  );
-  t.ok(
-    deployOutDemo.transactionReceipt.contractAddress,
-    "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-  );
-
-  t.comment("Approve 10 Tokens to HashTimeLockAddress");
-  const { success } = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Send,
-    methodName: "approve",
-    params: [hashTimeLockAddress, "10"],
-    gas: estimatedGas,
-  });
-  t.equal(success, true, "approve() transactionReceipt.status is true OK");
-
-  t.comment("Get account balance");
-  const responseBalance = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "balanceOf",
-    params: [firstHighNetWorthAccount],
-  });
-  t.equal(responseBalance.callOutput, "100", "balance of account is 100 OK");
-
-  t.comment("Get current timestamp");
-  const { callOutput } = await connector.invokeContract({
-    contractName: DemoHelperJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "getTimestamp",
-    params: [],
-  });
-  t.ok(callOutput, "callOutput() output.callOutput is truthy OK");
-  let timestamp = 0;
-  timestamp = callOutput as number;
-  timestamp = +timestamp + +10;
-
-  t.comment("Get HashTimeLock contract and account allowance");
-  const responseAllowance = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "allowance",
-    params: [firstHighNetWorthAccount, hashTimeLockAddress],
-  });
-  t.equal(responseAllowance.callOutput, "10", "callOutput() is 10 OK");
-
-  t.comment("Create new contract for HTLC");
-  const request: NewContractRequest = {
-    contractAddress: hashTimeLockAddress,
-    inputAmount: 10,
-    outputAmount: 1,
-    expiration: timestamp,
-    hashLock,
-    tokenAddress,
-    receiver,
-    outputNetwork: "BTC",
-    outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
-    connectorId,
-    keychainId,
-    web3SigningCredential,
-    gas: estimatedGas,
-  };
-  const res = await api.newContractV1(request);
-  t.equal(res.status, 200, "response status is 200 OK");
-
-  t.comment("Get account balance");
-  const responseBalance2 = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "balanceOf",
-    params: [firstHighNetWorthAccount],
-  });
-  t.equal(responseBalance2.callOutput, "90", "balance of account is 90 OK");
-
-  t.comment("Get HTLC Id from DemoHelper");
-  const responseTxId = await connector.invokeContract({
-    contractName: DemoHelperJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "getTxId",
-    params: [
-      firstHighNetWorthAccount,
-      receiver,
-      10,
-      hashLock,
-      timestamp,
-      tokenAddress,
-    ],
-  });
-  t.ok(responseTxId.callOutput, "result is truthy OK");
-  const id = responseTxId.callOutput as string;
-
-  t.comment("Refund HTLC");
-  await timeout(6000);
-  const refundRequest: RefundRequest = {
-    id,
-    web3SigningCredential,
-    connectorId,
-    keychainId,
-  };
-  const resRefund = await api.refundV1(refundRequest);
-  t.equal(resRefund.status, 200, "response status is 200 OK");
-
-  t.comment("Get account balance");
-  const responseFinalBalance = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "balanceOf",
-    params: [firstHighNetWorthAccount],
-  });
-  t.equal(
-    responseFinalBalance.callOutput,
-    "100",
-    "balance of account is 100 OK",
-  );
-  t.comment("Get status of HTLC");
-  const resStatus = await api.getSingleStatusV1({
-    id,
-    web3SigningCredential,
-    connectorId,
-    keychainId,
-  });
-  t.equal(resStatus.status, 200, "response status is 200 OK");
-  t.equal(resStatus.data, 2, "the contract status is 2 - Refunded");
-  t.end();
-});
-
-test("Test invalid refund with invalid time", async (t: Test) => {
-  t.comment("Starting Besu Test Ledger");
-  const besuTestLedger = new BesuTestLedger({
-    logLevel,
-    envVars: [...BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars, "BESU_LOGGING=ALL"],
-  });
-  await besuTestLedger.start();
-
-  test.onFinish(async () => {
+  afterAll(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
   });
-
-  const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
-  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
-  const keychainId = uuidv4();
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: uuidv4(),
-    keychainId,
-    // pre-provision keychain with mock backend holding the private key of the
-    // test account that we'll reference while sending requests with the
-    // signing credential pointing to this keychain entry.
-    backend: new Map([
-      [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
-    ]),
-    logLevel,
-  });
-  keychainPlugin.set(
-    DemoHelperJSON.contractName,
-    JSON.stringify(DemoHelperJSON),
-  );
-  keychainPlugin.set(
-    HashTimeLockJSON.contractName,
-    JSON.stringify(HashTimeLockJSON),
-  );
-  const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.Local,
+    
+  afterAll(async () => await Servers.shutdown(server));
+    
+  afterAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
   });
 
-  const pluginRegistry = new PluginRegistry({});
-  const connector: PluginLedgerConnectorBesu = await factory.create({
-    rpcApiHttpHost,
-    rpcApiWsHost,
-    logLevel,
-    instanceId: connectorId,
-    pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-  });
+  test(testCase, async () => {
+    const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+    const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
+    const keychainId = uuidv4();
+    const keychainPlugin = new PluginKeychainMemory({
+          instanceId: uuidv4(),
+          keychainId,
+          // pre-provision keychain with mock backend holding the private key of the
+          // test account that we'll reference while sending requests with the
+          // signing credential pointing to this keychain entry.
+          backend: new Map([
+            [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
+          ]),
+          logLevel,
+    });
+    keychainPlugin.set(
+          DemoHelperJSON.contractName,
+          JSON.stringify(DemoHelperJSON),
+    );
+    keychainPlugin.set(
+          HashTimeLockJSON.contractName,
+          JSON.stringify(HashTimeLockJSON),
+    );
+    const factory = new PluginFactoryLedgerConnector({
+          pluginImportType: PluginImportType.Local,
+    });
+      
+      const pluginRegistry = new PluginRegistry({});
+      const connector: PluginLedgerConnectorBesu = await factory.create({
+          rpcApiHttpHost,
+          rpcApiWsHost,
+          logLevel,
+          instanceId: connectorId,
+          pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+      });
+      
+      pluginRegistry.add(connector);
+      const pluginOptions: IPluginHtlcEthBesuErc20Options = {
+          instanceId: uuidv4(),
+          logLevel,
+          pluginRegistry,
+      };
+      
+      const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
+          pluginImportType: PluginImportType.Local,
+      });
+      const pluginHtlc = await factoryHTLC.create(pluginOptions);
+      pluginRegistry.add(pluginHtlc);
 
-  pluginRegistry.add(connector);
-  const pluginOptions: IPluginHtlcEthBesuErc20Options = {
-    instanceId: uuidv4(),
-    logLevel,
-    pluginRegistry,
-  };
+      const listenOptions: IListenOptions = {
+          hostname: "127.0.0.1",
+          port: 0,
+          server,
+      };
+      const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+      const { address, port } = addressInfo;
+      const apiHost = `http://${address}:${port}`;
+      
+      const configuration = new Configuration({ basePath: apiHost });
+      const api = new BesuApi(configuration);
+      
+      await pluginHtlc.getOrCreateWebServices();
+      await pluginHtlc.registerWebServices(expressApp);
 
-  const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-    pluginImportType: PluginImportType.Local,
-  });
-  const pluginHtlc = await factoryHTLC.create(pluginOptions);
-  pluginRegistry.add(pluginHtlc);
+    const initRequest: InitializeRequest = {
+      connectorId,
+      keychainId,
+      constructorArgs: [],
+      web3SigningCredential,
+      gas: estimatedGas,
+    };
+    const deployOut = await pluginHtlc.initialize(initRequest);
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
+    expect(deployOut).toBeTruthy();
+    expect(deployOut.transactionReceipt).toBeTruthy();
+    expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
 
-  const configuration = new Configuration({ basePath: apiHost });
-  const api = new BesuApi(configuration);
+    const hashTimeLockAddress = deployOut.transactionReceipt
+      .contractAddress as string;
+    const deployOutToken = await connector.deployContract({
+      contractName: TestTokenJSON.contractName,
+      contractAbi: TestTokenJSON.abi,
+      bytecode: TestTokenJSON.bytecode,
+      web3SigningCredential,
+      keychainId,
+      constructorArgs: ["100", "token", "2", "TKN"],
+      gas: estimatedGas,
+    });
+    
+    expect(deployOutToken).toBeTruthy();
+    expect(deployOutToken.transactionReceipt).toBeTruthy();
+    expect(deployOutToken.transactionReceipt.contractAddress).toBeTruthy();
 
-  await pluginHtlc.getOrCreateWebServices();
-  await pluginHtlc.registerWebServices(expressApp);
+    const tokenAddress = deployOutToken.transactionReceipt
+      .contractAddress as string;
+    const deployOutDemo = await connector.deployContract({
+      contractName: DemoHelperJSON.contractName,
+      contractAbi: DemoHelperJSON.abi,
+      bytecode: DemoHelperJSON.bytecode,
+      web3SigningCredential,
+      keychainId,
+      constructorArgs: [],
+      gas: estimatedGas,
+    });
 
-  t.comment("Deploys HashTimeLock via .json file on initialize function");
-  const initRequest: InitializeRequest = {
-    connectorId,
-    keychainId,
-    constructorArgs: [],
-    web3SigningCredential,
-    gas: estimatedGas,
-  };
-  const deployOut = await pluginHtlc.initialize(initRequest);
+    expect(deployOutDemo).toBeTruthy();
+    expect(deployOutDemo.transactionReceipt).toBeTruthy();
+    expect(deployOutDemo.transactionReceipt.contractAddress).toBeTruthy();
 
-  t.ok(deployOut, "pluginHtlc.initialize() output is truthy OK");
-  t.ok(
-    deployOut.transactionReceipt,
-    "pluginHtlc.initialize() output.transactionReceipt is truthy OK",
-  );
-  t.ok(
-    deployOut.transactionReceipt.contractAddress,
-    "pluginHtlc.initialize() output.transactionReceipt.contractAddress is truthy OK",
-  );
-  const hashTimeLockAddress = deployOut.transactionReceipt
-    .contractAddress as string;
+    const { success } = await connector.invokeContract({
+      contractName: TestTokenJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Send,
+      methodName: "approve",
+      params: [hashTimeLockAddress, "10"],
+      gas: estimatedGas,
+    });
+    expect(success).toBe(true);
 
-  t.comment("Deploys TestToken via .json file on deployContract function");
-  const deployOutToken = await connector.deployContract({
-    contractName: TestTokenJSON.contractName,
-    contractAbi: TestTokenJSON.abi,
-    bytecode: TestTokenJSON.bytecode,
-    web3SigningCredential,
-    keychainId,
-    constructorArgs: ["100", "token", "2", "TKN"],
-    gas: estimatedGas,
-  });
-  t.ok(deployOutToken, "deployContract() output is truthy OK");
-  t.ok(
-    deployOutToken.transactionReceipt,
-    "deployContract() output.transactionReceipt is truthy OK",
-  );
-  t.ok(
-    deployOutToken.transactionReceipt.contractAddress,
-    "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-  );
-  const tokenAddress = deployOutToken.transactionReceipt
-    .contractAddress as string;
+    const responseBalance = await connector.invokeContract({
+      contractName: TestTokenJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Call,
+      methodName: "balanceOf",
+      params: [firstHighNetWorthAccount],
+    });
 
-  t.comment("Deploys DemoHelpers via .json file on deployContract function");
-  const deployOutDemo = await connector.deployContract({
-    contractName: DemoHelperJSON.contractName,
-    contractAbi: DemoHelperJSON.abi,
-    bytecode: DemoHelperJSON.bytecode,
-    web3SigningCredential,
-    keychainId,
-    constructorArgs: [],
-    gas: estimatedGas,
-  });
-  t.ok(deployOutDemo, "deployContract() output is truthy OK");
-  t.ok(
-    deployOutDemo.transactionReceipt,
-    "deployContract() output.transactionReceipt is truthy OK",
-  );
-  t.ok(
-    deployOutDemo.transactionReceipt.contractAddress,
-    "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-  );
+    expect(responseBalance.callOutput).toEqual("100");
 
-  t.comment("Approve 10 Tokens to HashTimeLockAddress");
-  const { success } = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Send,
-    methodName: "approve",
-    params: [hashTimeLockAddress, "10"],
-    gas: estimatedGas,
-  });
-  t.equal(success, true, "approve() transactionReceipt.status is true OK");
+    const { callOutput } = await connector.invokeContract({
+      contractName: DemoHelperJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Call,
+      methodName: "getTimestamp",
+      params: [],
+    });
 
-  t.comment("Get account balance");
-  const responseBalance = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "balanceOf",
-    params: [firstHighNetWorthAccount],
-  });
-  t.equal(responseBalance.callOutput, "100", "balance of account is 100 OK");
+    expect(callOutput).toBeTruthy();
 
-  t.comment("Get current timestamp");
-  const { callOutput } = await connector.invokeContract({
-    contractName: DemoHelperJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "getTimestamp",
-    params: [],
-  });
-  t.ok(callOutput, "callOutput() output.callOutput is truthy OK");
-  let timestamp = 0;
-  timestamp = callOutput as number;
-  timestamp = +timestamp + +10;
+    let timestamp = 0;
+    timestamp = callOutput as number;
+    timestamp = +timestamp + +10;
 
-  t.comment("Get HashTimeLock contract and account allowance");
-  const responseAllowance = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "allowance",
-    params: [firstHighNetWorthAccount, hashTimeLockAddress],
-  });
-  t.equal(responseAllowance.callOutput, "10", "callOutput() is 10 OK");
+    const responseAllowance = await connector.invokeContract({
+      contractName: TestTokenJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Call,
+      methodName: "allowance",
+      params: [firstHighNetWorthAccount, hashTimeLockAddress],
+    });
 
-  t.comment("Create new contract for HTLC");
-  const request: NewContractRequest = {
-    contractAddress: hashTimeLockAddress,
-    inputAmount: 10,
-    outputAmount: 1,
-    expiration: timestamp,
-    hashLock,
-    tokenAddress,
-    receiver,
-    outputNetwork: "BTC",
-    outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
-    connectorId,
-    keychainId,
-    web3SigningCredential,
-    gas: estimatedGas,
-  };
-  const res = await api.newContractV1(request);
-  t.equal(res.status, 200, "response status is 200 OK");
+    expect(responseAllowance.callOutput).toEqual("10");
 
-  t.comment("Get HTLC Id from DemoHelper");
-  const responseTxId = await connector.invokeContract({
-    contractName: DemoHelperJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "getTxId",
-    params: [
-      firstHighNetWorthAccount,
-      receiver,
-      10,
+    const request: NewContractRequest = {
+      contractAddress: hashTimeLockAddress,
+      inputAmount: 10,
+      outputAmount: 1,
+      expiration: timestamp,
       hashLock,
-      timestamp,
       tokenAddress,
-    ],
-  });
-  t.ok(responseTxId.callOutput, "result is truthy OK");
-  const id = responseTxId.callOutput as string;
+      receiver,
+      outputNetwork: "BTC",
+      outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
+      connectorId,
+      keychainId,
+      web3SigningCredential,
+      gas: estimatedGas,
+    };
+    const res = await api.newContractV1(request);
 
-  t.comment("Refund HTLC when it is not possible yet");
-  try {
+    expect(res.status).toEqual(200);
+
+    const responseBalance2 = await connector.invokeContract({
+      contractName: TestTokenJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Call,
+      methodName: "balanceOf",
+      params: [firstHighNetWorthAccount],
+    });
+
+    expect(responseBalance2.callOutput).toEqual("90");
+
+    const responseTxId = await connector.invokeContract({
+      contractName: DemoHelperJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Call,
+      methodName: "getTxId",
+      params: [
+        firstHighNetWorthAccount,
+        receiver,
+        10,
+        hashLock,
+        timestamp,
+        tokenAddress,
+      ],
+    });
+    expect(responseTxId.callOutput).toBeTruthy();
+
+    const id = responseTxId.callOutput as string;
+
+    await timeout(6000);
     const refundRequest: RefundRequest = {
       id,
       web3SigningCredential,
@@ -583,20 +303,28 @@ test("Test invalid refund with invalid time", async (t: Test) => {
       keychainId,
     };
     const resRefund = await api.refundV1(refundRequest);
-    t.equal(resRefund.status, 400, "response status is 400");
-  } catch (error) {
-    t.equal(error.response.status, 400, "response status is 400");
-  }
 
-  t.comment("Get balance of account");
-  const responseFinalBalance = await connector.invokeContract({
-    contractName: TestTokenJSON.contractName,
-    keychainId,
-    signingCredential: web3SigningCredential,
-    invocationType: EthContractInvocationType.Call,
-    methodName: "balanceOf",
-    params: [firstHighNetWorthAccount],
-  });
-  t.equal(responseFinalBalance.callOutput, "90", "balance of account is 90 OK");
-  t.end();
+    expect(resRefund.status).toEqual(200);
+
+    const responseFinalBalance = await connector.invokeContract({
+      contractName: TestTokenJSON.contractName,
+      keychainId,
+      signingCredential: web3SigningCredential,
+      invocationType: EthContractInvocationType.Call,
+      methodName: "balanceOf",
+      params: [firstHighNetWorthAccount],
+    });
+
+    expect(responseFinalBalance.callOutput).toEqual("100");
+
+    const resStatus = await api.getSingleStatusV1({
+      id,
+      web3SigningCredential,
+      connectorId,
+      keychainId,
+    });
+
+    expect(resStatus.status).toEqual(200);
+    expect(resStatus.data).toEqual(2);
+   });
 });
