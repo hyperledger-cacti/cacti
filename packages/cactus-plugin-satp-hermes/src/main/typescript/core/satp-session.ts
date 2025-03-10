@@ -224,6 +224,12 @@ export class SATPSession {
     return this.serverSessionData?.id || this.clientSessionData?.id || "";
   }
 
+  public getSessionState(): State {
+    console.log("serverSessionId: ", this.serverSessionData?.state);
+    console.log("clientSessionId: ", this.clientSessionData?.state);
+    return this.serverSessionData?.state || this.clientSessionData?.state || State.UNSPECIFIED;
+  }
+
   public verify(
     tag: string,
     type: SessionType,
