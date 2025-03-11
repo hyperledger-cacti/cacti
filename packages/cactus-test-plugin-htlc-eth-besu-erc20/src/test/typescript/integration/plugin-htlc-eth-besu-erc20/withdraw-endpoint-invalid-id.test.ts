@@ -237,20 +237,20 @@ describe(testCase, () => {
     const res = await api.newContractV1(request);
     expect(res.status).toEqual(200);
 
-    try {
-      const fakeId = "0x66616b654964";
-      const withdrawRequest: WithdrawRequest = {
-        id: fakeId,
-        secret,
-        web3SigningCredential,
-        connectorId,
-        keychainId,
-      };
-      const resWithdraw = await api.withdrawV1(withdrawRequest);
-      expect(resWithdraw.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
-    }
+    const fakeId = "0x66616b654964";
+    const withdrawRequest: WithdrawRequest = {
+      id: fakeId,
+      secret,
+      web3SigningCredential,
+      connectorId,
+      keychainId,
+    };
+
+    await expect(api.withdrawV1(withdrawRequest)).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 400,
+      }),
+    });
 
     const responseFinalBalance = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,

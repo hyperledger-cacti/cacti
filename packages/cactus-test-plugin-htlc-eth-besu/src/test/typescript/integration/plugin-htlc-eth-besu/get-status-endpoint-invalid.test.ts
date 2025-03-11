@@ -197,17 +197,19 @@ describe(testCase, () => {
 
     expect(parseInt(balance)).toEqual(parseInt(balance2) - 10);
 
-    try {
-      const ids = [responseTxId.callOutput as string];
-      const res = await api.getStatusV1({
+    const ids = [responseTxId.callOutput as string];
+
+    await expect(
+      api.getStatusV1({
         ids,
         web3SigningCredential,
         connectorId,
         keychainId: "",
-      });
-      expect(res.status).toEqual(500);
-    } catch (e: any) {
-      expect(e.response.status).toEqual(500);
-    }
+      }),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 500,
+      }),
+    });
   });
 });
