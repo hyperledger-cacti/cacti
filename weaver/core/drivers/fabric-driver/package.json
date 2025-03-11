@@ -1,13 +1,28 @@
 {
   "name": "@hyperledger/cacti-weaver-driver-fabric",
   "version": "2.1.0",
-  "description": "",
+  "description": "Driver Server for communication with a Fabric Network as part of weaver data sharing protocol",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
   "main": "out/server.js",
   "scripts": {
     "build": "npm run tsc",
@@ -39,5 +54,8 @@
   "engines": {
     "node": ">=18",
     "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
