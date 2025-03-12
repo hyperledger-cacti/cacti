@@ -9458,7 +9458,7 @@ __metadata:
     "@types/node": "npm:18.11.9"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
-    elliptic: "npm:6.6.0"
+    elliptic: "npm:6.6.1"
     fabric-common: "npm:2.2.20"
     fabric-network: "npm:2.2.20"
     fabric-protos: "npm:2.2.20"
@@ -9907,7 +9907,7 @@ __metadata:
     body-parser: "npm:1.20.3"
     cookie-parser: "npm:1.4.6"
     debug: "npm:3.1.0"
-    elliptic: "npm:6.6.0"
+    elliptic: "npm:6.6.1"
     escape-html: "npm:1.0.3"
     ethereumjs-common: "npm:1.5.2"
     ethereumjs-tx: "npm:2.1.2"
@@ -10577,7 +10577,7 @@ __metadata:
     bl: "npm:6.0.17"
     bn.js: "npm:4.12.0"
     body-parser: "npm:1.20.3"
-    elliptic: "npm:6.6.0"
+    elliptic: "npm:6.6.1"
     express: "npm:4.21.2"
     fabric-ca-client: "npm:2.5.0-snapshot.23"
     fabric-common: "npm:2.5.0-snapshot.23"
@@ -11067,7 +11067,7 @@ __metadata:
     axios: "npm:1.7.9"
     compare-versions: "npm:3.6.0"
     dockerode: "npm:3.3.0"
-    elliptic: "npm:6.6.0"
+    elliptic: "npm:6.6.1"
     esm: "npm:3.2.25"
     execa: "npm:5.1.1"
     fabric-ca-client: "npm:2.5.0-snapshot.23"
@@ -26808,9 +26808,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elliptic@npm:>=6.5.7":
-  version: 6.5.7
-  resolution: "elliptic@npm:6.5.7"
+"elliptic@npm:>=6.6.1":
+  version: 6.6.1
+  resolution: "elliptic@npm:6.6.1"
   dependencies:
     bn.js: "npm:^4.11.9"
     brorand: "npm:^1.1.0"
@@ -26819,7 +26819,7 @@ __metadata:
     inherits: "npm:^2.0.4"
     minimalistic-assert: "npm:^1.0.1"
     minimalistic-crypto-utils: "npm:^1.0.1"
-  checksum: 10/fbad1fad0a5cc07df83f80cc1f7a784247ef59075194d3e340eaeb2f4dd594825ee24c7e9b0cf279c9f1982efe610503bb3139737926428c4821d4fca1bcf348
+  checksum: 10/dc678c9febd89a219c4008ba3a9abb82237be853d9fd171cd602c8fb5ec39927e65c6b5e7a1b2a4ea82ee8e0ded72275e7932bb2da04a5790c2638b818e4e1c5
   languageName: node
   linkType: hard
 
