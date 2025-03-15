@@ -61,7 +61,7 @@
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
-    "bl": "6.0.17",
+    "bl": "6.1.0",
     "bn.js": "4.12.0",
     "elliptic": "6.6.1",
     "express": "4.21.2",
