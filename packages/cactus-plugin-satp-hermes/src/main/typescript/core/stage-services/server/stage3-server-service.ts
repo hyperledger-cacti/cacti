@@ -692,6 +692,11 @@ export class Stage3ServerService extends SATPService {
         assetId,
         Number(amount),
       );
+
+      this.Log.debug(
+        `${fnTag}, Mint Operation Receipt: ${sessionData.mintAssertionClaim.receipt}`,
+      );
+
       sessionData.mintAssertionClaim.proof = await bridge.getProof(assetId);
       sessionData.mintAssertionClaimFormat = create(
         MintAssertionClaimFormatSchema,
@@ -781,6 +786,11 @@ export class Stage3ServerService extends SATPService {
         recipient,
         Number(amount),
       );
+
+      this.Log.debug(
+        `${fnTag}, Assign Operation Receipt: ${sessionData.assignmentAssertionClaim.receipt}`,
+      );
+
       sessionData.assignmentAssertionClaim.proof =
         await bridge.getProof(assetId);
       sessionData.assignmentAssertionClaimFormat = create(
