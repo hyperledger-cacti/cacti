@@ -1,4 +1,6 @@
 name: SATP CI - tests and docker deployments
+env:
+  NODEJS_VERSION: v18.19.0
 on:
   pull_request:
     branches: [main, satp-dev]
