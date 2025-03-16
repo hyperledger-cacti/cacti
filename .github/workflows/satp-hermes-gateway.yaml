@@ -1,50 +1,86 @@
-name: SATP CI - tests and docker deployments
+# SATP-Hermes Gateway tests and docker deployments
+name: SATP-Hermes Gateway
+env:
+  NODEJS_VERSION: v18.19.0
 on:
   pull_request:
     branches: [main, satp-dev]
   push:
     branches: [main, satp-dev]
-
 jobs:
-  run-satp-tests:
+  build-dev-satp:
+    runs-on: ubuntu-22.04
     continue-on-error: false
     env:
+      NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-22.04
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.1
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4.1.7
+
       - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v4.0.1
+        name: Initialize Yarn Cache
+        uses: actions/cache@v3
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-
+
+      - if: steps.yarn-cache.outputs.cache-hit != 'true'
+        name: Run CI script
+        run: ./tools/ci.sh
+
+  run-satp-tests:
+    needs: build-dev-satp
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.19.0
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_ENABLE_OPEN_API: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
       - run: ./tools/ci.sh
 
   set-docker-tags:
-    runs-on: ubuntu-22.04
-    needs: run-satp-tests
+    needs: run-satp-tests 
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
+    runs-on: ubuntu-22.04
     outputs:
       tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
       tag_version: ${{ steps.set_tags.outputs.tag_version }}
       dockerhub_image: ${{ steps.set_tags.outputs.dockerhub_image }}
       ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4.1.7  
+      - name: Debug Build Info
+        run: |
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
+          echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
+          echo "Debug: Building for dockerhub image = ${{ needs.set-docker-tags.outputs.dockerhub_image }}"
+          echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+          echo "Debug: Package version = ${PACKAGE_VERSION}"
+          echo "Debug: Commit hash = $(git rev-parse --short HEAD)"
       - name: Set image tags
         id: set_tags
         run: |
@@ -52,28 +88,63 @@ jobs:
           TAG_VERSION="$(date -u +"%Y-%m-%dT%H-%M-%S")-${TAG_SUFFIX}-$(git rev-parse --short HEAD)"
           DOCKERHUB_IMAGE="hyperledger/satp-hermes-gateway"
           GHCR_IMAGE="ghcr.io/hyperledger-cacti/satp-hermes-gateway"
+          
+          echo "Debug: Setting tag suffix = ${TAG_SUFFIX}"
+          echo "Debug: Setting tag version = ${TAG_VERSION}"
+          echo "Debug: Setting dockerhub image = ${DOCKERHUB_IMAGE}"
+          echo "Debug: Setting ghcr image = ${GHCR_IMAGE}"
+          
           echo "tag_suffix=${TAG_SUFFIX}" >> $GITHUB_OUTPUT
           echo "tag_version=${TAG_VERSION}" >> $GITHUB_OUTPUT
           echo "dockerhub_image=${DOCKERHUB_IMAGE}" >> $GITHUB_OUTPUT
           echo "ghcr_image=${GHCR_IMAGE}" >> $GITHUB_OUTPUT
-
   build-and-push-dockerhub:
-    runs-on: ubuntu-22.04
     needs: set-docker-tags
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.19.0
     steps:
       - uses: actions/checkout@v4.1.7
+      - name: Debug Build Info
+        run: |
+          echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
+          echo "Debug: Building for dockerhub image = ${{ needs.set-docker-tags.outputs.dockerhub_image }}"
+          echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+          echo "Debug: Working directory content:"
+          ls -la
+          echo "Debug: SATP plugin directory content:"
+          ls -la packages/cactus-plugin-satp-hermes/ || echo "Plugin directory not found"
+          
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+          
       - name: Configure and build bundle
         run: |
+          echo "Debug: Starting bundle configuration and build"
           yarn configure
+          echo "Debug: Yarn configure completed"
           yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+          echo "Debug: Bundle build completed"
+          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        
+      - name: Debug Docker Info
+        run: |
+          echo "Debug: Docker version:"
+          docker version
+          echo "Debug: Docker info:"
+          docker info
+          
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
+          
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -92,23 +163,53 @@ jobs:
             ${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest
 
   build-and-push-ghcr:
-    runs-on: ubuntu-22.04
     needs: set-docker-tags
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.19.0
     steps:
       - uses: actions/checkout@v4.1.7
+      - name: Debug Build Info
+        run: |
+          echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
+          echo "Debug: Building for GHCR image = ${{ needs.set-docker-tags.outputs.ghcr_image }}"
+          echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+          echo "Debug: Working directory content:"
+          ls -la
+          echo "Debug: SATP plugin directory content:"
+          ls -la packages/cactus-plugin-satp-hermes/ || echo "Plugin directory not found"
+          
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+          
       - name: Configure and build bundle
         run: |
+          echo "Debug: Starting bundle configuration and build"
           yarn configure
+          echo "Debug: Yarn configure completed"
           yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+          echo "Debug: Bundle build completed"
+          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        
+      - name: Debug Docker Info
+        run: |
+          echo "Debug: Docker version:"
+          docker version
+          echo "Debug: Docker info:"
+          docker info
+          
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
+          
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
