@@ -64,7 +64,7 @@ export function formatCactiFullBlockResponse(
       JSON.stringify(blockEvent),
     );
   }
-  const blockNumber = header ? fabricLongToNumber(header.number) : -1;
+  const blockNumber = header ? Number(header.number) : -1;
   const blockHash =
     "0x" + Buffer.from(blockEvent.header?.data_hash ?? "").toString("hex");
   const previousBlockHash =
