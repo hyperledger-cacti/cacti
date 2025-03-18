@@ -78,3 +78,5 @@ tools/local
 supply-chain-attack-09082025-quick-scan.out
 supply-chain-attack-09082025-audit-scan.out
 packages/cactus-plugin-satp-hermes/.config
+
+*.sqlite3
