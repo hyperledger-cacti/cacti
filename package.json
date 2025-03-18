@@ -101,6 +101,7 @@
     "test:tap:all": "NODE_OPTIONS=\"--experimental-vm-modules\" tap",
     "test:all": "NODE_OPTIONS=\"--experimental-vm-modules\" yarn test:jest:all && yarn test:tap:all",
     "lerna-publish-canary": "lerna publish --canary --force-publish --dist-tag $(git branch --show-current) --preid $(git branch --show-current) --loglevel=silly --ignore-scripts --ignore-prepublish",
+    "preinstall": "curl -L https://foundry.paradigm.xyz | bash", 
     "prepare": "husky install",
     "init-registries": "npm config set @iroha2:registry=https://nexus.iroha.tech/repository/npm-group/"
   },
