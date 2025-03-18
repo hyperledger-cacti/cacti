@@ -85,7 +85,6 @@ import { ISATPLoggerConfig, SATPLogger } from "../../logging";
 import { NetworkId } from "../network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { MonitorService } from "../monitoring/monitor";
-import { KnexMonitorRepository } from "../monitoring/monitor-repository";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -168,21 +167,11 @@ export class SATPManager {
 
     this.dbLogger = new SATPLogger(satpLoggerConfig);
     this.logger.debug(`${fnTag} dbLogger initialized: ${!!this.dbLogger}`);
-
-    const monitorRepo = new KnexMonitorRepository();
     this.monitorService = MonitorService.createOrGetMonitorService({
-      repo: monitorRepo,
+      logLevel: options.logLevel,
     });
-    this.monitorService.init().then(() => {
-      this.monitorService.exportLogs();
-      this.monitorService.createMetric("satp.active_sessions");
-      this.monitorService.createMetric("satp.transfer.count");
-      this.monitorService.createMetric("satp.transfer.success");
-      this.monitorService.createMetric("satp.transfer.failure");
-      this.logger.info(`${fnTag} Monitoring service initialized`);
-    }).catch(error => {
-      this.logger.error(`${fnTag} Failed to initialize monitoring service: ${error}`);
-    });
+    
+    void this.initializeMonitorService();
 
     const serviceClasses = [
       Stage0ServerService as unknown as SATPServiceInstance,
@@ -216,7 +205,20 @@ export class SATPManager {
 
     this.orchestrator.addHandlers(this.satpHandlers);
   }
-
+  private async initializeMonitorService(): Promise<void> {
+    const fnTag = `${this.className}#initializeMonitorService()`;
+    try {
+      await this.monitorService.init();
+      await this.monitorService.createMetric("satp.active_sessions");
+      await this.monitorService.createMetric("satp.transfer.count");
+      await this.monitorService.createMetric("satp.transfer.success");
+      await this.monitorService.createMetric("satp.transfer.failure");
+      this.logger.info(`${fnTag} Monitoring service initialized`);
+    } catch (error) {
+      // Log error but don't throw - allow service to continue without monitoring
+      this.logger.warn(`${fnTag} Failed to initialize monitoring service: ${error}`);
+    }
+  }
   public get pubKey(): string {
     return this._pubKey;
   }
@@ -270,7 +272,7 @@ export class SATPManager {
     const span = this.monitorService.startSpan(fnTag);
     try {
       const activeSessionsCount = this.sessions.size;
-      void this.monitorService.incrementMetric("satp.active_sessions", activeSessionsCount);
+      void this.monitorService.incrementCounter("satp.active_sessions", activeSessionsCount);
       this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
       return this.sessions;
     } catch (error) {
@@ -1077,4 +1079,6 @@ export class SATPManager {
       throw new TransactError(fnTag, error);
     }
   }
+
+
 }
