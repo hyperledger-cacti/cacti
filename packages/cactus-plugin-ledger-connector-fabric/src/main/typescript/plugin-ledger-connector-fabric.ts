@@ -1708,7 +1708,7 @@ export class PluginLedgerConnectorFabric
     }
 
     return {
-      height: fabricLongToNumber(decodedResponse.height),
+      height: Number(decodedResponse.height),
       currentBlockHash:
         "0x" + Buffer.from(decodedResponse.currentBlockHash).toString("hex"),
       previousBlockHash:
