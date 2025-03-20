@@ -81,7 +81,7 @@
     "body-parser": "1.20.3",
     "express": "4.21.2",
     "fabric-network": "2.2.20",
-    "kubo-rpc-client": "3.0.1",
+    "kubo-rpc-client": "3.0.4",
     "typescript": "5.5.2"
   },
   "engines": {
