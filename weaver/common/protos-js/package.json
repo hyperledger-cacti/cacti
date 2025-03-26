@@ -3,9 +3,10 @@
   "version": "2.1.0",
   "description": "Interop protos for Node JS (Weaver)",
   "keywords": [
-    "hyperledger",
-    "blockchain",
-    "interoperability",
+    "Hyperledger",
+    "Cacti",
+    "Blockchain",
+    "Interoperability",
     "weaver",
     "protos",
     "nodejs",
@@ -20,7 +21,21 @@
     "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
-  "author": "Sandeep Nishad",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Sandeep Nishad"
+    }
+  ],
   "exports": {
     "./common/*": "./common/*.js",
     "./corda/*": "./corda/*.js",
@@ -51,6 +66,7 @@
     "npm": ">=8"
   },
   "publishConfig": {
+    "access": "public",
     "registry": "https://npm.pkg.github.com/hyperledger-cacti"
   },
   "licenses": [

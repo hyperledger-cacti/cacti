@@ -1,13 +1,28 @@
 {
   "name": "@hyperledger/cacti-weaver-iin-agent",
   "version": "2.1.0",
-  "description": "",
+  "description": "Implementation of weaver IIN agent.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
   "main": "index.js",
   "scripts": {
     "build": "npm run tsc",
@@ -49,5 +64,8 @@
   "engines": {
     "node": ">=18",
     "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

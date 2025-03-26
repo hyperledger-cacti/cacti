@@ -2,12 +2,27 @@
   "name": "@hyperledger/cacti-weaver-sdk-besu",
   "version": "2.1.0",
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
   "main": "index.js",
   "scripts": {
     "build": "tsc",
