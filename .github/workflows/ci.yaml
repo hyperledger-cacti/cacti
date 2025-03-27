@@ -1967,7 +1967,7 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts,./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts}'
+      TAPE_TEST_PATTERN: '--files={./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts}'
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
