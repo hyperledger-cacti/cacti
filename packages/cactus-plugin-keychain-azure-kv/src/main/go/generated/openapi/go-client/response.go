@@ -1,5 +1,5 @@
 /*
-Hyperledger Cactus - Keychain API
+Hyperledger Cacti - Keychain API for Azure Key Vault
 
 Contains/describes the Keychain API types/paths for Hyperledger Cactus.
 

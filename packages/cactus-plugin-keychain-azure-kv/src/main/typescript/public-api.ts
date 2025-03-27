@@ -16,3 +16,9 @@ export async function createPluginFactory(
 ): Promise<PluginFactoryKeychain> {
   return new PluginFactoryKeychain(pluginFactoryOptions);
 }
+
+export { IRefreshTokenCredentialOptions } from "./credentials/refresh-token-credential";
+export { RefreshTokenCredential } from "./credentials/refresh-token-credential";
+
+export { AccessTokenCredential } from "./credentials/access-token-credential";
+export { IAccessTokenCredentialOptions } from "./credentials/access-token-credential";

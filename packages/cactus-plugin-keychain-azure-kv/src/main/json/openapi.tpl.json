@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Hyperledger Cactus - Keychain API",
+    "title": "Hyperledger Cacti - Keychain API for Azure Key Vault",
     "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
     "version": "2.1.0",
     "license": {
