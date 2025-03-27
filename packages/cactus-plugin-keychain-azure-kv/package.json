@@ -61,8 +61,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@azure/identity": "4.2.1",
-    "@azure/keyvault-secrets": "4.3.0",
+    "@azure/identity": "4.8.0",
+    "@azure/keyvault-secrets": "4.9.0",
+    "@azure/msal-node": "3.4.1",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
@@ -71,6 +72,7 @@
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
+    "@azure/core-auth": "1.9.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.0",

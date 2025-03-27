@@ -1,4 +1,9 @@
 import type { Express } from "express";
+import {
+  UsernamePasswordCredential,
+  DefaultAzureCredential,
+} from "@azure/identity";
+import { KeyVaultSecret, SecretClient } from "@azure/keyvault-secrets";
 
 import OAS from "../json/openapi.json";
 
@@ -19,19 +24,36 @@ import {
 import { SetKeychainEntryEndpoint } from "./web-services/set-keychain-entry-endpoint";
 import { GetKeychainEntryEndpoint } from "./web-services/get-keychain-entry-endpoint";
 import { DeleteKeychainEntryEndpoint } from "./web-services/delete-keychain-entry-endpoint";
-
-import { KeyVaultSecret, SecretClient } from "@azure/keyvault-secrets";
-import {
-  UsernamePasswordCredential,
-  DefaultAzureCredential,
-} from "@azure/identity";
 import { HasKeychainEntryEndpoint } from "./web-services/has-keychain-entry-endpoint";
+import {
+  AccessTokenCredential,
+  IAccessTokenCredentialOptions,
+} from "./credentials/access-token-credential";
+import {
+  IRefreshTokenCredentialOptions,
+  RefreshTokenCredential,
+} from "./credentials/refresh-token-credential";
 
 // TODO: Writing the getExpressRequestHandler() method for
 
 export enum AzureCredentialType {
   LocalFile = "LOCAL_FILE",
+  /**
+   * Enables authentication to Microsoft Entra ID with a user's username and password.
+   * This credential requires a high degree of trust so you should only use it
+   * when other, more secure credential types can't be used.
+   * @deprecated — UsernamePasswordCredential is deprecated.
+   * Use a more secure credential. See https://aka.ms/azsdk/identity/mfa for details.
+   */
   InMemory = "IN_MEMORY",
+  /**
+   * @see {@link AccessTokenCredential}
+   */
+  AccessToken = "ACCESS_TOKEN",
+  /**
+   * @see {@link RefreshTokenCredential}
+   */
+  RefreshToken = "REFRESH_TOKEN",
 }
 
 export interface IAzureInMemoryCredentials {
@@ -48,6 +70,8 @@ export interface IPluginKeychainAzureKvOptions extends ICactusPluginOptions {
   azureEndpoint: string;
   azureCredentialType?: AzureCredentialType;
   azureInMemoryCredentials?: IAzureInMemoryCredentials;
+  refreshTokenCredentials?: IRefreshTokenCredentialOptions;
+  accessTokenCredentials?: IAccessTokenCredentialOptions;
   backend?: SecretClient;
 }
 
@@ -106,10 +130,10 @@ export class PluginKeychainAzureKv
     if (opts.backend) {
       this.azureKvClient = opts.backend;
     } else if (
-      !opts.backend &&
       opts.azureCredentialType == AzureCredentialType.InMemory &&
       opts.azureInMemoryCredentials
     ) {
+      this.log.warn("Do not use AzureCredentialType.InMemory in production.");
       const azureCredentials = new UsernamePasswordCredential(
         opts.azureInMemoryCredentials.azureTenantId,
         opts.azureInMemoryCredentials.azureClientId,
@@ -117,7 +141,28 @@ export class PluginKeychainAzureKv
         opts.azureInMemoryCredentials.azurePassword,
       );
       this.azureKvClient = new SecretClient(this.vaultUrl, azureCredentials);
+    } else if (
+      opts.azureCredentialType === AzureCredentialType.AccessToken &&
+      opts.accessTokenCredentials
+    ) {
+      this.log.debug("Using AccessTokenCredential type Azure KV SecretClient");
+      const credential = new AccessTokenCredential({
+        ...opts.accessTokenCredentials,
+        logLevel: opts.logLevel,
+      });
+      this.azureKvClient = new SecretClient(this.vaultUrl, credential);
+    } else if (
+      opts.azureCredentialType === AzureCredentialType.RefreshToken &&
+      opts.refreshTokenCredentials
+    ) {
+      this.log.debug("Using RefreshTokenCredential type Azure KV SecretClient");
+      const credential = new RefreshTokenCredential({
+        ...opts.refreshTokenCredentials,
+        logLevel: opts.logLevel,
+      });
+      this.azureKvClient = new SecretClient(this.vaultUrl, credential);
     } else {
+      this.log.debug("Credentials: falling back to DefaultAzureCredential");
       const azureCredentials = new DefaultAzureCredential();
       this.azureKvClient = new SecretClient(this.vaultUrl, azureCredentials);
     }
@@ -157,31 +202,13 @@ export class PluginKeychainAzureKv
         logLevel: this.opts.logLevel,
       }),
     ];
-
-    // TODO: Writing the getExpressRequestHandler() method for
-    // GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1
-
-    // {
-    //   const ep = new GetKeychainEntryEndpointV1({
-    //     logLevel: this.opts.logLevel,
-    //   });
-    //   ep.registerExpress(expressApp);
-    //   endpoints.push(ep);
-    // }
-    // {
-    //   const ep = new SetKeychainEntryEndpointV1({
-    //     logLevel: this.opts.logLevel,
-    //   });
-    //   ep.registerExpress(expressApp);
-    //   endpoints.push(ep);
-    // }
     this.endpoints = endpoints;
 
     return endpoints;
   }
 
   public async shutdown(): Promise<void> {
-    throw new Error("Method not implemented.");
+    return;
   }
 
   public getInstanceId(): string {

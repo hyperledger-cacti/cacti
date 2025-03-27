@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Hyperledger Cactus - Keychain API
+ * Hyperledger Cacti - Keychain API for Azure Key Vault
  * Contains/describes the Keychain API types/paths for Hyperledger Cactus.
  *
  * The version of the OpenAPI document: 2.1.0
