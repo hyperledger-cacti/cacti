@@ -26,7 +26,6 @@ files:
   - ./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts
   - ./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts
   - ./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
-  - ./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts
