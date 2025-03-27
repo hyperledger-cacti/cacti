@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Hyperledger Cactus Plugin - Connector Besu
- * Can perform basic tasks on a Besu ledger
+ * Hyperledger Cacti Plugin - Besu Connector
+ * Can perform basic tasks on a Besu ledger such as executing transactions, streaming blocks or solidity smart contract events.
  *
  * The version of the OpenAPI document: 2.1.0
  * 
@@ -1070,6 +1070,98 @@ export interface SolidityContractJsonArtifactGasEstimatesCreation {
 /**
  * 
  * @export
+ * @interface ViemV2242EventLog
+ */
+export interface ViemV2242EventLog {
+    /**
+     * The address of the contract that emitted the log. Contains a 0x prefix.
+     * @type {string}
+     * @memberof ViemV2242EventLog
+     */
+    'address': string;
+    /**
+     * The arguments provided to the Solidity event\'s constructor at the time of the emission of the event. Note that BigInt values within this object will get serialized into strings during transport because JSON cannot handle BigInts natively.
+     * @type {object}
+     * @memberof ViemV2242EventLog
+     */
+    'args': object;
+    /**
+     * The block hash as a 0x prefixed HEX string.
+     * @type {string}
+     * @memberof ViemV2242EventLog
+     */
+    'blockHash': string;
+    /**
+     * The block number. Originally provided as a BigInt by the underlying implementation but serialized to a string to avoid data integrity issues during transport since JSON can only handle the old Javascript number type and nothing bigger than that.
+     * @type {string}
+     * @memberof ViemV2242EventLog
+     */
+    'blockNumber': string;
+    /**
+     * The log data as a 0x prefixed HEX string.
+     * @type {string}
+     * @memberof ViemV2242EventLog
+     */
+    'data': string;
+    /**
+     * The case-sensitive name of the Solidity event type that was emitted on-chain.
+     * @type {string}
+     * @memberof ViemV2242EventLog
+     */
+    'eventName': string;
+    /**
+     * The log index within the block.
+     * @type {number}
+     * @memberof ViemV2242EventLog
+     */
+    'logIndex': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ViemV2242EventLog
+     */
+    'removed': boolean;
+    /**
+     * An array of log topics represented as 0x prefixed HEX strings.
+     * @type {Array<string>}
+     * @memberof ViemV2242EventLog
+     */
+    'topics': Array<string>;
+    /**
+     * The 0x prefixed transaction hash HEX string.
+     * @type {string}
+     * @memberof ViemV2242EventLog
+     */
+    'transactionHash': string;
+    /**
+     * The transaction index within the block.
+     * @type {number}
+     * @memberof ViemV2242EventLog
+     */
+    'transactionIndex': number;
+}
+/**
+ * The event log as provided by the Web3 v1.6.1 library.
+ * @export
+ * @interface ViemV2242WatchEventsV1Progress
+ */
+export interface ViemV2242WatchEventsV1Progress {
+    /**
+     * A unique identifier for the request that originated this event.
+     * @type {string}
+     * @memberof ViemV2242WatchEventsV1Progress
+     */
+    'requestId': string;
+    /**
+     * 
+     * @type {Array<ViemV2242EventLog>}
+     * @memberof ViemV2242WatchEventsV1Progress
+     */
+    'logs'?: Array<ViemV2242EventLog>;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -1112,6 +1204,66 @@ export interface WatchBlocksV1Request {
 }
 
 
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const WatchEventsV1 = {
+    Subscribe: 'org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Subscribe',
+    Next: 'org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Next',
+    Unsubscribe: 'org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Unsubscribe',
+    Error: 'org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Error',
+    Complete: 'org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Complete'
+} as const;
+
+export type WatchEventsV1 = typeof WatchEventsV1[keyof typeof WatchEventsV1];
+
+
+/**
+ * 
+ * @export
+ * @interface WatchEventsV1Request
+ */
+export interface WatchEventsV1Request {
+    /**
+     * A unique identifier for this request.
+     * @type {string}
+     * @memberof WatchEventsV1Request
+     */
+    'requestId': string;
+    /**
+     * 
+     * @type {Array<object>}
+     * @memberof WatchEventsV1Request
+     */
+    'abi': Array<object>;
+    /**
+     * Timeout for socket acknowledgment in milliseconds.
+     * @type {number}
+     * @memberof WatchEventsV1Request
+     */
+    'socketAckTimeoutMs'?: number;
+    /**
+     * Address of the contract to watch for events.
+     * @type {string}
+     * @memberof WatchEventsV1Request
+     */
+    'address'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WatchEventsV1Request
+     */
+    'eventName'?: string;
+    /**
+     * The number of the block from which to start watching the events.
+     * @type {string}
+     * @memberof WatchEventsV1Request
+     */
+    'fromBlock'?: string;
+}
 /**
  * 
  * @export

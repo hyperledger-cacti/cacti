@@ -1,10 +1,11 @@
 openapi: 3.0.3
 info:
-  description: Can perform basic tasks on a Besu ledger
+  description: "Can perform basic tasks on a Besu ledger such as executing transactions,\
+    \ streaming blocks or solidity smart contract events."
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  title: Hyperledger Cactus Plugin - Connector Besu
+  title: Hyperledger Cacti Plugin - Besu Connector
   version: 2.1.0
 servers:
 - url: /
@@ -629,6 +630,127 @@ components:
           $ref: '#/components/schemas/WatchBlocksV1'
       required:
       - event
+      type: object
+    WatchEventsV1:
+      enum:
+      - org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Subscribe
+      - org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Next
+      - org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Unsubscribe
+      - org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Error
+      - org.lfdecentralizedtrust.cacti.api.async.besu.WatchEventsV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchEventsV1Request:
+      properties:
+        requestId:
+          description: A unique identifier for this request.
+          format: uuid
+          type: string
+        abi:
+          items:
+            type: object
+          type: array
+        socketAckTimeoutMs:
+          default: 30000
+          description: Timeout for socket acknowledgment in milliseconds.
+          type: integer
+        address:
+          description: Address of the contract to watch for events.
+          type: string
+        eventName:
+          type: string
+        fromBlock:
+          description: The number of the block from which to start watching the events.
+          format: int64
+          type: string
+      required:
+      - abi
+      - requestId
+      type: object
+    ViemV2_24_2_WatchEventsV1Progress:
+      description: The event log as provided by the Web3 v1.6.1 library.
+      properties:
+        requestId:
+          description: A unique identifier for the request that originated this event.
+          format: uuid
+          type: string
+        logs:
+          items:
+            $ref: '#/components/schemas/ViemV2_24_2_EventLog'
+          type: array
+      required:
+      - eventLog
+      - requestId
+      type: object
+    ViemV2_24_2_EventLog:
+      properties:
+        address:
+          description: The address of the contract that emitted the log. Contains
+            a 0x prefix.
+          type: string
+        args:
+          description: The arguments provided to the Solidity event's constructor
+            at the time of the emission of the event. Note that BigInt values within
+            this object will get serialized into strings during transport because
+            JSON cannot handle BigInts natively.
+          nullable: false
+          type: object
+        blockHash:
+          description: The block hash as a 0x prefixed HEX string.
+          nullable: false
+          type: string
+        blockNumber:
+          description: The block number. Originally provided as a BigInt by the underlying
+            implementation but serialized to a string to avoid data integrity issues
+            during transport since JSON can only handle the old Javascript number
+            type and nothing bigger than that.
+          nullable: false
+          type: string
+        data:
+          description: The log data as a 0x prefixed HEX string.
+          type: string
+        eventName:
+          description: The case-sensitive name of the Solidity event type that was
+            emitted on-chain.
+          nullable: false
+          type: string
+        logIndex:
+          description: The log index within the block.
+          format: int32
+          type: integer
+        removed:
+          type: boolean
+        topics:
+          description: An array of log topics represented as 0x prefixed HEX strings.
+          items:
+            nullable: false
+            type: string
+          nullable: false
+          type: array
+        transactionHash:
+          description: The 0x prefixed transaction hash HEX string.
+          type: string
+        transactionIndex:
+          description: The transaction index within the block.
+          format: int32
+          type: integer
+      required:
+      - address
+      - args
+      - blockHash
+      - blockNumber
+      - data
+      - eventName
+      - logIndex
+      - removed
+      - topics
+      - transactionHash
+      - transactionIndex
       type: object
     Web3BlockHeader:
       properties:

@@ -1,26 +1,23 @@
+import type { Express } from "express";
+import { RuntimeError } from "run-time-error-cjs";
+import { ReplaySubject, Observable } from "rxjs";
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
-import type { Express } from "express";
 import { Optional } from "typescript-optional";
-
-import OAS from "../json/openapi.json";
-
+import {
+  createPublicClient,
+  webSocket,
+  defineChain,
+  WebSocketTransportConfig,
+} from "viem";
+import { PublicClient as ViemPublicClient } from "viem";
+import { WebSocketTransport as ViemWebSocketTransport } from "viem";
 import Web3 from "web3";
-
+import { AbiItem } from "web3-utils";
 import type { WebsocketProvider } from "web3-core";
 import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
-
 import { Contract, ContractSendMethod } from "web3-eth-contract";
-import {
-  GetBalanceV1Request,
-  GetBalanceV1Response,
-  DeployContractSolidityBytecodeNoKeychainV1Request,
-} from "./generated/openapi/typescript-axios/index";
 
-import {
-  GetPastLogsV1Request,
-  GetPastLogsV1Response,
-} from "./generated/openapi/typescript-axios/index";
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -51,6 +48,19 @@ import {
 
 import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
 import { DeployContractSolidityBytecodeNoKeychainEndpoint } from "./web-services/deploy-contract-solidity-bytecode-no-keychain-endpoint";
+
+import {
+  GetBalanceV1Request,
+  GetBalanceV1Response,
+  DeployContractSolidityBytecodeNoKeychainV1Request,
+  WatchEventsV1,
+  WatchEventsV1Request,
+} from "./generated/openapi/typescript-axios/index";
+
+import {
+  GetPastLogsV1Request,
+  GetPastLogsV1Response,
+} from "./generated/openapi/typescript-axios/index";
 
 import {
   WatchBlocksV1,
@@ -84,14 +94,12 @@ import {
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
-import { RuntimeError } from "run-time-error-cjs";
 import { GetBalanceEndpoint } from "./web-services/get-balance-endpoint";
 import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint";
 import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint";
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-";
 import { GetBesuRecordEndpointV1 } from "./web-services/get-besu-record-endpoint-v1";
-import { AbiItem } from "web3-utils";
 import {
   GetOpenApiSpecV1Endpoint,
   IGetOpenApiSpecV1EndpointOptions,
@@ -104,7 +112,8 @@ import { getBlockV1Http } from "./impl/get-block-v1/get-block-v1-http";
 import { transactV1Impl } from "./impl/transact-v1/transact-v1-impl";
 import { deployContractV1Keychain } from "./impl/deploy-contract-v1/deploy-contract-v1-keychain";
 import { deployContractV1NoKeychain } from "./impl/deploy-contract-v1/deploy-contract-v1-no-keychain";
-import { ReplaySubject, Observable } from "rxjs";
+import { WatchEventsV1Endpoint } from "./web-services/watch-events-v1-endpoint";
+import OAS from "../json/openapi.json";
 
 export interface IRunTransactionV1Exchange {
   request: InvokeContractV1Request;
@@ -116,10 +125,13 @@ export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
 export interface IPluginLedgerConnectorBesuOptions
   extends ICactusPluginOptions {
+  networkId?: number;
+
   rpcApiHttpHost: string;
   rpcApiWsHost: string;
   pluginRegistry: PluginRegistry;
   prometheusExporter?: PrometheusExporter;
+  viemWebSocketTransportConfig?: Record<string, unknown>;
   logLevel?: LogLevelDesc;
 }
 
@@ -141,6 +153,9 @@ export class PluginLedgerConnectorBesu
   private readonly logLevel: LogLevelDesc;
   private readonly web3Provider: WebsocketProvider;
   private readonly web3: Web3;
+  private readonly viemClient: ViemPublicClient;
+  private readonly viemTransport: ViemWebSocketTransport;
+  private readonly viemWebSocketTransportConfig: Partial<WebSocketTransportConfig>;
   private web3Quorum: IWeb3Quorum | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
@@ -165,6 +180,8 @@ export class PluginLedgerConnectorBesu
     Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
 
+    const { viemWebSocketTransportConfig } = options;
+
     this.logLevel = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level: this.logLevel, label });
@@ -173,6 +190,39 @@ export class PluginLedgerConnectorBesu
     this.web3Provider = new Web3.providers.WebsocketProvider(
       this.options.rpcApiWsHost,
     );
+
+    if (typeof viemWebSocketTransportConfig === "object") {
+      this.viemWebSocketTransportConfig = viemWebSocketTransportConfig;
+    } else {
+      this.viemWebSocketTransportConfig = {};
+    }
+
+    const besuChain = defineChain({
+      id: options.networkId || 1337,
+      name: "Besu",
+      network: "besu-network",
+      nativeCurrency: {
+        decimals: 18,
+        name: "Ether",
+        symbol: "ETH",
+      },
+      rpcUrls: {
+        default: {
+          http: [this.options.rpcApiHttpHost],
+          websocket: [this.options.rpcApiWsHost],
+        },
+      },
+    });
+
+    this.viemTransport = webSocket(
+      this.options.rpcApiWsHost,
+      this.viemWebSocketTransportConfig,
+    );
+    this.viemClient = createPublicClient({
+      chain: besuChain,
+      transport: this.viemTransport,
+    });
+
     this.web3 = new Web3(this.web3Provider);
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry;
@@ -217,14 +267,19 @@ export class PluginLedgerConnectorBesu
   }
 
   public async shutdown(): Promise<void> {
-    this.log.info(`Shutting down ${this.className}...`);
+    this.log.info(`Shutting down...`);
+    const rpcClient = await this.viemClient.transport.getRpcClient();
+    this.log.debug("RPC client obtained.");
+    rpcClient.close();
+    this.log.debug("RPC client closed.");
+    this.log.info(`shutdown complete.`);
   }
 
   async registerWebServices(
     app: Express,
     wsApi: SocketIoServer,
   ): Promise<IWebServiceEndpoint[]> {
-    const { web3 } = this;
+    const { web3, viemClient } = this;
     const { logLevel } = this.options;
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
@@ -234,6 +289,12 @@ export class PluginLedgerConnectorBesu
 
       socket.on(WatchBlocksV1.Subscribe, () => {
         new WatchBlocksV1Endpoint({ web3, socket, logLevel }).subscribe();
+      });
+
+      socket.on(WatchEventsV1.Subscribe, (req: WatchEventsV1Request) => {
+        new WatchEventsV1Endpoint({ viemClient, socket, logLevel }).subscribe(
+          req,
+        );
       });
     });
     return webServices;

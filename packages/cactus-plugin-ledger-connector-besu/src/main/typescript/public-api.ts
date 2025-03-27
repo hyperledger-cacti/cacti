@@ -92,3 +92,5 @@ export {
   getBlockV1Impl,
   isBlockNumber,
 } from "./impl/get-block-v1/get-block-v1-impl";
+
+export { ensure0xPrefix } from "./common/ensure-0x-prefix";

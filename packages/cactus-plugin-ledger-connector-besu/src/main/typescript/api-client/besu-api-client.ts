@@ -6,8 +6,11 @@ import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi,
+  ViemV2242WatchEventsV1Progress,
   WatchBlocksV1,
   WatchBlocksV1Progress,
+  WatchEventsV1,
+  WatchEventsV1Request,
 } from "../generated/openapi/typescript-axios";
 import { Configuration } from "../generated/openapi/typescript-axios/configuration";
 
@@ -57,7 +60,7 @@ export class BesuApiClient
     });
 
     socket.on("connect", () => {
-      console.log("connected OK...");
+      this.log.debug("connected OK...");
       socket.emit(WatchBlocksV1.Subscribe);
     });
 
@@ -65,8 +68,38 @@ export class BesuApiClient
 
     return subject.pipe(
       finalize(() => {
-        console.log("FINALIZE - unsubscribing from the stream...");
+        this.log.debug("FINALIZE - unsubscribing from the stream...");
         socket.emit(WatchBlocksV1.Unsubscribe);
+        socket.disconnect();
+      }),
+      // TODO: Investigate if we need these below - in theory without these
+      // it could happen that only the fist subscriber gets the last emitted value
+      // publishReplay(1),
+      // refCount(),
+    );
+  }
+
+  public watchEventsV1(
+    req: WatchEventsV1Request,
+  ): Observable<ViemV2242WatchEventsV1Progress> {
+    const socket: Socket = io(this.wsApiHost, { path: this.wsApiPath });
+    const subject = new ReplaySubject<ViemV2242WatchEventsV1Progress>(0);
+
+    socket.on(WatchEventsV1.Next, (data: ViemV2242WatchEventsV1Progress) => {
+      subject.next(data);
+    });
+
+    socket.on("connect", () => {
+      this.log.info("socket connected OK emitting subscribe");
+      socket.emit(WatchEventsV1.Subscribe, req);
+    });
+
+    socket.connect();
+
+    return subject.pipe(
+      finalize(() => {
+        this.log.info("FINALIZE - unsubscribing from the stream...");
+        socket.emit(WatchEventsV1.Unsubscribe);
         socket.disconnect();
       }),
       // TODO: Investigate if we need these below - in theory without these
