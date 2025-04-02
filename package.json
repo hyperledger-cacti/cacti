@@ -192,6 +192,7 @@
     "inquirer": "8.2.6",
     "jest": "29.6.2",
     "jest-extended": "4.0.1",
+    "joi": "17.13.3",
     "json5": "2.2.3",
     "license-report": "6.4.0",
     "lint-staged": "11.2.6",
