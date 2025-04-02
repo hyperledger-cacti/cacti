@@ -3,6 +3,11 @@
 /**
  * Bump minimal nodejs and npm version in all cacti packages.
  * Will add engines entry if one is missing at the moment.
+ *
+ * @warning
+ * Remember to update node and npm checks in `tools/custom-checks/check-package-json-fields.ts`
+ * after bumping the engines !!!
+ *
  * How to run:
  *  TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/bump-package-engines.ts
  */
