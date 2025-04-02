@@ -44,7 +44,7 @@ import {
   TokenIdMissingError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
-import { State } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 
 export class Stage3ClientService extends SATPService {
