@@ -54,7 +54,7 @@
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "uuid": "10.0.0"
   },
   "engines": {

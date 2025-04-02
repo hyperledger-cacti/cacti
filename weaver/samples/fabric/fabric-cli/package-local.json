@@ -40,7 +40,7 @@
     "@hyperledger/cacti-weaver-sdk-fabric": "file:../../../sdks/fabric/interoperation-node-sdk",
     "body-parser": "1.20.2",
     "dotenv": "8.6.0",
-    "express": "4.19.2",
+    "express": "5.1.0",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
@@ -49,9 +49,9 @@
     "winston": "3.10.0"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.12.6",
+    "@grpc/grpc-js": "1.13.2",
     "@grpc/proto-loader": "0.7.13",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/node": "18.11.9",
     "google-protobuf": "3.21.4",
     "jest": "29.6.2",

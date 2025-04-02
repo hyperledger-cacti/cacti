@@ -59,13 +59,13 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "axios": "1.8.4",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "web3-eth-abi": "4.0.3",
     "web3-utils": "4.2.1"
   },
   "devDependencies": {
     "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
     "uuid": "10.0.0"

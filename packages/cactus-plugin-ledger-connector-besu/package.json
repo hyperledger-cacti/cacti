@@ -59,12 +59,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.12.6",
+    "@grpc/grpc-js": "1.13.2",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "google-protobuf": "3.21.4",
     "http-errors": "2.0.0",
     "http-errors-enhanced-cjs": "2.0.1",
@@ -89,7 +89,7 @@
     "@openapitools/openapi-generator-cli": "2.7.0",
     "@types/benchmark": "2.1.5",
     "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/google-protobuf": "3.15.5",
     "@types/http-errors": "2.0.4",
