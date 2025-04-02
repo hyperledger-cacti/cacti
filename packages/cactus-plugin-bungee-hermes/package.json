@@ -87,11 +87,11 @@
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.4",
     "@types/crypto-js": "4.0.1",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "fabric-network": "2.2.20",
     "socket.io": "4.6.2"
   },

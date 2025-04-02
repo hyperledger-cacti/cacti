@@ -61,11 +61,11 @@
     "sanitize-html": "2.12.1"
   },
   "devDependencies": {
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/node": "18.11.9",
     "@types/sanitize-html": "2.6.2",
     "body-parser": "1.20.3",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "jest-extended": "4.0.1",
     "uuid": "10.0.0"
   },

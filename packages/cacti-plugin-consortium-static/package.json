@@ -60,7 +60,7 @@
     "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "body-parser": "1.20.3",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "jose": "4.15.5",
     "merkletreejs": "0.4.0",
@@ -74,7 +74,7 @@
     "@hyperledger/cactus-cmd-api-server": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/json-stable-stringify": "1.2.0",
     "@types/uuid": "10.0.0",
     "web3": "1.6.1"

@@ -74,7 +74,7 @@
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/json-stable-stringify": "1.0.33",
     "@types/qs": "6.9.14",
