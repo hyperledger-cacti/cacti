@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   Type,
   type SessionData,
-} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import {

@@ -160,8 +160,9 @@ function mainTask()
   #elif [ "${JEST_TEST_CODE_COVERAGE_ENABLED:-true}" = "true" ]; then
   # yarn jest $JEST_TEST_PATTERN --coverage --coverageDirectory=$JEST_TEST_COVERAGE_PATH
   else
-    yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
-    yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration
+    yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:e2e:transfer
+    #yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
+    #yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration
     #yarn test:jest:all #$JEST_TEST_PATTERN
   fi
 

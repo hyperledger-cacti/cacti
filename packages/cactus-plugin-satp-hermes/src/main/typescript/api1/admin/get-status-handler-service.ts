@@ -14,7 +14,7 @@ import {
   getStageName,
   getStateName,
 } from "../../core/session-utils";
-import { State } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { State } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export async function executeGetStatus(

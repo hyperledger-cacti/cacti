@@ -46,7 +46,7 @@ import {
 import { LocalLog } from "../../../../main/typescript/core/types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import knex, { Knex } from "knex";
-import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 let crashManager: CrashManager;

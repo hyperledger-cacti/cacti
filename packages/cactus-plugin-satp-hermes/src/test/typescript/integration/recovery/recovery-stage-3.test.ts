@@ -43,7 +43,7 @@ import {
   Stage3SignaturesSchema,
   Stage3TimestampsSchema,
   State,
-} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import {
   knexClientConnection,
   knexServerConnection,

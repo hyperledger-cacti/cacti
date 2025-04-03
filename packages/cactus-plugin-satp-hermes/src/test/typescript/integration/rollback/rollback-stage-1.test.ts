@@ -44,7 +44,7 @@ import {
   Stage0HashesSchema,
   Stage1HashesSchema,
   State,
-} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 
 let knexInstanceClient: Knex;
 let knexInstanceServer: Knex;

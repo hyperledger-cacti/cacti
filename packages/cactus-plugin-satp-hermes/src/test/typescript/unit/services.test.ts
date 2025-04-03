@@ -48,7 +48,7 @@ import {
 import {
   SessionData,
   State as SessionState,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import {
   CommitFinalAssertionResponse,
   CommitFinalAssertionRequest,

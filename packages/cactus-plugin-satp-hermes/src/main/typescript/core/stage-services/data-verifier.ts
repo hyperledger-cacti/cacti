@@ -6,7 +6,7 @@ import {
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import { SATP_VERSION } from "../constants";
 import {
   ClientGatewayPubkeyError,
