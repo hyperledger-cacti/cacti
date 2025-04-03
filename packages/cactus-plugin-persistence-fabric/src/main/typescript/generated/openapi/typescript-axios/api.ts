@@ -26,6 +26,25 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface DiscoverNetworkResponseV1
+ */
+export interface DiscoverNetworkResponseV1 {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DiscoverNetworkResponseV1
+     */
+    'status': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof DiscoverNetworkResponseV1
+     */
+    'message': string;
+}
+/**
+ * 
+ * @export
  * @interface ErrorExceptionResponseV1
  */
 export interface ErrorExceptionResponseV1 {
@@ -113,6 +132,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
+         * @summary Refresh Fabric network structure in the database through discovery.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        discoverNetworkV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get the status of persistence plugin for fabric
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -153,6 +202,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Refresh Fabric network structure in the database through discovery.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async discoverNetworkV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiscoverNetworkResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.discoverNetworkV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the status of persistence plugin for fabric
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -173,6 +232,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Refresh Fabric network structure in the database through discovery.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        discoverNetworkV1(options?: any): AxiosPromise<DiscoverNetworkResponseV1> {
+            return localVarFp.discoverNetworkV1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get the status of persistence plugin for fabric
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -190,6 +258,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Refresh Fabric network structure in the database through discovery.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public discoverNetworkV1(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).discoverNetworkV1(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Get the status of persistence plugin for fabric

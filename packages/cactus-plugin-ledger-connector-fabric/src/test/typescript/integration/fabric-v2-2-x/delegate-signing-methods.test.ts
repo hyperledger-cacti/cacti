@@ -13,7 +13,7 @@ const assetTradeContractName = "copyAssetTrade";
 const privateAssetTradeContractName = "privateAssetTrade";
 const testTimeout = 1000 * 60 * 10; // 10 minutes per test
 
-// For development on local sawtooth network
+// For development on local fabric network
 // 1. leaveLedgerRunning = true, useRunningLedger = false to run ledger and leave it running after test finishes.
 // 2. leaveLedgerRunning = true, useRunningLedger = true to use that ledger in future runs.
 const useRunningLedger = false;
