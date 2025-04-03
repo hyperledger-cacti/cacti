@@ -11,7 +11,7 @@ import { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign } from "../../gateway-utils";
-import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import { getCrashedStage } from "../session-utils";
 
 export class CrashRecoveryClientService {
