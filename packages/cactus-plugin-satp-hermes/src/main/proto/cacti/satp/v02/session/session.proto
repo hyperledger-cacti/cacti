@@ -1,12 +1,11 @@
 syntax = "proto3";
-package cacti.satp.v02.common;
+package cacti.satp.v02.session;
 
 import "cacti/satp/v02/common/message.proto";
 import "cacti/satp/v02/service/stage_0.proto";
 import "cacti/satp/v02/service/stage_1.proto";
 import "cacti/satp/v02/service/stage_2.proto";
 import "cacti/satp/v02/service/stage_3.proto";
-
 import "google/protobuf/empty.proto";
 
 message SessionData {
@@ -245,6 +244,14 @@ message Stage3Timestamps {
     string transfer_complete_response_message_timestamp = 6;
 }
 
+enum SATPStage {
+    SATP_STAGE_UNSPECIFIED = 0;
+    SATP_STAGE_0 = 1;
+    SATP_STAGE_1 = 2;
+    SATP_STAGE_2 = 3;
+    SATP_STAGE_3 = 4;
+}
+
 message SendStatusRequest {
     string status = 1;
     bool has_backup = 2;
@@ -253,14 +260,6 @@ message SendStatusRequest {
 message GetStatusResponse {
     string status = 1;
     bool has_backup = 2;
-}
-
-enum SATPStage {
-    SATP_STAGE_UNSPECIFIED = 0;
-    SATP_STAGE_0 = 1;
-    SATP_STAGE_1 = 2;
-    SATP_STAGE_2 = 3;
-    SATP_STAGE_3 = 4;
 }
 
 message PingResponse {
