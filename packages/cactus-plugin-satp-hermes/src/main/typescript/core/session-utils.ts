@@ -12,7 +12,7 @@ import {
   SATPStage,
   SessionData,
   State,
-} from "../generated/proto/cacti/satp/v02/common/session_pb";
+} from "../generated/proto/cacti/satp/v02/session/session_pb";
 import {
   NewSessionRequest,
   NewSessionRequestSchema,
