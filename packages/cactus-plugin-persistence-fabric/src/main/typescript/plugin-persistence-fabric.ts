@@ -30,6 +30,7 @@ import {
 
 import OAS from "../json/openapi.json";
 import { StatusEndpointV1 } from "./web-services/status-endpoint-v1";
+import { DiscoverNetworkEndpointV1 } from "./web-services/discover-network-endpoint-v1";
 import PostgresDatabaseClient from "./db-client/db-client";
 import {
   StatusResponseV1,
@@ -369,6 +370,13 @@ export class PluginPersistenceFabric
       });
       endpoints.push(endpoint);
     }
+    {
+      const endpoint = new DiscoverNetworkEndpointV1({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
     this.endpoints = endpoints;
 
     log.info(`Instantiated web services for plugin ${pkgName} OK`, {
@@ -406,6 +414,9 @@ export class PluginPersistenceFabric
   public async startMonitor(onError?: (err: unknown) => void): Promise<void> {
     // Synchronize the current DB state
     this.lastSeenBlock = await this.syncAll();
+
+    // Update fabric network structure
+    await this.discoverNetwork();
 
     const blocksObservable = this.apiClient.watchBlocksV1({
       channelName: this.channelName,
@@ -527,6 +538,35 @@ export class PluginPersistenceFabric
       await this.syncBlocks(1, latestBlock);
 
       return latestBlock;
+    } finally {
+      this.removeTrackedOperation(operationId);
+    }
+  }
+
+  /**
+   * Synchronize current ledger structure (discovery results) with the database.
+   * Discovery should be enabled on the conenctor for this method to work.
+   * Any errors are ignored (i.e. this discovery is optional), but warning message will be printed.
+   */
+  public async discoverNetwork() {
+    const operationId = uuidv4();
+    this.addTrackedOperation(operationId, "discoverNetwork");
+
+    try {
+      this.log.info("discoverNetwork() started...");
+
+      const discoveryResultsResponse =
+        await this.apiClient.getDiscoveryResultsV1({
+          channelName: this.channelName,
+          gatewayOptions: this.gatewayOptions,
+        });
+
+      const discoveryResults = discoveryResultsResponse.data;
+
+      await this.dbClient.insertDiscoveryResults(discoveryResults);
+      this.log.info("Fabric network updated.");
+    } catch (err) {
+      this.log.warn("Could not update discovery results:", err);
     } finally {
       this.removeTrackedOperation(operationId);
     }

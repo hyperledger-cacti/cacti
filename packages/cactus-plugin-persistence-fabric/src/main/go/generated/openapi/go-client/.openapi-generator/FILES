@@ -6,6 +6,7 @@ client.go
 configuration.go
 go.mod
 go.sum
+model_discover_network_response_v1.go
 model_error_exception_response_v1.go
 model_status_response_v1.go
 model_tracked_operation_v1.go
