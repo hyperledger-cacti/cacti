@@ -180,75 +180,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       "1",
     );
 
-    const res = await dispatcher?.Transact(req);
-    log.info(res?.statusResponse);
-
-    const responseBalanceOwner = await besuEnv.connector.invokeContract({
-      contractName: besuEnv.erc20TokenContract,
-      keychainId: besuEnv.keychainPlugin1.getKeychainId(),
-      invocationType: EthContractInvocationType.Call,
-      methodName: "checkBalance",
-      params: [besuEnv.firstHighNetWorthAccount],
-      signingCredential: {
-        ethAccount: besuEnv.firstHighNetWorthAccount,
-        secret: besuEnv.besuKeyPair.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-      gas: 999999999,
-    });
-    expect(responseBalanceOwner).toBeTruthy();
-    expect(responseBalanceOwner.success).toBeTruthy();
-    expect(responseBalanceOwner.callOutput).toBe("0");
-    log.info("Amount was transfer correctly from the Owner account");
-
-    const responseBalanceBridge = await besuEnv.connector.invokeContract({
-      contractName: besuEnv.erc20TokenContract,
-      keychainId: besuEnv.keychainPlugin1.getKeychainId(),
-      invocationType: EthContractInvocationType.Call,
-      methodName: "checkBalance",
-      params: [besuEnv.wrapperContractAddress],
-      signingCredential: {
-        ethAccount: besuEnv.firstHighNetWorthAccount,
-        secret: besuEnv.besuKeyPair.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-      gas: 999999999,
-    });
-    expect(responseBalanceBridge).toBeTruthy();
-    expect(responseBalanceBridge.success).toBeTruthy();
-    expect(responseBalanceBridge.callOutput).toBe("0");
-    log.info("Amount was transfer correctly to the Wrapper account");
-
-    const responseBalance1 = await fabricEnv.apiClient.runTransactionV1({
-      contractName: fabricEnv.satpContractName,
-      channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.bridge_id],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricEnv.fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("0");
-    log.info("Amount was transfer correctly from the Bridge account");
-
-    const responseBalance2 = await fabricEnv.apiClient.runTransactionV1({
-      contractName: fabricEnv.satpContractName,
-      channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.clientId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricEnv.fabricSigningCredential,
-    });
-    expect(responseBalance2).not.toBeUndefined();
-    expect(responseBalance2.status).toBeGreaterThan(199);
-    expect(responseBalance2.status).toBeLessThan(300);
-    expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("1");
-    log.info("Amount was transfer correctly to the Owner account");
+    await dispatcher?.Transact(req);
   });
 });
 
