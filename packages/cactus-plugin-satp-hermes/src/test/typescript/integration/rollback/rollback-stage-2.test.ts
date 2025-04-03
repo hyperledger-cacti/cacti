@@ -47,7 +47,7 @@ import {
   Stage1HashesSchema,
   Stage2HashesSchema,
   State,
-} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { SATPCrossChainManager } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import SATPInteractionBesu from "../../../solidity/satp-erc20-interact.json";
 import { EvmAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/evm-asset";

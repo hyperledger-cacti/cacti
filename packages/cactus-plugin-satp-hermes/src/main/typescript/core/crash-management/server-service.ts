@@ -18,7 +18,7 @@ import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign, verifySignature } from "../../gateway-utils";
 import { SignatureVerificationError } from "../errors/satp-service-errors";
-import { Type } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { Type } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 
 export class CrashRecoveryServerService {
   constructor(

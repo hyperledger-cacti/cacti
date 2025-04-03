@@ -10,7 +10,7 @@ import {
   type Type,
   SATPStage,
   type SessionData,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { getCrashedStage } from "../../session-utils";
 
 // TODO: fix for single-gateway setups to handle both client and server data together
