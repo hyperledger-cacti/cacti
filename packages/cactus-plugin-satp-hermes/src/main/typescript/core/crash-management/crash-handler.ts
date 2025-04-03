@@ -15,7 +15,7 @@ import type {
   RollbackState,
 } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import { type SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
-import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 
 export class CrashRecoveryHandler implements SATPHandler {
   private readonly log: Logger;

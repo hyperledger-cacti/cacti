@@ -86,6 +86,7 @@
     "pretsc": "npm run generate-sdk",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
     "test:integration": "npx jest ./src/test/typescript/integration",
+    "test:integration:e2e:transfer":"npx jest ./src/test/typescript/integration/satp-e2e-transfer-1-gateway.test.ts --detectOpenHandles",
     "test:unit": "npx jest ./src/test/typescript/unit",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch",

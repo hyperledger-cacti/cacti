@@ -51,7 +51,8 @@ let gateway: SATPGateway;
 const bridge_id =
   "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
-afterAll(async () => {
+afterEach(async () => {
+  log.info("Shutting down Fabric and Besu environments...");
   await gateway.shutdown();
 
   if (gateway) {
@@ -76,8 +77,9 @@ afterAll(async () => {
     });
 });
 
-beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+/*beforeEach(async () => {
+  //Cleanup the docker environment
+  await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -87,7 +89,10 @@ beforeAll(async () => {
     });
 
   {
+    //setup fabric ledger
     const satpContractName = "satp-contract";
+
+    log.info("Setting up Fabric environment...");
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment(
       satpContractName,
       bridge_id,
@@ -99,9 +104,11 @@ beforeAll(async () => {
   }
 
   {
+    //setup besu ledger
     const erc20TokenContract = "SATPContract";
     const contractNameWrapper = "SATPWrapperContract";
 
+    log.info("Setting up Besu environment...");
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
       erc20TokenContract,
       contractNameWrapper,
@@ -111,7 +118,41 @@ beforeAll(async () => {
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
-});
+}, 2000000);*/
+beforeEach(async () => {
+  try {
+    log.info("Pruning Docker environment...");
+    await pruneDockerAllIfGithubAction({ logLevel });
+    log.info("Pruning completed successfully");
+
+    // Setup Fabric
+    const satpContractName = "satp-contract";
+    log.info("Setting up Fabric environment...");
+    fabricEnv = await FabricTestEnvironment.setupTestEnvironment(
+      satpContractName,
+      bridge_id,
+      logLevel,
+    );
+    log.info("Fabric Ledger started successfully");
+    await fabricEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+
+    // Setup Besu
+    const erc20TokenContract = "SATPContract";
+    const contractNameWrapper = "SATPWrapperContract";
+    log.info("Setting up Besu environment...");
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      erc20TokenContract,
+      contractNameWrapper,
+      logLevel,
+    );
+    log.info("Besu Ledger started successfully");
+    await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+  } catch (error) {
+    log.error("beforeEach setup failed", error);
+    await Containers.logDiagnostics({ logLevel });
+    throw error;
+  }
+}, 2000000);
 
 describe("SATPGateway sending a token from Besu to Fabric", () => {
   it("should realize a transfer", async () => {

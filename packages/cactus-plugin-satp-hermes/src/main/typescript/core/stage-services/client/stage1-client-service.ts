@@ -29,7 +29,7 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
-import { State } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import {
   HashError,
   MessageTypeError,
