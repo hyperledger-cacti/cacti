@@ -77,11 +77,13 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**DiscoverNetworkV1**](docs/DefaultApi.md#discovernetworkv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network | Refresh Fabric network structure in the database through discovery.
 *DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status | Get the status of persistence plugin for fabric
 
 
 ## Documentation For Models
 
+ - [DiscoverNetworkResponseV1](docs/DiscoverNetworkResponseV1.md)
  - [ErrorExceptionResponseV1](docs/ErrorExceptionResponseV1.md)
  - [StatusResponseV1](docs/StatusResponseV1.md)
  - [TrackedOperationV1](docs/TrackedOperationV1.md)
