@@ -14,7 +14,7 @@ import {
   Stage1HashesSchema,
   Stage2HashesSchema,
   Stage3HashesSchema,
-} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
