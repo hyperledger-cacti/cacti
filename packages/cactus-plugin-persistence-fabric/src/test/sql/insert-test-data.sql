@@ -549,6 +549,115 @@ j8Fxno3p3EAmocwmZyu4wxnVmqfKdhs=
   );
 
 --
+-- Data for Name: discovery_msp; Type: TABLE DATA; Schema: fabric; Owner: postgres
+--
+INSERT INTO
+  fabric.discovery_msp (
+    id,
+    mspid,
+    name,
+    organizational_unit_identifiers,
+    admins
+  )
+VALUES
+  (
+    '75ecbf61-5c81-4928-a2c3-316c136610bf',
+    'OrdererMSP',
+    'OrdererMSP',
+    '[]',
+    ''
+  );
+
+INSERT INTO
+  fabric.discovery_msp (
+    id,
+    mspid,
+    name,
+    organizational_unit_identifiers,
+    admins
+  )
+VALUES
+  (
+    '38f053a5-f3f4-49fc-96a1-6d0dacc21837',
+    'Org1MSP',
+    'Org1MSP',
+    '[]',
+    ''
+  );
+
+INSERT INTO
+  fabric.discovery_msp (
+    id,
+    mspid,
+    name,
+    organizational_unit_identifiers,
+    admins
+  )
+VALUES
+  (
+    'acd8eab1-59a0-4a89-a4f4-4d222ed2c3f2',
+    'Org2MSP',
+    'Org2MSP',
+    '[]',
+    ''
+  );
+
+--
+-- Data for Name: discovery_orderers; Type: TABLE DATA; Schema: fabric; Owner: postgres
+--
+INSERT INTO
+  fabric.discovery_orderers (id, name, host, port, discovery_msp_id)
+VALUES
+  (
+    'd165280d-93c1-4710-9829-88da847b6431',
+    'orderer.example.com:7050',
+    'orderer.example.com',
+    7050,
+    '75ecbf61-5c81-4928-a2c3-316c136610bf'
+  );
+
+--
+-- Data for Name: discovery_peers; Type: TABLE DATA; Schema: fabric; Owner: postgres
+--
+INSERT INTO
+  fabric.discovery_peers (
+    id,
+    name,
+    endpoint,
+    ledger_height,
+    chaincodes,
+    discovery_msp_id
+  )
+VALUES
+  (
+    '9819add6-c50d-467f-8fe8-eb1c4089ba9a',
+    'peer0.org1.example.com:7051',
+    'peer0.org1.example.com:7051',
+    7,
+    '[{"name":"basic","version":"1"},{"name":"_lifecycle","version":"1"}]',
+    '38f053a5-f3f4-49fc-96a1-6d0dacc21837'
+  );
+
+INSERT INTO
+  fabric.discovery_peers (
+    id,
+    name,
+    endpoint,
+    ledger_height,
+    chaincodes,
+    discovery_msp_id
+  )
+VALUES
+  (
+    'a3969e81-cb5b-4b99-be9c-4ca7e9384130',
+    'peer0.org2.example.com:9051',
+    'peer0.org2.example.com:9051',
+    7,
+    '[{"name":"basic","version":"1"},{"name":"_lifecycle","version":"1"}]',
+    'acd8eab1-59a0-4a89-a4f4-4d222ed2c3f2'
+  );
+
+--
 -- Data for Name: transaction; Type: TABLE DATA; Schema: fabric; Owner: postgres
 --
 INSERT INTO

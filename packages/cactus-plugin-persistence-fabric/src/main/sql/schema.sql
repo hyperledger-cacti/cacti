@@ -1,7 +1,7 @@
 --- Clean start:
 --- DROP SCHEMA fabric CASCADE;
 
-CREATE SCHEMA fabric;
+CREATE SCHEMA IF NOT EXISTS fabric;
 
 ALTER SCHEMA fabric OWNER TO postgres;
 
@@ -248,6 +248,135 @@ USING (true);
 
 ALTER TABLE ONLY fabric.transaction_action_endorsement
     ADD CONSTRAINT transaction_action_endorsements_pkey PRIMARY KEY (id);
+
+-- Table: fabric.discovery_msp
+
+-- DROP TABLE IF EXISTS fabric.discovery_msp;
+
+CREATE TABLE IF NOT EXISTS fabric.discovery_msp
+(
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    mspid text COLLATE pg_catalog."default" NOT NULL,
+    name text COLLATE pg_catalog."default" NOT NULL,
+    organizational_unit_identifiers text COLLATE pg_catalog."default" NOT NULL,
+    admins text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT discovery_msp_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE IF EXISTS fabric.discovery_msp
+    OWNER to postgres;
+
+GRANT ALL ON TABLE fabric.discovery_msp TO anon;
+GRANT ALL ON TABLE fabric.discovery_msp TO authenticated;
+GRANT ALL ON TABLE fabric.discovery_msp TO postgres;
+GRANT ALL ON TABLE fabric.discovery_msp TO service_role;
+
+ALTER TABLE fabric.discovery_msp
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY discovery_msp_select ON fabric.discovery_msp
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY discovery_msp_insert ON fabric.discovery_msp
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY discovery_msp_update ON fabric.discovery_msp
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY discovery_msp_delete ON fabric.discovery_msp
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
+-- Table: fabric.discovery_orderers
+
+-- DROP TABLE IF EXISTS fabric.discovery_orderers;
+
+CREATE TABLE IF NOT EXISTS fabric.discovery_orderers
+(
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name text COLLATE pg_catalog."default" NOT NULL,
+    host text COLLATE pg_catalog."default" NOT NULL,
+    port integer NOT NULL,
+    discovery_msp_id uuid NOT NULL,
+    CONSTRAINT discovery_orderers_pkey PRIMARY KEY (id),
+    CONSTRAINT discovery_orderers_discovery_msp_id_fkey FOREIGN KEY (discovery_msp_id) REFERENCES fabric.discovery_msp(id)
+);
+
+ALTER TABLE IF EXISTS fabric.discovery_orderers
+    OWNER to postgres;
+
+GRANT ALL ON TABLE fabric.discovery_orderers TO anon;
+GRANT ALL ON TABLE fabric.discovery_orderers TO authenticated;
+GRANT ALL ON TABLE fabric.discovery_orderers TO postgres;
+GRANT ALL ON TABLE fabric.discovery_orderers TO service_role;
+
+ALTER TABLE fabric.discovery_orderers
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY discovery_orderers_select ON fabric.discovery_orderers
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY discovery_orderers_insert ON fabric.discovery_orderers
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY discovery_orderers_update ON fabric.discovery_orderers
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY discovery_orderers_delete ON fabric.discovery_orderers
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
+-- Table: fabric.discovery_peers
+
+-- DROP TABLE IF EXISTS fabric.discovery_peers;
+
+CREATE TABLE IF NOT EXISTS fabric.discovery_peers
+(
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name text COLLATE pg_catalog."default" NOT NULL,
+    endpoint text COLLATE pg_catalog."default" NOT NULL,
+    ledger_height BIGINT NOT NULL,
+    chaincodes text COLLATE pg_catalog."default" NOT NULL,
+    discovery_msp_id uuid NOT NULL,
+    CONSTRAINT discovery_peers_pkey PRIMARY KEY (id),
+    CONSTRAINT discovery_peers_discovery_msp_id_fkey FOREIGN KEY (discovery_msp_id) REFERENCES fabric.discovery_msp(id)
+);
+
+ALTER TABLE IF EXISTS fabric.discovery_peers
+    OWNER to postgres;
+
+GRANT ALL ON TABLE fabric.discovery_peers TO anon;
+GRANT ALL ON TABLE fabric.discovery_peers TO authenticated;
+GRANT ALL ON TABLE fabric.discovery_peers TO postgres;
+GRANT ALL ON TABLE fabric.discovery_peers TO service_role;
+
+ALTER TABLE fabric.discovery_peers
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY discovery_peers_select ON fabric.discovery_peers
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY discovery_peers_insert ON fabric.discovery_peers
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY discovery_peers_update ON fabric.discovery_peers
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY discovery_peers_delete ON fabric.discovery_peers
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
 
 -- FUNCTION: fabric.get_missing_blocks_in_range(integer, integer)
 
