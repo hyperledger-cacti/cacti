@@ -312,26 +312,26 @@ describe(testCase, () => {
     });
     expect(callOutput).toEqual("10");
 
-    try {
-      const request: NewContractRequest = {
-        contractAddress: hashTimeLockAddress,
-        inputAmount: 0,
-        outputAmount: 0,
-        expiration,
-        hashLock,
-        tokenAddress,
-        receiver,
-        outputNetwork: "BTC",
-        outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
-        connectorId,
-        keychainId,
-        web3SigningCredential,
-        gas: estimatedGas,
-      };
-      const res = await api.newContractV1(request);
-      expect(res.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
-    }
+    const request: NewContractRequest = {
+      contractAddress: hashTimeLockAddress,
+      inputAmount: 0,
+      outputAmount: 0,
+      expiration,
+      hashLock,
+      tokenAddress,
+      receiver,
+      outputNetwork: "BTC",
+      outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
+      connectorId,
+      keychainId,
+      web3SigningCredential,
+      gas: estimatedGas,
+    };
+
+    await expect(api.newContractV1(request)).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 400,
+      }),
+    });
   });
 });
