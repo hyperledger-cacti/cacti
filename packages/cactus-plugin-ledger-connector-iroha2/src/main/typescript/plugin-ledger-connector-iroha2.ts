@@ -25,6 +25,7 @@ import {
 } from "@hyperledger/cactus-core";
 
 import {
+  bigIntToDecimalStringReplacer,
   Checks,
   Logger,
   LoggerProvider,
@@ -61,7 +62,7 @@ import {
   TransactionPayloadParameters,
 } from "./cactus-iroha-sdk-wrapper/client";
 import { CactusIrohaV2QueryClient } from "./cactus-iroha-sdk-wrapper/query";
-import { LengthOf, stringifyBigIntReplacer } from "./utils";
+import { LengthOf } from "./utils";
 import { createAccountId } from "./cactus-iroha-sdk-wrapper/data-factories";
 
 /**
@@ -225,7 +226,7 @@ export class PluginLedgerConnectorIroha2
     wsApi: SocketIoServer,
   ): Promise<IWebServiceEndpoint[]> {
     // Add custom replacer to handle bigint responses correctly
-    app.set("json replacer", stringifyBigIntReplacer);
+    app.set("json replacer", bigIntToDecimalStringReplacer);
 
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));

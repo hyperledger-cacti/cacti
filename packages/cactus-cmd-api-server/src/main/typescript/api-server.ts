@@ -59,6 +59,7 @@ import {
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import {
+  bigIntToDecimalStringReplacer,
   Bools,
   isExpressHttpVerbMethodName,
   Logger,
@@ -932,7 +933,7 @@ export class ApiServer {
     app.use(corsMiddleware);
     app.use(bodyParser.json({ limit: "50mb" }));
     // Add custom replacer to handle bigint responses correctly
-    app.set("json replacer", this.stringifyBigIntReplacer);
+    app.set("json replacer", bigIntToDecimalStringReplacer);
 
     const authzFactoryOptions = { apiServerOptions, pluginRegistry, logLevel };
     const authzFactory = new AuthorizerFactory(authzFactoryOptions);
@@ -1060,19 +1061,5 @@ export class ApiServer {
       callback(null, corsOptions); // callback expects two parameters: error and options
     };
     return cors(corsOptionsDelegate);
-  }
-
-  /**
-   * `JSON.stringify` replacer function to handle BigInt.
-   * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
-   */
-  private stringifyBigIntReplacer(
-    _key: string,
-    value: bigint | unknown,
-  ): string | unknown {
-    if (typeof value === "bigint") {
-      return value.toString();
-    }
-    return value;
   }
 }
