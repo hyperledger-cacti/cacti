@@ -13,6 +13,7 @@ import { isEthereumConfigJSON } from "./bridges-config-validating-functions/vali
 import { createEthereumOptions } from "./bridges-config-validating-functions/validateEthereumOptions";
 import { createBungeeOptions } from "./bridges-config-validating-functions/validateBungeeOptions";
 import type { NetworkId } from "../../network-identification/chainid-list";
+import { validateSmartContractJson } from "./validateContractFields";
 
 export interface NetworkConfigJSON {
   network: NetworkId;
@@ -41,9 +42,9 @@ function isNetworkConfigJSONArray(
   return Array.isArray(input) && input.every(isNetworkConfigJSON);
 }
 
-export function validateSatpBridgesConfig(opts: {
+export async function validateSatpBridgesConfig(opts: {
   readonly configValue: unknown;
-}): Array<NetworkConfig> {
+}): Promise<Array<NetworkConfig>> {
   if (!opts || !opts.configValue) {
     return [];
   }
@@ -122,5 +123,8 @@ export function validateSatpBridgesConfig(opts: {
       bridgesConfigParsed.push(ethereumConfig);
     }
   });
+  if(!await validateSmartContractJson("satp-erc20-interact.json", "", false, false)) {
+    throw new Error("Smart Contract Deployed for SATP does not meet the basic requirements");
+  }
   return bridgesConfigParsed;
 }

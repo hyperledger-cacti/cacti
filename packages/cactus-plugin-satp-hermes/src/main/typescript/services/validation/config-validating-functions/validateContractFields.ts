@@ -10,20 +10,66 @@ import {
 } from "crypto";
 import { keccak256 } from "js-sha3";
 import { generateKeyPairSync, createSign } from "crypto";
+import type {
+  SmartContractConfig,
+} from "../../../types/blockchain-interaction";
+import { HashNotMatchingError, OntologyFormatError } from "./validationErrors";
 
-export async function loadJsonFile(
+const THIS_FILE_NAME = "validateContractFields.ts";
+
+async function loadDataFromFile(dirPaths: string[], fileName: string) {
+  for (const dirPath of dirPaths) {
+    const filePath = path.join(dirPath, fileName);
+    try {
+      const jsonData = await fs.readFile(filePath, "utf-8");
+      return jsonData;
+    }
+    catch (fileReadErr) {
+      if (fileReadErr.code !== "ENOENT") {
+        console.error("Error reading file: ", fileReadErr);
+      }
+    }
+  }
+}
+
+async function writeDataToFile(dirPaths: string[], fileName: string, dataToWrite: any) {
+  for (const dirPath of dirPaths) {
+    const filePath = path.join(dirPath, fileName);
+    if (fss.existsSync(filePath)) {
+      try {
+        await fs.writeFile(filePath, JSON.stringify(dataToWrite, null, 4), "utf-8");
+      } catch (error) {
+        console.log("Writing Error");
+        throw error;
+      }
+    }
+  }
+}
+
+function isSmartContractConfigJSON(obj: unknown): obj is SmartContractConfig {
+  if (typeof obj !== "object" || obj === null) {
+    return false;
+  }
+  //const objRecord = obj as Record<string, unknown>;
+  if (!("name" in obj) || !("contract" in obj) || !("ontology" in obj)) {
+    return false;
+  }
+  return true;
+}
+
+export async function validateSmartContractJson(
   fileName: string,
   checkOptionsFilename: string,
   useOptionsFile: boolean,
-  controlKeyFlag: boolean,
-): Promise<void> {
-  const filePaths = [
+  controlKeyPairFlag: boolean,
+  filePaths: string[] = [
     "/home/tomas/cacti_old/cacti/packages/cactus-plugin-satp-hermes/src/test/solidity/",
-  ];
+  ],
+): Promise<boolean| undefined> {
   if (useOptionsFile) {
     try {
       const checkOptionsDir =
-        "/home/tomas/cacti_old/cacti/packages/cactus-plugin-sat[-hermes/src/test/";
+        "/home/tomas/cacti_old/cacti/packages/cactus-plugin-satp-hermes/src/test/";
       const checkOptionsFile = path.join(checkOptionsDir, checkOptionsFilename);
       const data = await fs.readFile(checkOptionsFile, "utf-8");
       const checkOptionsJson = JSON.parse(data);
@@ -32,21 +78,28 @@ export async function loadJsonFile(
       console.error("Error opening check options file: ", filePathErr);
     }
   } else {
-    for (const dirPath of filePaths) {
-      const filePath = path.join(dirPath, fileName);
-      try {
-        const oldData = await fs.readFile(filePath, "utf-8");
-        if (controlKeyFlag) {
-          generateNewKeyPair();
-        }
-        const data = await updateHashAndSignature(
-          oldData,
+    try {
+      let data = "";
+      loadDataFromFile(filePaths, fileName).then((contractJsonString) => {
+        if (contractJsonString !== undefined)
+          data = contractJsonString;
+      });
+      // This if is for testing purposes of signature checks with locally generated keys
+      if (controlKeyPairFlag) {
+        generateNewKeyPair();
+        data = await updateHashAndSignature(
+          data,
           false,
-          filePath,
-          controlKeyFlag,
+          controlKeyPairFlag,
+          "signature",
+          filePaths,
+          fileName,
         );
-        try {
-          const jsonData = JSON.parse(data);
+      }
+      
+      try {
+        const jsonData = JSON.parse(data);
+        if(isSmartContractConfigJSON(jsonData)) {
           const functionSignatures: any[] = [];
           let contractHash = "";
           let contractLanguage: any = "";
@@ -100,17 +153,18 @@ export async function loadJsonFile(
                 console.log("Content", value);
             }
           });
-        } catch (checkExecErr) {
-          throw checkExecErr;
+          return true;
         }
-      } catch (fileReadErr) {
-        if (fileReadErr.code !== "ENOENT") {
-          console.error("Error reading file: ", fileReadErr);
-        }
+        return false;
+      } catch (checkExecErr) {
+        throw checkExecErr;
       }
+    } catch (error) {
+      console.error(error);
     }
   }
 }
+
 
 function checkOntologyV1(ontologyField: string, functionSignatures: string[]) {
   const ontologyJson = JSON.parse(ontologyField);
@@ -150,7 +204,7 @@ function checkOntologyV1(ontologyField: string, functionSignatures: string[]) {
         }
       });
     } else {
-      throw new Error("Function formats not in an array");
+      throw new OntologyFormatError("Function formats not in an array", THIS_FILE_NAME);
     }
   });
   if (ontologyElements.length !== 0) {
@@ -158,7 +212,7 @@ function checkOntologyV1(ontologyField: string, functionSignatures: string[]) {
     ontologyElements.forEach((element) => {
       console.log("->", element);
     });
-    throw new Error("Ontology not including every basic SATP operation");
+    throw new OntologyFormatError("Not every basic SATP operation is included", THIS_FILE_NAME);
   }
 }
 
@@ -211,20 +265,6 @@ function checkOntologyElementV1(fieldName: string, variables: string[]) {
   }
 }
 
-/*function checkContractHashV1(jsonObject: string, contractHash: any) {
-  const contractJson = JSON.parse(jsonObject);
-  const contractCryptFields = ["signature", "hash", "bytecode"];
-  contractCryptFields.forEach((field) => {
-    delete contractJson[field];
-  });
-  const hash = SHA256(JSON.stringify(contractJson) ?? "").toString();
-  if (contractHash === hash) {
-    console.log("Hashes match: ", hash);
-  } else {
-    console.log("Hashes don't match: ", hash);
-  }
-}*/
-
 function parseAndCheckContractHashV2(
   jsonObject: string,
   contractHash: any = null,
@@ -246,7 +286,7 @@ function parseAndCheckContractHashV2(
     if (contractHash === hash) {
       console.log("Hashes match: ", hash);
     } else {
-      console.log("Hashes don't match: ", hash);
+      throw new HashNotMatchingError(THIS_FILE_NAME);
     }
     return hash;
   } else {
@@ -257,9 +297,10 @@ function parseAndCheckContractHashV2(
 async function updateHashAndSignature(
   data: string,
   redoHash: boolean,
-  path: string,
   redoSignature: boolean,
   signatureId: string = "signature",
+  filePaths: string[],
+  fileName: string,
 ) {
   const contractJson = JSON.parse(data);
   const contractCryptFields = ["signature", "hash", "bytecode"];
@@ -295,23 +336,10 @@ async function updateHashAndSignature(
   contractJson.bytecode = bytecode;
   contractJson.hash = hash;
   if (redoHash || redoSignature) {
-    try {
-      await fs.writeFile(path, JSON.stringify(contractJson, null, 4), "utf-8");
-    } catch (error) {
-      console.log("Writing Error");
-      throw error;
-    }
+    writeDataToFile(filePaths, fileName, contractJson);
   }
   return JSON.stringify(contractJson);
 }
-
-/*function checkSignatureV1(hash: any, signature: any, key: any) {
-  const verify = createVerify("SHA256");
-  verify.update(hash);
-  verify.end();
-  const isValid = verify.verify(key, signature, "hex");
-  console.log("Signature Valid:", isValid);
-}*/
 
 function checkSignatureV2(signedData: any, signature: any, keyArray: any) {
   const verify = createVerify("SHA256");
