@@ -2247,12 +2247,6 @@ jobs:
         run: npm install -g @devcontainers/cli@0.44.0
       - name: npx_yes_devcontainers_cli_build
         run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"
-  ghcr-example-carbon-accounting:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4.1.7
-      - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
 
   ghcr-example-supply-chain-app:
     runs-on: ubuntu-22.04
