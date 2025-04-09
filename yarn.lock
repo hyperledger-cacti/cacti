@@ -11348,6 +11348,7 @@ __metadata:
     inquirer: "npm:8.2.6"
     jest: "npm:29.6.2"
     jest-extended: "npm:4.0.1"
+    joi: "npm:17.13.3"
     json5: "npm:2.2.3"
     license-report: "npm:6.4.0"
     lint-staged: "npm:11.2.6"
