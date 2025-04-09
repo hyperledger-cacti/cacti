@@ -4,17 +4,15 @@ import { ReplaySubject, Observable } from "rxjs";
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
 import { Optional } from "typescript-optional";
-import {
-  createPublicClient,
-  webSocket,
-  defineChain,
-  WebSocketTransportConfig,
-} from "viem";
+import { createPublicClient, webSocket, defineChain, http } from "viem";
 import { PublicClient as ViemPublicClient } from "viem";
 import { WebSocketTransport as ViemWebSocketTransport } from "viem";
+import { WebSocketTransportConfig as ViemWebSocketTransportConfig } from "viem";
+import { HttpTransport as ViemHttpTransport } from "viem";
+import { HttpTransportConfig as ViemHttpTransportConfig } from "viem";
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
-import type { WebsocketProvider } from "web3-core";
+import type { HttpProvider, WebsocketProvider } from "web3-core";
 import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 
@@ -126,12 +124,13 @@ export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 export interface IPluginLedgerConnectorBesuOptions
   extends ICactusPluginOptions {
   networkId?: number;
-
   rpcApiHttpHost: string;
   rpcApiWsHost: string;
   pluginRegistry: PluginRegistry;
+  mainTransport?: "ws" | "http";
   prometheusExporter?: PrometheusExporter;
   viemWebSocketTransportConfig?: Record<string, unknown>;
+  viemHttpTransportConfig?: Record<string, unknown>;
   logLevel?: LogLevelDesc;
 }
 
@@ -151,11 +150,14 @@ export class PluginLedgerConnectorBesu
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
-  private readonly web3Provider: WebsocketProvider;
+  private readonly web3ws: WebsocketProvider;
+  private readonly web3Http: HttpProvider;
   private readonly web3: Web3;
   private readonly viemClient: ViemPublicClient;
-  private readonly viemTransport: ViemWebSocketTransport;
-  private readonly viemWebSocketTransportConfig: Partial<WebSocketTransportConfig>;
+  private readonly viemWs: ViemWebSocketTransport;
+  private readonly viemHttp: ViemHttpTransport;
+  private readonly viemHttpTransportConfig: Partial<ViemHttpTransportConfig>;
+  private readonly viemWebSocketTransportConfig: Partial<ViemWebSocketTransportConfig>;
   private web3Quorum: IWeb3Quorum | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
@@ -180,21 +182,31 @@ export class PluginLedgerConnectorBesu
     Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
 
-    const { viemWebSocketTransportConfig } = options;
+    const { viemWebSocketTransportConfig, viemHttpTransportConfig } = options;
+    const { rpcApiHttpHost, rpcApiWsHost, mainTransport = "ws" } = options;
 
     this.logLevel = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level: this.logLevel, label });
 
-    this.log.debug("Creating WebsocketProvider for %s", options.rpcApiWsHost);
-    this.web3Provider = new Web3.providers.WebsocketProvider(
-      this.options.rpcApiWsHost,
-    );
+    this.log.debug("Primary EVM transport (ws|http): %s", mainTransport);
+
+    this.log.debug("Creating Web3 ws for %s", rpcApiWsHost);
+    this.web3ws = new Web3.providers.WebsocketProvider(rpcApiWsHost);
+
+    this.log.debug("Creating Web3 http for %s", rpcApiHttpHost);
+    this.web3Http = new Web3.providers.HttpProvider(rpcApiHttpHost);
 
     if (typeof viemWebSocketTransportConfig === "object") {
       this.viemWebSocketTransportConfig = viemWebSocketTransportConfig;
     } else {
       this.viemWebSocketTransportConfig = {};
+    }
+
+    if (typeof viemHttpTransportConfig === "object") {
+      this.viemHttpTransportConfig = viemHttpTransportConfig;
+    } else {
+      this.viemHttpTransportConfig = {};
     }
 
     const besuChain = defineChain({
@@ -214,16 +226,22 @@ export class PluginLedgerConnectorBesu
       },
     });
 
-    this.viemTransport = webSocket(
-      this.options.rpcApiWsHost,
-      this.viemWebSocketTransportConfig,
-    );
+    this.viemWs = webSocket(rpcApiWsHost, this.viemWebSocketTransportConfig);
+    this.log.debug("Instantiated Viem WS transport: %s", rpcApiWsHost);
+
+    this.viemHttp = http(rpcApiHttpHost, this.viemHttpTransportConfig);
+    this.log.debug("Instantiated Viem HTTP transport: %s", rpcApiHttpHost);
+
+    const viemTp = mainTransport === "ws" ? this.viemWs : this.viemHttp;
+
     this.viemClient = createPublicClient({
       chain: besuChain,
-      transport: this.viemTransport,
+      transport: viemTp,
     });
 
-    this.web3 = new Web3(this.web3Provider);
+    const web3Tp = mainTransport === "ws" ? this.web3ws : this.web3Http;
+
+    this.web3 = new Web3(web3Tp);
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry;
     this.prometheusExporter =
@@ -268,10 +286,16 @@ export class PluginLedgerConnectorBesu
 
   public async shutdown(): Promise<void> {
     this.log.info(`Shutting down...`);
-    const rpcClient = await this.viemClient.transport.getRpcClient();
-    this.log.debug("RPC client obtained.");
-    rpcClient.close();
-    this.log.debug("RPC client closed.");
+
+    if (typeof this.viemClient.transport.getRpcClient === "function") {
+      const rpcClient = await this.viemClient.transport.getRpcClient();
+      this.log.debug("RPC client obtained.");
+      rpcClient.close();
+      this.log.debug("RPC client closed.");
+    } else {
+      this.log.debug("viemClient.transport.getRpcClient not a function.");
+    }
+
     this.log.info(`shutdown complete.`);
   }
 
