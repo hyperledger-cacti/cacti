@@ -271,18 +271,18 @@ describe(testCase, () => {
     expect(responseTxId.callOutput).toBeTruthy();
     const id = responseTxId.callOutput as string;
 
-    try {
-      const refundRequest: RefundRequest = {
-        id,
-        web3SigningCredential,
-        connectorId,
-        keychainId,
-      };
-      const resRefund = await api.refundV1(refundRequest);
-      expect(resRefund.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
-    }
+    const refundRequest: RefundRequest = {
+      id,
+      web3SigningCredential,
+      connectorId,
+      keychainId,
+    };
+
+    await expect(api.refundV1(refundRequest)).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 400,
+      }),
+    });
 
     const responseFinalBalance = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,
