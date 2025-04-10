@@ -3,16 +3,11 @@ import esMain from "es-main";
 import { exit } from "process";
 
 const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
-  "@hyperledger/cacti-ledger-browser",
-  "@hyperledger/cacti-plugin-consortium-static",
   "@hyperledger-cacti/cacti-plugin-copm-fabric",
   "@hyperledger/cacti-plugin-ledger-connector-stellar",
   "@hyperledger/cactus-api-client",
   "@hyperledger/cactus-cmd-api-server",
   "@hyperledger/cactus-common",
-  "@hyperledger/cactus-core",
-  "@hyperledger/cactus-core-api",
-  "@hyperledger/cactus-plugin-bungee-hermes",
   "@hyperledger/cactus-plugin-consortium-manual",
   "@hyperledger/cactus-plugin-htlc-eth-besu",
   "@hyperledger/cactus-plugin-htlc-eth-besu-erc20",
@@ -76,6 +71,7 @@ export async function checkDependencyVersionConsistency(): Promise<
   const errors: string[] = [];
   const cdvc = new CDVC(process.cwd(), {
     ignorePackage: PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK,
+    ignoreDepPattern: ["web3"],
   });
   if (cdvc.hasMismatchingDependencies) {
     errors.push(cdvc.toMismatchSummary());
