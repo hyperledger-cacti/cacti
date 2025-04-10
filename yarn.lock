@@ -9331,7 +9331,7 @@ __metadata:
     jose: "npm:4.15.5"
     merkletreejs: "npm:0.4.0"
     prom-client: "npm:15.1.3"
-    safe-stable-stringify: "npm:2.4.3"
+    safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
@@ -9803,7 +9803,7 @@ __metadata:
     http-errors-enhanced-cjs: "npm:2.0.1"
     node-mocks-http: "npm:1.14.0"
     run-time-error-cjs: "npm:1.4.0"
-    safe-stable-stringify: "npm:2.4.3"
+    safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
   languageName: unknown
@@ -10199,7 +10199,7 @@ __metadata:
     fs-extra: "npm:11.2.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     key-encoder: "npm:2.0.3"
-    merkletreejs: "npm:0.3.11"
+    merkletreejs: "npm:0.4.0"
     safe-stable-stringify: "npm:2.5.0"
     socket.io: "npm:4.6.2"
     typescript-optional: "npm:2.0.1"
@@ -39870,19 +39870,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"merkletreejs@npm:0.3.11":
-  version: 0.3.11
-  resolution: "merkletreejs@npm:0.3.11"
-  dependencies:
-    bignumber.js: "npm:^9.0.1"
-    buffer-reverse: "npm:^1.0.1"
-    crypto-js: "npm:^4.2.0"
-    treeify: "npm:^1.1.0"
-    web3-utils: "npm:^1.3.4"
-  checksum: 10/a93520ef768648d1e4ebd175182bd3d304270b8eb0700df5be99395fb3ad8805407bdaf3231d13b1649e87de799aa06d71c616db047ad039025764eb23b02244
-  languageName: node
-  linkType: hard
-
 "merkletreejs@npm:0.4.0":
   version: 0.4.0
   resolution: "merkletreejs@npm:0.4.0"
@@ -48378,13 +48365,6 @@ __metadata:
   dependencies:
     ret: "npm:~0.1.10"
   checksum: 10/5405b5a3effed649e6133d51d45cecbbbb02a1dd8d5b78a5e7979a69035870c817a5d2682d0ebb62188d3a840f7b24ea00ebbad2e418d5afabed151e8db96d04
-  languageName: node
-  linkType: hard
-
-"safe-stable-stringify@npm:2.4.3":
-  version: 2.4.3
-  resolution: "safe-stable-stringify@npm:2.4.3"
-  checksum: 10/a6c192bbefe47770a11072b51b500ed29be7b1c15095371c1ee1dc13e45ce48ee3c80330214c56764d006c485b88bd0b24940d868948170dddc16eed312582d8
   languageName: node
   linkType: hard
 
