@@ -59,7 +59,7 @@
     "http-errors": "2.0.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "run-time-error-cjs": "1.4.0",
-    "safe-stable-stringify": "2.4.3",
+    "safe-stable-stringify": "2.5.0",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
