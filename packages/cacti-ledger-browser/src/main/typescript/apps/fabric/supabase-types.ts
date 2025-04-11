@@ -55,3 +55,33 @@ export interface FabricCertificate {
   valid_from: string;
   valid_to: string;
 }
+
+export interface DiscoveryMSP {
+  id: string;
+  mspid: string;
+  name: string;
+  organizational_unit_identifiers: string;
+  admins: string;
+}
+
+export interface DiscoveryPeer {
+  id: string;
+  endpoint: string;
+  name: string;
+  chaincodes: string;
+  ledger_height: number;
+  discovery_msp_id: string;
+}
+
+export interface DiscoveryPeerChaincodes {
+  name: string;
+  version: string;
+}
+
+export interface DiscoveryOrderer {
+  id: string;
+  host: string;
+  name: string;
+  port: number;
+  discovery_msp_id: string;
+}

@@ -122,7 +122,7 @@ export default function AppCard({ appConfig }: AppCardProps) {
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: 400,
+        width: "400px",
       }}
     >
       <CardActionArea
