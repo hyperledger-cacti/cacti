@@ -231,10 +231,12 @@ export class BesuTestLedger implements ITestLedger {
 
     if (!omitPull) {
       this.log.debug(`Pulling container image ${imageFqn} ...`);
+      this.log.info(`Pulling container image ${imageFqn} ...`); //added by Rodolfo Carapau
       await this.pullContainerImage(imageFqn);
       this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
+      this.log.info(`Pulled ${imageFqn} OK. Starting container...`); //added by Rodolfo Carapau
     }
-
+    this.log.info(`This will appear before the 404 error`); //added by Rodolfo Carapau
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
         imageFqn,
