@@ -1,6 +1,6 @@
 # `@hyperledger/cacti-ledger-browser`
 
-This component allows viewing ledger data in Supabase or other postgreSQL compatible database. The data is fed to supabase by persistence plugins for each ledgers.
+This component allows viewing ledger data in Supabase or other PostgreSQL compatible database. The data is fed to supabase by persistence plugins for each ledgers.
 
 ## Summary
 
@@ -8,9 +8,6 @@ This component allows viewing ledger data in Supabase or other postgreSQL compat
   - [Summary](#summary)
   - [Remarks](#remarks)
   - [Getting Started](#getting-started)
-    - [Prerequisites using yarn](#prerequisites-using-yarn)
-    - [Alternative Prerequisites using npm](#alternative-prerequisites-using-npm)
-    - [Usage](#usage)
   - [Contributing](#contributing)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
@@ -22,35 +19,9 @@ This component allows viewing ledger data in Supabase or other postgreSQL compat
 
 ## Getting Started
 
-Clone the git repository on your local machine. Follow these instructions that will get you a copy of the project up and running on your local machine for development and testing purposes.
+Clone the git repository on your local machine.
 
-### Prerequisites using yarn
-
-In the root of the project, execute the command to install and build the dependencies. It will also build this GUI front-end component:
-
-```sh
-yarn run build
-```
-
-### Alternative Prerequisites using npm
-
-In the root of the project, execute the command to install and build the dependencies. It will also build this GUI front-end component:
-
-```sh
-npm install
-```
-
-### Usage
-
-- Run Supabase instance (see documentation for detailed instructions). For development purposes, you can use our image located in `tools/docker/supabase-all-in-one`.
-- Run one or more persistence plugins:
-  - [Ethereum](../cacti-plugin-persistence-ethereum)
-  - [Fabric] (../cacti-plugin-persistence-fabric)
-- Edit Supabase configuration files, set correct supabase API URL and service_role key.
-  - ./src/main/typescript/common/supabase-client.tsx
-  - ./src/main/typescript/common/queries.ts
-- Execute `yarn run start` or `npm start` in this package directory.
-- The running application address: http://localhost:3001/ (can be changed in [Vite configuration](./vite.config.ts))
+See [docs/docs/cactus/ledger-browser/setup.md](../../docs/docs/cactus/ledger-browser/setup.md) for detailed information on how to setup and use this package.
 
 ## Contributing
 
