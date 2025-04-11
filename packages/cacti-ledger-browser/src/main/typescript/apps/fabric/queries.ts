@@ -6,6 +6,9 @@
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { queryOptions } from "@tanstack/react-query";
 import {
+  DiscoveryMSP,
+  DiscoveryOrderer,
+  DiscoveryPeer,
   FabricBlock,
   FabricCertificate,
   FabricTransaction,
@@ -209,5 +212,70 @@ export function fabricActionEndorsements(actionId: string) {
 
       return data as FabricTransactionActionEndorsement[];
     },
+  });
+}
+
+/**
+ * Get all MSPs discovered on current fabric channel.
+ */
+export function fabricDiscoveryMSPs() {
+  const [supabase, supabaseQueryKey] = useSupabaseClient();
+  const tableName = "discovery_msp";
+
+  return queryOptions({
+    queryKey: [supabaseQueryKey, tableName],
+    queryFn: async () => {
+      const { data, error } = await supabase.from(tableName).select();
+
+      if (error) {
+        throw new Error(`Could not get discovery MSPs: ${error.message}`);
+      }
+
+      return data as DiscoveryMSP[];
+    },
+  });
+}
+
+/**
+ * Get all peers and orderers for specified msp.
+ *
+ * @param mspId: Database ID of the MSP (i.e. uuid in `id` field)
+ */
+export function fabricDiscoveryNodes(mspId?: string) {
+  const [supabase, supabaseQueryKey] = useSupabaseClient();
+
+  return queryOptions({
+    queryKey: [supabaseQueryKey, "fabricDiscoveryNodes", mspId],
+    queryFn: async () => {
+      // Fetch peers
+      const { data: peers, error: peerError } = await supabase
+        .from("discovery_peers")
+        .select()
+        .match({ discovery_msp_id: mspId });
+
+      if (peerError) {
+        throw new Error(
+          `Could not get peers of MSP ID ${mspId}: ${peerError.message}`,
+        );
+      }
+
+      // Fetch orderers
+      const { data: orderers, error: ordererError } = await supabase
+        .from("discovery_orderers")
+        .select()
+        .match({ discovery_msp_id: mspId });
+
+      if (ordererError) {
+        throw new Error(
+          `Could not get orderers of MSP ID ${mspId}: ${ordererError.message}`,
+        );
+      }
+
+      return {
+        peers: peers as DiscoveryPeer[],
+        orderers: orderers as DiscoveryOrderer[],
+      };
+    },
+    enabled: !!mspId,
   });
 }
