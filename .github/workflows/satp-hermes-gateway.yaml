@@ -22,7 +22,7 @@ jobs:
       NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
-      CACHE_VERSION: v2
+      CACHE_VERSION: v3
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       NODEJS_VERSION: v18.19.0
-      CONFIGURE_DISABLED: true
+      CONFIGURE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_PATTERN_SPECIFIC_TEST: workspace @hyperledger/cactus-plugin-satp-hermes test:integration:e2e:transfer
