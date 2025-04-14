@@ -7,7 +7,7 @@
 //////////////////////////////////
 
 const postgresImageName = "postgres";
-const postgresImageVersion = "14.6-alpine";
+const postgresImageVersion = "15.12-alpine";
 const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
 const setupTimeout = 1000 * 60; // 1 minute timeout for setup
