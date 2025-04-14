@@ -25,6 +25,9 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.plugin_status
     OWNER to postgres;
 
+ALTER TABLE public.plugin_status
+ENABLE ROW LEVEL SECURITY;
+
 GRANT ALL ON TABLE public.plugin_status TO anon;
 GRANT ALL ON TABLE public.plugin_status TO authenticated;
 GRANT ALL ON TABLE public.plugin_status TO postgres;
@@ -49,6 +52,26 @@ CREATE TABLE IF NOT EXISTS ethereum.block
 ALTER TABLE IF EXISTS ethereum.block
     OWNER to postgres;
 
+ALTER TABLE ethereum.block
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY block_select ON ethereum.block
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY block_insert ON ethereum.block
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY block_update ON ethereum.block
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY block_delete ON ethereum.block
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
 -- Table: ethereum.token_metadata_erc20
 
 -- DROP TABLE IF EXISTS ethereum."token_metadata_erc20";
@@ -67,6 +90,26 @@ CREATE TABLE IF NOT EXISTS ethereum."token_metadata_erc20"
 ALTER TABLE IF EXISTS ethereum."token_metadata_erc20"
     OWNER to postgres;
 
+ALTER TABLE ethereum."token_metadata_erc20"
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY token_metadata_erc20_select ON ethereum."token_metadata_erc20"
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY token_metadata_erc20_insert ON ethereum."token_metadata_erc20"
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY token_metadata_erc20_update ON ethereum."token_metadata_erc20"
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY token_metadata_erc20_delete ON ethereum."token_metadata_erc20"
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
 -- Table: ethereum.token_metadata_erc721
 
 -- DROP TABLE IF EXISTS ethereum."token_metadata_erc721";
@@ -84,13 +127,33 @@ CREATE TABLE IF NOT EXISTS ethereum."token_metadata_erc721"
 ALTER TABLE IF EXISTS ethereum."token_metadata_erc721"
     OWNER to postgres;
 
+ALTER TABLE ethereum."token_metadata_erc721"
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY token_metadata_erc721_select ON ethereum."token_metadata_erc721"
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY token_metadata_erc721_insert ON ethereum."token_metadata_erc721"
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY token_metadata_erc721_update ON ethereum."token_metadata_erc721"
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY token_metadata_erc721_delete ON ethereum."token_metadata_erc721"
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
 -- Table: ethereum.token_erc721
 
 -- DROP TABLE IF EXISTS ethereum.token_erc721;
 
 CREATE TABLE IF NOT EXISTS ethereum.token_erc721
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_address text COLLATE pg_catalog."default" NOT NULL,
     token_address text COLLATE pg_catalog."default" NOT NULL,
     uri text COLLATE pg_catalog."default" NOT NULL,
@@ -104,9 +167,28 @@ CREATE TABLE IF NOT EXISTS ethereum.token_erc721
         ON DELETE NO ACTION
 );
 
-
 ALTER TABLE IF EXISTS ethereum.token_erc721
     OWNER to postgres;
+
+ALTER TABLE ethereum.token_erc721
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY token_erc721_select ON ethereum.token_erc721
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY token_erc721_insert ON ethereum.token_erc721
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY token_erc721_update ON ethereum.token_erc721
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY token_erc721_delete ON ethereum.token_erc721
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
 
 -- Table: ethereum.transaction
 
@@ -114,7 +196,7 @@ ALTER TABLE IF EXISTS ethereum.token_erc721
 
 CREATE TABLE IF NOT EXISTS ethereum.transaction
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     index numeric NOT NULL,
     hash text COLLATE pg_catalog."default" NOT NULL,
     block_number numeric NOT NULL,
@@ -134,13 +216,33 @@ CREATE TABLE IF NOT EXISTS ethereum.transaction
 ALTER TABLE IF EXISTS ethereum.transaction
     OWNER to postgres;
 
+ALTER TABLE ethereum.transaction
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY transaction_select ON ethereum.transaction
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY transaction_insert ON ethereum.transaction
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY transaction_update ON ethereum.transaction
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY transaction_delete ON ethereum.transaction
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
 -- Table: ethereum.token_transfer
 
 -- DROP TABLE IF EXISTS ethereum.token_transfer;
 
 CREATE TABLE IF NOT EXISTS ethereum.token_transfer
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     transaction_id uuid NOT NULL,
     sender text COLLATE pg_catalog."default" NOT NULL,
     recipient text COLLATE pg_catalog."default" NOT NULL,
@@ -155,6 +257,26 @@ CREATE TABLE IF NOT EXISTS ethereum.token_transfer
 ALTER TABLE IF EXISTS ethereum.token_transfer
     OWNER to postgres;
 
+ALTER TABLE ethereum.token_transfer
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY token_transfer_select ON ethereum.token_transfer
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY token_transfer_insert ON ethereum.token_transfer
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY token_transfer_update ON ethereum.token_transfer
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY token_transfer_delete ON ethereum.token_transfer
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
 COMMENT ON COLUMN ethereum.token_transfer.value
     IS 'ERC20 - token quantity, ERC721 - token ID';
 
@@ -167,6 +289,7 @@ COMMENT ON COLUMN ethereum.token_transfer.value
 -- DROP VIEW ethereum.erc20_token_history_view;
 
 CREATE OR REPLACE VIEW ethereum.erc20_token_history_view
+WITH (security_invoker = on)
  AS
  SELECT
     tx.hash AS transaction_hash,
@@ -189,6 +312,7 @@ ALTER TABLE ethereum.erc20_token_history_view
 -- DROP VIEW ethereum.erc721_token_history_view;
 
 CREATE OR REPLACE VIEW ethereum.erc721_token_history_view
+WITH (security_invoker = on)
  AS
  SELECT tx.hash AS transaction_hash,
     tx."to" AS token_address,
@@ -255,7 +379,9 @@ CREATE UNIQUE INDEX token_erc20_uniq_idx
 
 -- Refresh ethereum.token_erc20 on new token transfers
 CREATE OR REPLACE FUNCTION refresh_token_erc20()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SET search_path = ethereum
+AS $$
 BEGIN
     REFRESH MATERIALIZED VIEW ethereum.token_erc20;
     RETURN NULL;
@@ -273,6 +399,7 @@ EXECUTE FUNCTION refresh_token_erc20();
 
 CREATE OR REPLACE PROCEDURE ethereum.update_issued_erc721_tokens(IN from_block_number numeric)
 LANGUAGE 'plpgsql'
+SET search_path = ethereum, public
 AS $BODY$
 DECLARE
   current_token_entry ethereum.token_erc721%ROWTYPE;
@@ -342,6 +469,7 @@ CREATE OR REPLACE FUNCTION ethereum.get_missing_blocks_in_range(
   end_number integer)
 RETURNS TABLE(block_number integer)
 LANGUAGE 'plpgsql'
+SET search_path = ethereum
 COST 100
 VOLATILE PARALLEL UNSAFE
 ROWS 1000
@@ -367,3 +495,6 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA ethereum TO anon, authenticated, service_ro
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ethereum GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ethereum GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ethereum GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+
+REVOKE ALL ON ethereum.token_erc20 FROM anon, authenticated;
+GRANT SELECT ON ethereum.token_erc20 TO service_role;
