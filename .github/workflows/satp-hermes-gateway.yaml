@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       NODEJS_VERSION: v18.19.0
-      CONFIGURE_DISABLED: true
+      CONFIGURE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_PATTERN_SPECIFIC_TEST: workspace @hyperledger/cactus-plugin-satp-hermes test:integration:e2e:transfer
