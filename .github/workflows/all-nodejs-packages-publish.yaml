@@ -25,7 +25,7 @@ jobs:
       id-token: write
     steps:
       - name: Check Version Format in Tag
-        uses: nowsprinting/check-version-format-action@v4.0.5
+        uses: nowsprinting/check-version-format-action@8678d594eeed2666b105eca0253f77c5eae94e5a #v4.0.5
         id: version
         with:
           prefix: 'v'
@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "inputs.GIT_TAG_TO_PUBLISH=${{ inputs.GIT_TAG_TO_PUBLISH }}" 
 
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
         with:
           ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
       
@@ -48,7 +48,7 @@ jobs:
 
       - run: git status --long --verbose
 
-      - uses: actions/setup-node@v4.0.3
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           always-auth: true
           node-version: ${{ env.NODEJS_VERSION }}
@@ -84,7 +84,7 @@ jobs:
       # so that we can publish to both registries instead of having to choose.
       - run: rm /home/runner/work/_temp/.npmrc
 
-      - uses: actions/setup-node@v4.0.3
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           always-auth: true
           node-version: ${{ env.NODEJS_VERSION }}

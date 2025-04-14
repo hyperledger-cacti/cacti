@@ -29,9 +29,9 @@ jobs:
       status: ${{ steps.changes.outputs.weaver_code_changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
-      - uses: dorny/paths-filter@v2.11.1
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
         id: changes
         with:
           filters: |
@@ -48,21 +48,21 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3.11.0
+        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Go
-        uses: actions/setup-go@v4.0.0
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
         with:
           go-version: '1.20.2'
 
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
@@ -424,9 +424,9 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
-      - uses: dorny/paths-filter@v2.11.1
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
         id: changes
         with:
           filters: |
@@ -435,18 +435,18 @@ jobs:
               - '.github/workflows/test_weaver-data-sharing.yaml'
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3.11.0
+        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Go
-        uses: actions/setup-go@v4.0.0
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
         with:
           go-version: '1.20.2'
 
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
@@ -851,9 +851,9 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
-      - uses: dorny/paths-filter@v2.11.1
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
         id: changes
         with:
           filters: |
@@ -862,23 +862,23 @@ jobs:
               - '.github/workflows/test_weaver-data-sharing.yaml'
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3.11.0
+        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Go
-        uses: actions/setup-go@v4.0.0
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
         with:
           go-version: '1.20.2'
 
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@v1.0.6
+        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
         with:
           profile: minimal
           toolchain: stable

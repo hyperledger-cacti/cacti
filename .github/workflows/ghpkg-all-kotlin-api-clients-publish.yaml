@@ -30,7 +30,7 @@ jobs:
           && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
 
     - name: Checkout
-      uses: actions/checkout@v4.1.7
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       with:
         fetch-depth: 0
 
@@ -40,13 +40,13 @@ jobs:
         export GITVERSION
         echo "GITVERSION=$GITVERSION" >> "$GITHUB_ENV"
 
-    - uses: actions/setup-java@v3.11.0
+    - uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
       with:
         distribution: 'adopt'
         java-version: '8'
 
     - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
-      uses: actions/setup-node@v4.0.3
+      uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
       with:
         node-version: ${{ env.NODEJS_VERSION }}
 
@@ -61,7 +61,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-ledger-connector-corda-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-ledger-connector-corda-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -75,7 +75,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-cmd-api-server-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-cmd-api-server-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-cmd-api-server/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -89,7 +89,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-core-api-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-core-api-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-core-api/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -103,7 +103,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-consortium-manual-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-consortium-manual-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-consortium-manual/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -117,7 +117,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-keychain-google-sm-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-keychain-google-sm-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-google-sm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -131,7 +131,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-keychain-aws-sm-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-keychain-aws-sm-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-aws-sm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -145,7 +145,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-keychain-azure-kv-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-keychain-azure-kv-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-azure-kv/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -159,7 +159,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-keychain-memory-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-keychain-memory-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-memory/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -173,7 +173,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-keychain-vault-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-keychain-vault-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-vault/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -187,7 +187,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-ledger-connector-fabric-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-ledger-connector-fabric-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-ledger-connector-fabric/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -201,7 +201,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-keychain-memory-wasm-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-keychain-memory-wasm-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -215,7 +215,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-satp-hermes-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-satp-hermes-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -229,7 +229,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-example-supply-chain-business-logic-plugin-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-example-supply-chain-business-logic-plugin-kotlin-client-${{ env.GITVERSION }}.jar
         path: examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -243,7 +243,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-example-carbon-accounting-business-logic-plugin-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-example-carbon-accounting-business-logic-plugin-kotlin-client-${{ env.GITVERSION }}.jar
         path: examples/cactus-example-carbon-accounting-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
@@ -257,7 +257,7 @@ jobs:
         ./gradlew build
 
     - name: publish-cactus-plugin-object-store-ipfs-kotlin-client
-      uses: actions/upload-artifact@v4.0.0
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
       with:
         name: cactus-plugin-object-store-ipfs-kotlin-client-${{ env.GITVERSION }}.jar
         path: extensions/cactus-plugin-object-store-ipfs/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar

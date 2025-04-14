@@ -28,7 +28,7 @@ jobs:
         COPM_NET_2: ${{ matrix.net2 }}
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@v4.1.1
+        - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
         - uses: ./.github/actions/copm_test/
           with:
             github-actor: ${GITHUB_ACTOR}
@@ -47,7 +47,7 @@ jobs:
         - run: ./tools/ci.sh
         - name: Upload coverage reports as artifacts
           if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
-          uses: actions/upload-artifact@v4.3.3
+          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
           with:
             name: copm-pledge-${{ matrix.net1 }}-${{ matrix.net2}}
             path: ./code-coverage-ts/**/
@@ -70,7 +70,7 @@ jobs:
         COPM_NET_1: ${{ matrix.net1 }}
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@v4.1.1
+        - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
         - uses: ./.github/actions/copm_test/
           with:
             github-actor: ${GITHUB_ACTOR}
@@ -84,7 +84,7 @@ jobs:
         - run: ./tools/ci.sh
         - name: Upload coverage reports as artifacts
           if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
-          uses: actions/upload-artifact@v4.3.3
+          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
           with:
             name: copm-lock-${{ matrix.net1 }}
             path: ./code-coverage-ts/**/

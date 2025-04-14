@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-22.04
     name: Dependent Issues
     steps:
-      - uses: z0al/dependent-issues@v1
+      - uses: z0al/dependent-issues@104e2eed9880cf70215b545f9e5674372d576a05 #v1
         env:
           # (Required) The token to use to make API calls to GitHub.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
