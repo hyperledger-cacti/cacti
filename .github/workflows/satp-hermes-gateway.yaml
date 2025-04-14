@@ -76,6 +76,10 @@ jobs:
       #    for i in {1..5}; do
       #      docker pull ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5 && break || sleep 10;
       #    done
+      - name: Check for existing containers and ports
+        run: |
+          docker ps
+          sudo lsof -i -P -n | grep LISTEN
 
       - name: Run CI script
         run: ./tools/ci.sh
