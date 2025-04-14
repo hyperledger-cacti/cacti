@@ -25,7 +25,7 @@ jobs:
     steps:
       - id: lint-git-repo
         name: Lint Git Repo
-        uses: petermetz/gh-action-dci-lint@v0.6.1
+        uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
         with:
           lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
       - name: Get the output response
@@ -34,7 +34,7 @@ jobs:
   check-ci-skip:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: Check CI Skip
         run: node tools/ci-skip-for-maintainers.js ${{ github.event.pull_request.url }} ${{ github.event.pull_request.user.login }}
 
@@ -44,7 +44,7 @@ jobs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: Set output
         id: set-output
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
@@ -67,9 +67,9 @@ jobs:
       copm-changed: ${{ steps.changes.outputs.copm-changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
-      - uses: dorny/paths-filter@v2.11.1
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
         id: changes
         with:
           filters: |
@@ -200,14 +200,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -231,13 +231,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -259,7 +259,7 @@ jobs:
         id: print_env_git_index_file_count
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
-      - uses: actions/github-script@v7.0.1
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
         id: set-result-git_index_file_count
         with:
           script: |
@@ -274,7 +274,7 @@ jobs:
 
       - name: Check Lint Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@v7.0.1
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
         with:
           script: |
             const failMsg = "yarn lint script produced version control " +
@@ -299,14 +299,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -329,7 +329,7 @@ jobs:
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
 
-      - uses: actions/github-script@v7.0.1
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
         id: set-result-git_index_file_count
         with:
           script: |
@@ -344,7 +344,7 @@ jobs:
 
       - name: Check CodeGen Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@v7.0.1
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
         with:
           script: |
             const failMsg = "yarn codegen script produced version control " +
@@ -370,13 +370,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -397,13 +397,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -424,14 +424,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -441,7 +441,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-1
           path: ./code-coverage-ts/**/
@@ -465,14 +465,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -482,7 +482,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-2
           path: ./code-coverage-ts/**/
@@ -501,7 +501,7 @@ jobs:
 
       - if: ${{ env.RUN_TRIVY_SCAN == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cmd-api-server
-        uses: aquasecurity/trivy-action@0.19.0
+        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
         with:
           image-ref: 'cmd-api-server'
           format: 'table'
@@ -516,7 +516,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           path: .tmp/benchmark-results/cmd-api-server/
           key: ${{ runner.os }}-benchmark
@@ -526,7 +526,7 @@ jobs:
         run: yarn run benchmark
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1.20.3
+        uses: benchmark-action/github-action-benchmark@4de1bed97a47495fc4c5404952da0499e31f5c29 #v1.20.3
         with:
           tool: 'benchmarkjs'
           output-file-path: .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log
@@ -555,14 +555,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -572,7 +572,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-3
           path: ./code-coverage-ts/**/
@@ -591,14 +591,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -608,7 +608,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-4
           path: ./code-coverage-ts/**/
@@ -626,14 +626,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -642,7 +642,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-5
           path: ./code-coverage-ts/**/
@@ -660,14 +660,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -677,7 +677,7 @@ jobs:
 
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-6
           path: ./code-coverage-ts/**/
@@ -696,14 +696,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -712,7 +712,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-7
           path: ./code-coverage-ts/**/
@@ -730,14 +730,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -746,7 +746,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-8
           path: ./code-coverage-ts/**/
@@ -765,14 +765,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -781,7 +781,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-9
           path: ./code-coverage-ts/**/
@@ -801,14 +801,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -817,7 +817,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-10
           path: ./code-coverage-ts/**/
@@ -835,14 +835,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -851,7 +851,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-11
           path: ./code-coverage-ts/**/
@@ -870,14 +870,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -886,7 +886,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-12
           path: ./code-coverage-ts/**/
@@ -904,14 +904,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -920,7 +920,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-13
           path: ./code-coverage-ts/**/
@@ -940,14 +940,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -956,7 +956,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-14
           path: ./code-coverage-ts/**/
@@ -974,14 +974,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -990,7 +990,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-15
           path: ./code-coverage-ts/**/
@@ -1008,14 +1008,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1024,7 +1024,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-16
           path: ./code-coverage-ts/**/
@@ -1043,14 +1043,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1059,7 +1059,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-17
           path: ./code-coverage-ts/**/
@@ -1078,14 +1078,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1094,7 +1094,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-18
           path: ./code-coverage-ts/**/
@@ -1112,14 +1112,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1128,7 +1128,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-19
           path: ./code-coverage-ts/**/
@@ -1145,14 +1145,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1161,7 +1161,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-20
           path: ./code-coverage-ts/**/
@@ -1179,14 +1179,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1195,7 +1195,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-21
           path: ./code-coverage-ts/**/
@@ -1213,14 +1213,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1229,7 +1229,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-22
           path: ./code-coverage-ts/**/
@@ -1249,13 +1249,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1264,7 +1264,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-23
           path: ./code-coverage-ts/**/
@@ -1287,14 +1287,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1303,7 +1303,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-24
           path: ./code-coverage-ts/**/
@@ -1313,7 +1313,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           path: .tmp/benchmark-results/plugin-ledger-connector-besu/
           key: ${{ runner.os }}-benchmark
@@ -1323,7 +1323,7 @@ jobs:
         run: yarn run benchmark
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1.20.3
+        uses: benchmark-action/github-action-benchmark@4de1bed97a47495fc4c5404952da0499e31f5c29 #v1.20.3
         with:
           tool: 'benchmarkjs'
           output-file-path: .tmp/benchmark-results/plugin-ledger-connector-besu/run-plugin-ledger-connector-besu-benchmark.ts.log
@@ -1355,14 +1355,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1371,7 +1371,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-25
           path: ./code-coverage-ts/**/
@@ -1394,15 +1394,15 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1413,7 +1413,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-26
           path: ./code-coverage-ts/**/
@@ -1424,7 +1424,7 @@ jobs:
   
       - if: ${{ env.RUN_TRIVY_SCAN == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cactus-connector-corda-server
-        uses: aquasecurity/trivy-action@0.19.0
+        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
         with:
           scan-type: 'rootfs'
           scan-ref: 'packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/build/libs/cacti-connector-corda-server-dev.jar'
@@ -1450,14 +1450,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1467,7 +1467,7 @@ jobs:
 
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-27
           path: ./code-coverage-ts/**/
@@ -1499,14 +1499,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1515,7 +1515,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-28
           path: ./code-coverage-ts/**/
@@ -1536,14 +1536,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1552,7 +1552,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-30
           path: ./code-coverage-ts/**/
@@ -1572,13 +1572,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1587,7 +1587,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-31
           path: ./code-coverage-ts/**/
@@ -1604,13 +1604,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1619,7 +1619,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-32
           path: ./code-coverage-ts/**/
@@ -1638,14 +1638,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1654,7 +1654,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-33
           path: ./code-coverage-ts/**/
@@ -1671,14 +1671,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1687,7 +1687,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-34
           path: ./code-coverage-ts/**/
@@ -1704,14 +1704,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1720,7 +1720,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-cpp-fabric
           path: ./code-coverage-ts/**/
@@ -1738,14 +1738,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1754,7 +1754,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-35
           path: ./code-coverage-ts/**/
@@ -1769,16 +1769,16 @@ jobs:
   #   runs-on: ubuntu-22.04
   #   steps:
   #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
-  #       uses: actions/setup-node@v4.0.3
+  #       uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
   #       with:
   #         node-version: ${{ env.NODEJS_VERSION }}
-  #     - uses: actions/checkout@v4.1.7
+  #     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
   #     - id: yarn-cache-dir-path
   #       name: Get yarn cache directory path
   #       run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
   #     - id: yarn-cache
   #       name: Restore Yarn Cache
-  #       uses: actions/cache@v4.2.2
+  #       uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
   #       with:
   #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
   #         path: ./.yarn/
@@ -1802,14 +1802,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1818,7 +1818,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-36
           path: ./code-coverage-ts/**/
@@ -1835,14 +1835,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1851,7 +1851,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-37
           path: ./code-coverage-ts/**/
@@ -1871,14 +1871,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1887,7 +1887,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-38
           path: ./code-coverage-ts/**/
@@ -1904,14 +1904,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1920,7 +1920,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-39
           path: ./code-coverage-ts/**/
@@ -1938,14 +1938,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1954,7 +1954,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-40
           path: ./code-coverage-ts/**/
@@ -1973,14 +1973,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -1989,13 +1989,13 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-41
           path: ./code-coverage-ts/**/
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@ca7e86820a6802e19349b5622e91976c4561c454 #v1
 
       - name: Run solidity tests
         run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
@@ -2014,14 +2014,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2030,7 +2030,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-42
           path: ./code-coverage-ts/**/
@@ -2050,14 +2050,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2066,7 +2066,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-43
           path: ./code-coverage-ts/**/
@@ -2083,13 +2083,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2098,7 +2098,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-44
           path: ./code-coverage-ts/**/
@@ -2120,14 +2120,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2136,7 +2136,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-45
           path: ./code-coverage-ts/**/
@@ -2153,14 +2153,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2169,7 +2169,7 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-46
           path: ./code-coverage-ts/**/
@@ -2186,14 +2186,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -2202,14 +2202,14 @@ jobs:
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-47
           path: ./code-coverage-ts/**/
   ghcr-besu-all-in-one:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
   ghcr-connector-corda-server:
@@ -2219,14 +2219,14 @@ jobs:
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
 
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-connector-corda-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
          
   ghcr-corda-all-in-one-flowdb:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
 
@@ -2239,10 +2239,10 @@ jobs:
       IMAGE_NAME: cacti-dev-container-vscode
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: npm_install_@devcontainers/cli@0.44.0
         run: npm install -g @devcontainers/cli@0.44.0
       - name: npx_yes_devcontainers_cli_build
@@ -2251,33 +2251,33 @@ jobs:
   ghcr-example-supply-chain-app:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
 
   ghcr-fabric2-all-in-one:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
 
   ghcr-daml-all-in-one:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/daml-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/daml-all-in-one/ -f ./tools/docker/daml-all-in-one/Dockerfile
 
   ghcr-keychain-vault-server:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-keychain-vault-server
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
       - if: ${{ env.RUN_TRIVY_SCAN == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cactus-keychain-vault-server
-        uses: aquasecurity/trivy-action@0.19.0
+        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
         with:
           image-ref: 'cactus-keychain-vault-server'
           format: 'table'

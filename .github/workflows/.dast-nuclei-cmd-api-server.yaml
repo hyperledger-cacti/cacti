@@ -27,7 +27,7 @@ jobs:
             && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
 
       - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
@@ -37,9 +37,9 @@ jobs:
       - name: Verify jq
         run: jq --version
 
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
-      - uses: actions/setup-go@v4.0.0
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
         with:
           go-version: 1.23
 
@@ -128,7 +128,7 @@ jobs:
           echo "dast_jwt=$JWT" >> "$GITHUB_ENV"
 
       - name: Start API Server & Run DAST
-        uses: BerniWittmann/background-server-action@v1.1.0
+        uses: BerniWittmann/background-server-action@4cd0c67a97c1d490dd4ac7e303a528ce56394e29 #v1.1.0
         env:
           # Needed because the wait-on syntax otherwise keeps thinking that
           # there is a problem due to our self signed certificates on the
@@ -148,7 +148,7 @@ jobs:
         run: "nuclei -list=urls.txt -dast -severity=high,critical -sarif-export ~/nuclei.sarif -output=nuclei.log"
 
       - name: GitHub Workflow artifacts
-        uses: actions/upload-artifact@v4.0.0
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
         with:
           name: nuclei.log
           path: nuclei.log

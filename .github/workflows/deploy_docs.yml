@@ -29,15 +29,15 @@ jobs:
       pages: write
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: Use Python 3.x
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@d09bd5e6005b175076f227b13d9730d56e9dcfcb #v4
         with:
           python-version: '3.10'
           cache: 'pip' # caching pip dependencies

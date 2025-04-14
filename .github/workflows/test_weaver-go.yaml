@@ -34,9 +34,9 @@ jobs:
       simpleassettransfer_changed: ${{ steps.changes.outputs.simpleassettransfer_changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
-      - uses: dorny/paths-filter@v2.11.1
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
         id: changes
         with:
           filters: |
@@ -71,10 +71,10 @@ jobs:
     if:   inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -96,10 +96,10 @@ jobs:
     # if: ${{ false }}  # disable
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -120,10 +120,10 @@ jobs:
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -140,10 +140,10 @@ jobs:
     if:  inputs.run_all == 'true' ||  needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -160,10 +160,10 @@ jobs:
     if:  inputs.run_all == 'true' ||  ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed   == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -184,10 +184,10 @@ jobs:
     if: ${{   inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gocli_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -204,10 +204,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simplestate_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -228,10 +228,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' ||  needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.satpsimpleasset_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -252,10 +252,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleasset_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -276,10 +276,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassetandinterop_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -300,10 +300,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassettransfer_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -324,10 +324,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed   == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
     - name: Set up Go
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
         

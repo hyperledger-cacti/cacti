@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
         with:
           fetch-depth: 0 # fetch all history so multiple commits can be scanned
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitGuardian scan
-        uses: GitGuardian/ggshield-action@v1.14.4
+        uses: GitGuardian/ggshield-action@a433b400f1dcee1cf4a9a25d6a85de42d97beca5 #v1.14.4
         with:
           args: --show-secrets --exit-zero --all-policies --verbose
         env:
