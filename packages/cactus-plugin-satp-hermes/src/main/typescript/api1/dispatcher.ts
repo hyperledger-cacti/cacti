@@ -22,7 +22,10 @@ import type {
   TransactResponse,
 } from "../generated/gateway-client/typescript-axios/api";
 import { executeGetIntegrations } from "./admin/get-integrations-handler-service";
-import { type ISATPManagerOptions, SATPManager } from "../services/gateway/satp-manager";
+import {
+  type ISATPManagerOptions,
+  SATPManager,
+} from "../services/gateway/satp-manager";
 import type { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import type { SATPCrossChainManager } from "../cross-chain-mechanisms/satp-cc-manager";
 import { TransactEndpointV1 } from "./transaction/transact-endpoint";
@@ -205,7 +208,7 @@ export class BLODispatcher {
    * @param req TransactRequest
    * @throws GatewayShuttingDownError when the flag isShuttingDown is true
    * @returns TransactResponse
-  */
+   */
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
     const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
@@ -235,7 +238,7 @@ export class BLODispatcher {
 
   /**
    * Changes the isShuttingDown flag to true, stopping all new requests
-  */
+   */
   public setInitiateShutdown(): void {
     this.logger.info(`Stopping requests`);
     this.isShuttingDown = true;

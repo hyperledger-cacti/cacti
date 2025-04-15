@@ -6,7 +6,11 @@ import {
 } from "@opentelemetry/sdk-trace-base";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
-import { Logger, LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common"; 
+import {
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import { Context, context, trace, Span } from "@opentelemetry/api";
 
 export interface MonitorServiceOptions {
@@ -23,7 +27,9 @@ export class MonitorService {
 
   private static instance: MonitorService | undefined;
 
-  public static createOrGetMonitorService(options: MonitorServiceOptions): MonitorService {
+  public static createOrGetMonitorService(
+    options: MonitorServiceOptions,
+  ): MonitorService {
     if (!MonitorService.instance) {
       MonitorService.instance = new MonitorService(options);
     }
@@ -31,18 +37,21 @@ export class MonitorService {
   }
 
   private constructor(options: MonitorServiceOptions) {
-    this.logger = LoggerProvider.getOrCreate({ 
-      level: (options.logLevel || "info") as LogLevelDesc, 
-      label: this.label 
+    this.logger = LoggerProvider.getOrCreate({
+      level: (options.logLevel || "info") as LogLevelDesc,
+      label: this.label,
     });
-    this.otelMetricsExporterUrl = options.otelMetricsExporterUrl || "http://localhost:4318/v1/metrics";
+    this.otelMetricsExporterUrl =
+      options.otelMetricsExporterUrl || "http://localhost:4318/v1/metrics";
   }
 
   public async init(): Promise<void> {
     this.logger.info("Initializing MonitorService...");
     if (!this.tracerProvider) {
       this.tracerProvider = new NodeTracerProvider();
-      this.tracerProvider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+      this.tracerProvider.addSpanProcessor(
+        new SimpleSpanProcessor(new ConsoleSpanExporter()),
+      );
       this.tracerProvider.register();
     }
 
@@ -84,7 +93,9 @@ export class MonitorService {
   ): Span {
     if (!this.tracerProvider) {
       this.tracerProvider = new NodeTracerProvider();
-      this.tracerProvider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+      this.tracerProvider.addSpanProcessor(
+        new SimpleSpanProcessor(new ConsoleSpanExporter()),
+      );
       this.tracerProvider.register();
     }
     const tracer = this.tracerProvider.getTracer(tracerName);
