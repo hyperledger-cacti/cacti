@@ -3,7 +3,6 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
   Checks,
-  JsObjectSigner,
   LogLevelDesc,
   Logger,
   LoggerProvider,
@@ -248,7 +247,11 @@ export class SATPSession {
   public getSessionState(): State {
     this.logger.info("serverSessionId: ", this.serverSessionData?.state);
     this.logger.info("clientSessionId: ", this.clientSessionData?.state);
-    return this.serverSessionData?.state || this.clientSessionData?.state || State.UNSPECIFIED;
+    return (
+      this.serverSessionData?.state ||
+      this.clientSessionData?.state ||
+      State.UNSPECIFIED
+    );
   }
 
   public verify(

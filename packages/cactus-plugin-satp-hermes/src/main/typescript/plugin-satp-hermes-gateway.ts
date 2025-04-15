@@ -109,7 +109,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
 
-
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -588,7 +587,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public async shutdown(): Promise<void> {
     const fnTag = `${this.className}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
-    
+
     this.logger.info("Shutting down Node server - BOL");
     await this.shutdownBLOServer();
     await this.shutdownGOLServer();
@@ -658,10 +657,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
   /**
    * Verify the state of the sessions before shutting down the server.
-   * This method is called before the server is shut down and awaits ensure that 
+   * This method is called before the server is shut down and awaits ensure that
    * all sessions are concluded before the server is terminated.
    * After all sessions are concluded, the job is cancelled.
-  */
+   */
   private async verifySessionsState(): Promise<void> {
     const fnTag = `${this.className}#verifySessionsState()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -678,14 +677,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * Verifies if the sessions are concluded before shutting down the server.
    * If they aren't starts a scheduled job to verify session states.
    * The job runs every 20 seconds until all sessions are concluded.
-  */
+   */
   private async startSessionVerificationJob(manager: any): Promise<void> {
     return new Promise<void>((resolve) => {
       const cleanup = () => {
         if (this.sessionVerificationJob) {
-            this.sessionVerificationJob.cancel();
-            this.activeJobs.delete(this.sessionVerificationJob);
-            this.sessionVerificationJob = null;
+          this.sessionVerificationJob.cancel();
+          this.activeJobs.delete(this.sessionVerificationJob);
+          this.sessionVerificationJob = null;
         }
       };
 
@@ -708,20 +707,22 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       initialCheck().then((needsRecurring) => {
         if (needsRecurring) {
           this.sessionVerificationJob = schedule.scheduleJob(
-            "*/20 * * * * *", async () => {
-            try {
-              const status = await manager.getSATPSessionState();
-              if (status) {
-                this.logger.info("All sessions concluded");
-                cleanup();
-                resolve();
-              } else {
-                this.logger.info("Sessions still pending");
+            "*/20 * * * * *",
+            async () => {
+              try {
+                const status = await manager.getSATPSessionState();
+                if (status) {
+                  this.logger.info("All sessions concluded");
+                  cleanup();
+                  resolve();
+                } else {
+                  this.logger.info("Sessions still pending");
+                }
+              } catch (error) {
+                this.logger.error(`Session check failed: ${error}`);
               }
-            } catch (error) {
-              this.logger.error(`Session check failed: ${error}`);
-            }
-          });
+            },
+          );
           this.activeJobs.add(this.sessionVerificationJob);
         }
       });
