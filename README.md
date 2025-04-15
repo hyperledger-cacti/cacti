@@ -1,7 +1,7 @@
- [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/hyperledger/cactus)
- ![license](https://img.shields.io/github/license/hyperledger/cacti) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
- [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger/cacti)
- ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus)
+ [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://vscode.dev/github/hyperledger-cacti/cacti)
+ [![License](https://img.shields.io/github/license/hyperledger-cacti/cacti)](https://opensource.org/licenses/Apache-2.0) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
+ [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger-cacti/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger-cacti/cacti)
+ [![GitHub issues](https://img.shields.io/github/issues/hyperledger-cacti/cacti)](https://github.com/hyperledger-cacti/cacti/issues)
 
 ![Cacti Logo Color](./images/HL_Cacti_Logo_Color.png#gh-light-mode-only)
 ![Cacti Logo Color](./images/HL_Cacti_Logo_Colorreverse.svg#gh-dark-mode-only)
