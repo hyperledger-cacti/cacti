@@ -106,7 +106,9 @@ export async function launchGateway(): Promise<void> {
     configValue: config.mergePolicies,
   });
   logger.debug("SATP Merge Policies is valid.");
-  mergePolicies.forEach((p: unknown, i: unknown) => logger.debug("Merge Policy #%d => %o", i, p));
+  mergePolicies.forEach((p: unknown, i: unknown) =>
+    logger.debug("Merge Policy #%d => %o", i, p),
+  );
 
   logger.debug("Validating SATP KeyPair...");
   const keyPair = validateSatpKeyPairJSON({
