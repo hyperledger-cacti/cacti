@@ -394,7 +394,7 @@ describe("SATPGateway startup", () => {
 
 afterAll(async () => {
   await pruneDockerAllIfGithubAction({ logLevel })
-    .then(() => { 
+    .then(() => {
       logger.info("Pruning throw OK");
     })
     .catch(async () => {
