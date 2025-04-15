@@ -1,7 +1,5 @@
 //// filepath: /Users/rafaelapb/Projects/blockchain-integration-framework/packages/cactus-plugin-satp-hermes/src/main/typescript/cross-chain-mechanisms/oracle/oracle-abstract.ts
-import type {
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import type { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import type { TransactionResponse } from "../../types/blockchain-interaction";
 
@@ -37,9 +35,11 @@ export interface ReadEntryArgsBase {
 export abstract class OracleAbstract {
   protected readonly config: any;
   public network: string;
+  private options: OracleAbstractOptions;
 
   constructor(options: OracleAbstractOptions) {
     this.network = this.config?.network?.id || "";
+    this.options = options;
   }
 
   /**
@@ -57,4 +57,8 @@ export abstract class OracleAbstract {
   public abstract readEntry(
     args: ReadEntryArgsBase,
   ): Promise<{ callOutput: any; proof: any }>;
+
+  public getOptions(): OracleAbstractOptions {
+    return this.options;
+  }
 }
