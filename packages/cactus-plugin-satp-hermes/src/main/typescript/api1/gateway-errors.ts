@@ -23,6 +23,10 @@ export class GatewayError extends RuntimeError {
 
 export class GatewayShuttingDownError extends GatewayError {
   constructor(tag: string, cause?: string | Error | null) {
-    super(`${tag}, shutdown initiated not receiving new requests`, cause ?? null, 500);
+    super(
+      `${tag}, shutdown initiated not receiving new requests`,
+      cause ?? null,
+      500,
+    );
   }
 }
