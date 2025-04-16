@@ -11,6 +11,7 @@ import Web3, {
   TransactionReceiptBase,
   WebSocketProvider,
 } from "web3";
+
 import { PayableMethodObject } from "web3-eth-contract";
 
 import OAS from "../json/openapi.json";
@@ -89,6 +90,7 @@ import {
   convertWeb3ReceiptStatusToBool,
 } from "./types/util-types";
 import { Observable, ReplaySubject } from "rxjs";
+import { RegisteredSubscription } from "web3-eth";
 
 export interface RunTransactionV1Exchange {
   request: InvokeContractV1Request;
@@ -755,6 +757,36 @@ export class PluginLedgerConnectorEthereum
         status: convertWeb3ReceiptStatusToBool(receipt.status) ?? true,
       },
     };
+  }
+
+  /**
+   * Creates a new Web3 subscription for the specified event type.
+   *
+   * @template T - The type of the subscription event, which must be a key of `RegisteredSubscription`.
+   * @param name - The name of the subscription event to listen for.
+   * @param args - Optional arguments to configure the subscription.
+   * @returns A promise that resolves to the subscription object.
+   *
+   * @remarks
+   * This method utilizes the Web3.js `eth.subscribe` function to create a subscription
+   * for Ethereum events. The `name` parameter specifies the type of event to subscribe to,
+   * such as "logs", "newBlockHeaders", or other supported event types.
+   *
+   * @throws Will throw an error if the subscription cannot be created.
+   */
+  public async createSubscriber<T extends keyof RegisteredSubscription>(
+    name: T,
+    args?: unknown,
+  ): Promise<unknown> {
+    const fnTag = `${this.className}#createSubscriber()`;
+    try {
+      return this.web3.eth.subscribe(name, args);
+    } catch (error) {
+      throw new Error(
+        `${fnTag} Failed to create subscription for ${name}. ` +
+          `Error: ${error.message}`,
+      );
+    }
   }
 
   /**
