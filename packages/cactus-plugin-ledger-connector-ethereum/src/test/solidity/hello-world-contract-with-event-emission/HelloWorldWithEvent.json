@@ -1,0 +1,516 @@
+{
+    "contractName": "HelloWorldWithEvent",
+    "abi": [
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "message",
+                    "type": "string"
+                }
+            ],
+            "name": "HelloWorldEvent",
+            "type": "event"
+        },
+        {
+            "inputs": [],
+            "name": "getName",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "sayHello",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "newName",
+                    "type": "string"
+                }
+            ],
+            "name": "setName",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ],
+    "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"message\",\"type\":\"string\"}],\"name\":\"HelloWorldEvent\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"getName\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sayHello\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"newName\",\"type\":\"string\"}],\"name\":\"setName\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/andre/Documents/GitHub/cacti/packages/cactus-plugin-ledger-connector-ethereum/src/test/solidity/hello-world-contract-with-event-emission/HelloWorldWithEvent.sol\":\"HelloWorldWithEvent\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"/Users/andre/Documents/GitHub/cacti/packages/cactus-plugin-ledger-connector-ethereum/src/test/solidity/hello-world-contract-with-event-emission/HelloWorldWithEvent.sol\":{\"keccak256\":\"0xd7ceee5129d67b3e407f917cde5f3b021f74da6fd7ff1f5238c009c2ee245580\",\"urls\":[\"bzz-raw://513505206ae14f85dc595a5699ddd86700b3c0a4a9b5ed9a8134ecfdb6140091\",\"dweb:/ipfs/QmT9VmGUtVhdHh9HA96cYyaK5hJLX4TNXstGUhE9Z4p85w\"]}},\"version\":1}",
+    "bytecode": "608060405234156100105760006000fd5b60c0604052600d6080527f4361707461696e4361637475730000000000000000000000000000000000000060a0526000805460027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff60018316156101000201821604905081601f8211801561008b57610088846100c9565b91505b80156100a4576100a36020601f8501048301836100da565b5b5050506100b4600d60a0516100f8565b81556104878061013383398082f35050610131565b60008181526020812090505b919050565b5b818110156100f357600081555b6001810190506100db565b5b5050565b6000826002027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff846008021c1983161790505b92915050565bfe60806040526004361015156100de576000803560e01c6317d7de7c811461003b5763c47f002781146100775763ef5fb05b81146100a4576100db565b3415610045578182fd5b6100503660046100e8565b61005982610240565b610062836101e6565b8061006d838361018c565b0381f350506100db565b3415610081578182fd5b61009461008f3660046100fe565b610381565b8161009e836101e6565bf36100db565b34156100ae578182fd5b6100b93660046100e8565b6100c16102ee565b6100ca836101e6565b806100d5838361018c565b0381f350505b50505b60006000fd610486565b600081830312156100f95760006000fd5b5b5050565b60006020808385031215610110578182fd5b823567ffffffffffffffff80821115610127578384fd5b818501915085601f830112151561013c578384fd5b81358181111561014857fe5b61015a84601f19601f840116016101e6565b9150808252868482850101111561016f578485fd5b808484018584013784848284010152508093505050505b92915050565b6000602080835283518082850152825b818110156101bc57828187010151604082870101525b828101905061019c565b818111156101cd5783604083870101525b506040601f19601f830116850101925050505b92915050565b6000604051905081810181811067ffffffffffffffff8211171561020657fe5b80604052505b919050565b60008181526020812090505b919050565b5b8181101561023b57600081555b600181019050610223565b5b5050565b60006040519050600082546001808216600081146102655760018114610283576102c4565b607f6002840416855260ff19831660208601526040850193506102c4565b6002830480865261029387610211565b60005b828110156102b85781546020828a01015284820191505b602081019050610296565b60208189010196505050505b50505080604052505b919050565b600060026000196001841615610100020183160490505b919050565b600060405160208152600c60208201527f48656c6c6f20576f726c642100000000000000000000000000000000000000008060408301527fa40dfd2729daee195cadae2e21e670770eb2c560f5e9b65305e48f5782f3be1c606083a160405191506040820182811067ffffffffffffffff8211171561036957fe5b8060405250600c825280602083015250809150505b90565b805167ffffffffffffffff81111561039557fe5b60006103a181546102d2565b816020905082601f8511601f8411818117156103c3576103c086610211565b92505b80156103f05783601f8801048301848810156103dd578390505b6103ee85601f880104850182610222565b505b50806001811461042157859450861561040a578388015194505b86600202600019886008021c19861617865561047b565b601f198716945082865b8681101561045157858a015182556001820191506020860195505b60208101905061042b565b50878610156104705784890151600019601f8a166008021c1981168255505b506001600288020186555b505050505050505b50565b",
+    "deployedBytecode": "",
+    "sourceMap": "",
+    "deployedSourceMap": "",
+    "sourcePath": "/Users/andre/Documents/GitHub/cacti/packages/cactus-plugin-ledger-connector-ethereum/src/test/solidity/hello-world-contract-with-event-emission/HelloWorldWithEvent.sol",
+    "compiler": {
+        "name": "solc",
+        "version": "0.7.6+commit.7338295f"
+    },
+    "ast": {
+        "absolutePath": "/Users/andre/Documents/GitHub/cacti/packages/cactus-plugin-ledger-connector-ethereum/src/test/solidity/hello-world-contract-with-event-emission/HelloWorldWithEvent.sol",
+        "exportedSymbols": {
+            "HelloWorldWithEvent": [
+                39
+            ]
+        },
+        "id": 40,
+        "nodeType": "SourceUnit",
+        "nodes": [
+            {
+                "id": 1,
+                "literals": [
+                    "solidity",
+                    ">=",
+                    "0.7",
+                    ".0"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "413:24:0"
+            },
+            {
+                "abstract": false,
+                "baseContracts": [],
+                "contractDependencies": [],
+                "contractKind": "contract",
+                "fullyImplemented": true,
+                "id": 39,
+                "linearizedBaseContracts": [
+                    39
+                ],
+                "name": "HelloWorldWithEvent",
+                "nodeType": "ContractDefinition",
+                "nodes": [
+                    {
+                        "constant": false,
+                        "id": 4,
+                        "mutability": "mutable",
+                        "name": "name",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 39,
+                        "src": "472:37:0",
+                        "stateVariable": true,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_string_storage",
+                            "typeString": "string"
+                        },
+                        "typeName": {
+                            "id": 2,
+                            "name": "string",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "472:6:0",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_string_storage_ptr",
+                                "typeString": "string"
+                            }
+                        },
+                        "value": {
+                            "hexValue": "4361707461696e436163747573",
+                            "id": 3,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "kind": "string",
+                            "lValueRequested": false,
+                            "nodeType": "Literal",
+                            "src": "494:15:0",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_stringliteral_bdd2f21877c99489ddcc32737686677f40d460368c7982ce22ce4f72b41b0312",
+                                "typeString": "literal_string \"CaptainCactus\""
+                            },
+                            "value": "CaptainCactus"
+                        },
+                        "visibility": "private"
+                    },
+                    {
+                        "anonymous": false,
+                        "id": 8,
+                        "name": "HelloWorldEvent",
+                        "nodeType": "EventDefinition",
+                        "parameters": {
+                            "id": 7,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 6,
+                                    "indexed": false,
+                                    "mutability": "mutable",
+                                    "name": "message",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 8,
+                                    "src": "536:14:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "default",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 5,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "536:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "535:16:0"
+                        },
+                        "src": "514:38:0"
+                    },
+                    {
+                        "body": {
+                            "id": 19,
+                            "nodeType": "Block",
+                            "src": "608:80:0",
+                            "statements": [
+                                {
+                                    "eventCall": {
+                                        "arguments": [
+                                            {
+                                                "hexValue": "48656c6c6f20576f726c6421",
+                                                "id": 14,
+                                                "isConstant": false,
+                                                "isLValue": false,
+                                                "isPure": true,
+                                                "kind": "string",
+                                                "lValueRequested": false,
+                                                "nodeType": "Literal",
+                                                "src": "640:14:0",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_stringliteral_3ea2f1d0abf3fc66cf29eebb70cbd4e7fe762ef8a09bcc06c8edf641230afec0",
+                                                    "typeString": "literal_string \"Hello World!\""
+                                                },
+                                                "value": "Hello World!"
+                                            }
+                                        ],
+                                        "expression": {
+                                            "argumentTypes": [
+                                                {
+                                                    "typeIdentifier": "t_stringliteral_3ea2f1d0abf3fc66cf29eebb70cbd4e7fe762ef8a09bcc06c8edf641230afec0",
+                                                    "typeString": "literal_string \"Hello World!\""
+                                                }
+                                            ],
+                                            "id": 13,
+                                            "name": "HelloWorldEvent",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [],
+                                            "referencedDeclaration": 8,
+                                            "src": "624:15:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$returns$__$",
+                                                "typeString": "function (string memory)"
+                                            }
+                                        },
+                                        "id": 15,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": false,
+                                        "kind": "functionCall",
+                                        "lValueRequested": false,
+                                        "names": [],
+                                        "nodeType": "FunctionCall",
+                                        "src": "624:31:0",
+                                        "tryCall": false,
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_tuple$__$",
+                                            "typeString": "tuple()"
+                                        }
+                                    },
+                                    "id": 16,
+                                    "nodeType": "EmitStatement",
+                                    "src": "619:36:0"
+                                },
+                                {
+                                    "expression": {
+                                        "hexValue": "48656c6c6f20576f726c6421",
+                                        "id": 17,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": true,
+                                        "kind": "string",
+                                        "lValueRequested": false,
+                                        "nodeType": "Literal",
+                                        "src": "669:14:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_stringliteral_3ea2f1d0abf3fc66cf29eebb70cbd4e7fe762ef8a09bcc06c8edf641230afec0",
+                                            "typeString": "literal_string \"Hello World!\""
+                                        },
+                                        "value": "Hello World!"
+                                    },
+                                    "functionReturnParameters": 12,
+                                    "id": 18,
+                                    "nodeType": "Return",
+                                    "src": "662:21:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "ef5fb05b",
+                        "id": 20,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "sayHello",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 9,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "574:2:0"
+                        },
+                        "returnParameters": {
+                            "id": 12,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 11,
+                                    "mutability": "mutable",
+                                    "name": "",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 20,
+                                    "src": "593:13:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 10,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "593:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "592:15:0"
+                        },
+                        "scope": 39,
+                        "src": "556:132:0",
+                        "stateMutability": "nonpayable",
+                        "virtual": false,
+                        "visibility": "public"
+                    },
+                    {
+                        "body": {
+                            "id": 27,
+                            "nodeType": "Block",
+                            "src": "749:24:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "id": 25,
+                                        "name": "name",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 4,
+                                        "src": "764:4:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage",
+                                            "typeString": "string storage ref"
+                                        }
+                                    },
+                                    "functionReturnParameters": 24,
+                                    "id": 26,
+                                    "nodeType": "Return",
+                                    "src": "757:11:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "17d7de7c",
+                        "id": 28,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "getName",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 21,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "708:2:0"
+                        },
+                        "returnParameters": {
+                            "id": 24,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 23,
+                                    "mutability": "mutable",
+                                    "name": "",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 28,
+                                    "src": "732:13:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 22,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "732:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "731:15:0"
+                        },
+                        "scope": 39,
+                        "src": "692:81:0",
+                        "stateMutability": "view",
+                        "virtual": false,
+                        "visibility": "public"
+                    },
+                    {
+                        "body": {
+                            "id": 37,
+                            "nodeType": "Block",
+                            "src": "826:27:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "id": 35,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": false,
+                                        "lValueRequested": false,
+                                        "leftHandSide": {
+                                            "id": 33,
+                                            "name": "name",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [],
+                                            "referencedDeclaration": 4,
+                                            "src": "834:4:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_string_storage",
+                                                "typeString": "string storage ref"
+                                            }
+                                        },
+                                        "nodeType": "Assignment",
+                                        "operator": "=",
+                                        "rightHandSide": {
+                                            "id": 34,
+                                            "name": "newName",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [],
+                                            "referencedDeclaration": 30,
+                                            "src": "841:7:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_string_memory_ptr",
+                                                "typeString": "string memory"
+                                            }
+                                        },
+                                        "src": "834:14:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage",
+                                            "typeString": "string storage ref"
+                                        }
+                                    },
+                                    "id": 36,
+                                    "nodeType": "ExpressionStatement",
+                                    "src": "834:14:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "c47f0027",
+                        "id": 38,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "setName",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 31,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 30,
+                                    "mutability": "mutable",
+                                    "name": "newName",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 38,
+                                    "src": "794:21:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 29,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "794:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "793:23:0"
+                        },
+                        "returnParameters": {
+                            "id": 32,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "826:0:0"
+                        },
+                        "scope": 39,
+                        "src": "777:76:0",
+                        "stateMutability": "nonpayable",
+                        "virtual": false,
+                        "visibility": "public"
+                    }
+                ],
+                "scope": 40,
+                "src": "439:416:0"
+            }
+        ],
+        "src": "413:443:0"
+    },
+    "functionHashes": {
+        "getName()": "17d7de7c",
+        "sayHello()": "ef5fb05b",
+        "setName(string)": "c47f0027"
+    }
+}
