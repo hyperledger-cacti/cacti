@@ -69,7 +69,7 @@
     "winston": "3.10.0"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.13.2",
+    "@grpc/grpc-js": "1.13.3",
     "@grpc/proto-loader": "0.7.13",
     "@types/express": "5.0.1",
     "@types/node": "18.11.9",
