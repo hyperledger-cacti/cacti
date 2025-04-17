@@ -27,8 +27,8 @@ export interface IBesuTestLedgerConstructorOptions {
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: "2021-01-08-7a055c3",
-  containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
+  containerImageVersion: "v2.2.0-rc.2",
+  containerImageName: "ghcr.io/hyperledger-cacti/besu-all-in-one",
   rpcApiHttpPort: 8545,
   rpcApiWsPort: 8546,
   envVars: ["BESU_NETWORK=dev"],
@@ -208,16 +208,36 @@ export class BesuTestLedger implements ITestLedger {
     return receipt;
   }
 
-  public async getBesuKeyPair(): Promise<IKeyPair> {
-    const publicKey = await this.getFileContents("/opt/besu/keys/key.pub");
-    const privateKey = await this.getFileContents("/opt/besu/keys/key");
-    return { publicKey, privateKey };
+  public async getBesuKeyPair(
+    opts: { genesisAllocIdx: number } = { genesisAllocIdx: 1 },
+  ): Promise<IKeyPair> {
+    const fn = `BesuTestLedger#getBesuKeyPair()`;
+    const genesisFile = await this.getFileContents("/opt/besu/genesis.json");
+    const { genesisAllocIdx: idx } = opts;
+    const { alloc } = JSON.parse(genesisFile);
+
+    const keyPair = Object.entries(alloc).find((_, i) => i === idx);
+
+    if (!keyPair) {
+      throw new Error(`${fn} genesis alloc missing entry with idx: ${idx}`);
+    }
+    const [pubKey, keyData] = keyPair;
+
+    const publicKey = pubKey.startsWith("0x") ? pubKey : `0x${pubKey}`;
+    if (!keyData || typeof keyData !== "object" || !("privateKey" in keyData)) {
+      throw new Error(`${fn} invalid key data within genesis alloc`);
+    }
+
+    const { privateKey } = keyData;
+    if (typeof privateKey !== "string") {
+      throw new Error(`${fn} invalid genesis alloc: privateKey must be string`);
+    }
+    const pKey0x = privateKey.startsWith("0x") ? privateKey : "0x" + privateKey;
+    return { publicKey, privateKey: pKey0x };
   }
 
   public async getOrionKeyPair(): Promise<IKeyPair> {
-    const publicKey = await this.getFileContents("/config/orion/nodeKey.pub");
-    const privateKey = await this.getFileContents("/config/orion/nodeKey.key");
-    return { publicKey, privateKey };
+    return this.getBesuKeyPair({ genesisAllocIdx: 2 });
   }
 
   public async start(omitPull = false): Promise<Container> {
