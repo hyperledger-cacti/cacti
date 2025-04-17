@@ -7,21 +7,20 @@ Comes equipped with supervisord which provides access to tailing logs of both or
 
 ## Build an image locally
 
-* To build the besu v1.5.1 image locally use:
+* To build the default besu image locally use:
   ```sh
-  docker build . -t hyperledger/cactus-besu-all-in-one:latest
+  docker build ./tools/docker/besu-all-in-one/ \
+    --file=./tools/docker/besu-all-in-one/Dockerfile \
+    --tag baio:local \
+    --tag ghcr.io/hyperledger-cacti/besu-all-in-one:local \
+    --tag ghcr.io/hyperledger-cacti/besu-all-in-one:$(git describe --contains --all HEAD | sed -r 's,/,-,g')_$(git rev-parse --short HEAD)
   ```
 
-* To build the besu v21.1.x image locally use:
-  
-  ```sh
-  docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/v21_1_x/Dockerfile -t baio21
-  ```
 
 ## Shell into a running container:
 
 ```sh
-docker run -it --entrypoint bash hyperledger/cactus-besu-all-in-one
+docker run -it --entrypoint bash ghcr.io/hyperledger-cacti/besu-all-in-one:local
 ```
 
 
@@ -44,7 +43,7 @@ The following ports are open on the container:
 ## Without docker-compose
 
 ```sh
-docker run -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp hyperledger/cactus-besu-all-in-one:latest
+docker run -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger-cacti/besu-all-in-one:local
 ```
 
 ## Logs of Besu and Orion via supervisord web UI:

@@ -28,7 +28,7 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 describe("ApiServer:PluginLedgerConnectorBesu", () => {
-  const logLevel = "TRACE";
+  const logLevel = "INFO";
   let apiServer: ApiServer;
   let apiClient: BesuApiClient;
   let ledger: BesuTestLedger;
