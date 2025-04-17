@@ -1,6 +1,7 @@
 - [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
 - [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
 - [Getting Started](#getting-started)
+  - [VSCode Dev Container](#vscode-dev-container)
   - [MacOS](#macos)
   - [Linux](#linux)
   - [Windows](#windows)
@@ -40,38 +41,70 @@ The `npm run watch` script in action:
 
 ## Getting Started
 
+### VSCode Dev Container
+* Install prerequisites
+  * [Git](https://github.com/git-guides/install-git#install-git-on-mac)
+  * [Visual Studio Code](https://code.visualstudio.com/)
+  * [Docker Desktop](https://www.docker.com/) (Please ensure Docker Desktop running when using VSCode Dev Container)
+  * [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) (Download this extension in VSCode)
+
+* Direct Dev Container settings **(Suitable for Beginners)**
+ 
+  * Clone the repository and open Cacti folder in VSCode
+  
+    ```
+    git clone https://github.com/hyperledger-cacti/cacti.git
+    ```
+  * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
+  * Wait for the container setup and start developing!
+    
+* Persistent Dev Environment settings with Docker Volume **(Suitable for Advanced Users)**
+  * Clone the repository and open Cacti folder in VSCode
+  
+    ```
+    git clone https://github.com/hyperledger-cacti/cacti.git
+    ```
+  * Create and run Docker Volume
+
+    ```
+    docker volume create cacti_volume
+    docker run -v cacti_volume:/workspace -w /workspace -it node:18.19.0 bash
+    ```
+  * Add Docker volume configuration to devcontainer.json
+    ```
+    "mounts": [
+      "source=cacti_volume,target=/workspace,type=volume"
+    ],
+    ```
+  * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
+  * Wait for the container setup and start developing!
+    
 ### MacOS 
 
 _Unless explicitly stated otherwise, each bullet will apply to both Intel and ARM Macs. In bullets where there is a difference in the installation process it will be noted._
-
-* Use preset environment:
-  * [VSCode docker container](./.devcontainer)
-* Or install OS level dependencies manually:
-  * Git
-    * https://github.com/git-guides/install-git#install-git-on-mac
-  * NodeJS v18.19.0, npm v10.2.3 (we recommend using the Node Version Manager (nvm) if available for your OS)
-    * [Download nvm using script](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
-      * _See the Section "Macs with Apple Silicon Chips" under [macOS Troubleshooting](https://github.com/nvm-sh/nvm?tab=readme-ov-file#macos-troubleshooting) for ARM Mac specific instructions_
-    * [Download nvm using homebrew](https://sukiphan.medium.com/how-to-install-nvm-node-version-manager-on-macos-d9fe432cc7db)
-    * Using nvm install and use specific version of node: 
-      ```
-      nvm install 18.19.0
-      nvm use 18.19.0
-      ```
-  * Yarn
-    * `npm run enable-corepack` (from within the project directory)
-  * [Docker Engine is available on Mac OS through Docker Engine](https://docs.docker.com/desktop/install/mac-install/). 
-    * _See the difference in system requirements for Docker Desktop for Intel and ARM Macs under System Requirements on the page above._
-  * Docker Compose
-    * Installing Docker Desktop on Mac will include Docker Compose 
-  * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
-    * [Follow instructions for Mac here](https://github.com/supertokens/supertokens-core/wiki/Installing-OpenJDK-for-Mac-and-Linux)
-  * Indy SDK (optional)
-    * [Build the SDK from source](https://github.com/hyperledger-archives/indy-sdk/blob/main/docs/build-guides/mac-build.md)
-  * Go
-    * [Installing Go for Mac](https://go.dev/dl/)
-      * _Under featured downloads on the page above choose between the ARM64 or x86-64 option based on your machine._
-    * [Adding Environment Variable and Go extensions](https://code.visualstudio.com/docs/languages/go)
+* Git
+  * https://github.com/git-guides/install-git#install-git-on-mac
+* NodeJS v18.19.0, npm v10.2.3 (we recommend using the Node Version Manager (nvm) if available for your OS)
+  * [Download nvm using script](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
+    * _See the Section "Macs with Apple Silicon Chips" under [macOS Troubleshooting](https://github.com/nvm-sh/nvm?tab=readme-ov-file#macos-troubleshooting) for ARM Mac specific instructions_
+  * [Download nvm using homebrew](https://sukiphan.medium.com/how-to-install-nvm-node-version-manager-on-macos-d9fe432cc7db)
+  * Using nvm install and use specific version of node: 
+    ```
+    nvm install 18.19.0
+    nvm use 18.19.0
+    ```
+* Yarn
+  * `npm run enable-corepack` (from within the project directory)
+* [Docker Engine is available on Mac OS through Docker Engine](https://docs.docker.com/desktop/install/mac-install/). 
+  * _See the difference in system requirements for Docker Desktop for Intel and ARM Macs under System Requirements on the page above._
+* Docker Compose
+  * Installing Docker Desktop on Mac will include Docker Compose 
+* OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
+  * [Follow instructions for Mac here](https://github.com/supertokens/supertokens-core/wiki/Installing-OpenJDK-for-Mac-and-Linux)
+* Go
+  * [Installing Go for Mac](https://go.dev/dl/)
+    * _Under featured downloads on the page above choose between the ARM64 or x86-64 option based on your machine._
+  * [Adding Environment Variable and Go extensions](https://code.visualstudio.com/docs/languages/go)
 
 ### Linux 
 * Insert Linux instructions here 
