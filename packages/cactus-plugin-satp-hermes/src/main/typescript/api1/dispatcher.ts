@@ -93,7 +93,7 @@ export class BLODispatcher {
     this.bridgeManager = options.bridgesManager;
 
     const SATPManagerOpts: ISATPManagerOptions = {
-      logLevel: "DEBUG",
+      logLevel: this.level,
       instanceId: ourGateway?.id,
       signer: signer,
       connectedDLTs: this.orchestrator.connectedDLTs,
