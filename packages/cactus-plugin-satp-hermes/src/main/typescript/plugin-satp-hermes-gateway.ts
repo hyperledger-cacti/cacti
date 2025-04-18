@@ -114,7 +114,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     Checks.truthy(options, `${fnTag} arg options`);
     this.config = SATPGateway.ProcessGatewayCoordinatorConfig(options);
     this.shutdownHooks = [];
-    const level = options.logLevel || "INFO";
+    const level = this.config.logLevel;
     const logOptions: ILoggerOptions = {
       level: level,
       label: this.className,
@@ -150,7 +150,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     const signerOptions: IJsObjectSignerOptions = {
       privateKey: bufArray2HexStr(this.config.keyPair.privateKey),
-      logLevel: "debug",
+      logLevel: this.config.logLevel,
     };
     this.signer = new JsObjectSigner(signerOptions);
 
@@ -402,7 +402,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     }
 
     if (!pluginOptions.logLevel) {
-      pluginOptions.logLevel = "DEBUG";
+      pluginOptions.logLevel = "INFO";
     }
 
     if (!pluginOptions.environment) {

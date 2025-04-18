@@ -27,6 +27,7 @@ export interface ISATPLoggerConfig {
   remoteRepository?: IRemoteLogRepository;
   signer: JsObjectSigner;
   pubKey: string;
+  logLevel?: LogLevelDesc;
 }
 
 export class SATPLogger {
@@ -44,10 +45,9 @@ export class SATPLogger {
     this.signer = config.signer;
     this.pubKey = config.pubKey;
 
-    const logLevel: LogLevelDesc = "INFO";
     this.log = LoggerProvider.getOrCreate({
       label: "SATPLogger",
-      level: logLevel,
+      level: config.logLevel || "INFO",
     });
 
     this.log.info("SATPLogger initialized.");
