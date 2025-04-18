@@ -164,6 +164,7 @@ export class SATPManager {
       remoteRepository: this.remoteRepository,
       signer: this.signer,
       pubKey: this.pubKey,
+      logLevel: level,
     };
 
     this.dbLogger = new SATPLogger(satpLoggerConfig);
