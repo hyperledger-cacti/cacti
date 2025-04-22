@@ -36,7 +36,7 @@ import {
   knexSourceRemoteConnection,
 } from "../knex.config";
 import { Knex, knex } from "knex";
-//New dependecies
+//New dependencies
 import { exec } from "child_process";
 import util from "util";
 
@@ -143,7 +143,10 @@ beforeEach(async () => {
     } catch (err) {
       log.warn("Could not inspect Docker state:", err);
     }
-
+    const { stdout: inspectOut } = await execAsync(
+      "docker ps --format '{{.Names}} - {{.Ports}}'",
+    );
+    log.info(`Bound container ports:\n${inspectOut}`);
     // Setup Fabric
     const satpContractName = "satp-contract";
     log.info("Setting up Fabric environment...");
