@@ -131,13 +131,18 @@ beforeEach(async () => {
     log.info("Pruning completed successfully");
 
     // Check if Docker is running
-    const { stdout: containers } = await execAsync("docker ps -a --format '{{.Names}} - {{.Status}}'");
-    log.info(`Containers:\n${containers || "No containers found"}`);
-  
-    const { stdout: networks } = await execAsync("docker network ls --format '{{.Name}} - {{.Driver}}'");
-    log.info(`Networks:\n${networks || "No networks found"}`);
-  } catch (err) {
-    log.warn("Could not inspect Docker state:", err);
+    try {
+      const { stdout: containers } = await execAsync(
+        "docker ps -a --format '{{.Names}} - {{.Status}}'",
+      );
+      log.info(`Containers:\n${containers || "No containers found"}`);
+      const { stdout: networks } = await execAsync(
+        "docker network ls --format '{{.Name}} - {{.Driver}}'",
+      );
+      log.info(`Networks:\n${networks || "No networks found"}`);
+    } catch (err) {
+      log.warn("Could not inspect Docker state:", err);
+    }
 
     // Setup Fabric
     const satpContractName = "satp-contract";
