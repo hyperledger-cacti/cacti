@@ -83,7 +83,7 @@ jobs:
 
       - name: Run CI script
         run: ./tools/ci.sh
-
+#Added to troubleshoot the issue with the docker containers
       - name: Clean up Docker containers
         if: always()
         run: |
@@ -95,7 +95,7 @@ jobs:
         run: |
           docker network prune -f
           docker volume prune -f
-          
+
   set-docker-tags:
     needs: run-satp-tests 
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
