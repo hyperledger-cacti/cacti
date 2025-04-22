@@ -36,12 +36,17 @@ import {
   knexSourceRemoteConnection,
 } from "../knex.config";
 import { Knex, knex } from "knex";
+//New dependecies
+import { exec } from "child_process";
+import util from "util";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
 });
+//New const defintion
+const execAsync = util.promisify(exec);
 
 let knexInstanceClient: Knex;
 let knexSourceRemoteInstance: Knex;
@@ -124,6 +129,15 @@ beforeEach(async () => {
     log.info("Pruning Docker environment...");
     await pruneDockerAllIfGithubAction({ logLevel });
     log.info("Pruning completed successfully");
+
+    // Check if Docker is running
+    const { stdout: containers } = await execAsync("docker ps -a --format '{{.Names}} - {{.Status}}'");
+    log.info(`Containers:\n${containers || "No containers found"}`);
+  
+    const { stdout: networks } = await execAsync("docker network ls --format '{{.Name}} - {{.Driver}}'");
+    log.info(`Networks:\n${networks || "No networks found"}`);
+  } catch (err) {
+    log.warn("Could not inspect Docker state:", err);
 
     // Setup Fabric
     const satpContractName = "satp-contract";
