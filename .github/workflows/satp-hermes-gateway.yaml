@@ -46,6 +46,18 @@ jobs:
       - if: steps.yarn-cache.outputs.cache-hit != 'true'
         name: Run CI script
         run: ./tools/ci.sh
+#Added to troubleshoot the issue with the docker containers
+      - name: Clean up Docker containers
+        if: always()
+        run: |
+          echo "Stopping and removing all Docker containers..."
+          docker ps -aq | xargs -r docker rm -f || true
+
+      - name: Prune Docker networks and volumes
+        if: always()
+        run: |
+          docker network prune -f
+          docker volume prune -f
 
   run-satp-tests:
     needs: build-dev-satp
