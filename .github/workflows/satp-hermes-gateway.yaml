@@ -84,6 +84,18 @@ jobs:
       - name: Run CI script
         run: ./tools/ci.sh
 
+      - name: Clean up Docker containers
+        if: always()
+        run: |
+          echo "Stopping and removing all Docker containers..."
+          docker ps -aq | xargs -r docker rm -f || true
+
+      - name: Prune Docker networks and volumes
+        if: always()
+        run: |
+          docker network prune -f
+          docker volume prune -f
+          
   set-docker-tags:
     needs: run-satp-tests 
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
