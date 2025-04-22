@@ -40,7 +40,6 @@ import type {
   IRemoteLogRepository,
 } from "../database/repository/interfaces/repository";
 import { GatewayShuttingDownError } from "./gateway-errors";
-import { GatewayShuttingDownError } from "./gateway-errors";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -70,7 +69,6 @@ export class BLODispatcher {
   private defaultRepository: boolean;
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
-  private isShuttingDown = false;
   private isShuttingDown = false;
 
   constructor(public readonly options: BLODispatcherOptions) {
@@ -213,7 +211,6 @@ export class BLODispatcher {
   */
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
-    const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
     const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
     this.logger.info(`Transact request: ${req}`);
     if (this.isShuttingDown) {

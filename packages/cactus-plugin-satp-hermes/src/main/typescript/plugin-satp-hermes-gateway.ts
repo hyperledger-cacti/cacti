@@ -67,8 +67,8 @@ import type { NetworkId } from "./services/network-identification/chainid-list";
 import { knexLocalInstance } from "./database/knexfile";
 import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
-import schedule, { Job } from "node-schedule";
-import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
+
+
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsDefined()
