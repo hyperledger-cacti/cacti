@@ -124,7 +124,8 @@
     ],
     "moduleNameMapper": {
       "^(\\.?\\.?/.*)\\.js$": "$1"
-    }
+    },
+    "modulePathIgnorePatterns": ["<rootDir>/dist/"]
   },
   "dependencies": {
     "@bufbuild/protobuf": "2.2.2",
