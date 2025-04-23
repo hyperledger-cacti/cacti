@@ -405,6 +405,27 @@ export class Containers {
       return NetworkSettings.Networks[networkNames[0]].IPAddress;
     }
   }
+  public static async getContainerNetworkIP(
+    containerInfo: ContainerInfo,
+    networkName: string,
+  ): Promise<string> {
+    const fnTag = "Containers#getContainerInternalIp()";
+    Checks.truthy(containerInfo, `${fnTag} arg #1 containerInfo`);
+
+    const { NetworkSettings } = containerInfo;
+    const networkNames: string[] = Object.keys(NetworkSettings.Networks);
+
+    if (networkNames.length < 1) {
+      throw new Error(`${fnTag} container not connected to any networks`);
+    } else {
+      if (!NetworkSettings.Networks[networkName]) {
+        throw new Error(
+          `${fnTag} container not connected to network ${networkName}`,
+        );
+      }
+      return NetworkSettings.Networks[networkName].IPAddress;
+    }
+  }
   public static pullImage(
     imageFqn: string,
     options: Record<string, unknown> = {},
