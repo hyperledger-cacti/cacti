@@ -106,6 +106,13 @@ jobs:
         run: ./tools/ci.sh
 
       #Added to troubleshoot the issue with the docker containers
+      - name: Show logs of potentially stuck containers
+        run: |
+          for cid in $(docker ps -q); do
+            echo "Logs for container: $cid"
+            docker logs --tail 50 $cid || true
+          done
+
       - name: Cleanup Docker containers
         if: always()
         run: |
