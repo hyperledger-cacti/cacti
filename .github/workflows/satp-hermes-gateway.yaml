@@ -67,7 +67,7 @@ jobs:
       CONFIGURE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_PATTERN_SPECIFIC_TEST: workspace @hyperledger/cactus-plugin-satp-hermes test:integration:e2e:transfer
+      JEST_TEST_PATTERN_SPECIFIC_TEST: workspace @hyperledger/cactus-plugin-satp-hermes test:unit:service
       JEST_TEST_RUNNER_DISABLED: false
 
       # SATP specific configuration

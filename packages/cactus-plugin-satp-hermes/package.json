@@ -88,6 +88,7 @@
     "test:integration": "npx jest ./src/test/typescript/integration",
     "test:integration:e2e:transfer": "npx jest ./src/test/typescript/integration/satp-e2e-transfer-1-gateway.test.ts --detectOpenHandles",
     "test:unit": "npx jest ./src/test/typescript/unit",
+    "test:unit:service": "npx jest ./src/test/typescript/unit/service.test.ts --detectOpenHandles",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch",
     "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
