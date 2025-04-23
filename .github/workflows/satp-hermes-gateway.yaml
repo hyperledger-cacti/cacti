@@ -92,8 +92,10 @@ jobs:
         run: |
           docker ps
           sudo lsof -i -P -n | grep LISTEN
+
       - name: Clean up Docker containers
-        run: docker rm -f $(docker ps -aq) || true
+        run: | 
+          docker ps -aq | xargs --no-run-if-empty docker rm -f
 
       - name: Cleanup Docker networks and volumes
         run: |
