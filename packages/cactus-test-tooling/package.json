@@ -1,131 +1,132 @@
 {
-  "name": "@hyperledger/cactus-test-tooling",
-  "version": "2.1.0",
-  "description": "Swiss army knife for test development. Main goal is to make pulling up test/dummy ledgers on the fly for tests easy, especially for test cases that are about simulating clean ledger state or wiped ledger state, etc.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Catarina Pedreira",
-      "email": "catarina.pedreira@tecnico.ulisboa.pt",
-      "url": "https://github.com/CatarinaPedreira"
-    },
-    {
-      "name": "Rafael Belchior",
-      "email": "rafael.belchior@tecnico.ulisboa.pt",
-      "url": "https://rafaelapb.github.io/"
-    },
-    {
-      "name": "Peter Somogyvari",
-      "email": "peter.somogyvari@accenture.com",
-      "url": "https://accenture.com"
-    },
-    {
-      "name": "Fabricius Zatti",
-      "email": "fazzatti@gmail.com",
-      "url": "https://oififo.com"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-test-tooling.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
-  "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "axios": "1.8.4",
-    "compare-versions": "3.6.0",
-    "dockerode": "3.3.0",
-    "elliptic": "6.6.1",
-    "execa": "5.1.1",
-    "fabric-ca-client": "2.5.0-snapshot.23",
-    "fabric-network": "2.5.0-snapshot.23",
-    "fs-extra": "11.2.0",
-    "internal-ip": "6.2.0",
-    "is-port-reachable": "3.0.0",
-    "joi": "17.13.3",
-    "js-yaml": "4.1.0",
-    "keycloak-admin": "1.14.22",
-    "lodash": "4.17.21",
-    "node-forge": "1.3.0",
-    "node-ssh": "13.1.0",
-    "p-retry": "4.6.1",
-    "run-time-error-cjs": "1.4.0",
-    "socket.io": "4.6.2",
-    "socket.io-client-fixed-types": "4.5.4",
+      "name": "@hyperledger/cactus-test-tooling",
+      "version": "2.1.0",
+      "description": "Swiss army knife for test development. Main goal is to make pulling up test/dummy ledgers on the fly for tests easy, especially for test cases that are about simulating clean ledger state or wiped ledger state, etc.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Catarina Pedreira",
+              "email": "catarina.pedreira@tecnico.ulisboa.pt",
+              "url": "https://github.com/CatarinaPedreira"
+          },
+          {
+              "name": "Rafael Belchior",
+              "email": "rafael.belchior@tecnico.ulisboa.pt",
+              "url": "https://rafaelapb.github.io/"
+          },
+          {
+              "name": "Peter Somogyvari",
+              "email": "peter.somogyvari@accenture.com",
+              "url": "https://accenture.com"
+          },
+          {
+              "name": "Fabricius Zatti",
+              "email": "fazzatti@gmail.com",
+              "url": "https://oififo.com"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "browser": "dist/cactus-test-tooling.web.umd.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "watch": "npm-watch",
+          "webpack": "npm-run-all webpack:dev",
+          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+      },
+      "dependencies": {
+          "@hyperledger/cactus-common": "2.1.0",
+          "axios": "1.8.4",
+          "compare-versions": "3.6.0",
+          "dockerode": "3.3.0",
+          "elliptic": "6.6.1",
+          "execa": "5.1.1",
+          "fabric-ca-client": "2.5.0-snapshot.23",
+          "fabric-network": "2.5.0-snapshot.23",
+          "fs-extra": "11.2.0",
+          "internal-ip": "6.2.0",
+          "is-port-reachable": "3.0.0",
+          "joi": "17.13.3",
+          "js-yaml": "4.1.0",
+          "keycloak-admin": "1.14.22",
+          "lodash": "4.17.21",
+          "node-forge": "1.3.0",
+          "node-ssh": "13.1.0",
+          "p-retry": "4.6.1",
+          "run-time-error-cjs": "1.4.0",
+          "socket.io": "4.6.2",
+          "socket.io-client-fixed-types": "4.5.4",
     "tar-fs": "3.0.10",
-    "tar-stream": "2.2.0",
-    "temp": "0.9.4",
-    "typescript-optional": "2.0.1",
-    "uuid": "10.0.0",
-    "web3": "1.6.1",
-    "web3-core": "1.6.1",
-    "web3-utils": "1.6.1"
-  },
-  "devDependencies": {
-    "@aries-framework/askar": "0.5.0-alpha.58",
-    "@aries-framework/core": "0.5.0-alpha.58",
-    "@aries-framework/indy-vdr": "0.5.0-alpha.58",
-    "@aries-framework/node": "0.5.0-alpha.58",
-    "@hyperledger/aries-askar-nodejs": "0.2.0",
-    "@hyperledger/indy-vdr-nodejs": "0.2.0",
-    "@types/dockerode": "3.2.7",
-    "@types/esm": "3.2.0",
-    "@types/fs-extra": "11.0.4",
-    "@types/js-yaml": "4.0.3",
-    "@types/lodash": "4.14.172",
-    "@types/node": "18.11.9",
-    "@types/node-forge": "1.3.0",
-    "@types/ssh2": "0.5.47",
-    "@types/ssh2-streams": "0.1.9",
+          "tar-stream": "2.2.0",
+          "temp": "0.9.4",
+          "typescript-optional": "2.0.1",
+          "uuid": "10.0.0",
+          "web3": "1.6.1",
+          "web3-core": "1.6.1",
+          "web3-utils": "1.6.1"
+      },
+      "devDependencies": {
+          "@aries-framework/askar": "0.5.0-alpha.58",
+          "@aries-framework/core": "0.5.0-alpha.58",
+          "@aries-framework/indy-vdr": "0.5.0-alpha.58",
+          "@aries-framework/node": "0.5.0-alpha.58",
+          "@hyperledger/aries-askar-nodejs": "0.2.0",
+          "@hyperledger/indy-vdr-nodejs": "0.2.0",
+          "@types/dockerode": "3.2.7",
+          "@types/esm": "3.2.0",
+          "@types/fs-extra": "11.0.4",
+          "@types/js-yaml": "4.0.3",
+          "@types/lodash": "4.14.172",
+          "@types/node": "18.11.9",
+          "@types/node-forge": "1.3.0",
+          "@types/ssh2": "0.5.47",
+          "@types/ssh2-streams": "0.1.9",
     "@types/tar-fs": "2.0.4",
-    "@types/tar-stream": "2.2.1",
-    "@types/temp": "0.9.1",
-    "esm": "3.2.25",
+          "@types/tar-stream": "2.2.1",
+          "@types/temp": "0.9.1",
+          "esm": "3.2.25",
     "tar-fs": "3.0.10",
-    "temp": "0.9.4"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-test-tooling.web.umd.min.js",
-  "mainMinified": "dist/cactus-test-tooling.node.umd.min.js",
-  "watch": {}
-}
+          "temp": "0.9.4"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "browserMinified": "dist/cactus-test-tooling.web.umd.min.js",
+      "mainMinified": "dist/cactus-test-tooling.node.umd.min.js",
+      "watch": {}
+  }
+    
