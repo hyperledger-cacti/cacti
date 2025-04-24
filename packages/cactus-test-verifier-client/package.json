@@ -1,79 +1,80 @@
 {
-  "name": "@hyperledger/cactus-test-verifier-client",
-  "version": "2.1.0",
-  "description": "Integration and stress tests for the verifier client.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Michal Bajer",
-      "email": "michal.bajer@fujitsu.com",
-      "url": "https://www.fujitsu.com/global/"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "stress-test": "node --expose-gc --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js",
-    "stress-test-inspect": "node --expose-gc --inspect-brk --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js"
-  },
-  "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
-    "@hyperledger/cactus-test-geth-ledger": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
-    "@hyperledger/cactus-verifier-client": "2.1.0",
-    "body-parser": "1.20.3",
-    "express": "5.1.0",
-    "log4js": "6.4.1",
-    "socket.io": "4.6.2",
-    "uuid": "10.0.0",
-    "web3": "1.7.3",
-    "web3-core": "1.7.3"
-  },
-  "devDependencies": {
-    "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.1",
-    "@types/node": "18.11.9",
-    "@types/uuid": "10.0.0",
-    "web3-eth-accounts": "4.0.3"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "watch": {}
-}
+      "name": "@hyperledger/cactus-test-verifier-client",
+      "version": "2.1.0",
+      "description": "Integration and stress tests for the verifier client.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Michal Bajer",
+              "email": "michal.bajer@fujitsu.com",
+              "url": "https://www.fujitsu.com/global/"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "stress-test": "node --expose-gc --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js",
+          "stress-test-inspect": "node --expose-gc --inspect-brk --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js"
+      },
+      "dependencies": {
+          "@hyperledger/cactus-common": "2.1.0",
+          "@hyperledger/cactus-core": "2.1.0",
+          "@hyperledger/cactus-core-api": "2.1.0",
+          "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+          "@hyperledger/cactus-test-geth-ledger": "2.1.0",
+          "@hyperledger/cactus-test-tooling": "2.1.0",
+          "@hyperledger/cactus-verifier-client": "2.1.0",
+          "body-parser": "1.20.3",
+          "express": "5.1.0",
+          "log4js": "6.4.1",
+          "socket.io": "4.6.2",
+          "uuid": "10.0.0",
+          "web3": "1.7.3",
+          "web3-core": "1.7.3"
+      },
+      "devDependencies": {
+          "@types/body-parser": "1.19.4",
+          "@types/express": "5.0.1",
+          "@types/node": "18.11.9",
+          "@types/uuid": "10.0.0",
+          "web3-eth-accounts": "4.0.3"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "watch": {}
+  }
+    

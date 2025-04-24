@@ -1,71 +1,72 @@
 {
-  "name": "@hyperledger/cacti-weaver-iin-agent",
-  "version": "2.1.0",
-  "description": "Implementation of Weaver IIN agent.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "main": "index.js",
-  "scripts": {
-    "build": "npm run tsc",
-    "dev": "nodemon out/server.js",
-    "start": "node out/server.js",
-    "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
-    "tsc": "tsc",
-    "watch": "tsc --watch"
-  },
-  "dependencies": {
-    "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
-    "dotenv": "8.6.0",
-    "fabric-ca-client": "2.2.20",
-    "fabric-common": "2.2.20",
-    "fabric-network": "2.2.20",
-    "uuid": "10.0.0"
-  },
-  "devDependencies": {
-    "@types/jsrsasign": "10.5.11",
-    "@types/node": "18.11.9",
-    "@types/uuid": "10.0.0",
-    "chai": "4.3.7",
-    "chai-as-promised": "7.1.1",
-    "jsrsasign": "11.0.0",
-    "mocha": "10.7.3",
-    "nodemon": "2.0.22",
-    "nyc": "12.0.2",
-    "proto3-json-serializer": "1.1.1",
-    "rewire": "4.0.1",
-    "sinon": "6.3.5",
-    "sinon-chai": "3.7.0",
-    "ts-node": "10.9.1",
-    "typedoc": "0.26.2",
-    "typescript": "5.5.2"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
+      "name": "@hyperledger/cacti-weaver-iin-agent",
+      "version": "2.1.0",
+      "description": "Implementation of Weaver IIN agent.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "main": "index.js",
+      "scripts": {
+          "build": "npm run tsc",
+          "dev": "nodemon out/server.js",
+          "start": "node out/server.js",
+          "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
+          "tsc": "tsc",
+          "watch": "tsc --watch"
+      },
+      "dependencies": {
+          "@fidm/x509": "1.2.1",
+          "@grpc/grpc-js": "1.13.3",
+          "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+          "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+          "dotenv": "8.6.0",
+          "fabric-ca-client": "2.2.20",
+          "fabric-common": "2.2.20",
+          "fabric-network": "2.2.20",
+          "uuid": "10.0.0"
+      },
+      "devDependencies": {
+          "@types/jsrsasign": "10.5.11",
+          "@types/node": "18.11.9",
+          "@types/uuid": "10.0.0",
+          "chai": "4.3.7",
+          "chai-as-promised": "7.1.1",
+          "jsrsasign": "11.0.0",
+          "mocha": "10.7.3",
+          "nodemon": "2.0.22",
+          "nyc": "12.0.2",
+          "proto3-json-serializer": "1.1.1",
+          "rewire": "4.0.1",
+          "sinon": "6.3.5",
+          "sinon-chai": "3.7.0",
+          "ts-node": "10.9.1",
+          "typedoc": "0.26.2",
+          "typescript": "5.5.2"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      }
   }
-}
+    
