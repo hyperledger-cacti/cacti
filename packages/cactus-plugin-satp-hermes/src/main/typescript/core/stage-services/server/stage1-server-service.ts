@@ -43,7 +43,7 @@ import {
 } from "../../errors/satp-service-errors";
 import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
-import { State } from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../services/network-identification/chainid-list";
 export class Stage1ServerService extends SATPService {

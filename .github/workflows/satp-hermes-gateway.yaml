@@ -1,5 +1,6 @@
 # SATP-Hermes Gateway tests and docker deployments
 name: SATP CI - tests and docker deployments
+
 env:
   NODEJS_VERSION: v18.19.0
 on:
@@ -78,14 +79,19 @@ jobs:
       dockerhub_image: ${{ steps.set_tags.outputs.dockerhub_image }}
       ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
     steps:
-      - uses: actions/checkout@v4.1.7
-      - name: Debug Environment
+      - uses: actions/checkout@v4.1.7  
+      - name: Debug Build Info
         run: |
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           echo "Debug: Current ref = ${{ github.ref }}"
           echo "Debug: Event name = ${{ github.event_name }}"
           echo "Debug: GitHub workspace = ${{ github.workspace }}"
           echo "Debug: Repository = ${{ github.repository }}"
-          
+          echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
+          echo "Debug: Building for dockerhub image = ${{ needs.set-docker-tags.outputs.dockerhub_image }}"
+          echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+          echo "Debug: Package version = ${PACKAGE_VERSION}"
+          echo "Debug: Commit hash = $(git rev-parse --short HEAD)"
       - name: Set image tags
         id: set_tags
         run: |
@@ -103,7 +109,6 @@ jobs:
           echo "tag_version=${TAG_VERSION}" >> $GITHUB_OUTPUT
           echo "dockerhub_image=${DOCKERHUB_IMAGE}" >> $GITHUB_OUTPUT
           echo "ghcr_image=${GHCR_IMAGE}" >> $GITHUB_OUTPUT
-
   build-and-push-dockerhub:
     needs: set-docker-tags
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')

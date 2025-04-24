@@ -37,7 +37,8 @@ import { Stage2SATPHandler } from "../../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../../core/stage-handlers/stage3-handler";
 import { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import { GatewayOrchestrator } from "./gateway-orchestrator";
-import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
+import { State } from "../../generated/proto/cacti/satp/v02/session/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
@@ -85,7 +86,6 @@ import { ISATPLoggerConfig, SATPLogger } from "../../logging";
 import { NetworkId } from "../network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { MonitorService } from "../monitoring/monitor";
-import { KnexMonitorRepository } from "../monitoring/monitor-repository";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -164,25 +164,16 @@ export class SATPManager {
       remoteRepository: this.remoteRepository,
       signer: this.signer,
       pubKey: this.pubKey,
+      logLevel: level,
     };
 
     this.dbLogger = new SATPLogger(satpLoggerConfig);
     this.logger.debug(`${fnTag} dbLogger initialized: ${!!this.dbLogger}`);
-
-    const monitorRepo = new KnexMonitorRepository();
     this.monitorService = MonitorService.createOrGetMonitorService({
-      repo: monitorRepo,
+      logLevel: options.logLevel,
     });
-    this.monitorService.init().then(() => {
-      this.monitorService.exportLogs();
-      this.monitorService.createMetric("satp.active_sessions");
-      this.monitorService.createMetric("satp.transfer.count");
-      this.monitorService.createMetric("satp.transfer.success");
-      this.monitorService.createMetric("satp.transfer.failure");
-      this.logger.info(`${fnTag} Monitoring service initialized`);
-    }).catch(error => {
-      this.logger.error(`${fnTag} Failed to initialize monitoring service: ${error}`);
-    });
+
+    void this.initializeMonitorService();
 
     const serviceClasses = [
       Stage0ServerService as unknown as SATPServiceInstance,
@@ -216,7 +207,22 @@ export class SATPManager {
 
     this.orchestrator.addHandlers(this.satpHandlers);
   }
-
+  private async initializeMonitorService(): Promise<void> {
+    const fnTag = `${this.className}#initializeMonitorService()`;
+    try {
+      await this.monitorService.init();
+      await this.monitorService.createMetric("satp.active_sessions");
+      await this.monitorService.createMetric("satp.transfer.count");
+      await this.monitorService.createMetric("satp.transfer.success");
+      await this.monitorService.createMetric("satp.transfer.failure");
+      this.logger.info(`${fnTag} Monitoring service initialized`);
+    } catch (error) {
+      // Log error but don't throw - allow service to continue without monitoring
+      this.logger.warn(
+        `${fnTag} Failed to initialize monitoring service: ${error}`,
+      );
+    }
+  }
   public get pubKey(): string {
     return this._pubKey;
   }
@@ -270,7 +276,10 @@ export class SATPManager {
     const span = this.monitorService.startSpan(fnTag);
     try {
       const activeSessionsCount = this.sessions.size;
-      void this.monitorService.incrementMetric("satp.active_sessions", activeSessionsCount);
+      void this.monitorService.incrementCounter(
+        "satp.active_sessions",
+        activeSessionsCount,
+      );
       this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
       return this.sessions;
     } catch (error) {
@@ -285,7 +294,7 @@ export class SATPManager {
     const fnTag = `${SATPManager.CLASS_NAME}#getSession`;
     const span = this.monitorService.startSpan(fnTag);
     span.setAttributes({ sessionId });
-    
+
     try {
       this.logger.debug(`${fnTag} retrieving session: ${sessionId}`);
       if (this.sessions == undefined) {
@@ -306,6 +315,21 @@ export class SATPManager {
 
   public getSATPHandler(type: SATPHandlerType): SATPHandler | undefined {
     return this.satpHandlers.get(type);
+  }
+
+  /*
+   * Function checks if all the sessions are in the completed state
+   * @returns boolean
+   */
+  public getSATPSessionState(): boolean {
+    const fnTag = `${SATPManager.CLASS_NAME}#getSATPSessionStatus()`;
+    this.logger.info(`${fnTag}, Getting SATP Session Status...`);
+    for (const value of this.sessions.values()) {
+      if (value.getSessionState() !== State.COMPLETED) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public getOrCreateSession(

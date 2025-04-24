@@ -12,7 +12,7 @@ import {
   Type,
   SATPStage,
   type SessionData,
-} from "../../../generated/proto/cacti/satp/v02/common/session_pb";
+} from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 
 export class Stage0RollbackStrategy implements RollbackStrategy {
   private log: Logger;

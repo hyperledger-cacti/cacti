@@ -2,6 +2,13 @@ import { v4 as uuidv4 } from "uuid";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
+  Checks,
+  LogLevelDesc,
+  Logger,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
+
+import {
   Type,
   MessageStagesHashesSchema,
   MessageStagesSignaturesSchema,
@@ -26,7 +33,7 @@ import {
   Stage3SignaturesSchema,
   Stage3TimestampsSchema,
   State,
-} from "../generated/proto/cacti/satp/v02/common/session_pb";
+} from "../generated/proto/cacti/satp/v02/session/session_pb";
 import {
   AccessControlProfileError,
   ClientGatewayPubkeyError,
@@ -55,6 +62,7 @@ import { create } from "@bufbuild/protobuf";
 
 // Define interface on protos
 export interface ISATPSessionOptions {
+  logLevel?: LogLevelDesc;
   contextID: string;
   sessionID?: string;
   server: boolean;
@@ -65,8 +73,16 @@ export class SATPSession {
   public static readonly CLASS_NAME = "SATPSession";
   private clientSessionData: SessionData | undefined;
   private serverSessionData: SessionData | undefined;
+  private readonly logger: Logger;
 
   constructor(ops: ISATPSessionOptions) {
+    const fnTag = `${SATPSession.CLASS_NAME}#constructor()`;
+    Checks.truthy(ops, `${fnTag} arg options`);
+
+    const level = ops.logLevel || "DEBUG";
+    const label = this.className;
+    this.logger = LoggerProvider.getOrCreate({ level, label });
+
     if (!ops.server && !ops.client) {
       throw new Error(`${SATPSession.CLASS_NAME}#constructor(), at least one of server or client must be true
     `);
@@ -133,6 +149,10 @@ export class SATPSession {
       );
     }
     return this.serverSessionData;
+  }
+
+  public get className(): string {
+    return SATPSession.CLASS_NAME;
   }
 
   public getClientSessionData(): SessionData {
@@ -219,9 +239,19 @@ export class SATPSession {
   }
 
   public getSessionId(): string {
-    console.log("serverSessionId: ", this.serverSessionData?.id);
-    console.log("clientSessionId: ", this.clientSessionData?.id);
+    this.logger.info("serverSessionId: ", this.serverSessionData?.state);
+    this.logger.info("clientSessionId: ", this.clientSessionData?.state);
     return this.serverSessionData?.id || this.clientSessionData?.id || "";
+  }
+
+  public getSessionState(): State {
+    this.logger.info("serverSessionId: ", this.serverSessionData?.state);
+    this.logger.info("clientSessionId: ", this.clientSessionData?.state);
+    return (
+      this.serverSessionData?.state ||
+      this.clientSessionData?.state ||
+      State.UNSPECIFIED
+    );
   }
 
   public verify(
