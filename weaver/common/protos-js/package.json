@@ -1,78 +1,79 @@
 {
-  "name": "@hyperledger/cacti-weaver-protos-js",
-  "version": "2.1.0",
-  "description": "Interop protos for Node JS (Weaver)",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Blockchain",
-    "Interoperability",
-    "weaver",
-    "protos",
-    "nodejs",
-    "js"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Sandeep Nishad"
-    }
-  ],
-  "exports": {
-    "./common/*": "./common/*.js",
-    "./corda/*": "./corda/*.js",
-    "./driver/*": "./driver/*.js",
-    "./fabric/*": "./fabric/*.js",
-    "./msp/*": "./msp/*.js",
-    "./networks/*": "./networks/*.js",
-    "./peer/*": "./peer/*.js",
-    "./identity/*": "./identity/*.js",
-    "./relay/*": "./relay/*.js"
-  },
-  "scripts": {
-    "build": "sh ./build-protos.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "1.13.3",
-    "@grpc/proto-loader": "0.7.13",
-    "@types/node": "18.19.0",
-    "google-protobuf": "3.21.4",
-    "grpc-tools": "1.12.4"
-  },
-  "devDependencies": {
-    "grpc_tools_node_protoc_ts": "5.3.3"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.pkg.github.com/hyperledger-cacti"
-  },
-  "licenses": [
-    {
-      "type": "Apache-2.0",
-      "url": "https://github.com/hyperledger-cacti/cacti/blob/main/weaver/LICENSE"
-    }
-  ]
-}
+      "name": "@hyperledger/cacti-weaver-protos-js",
+      "version": "2.1.0",
+      "description": "Interop protos for Node JS (Weaver)",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Blockchain",
+          "Interoperability",
+          "weaver",
+          "protos",
+          "nodejs",
+          "js"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Sandeep Nishad"
+          }
+      ],
+      "exports": {
+          "./common/*": "./common/*.js",
+          "./corda/*": "./corda/*.js",
+          "./driver/*": "./driver/*.js",
+          "./fabric/*": "./fabric/*.js",
+          "./msp/*": "./msp/*.js",
+          "./networks/*": "./networks/*.js",
+          "./peer/*": "./peer/*.js",
+          "./identity/*": "./identity/*.js",
+          "./relay/*": "./relay/*.js"
+      },
+      "scripts": {
+          "build": "sh ./build-protos.sh",
+          "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "dependencies": {
+          "@grpc/grpc-js": "1.13.3",
+          "@grpc/proto-loader": "0.7.13",
+          "@types/node": "18.19.0",
+          "google-protobuf": "3.21.4",
+          "grpc-tools": "1.12.4"
+      },
+      "devDependencies": {
+          "grpc_tools_node_protoc_ts": "5.3.3"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public",
+          "registry": "https://npm.pkg.github.com/hyperledger-cacti"
+      },
+      "licenses": [
+          {
+              "type": "Apache-2.0",
+              "url": "https://github.com/hyperledger-cacti/cacti/blob/main/weaver/LICENSE"
+          }
+      ]
+  }
+    

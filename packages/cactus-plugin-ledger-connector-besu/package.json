@@ -1,128 +1,129 @@
 {
-  "name": "@hyperledger/cactus-plugin-ledger-connector-besu",
-  "version": "2.1.0",
-  "description": "Allows Cactus nodes to connect to a Besu ledger.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Peter Somogyvari",
-      "email": "peter.somogyvari@accenture.com",
-      "url": "https://accenture.com"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-plugin-ledger-connector-besu.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "benchmark": "tsx ./src/test/typescript/benchmark/run-plugin-ledger-connector-besu-benchmark.ts .tmp/benchmark-results/plugin-ledger-connector-besu/run-plugin-ledger-connector-besu-benchmark.ts.log",
-    "codegen": "yarn run --top-level run-s 'codegen:*'",
-    "codegen:openapi": "npm run generate-sdk",
-    "codegen:proto": "run-s proto:openapi proto:protoc-gen-ts",
-    "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "proto:openapi": "yarn run --top-level openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --language-specific-primitives=google.protobuf.Any --type-mappings=AnyType=google.protobuf.Any --type-mappings=object=google.protobuf.Any --additional-properties=packageName=org.hyperledger.cacti.plugin.ledger.connector.besu -o ./src/main/proto/generated/openapi/ -t=./src/main/mustache/openapi-generator/templates/protobuf-schema/ --ignore-file-override ../../openapi-generator-ignore",
-    "proto:protoc-gen-ts": "yarn run --top-level grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/ --proto_path ./src/main/proto/generated/openapi/ --proto_path ./src/main/proto/generated/openapi/models/ --proto_path ./src/main/proto/ ./src/main/proto/generated/openapi/services/*.proto ./src/main/proto/services/*.proto",
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
-    "express": "5.1.0",
-    "google-protobuf": "3.21.4",
-    "http-errors": "2.0.0",
-    "http-errors-enhanced-cjs": "2.0.1",
-    "joi": "17.13.3",
-    "openapi-types": "12.1.3",
-    "prom-client": "15.1.3",
-    "run-time-error-cjs": "1.4.0",
-    "rxjs": "7.8.1",
-    "socket.io-client-fixed-types": "4.5.4",
-    "typescript-optional": "2.0.1",
-    "web3": "1.6.1",
-    "web3-core": "1.6.1",
-    "web3-eth": "1.6.1",
-    "web3-eth-contract": "1.6.1",
-    "web3-utils": "1.6.1",
-    "web3js-quorum": "22.4.0",
-    "websocket-event-codes": "1.1.0"
-  },
-  "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
-    "@openapitools/openapi-generator-cli": "2.7.0",
-    "@types/benchmark": "2.1.5",
-    "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.1",
-    "@types/fs-extra": "11.0.4",
-    "@types/google-protobuf": "3.15.5",
-    "@types/http-errors": "2.0.4",
-    "@types/uuid": "10.0.0",
-    "benchmark": "2.1.4",
-    "body-parser": "1.20.3",
-    "fs-extra": "11.2.0",
-    "grpc-tools": "1.12.4",
-    "grpc_tools_node_protoc_ts": "5.3.3",
-    "key-encoder": "2.0.3",
-    "npm-run-all2": "6.1.2",
-    "protobufjs": "7.4.0",
-    "socket.io": "4.6.2",
-    "tsx": "4.16.2",
-    "uuid": "10.0.0",
-    "web3-core": "1.6.1",
-    "web3-eth": "1.6.1",
-    "web3-eth-accounts": "patch:web3-eth-accounts@npm%3A1.6.1#~/.yarn/patches/web3-eth-accounts-npm-1.6.1-c95f31ca81.patch"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-plugin-ledger-connector-besu.web.umd.min.js",
-  "mainMinified": "dist/cactus-plugin-ledger-connector-besu.node.umd.min.js",
-  "watch": {
-    "codegen:openapi": {
-      "patterns": [
-        "./src/main/json/openapi.json"
-      ]
-    }
+      "name": "@hyperledger/cactus-plugin-ledger-connector-besu",
+      "version": "2.1.0",
+      "description": "Allows Cactus nodes to connect to a Besu ledger.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Peter Somogyvari",
+              "email": "peter.somogyvari@accenture.com",
+              "url": "https://accenture.com"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "browser": "dist/cactus-plugin-ledger-connector-besu.web.umd.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "benchmark": "tsx ./src/test/typescript/benchmark/run-plugin-ledger-connector-besu-benchmark.ts .tmp/benchmark-results/plugin-ledger-connector-besu/run-plugin-ledger-connector-besu-benchmark.ts.log",
+          "codegen": "yarn run --top-level run-s 'codegen:*'",
+          "codegen:openapi": "npm run generate-sdk",
+          "codegen:proto": "run-s proto:openapi proto:protoc-gen-ts",
+          "generate-sdk": "run-s 'generate-sdk:*'",
+          "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+          "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+          "proto:openapi": "yarn run --top-level openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --language-specific-primitives=google.protobuf.Any --type-mappings=AnyType=google.protobuf.Any --type-mappings=object=google.protobuf.Any --additional-properties=packageName=org.hyperledger.cacti.plugin.ledger.connector.besu -o ./src/main/proto/generated/openapi/ -t=./src/main/mustache/openapi-generator/templates/protobuf-schema/ --ignore-file-override ../../openapi-generator-ignore",
+          "proto:protoc-gen-ts": "yarn run --top-level grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/ --proto_path ./src/main/proto/generated/openapi/ --proto_path ./src/main/proto/generated/openapi/models/ --proto_path ./src/main/proto/ ./src/main/proto/generated/openapi/services/*.proto ./src/main/proto/services/*.proto",
+          "watch": "npm-watch",
+          "webpack": "npm-run-all webpack:dev",
+          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+      },
+      "dependencies": {
+          "@grpc/grpc-js": "1.13.3",
+          "@hyperledger/cactus-common": "2.1.0",
+          "@hyperledger/cactus-core": "2.1.0",
+          "@hyperledger/cactus-core-api": "2.1.0",
+          "axios": "1.8.4",
+          "express": "5.1.0",
+          "google-protobuf": "3.21.4",
+          "http-errors": "2.0.0",
+          "http-errors-enhanced-cjs": "2.0.1",
+          "joi": "17.13.3",
+          "openapi-types": "12.1.3",
+          "prom-client": "15.1.3",
+          "run-time-error-cjs": "1.4.0",
+          "rxjs": "7.8.1",
+          "socket.io-client-fixed-types": "4.5.4",
+          "typescript-optional": "2.0.1",
+          "web3": "1.6.1",
+          "web3-core": "1.6.1",
+          "web3-eth": "1.6.1",
+          "web3-eth-contract": "1.6.1",
+          "web3-utils": "1.6.1",
+          "web3js-quorum": "22.4.0",
+          "websocket-event-codes": "1.1.0"
+      },
+      "devDependencies": {
+          "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+          "@hyperledger/cactus-test-tooling": "2.1.0",
+          "@openapitools/openapi-generator-cli": "2.7.0",
+          "@types/benchmark": "2.1.5",
+          "@types/body-parser": "1.19.4",
+          "@types/express": "5.0.1",
+          "@types/fs-extra": "11.0.4",
+          "@types/google-protobuf": "3.15.5",
+          "@types/http-errors": "2.0.4",
+          "@types/uuid": "10.0.0",
+          "benchmark": "2.1.4",
+          "body-parser": "1.20.3",
+          "fs-extra": "11.2.0",
+          "grpc-tools": "1.12.4",
+          "grpc_tools_node_protoc_ts": "5.3.3",
+          "key-encoder": "2.0.3",
+          "npm-run-all2": "6.1.2",
+          "protobufjs": "7.4.0",
+          "socket.io": "4.6.2",
+          "tsx": "4.16.2",
+          "uuid": "10.0.0",
+          "web3-core": "1.6.1",
+          "web3-eth": "1.6.1",
+          "web3-eth-accounts": "patch:web3-eth-accounts@npm%3A1.6.1#~/.yarn/patches/web3-eth-accounts-npm-1.6.1-c95f31ca81.patch"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "browserMinified": "dist/cactus-plugin-ledger-connector-besu.web.umd.min.js",
+      "mainMinified": "dist/cactus-plugin-ledger-connector-besu.node.umd.min.js",
+      "watch": {
+          "codegen:openapi": {
+              "patterns": [
+                  "./src/main/json/openapi.json"
+              ]
+          }
+      }
   }
-}
+    

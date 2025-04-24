@@ -1,104 +1,105 @@
 {
-  "name": "@hyperledger/cactus-core-api",
-  "version": "2.1.0",
-  "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Peter Somogyvari",
-      "email": "peter.somogyvari@accenture.com",
-      "url": "https://accenture.com"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-core-api.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "codegen": "yarn run --top-level run-s 'codegen:*'",
-    "codegen:openapi": "npm run generate-sdk",
-    "codegen:proto": "run-s proto:protoc-gen-ts",
-    "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "proto:protoc-gen-ts": "run-s proto:protoc-gen-ts:make-dir proto:protoc-gen-ts:grpc_tools_node_protoc",
-    "proto:protoc-gen-ts:make-dir": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
-    "proto:protoc-gen-ts:grpc_tools_node_protoc": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cactus-common": "2.1.0",
-    "ajv": "8.17.1",
-    "ajv-draft-04": "1.0.0",
-    "ajv-formats": "3.0.1",
-    "axios": "1.8.4",
-    "google-protobuf": "3.21.4"
-  },
-  "devDependencies": {
-    "@bufbuild/protobuf": "1.10.0",
-    "@connectrpc/connect": "1.4.0",
-    "@grpc/proto-loader": "0.7.13",
-    "@types/express": "5.0.1",
-    "@types/google-protobuf": "3.15.5",
-    "grpc-tools": "1.12.4",
-    "grpc_tools_node_protoc_ts": "5.3.3",
-    "make-dir-cli": "3.1.0",
-    "npm-run-all": "4.1.5",
-    "rxjs": "7.8.1",
-    "socket.io": "4.6.2",
-    "typescript-optional": "2.0.1"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-core-api.web.umd.min.js",
-  "installConfig": {
-    "hoistingLimits": "dependencies"
-  },
-  "mainMinified": "dist/cactus-core-api.node.umd.min.js",
-  "watch": {
-    "codegen:openapi": {
-      "patterns": [
-        "./src/main/json/openapi.json"
-      ]
-    }
+      "name": "@hyperledger/cactus-core-api",
+      "version": "2.1.0",
+      "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Peter Somogyvari",
+              "email": "peter.somogyvari@accenture.com",
+              "url": "https://accenture.com"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "browser": "dist/cactus-core-api.web.umd.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "codegen": "yarn run --top-level run-s 'codegen:*'",
+          "codegen:openapi": "npm run generate-sdk",
+          "codegen:proto": "run-s proto:protoc-gen-ts",
+          "generate-sdk": "run-s 'generate-sdk:*'",
+          "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+          "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+          "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+          "proto:protoc-gen-ts": "run-s proto:protoc-gen-ts:make-dir proto:protoc-gen-ts:grpc_tools_node_protoc",
+          "proto:protoc-gen-ts:make-dir": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
+          "proto:protoc-gen-ts:grpc_tools_node_protoc": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
+          "watch": "npm-watch",
+          "webpack": "npm-run-all webpack:dev",
+          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+      },
+      "dependencies": {
+          "@grpc/grpc-js": "1.13.3",
+          "@hyperledger/cactus-common": "2.1.0",
+          "ajv": "8.17.1",
+          "ajv-draft-04": "1.0.0",
+          "ajv-formats": "3.0.1",
+          "axios": "1.8.4",
+          "google-protobuf": "3.21.4"
+      },
+      "devDependencies": {
+          "@bufbuild/protobuf": "1.10.0",
+          "@connectrpc/connect": "1.4.0",
+          "@grpc/proto-loader": "0.7.13",
+          "@types/express": "5.0.1",
+          "@types/google-protobuf": "3.15.5",
+          "grpc-tools": "1.12.4",
+          "grpc_tools_node_protoc_ts": "5.3.3",
+          "make-dir-cli": "3.1.0",
+          "npm-run-all": "4.1.5",
+          "rxjs": "7.8.1",
+          "socket.io": "4.6.2",
+          "typescript-optional": "2.0.1"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "browserMinified": "dist/cactus-core-api.web.umd.min.js",
+      "installConfig": {
+          "hoistingLimits": "dependencies"
+      },
+      "mainMinified": "dist/cactus-core-api.node.umd.min.js",
+      "watch": {
+          "codegen:openapi": {
+              "patterns": [
+                  "./src/main/json/openapi.json"
+              ]
+          }
+      }
   }
-}
+    

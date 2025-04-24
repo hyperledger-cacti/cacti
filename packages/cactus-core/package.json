@@ -1,82 +1,83 @@
 {
-  "name": "@hyperledger/cactus-core",
-  "version": "2.1.0",
-  "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Peter Somogyvari",
-      "email": "peter.somogyvari@accenture.com",
-      "url": "https://accenture.com"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-core.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
-  "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "body-parser": "1.20.3",
-    "express": "5.1.0",
-    "express-jwt-authz": "2.4.1",
-    "express-openapi-validator": "5.2.0",
-    "http-errors": "2.0.0",
-    "http-errors-enhanced-cjs": "2.0.1",
-    "run-time-error-cjs": "1.4.0",
-    "safe-stable-stringify": "2.5.0",
-    "typescript-optional": "2.0.1"
-  },
-  "devDependencies": {
-    "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.1",
-    "@types/http-errors": "2.0.2",
-    "node-mocks-http": "1.14.0",
-    "uuid": "10.0.0"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-core.web.umd.min.js",
-  "mainMinified": "dist/cactus-core.node.umd.min.js",
-  "watch": {}
-}
+      "name": "@hyperledger/cactus-core",
+      "version": "2.1.0",
+      "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Peter Somogyvari",
+              "email": "peter.somogyvari@accenture.com",
+              "url": "https://accenture.com"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "browser": "dist/cactus-core.web.umd.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "watch": "npm-watch",
+          "webpack": "npm-run-all webpack:dev",
+          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+      },
+      "dependencies": {
+          "@hyperledger/cactus-common": "2.1.0",
+          "@hyperledger/cactus-core-api": "2.1.0",
+          "body-parser": "1.20.3",
+          "express": "5.1.0",
+          "express-jwt-authz": "2.4.1",
+          "express-openapi-validator": "5.2.0",
+          "http-errors": "2.0.0",
+          "http-errors-enhanced-cjs": "2.0.1",
+          "run-time-error-cjs": "1.4.0",
+          "safe-stable-stringify": "2.5.0",
+          "typescript-optional": "2.0.1"
+      },
+      "devDependencies": {
+          "@types/body-parser": "1.19.4",
+          "@types/express": "5.0.1",
+          "@types/http-errors": "2.0.2",
+          "node-mocks-http": "1.14.0",
+          "uuid": "10.0.0"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "browserMinified": "dist/cactus-core.web.umd.min.js",
+      "mainMinified": "dist/cactus-core.node.umd.min.js",
+      "watch": {}
+  }
+    

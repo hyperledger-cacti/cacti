@@ -1,86 +1,87 @@
 {
-  "name": "@hyperledger/cactus-test-plugin-ledger-connector-besu",
-  "version": "2.1.0",
-  "description": "Integration tests for the Besu ledger and the API server.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Peter Somogyvari",
-      "email": "peter.somogyvari@accenture.com",
-      "url": "https://accenture.com"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-test-plugin-ledger-connector-besu.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cactus-cmd-api-server": "2.1.0",
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
-    "@hyperledger/cactus-verifier-client": "2.1.0",
-    "key-encoder": "2.0.3",
-    "socket.io": "4.6.2",
-    "web3": "1.6.1",
-    "web3js-quorum": "22.4.0"
-  },
-  "devDependencies": {
-    "@types/express": "5.0.1",
-    "@types/uuid": "10.0.0",
-    "axios": "1.8.4",
-    "express": "5.1.0",
-    "http-status-codes": "2.3.0",
-    "uuid": "10.0.0",
-    "web3-core": "1.6.1"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-test-plugin-ledger-connector-besu.web.umd.min.js",
-  "mainMinified": "dist/cactus-test-plugin-ledger-connector-besu.node.umd.min.js",
-  "watch": {}
-}
+      "name": "@hyperledger/cactus-test-plugin-ledger-connector-besu",
+      "version": "2.1.0",
+      "description": "Integration tests for the Besu ledger and the API server.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Peter Somogyvari",
+              "email": "peter.somogyvari@accenture.com",
+              "url": "https://accenture.com"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "browser": "dist/cactus-test-plugin-ledger-connector-besu.web.umd.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "watch": "npm-watch",
+          "webpack": "npm-run-all webpack:dev",
+          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+      },
+      "dependencies": {
+          "@grpc/grpc-js": "1.13.3",
+          "@hyperledger/cactus-cmd-api-server": "2.1.0",
+          "@hyperledger/cactus-common": "2.1.0",
+          "@hyperledger/cactus-core": "2.1.0",
+          "@hyperledger/cactus-core-api": "2.1.0",
+          "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+          "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
+          "@hyperledger/cactus-test-tooling": "2.1.0",
+          "@hyperledger/cactus-verifier-client": "2.1.0",
+          "key-encoder": "2.0.3",
+          "socket.io": "4.6.2",
+          "web3": "1.6.1",
+          "web3js-quorum": "22.4.0"
+      },
+      "devDependencies": {
+          "@types/express": "5.0.1",
+          "@types/uuid": "10.0.0",
+          "axios": "1.8.4",
+          "express": "5.1.0",
+          "http-status-codes": "2.3.0",
+          "uuid": "10.0.0",
+          "web3-core": "1.6.1"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "browserMinified": "dist/cactus-test-plugin-ledger-connector-besu.web.umd.min.js",
+      "mainMinified": "dist/cactus-test-plugin-ledger-connector-besu.node.umd.min.js",
+      "watch": {}
+  }
+    
