@@ -1,61 +1,62 @@
 {
-  "name": "@hyperledger/cacti-weaver-driver-fabric",
-  "version": "2.1.0",
-  "description": "Driver Server for communication with a Fabric Network as part of Weaver data sharing protocol",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "main": "out/server.js",
-  "scripts": {
-    "build": "npm run tsc",
-    "dev": "nodemon out/server.js",
-    "start": "node out/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "tsc",
-    "watch": "tsc --watch"
-  },
-  "dependencies": {
-    "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
-    "dotenv": "8.6.0",
-    "fabric-ca-client": "2.2.20",
-    "fabric-common": "2.2.20",
-    "fabric-network": "2.2.20",
-    "fabric-protos": "2.2.20",
-    "level": "8.0.0",
-    "winston": "3.10.0"
-  },
-  "devDependencies": {
-    "@types/node": "18.11.9",
-    "nodemon": "2.0.22",
-    "typedoc": "0.26.2",
-    "typescript": "5.5.2"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
+      "name": "@hyperledger/cacti-weaver-driver-fabric",
+      "version": "2.1.0",
+      "description": "Driver Server for communication with a Fabric Network as part of Weaver data sharing protocol",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "main": "out/server.js",
+      "scripts": {
+          "build": "npm run tsc",
+          "dev": "nodemon out/server.js",
+          "start": "node out/server.js",
+          "test": "echo \"Error: no test specified\" && exit 1",
+          "tsc": "tsc",
+          "watch": "tsc --watch"
+      },
+      "dependencies": {
+          "@fidm/x509": "1.2.1",
+          "@grpc/grpc-js": "1.13.3",
+          "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+          "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+          "dotenv": "8.6.0",
+          "fabric-ca-client": "2.2.20",
+          "fabric-common": "2.2.20",
+          "fabric-network": "2.2.20",
+          "fabric-protos": "2.2.20",
+          "level": "8.0.0",
+          "winston": "3.10.0"
+      },
+      "devDependencies": {
+          "@types/node": "18.11.9",
+          "nodemon": "2.0.22",
+          "typedoc": "0.26.2",
+          "typescript": "5.5.2"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      }
   }
-}
+    

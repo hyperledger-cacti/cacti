@@ -1,12 +1,19 @@
 # SATP-Hermes Gateway tests and docker deployments
-name: SATP-Hermes Gateway
+name: SATP CI - tests and docker deployments
+
 env:
   NODEJS_VERSION: v18.19.0
 on:
+  # Run tests on PR
   pull_request:
     branches: [main, satp-dev]
+  # Run tests and build/push docker images on push
   push:
     branches: [main, satp-dev]
+
+env:
+  NODEJS_VERSION: v18.19.0
+
 jobs:
   build-dev-satp:
     runs-on: ubuntu-22.04
@@ -76,6 +83,10 @@ jobs:
       - name: Debug Build Info
         run: |
           PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
+          echo "Debug: Current ref = ${{ github.ref }}"
+          echo "Debug: Event name = ${{ github.event_name }}"
+          echo "Debug: GitHub workspace = ${{ github.workspace }}"
+          echo "Debug: Repository = ${{ github.repository }}"
           echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
           echo "Debug: Building for dockerhub image = ${{ needs.set-docker-tags.outputs.dockerhub_image }}"
           echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
