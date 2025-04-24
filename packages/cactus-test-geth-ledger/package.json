@@ -1,74 +1,75 @@
 {
-  "name": "@hyperledger/cactus-test-geth-ledger",
-  "version": "2.1.0",
-  "description": "Helpers for running test go-ethereum ledger in test scripts.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Michal Bajer",
-      "email": "michal.bajer@fujitsu.com",
-      "url": "https://www.fujitsu.com/global/"
-    }
-  ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-test-geth-ledger.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
-  "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
-    "dockerode": "3.3.0",
-    "internal-ip": "6.2.0",
-    "run-time-error-cjs": "1.4.0",
-    "web3": "4.0.3",
-    "web3-eth-accounts": "4.0.3"
-  },
-  "devDependencies": {
-    "@types/dockerode": "3.2.7"
-  },
-  "engines": {
-    "node": ">=18",
-    "npm": ">=8"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-test-geth-ledger.web.umd.min.js",
-  "mainMinified": "dist/cactus-test-geth-ledger.node.umd.min.js",
-  "watch": {}
-}
+      "name": "@hyperledger/cactus-test-geth-ledger",
+      "version": "2.1.0",
+      "description": "Helpers for running test go-ethereum ledger in test scripts.",
+      "keywords": [
+          "Hyperledger",
+          "Cacti",
+          "Integration",
+          "Blockchain",
+          "Distributed Ledger Technology"
+      ],
+      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+      "bugs": {
+          "url": "https://github.com/hyperledger-cacti/cacti/issues"
+      },
+      "repository": {
+          "type": "git",
+          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+      },
+      "license": "Apache-2.0",
+      "author": {
+          "name": "Hyperledger Cacti Contributors",
+          "email": "cacti@lists.lfdecentralizedtrust.org",
+          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+      },
+      "contributors": [
+          {
+              "name": "Please add yourself to the list of contributors",
+              "email": "your.name@example.com",
+              "url": "https://example.com"
+          },
+          {
+              "name": "Michal Bajer",
+              "email": "michal.bajer@fujitsu.com",
+              "url": "https://www.fujitsu.com/global/"
+          }
+      ],
+      "main": "dist/lib/main/typescript/index.js",
+      "module": "dist/lib/main/typescript/index.js",
+      "browser": "dist/cactus-test-geth-ledger.web.umd.js",
+      "types": "dist/lib/main/typescript/index.d.ts",
+      "files": [
+          "dist/*"
+      ],
+      "scripts": {
+          "watch": "npm-watch",
+          "webpack": "npm-run-all webpack:dev",
+          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+      },
+      "dependencies": {
+          "@hyperledger/cactus-common": "2.1.0",
+          "@hyperledger/cactus-test-tooling": "2.1.0",
+          "dockerode": "3.3.0",
+          "internal-ip": "6.2.0",
+          "run-time-error-cjs": "1.4.0",
+          "web3": "4.0.3",
+          "web3-eth-accounts": "4.0.3"
+      },
+      "devDependencies": {
+          "@types/dockerode": "3.2.7"
+      },
+      "engines": {
+          "node": ">=18",
+          "npm": ">=8"
+      },
+      "publishConfig": {
+          "access": "public"
+      },
+      "browserMinified": "dist/cactus-test-geth-ledger.web.umd.min.js",
+      "mainMinified": "dist/cactus-test-geth-ledger.node.umd.min.js",
+      "watch": {}
+  }
+    
