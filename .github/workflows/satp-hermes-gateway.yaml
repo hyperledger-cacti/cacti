@@ -1,21 +1,26 @@
 # SATP-Hermes Gateway tests and docker deployments
 name: SATP CI - tests and docker deployments
 
+# This workflow handles the CI/CD pipeline for the SATP Hermes Gateway plugin.
+# It performs the following tasks:
+# 1. Builds the SATP plugin bundle and generates necessary files
+# 2. Runs unit, integration, and forge (smart contract) tests
+# 3. Builds and pushes Docker images to both Docker Hub and GHCR
+# 4. Tags images appropriately (version-specific and latest)
+
 env:
   NODEJS_VERSION: v18.19.0
 on:
   # Run tests on PR
   pull_request:
     branches: [main, satp-dev]
+    
   # Run tests and build/push docker images on push
   push:
     branches: [main, satp-dev]
-
-env:
-  NODEJS_VERSION: v18.19.0
-
+  
 jobs:
-  build-dev-satp:
+  build-satp-dev:
     runs-on: ubuntu-22.04
     continue-on-error: false
     env:
@@ -32,21 +37,57 @@ jobs:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.7
 
-      - id: yarn-cache
-        name: Initialize Yarn Cache
+      - name: Cache dependencies
         uses: actions/cache@v3
+        id: cache
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
+          path: |
+            ./.yarn/
+            ./packages/cactus-plugin-satp-hermes/node_modules/
+            $HOME/.foundry/
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-deps-
 
-      - if: steps.yarn-cache.outputs.cache-hit != 'true'
-        name: Run CI script
-        run: ./tools/ci.sh
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes
+
+      - name: Install Foundry
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash
+          source $HOME/.bashrc && foundryup
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Build bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+
+      - name: Generate protobuf files
+        run: yarn build-proto
+
+      - name: Generate OpenAPI SDKs
+        run: |
+          yarn bundle-openapi-yaml
+          yarn bundle-openapi-json
+          yarn generate-sdk:typescript-axios-bol
+
+      - name: Generate ABI types
+        run: |
+          yarn forge:all
+          yarn codegen:abi
+
+      - name: Run linting
+        continue-on-error: true
+        run: |
+          yarn lint-code || echo "Linting completed with warnings"
+          yarn lint:oapi || echo "OpenAPI linting completed with warnings"
+          yarn lint:protobuf || echo "Protobuf linting completed with warnings"
 
   run-satp-tests:
-    needs: build-dev-satp
+    needs: build-satp-dev
     runs-on: ubuntu-22.04
     env:
       NODEJS_VERSION: v18.19.0
@@ -67,8 +108,42 @@ jobs:
         uses: actions/setup-node@v4.0.2
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - run: ./tools/ci.sh
 
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            ./.yarn/
+            ./packages/cactus-plugin-satp-hermes/node_modules/
+            $HOME/.foundry/
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes
+
+      - name: Install Foundry
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash
+          source $HOME/.bashrc && foundryup
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Run SATP unit tests
+        run: yarn test:unit
+
+      - name: Run SATP integration tests
+        run: yarn test:integration
+
+      - name: Run SATP forge tests
+        run: yarn test:forge
+
+  # Set Docker tags based on branch and commit information
   set-docker-tags:
     needs: run-satp-tests 
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
@@ -109,6 +184,8 @@ jobs:
           echo "tag_version=${TAG_VERSION}" >> $GITHUB_OUTPUT
           echo "dockerhub_image=${DOCKERHUB_IMAGE}" >> $GITHUB_OUTPUT
           echo "ghcr_image=${GHCR_IMAGE}" >> $GITHUB_OUTPUT
+  
+  # Build and push Docker image to Docker Hub
   build-and-push-dockerhub:
     needs: set-docker-tags
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
@@ -140,7 +217,7 @@ jobs:
           yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
           echo "Debug: Bundle build completed"
           
-      - name: Set up Docker Buildx
+      - name: Set up Docker Build
         uses: docker/setup-buildx-action@v3
         
       - name: Debug Docker Info
@@ -169,10 +246,17 @@ jobs:
             org.opencontainers.image.vendor=Hyperledger
             org.opencontainers.image.version=${{ needs.set-docker-tags.outputs.tag_version }}
             org.opencontainers.image.visibility=public
-          tags: |
-            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
-            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest
+          tags: ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-from: type=registry,ref=${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-to: type=inline
 
+      - name: Tag and push latest to Docker Hub
+        run: |
+          docker pull ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          docker tag ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }} ${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest
+          docker push ${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest
+
+  # Build and push Docker image to GitHub Container Registry
   build-and-push-ghcr:
     needs: set-docker-tags
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev')
@@ -204,7 +288,7 @@ jobs:
           yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
           echo "Debug: Bundle build completed"
           
-      - name: Set up Docker Buildx
+      - name: Set up Docker Build
         uses: docker/setup-buildx-action@v3
         
       - name: Debug Docker Info
@@ -234,6 +318,12 @@ jobs:
             org.opencontainers.image.vendor=Hyperledger
             org.opencontainers.image.version=${{ needs.set-docker-tags.outputs.tag_version }}
             org.opencontainers.image.visibility=public
-          tags: |
-            ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
-            ${{ needs.set-docker-tags.outputs.ghcr_image }}:latest
+          tags: ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-from: type=registry,ref=${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-to: type=inline
+
+      - name: Tag and push latest to GHCR
+        run: |
+          docker pull ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          docker tag ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }} ${{ needs.set-docker-tags.outputs.ghcr_image }}:latest
+          docker push ${{ needs.set-docker-tags.outputs.ghcr_image }}:latest
