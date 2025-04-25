@@ -1,92 +1,91 @@
 {
-      "name": "@hyperledger/cacti-ledger-browser",
-      "version": "2.1.0",
-      "description": "Cacti GUI for visualizing ledger data build on react.",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Michal Bajer",
-              "email": "michal.bajer@fujitsu.com",
-              "url": "https://www.fujitsu.com/global/"
-          },
-          {
-              "name": "Tomasz Awramski",
-              "email": "tomasz.awramski@fujitsu.com",
-              "url": "https://www.fujitsu.com/global/"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "build": "yarn run tsc && yarn run build:prod:frontend",
-          "build:dev:frontend": "vite build --mode=development",
-          "build:prod:frontend": "vite build",
-          "serve": "vite preview",
-          "start": "vite",
-          "tsc": "tsc --build --verbose"
-      },
-      "dependencies": {
-          "@emotion/react": "11.11.4",
-          "@emotion/styled": "11.11.5",
-          "@mui/icons-material": "5.15.10",
-          "@mui/lab": "5.0.0-alpha.170",
-          "@mui/material": "5.15.15",
-          "@supabase/supabase-js": "1.35.6",
-          "@tanstack/react-query": "5.29.2",
-          "apexcharts": "3.45.2",
-          "axios": "1.8.4",
-          "buffer": "6.0.3",
-          "ethers": "6.12.1",
-          "react": "18.2.0",
-          "react-apexcharts": "1.4.1",
-          "react-dom": "18.2.0",
-          "react-router-dom": "6.21.3",
-          "web3": "4.1.1"
-      },
-      "devDependencies": {
-          "@tanstack/eslint-plugin-query": "5.28.11",
-          "@tanstack/react-query-devtools": "5.29.2",
-          "@types/react": "18.2.43",
-          "@types/react-dom": "18.2.17",
-          "@vitejs/plugin-react": "4.2.1",
-          "typescript": "5.5.2",
-          "vite": "6.2.6"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cacti-ledger-browser",
+  "version": "2.1.0",
+  "description": "Cacti GUI for visualizing ledger data build on react.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    },
+    {
+      "name": "Tomasz Awramski",
+      "email": "tomasz.awramski@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "yarn run tsc && yarn run build:prod:frontend",
+    "build:dev:frontend": "vite build --mode=development",
+    "build:prod:frontend": "vite build",
+    "serve": "vite preview",
+    "start": "vite",
+    "tsc": "tsc --build --verbose"
+  },
+  "dependencies": {
+    "@emotion/react": "11.11.4",
+    "@emotion/styled": "11.11.5",
+    "@mui/icons-material": "5.15.10",
+    "@mui/lab": "5.0.0-alpha.170",
+    "@mui/material": "5.15.15",
+    "@supabase/supabase-js": "1.35.6",
+    "@tanstack/react-query": "5.29.2",
+    "apexcharts": "3.45.2",
+    "axios": "1.8.4",
+    "buffer": "6.0.3",
+    "ethers": "6.12.1",
+    "react": "18.2.0",
+    "react-apexcharts": "1.4.1",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.21.3",
+    "web3": "4.1.1"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-plugin-query": "5.28.11",
+    "@tanstack/react-query-devtools": "5.29.2",
+    "@types/react": "18.2.43",
+    "@types/react-dom": "18.2.17",
+    "@vitejs/plugin-react": "4.2.1",
+    "typescript": "5.5.2",
+    "vite": "6.2.6"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}
