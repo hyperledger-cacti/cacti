@@ -1,87 +1,86 @@
 {
-      "name": "@hyperledger/cactus-common",
-      "version": "2.1.0",
-      "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Peter Somogyvari",
-              "email": "peter.somogyvari@accenture.com",
-              "url": "https://accenture.com"
-          },
-          {
-              "name": "Michael Courtin",
-              "email": "michael.courtin@accenture.com",
-              "url": "https://accenture.com"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "browser": "dist/cactus-common.web.umd.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "watch": "npm-watch",
-          "webpack": "npm-run-all webpack:dev",
-          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-      },
-      "dependencies": {
-          "fast-safe-stringify": "2.1.1",
-          "json-stable-stringify": "1.0.2",
-          "key-encoder": "2.0.3",
-          "loglevel": "1.8.1",
-          "loglevel-plugin-prefix": "0.8.4",
-          "run-time-error-cjs": "1.4.0",
-          "sanitize-html": "2.12.1",
-          "secp256k1": "5.0.1",
-          "sha3": "2.1.4"
-      },
-      "devDependencies": {
-          "@grpc/grpc-js": "1.13.3",
-          "@types/json-stable-stringify": "1.0.33",
-          "@types/sanitize-html": "2.9.5",
-          "@types/secp256k1": "4.0.3",
-          "@types/uuid": "10.0.0",
-          "uuid": "10.0.0"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      },
-      "browserMinified": "dist/cactus-common.web.umd.min.js",
-      "mainMinified": "dist/cactus-common.node.umd.min.js",
-      "watch": {}
-  }
-    
+  "name": "@hyperledger/cactus-common",
+  "version": "2.1.0",
+  "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    },
+    {
+      "name": "Michael Courtin",
+      "email": "michael.courtin@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-common.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "fast-safe-stringify": "2.1.1",
+    "json-stable-stringify": "1.0.2",
+    "key-encoder": "2.0.3",
+    "loglevel": "1.8.1",
+    "loglevel-plugin-prefix": "0.8.4",
+    "run-time-error-cjs": "1.4.0",
+    "sanitize-html": "2.12.1",
+    "secp256k1": "5.0.1",
+    "sha3": "2.1.4"
+  },
+  "devDependencies": {
+    "@grpc/grpc-js": "1.13.3",
+    "@types/json-stable-stringify": "1.0.33",
+    "@types/sanitize-html": "2.9.5",
+    "@types/secp256k1": "4.0.3",
+    "@types/uuid": "10.0.0",
+    "uuid": "10.0.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-common.web.umd.min.js",
+  "mainMinified": "dist/cactus-common.node.umd.min.js",
+  "watch": {}
+}

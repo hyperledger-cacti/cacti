@@ -1,79 +1,78 @@
 {
-      "name": "@hyperledger/cacti-weaver-besu-cli",
-      "version": "2.1.0",
-      "description": "besu-cli CLI",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "types": "build/types/types.d.ts",
-      "bin": {
-          "besu-cli": "bin/besu-cli"
-      },
-      "files": [
-          "tsconfig.json",
-          "tslint.json",
-          "build",
-          "LICENSE",
-          "readme.md",
-          "docs",
-          "bin"
-      ],
-      "scripts": {
-          "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
-          "clean-build": "rm -rf ./build",
-          "compile": "tsc -p .",
-          "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-          "coverage": "jest --coverage",
-          "lint": "tslint -p .",
-          "prepublishOnly": "yarn build",
-          "snapupdate": "jest --updateSnapshot",
-          "test": "jest",
-          "watch": "jest --watch"
-      },
-      "jest": {
-          "preset": "ts-jest",
-          "testEnvironment": "node"
-      },
-      "dependencies": {
-          "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-          "@hyperledger/cacti-weaver-sdk-besu": "2.1.0",
-          "@truffle/contract": "4.6.28",
-          "gluegun": "5.1.6",
-          "web3": "1.10.0",
-          "winston": "3.10.0"
-      },
-      "devDependencies": {
-          "@types/jest": "29.5.3",
-          "@types/node": "18.11.9",
-          "jest": "29.6.2",
-          "ts-jest": "29.1.1",
-          "ts-node": "10.9.1",
-          "typescript": "5.5.2"
-      },
-      "engines": {
-          "node": ">=20",
-          "npm": ">=10"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cacti-weaver-besu-cli",
+  "version": "2.1.0",
+  "description": "besu-cli CLI",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "types": "build/types/types.d.ts",
+  "bin": {
+    "besu-cli": "bin/besu-cli"
+  },
+  "files": [
+    "tsconfig.json",
+    "tslint.json",
+    "build",
+    "LICENSE",
+    "readme.md",
+    "docs",
+    "bin"
+  ],
+  "scripts": {
+    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "coverage": "jest --coverage",
+    "lint": "tslint -p .",
+    "prepublishOnly": "yarn build",
+    "snapupdate": "jest --updateSnapshot",
+    "test": "jest",
+    "watch": "jest --watch"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger/cacti-weaver-sdk-besu": "2.1.0",
+    "@truffle/contract": "4.6.28",
+    "gluegun": "5.1.6",
+    "web3": "1.10.0",
+    "winston": "3.10.0"
+  },
+  "devDependencies": {
+    "@types/jest": "29.5.3",
+    "@types/node": "18.11.9",
+    "jest": "29.6.2",
+    "ts-jest": "29.1.1",
+    "ts-node": "10.9.1",
+    "typescript": "5.5.2"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}

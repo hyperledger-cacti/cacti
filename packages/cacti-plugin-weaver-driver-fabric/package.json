@@ -1,77 +1,76 @@
 {
-      "name": "@hyperledger/cacti-plugin-weaver-driver-fabric",
-      "version": "2.1.0",
-      "description": "Driver Server for communication with a Fabric Network as part of Weaver data sharing protocol",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology",
-          "Weaver"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Venkatraman Ramakrishna",
-              "email": "vramakr2@in.ibm.com",
-              "url": "https://github.com/VRamakrishna"
-          },
-          {
-              "name": "Sandeep Nishad",
-              "email": "sandeep.nishad1@ibm.com",
-              "url": "https://github.com/sandeepnRES"
-          },
-          {
-              "name": "Krishnasuri Narayanam",
-              "email": "knaraya3@in.ibm.com",
-              "url": "https://github.com/knarayan"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "build": "cd src/main/typescript && make build",
-          "build-image": "cd src/main/typescript && make build-image",
-          "build-image-local": "cd src/main/typescript && make build-image-local",
-          "build-local": "cd src/main/typescript && make build-local",
-          "clean": "cd src/main/typescript && make clean",
-          "clean-local": "cd src/main/typescript && make clean-local",
-          "publish": "cd src/main/typescript && make push-image && make push-image-latest",
-          "postpublish": "cd src/main/typescript && make push-image-latest",
-          "watch": "npm-watch"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      },
-      "browserMinified": "dist/cacti-weaver-driver-fabric.web.umd.min.js",
-      "mainMinified": "dist/cacti-weaver-driver-fabric.node.umd.min.js",
-      "watch": {}
-  }
-    
+  "name": "@hyperledger/cacti-plugin-weaver-driver-fabric",
+  "version": "2.1.0",
+  "description": "Driver Server for communication with a Fabric Network as part of Weaver data sharing protocol",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology",
+    "Weaver"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Venkatraman Ramakrishna",
+      "email": "vramakr2@in.ibm.com",
+      "url": "https://github.com/VRamakrishna"
+    },
+    {
+      "name": "Sandeep Nishad",
+      "email": "sandeep.nishad1@ibm.com",
+      "url": "https://github.com/sandeepnRES"
+    },
+    {
+      "name": "Krishnasuri Narayanam",
+      "email": "knaraya3@in.ibm.com",
+      "url": "https://github.com/knarayan"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "cd src/main/typescript && make build",
+    "build-image": "cd src/main/typescript && make build-image",
+    "build-image-local": "cd src/main/typescript && make build-image-local",
+    "build-local": "cd src/main/typescript && make build-local",
+    "clean": "cd src/main/typescript && make clean",
+    "clean-local": "cd src/main/typescript && make clean-local",
+    "publish": "cd src/main/typescript && make push-image && make push-image-latest",
+    "postpublish": "cd src/main/typescript && make push-image-latest",
+    "watch": "npm-watch"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cacti-weaver-driver-fabric.web.umd.min.js",
+  "mainMinified": "dist/cacti-weaver-driver-fabric.node.umd.min.js",
+  "watch": {}
+}

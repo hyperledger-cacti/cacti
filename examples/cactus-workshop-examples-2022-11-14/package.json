@@ -1,79 +1,78 @@
 {
-      "name": "@hyperledger/cactus-workshop-examples-2022-11-14",
-      "version": "2.1.0",
-      "description": "Cacti Workshop 2022-11-14 Examples",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Rafael Belchior",
-              "email": "rbelchior@blockdaemon.com"
-          },
-          {
-              "name": "Mónica Gomez",
-              "email": "monica.gomez@tecnico.ulisboa.pt"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "browser": "dist/cactus-workshop-examples-2022-11-14.web.umd.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "watch": "npm-watch",
-          "webpack": "npm-run-all webpack:dev",
-          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-      },
-      "dependencies": {
-          "@hyperledger/cactus-cmd-api-server": "2.1.0",
-          "@hyperledger/cactus-common": "2.1.0",
-          "@hyperledger/cactus-core": "2.1.0",
-          "@hyperledger/cactus-core-api": "2.1.0",
-          "@hyperledger/cactus-test-tooling": "2.1.0",
-          "kubo-rpc-client": "3.0.1",
-          "typescript-optional": "2.0.1",
-          "uuid": "10.0.0"
-      },
-      "devDependencies": {
-          "@types/uuid": "10.0.0"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      },
-      "browserMinified": "dist/cactus-workshop-examples-2022-11-14.web.umd.min.js",
-      "mainMinified": "dist/cactus-workshop-examples-2022-11-14.node.umd.min.js",
-      "watch": {}
-  }
-    
+  "name": "@hyperledger/cactus-workshop-examples-2022-11-14",
+  "version": "2.1.0",
+  "description": "Cacti Workshop 2022-11-14 Examples",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Rafael Belchior",
+      "email": "rbelchior@blockdaemon.com"
+    },
+    {
+      "name": "Mónica Gomez",
+      "email": "monica.gomez@tecnico.ulisboa.pt"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-workshop-examples-2022-11-14.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "kubo-rpc-client": "3.0.1",
+    "typescript-optional": "2.0.1",
+    "uuid": "10.0.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "10.0.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-workshop-examples-2022-11-14.web.umd.min.js",
+  "mainMinified": "dist/cactus-workshop-examples-2022-11-14.node.umd.min.js",
+  "watch": {}
+}
