@@ -1,79 +1,78 @@
 {
-      "name": "@hyperledger/cactus-example-discounted-asset-trade-client",
-      "version": "2.1.0",
-      "description": "Client for interacting with discounted asset trade sample app and some tools for setting up indy enviroment",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Michal Bajer",
-              "email": "michal.bajer@fujitsu.com",
-              "url": "https://www.fujitsu.com/global/"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "bin": {
-          "run-discounted-asset-trade-client": "dist/lib/main/typescript/scripts/run-discounted-asset-trade-client.js",
-          "setup-credentials": "dist/lib/main/typescript/scripts/setup-credentials.js"
-      },
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "build": "tsc",
-          "run-discounted-asset-trade-client": "node dist/lib/main/typescript/scripts/run-discounted-asset-trade-client.js",
-          "setup-credentials": "node dist/lib/main/typescript/scripts/setup-credentials.js"
-      },
-      "dependencies": {
-          "@aries-framework/anoncreds": "0.5.0-alpha.71",
-          "@aries-framework/anoncreds-rs": "0.5.0-alpha.71",
-          "@aries-framework/askar": "0.5.0-alpha.71",
-          "@aries-framework/core": "0.5.0-alpha.71",
-          "@aries-framework/indy-vdr": "0.5.0-alpha.71",
-          "@aries-framework/node": "0.5.0-alpha.71",
-          "@hyperledger/anoncreds-nodejs": "0.2.0",
-          "@hyperledger/aries-askar-nodejs": "0.2.0",
-          "@hyperledger/indy-vdr-nodejs": "0.2.0",
-          "axios": "1.8.4",
-          "inquirer": "8.2.6",
-          "loglevel": "1.8.1"
-      },
-      "devDependencies": {
-          "@aries-framework/indy-sdk": "0.5.0-alpha.71",
-          "@types/inquirer": "8.2.6"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cactus-example-discounted-asset-trade-client",
+  "version": "2.1.0",
+  "description": "Client for interacting with discounted asset trade sample app and some tools for setting up indy enviroment",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "bin": {
+    "run-discounted-asset-trade-client": "dist/lib/main/typescript/scripts/run-discounted-asset-trade-client.js",
+    "setup-credentials": "dist/lib/main/typescript/scripts/setup-credentials.js"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "run-discounted-asset-trade-client": "node dist/lib/main/typescript/scripts/run-discounted-asset-trade-client.js",
+    "setup-credentials": "node dist/lib/main/typescript/scripts/setup-credentials.js"
+  },
+  "dependencies": {
+    "@aries-framework/anoncreds": "0.5.0-alpha.71",
+    "@aries-framework/anoncreds-rs": "0.5.0-alpha.71",
+    "@aries-framework/askar": "0.5.0-alpha.71",
+    "@aries-framework/core": "0.5.0-alpha.71",
+    "@aries-framework/indy-vdr": "0.5.0-alpha.71",
+    "@aries-framework/node": "0.5.0-alpha.71",
+    "@hyperledger/anoncreds-nodejs": "0.2.0",
+    "@hyperledger/aries-askar-nodejs": "0.2.0",
+    "@hyperledger/indy-vdr-nodejs": "0.2.0",
+    "axios": "1.8.4",
+    "inquirer": "8.2.6",
+    "loglevel": "1.8.1"
+  },
+  "devDependencies": {
+    "@aries-framework/indy-sdk": "0.5.0-alpha.71",
+    "@types/inquirer": "8.2.6"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}

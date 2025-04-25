@@ -77,3 +77,4 @@ tools/local
 
 
 *.sqlite3
+packages/cactus-plugin-satp-hermes/src/test/solidity/generated/build-info

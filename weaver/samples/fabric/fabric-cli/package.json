@@ -1,92 +1,91 @@
 {
-      "name": "@hyperledger/cacti-weaver-fabric-cli",
-      "version": "2.1.0",
-      "description": "fabric-cli CLI",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "types": "build/types/types.d.ts",
-      "bin": {
-          "fabric-cli": "bin/fabric-cli"
-      },
-      "files": [
-          "tsconfig.json",
-          "build",
-          "LICENSE",
-          "readme.md",
-          "docs",
-          "bin"
-      ],
-      "scripts": {
-          "build": "yarn clean-build && yarn compile && yarn copy-templates && yarn copy-data && yarn copy-basic-wallets && yarn copy-credentials",
-          "clean-build": "rm -rf ./build",
-          "compile": "tsc -p .",
-          "copy-basic-wallets": "cp -a ./src/wallet-network1 ./build/ && cp -a ./src/wallet-network2 ./build/",
-          "copy-config": "if [ -f ./config.json ]; then cp ./config.json ./build/; fi",
-          "copy-credentials": "if [ -e ./src/credentials ]; then cp -a ./src/credentials ./build/; fi",
-          "copy-data": "if [ -e ./src/data ]; then cp -a ./src/data ./build/; fi",
-          "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-          "coverage": "jest --coverage",
-          "prepublishOnly": "yarn build",
-          "snapupdate": "jest --updateSnapshot",
-          "test": "jest",
-          "watch": "jest --watch"
-      },
-      "jest": {
-          "preset": "ts-jest",
-          "testEnvironment": "node"
-      },
-      "dependencies": {
-          "@fidm/x509": "1.2.1",
-          "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-          "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
-          "body-parser": "1.20.3",
-          "dotenv": "8.6.0",
-          "express": "5.1.0",
-          "fabric-ca-client": "2.2.20",
-          "fabric-common": "2.2.20",
-          "fabric-network": "2.2.20",
-          "gluegun": "5.1.6",
-          "uuid": "10.0.0",
-          "winston": "3.10.0"
-      },
-      "devDependencies": {
-          "@grpc/grpc-js": "1.13.3",
-          "@grpc/proto-loader": "0.7.13",
-          "@types/express": "5.0.1",
-          "@types/node": "18.11.9",
-          "google-protobuf": "3.21.4",
-          "jest": "29.6.2",
-          "pkg": "5.8.1",
-          "protobufjs": "7.4.0",
-          "ts-jest": "29.1.1",
-          "ts-node": "10.9.1",
-          "typescript": "5.5.2"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cacti-weaver-fabric-cli",
+  "version": "2.1.0",
+  "description": "fabric-cli CLI",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "types": "build/types/types.d.ts",
+  "bin": {
+    "fabric-cli": "bin/fabric-cli"
+  },
+  "files": [
+    "tsconfig.json",
+    "build",
+    "LICENSE",
+    "readme.md",
+    "docs",
+    "bin"
+  ],
+  "scripts": {
+    "build": "yarn clean-build && yarn compile && yarn copy-templates && yarn copy-data && yarn copy-basic-wallets && yarn copy-credentials",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-basic-wallets": "cp -a ./src/wallet-network1 ./build/ && cp -a ./src/wallet-network2 ./build/",
+    "copy-config": "if [ -f ./config.json ]; then cp ./config.json ./build/; fi",
+    "copy-credentials": "if [ -e ./src/credentials ]; then cp -a ./src/credentials ./build/; fi",
+    "copy-data": "if [ -e ./src/data ]; then cp -a ./src/data ./build/; fi",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "coverage": "jest --coverage",
+    "prepublishOnly": "yarn build",
+    "snapupdate": "jest --updateSnapshot",
+    "test": "jest",
+    "watch": "jest --watch"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "@fidm/x509": "1.2.1",
+    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+    "body-parser": "1.20.3",
+    "dotenv": "8.6.0",
+    "express": "5.1.0",
+    "fabric-ca-client": "2.2.20",
+    "fabric-common": "2.2.20",
+    "fabric-network": "2.2.20",
+    "gluegun": "5.1.6",
+    "uuid": "10.0.0",
+    "winston": "3.10.0"
+  },
+  "devDependencies": {
+    "@grpc/grpc-js": "1.13.3",
+    "@grpc/proto-loader": "0.7.13",
+    "@types/express": "5.0.1",
+    "@types/node": "18.11.9",
+    "google-protobuf": "3.21.4",
+    "jest": "29.6.2",
+    "pkg": "5.8.1",
+    "protobufjs": "7.4.0",
+    "ts-jest": "29.1.1",
+    "ts-node": "10.9.1",
+    "typescript": "5.5.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}

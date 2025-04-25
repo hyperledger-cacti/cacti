@@ -1,94 +1,93 @@
 {
-      "name": "@hyperledger/cactus-common-example-server",
-      "version": "2.1.0",
-      "description": "Allows Cactus nodes to interact with HTLC ETH contracts",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "build": "npm run build-ts && npm run build:dev:backend:postbuild",
-          "build-ts": "tsc",
-          "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
-      },
-      "dependencies": {
-          "@hyperledger/cactus-common": "2.1.0",
-          "@hyperledger/cactus-core-api": "2.1.0",
-          "@types/node": "18.11.9",
-          "body-parser": "1.20.3",
-          "config": "3.3.7",
-          "cookie-parser": "1.4.5",
-          "debug": "3.1.0",
-          "escape-html": "1.0.3",
-          "ethereumjs-common": "1.5.2",
-          "ethereumjs-tx": "2.1.2",
-          "express": "5.1.0",
-          "fabric-network": "2.2.20",
-          "http-errors": "1.6.3",
-          "js-yaml": "3.14.1",
-          "jsonwebtoken": "9.0.2",
-          "log4js": "6.4.1",
-          "morgan": "1.10.0",
-          "shelljs": "0.9.2",
-          "socket.io": "4.6.2",
-          "socket.io-client-fixed-types": "4.5.4",
-          "web3": "1.6.1",
-          "xmlhttprequest": "1.8.0"
-      },
-      "devDependencies": {
-          "@hyperledger/cactus-test-tooling": "2.1.0",
-          "@types/config": "3.3.0",
-          "@types/cookie-parser": "1.4.5",
-          "@types/debug": "4.1.8",
-          "@types/escape-html": "1.0.1",
-          "@types/express": "5.0.1",
-          "@types/http-errors": "1.6.3",
-          "@types/js-yaml": "4.0.5",
-          "@types/jsonwebtoken": "9.0.6",
-          "@types/lodash": "4.14.195",
-          "@types/morgan": "1.9.1",
-          "@types/node": "18.11.9",
-          "@types/shelljs": "0.8.11",
-          "http-terminator": "3.2.0",
-          "lodash": "4.17.21",
-          "ts-node": "8.9.1"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cactus-common-example-server",
+  "version": "2.1.0",
+  "description": "Allows Cactus nodes to interact with HTLC ETH contracts",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "npm run build-ts && npm run build:dev:backend:postbuild",
+    "build-ts": "tsc",
+    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@types/node": "18.11.9",
+    "body-parser": "1.20.3",
+    "config": "3.3.7",
+    "cookie-parser": "1.4.5",
+    "debug": "3.1.0",
+    "escape-html": "1.0.3",
+    "ethereumjs-common": "1.5.2",
+    "ethereumjs-tx": "2.1.2",
+    "express": "5.1.0",
+    "fabric-network": "2.2.20",
+    "http-errors": "1.6.3",
+    "js-yaml": "3.14.1",
+    "jsonwebtoken": "9.0.2",
+    "log4js": "6.4.1",
+    "morgan": "1.10.0",
+    "shelljs": "0.9.2",
+    "socket.io": "4.6.2",
+    "socket.io-client-fixed-types": "4.5.4",
+    "web3": "1.6.1",
+    "xmlhttprequest": "1.8.0"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/config": "3.3.0",
+    "@types/cookie-parser": "1.4.5",
+    "@types/debug": "4.1.8",
+    "@types/escape-html": "1.0.1",
+    "@types/express": "5.0.1",
+    "@types/http-errors": "1.6.3",
+    "@types/js-yaml": "4.0.5",
+    "@types/jsonwebtoken": "9.0.6",
+    "@types/lodash": "4.14.195",
+    "@types/morgan": "1.9.1",
+    "@types/node": "18.11.9",
+    "@types/shelljs": "0.8.11",
+    "http-terminator": "3.2.0",
+    "lodash": "4.17.21",
+    "ts-node": "8.9.1"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}

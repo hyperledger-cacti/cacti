@@ -1,109 +1,108 @@
 {
-      "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
-      "version": "2.1.0",
-      "description": "Frontend for CBDC sample application.",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "build": "react-app-rewired build",
-          "eject": "react-app-rewired eject",
-          "start": "react-app-rewired start",
-          "test": "react-app-rewired test"
-      },
-      "browserslist": {
-          "production": [
-              ">0.2%",
-              "not dead",
-              "not op_mini all"
-          ],
-          "development": [
-              "last 1 chrome version",
-              "last 1 firefox version",
-              "last 1 safari version"
-          ]
-      },
-      "contributors": [
-          {
-              "name": "Eduardo Vasques",
-              "email": "eduardovasques10@tecnico.ulisboa.pt"
-          },
-          {
-              "name": "André Augusto",
-              "email": "andre.augusto@tecnico.ulisboa.pt"
-          },
-          {
-              "name": "Carlos Amaro",
-              "email": "carlosrscamaro@tecnico.ulisboa.pt"
-          }
-      ],
-      "dependencies": {
-          "@emotion/react": "11.11.1",
-          "@emotion/styled": "11.11.0",
-          "@hyperledger/cactus-example-cbdc-bridging-backend": "2.1.0",
-          "@mui/icons-material": "6.1.1",
-          "@mui/material": "6.1.1",
-          "@testing-library/jest-dom": "5.17.0",
-          "@testing-library/react": "13.4.0",
-          "@testing-library/user-event": "13.5.0",
-          "@types/copy-webpack-plugin": "^10.1.0",
-          "@types/jest": "27.5.2",
-          "@types/node": "18.11.9",
-          "@types/react": "18.2.39",
-          "@types/react-dom": "18.2.17",
-          "axios": "1.8.4",
-          "copy-webpack-plugin": "^12.0.2",
-          "css-loader": "^7.1.2",
-          "html-webpack-plugin": "^5.6.0",
-          "react": "18.2.0",
-          "react-dom": "18.2.0",
-          "react-router-dom": "6.2.1",
-          "react-scripts": "5.0.1",
-          "style-loader": "^4.0.0",
-          "ts-node": "^10.9.2",
-          "typescript": "^5.6.2",
-          "uuid": "10.0.0",
-          "webpack": "^5.94.0",
-          "webpack-cli": "5.1.4",
-          "webpack-dev-server": "^5.1.0"
-      },
-      "devDependencies": {
-          "@types/customize-cra": "^1",
-          "@types/uuid": "10.0.0",
-          "customize-cra": "^1.0.0",
-          "react-app-rewired": "^2.2.1",
-          "ts-loader": "^9.5.1"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
+  "version": "2.1.0",
+  "description": "Frontend for CBDC sample application.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "react-app-rewired build",
+    "eject": "react-app-rewired eject",
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "contributors": [
+    {
+      "name": "Eduardo Vasques",
+      "email": "eduardovasques10@tecnico.ulisboa.pt"
+    },
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt"
+    },
+    {
+      "name": "Carlos Amaro",
+      "email": "carlosrscamaro@tecnico.ulisboa.pt"
+    }
+  ],
+  "dependencies": {
+    "@emotion/react": "11.11.1",
+    "@emotion/styled": "11.11.0",
+    "@hyperledger/cactus-example-cbdc-bridging-backend": "2.1.0",
+    "@mui/icons-material": "6.1.1",
+    "@mui/material": "6.1.1",
+    "@testing-library/jest-dom": "5.17.0",
+    "@testing-library/react": "13.4.0",
+    "@testing-library/user-event": "13.5.0",
+    "@types/copy-webpack-plugin": "^10.1.0",
+    "@types/jest": "27.5.2",
+    "@types/node": "18.11.9",
+    "@types/react": "18.2.39",
+    "@types/react-dom": "18.2.17",
+    "axios": "1.8.4",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.2.1",
+    "react-scripts": "5.0.1",
+    "style-loader": "^4.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "uuid": "10.0.0",
+    "webpack": "^5.94.0",
+    "webpack-cli": "5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/customize-cra": "^1",
+    "@types/uuid": "10.0.0",
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.2.1",
+    "ts-loader": "^9.5.1"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}
