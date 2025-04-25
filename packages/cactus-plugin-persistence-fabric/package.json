@@ -1,98 +1,97 @@
 {
-      "name": "@hyperledger/cactus-plugin-persistence-fabric",
-      "version": "2.1.0",
-      "description": "Persistence plugin for Fabric ledgers to store data into a database.",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Michal Bajer",
-              "email": "michal.bajer@fujitsu.com",
-              "url": "https://www.fujitsu.com/global/"
-          },
-          {
-              "name": "Tomasz Awramski",
-              "email": "tomasz.awramski@fujitsu.com",
-              "url": "https://www.fujitsu.com/global/"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "build": "npm run build-ts && npm run build:dev:backend:postbuild",
-          "build-ts": "tsc",
-          "build:dev:backend:postbuild": "npm run copy-sql && npm run copy-yarn-lock",
-          "codegen": "yarn run --top-level run-s 'codegen:*'",
-          "codegen:openapi": "npm run generate-sdk",
-          "complete-sample-scenario": "npm run build && node ./dist/lib/test/typescript/manual/complete-sample-scenario.js",
-          "copy-sql": "mkdir -p ./dist/lib/main/ && cp -Rfp ./src/main/sql ./dist/lib/main/",
-          "copy-yarn-lock": "mkdir -p ./dist/lib/ && cp -rfp ../../yarn.lock ./dist/yarn.lock",
-          "generate-sdk": "run-p 'generate-sdk:*'",
-          "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-          "generate-sdk:typecript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-          "sample-setup": "npm run build && node ./dist/lib/test/typescript/manual/sample-setup.js",
-          "watch": "npm-watch"
-      },
-      "dependencies": {
-          "@hyperledger/cactus-common": "2.1.0",
-          "@hyperledger/cactus-core": "2.1.0",
-          "@hyperledger/cactus-core-api": "2.1.0",
-          "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
-          "async-mutex": "0.4.0",
-          "axios": "1.8.4",
-          "pg": "8.8.0",
-          "run-time-error-cjs": "1.4.0",
-          "uuid": "10.0.0"
-      },
-      "devDependencies": {
-          "@hyperledger/cactus-cmd-api-server": "2.1.0",
-          "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-          "@hyperledger/cactus-test-tooling": "2.1.0",
-          "@openapitools/openapi-generator-cli": "2.7.0",
-          "@types/express": "5.0.1",
-          "@types/pg": "8.6.5",
-          "body-parser": "1.20.3",
-          "express": "5.1.0",
-          "fabric-network": "2.5.0-snapshot.23",
-          "jest-extended": "4.0.1",
-          "rxjs": "7.8.1",
-          "socket.io": "4.6.2"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      },
-      "watch": {}
-  }
-    
+  "name": "@hyperledger/cactus-plugin-persistence-fabric",
+  "version": "2.1.0",
+  "description": "Persistence plugin for Fabric ledgers to store data into a database.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    },
+    {
+      "name": "Tomasz Awramski",
+      "email": "tomasz.awramski@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "npm run build-ts && npm run build:dev:backend:postbuild",
+    "build-ts": "tsc",
+    "build:dev:backend:postbuild": "npm run copy-sql && npm run copy-yarn-lock",
+    "codegen": "yarn run --top-level run-s 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "complete-sample-scenario": "npm run build && node ./dist/lib/test/typescript/manual/complete-sample-scenario.js",
+    "copy-sql": "mkdir -p ./dist/lib/main/ && cp -Rfp ./src/main/sql ./dist/lib/main/",
+    "copy-yarn-lock": "mkdir -p ./dist/lib/ && cp -rfp ../../yarn.lock ./dist/yarn.lock",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:typecript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "sample-setup": "npm run build && node ./dist/lib/test/typescript/manual/sample-setup.js",
+    "watch": "npm-watch"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
+    "async-mutex": "0.4.0",
+    "axios": "1.8.4",
+    "pg": "8.8.0",
+    "run-time-error-cjs": "1.4.0",
+    "uuid": "10.0.0"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@openapitools/openapi-generator-cli": "2.7.0",
+    "@types/express": "5.0.1",
+    "@types/pg": "8.6.5",
+    "body-parser": "1.20.3",
+    "express": "5.1.0",
+    "fabric-network": "2.5.0-snapshot.23",
+    "jest-extended": "4.0.1",
+    "rxjs": "7.8.1",
+    "socket.io": "4.6.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "watch": {}
+}
