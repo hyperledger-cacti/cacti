@@ -64,3 +64,12 @@ export interface TransactionResponse {
   transactionReceipt?: string;
   output?: unknown;
 }
+
+export interface SmartContractOntologyJsonConfig {
+  name: string;
+  contract: string;
+  ontology: unknown;
+  bytecode?: string;
+  signature?: Uint8Array;
+  hash?: unknown;
+}
