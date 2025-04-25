@@ -1,77 +1,76 @@
 {
-      "name": "@hyperledger/cactus-test-cmd-api-server",
-      "version": "2.1.0",
-      "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Please add yourself to the list of contributors",
-              "email": "your.name@example.com",
-              "url": "https://example.com"
-          },
-          {
-              "name": "Peter Somogyvari",
-              "email": "peter.somogyvari@accenture.com",
-              "url": "https://accenture.com"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "browser": "dist/cactus-test-cmd-api-server.web.umd.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "watch": "npm-watch",
-          "webpack": "npm-run-all webpack:dev",
-          "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-          "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-          "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-      },
-      "dependencies": {
-          "@hyperledger/cactus-cmd-api-server": "2.1.0",
-          "@hyperledger/cactus-common": "2.1.0",
-          "@hyperledger/cactus-core": "2.1.0",
-          "@hyperledger/cactus-core-api": "2.1.0",
-          "@hyperledger/cactus-plugin-keychain-vault": "2.1.0",
-          "express-jwt-authz": "2.4.1",
-          "jose": "4.15.5",
-          "uuid": "10.0.0"
-      },
-      "devDependencies": {
-          "@hyperledger/cactus-test-tooling": "2.1.0",
-          "@types/uuid": "10.0.0"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      },
-      "browserMinified": "dist/cactus-test-cmd-api-server.web.umd.min.js",
-      "mainMinified": "dist/cactus-test-cmd-api-server.node.umd.min.js",
-      "watch": {}
-  }
-    
+  "name": "@hyperledger/cactus-test-cmd-api-server",
+  "version": "2.1.0",
+  "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-test-cmd-api-server.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-vault": "2.1.0",
+    "express-jwt-authz": "2.4.1",
+    "jose": "4.15.5",
+    "uuid": "10.0.0"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/uuid": "10.0.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-test-cmd-api-server.web.umd.min.js",
+  "mainMinified": "dist/cactus-test-cmd-api-server.node.umd.min.js",
+  "watch": {}
+}

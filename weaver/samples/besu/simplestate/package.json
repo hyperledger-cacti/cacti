@@ -1,62 +1,61 @@
 {
-      "name": "@hyperledger/cacti-weaver-besu-simplestate",
-      "version": "2.1.0",
-      "description": "Sample Besu Application for Storing Key Value Pairs",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "ethereum",
-          "besu",
-          "interoperability",
-          "hashed-timelock-contract",
-          "solidity",
-          "smart-contract"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "directories": {
-          "doc": "docs",
-          "test": "test"
-      },
-      "scripts": {
-          "clean": "rm -rf node_modules package-lock.json build",
-          "clean-build": "rm -rf build",
-          "compile": "truffle compile",
-          "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
-          "deploy": "npm run update-truffle-config && truffle migrate",
-          "deploy-contract": "npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
-          "update-truffle-config": "node get-network-details.js"
-      },
-      "dependencies": {
-          "@openzeppelin/contracts": "4.9.6",
-          "@truffle/contract": "4.6.28",
-          "chai": "4.3.7",
-          "dotenv": "16.3.1",
-          "ganache-cli": "6.12.2",
-          "solc": "0.8.21",
-          "web3": "1.10.0"
-      },
-      "devDependencies": {
-          "truffle": "5.11.2"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      }
+  "name": "@hyperledger/cacti-weaver-besu-simplestate",
+  "version": "2.1.0",
+  "description": "Sample Besu Application for Storing Key Value Pairs",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "ethereum",
+    "besu",
+    "interoperability",
+    "hashed-timelock-contract",
+    "solidity",
+    "smart-contract"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "clean": "rm -rf node_modules package-lock.json build",
+    "clean-build": "rm -rf build",
+    "compile": "truffle compile",
+    "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
+    "deploy": "npm run update-truffle-config && truffle migrate",
+    "deploy-contract": "npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
+    "update-truffle-config": "node get-network-details.js"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "4.9.6",
+    "@truffle/contract": "4.6.28",
+    "chai": "4.3.7",
+    "dotenv": "16.3.1",
+    "ganache-cli": "6.12.2",
+    "solc": "0.8.21",
+    "web3": "1.10.0"
+  },
+  "devDependencies": {
+    "truffle": "5.11.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
   }
-    
+}

@@ -80,3 +80,4 @@ supply-chain-attack-09082025-audit-scan.out
 packages/cactus-plugin-satp-hermes/.config
 
 *.sqlite3
+packages/cactus-plugin-satp-hermes/src/test/solidity/generated/build-info

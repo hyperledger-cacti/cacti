@@ -1,126 +1,125 @@
 {
-      "name": "@hyperledger/cactus-plugin-bungee-hermes",
-      "version": "2.1.0",
-      "description": "Allows Cactus nodes to create DLT views using Cactus connectors",
-      "keywords": [
-          "Hyperledger",
-          "Cacti",
-          "Integration",
-          "Blockchain",
-          "Distributed Ledger Technology",
-          "View"
-      ],
-      "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-      "bugs": {
-          "url": "https://github.com/hyperledger-cacti/cacti/issues"
-      },
-      "repository": {
-          "type": "git",
-          "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-      },
-      "license": "Apache-2.0",
-      "author": {
-          "name": "Hyperledger Cacti Contributors",
-          "email": "cacti@lists.lfdecentralizedtrust.org",
-          "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-      },
-      "contributors": [
-          {
-              "name": "Eduardo Vasques",
-              "email": "eduardovasques10@tecnico.ulisboa.pt",
-              "url": "https://github.com/eduv09"
-          },
-          {
-              "name": "Rafael Belchior",
-              "email": "rafael.belchior@tecnico.ulisboa.pt",
-              "url": "https://rafaelapb.github.io/"
-          },
-          {
-              "name": "André Augusto",
-              "email": "andre.augusto@tecnico.ulisboa.pt",
-              "url": "https://github.com/AndreAugusto11"
-          },
-          {
-              "name": "Carlos Amaro",
-              "email": "carlosrscamaro@tecnico.ulisboa.pt",
-              "url": "https://github.com/LordKubaya"
-          }
-      ],
-      "main": "dist/lib/main/typescript/index.js",
-      "module": "dist/lib/main/typescript/index.js",
-      "types": "dist/lib/main/typescript/index.d.ts",
-      "files": [
-          "dist/*"
-      ],
-      "scripts": {
-          "codegen": "yarn run --top-level run-s 'codegen:*'",
-          "codegen:openapi": "npm run generate-sdk",
-          "generate-sdk": "run-p 'generate-sdk:*'",
-          "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-          "pretsc": "npm run generate-sdk",
-          "tsc": "tsc --project ./tsconfig.json",
-          "watch": "npm-watch"
-      },
-      "dependencies": {
-          "@hyperledger/cactus-cmd-api-server": "2.1.0",
-          "@hyperledger/cactus-common": "2.1.0",
-          "@hyperledger/cactus-core": "2.1.0",
-          "@hyperledger/cactus-core-api": "2.1.0",
-          "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-          "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
-          "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
-          "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
-          "axios": "1.8.4",
-          "body-parser": "1.20.3",
+  "name": "@hyperledger/cactus-plugin-bungee-hermes",
+  "version": "2.1.0",
+  "description": "Allows Cactus nodes to create DLT views using Cactus connectors",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology",
+    "View"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Eduardo Vasques",
+      "email": "eduardovasques10@tecnico.ulisboa.pt",
+      "url": "https://github.com/eduv09"
+    },
+    {
+      "name": "Rafael Belchior",
+      "email": "rafael.belchior@tecnico.ulisboa.pt",
+      "url": "https://rafaelapb.github.io/"
+    },
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt",
+      "url": "https://github.com/AndreAugusto11"
+    },
+    {
+      "name": "Carlos Amaro",
+      "email": "carlosrscamaro@tecnico.ulisboa.pt",
+      "url": "https://github.com/LordKubaya"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "yarn run --top-level run-s 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "pretsc": "npm run generate-sdk",
+    "tsc": "tsc --project ./tsconfig.json",
+    "watch": "npm-watch"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
+    "axios": "1.8.4",
+    "body-parser": "1.20.3",
     "dockerode": "3.3.0",
-          "fs-extra": "11.2.0",
-          "http-errors-enhanced-cjs": "2.0.1",
-          "key-encoder": "2.0.3",
-          "merkletreejs": "0.4.0",
-          "safe-stable-stringify": "2.5.0",
-          "typescript-optional": "2.0.1",
-          "uuid": "10.0.0",
-          "web3": "1.6.1",
-          "web3-core": "1.6.1"
-      },
-      "devDependencies": {
-          "@hyperledger/cactus-test-geth-ledger": "2.1.0",
-          "@hyperledger/cactus-test-tooling": "2.1.0",
-          "@types/body-parser": "1.19.4",
-          "@types/crypto-js": "4.0.1",
+    "fs-extra": "11.2.0",
+    "http-errors-enhanced-cjs": "2.0.1",
+    "key-encoder": "2.0.3",
+    "merkletreejs": "0.4.0",
+    "safe-stable-stringify": "2.5.0",
+    "typescript-optional": "2.0.1",
+    "uuid": "10.0.0",
+    "web3": "1.6.1",
+    "web3-core": "1.6.1"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-test-geth-ledger": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/body-parser": "1.19.4",
+    "@types/crypto-js": "4.0.1",
     "@types/dockerode": "3.2.7",
-          "@types/express": "5.0.1",
-          "@types/fs-extra": "11.0.4",
-          "@types/tape": "4.13.4",
-          "@types/uuid": "10.0.0",
-          "express": "5.1.0",
-          "fabric-network": "2.2.20",
-          "socket.io": "4.6.2"
-      },
-      "engines": {
-          "node": ">=18",
-          "npm": ">=8"
-      },
-      "publishConfig": {
-          "access": "public"
-      },
-      "watch": {
-          "tsc": {
-              "patterns": [
-                  "src/",
-                  "src/*/json/**/openapi*"
-              ],
-              "ignore": [
-                  "src/**/generated/*"
-              ],
-              "extensions": [
-                  "ts",
-                  "json"
-              ],
-              "quiet": true,
-              "verbose": false,
-              "runOnChangeOnly": true
-          }
-      }
+    "@types/express": "5.0.1",
+    "@types/fs-extra": "11.0.4",
+    "@types/tape": "4.13.4",
+    "@types/uuid": "10.0.0",
+    "express": "5.1.0",
+    "fabric-network": "2.2.20",
+    "socket.io": "4.6.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "watch": {
+    "tsc": {
+      "patterns": [
+        "src/",
+        "src/*/json/**/openapi*"
+      ],
+      "ignore": [
+        "src/**/generated/*"
+      ],
+      "extensions": [
+        "ts",
+        "json"
+      ],
+      "quiet": true,
+      "verbose": false,
+      "runOnChangeOnly": true
+    }
   }
-    
+}
