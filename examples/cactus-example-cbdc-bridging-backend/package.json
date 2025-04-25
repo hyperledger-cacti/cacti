@@ -49,8 +49,9 @@
   "scripts": {
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/fabric-contracts && cp -r ./src/fabric-contracts/* ./dist/lib/fabric-contracts/",
     "forge": "forge build ./src/solidity/main/*.sol --out ./src/solidity/main/generated",
-    "forge:all": "run-s 'forge' 'forge:test'",
-    "forge:test": "forge build ./src/solidity/test/*.sol --out ./src/solidity/test/generated",
+    "forge:all": "run-s 'forge' 'forge:build' 'forge:test'",
+    "forge:build": "forge build ./src/solidity/test/*.sol --out ./src/solidity/test/generated",
+    "forge:test": "exit 0",
     "solidity": "hardhat compile",
     "start": "npx ts-node ./src/main/typescript/cbdc-bridging-app-cli.ts dotenv_config_path=./process.env",
     "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
