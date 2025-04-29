@@ -5,7 +5,9 @@ import type {
 
 import { Express } from "express";
 import Web3, {
+  AbiEventFragment,
   Contract,
+  DecodedParams,
   HttpProvider,
   Transaction,
   TransactionReceiptBase,
@@ -86,11 +88,13 @@ import { RuntimeError } from "run-time-error-cjs";
 import { createProxyMiddleware, fixRequestBody } from "http-proxy-middleware";
 
 import {
+  SolidityEventLog,
   Web3StringReturnFormat,
   convertWeb3ReceiptStatusToBool,
 } from "./types/util-types";
 import { Observable, ReplaySubject } from "rxjs";
 import { RegisteredSubscription } from "web3-eth";
+import { decodeEvent } from "./decode-utils";
 
 export interface RunTransactionV1Exchange {
   request: InvokeContractV1Request;
@@ -1238,5 +1242,13 @@ export class PluginLedgerConnectorEthereum
     return methodRef(...contractMethodArgs)[args.invocationType](
       args.invocationParams,
     );
+  }
+
+  public decodeEvent(
+    log: SolidityEventLog,
+    abi: AbiEventFragment[],
+    eventName: string,
+  ): DecodedParams | null {
+    return decodeEvent(this.web3, log, abi, eventName);
   }
 }

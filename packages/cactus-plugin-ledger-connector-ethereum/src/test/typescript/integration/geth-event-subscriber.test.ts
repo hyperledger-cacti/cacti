@@ -17,7 +17,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { v4 as uuidV4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
-import Web3, { HexString } from "web3";
+import Web3, { DecodedParams, HexString } from "web3";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -29,13 +29,16 @@ import {
   WHALE_ACCOUNT_ADDRESS,
 } from "@hyperledger/cactus-test-geth-ledger";
 
-import HelloWorldWithEventContractJson from "../../solidity/hello-world-contract-with-event-emission/HelloWorldWithEvent.json";
+import SayMessageContractJson from "../../solidity/say-message-contract/SayMessageContract.json";
 import {
   EthContractInvocationType,
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
 } from "../../../main/typescript/public-api";
 import { LogsSubscription, NewHeadsSubscription } from "web3-eth";
+import { decodeEvent } from "../../../main/typescript/decode-utils";
+import { SolidityEventLog } from "../../../main/typescript/types/util-types";
+import { keccak256 } from "web3-utils";
 
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";
@@ -88,8 +91,8 @@ describe("Testing the ability for listening to events emitted by deployed contra
       logLevel: testLogLevel,
     });
     keychainPlugin.set(
-      HelloWorldWithEventContractJson.contractName,
-      JSON.stringify(HelloWorldWithEventContractJson),
+      SayMessageContractJson.contractName,
+      JSON.stringify(SayMessageContractJson),
     );
     connector = new PluginLedgerConnectorEthereum({
       instanceId: uuidV4(),
@@ -102,7 +105,7 @@ describe("Testing the ability for listening to events emitted by deployed contra
 
     const deploy = await connector.deployContract({
       contract: {
-        contractJSON: HelloWorldWithEventContractJson,
+        contractJSON: SayMessageContractJson,
       },
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
@@ -131,11 +134,10 @@ describe("Testing the ability for listening to events emitted by deployed contra
   test("setup log subscriber, issue tx, and capture event emitted", async () => {
     console.log("Subscribing to events emitted by contract:", contractAddress);
 
+    // Set up the event listener for event SayMessageEvent
     const subscriber = (await connector.createSubscriber("logs", {
       address: contractAddress,
-      topics: [
-        "0xa40dfd2729daee195cadae2e21e670770eb2c560f5e9b65305e48f5782f3be1c",
-      ],
+      topics: [keccak256("SayMessageEvent(bytes32,string,uint256)")],
     })) as LogsSubscription;
 
     // Set up the event listener before the transaction is invoked
@@ -157,15 +159,17 @@ describe("Testing the ability for listening to events emitted by deployed contra
       });
     });
 
+    const payload = "Message to emit";
+
     // Invoke the contract after setting up the listener
     const txReceipt = await connector.invokeContract({
       contract: {
-        contractJSON: HelloWorldWithEventContractJson,
+        contractJSON: SayMessageContractJson,
         contractAddress,
       },
       invocationType: EthContractInvocationType.Send,
-      methodName: "sayHello",
-      params: [],
+      methodName: "sayMessage",
+      params: [payload],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
         secret: "",
@@ -180,17 +184,35 @@ describe("Testing the ability for listening to events emitted by deployed contra
     // Wait for the event to be captured
     const event = await eventPromise;
     expect(event).toBeTruthy();
+
     const typedEvent = event as {
       address: string;
       topics: string[];
       data: string;
       transactionHash: string;
     };
+
     expect(typedEvent.address).toEqual(contractAddress);
-    expect(typedEvent.topics).toEqual([
-      "0xa40dfd2729daee195cadae2e21e670770eb2c560f5e9b65305e48f5782f3be1c",
-    ]);
+    expect(typedEvent.topics).toBeArrayOfSize(2);
+    expect(typedEvent.topics[0]).toEqual(
+      keccak256("SayMessageEvent(bytes32,string,uint256)"),
+    );
+    expect(typedEvent.topics[1]).toEqual(keccak256(payload));
     expect(typedEvent.data).toBeTruthy();
+
+    const decoded = decodeEvent(
+      new Web3(rpcApiWsHost),
+      event as SolidityEventLog,
+      SayMessageContractJson.abi,
+      "SayMessageEvent",
+    ) as DecodedParams;
+
+    expect(decoded).toBeTruthy();
+    expect(decoded).toHaveProperty("message");
+    expect(decoded).toHaveProperty("nonce");
+    expect(decoded?.["message"] as string).toEqual(payload);
+    expect(decoded?.["messageHash"] as string).toEqual(keccak256(payload));
+    expect((decoded?.["nonce"] as bigint).toString()).toEqual("1");
 
     // Clean up by unsubscribing from the event listener
     await subscriber.unsubscribe();
@@ -222,12 +244,12 @@ describe("Testing the ability for listening to events emitted by deployed contra
     // Issue a transaction
     const txReceipt = await connector.invokeContract({
       contract: {
-        contractJSON: HelloWorldWithEventContractJson,
+        contractJSON: SayMessageContractJson,
         contractAddress,
       },
       invocationType: EthContractInvocationType.Send,
-      methodName: "sayHello",
-      params: [],
+      methodName: "sayMessage",
+      params: [""],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
         secret: "",
