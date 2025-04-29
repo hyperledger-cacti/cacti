@@ -65,11 +65,11 @@ export interface TransactionResponse {
   output?: unknown;
 }
 
-export interface SmartContractConfig {
+export interface SmartContractOntologyJsonConfig {
   name: string;
   contract: string;
   ontology: unknown;
   bytecode?: string;
-  signature?: string;
-  hash?: string;
+  signature?: Uint8Array;
+  hash?: unknown;
 }
