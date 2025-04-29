@@ -7,25 +7,27 @@
 
 pragma solidity >=0.7.0;
 
-contract HelloWorldWithEvent {
+contract SayMessageContract {
   string private name = "CaptainCactus";
 
-  event HelloWorldEvent(string message);
+  uint256 private nonce = 0;
 
-  function sayHello () public returns (string memory) {
-    
-    emit HelloWorldEvent("Hello World!");
+  event SayMessageEvent(
+    bytes32 indexed messageHash,
+    string message,
+    uint256 nonce
+  );
 
-    return 'Hello World!';
+  function getNonce() public view returns (uint256) {
+    return nonce;
   }
 
-  function getName() public view returns (string memory)
-  {
-      return name;
+  function incrementNonce() internal {
+    nonce += 1;
   }
 
-  function setName(string memory newName) public
-  {
-      name = newName;
+  function sayMessage(string calldata message) public {
+    incrementNonce();
+    emit SayMessageEvent(keccak256(abi.encodePacked(message)), message, nonce);
   }
 }
