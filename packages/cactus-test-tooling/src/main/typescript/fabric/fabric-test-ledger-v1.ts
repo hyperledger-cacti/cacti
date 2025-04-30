@@ -99,7 +99,7 @@ const DEFAULT_OPTS = Object.freeze({
   envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
   stateDatabase: STATE_DATABASE.COUCH_DB,
   orgList: ["org1", "org2"],
-  networkName: "cactusfabrictestnetwork",
+  networkName: "cactus-fabric-test-network",
 });
 export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
 
@@ -136,7 +136,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   private readonly log: Logger;
 
-  private readonly networkName: string | undefined;
+  private readonly networkName: string;
   private container: Container | undefined;
   private containerId: string | undefined;
   private readonly useRunningLedger: boolean;

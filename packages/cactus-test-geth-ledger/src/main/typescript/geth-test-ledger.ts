@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
-import Docker, { Container } from "dockerode";
-import { v4 as internalIpV4 } from "internal-ip";
+import Docker, { Container, ContainerInfo } from "dockerode";
 import Web3, { ContractAbi, TransactionReceipt } from "web3";
 import type { Web3Account } from "web3-eth-accounts";
 import { RuntimeError } from "run-time-error-cjs";
@@ -21,6 +20,7 @@ export interface IGethTestLedgerOptions {
   readonly envVars?: string[];
   // For test development, attach to ledger that is already running, don't spin up new one
   readonly useRunningLedger?: boolean;
+  readonly networkName?: string;
 }
 
 /**
@@ -33,6 +33,7 @@ export const GETH_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   emitContainerLogs: false,
   envVars: [],
   useRunningLedger: false,
+  networkName: "cactus-ethereum-test-network",
 });
 
 export const WHALE_ACCOUNT_PRIVATE_KEY =
@@ -52,6 +53,8 @@ export class GethTestLedger {
   private _container: Container | undefined;
   private _containerId: string | undefined;
   private _web3: Web3 | undefined;
+
+  private readonly networkName: string;
 
   public get fullContainerImageName(): string {
     return [this.containerImageName, this.containerImageVersion].join(":");
@@ -102,6 +105,9 @@ export class GethTestLedger {
       GETH_TEST_LEDGER_DEFAULT_OPTIONS.containerImageVersion;
     this.envVars =
       this.options.envVars || GETH_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
+
+    this.networkName =
+      options.networkName || GETH_TEST_LEDGER_DEFAULT_OPTIONS.networkName;
 
     this.log.info(
       `Created ${this.className} OK. Image FQN: ${this.fullContainerImageName}`,
@@ -164,6 +170,18 @@ export class GethTestLedger {
       );
     }
 
+    if (this.networkName) {
+      const docker = new Docker();
+      const networks = await docker.listNetworks();
+      const networkExists = networks.some((n) => n.Name === this.networkName);
+      if (!networkExists) {
+        await docker.createNetwork({
+          Name: this.networkName,
+          Driver: "bridge",
+        });
+      }
+    }
+
     return new Promise<Container>((resolve, reject) => {
       const docker = new Docker();
       const eventEmitter: EventEmitter = docker.run(
@@ -178,6 +196,7 @@ export class GethTestLedger {
           Env: this.envVars,
           HostConfig: {
             PublishAllPorts: true,
+            NetworkMode: this.networkName,
           },
         },
         {},
@@ -373,24 +392,67 @@ export class GethTestLedger {
     return await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
   }
 
-  public async getRpcApiHttpHost(
-    host?: string,
-    port?: number,
-  ): Promise<string> {
-    const thePort = port || (await this.getHostPortHttp());
-    const lanIpV4OrUndefined = await internalIpV4();
-    const lanAddress = host || lanIpV4OrUndefined || "127.0.0.1"; // best effort...
-    return `http://${lanAddress}:${thePort}`;
+  public async getRpcApiHttpHost(asLocalhost: boolean = true): Promise<string> {
+    if (asLocalhost) {
+      const thePort = await this.getHostPortHttp();
+      const ipAddress = "127.0.0.1";
+      return `http://${ipAddress}:${thePort}`;
+    } else {
+      const hostIp: string = await this.getContainerIpAddress();
+      return `http://${hostIp}:${8545}`;
+    }
   }
 
   public async getRpcApiWebSocketHost(
-    host?: string,
-    port?: number,
+    asLocalhost: boolean = true,
   ): Promise<string> {
-    const thePort = port || (await this.getHostPortWs());
-    const lanIpV4OrUndefined = await internalIpV4();
-    const lanAddress = host || lanIpV4OrUndefined || "127.0.0.1"; // best effort...
-    return `ws://${lanAddress}:${thePort}`;
+    if (asLocalhost) {
+      const thePort = await this.getHostPortWs();
+      const ipAddress = "127.0.0.1";
+      return `ws://${ipAddress}:${thePort}`;
+    } else {
+      const hostIp: string = await this.getContainerIpAddress();
+      return `ws://${hostIp}:${8546}`;
+    }
+  }
+
+  public async getContainerIpAddress(
+    network: string = this.networkName || "bridge",
+  ): Promise<string> {
+    const fnTag = `${this.className}#getContainerIpAddress()`;
+    const aContainerInfo = await this.getContainerInfo();
+
+    if (!aContainerInfo) {
+      throw new Error(`${fnTag} cannot find image: ${this.containerImageName}`);
+    }
+    const { NetworkSettings } = aContainerInfo;
+    const networkNames: string[] = Object.keys(NetworkSettings.Networks);
+    if (networkNames.length < 1) {
+      throw new Error(`${fnTag} container not connected to any networks`);
+    }
+
+    return NetworkSettings.Networks[network].IPAddress;
+  }
+
+  protected async getContainerInfo(): Promise<ContainerInfo> {
+    const docker = new Docker();
+    const image = this.getContainerImageName();
+    const containerInfos = await docker.listContainers({});
+
+    let aContainerInfo;
+    if (this._containerId !== undefined) {
+      aContainerInfo = containerInfos.find((ci) => ci.Id === this._containerId);
+    }
+
+    if (aContainerInfo) {
+      return aContainerInfo;
+    } else {
+      throw new Error(`BesuTestLedger#getContainerInfo() no image "${image}"`);
+    }
+  }
+
+  public getContainerImageName(): string {
+    return `${this.containerImageName}:${this.containerImageVersion}`;
   }
 
   private async getHostPort(port: number): Promise<number> {
@@ -409,5 +471,13 @@ export class GethTestLedger {
 
   public async getHostPortWs(): Promise<number> {
     return this.getHostPort(8546);
+  }
+
+  public getNetworkName(): string {
+    const fnTag = `${this.className}#getNetworkName()`;
+    if (this.networkName) {
+      return this.networkName;
+    }
+    throw new Error(`${fnTag} network name not set`);
   }
 }
