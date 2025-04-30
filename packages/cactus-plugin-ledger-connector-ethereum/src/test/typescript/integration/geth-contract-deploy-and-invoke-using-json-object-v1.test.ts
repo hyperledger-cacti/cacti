@@ -243,8 +243,8 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("deployContract with additional parameters should fail", async () => {
-    try {
-      await apiClient.deployContract({
+    await expect(
+      apiClient.deployContract({
         contract: {
           contractJSON: HelloWorldContractJson,
         },
@@ -255,11 +255,15 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         },
         gas: 1000000,
         fake: 4,
-      } as DeployContractV1Request);
-      fail("Expected deployContract call to fail but it succeeded.");
-    } catch (error) {
-      console.log("deployContract failed as expected");
-    }
+      } as DeployContractV1Request),
+    ).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: {
+          message: expect.stringContaining("Invalid request body"),
+        },
+      },
+    });
   });
 
   //////////////////////////////////
