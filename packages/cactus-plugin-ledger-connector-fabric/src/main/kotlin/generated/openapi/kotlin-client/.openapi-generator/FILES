@@ -30,6 +30,7 @@ src/main/kotlin/org/openapitools/client/models/ChainCodeLifeCycleCommandResponse
 src/main/kotlin/org/openapitools/client/models/ChainCodeProgrammingLanguage.kt
 src/main/kotlin/org/openapitools/client/models/ConnectionProfile.kt
 src/main/kotlin/org/openapitools/client/models/ConnectionProfileClient.kt
+src/main/kotlin/org/openapitools/client/models/CreateListenerRequest.kt
 src/main/kotlin/org/openapitools/client/models/DefaultEventHandlerStrategy.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1501Response.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1Request.kt
