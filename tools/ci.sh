@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###
-### Continous Integration Shell Script
+### Continuous Integration Shell Script
 ###
 ### Designed to be re-entrant on a local dev machine as well, not just on a
 ### newly pulled up VM.
@@ -143,6 +143,9 @@ function mainTask()
     npm run configure
   fi
 
+  #Used to check if the node_modules are up to date
+  #npm list --depth=0 
+
   if [ "${TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED:-true}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] yarn tools:validate-bundle-names disabled. Skipping..."
   else
@@ -157,10 +160,16 @@ function mainTask()
 
   if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."
+  #The changes in this sections are temporary!! Only here to validade the CI o SATP------
   #elif [ "${JEST_TEST_CODE_COVERAGE_ENABLED:-true}" = "true" ]; then
   # yarn jest $JEST_TEST_PATTERN --coverage --coverageDirectory=$JEST_TEST_COVERAGE_PATH
   else
-    yarn test:jest:all #$JEST_TEST_PATTERN
+    yarn $JEST_TEST_PATTERN_SPECIFIC_TEST
+    #yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:e2e:transfer
+    #yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
+    #yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration
+    #yarn test:jest:all #$JEST_TEST_PATTERN
+    #-------------------------------------------------------------------------------------
   fi
 
   if [ "${DUMP_DISK_USAGE_INFO_DISABLED:-true}" = "true" ]; then
@@ -172,6 +181,7 @@ function mainTask()
   if [ "${TAPE_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Tape test runner disabled. Skipping..."
   else
+    yarn workspace @hyperledger/cactus-plugin-satp-hermes test:tap:all
     yarn test:tap:all --bail $TAPE_TEST_PATTERN
   fi
 

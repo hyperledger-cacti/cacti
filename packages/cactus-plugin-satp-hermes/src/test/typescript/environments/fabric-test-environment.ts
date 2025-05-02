@@ -101,6 +101,7 @@ export class FabricTestEnvironment {
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
     });
+    this.log.info("Starting Fabric ledger"); //Added by Rodolfo Carapau
     await this.ledger.start();
 
     this.fabricChannelName = "mychannel";

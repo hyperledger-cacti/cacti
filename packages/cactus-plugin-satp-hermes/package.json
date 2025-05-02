@@ -86,7 +86,9 @@
     "pretsc": "npm run generate-sdk",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
     "test:integration": "npx jest ./src/test/typescript/integration",
+    "test:integration:e2e:transfer": "npx jest ./src/test/typescript/integration/satp-e2e-transfer-1-gateway.test.ts --detectOpenHandles",
     "test:unit": "npx jest ./src/test/typescript/unit",
+    "test:unit:service": "npx jest ./src/test/typescript/unit/services.test.ts --detectOpenHandles",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "tsc --build --watch",
     "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
@@ -106,9 +108,24 @@
     "docker:compose": "docker compose --project-directory ./ -f ./docker-compose.yml up --build"
   },
   "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
     "moduleNameMapper": {
-      "(.+)\\.js": "$1"
-    }
+      "^(\\.?\\.?/.*)\\.js$": "$1"
+    },
+    "modulePathIgnorePatterns": ["<rootDir>/dist/"]
   },
   "dependencies": {
     "@bufbuild/protobuf": "2.2.2",

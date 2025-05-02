@@ -1,8 +1,6 @@
 # SATP-Hermes Gateway tests and docker deployments
 name: SATP CI - tests and docker deployments
 
-env:
-  NODEJS_VERSION: v18.19.0
 on:
   # Run tests on PR
   pull_request:
@@ -22,9 +20,12 @@ jobs:
       NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CACHE_VERSION: v4
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
     steps:
       - name: Use Node.js
         uses: actions/setup-node@v4.0.3
@@ -36,22 +37,35 @@ jobs:
         name: Initialize Yarn Cache
         uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ env.CACHE_VERSION }}-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-
-
       - if: steps.yarn-cache.outputs.cache-hit != 'true'
         name: Run CI script
         run: ./tools/ci.sh
+#Added to troubleshoot the issue with the docker containers
+      - name: Clean up Docker containers
+        if: always()
+        run: |
+          echo "Stopping and removing all Docker containers..."
+          docker ps -aq | xargs -r docker rm -f || true
+
+      - name: Prune Docker networks and volumes
+        if: always()
+        run: |
+          docker network prune -f
+          docker volume prune -f
 
   run-satp-tests:
     needs: build-dev-satp
     runs-on: ubuntu-22.04
     env:
       NODEJS_VERSION: v18.19.0
+      CONFIGURE_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_PATTERN_SPECIFIC_TEST: workspace @hyperledger/cactus-plugin-satp-hermes test:unit:service
       JEST_TEST_RUNNER_DISABLED: false
 
       # SATP specific configuration
@@ -60,6 +74,7 @@ jobs:
       SATP_LOG_LEVEL: DEBUG
       SATP_ENABLE_LOCAL_REPOSITORY: true
       SATP_ENABLE_REMOTE_REPOSITORY: false
+      #New run v1
 
     steps:
       - uses: actions/checkout@v4.1.7
@@ -67,7 +82,51 @@ jobs:
         uses: actions/setup-node@v4.0.2
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - run: ./tools/ci.sh
+     # - name: Ensure Docker is ready
+      #  run: |
+      #    for i in {1..5}; do
+      #      docker pull ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5 && break || sleep 10;
+      #    done
+      - name: Check for existing containers and ports
+        run: |
+          docker ps
+          sudo lsof -i -P -n | grep LISTEN
+
+      - name: Clean up Docker containers
+        run: | 
+          docker ps -aq | xargs --no-run-if-empty docker rm -f
+
+      - name: Cleanup Docker networks and volumes
+        run: |
+          docker network prune -f
+          docker volume prune -f
+      #- name: Check if Jest is installed
+      #  run: npx jest --version
+      #- name: List installed packages
+      #  run: npm list --depth=0
+      
+      - name: Run CI script
+        run: ./tools/ci.sh
+
+      #Added to troubleshoot the issue with the docker containers
+      - name: Show logs of potentially stuck containers
+        run: |
+          for cid in $(docker ps -q); do
+            echo "Logs for container: $cid"
+            docker logs --tail 50 $cid || true
+          done
+
+      - name: Cleanup Docker containers
+        if: always()
+        run: |
+          echo "Stopping and removing all Docker containers..."
+          docker ps -aq | xargs -r docker rm -f || true
+
+      - name: Prune Docker networks and volumes
+        if: always()
+        run: |
+          docker network prune -f
+          docker volume prune -f
 
   set-docker-tags:
     needs: run-satp-tests 

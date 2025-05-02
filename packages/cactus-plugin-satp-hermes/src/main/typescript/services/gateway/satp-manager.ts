@@ -318,13 +318,13 @@ export class SATPManager {
   }
 
   /*
-   * Function checks if all the sessions are in the completed state
-   * @returns boolean
-   */
+    * Function checks if all the sessions are in the completed state
+    * @returns boolean
+  */
   public getSATPSessionState(): boolean {
     const fnTag = `${SATPManager.CLASS_NAME}#getSATPSessionStatus()`;
     this.logger.info(`${fnTag}, Getting SATP Session Status...`);
-    for (const value of this.sessions.values()) {
+    for (let value of this.sessions.values()) {
       if (value.getSessionState() !== State.COMPLETED) {
         return false;
       }
