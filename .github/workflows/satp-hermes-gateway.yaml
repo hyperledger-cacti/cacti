@@ -55,8 +55,16 @@ jobs:
       - name: Install Foundry
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          curl -L https://foundry.paradigm.xyz | bash
-          source $HOME/.bashrc && foundryup
+          if [ ! -d "${XDG_CONFIG_HOME:-$HOME}" ]; then
+            echo "$(date +%FT%T%z) [CI] directory ${XDG_CONFIG_HOME:-$HOME} does not exist."
+          else
+            npm run preinstall || { echo "Preinstall failed"; exit 1; }
+            export PATH="${XDG_CONFIG_HOME:-$HOME}/.foundry/bin:$PATH"
+            if [ -f ~/.bashrc ]; then
+              source ~/.bashrc
+            fi
+            foundryup
+          fi
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
