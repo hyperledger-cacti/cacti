@@ -1,8 +1,6 @@
 # SATP-Hermes Gateway tests and docker deployments
 name: SATP CI - tests and docker deployments
 
-env:
-  NODEJS_VERSION: v18.19.0
 on:
   # Run tests on PR
   pull_request:
