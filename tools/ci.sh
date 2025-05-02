@@ -143,6 +143,9 @@ function mainTask()
     npm run configure
   fi
 
+  #Used to check if the node_modules are up to date
+  npm list --depth=0 
+
   if [ "${TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED:-true}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] yarn tools:validate-bundle-names disabled. Skipping..."
   else

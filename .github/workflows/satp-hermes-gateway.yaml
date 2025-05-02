@@ -100,10 +100,10 @@ jobs:
         run: |
           docker network prune -f
           docker volume prune -f
-      - name: Check if Jest is installed
-        run: npx jest --version
-      - name: List installed packages
-        run: npm list --depth=0
+      #- name: Check if Jest is installed
+      #  run: npx jest --version
+      #- name: List installed packages
+      #  run: npm list --depth=0
       
       - name: Run CI script
         run: ./tools/ci.sh
