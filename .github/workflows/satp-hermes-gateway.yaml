@@ -76,6 +76,7 @@ jobs:
       SATP_LOG_LEVEL: DEBUG
       SATP_ENABLE_LOCAL_REPOSITORY: true
       SATP_ENABLE_REMOTE_REPOSITORY: false
+      #New run v1
 
     steps:
       - uses: actions/checkout@v4.1.7
