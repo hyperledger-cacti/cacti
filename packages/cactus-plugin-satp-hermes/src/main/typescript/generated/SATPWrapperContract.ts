@@ -1,12 +1,12 @@
-import BN from "bn.js";
-import BigNumber from "bignumber.js";
+import BN from 'bn.js';
+import BigNumber from 'bignumber.js';
 import {
   PromiEvent,
   TransactionReceipt,
   EventResponse,
   EventData,
   Web3ContractContext,
-} from "ethereum-abi-types-generator";
+} from 'ethereum-abi-types-generator';
 
 export interface CallOptions {
   from?: string;
@@ -31,12 +31,12 @@ export interface MethodPayableReturnContext {
   send(options: SendOptions): PromiEvent<TransactionReceipt>;
   send(
     options: SendOptions,
-    callback: (error: Error, result: any) => void,
+    callback: (error: Error, result: any) => void
   ): PromiEvent<TransactionReceipt>;
   estimateGas(options: EstimateGasOptions): Promise<number>;
   estimateGas(
     options: EstimateGasOptions,
-    callback: (error: Error, result: any) => void,
+    callback: (error: Error, result: any) => void
   ): Promise<number>;
   encodeABI(): string;
 }
@@ -46,7 +46,7 @@ export interface MethodConstantReturnContext<TCallReturn> {
   call(options: CallOptions): Promise<TCallReturn>;
   call(
     options: CallOptions,
-    callback: (error: Error, result: TCallReturn) => void,
+    callback: (error: Error, result: TCallReturn) => void
   ): Promise<TCallReturn>;
   encodeABI(): string;
 }
@@ -60,60 +60,60 @@ export type ContractContext = Web3ContractContext<
   SATPWrapperContractEvents
 >;
 export type SATPWrapperContractEvents =
-  | "Assign"
-  | "Burn"
-  | "Changed"
-  | "Lock"
-  | "Mint"
-  | "OwnershipTransferred"
-  | "Unlock"
-  | "Unwrap"
-  | "Wrap";
+  | 'Assign'
+  | 'Burn'
+  | 'Changed'
+  | 'Lock'
+  | 'Mint'
+  | 'OwnershipTransferred'
+  | 'Unlock'
+  | 'Unwrap'
+  | 'Wrap';
 export interface SATPWrapperContractEventsContext {
   Assign(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Burn(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Changed(
     parameters: {
       filter?: { id?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Lock(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Mint(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   OwnershipTransferred(
     parameters: {
@@ -122,68 +122,72 @@ export interface SATPWrapperContractEventsContext {
         newOwner?: string | string[];
       };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Unlock(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Unwrap(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   Wrap(
     parameters: {
       filter?: { tokenId?: string | string[] };
       fromBlock?: number;
-      toBlock?: "latest" | number;
+      toBlock?: 'latest' | number;
       topics?: string[];
     },
-    callback?: (error: Error, event: EventData) => void,
+    callback?: (error: Error, event: EventData) => void
   ): EventResponse;
 }
 export type SATPWrapperContractMethodNames =
-  | "new"
-  | "assign"
-  | "bridge_address"
-  | "burn"
-  | "getAllAssetsIDs"
-  | "getToken"
-  | "lock"
-  | "mint"
-  | "owner"
-  | "renounceOwnership"
-  | "tokens"
-  | "tokensInteractions"
-  | "transferOwnership"
-  | "unlock"
-  | "unwrap"
-  | "wrap"
-  | "wrap";
+  | 'new'
+  | 'assign'
+  | 'bridge_address'
+  | 'burn'
+  | 'getAllAssetsIDs'
+  | 'getToken'
+  | 'lock'
+  | 'mint'
+  | 'owner'
+  | 'renounceOwnership'
+  | 'tokens'
+  | 'tokensInteractions'
+  | 'transferOwnership'
+  | 'unlock'
+  | 'unwrap'
+  | 'wrap'
+  | 'wrap';
 export interface TokenResponse {
+  contractName: string;
   contractAddress: string;
   tokenType: string;
   tokenId: string;
+  referenceId: string;
   owner: string;
   amount: string;
 }
 export interface TokensResponse {
+  contractName: string;
   contractAddress: string;
   tokenType: string;
   tokenId: string;
+  referenceId: string;
   owner: string;
   amount: string;
 }
@@ -231,6 +235,7 @@ export interface UnwrapEventEmittedResponse {
 }
 export interface WrapEventEmittedResponse {
   tokenId: string;
+  contractName: string;
   contractAddress: string;
   tokenType: string | number;
   owner: string;
@@ -243,7 +248,7 @@ export interface SATPWrapperContract {
    * Type: constructor
    * @param _bridge_address Type: address, Indexed: false
    */
-  "new"(_bridge_address: string): MethodReturnContext;
+  'new'(_bridge_address: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -256,7 +261,7 @@ export interface SATPWrapperContract {
   assign(
     tokenId: string,
     receiver_account: string,
-    amount: string,
+    amount: string
   ): MethodReturnContext;
   /**
    * Payable: false
@@ -339,7 +344,7 @@ export interface SATPWrapperContract {
    */
   tokensInteractions(
     parameter0: string,
-    parameter1: string | number,
+    parameter1: string | number
   ): MethodConstantReturnContext<TokensInteractionsResponse>;
   /**
    * Payable: false
@@ -371,33 +376,41 @@ export interface SATPWrapperContract {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param contractName Type: string, Indexed: false
    * @param contractAddress Type: address, Indexed: false
    * @param tokenType Type: uint8, Indexed: false
    * @param tokenId Type: string, Indexed: false
+   * @param referenceId Type: string, Indexed: false
    * @param owner Type: address, Indexed: false
-   * @param interactions Type: tuple[], Indexed: false
    */
   wrap(
+    contractName: string,
     contractAddress: string,
     tokenType: string | number,
     tokenId: string,
-    owner: string,
-    interactions: InteractionsRequest[],
+    referenceId: string,
+    owner: string
   ): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param contractName Type: string, Indexed: false
    * @param contractAddress Type: address, Indexed: false
    * @param tokenType Type: uint8, Indexed: false
    * @param tokenId Type: string, Indexed: false
+   * @param referenceId Type: string, Indexed: false
    * @param owner Type: address, Indexed: false
+   * @param interactions Type: tuple[], Indexed: false
    */
   wrap(
+    contractName: string,
     contractAddress: string,
     tokenType: string | number,
     tokenId: string,
+    referenceId: string,
     owner: string,
+    interactions: InteractionsRequest[]
   ): MethodReturnContext;
 }

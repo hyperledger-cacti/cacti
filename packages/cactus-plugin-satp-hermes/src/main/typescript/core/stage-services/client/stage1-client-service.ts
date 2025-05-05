@@ -40,7 +40,7 @@ import {
 } from "../../errors/satp-service-errors";
 import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
-import { NetworkId } from "../../../services/network-identification/chainid-list";
+import { NetworkId } from "../../../public-api";
 
 export class Stage1ClientService extends SATPService {
   public static readonly SATP_STAGE = "1";
@@ -94,15 +94,21 @@ export class Stage1ClientService extends SATPService {
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });
+      if (sessionData.senderAsset == undefined) {
+        throw new Error(`${fnTag}, receiverAsset is missing`);
+      }
+      if (sessionData.senderAsset?.networkId == undefined) {
+        throw new Error(`${fnTag}, senderAsset.networkId is missing`);
+      }
       if (
         !connectedDLTs
           .map((dlt) => {
             return dlt.id;
           })
-          .includes(sessionData.senderGatewayNetworkId)
+          .includes(sessionData.senderAsset?.networkId.id)
       ) {
         throw new Error( //todo change this to the transferClaims check
-          `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
+          `${fnTag}, sender gateway dlt system: ${sessionData.senderAsset?.networkId.id} is not supported by this gateway, supported networks: ${safeStableStringify(connectedDLTs)}`,
         );
       }
 
@@ -360,10 +366,15 @@ export class Stage1ClientService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    session.verify(fnTag, SessionType.CLIENT);
+    if (response.recipientGatewayNetworkId == "") {
+      throw new Error(`${fnTag}, recipientGatewayNetworkId is missing`);
+    }
 
     const sessionData = session.getClientSessionData();
 
+    sessionData.recipientGatewayNetworkId = response.recipientGatewayNetworkId;
+
+    session.verify(fnTag, SessionType.CLIENT);
     if (
       response.contextId == "" ||
       response.contextId != sessionData.transferContextId

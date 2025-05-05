@@ -396,7 +396,12 @@ export class TokenIdMissingError extends SATPInternalError {
     this.errorType = SATPErrorType.MISSING_PARAMETER;
   }
 }
-
+export class AmountMissingError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(`${tag}, Amount missing`, cause ?? null, 400);
+    this.errorType = SATPErrorType.MISSING_PARAMETER;
+  }
+}
 export class MissingRecipientError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(`${tag}, Recipient is missing`, cause ?? null, 400);
