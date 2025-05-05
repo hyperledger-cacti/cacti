@@ -1,20 +1,13 @@
 import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { FabricContractInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger/cactus-test-tooling";
-import {
-  EthContractInvocationType,
-  Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
 import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
-  createClient,
   setupGatewayDockerFiles,
   BesuTestEnvironment,
   FabricTestEnvironment,
@@ -24,20 +17,26 @@ import {
   setupDBTable,
 } from "../test-utils";
 import {
-  DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_OAPI,
   DEFAULT_PORT_GATEWAY_SERVER,
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger/cactus-test-geth-ledger";
 import { Container } from "dockerode";
 import { Knex } from "knex";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger/cactus-core-api";
+import {
+  GetApproveAddressApi,
+  GetApproveAddressRequest,
+  TokenType,
+  TransactionApi,
+} from "../../../main/typescript";
+import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../constants";
 
-const logLevel: LogLevelDesc = "DEBUG";
+const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
@@ -46,17 +45,25 @@ const log = LoggerProvider.getOrCreate({
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
+
 const erc20TokenContract = "SATPContract";
-const contractNameWrapper = "SATPWrapperContract";
-const bridge_id =
-  "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
 let db_local_config: Knex.Config;
 let db_remote_config: Knex.Config;
 let db_local: Container;
 let db_remote: Container;
+let gatewayRunner: SATPGatewayRunner;
+
+const testNetwork = "test-network";
 
 afterAll(async () => {
+  await gatewayRunner.stop();
+  await gatewayRunner.destroy();
+  await db_local.stop();
+  await db_local.remove();
+  await db_remote.stop();
+  await db_remote.remove();
+
   await besuEnv.tearDown();
   await ethereumEnv.tearDown();
   await fabricEnv.tearDown();
@@ -81,49 +88,51 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  ({ config: db_local_config, container: db_local } = await createPGDatabase(
-    5432,
-    "user123123",
-    "password",
-  ));
+  ({ config: db_local_config, container: db_local } = await createPGDatabase({
+    port: 5432,
+    network: testNetwork,
+    postgresUser: "user123123",
+    postgresPassword: "password",
+  }));
 
-  ({ config: db_remote_config, container: db_remote } = await createPGDatabase(
-    5450,
-    "user123123",
-    "password",
-  ));
+  ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
+    port: 5450,
+    network: testNetwork,
+    postgresUser: "user123123",
+    postgresPassword: "password",
+  }));
 
-  await setupDBTable(db_local_config);
   await setupDBTable(db_remote_config);
 
   {
     const satpContractName = "satp-contract";
-    fabricEnv = await FabricTestEnvironment.setupTestEnvironment(
+    fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       satpContractName,
-      bridge_id,
       logLevel,
-    );
+      network: testNetwork,
+      claimFormat: ClaimFormat.DEFAULT,
+    });
     log.info("Fabric Ledger started successfully");
 
-    await fabricEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+    await fabricEnv.deployAndSetupContracts();
   }
 
   {
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
-      erc20TokenContract,
-      contractNameWrapper,
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
+      satpContractName: erc20TokenContract,
       logLevel,
-    );
+      network: testNetwork,
+    });
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
   {
-    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
-      erc20TokenContract,
-      contractNameWrapper,
+    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
+      satpContractName: erc20TokenContract,
       logLevel,
-    );
+      network: testNetwork,
+    });
     log.info("Ethereum Ledger started successfully");
 
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
@@ -131,6 +140,17 @@ beforeAll(async () => {
 });
 
 describe("SATPGateway sending a token from Besu to Fabric", () => {
+  it("should mint 100 tokens to the owner account", async () => {
+    await besuEnv.mintTokens("100");
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "100",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+  });
   it("should realize a transfer", async () => {
     const address: Address = `http://localhost`;
 
@@ -145,171 +165,156 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      connectedDLTs: [
-        {
-          id: BesuTestEnvironment.BESU_NETWORK_ID,
-          ledgerType: LedgerType.Besu2X,
-        },
-        {
-          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
-          ledgerType: LedgerType.Fabric2,
-        },
-      ],
       proofID: "mockProofID10",
       address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfigJSON(logLevel);
+    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON(logLevel);
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
 
-    const files = setupGatewayDockerFiles(
+    // gateway configuration setup:
+    const files = setupGatewayDockerFiles({
       gatewayIdentity,
       logLevel,
-      [], //only knows itself
-      [besuConfigJSON, fabricConfigJSON],
-      false, // Crash recovery disabled
-      db_local_config,
-      db_remote_config,
-    );
+      counterPartyGateways: [], //only knows itself
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [besuConfigJSON, fabricConfigJSON] },
+      localRepository: db_local_config,
+      remoteRepository: db_remote_config,
+    });
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "latest",
-      containerImageName: "rafaelapb/cacti-satp-hermes-gateway",
+      containerImageVersion: DOCKER_IMAGE_VERSION,
+      containerImageName: DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
-      configFile: files.configFile,
-      outputLogFile: files.outputLogFile,
-      errorLogFile: files.errorLogFile,
+      configFilePath: files.configFilePath,
+      logsPath: files.logsPath,
+      ontologiesPath: files.ontologiesPath,
+      networkName: testNetwork,
     };
-    const gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
-    console.log("starting gatewayRunner...");
-    await gatewayRunner.start();
-    console.log("gatewayRunner started sucessfully");
+
+    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
+    log.debug("starting gatewayRunner...");
+    await gatewayRunner.start(false);
+    log.debug("gatewayRunner started sucessfully");
+
+    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
+
+    const approveAddressApi = new GetApproveAddressApi(
+      new Configuration({ basePath: `${address}:${port}` }),
+    );
+
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
+      networkId: besuEnv.network,
+      tokenType: TokenType.NonstandardFungible,
+    } as GetApproveAddressRequest);
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.data.approveAddress);
+
+    if (reqApproveBesuAddress?.data.approveAddress) {
+      await besuEnv.approveAmount(
+        reqApproveBesuAddress.data.approveAddress,
+        "100",
+      );
+    } else {
+      throw new Error("Approve address is undefined");
+    }
+    log.debug("Approved 100 amout to the Besu Bridge Address");
+
+    const reqApproveFabricAddress = await approveAddressApi.getApproveAddress({
+      networkId: fabricEnv.network,
+      tokenType: TokenType.NonstandardFungible,
+    } as GetApproveAddressRequest);
+    expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveFabricAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await fabricEnv.giveRoleToBridge("Org2MSP");
+
+    const satpApi = new TransactionApi(
+      new Configuration({ basePath: `${address}:${port}` }),
+    );
 
     const req = getTransactRequest(
       "mockContext",
       besuEnv,
       fabricEnv,
       "100",
-      "1",
+      "100",
     );
 
-    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_API);
+    const res = await satpApi.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
 
-    const transactionApiClient = createClient(
-      "TransactionApi",
-      address,
-      port,
-      log,
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
     );
-    const adminApi = createClient("AdminApi", address, port, log);
-
-    const res = await transactionApiClient.transact(req);
-    log.info(res?.data.statusResponse);
-
-    const sessions = await adminApi.getSessionIds({});
-    expect(sessions.data).toBeTruthy();
-    expect(sessions.data.length).toBe(1);
-    expect(sessions.data[0]).toBe(res.data.sessionID);
-
-    const responseBalanceOwner = await besuEnv.connector.invokeContract({
-      contractName: besuEnv.erc20TokenContract,
-      contractAbi: SATPContract.abi,
-      invocationType: EthContractInvocationType.Call,
-      contractAddress: besuEnv.assetContractAddress,
-      methodName: "checkBalance",
-      params: [besuEnv.firstHighNetWorthAccount],
-      signingCredential: {
-        ethAccount: besuEnv.firstHighNetWorthAccount,
-        secret: besuEnv.besuKeyPair.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-      gas: 999999999,
-    });
-    expect(responseBalanceOwner).toBeTruthy();
-    expect(responseBalanceOwner.success).toBeTruthy();
-    console.log(
-      `Balance Besu Owner Account: ${responseBalanceOwner.callOutput}`,
-    );
-    expect(responseBalanceOwner.callOutput).toBe("0");
     log.info("Amount was transfer correctly from the Owner account");
 
-    const responseBalanceBridge = await besuEnv.connector.invokeContract({
-      contractName: besuEnv.erc20TokenContract,
-      contractAbi: SATPContract.abi,
-      invocationType: EthContractInvocationType.Call,
-      contractAddress: besuEnv.assetContractAddress,
-      methodName: "checkBalance",
-      params: [besuEnv.wrapperContractAddress],
-      signingCredential: {
-        ethAccount: besuEnv.firstHighNetWorthAccount,
-        secret: besuEnv.besuKeyPair.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-      gas: 999999999,
-    });
-    expect(responseBalanceBridge).toBeTruthy();
-    expect(responseBalanceBridge.success).toBeTruthy();
-    console.log(
-      `Balance Besu Bridge Account: ${responseBalanceBridge.callOutput}`,
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      reqApproveBesuAddress?.data.approveAddress,
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
     );
-    expect(responseBalanceBridge.callOutput).toBe("0");
     log.info("Amount was transfer correctly to the Wrapper account");
 
-    const responseBalance1 = await fabricEnv.apiClient.runTransactionV1({
-      contractName: fabricEnv.satpContractName,
-      channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.bridge_id],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricEnv.fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("0");
-    console.log(
-      `Balance Fabric Bridge Account: ${responseBalance1.data.functionOutput}`,
+    await fabricEnv.checkBalance(
+      fabricEnv.getTestContractName(),
+      fabricEnv.getTestChannelName(),
+      reqApproveFabricAddress?.data.approveAddress,
+      "0",
+      fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly from the Bridge account");
 
-    const responseBalance2 = await fabricEnv.apiClient.runTransactionV1({
-      contractName: fabricEnv.satpContractName,
-      channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.clientId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricEnv.fabricSigningCredential,
-    });
-    expect(responseBalance2).not.toBeUndefined();
-    expect(responseBalance2.status).toBeGreaterThan(199);
-    expect(responseBalance2.status).toBeLessThan(300);
-    expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe("1");
-    console.log(
-      `Balance Fabric Owner Account: ${responseBalance2.data.functionOutput}`,
+    await fabricEnv.checkBalance(
+      fabricEnv.getTestContractName(),
+      fabricEnv.getTestChannelName(),
+      fabricEnv.getTestOwnerAccount(),
+      "100",
+      fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    await gatewayRunner.stop();
-    await gatewayRunner.destroy();
-    await db_local.stop();
-    await db_local.remove();
-    await db_remote.stop();
-    await db_remote.remove();
   });
 });
 
-describe("SATPGateway sending a token from Ethereum to Fabric", () => {
+describe("SATPGateway sending a token from Fabric to Besu", () => {
+  it("should mint 100 tokens to the owner account", async () => {
+    await fabricEnv.mintTokens("100");
+    await fabricEnv.checkBalance(
+      fabricEnv.getTestContractName(),
+      fabricEnv.getTestChannelName(),
+      fabricEnv.getTestOwnerAccount(),
+      "100",
+      fabricEnv.getTestOwnerSigningCredential(),
+    );
+  });
   it("should realize a transfer", async () => {
     const address: Address = `http://localhost`;
 
@@ -324,174 +329,310 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      connectedDLTs: [
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+    } as GatewayIdentity;
+
+    // ethereumConfig Json object setup:
+    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
+
+    // fabricConfig Json object setup:
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
+
+    // gateway configuration setup:
+    const files = setupGatewayDockerFiles({
+      gatewayIdentity,
+      logLevel,
+      counterPartyGateways: [], //only knows itself
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [besuConfigJSON, fabricConfigJSON] },
+      localRepository: db_local_config,
+      remoteRepository: db_remote_config,
+    });
+
+    // gatewayRunner setup:
+    const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: DOCKER_IMAGE_VERSION,
+      containerImageName: DOCKER_IMAGE_NAME,
+      logLevel,
+      emitContainerLogs: true,
+      configFilePath: files.configFilePath,
+      logsPath: files.logsPath,
+      ontologiesPath: files.ontologiesPath,
+      networkName: testNetwork,
+    };
+
+    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
+    log.debug("starting gatewayRunner...");
+    await gatewayRunner.start(true);
+    log.debug("gatewayRunner started sucessfully");
+
+    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
+
+    const approveAddressApi = new GetApproveAddressApi(
+      new Configuration({ basePath: `${address}:${port}` }),
+    );
+
+    const reqApproveFabricAddress = await approveAddressApi.getApproveAddress({
+      networkId: fabricEnv.network,
+      tokenType: TokenType.NonstandardFungible,
+    } as GetApproveAddressRequest);
+
+    if (!reqApproveFabricAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
+
+    await fabricEnv.giveRoleToBridge("Org2MSP"); //This depend on the Fabric setup
+
+    if (reqApproveFabricAddress?.data.approveAddress) {
+      await fabricEnv.approveAmount(
+        reqApproveFabricAddress.data.approveAddress,
+        "100",
+      );
+    }
+
+    log.debug("Approved 100 amount to the Fabric Bridge Address");
+
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
+      networkId: besuEnv.network,
+      tokenType: TokenType.NonstandardFungible,
+    } as GetApproveAddressRequest);
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
+
+    const satpApi = new TransactionApi(
+      new Configuration({ basePath: `${address}:${port}` }),
+    );
+
+    const req = getTransactRequest(
+      "mockContext",
+      fabricEnv,
+      besuEnv,
+      "100",
+      "100",
+    );
+
+    const res = await satpApi.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
+
+    await fabricEnv.checkBalance(
+      fabricEnv.getTestContractName(),
+      fabricEnv.getTestChannelName(),
+      fabricEnv.getTestOwnerAccount(),
+      "0",
+      fabricEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transferred correctly from the Owner account");
+
+    await fabricEnv.checkBalance(
+      fabricEnv.getTestContractName(),
+      fabricEnv.getTestChannelName(),
+      reqApproveFabricAddress?.data.approveAddress,
+      "0",
+      fabricEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transferred correctly to the Wrapper account");
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      reqApproveBesuAddress?.data.approveAddress,
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transferred correctly from the Bridge account");
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "100",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transferred correctly to the Owner account");
+  });
+});
+
+describe("SATPGateway sending a token from Besu to Ethereum", () => {
+  it("should mint 100 tokens to the owner account", async () => {
+    await besuEnv.mintTokens("100");
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "100",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+  });
+  it("should realize a transfer", async () => {
+    const address: Address = `http://localhost`;
+
+    // gateway setup:
+    const gatewayIdentity = {
+      id: "mockID",
+      name: "CustomGateway",
+      version: [
         {
-          id: EthereumTestEnvironment.ETH_NETWORK_ID,
-          ledgerType: LedgerType.Ethereum,
-        },
-        {
-          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
-          ledgerType: LedgerType.Fabric2,
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
         },
       ],
       proofID: "mockProofID10",
       address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
     } as GatewayIdentity;
 
-    // ethereumConfig Json object setup:
-    const ethereumConfigJSON =
-      await ethereumEnv.createEthereumConfigJSON(logLevel);
+    // besuConfig Json object setup:
+    const besuConfig = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON(logLevel);
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
 
     // gateway configuration setup:
-    const files = setupGatewayDockerFiles(
+    const files = setupGatewayDockerFiles({
       gatewayIdentity,
       logLevel,
-      [], //only knows itself
-      [ethereumConfigJSON, fabricConfigJSON],
-      false, // Crash recovery disabled
-      db_local_config,
-      db_remote_config,
-    );
+      counterPartyGateways: [], //only knows itself
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [besuConfig, ethereumConfig] },
+      localRepository: db_local_config,
+      remoteRepository: db_remote_config,
+    });
 
-    let initialBalance;
-    try {
-      initialBalance = await fabricEnv.apiClient.runTransactionV1({
-        contractName: fabricEnv.satpContractName,
-        channelName: fabricEnv.fabricChannelName,
-        params: [fabricEnv.clientId],
-        methodName: "ClientIDAccountBalance",
-        invocationType: FabricContractInvocationType.Send,
-        signingCredential: fabricEnv.fabricSigningCredential,
-      });
-    } catch (error) {
-      initialBalance = { data: { functionOutput: "0" } };
-    }
-
-    //TODO: when ready, change to official hyperledger image
-    // -- for now use your local image (the name might be different)
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "latest",
-      containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
+      containerImageVersion: DOCKER_IMAGE_VERSION,
+      containerImageName: DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
-      configFile: files.configFile,
-      outputLogFile: files.outputLogFile,
-      errorLogFile: files.errorLogFile,
+      configFilePath: files.configFilePath,
+      logsPath: files.logsPath,
+      ontologiesPath: files.ontologiesPath,
+      networkName: testNetwork,
     };
-    const gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
-    console.log("starting gatewayRunner...");
+
+    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
+    log.debug("starting gatewayRunner...");
     await gatewayRunner.start(true);
-    console.log("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started sucessfully");
+
+    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
+
+    const approveAddressApi = new GetApproveAddressApi(
+      new Configuration({ basePath: `${address}:${port}` }),
+    );
+
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
+      networkId: besuEnv.network,
+      tokenType: TokenType.NonstandardFungible,
+    } as GetApproveAddressRequest);
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.data.approveAddress);
+
+    if (reqApproveBesuAddress?.data.approveAddress) {
+      await besuEnv.approveAmount(
+        reqApproveBesuAddress.data.approveAddress,
+        "100",
+      );
+    } else {
+      throw new Error("Approve address is undefined");
+    }
+    log.debug("Approved 100 amout to the Besu Bridge Address");
+
+    const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
+      {
+        networkId: ethereumEnv.network,
+        tokenType: TokenType.NonstandardFungible,
+      } as GetApproveAddressRequest,
+    );
+
+    expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveEthereumAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await ethereumEnv.giveRoleToBridge(
+      reqApproveEthereumAddress.data.approveAddress,
+    );
+
+    const satpApi = new TransactionApi(
+      new Configuration({ basePath: `${address}:${port}` }),
+    );
 
     const req = getTransactRequest(
       "mockContext",
+      besuEnv,
       ethereumEnv,
-      fabricEnv,
       "100",
-      "1",
+      "100",
     );
 
-    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_API);
+    const res = await satpApi.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
 
-    const transactionApiClient = createClient(
-      "TransactionApi",
-      address,
-      port,
-      log,
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
     );
-    const adminApi = createClient("AdminApi", address, port, log);
-
-    const res = await transactionApiClient.transact(req);
-    log.info(res?.data.statusResponse);
-
-    const sessions = await adminApi.getSessionIds({});
-    expect(sessions.data).toBeTruthy();
-    expect(sessions.data.length).toBe(1);
-    expect(sessions.data[0]).toBe(res.data.sessionID);
-
-    const responseBalanceOwner = await ethereumEnv.connector.invokeContract({
-      contract: {
-        contractName: ethereumEnv.erc20TokenContract,
-        keychainId: ethereumEnv.keychainPlugin1.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Call,
-      methodName: "checkBalance",
-      params: [WHALE_ACCOUNT_ADDRESS],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(responseBalanceOwner).toBeTruthy();
-    expect(responseBalanceOwner.success).toBeTruthy();
-    expect(responseBalanceOwner.callOutput).toBe(BigInt(0));
     log.info("Amount was transfer correctly from the Owner account");
 
-    const responseBalanceBridge = await ethereumEnv.connector.invokeContract({
-      contract: {
-        contractName: ethereumEnv.erc20TokenContract,
-        keychainId: ethereumEnv.keychainPlugin1.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Call,
-      methodName: "checkBalance",
-      params: [ethereumEnv.wrapperContractAddress],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(responseBalanceBridge).toBeTruthy();
-    expect(responseBalanceBridge.success).toBeTruthy();
-    expect(responseBalanceBridge.callOutput).toBe(BigInt(0));
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
     log.info("Amount was transfer correctly to the Wrapper account");
 
-    const responseBalance1 = await fabricEnv.apiClient.runTransactionV1({
-      contractName: fabricEnv.satpContractName,
-      channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.bridge_id],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricEnv.fabricSigningCredential,
-    });
-
-    expect(responseBalance1).not.toBeUndefined();
-    expect(responseBalance1.status).toBeGreaterThan(199);
-    expect(responseBalance1.status).toBeLessThan(300);
-    expect(responseBalance1.data).not.toBeUndefined();
-    expect(responseBalance1.data.functionOutput).toBe("0");
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestContractName(),
+      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestContractAbi(),
+      reqApproveEthereumAddress?.data.approveAddress,
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
     log.info("Amount was transfer correctly from the Bridge account");
 
-    const responseBalance2 = await fabricEnv.apiClient.runTransactionV1({
-      contractName: fabricEnv.satpContractName,
-      channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.clientId],
-      methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: fabricEnv.fabricSigningCredential,
-    });
-    expect(responseBalance2).not.toBeUndefined();
-    expect(responseBalance2.status).toBeGreaterThan(199);
-    expect(responseBalance2.status).toBeLessThan(300);
-    expect(responseBalance2.data).not.toBeUndefined();
-    expect(responseBalance2.data.functionOutput).toBe(
-      (Number(initialBalance.data.functionOutput) + 1).toString(),
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestContractName(),
+      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestContractAbi(),
+      ethereumEnv.getTestOwnerAccount(),
+      "100",
+      ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    await gatewayRunner.stop();
-    await gatewayRunner.destroy();
-    await db_local.stop();
-    await db_local.remove();
-    await db_remote.stop();
-    await db_remote.remove();
   });
 });

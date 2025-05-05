@@ -27,21 +27,21 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { saveMessageInSessionData, setError } from "../session-utils";
-import { NetworkId } from "../../services/network-identification/chainid-list";
+import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
   private sessions: Map<string, SATPSession>;
   private serverService: Stage1ServerService;
   private clientService: Stage1ClientService;
-  private connectedDLTs: NetworkId[];
+  private bridgeManagerClient: BridgeManagerClientInterface;
   private logger: Logger;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage1ServerService;
     this.clientService = ops.clientService as Stage1ClientService;
-    this.connectedDLTs = ops.connectedDLTs;
+    this.bridgeManagerClient = ops.bridgeClient;
     this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
     this.logger.trace(`Initialized ${Stage1SATPHandler.CLASS_NAME}`);
   }
@@ -80,7 +80,7 @@ export class Stage1SATPHandler implements SATPHandler {
       await this.serverService.checkTransferProposalRequestMessage(
         req,
         session,
-        this.connectedDLTs,
+        this.bridgeManagerClient.getAvailableEndPoints(),
       );
 
       saveMessageInSessionData(session.getServerSessionData(), req);
@@ -216,7 +216,7 @@ export class Stage1SATPHandler implements SATPHandler {
       const requestTransferProposal =
         await this.clientService.transferProposalRequest(
           session,
-          this.connectedDLTs,
+          this.bridgeManagerClient.getAvailableEndPoints(),
         );
 
       if (!requestTransferProposal) {

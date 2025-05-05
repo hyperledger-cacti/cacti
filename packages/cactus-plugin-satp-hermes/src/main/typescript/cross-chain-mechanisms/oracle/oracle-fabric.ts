@@ -1,4 +1,3 @@
-import type { TransactionResponse } from "../../types/blockchain-interaction";
 import {
   FabricContractInvocationType,
   type FabricSigningCredential,
@@ -21,6 +20,7 @@ import {
   type ReadEntryArgsBase,
   type UpdateOracleEntryBase,
 } from "./oracle-abstract";
+import { OracleResponse } from "./oracle-types";
 
 export interface UpdateFabricOracleTransactionConfig {
   contractName: string;
@@ -76,7 +76,7 @@ export class OracleFabric extends OracleAbstract {
    */
   public async updateEntry(
     entry: UpdateFabricOracleEntry,
-  ): Promise<{ transactionResponse: TransactionResponse; proof: any }> {
+  ): Promise<{ transactionResponse: OracleResponse; proof: any }> {
     const fnTag = `${OracleFabric.CLASS_NAME}#updateEntry`;
     this.logger.debug(
       `${fnTag}: Updating entry with header: ${safeStableStringify(entry.header)}`,
@@ -99,7 +99,7 @@ export class OracleFabric extends OracleAbstract {
       throw new Error(`${fnTag}: Transaction failed`);
     }
 
-    const transactionResponse: TransactionResponse = {
+    const transactionResponse: OracleResponse = {
       transactionId: response.transactionId,
       output: response.functionOutput,
     };

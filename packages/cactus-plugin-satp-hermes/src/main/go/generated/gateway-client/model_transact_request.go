@@ -21,10 +21,6 @@ var _ MappedNullable = &TransactRequest{}
 type TransactRequest struct {
 	ContextID string `json:"contextID"`
 	Payload *string `json:"payload,omitempty"`
-	FromDLTNetworkID string `json:"fromDLTNetworkID"`
-	ToDLTNetworkID string `json:"toDLTNetworkID"`
-	FromAmount string `json:"fromAmount"`
-	ToAmount string `json:"toAmount"`
 	BeneficiaryPubkey string `json:"beneficiaryPubkey"`
 	OriginatorPubkey string `json:"originatorPubkey"`
 	SourceAsset TransactRequestSourceAsset `json:"sourceAsset"`
@@ -35,13 +31,9 @@ type TransactRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransactRequest(contextID string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, toAmount string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset) *TransactRequest {
+func NewTransactRequest(contextID string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset) *TransactRequest {
 	this := TransactRequest{}
 	this.ContextID = contextID
-	this.FromDLTNetworkID = fromDLTNetworkID
-	this.ToDLTNetworkID = toDLTNetworkID
-	this.FromAmount = fromAmount
-	this.ToAmount = toAmount
 	this.BeneficiaryPubkey = beneficiaryPubkey
 	this.OriginatorPubkey = originatorPubkey
 	this.SourceAsset = sourceAsset
@@ -111,102 +103,6 @@ func (o *TransactRequest) HasPayload() bool {
 // SetPayload gets a reference to the given string and assigns it to the Payload field.
 func (o *TransactRequest) SetPayload(v string) {
 	o.Payload = &v
-}
-
-// GetFromDLTNetworkID returns the FromDLTNetworkID field value
-func (o *TransactRequest) GetFromDLTNetworkID() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.FromDLTNetworkID
-}
-
-// GetFromDLTNetworkIDOk returns a tuple with the FromDLTNetworkID field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetFromDLTNetworkIDOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.FromDLTNetworkID, true
-}
-
-// SetFromDLTNetworkID sets field value
-func (o *TransactRequest) SetFromDLTNetworkID(v string) {
-	o.FromDLTNetworkID = v
-}
-
-// GetToDLTNetworkID returns the ToDLTNetworkID field value
-func (o *TransactRequest) GetToDLTNetworkID() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.ToDLTNetworkID
-}
-
-// GetToDLTNetworkIDOk returns a tuple with the ToDLTNetworkID field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetToDLTNetworkIDOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.ToDLTNetworkID, true
-}
-
-// SetToDLTNetworkID sets field value
-func (o *TransactRequest) SetToDLTNetworkID(v string) {
-	o.ToDLTNetworkID = v
-}
-
-// GetFromAmount returns the FromAmount field value
-func (o *TransactRequest) GetFromAmount() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.FromAmount
-}
-
-// GetFromAmountOk returns a tuple with the FromAmount field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetFromAmountOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.FromAmount, true
-}
-
-// SetFromAmount sets field value
-func (o *TransactRequest) SetFromAmount(v string) {
-	o.FromAmount = v
-}
-
-// GetToAmount returns the ToAmount field value
-func (o *TransactRequest) GetToAmount() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.ToAmount
-}
-
-// GetToAmountOk returns a tuple with the ToAmount field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetToAmountOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.ToAmount, true
-}
-
-// SetToAmount sets field value
-func (o *TransactRequest) SetToAmount(v string) {
-	o.ToAmount = v
 }
 
 // GetBeneficiaryPubkey returns the BeneficiaryPubkey field value
@@ -319,10 +215,6 @@ func (o TransactRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Payload) {
 		toSerialize["payload"] = o.Payload
 	}
-	toSerialize["fromDLTNetworkID"] = o.FromDLTNetworkID
-	toSerialize["toDLTNetworkID"] = o.ToDLTNetworkID
-	toSerialize["fromAmount"] = o.FromAmount
-	toSerialize["toAmount"] = o.ToAmount
 	toSerialize["beneficiaryPubkey"] = o.BeneficiaryPubkey
 	toSerialize["originatorPubkey"] = o.OriginatorPubkey
 	toSerialize["sourceAsset"] = o.SourceAsset

@@ -67,8 +67,6 @@ message SessionData {
     string server_transfer_number = 56;
     uint64 lock_assertion_expiration = 57;
     cacti.satp.v02.common.AssetProfile asset_profile = 58;
-    string sender_contract_ontology = 59;
-    string receiver_contract_ontology = 60;
     string resource_url = 61;
     cacti.satp.v02.common.WrapAssertionClaim sender_wrap_assertion_claim = 62;
     cacti.satp.v02.common.WrapAssertionClaim receiver_wrap_assertion_claim = 63;
@@ -79,8 +77,6 @@ message SessionData {
     cacti.satp.v02.common.MessageType phase_error = 68;
     bool recovered_tried = 69;
     SATPMessages satp_messages = 70; 
-    string sender_gateway_network_type = 71;
-    string recipient_gateway_network_type = 72; 
     Type role = 73;
 }
 
