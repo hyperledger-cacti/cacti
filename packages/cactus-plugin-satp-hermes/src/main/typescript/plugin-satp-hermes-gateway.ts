@@ -647,7 +647,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public async shutdown(): Promise<void> {
-    const fnTag = `${this.className}#getGatewaySeeds()`;
+    const fnTag = `${this.className}#shutdown()`;
     this.logger.debug(`Entering ${fnTag}`);
 
     this.logger.debug("Shutting down Gateway Application");
@@ -670,6 +670,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.debug(`Running shutdown hook: ${hook.name}`);
       await hook.hook();
     }
+
+    this.logger.debug("Oracle Manager shut down");
+    this.SATPCCManager.getOracleManager().shutdown();
 
     this.logger.info("Shutting down Gateway Connection Manager");
     const connectionsClosed = await this.gatewayOrchestrator.disconnectAll();

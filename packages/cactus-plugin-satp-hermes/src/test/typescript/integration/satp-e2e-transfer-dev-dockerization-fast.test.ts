@@ -138,7 +138,7 @@ beforeAll(async () => {
 
   {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
       network: testNetwork,
     });
@@ -148,7 +148,7 @@ beforeAll(async () => {
   }
   {
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
       network: testNetwork,
     });

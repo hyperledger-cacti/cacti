@@ -107,7 +107,7 @@ beforeAll(async () => {
   {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
-      satpContractName,
+      contractName: satpContractName,
       logLevel,
       network: testNetwork,
       claimFormat: ClaimFormat.DEFAULT,
@@ -119,7 +119,7 @@ beforeAll(async () => {
 
   {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
       network: testNetwork,
     });
@@ -129,7 +129,7 @@ beforeAll(async () => {
   }
   {
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
       network: testNetwork,
     });

@@ -1,6 +1,7 @@
 import { Logger, LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   AdminApi,
+  OracleApi,
   TransactionApi,
 } from "../../main/typescript/generated/gateway-client/typescript-axios/api";
 import { TransactRequest } from "../../main/typescript";
@@ -35,14 +36,20 @@ export function createClient(
   port: number,
   logger: Logger,
 ): TransactionApi;
-
-// Creates an API client instance for interacting with the gateway
 export function createClient(
-  type: "AdminApi" | "TransactionApi",
+  type: "OracleApi",
   address: string,
   port: number,
   logger: Logger,
-): AdminApi | TransactionApi {
+): OracleApi;
+
+// Creates an API client instance for interacting with the gateway
+export function createClient(
+  type: "AdminApi" | "TransactionApi" | "OracleApi",
+  address: string,
+  port: number,
+  logger: Logger,
+): AdminApi | TransactionApi | OracleApi {
   const config = new Configuration({ basePath: `${address}:${port}` });
   logger.debug(config);
 
@@ -50,6 +57,8 @@ export function createClient(
     return new AdminApi(config);
   } else if (type === "TransactionApi") {
     return new TransactionApi(config);
+  } else if (type === "OracleApi") {
+    return new OracleApi(config);
   } else {
     throw new Error("Invalid api type");
   }
@@ -387,4 +396,11 @@ export async function createPGDatabase(
 export async function setupDBTable(config: Knex.Config): Promise<void> {
   const knexInstanceClient = knex(config);
   await knexInstanceClient.migrate.latest();
+}
+
+export interface IContractJson {
+  abi: any;
+  bytecode: {
+    object: string;
+  };
 }
