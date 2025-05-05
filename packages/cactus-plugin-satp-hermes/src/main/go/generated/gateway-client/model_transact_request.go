@@ -19,6 +19,7 @@ var _ MappedNullable = &TransactRequest{}
 
 // TransactRequest Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks.
 type TransactRequest struct {
+	// The unique identifier of the task.
 	ContextID string `json:"contextID"`
 	Payload *string `json:"payload,omitempty"`
 	BeneficiaryPubkey string `json:"beneficiaryPubkey"`
