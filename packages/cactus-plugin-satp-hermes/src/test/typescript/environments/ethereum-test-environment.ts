@@ -2,18 +2,17 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-  Secp256k1Keys,
 } from "@hyperledger/cactus-common";
 import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
-import SATPWrapperContract from "../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
+import SATPWrapperContract from "../../../main/solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
-import { EthereumConfig } from "../../../main/typescript/types/blockchain-interaction";
 import {
   EthContractInvocationType,
   IPluginLedgerConnectorEthereumOptions,
   PluginLedgerConnectorEthereum,
+  Web3SigningCredential,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
@@ -23,15 +22,26 @@ import {
   WHALE_ACCOUNT_ADDRESS,
 } from "@hyperledger/cactus-test-geth-ledger";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { Asset } from "../../../main/typescript";
-import BesuSATPInteraction from "../../solidity/satp-erc20-interact.json";
+import { Asset, AssetTokenTypeEnum, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { NetworkId } from "../../../main/typescript/services/network-identification/chainid-list";
+import {
+  IEthereumLeafNeworkOptions,
+  IEthereumLeafOptions,
+} from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
+import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
+import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
+import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 
+export interface IEthereumTestEnvironment {
+  satpContractName: string;
+  logLevel: LogLevelDesc;
+  network?: string;
+}
 // Test environment for Ethereum ledger operations
 export class EthereumTestEnvironment {
-  public static readonly ETH_ASSET_ID: string = uuidv4();
-  public static readonly ETH_NETWORK_ID: string = "ETH";
+  public static readonly ETH_ASSET_ID: string = "EthereumExampleAsset";
+  public static readonly ETHREFERENCE_ID: string = ExampleOntology.id;
+  public static readonly ETH_NETWORK_ID: string = "EthereumLedgerTestNetwork";
   public readonly network: NetworkId = {
     id: EthereumTestEnvironment.ETH_NETWORK_ID,
     ledgerType: LedgerType.Ethereum,
@@ -49,17 +59,20 @@ export class EthereumTestEnvironment {
   public contractNameWrapper!: string;
   public assetContractAddress!: string;
   public wrapperContractAddress!: string;
-  public ethereumConfig!: EthereumConfig;
+  public ethereumConfig!: IEthereumLeafNeworkOptions;
+
+  private dockerNetwork?: string;
 
   private readonly log: Logger;
 
-  private constructor(
-    erc20TokenContract: string,
-    contractNameWrapper: string,
-    logLevel: LogLevelDesc,
-  ) {
+  // eslint-disable-next-line prettier/prettier
+  private constructor(erc20TokenContract: string, logLevel: LogLevelDesc, network?: string) {
+    if (network) {
+      this.dockerNetwork = network;
+    }
+
+    this.contractNameWrapper = "SATPWrapperContract";
     this.erc20TokenContract = erc20TokenContract;
-    this.contractNameWrapper = contractNameWrapper;
 
     const level = logLevel || "INFO";
     const label = "EthereumTestEnvironment";
@@ -71,8 +84,10 @@ export class EthereumTestEnvironment {
     this.ledger = new GethTestLedger({
       containerImageName: "ghcr.io/hyperledger/cacti-geth-all-in-one",
       containerImageVersion: "2023-07-27-2a8c48ed6",
+      networkName: this.dockerNetwork,
     });
-    await this.ledger.start();
+
+    await this.ledger.start(false, []);
 
     const SATPContract1 = {
       contractName: "SATPContract",
@@ -127,86 +142,109 @@ export class EthereumTestEnvironment {
     this.connector = new PluginLedgerConnectorEthereum(this.connectorOptions);
   }
 
+  public getTestContractAddress(): string {
+    return this.assetContractAddress ?? "";
+  }
+
+  public getTestContractName(): string {
+    return this.erc20TokenContract;
+  }
+
+  public getTestContractAbi(): any {
+    return SATPContract.abi;
+  }
+
+  public getTestOwnerAccount(): string {
+    return WHALE_ACCOUNT_ADDRESS;
+  }
+
+  public getBridgeEthAccount(): string {
+    return this.bridgeEthAccount;
+  }
+
+  public getTestOwnerSigningCredential(): Web3SigningCredential {
+    return {
+      ethAccount: WHALE_ACCOUNT_ADDRESS,
+      secret: "",
+      type: Web3SigningCredentialType.GethKeychainPassword,
+    };
+  }
+
+  public getTestBridgeSigningCredential(): Web3SigningCredential {
+    return {
+      ethAccount: this.bridgeEthAccount,
+      secret: "test",
+      type: Web3SigningCredentialType.GethKeychainPassword,
+    };
+  }
+
   // Creates and initializes a new EthereumTestEnvironment instance
   public static async setupTestEnvironment(
-    erc20TokenContract: string,
-    contractNameWrapper: string,
-    logLevel: LogLevelDesc,
+    config: IEthereumTestEnvironment,
   ): Promise<EthereumTestEnvironment> {
     const instance = new EthereumTestEnvironment(
-      erc20TokenContract,
-      contractNameWrapper,
-      logLevel,
+      config.satpContractName,
+      config.logLevel,
+      config.network,
     );
-    await instance.init(logLevel);
+    await instance.init(config.logLevel);
     return instance;
   }
 
-  // Generates the Ethereum configuration for use in SATP Gateway Docker container
-  public async createEthereumConfigJSON(
+  // this creates the same config as the bridge manager does
+  public createEthereumLeafConfig(
+    ontologyManager: OntologyManager,
     logLevel?: LogLevelDesc,
-  ): Promise<Record<string, unknown>> {
+  ): IEthereumLeafOptions {
     return {
-      network: this.ethereumConfig.network,
-      keychainId: this.ethereumConfig.keychainId,
+      networkIdentification: this.ethereumConfig.networkIdentification,
       signingCredential: this.ethereumConfig.signingCredential,
-      contractName: this.ethereumConfig.contractName,
-      contractAddress: this.ethereumConfig.contractAddress,
+      ontologyManager: ontologyManager,
+      wrapperContractName: this.ethereumConfig.wrapperContractName,
+      wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
       gas: this.ethereumConfig.gas,
-      options: {
+      connectorOptions: {
         instanceId: this.connectorOptions.instanceId,
         rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
         rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
-        pluginRegistryOptions: {
-          plugins: [
-            {
-              instanceId: this.keychainPlugin1.getInstanceId(),
-              keychainId: this.keychainPlugin1.getKeychainId(),
-              logLevel,
-              backend: [
-                {
-                  keychainEntry: this.keychainEntryKey,
-                  keychainEntryValue: this.keychainEntryValue,
-                },
-              ],
-              contractName: this.erc20TokenContract,
-              contractString: await this.keychainPlugin1.get(
-                this.erc20TokenContract,
-              ),
-            },
-            {
-              instanceId: this.keychainPlugin2.getInstanceId(),
-              keychainId: this.keychainPlugin2.getKeychainId(),
-              logLevel,
-              backend: [
-                {
-                  keychainEntry: this.keychainEntryKey,
-                  keychainEntryValue: this.keychainEntryValue,
-                },
-              ],
-              contractName: this.contractNameWrapper,
-              contractString: await this.keychainPlugin2.get(
-                this.contractNameWrapper,
-              ),
-            },
-          ],
-        },
-        logLevel: this.connectorOptions.logLevel,
+        pluginRegistry: new PluginRegistry({ plugins: [] }),
+        logLevel: logLevel,
       },
-      bungeeOptions: {
-        keyPair: {
-          privateKey: Buffer.from(
-            this.bungeeOptions.keyPair!.privateKey.buffer,
-          ).toString("hex"),
-          publicKey: Buffer.from(
-            this.bungeeOptions.keyPair!.publicKey.buffer,
-          ).toString("hex"),
-        },
-        instanceId: this.bungeeOptions.instanceId,
-        logLevel: this.bungeeOptions.logLevel,
-      },
-      claimFormat: this.ethereumConfig.claimFormat,
+      claimFormats: this.ethereumConfig.claimFormats,
+      logLevel: logLevel,
     };
+  }
+
+  // this is the config to be loaded by the gateway, does not contain the log level because it will use the one in the gateway config
+  public createEthereumConfig(): INetworkOptions {
+    return {
+      networkIdentification: this.ethereumConfig.networkIdentification,
+      signingCredential: this.ethereumConfig.signingCredential,
+      wrapperContractName: this.ethereumConfig.wrapperContractName,
+      wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
+      gas: this.ethereumConfig.gas,
+      connectorOptions: {
+        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
+        rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
+      },
+      claimFormats: this.ethereumConfig.claimFormats,
+    } as INetworkOptions;
+  }
+
+  // this is the config to be loaded by the gateway when in a docker, does not contain the log level because it will use the one in the gateway config
+  public async createEthereumDockerConfig(): Promise<INetworkOptions> {
+    return {
+      networkIdentification: this.ethereumConfig.networkIdentification,
+      signingCredential: this.ethereumConfig.signingCredential,
+      wrapperContractName: this.ethereumConfig.wrapperContractName,
+      wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
+      gas: this.ethereumConfig.gas,
+      connectorOptions: {
+        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
+        rpcApiWsHost: await this.ledger.getRpcApiWebSocketHost(false),
+      },
+      claimFormats: this.ethereumConfig.claimFormats,
+    } as INetworkOptions;
   }
 
   // Deploys smart contracts and sets up configurations for testing
@@ -237,50 +275,43 @@ export class EthereumTestEnvironment {
 
     this.log.info("SATPContract Deployed successfully");
 
-    const deployOutWrapperContract = await this.connector.deployContract({
-      contract: {
-        keychainId: this.keychainPlugin2.getKeychainId(),
-        contractName: this.contractNameWrapper,
-      },
-      constructorArgs: [this.bridgeEthAccount],
-      web3SigningCredential: {
-        ethAccount: this.bridgeEthAccount,
-        secret: "test",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(deployOutWrapperContract).toBeTruthy();
-    expect(deployOutWrapperContract.transactionReceipt).toBeTruthy();
-    expect(
-      deployOutWrapperContract.transactionReceipt.contractAddress,
-    ).toBeTruthy();
-    this.log.info("SATPWrapperContract Deployed successfully");
-
-    this.wrapperContractAddress =
-      deployOutWrapperContract.transactionReceipt.contractAddress ?? "";
-
-    this.bungeeOptions = {
-      keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-      instanceId: uuidv4(),
-      pluginRegistry: new PluginRegistry(),
-    };
-
     this.ethereumConfig = {
-      network: this.network,
-      keychainId: this.keychainPlugin2.getKeychainId(),
+      networkIdentification: this.network,
       signingCredential: {
         ethAccount: this.bridgeEthAccount,
         secret: "test",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      contractName: this.contractNameWrapper,
-      contractAddress: this.wrapperContractAddress,
-      options: this.connectorOptions,
-      bungeeOptions: this.bungeeOptions,
+      leafId: "Testing-event-ethereum-leaf",
+      connectorOptions: this.connectorOptions,
+      claimFormats: [claimFormat],
       gas: 5000000,
-      claimFormat: claimFormat,
     };
 
+    this.log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
+  }
+
+  public async mintTokens(amount: string): Promise<void> {
+    const responseMint = await this.connector.invokeContract({
+      contract: {
+        contractName: this.erc20TokenContract,
+        keychainId: this.keychainPlugin1.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "mint",
+      params: [WHALE_ACCOUNT_ADDRESS, amount],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(responseMint).toBeTruthy();
+    expect(responseMint.success).toBeTruthy();
+    this.log.info("Minted 100 tokens to firstHighNetWorthAccount");
+  }
+
+  public async giveRoleToBridge(wrapperAddress: string): Promise<void> {
     const giveRoleRes = await this.connector.invokeContract({
       contract: {
         contractName: this.erc20TokenContract,
@@ -288,7 +319,7 @@ export class EthereumTestEnvironment {
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "giveRole",
-      params: [this.wrapperContractAddress],
+      params: [wrapperAddress],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
         secret: "",
@@ -299,25 +330,12 @@ export class EthereumTestEnvironment {
     expect(giveRoleRes).toBeTruthy();
     expect(giveRoleRes.success).toBeTruthy();
     this.log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
+  }
 
-    const responseMint = await this.connector.invokeContract({
-      contract: {
-        contractName: this.erc20TokenContract,
-        keychainId: this.keychainPlugin1.getKeychainId(),
-      },
-      invocationType: EthContractInvocationType.Send,
-      methodName: "mint",
-      params: [WHALE_ACCOUNT_ADDRESS, "100"],
-      web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    expect(responseMint).toBeTruthy();
-    expect(responseMint.success).toBeTruthy();
-    this.log.info("Minted 100 tokens to firstHighNetWorthAccount");
-
+  public async approveAmount(
+    wrapperAddress: string,
+    amount: string,
+  ): Promise<void> {
     const responseApprove = await this.connector.invokeContract({
       contract: {
         contractName: this.erc20TokenContract,
@@ -325,7 +343,7 @@ export class EthereumTestEnvironment {
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "approve",
-      params: [this.wrapperContractAddress, "100"],
+      params: [wrapperAddress, amount],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
         secret: "",
@@ -337,13 +355,43 @@ export class EthereumTestEnvironment {
     this.log.info("Approved 100 tokens to SATPWrapperContract");
   }
 
+  public async checkBalance(
+    contract_name: string,
+    contract_address: string,
+    contract_abi: any,
+    account: string,
+    amount: string,
+    signingCredential: Web3SigningCredential,
+  ): Promise<void> {
+    const responseBalanceBridge = await this.connector.invokeContract({
+      contract: {
+        contractJSON: {
+          contractName: contract_name,
+          abi: contract_abi,
+          bytecode: contract_abi.object,
+        },
+        contractAddress: contract_address,
+      },
+      invocationType: EthContractInvocationType.Call,
+      methodName: "checkBalance",
+      params: [account],
+      web3SigningCredential: signingCredential,
+    });
+
+    expect(responseBalanceBridge).toBeTruthy();
+    expect(responseBalanceBridge.success).toBeTruthy();
+    expect(responseBalanceBridge.callOutput.toString()).toBe(amount);
+  }
   // Gets the default asset configuration for testing
   public get defaultAsset(): Asset {
     return {
+      id: EthereumTestEnvironment.ETH_ASSET_ID,
+      referenceId: EthereumTestEnvironment.ETHREFERENCE_ID,
       owner: WHALE_ACCOUNT_ADDRESS,
-      ontology: JSON.stringify(BesuSATPInteraction),
       contractName: this.erc20TokenContract,
       contractAddress: this.assetContractAddress,
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.NonstandardFungible,
     };
   }
 

@@ -19,23 +19,31 @@ var _ MappedNullable = &TransactRequestSourceAsset{}
 
 // TransactRequestSourceAsset An asset
 type TransactRequestSourceAsset struct {
+	Id string `json:"id"`
 	Owner string `json:"owner"`
-	Ontology string `json:"ontology"`
 	ContractName string `json:"contractName"`
 	ContractAddress *string `json:"contractAddress,omitempty"`
 	MspId *string `json:"mspId,omitempty"`
 	ChannelName *string `json:"channelName,omitempty"`
+	Amount *string `json:"amount,omitempty"`
+	NetworkId TransactRequestSourceAssetNetworkId `json:"networkId"`
+	// The type of token.
+	TokenType string `json:"tokenType"`
+	ReferenceId string `json:"referenceId"`
 }
 
 // NewTransactRequestSourceAsset instantiates a new TransactRequestSourceAsset object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransactRequestSourceAsset(owner string, ontology string, contractName string) *TransactRequestSourceAsset {
+func NewTransactRequestSourceAsset(id string, owner string, contractName string, networkId TransactRequestSourceAssetNetworkId, tokenType string, referenceId string) *TransactRequestSourceAsset {
 	this := TransactRequestSourceAsset{}
+	this.Id = id
 	this.Owner = owner
-	this.Ontology = ontology
 	this.ContractName = contractName
+	this.NetworkId = networkId
+	this.TokenType = tokenType
+	this.ReferenceId = referenceId
 	return &this
 }
 
@@ -45,6 +53,30 @@ func NewTransactRequestSourceAsset(owner string, ontology string, contractName s
 func NewTransactRequestSourceAssetWithDefaults() *TransactRequestSourceAsset {
 	this := TransactRequestSourceAsset{}
 	return &this
+}
+
+// GetId returns the Id field value
+func (o *TransactRequestSourceAsset) GetId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value
+// and a boolean to check if the value has been set.
+func (o *TransactRequestSourceAsset) GetIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Id, true
+}
+
+// SetId sets field value
+func (o *TransactRequestSourceAsset) SetId(v string) {
+	o.Id = v
 }
 
 // GetOwner returns the Owner field value
@@ -69,30 +101,6 @@ func (o *TransactRequestSourceAsset) GetOwnerOk() (*string, bool) {
 // SetOwner sets field value
 func (o *TransactRequestSourceAsset) SetOwner(v string) {
 	o.Owner = v
-}
-
-// GetOntology returns the Ontology field value
-func (o *TransactRequestSourceAsset) GetOntology() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Ontology
-}
-
-// GetOntologyOk returns a tuple with the Ontology field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequestSourceAsset) GetOntologyOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Ontology, true
-}
-
-// SetOntology sets field value
-func (o *TransactRequestSourceAsset) SetOntology(v string) {
-	o.Ontology = v
 }
 
 // GetContractName returns the ContractName field value
@@ -215,6 +223,110 @@ func (o *TransactRequestSourceAsset) SetChannelName(v string) {
 	o.ChannelName = &v
 }
 
+// GetAmount returns the Amount field value if set, zero value otherwise.
+func (o *TransactRequestSourceAsset) GetAmount() string {
+	if o == nil || IsNil(o.Amount) {
+		var ret string
+		return ret
+	}
+	return *o.Amount
+}
+
+// GetAmountOk returns a tuple with the Amount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactRequestSourceAsset) GetAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.Amount) {
+		return nil, false
+	}
+	return o.Amount, true
+}
+
+// HasAmount returns a boolean if a field has been set.
+func (o *TransactRequestSourceAsset) HasAmount() bool {
+	if o != nil && !IsNil(o.Amount) {
+		return true
+	}
+
+	return false
+}
+
+// SetAmount gets a reference to the given string and assigns it to the Amount field.
+func (o *TransactRequestSourceAsset) SetAmount(v string) {
+	o.Amount = &v
+}
+
+// GetNetworkId returns the NetworkId field value
+func (o *TransactRequestSourceAsset) GetNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil {
+		var ret TransactRequestSourceAssetNetworkId
+		return ret
+	}
+
+	return o.NetworkId
+}
+
+// GetNetworkIdOk returns a tuple with the NetworkId field value
+// and a boolean to check if the value has been set.
+func (o *TransactRequestSourceAsset) GetNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.NetworkId, true
+}
+
+// SetNetworkId sets field value
+func (o *TransactRequestSourceAsset) SetNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.NetworkId = v
+}
+
+// GetTokenType returns the TokenType field value
+func (o *TransactRequestSourceAsset) GetTokenType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.TokenType
+}
+
+// GetTokenTypeOk returns a tuple with the TokenType field value
+// and a boolean to check if the value has been set.
+func (o *TransactRequestSourceAsset) GetTokenTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.TokenType, true
+}
+
+// SetTokenType sets field value
+func (o *TransactRequestSourceAsset) SetTokenType(v string) {
+	o.TokenType = v
+}
+
+// GetReferenceId returns the ReferenceId field value
+func (o *TransactRequestSourceAsset) GetReferenceId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.ReferenceId
+}
+
+// GetReferenceIdOk returns a tuple with the ReferenceId field value
+// and a boolean to check if the value has been set.
+func (o *TransactRequestSourceAsset) GetReferenceIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.ReferenceId, true
+}
+
+// SetReferenceId sets field value
+func (o *TransactRequestSourceAsset) SetReferenceId(v string) {
+	o.ReferenceId = v
+}
+
 func (o TransactRequestSourceAsset) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -225,8 +337,8 @@ func (o TransactRequestSourceAsset) MarshalJSON() ([]byte, error) {
 
 func (o TransactRequestSourceAsset) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["id"] = o.Id
 	toSerialize["owner"] = o.Owner
-	toSerialize["ontology"] = o.Ontology
 	toSerialize["contractName"] = o.ContractName
 	if !IsNil(o.ContractAddress) {
 		toSerialize["contractAddress"] = o.ContractAddress
@@ -237,6 +349,12 @@ func (o TransactRequestSourceAsset) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.ChannelName) {
 		toSerialize["channelName"] = o.ChannelName
 	}
+	if !IsNil(o.Amount) {
+		toSerialize["amount"] = o.Amount
+	}
+	toSerialize["networkId"] = o.NetworkId
+	toSerialize["tokenType"] = o.TokenType
+	toSerialize["referenceId"] = o.ReferenceId
 	return toSerialize, nil
 }
 

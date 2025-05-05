@@ -44,7 +44,10 @@ import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/ser
 import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import type { Client as ConnectClient } from "@connectrpc/connect";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  ClaimFormat,
+  MessageType,
+} from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { getMessageInSessionData } from "../../core/session-utils";
 import {
   TransferProposalRequest,
@@ -77,14 +80,15 @@ import {
   TransactError,
 } from "../../core/errors/satp-errors";
 import { getMessageTypeName } from "../../core/satp-utils";
-import { HealthCheckResponseStatusEnum } from "../../generated/gateway-client/typescript-axios";
+import {
+  HealthCheckResponseStatusEnum,
+  NetworkId,
+} from "../../generated/gateway-client/typescript-axios";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../database/repository/interfaces/repository";
 import { ISATPLoggerConfig, SATPLogger } from "../../logging";
-import { NetworkId } from "../network-identification/chainid-list";
-import { LedgerType } from "@hyperledger/cactus-core-api";
 import { MonitorService } from "../monitoring/monitor";
 
 export interface ISATPManagerOptions {
@@ -94,21 +98,20 @@ export interface ISATPManagerOptions {
   signer: JsObjectSigner;
   pubKey: string;
   connectedDLTs: NetworkId[];
-  bridgeManager: SATPCrossChainManager;
+  ccManager: SATPCrossChainManager;
   orchestrator: GatewayOrchestrator;
-  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
+  claimFormat?: ClaimFormat;
 }
 export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
   private readonly logger: Logger;
   private readonly instanceId: string;
   private status: HealthCheckResponseStatusEnum;
-  private endpoints: any[] | undefined;
+
   private signer: JsObjectSigner;
   public connectedDLTs: NetworkId[] = [];
-  private supportedDLTs: LedgerType[] = [];
   private sessions: Map<string, SATPSession>;
   // maps stage to client/service and service class
   private readonly satpServices: Map<
@@ -118,16 +121,17 @@ export class SATPManager {
   private readonly satpHandlers: Map<SATPHandlerType, SATPHandler> = new Map();
   private _pubKey: string;
 
-  private readonly bridgesManager: SATPCrossChainManager;
+  private readonly ccManager: SATPCrossChainManager;
 
   private readonly orchestrator: GatewayOrchestrator;
 
   private gatewaysPubKeys: Map<string, string> = new Map();
-  private defaultRepository: boolean;
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
   private readonly dbLogger: SATPLogger;
   private readonly monitorService: MonitorService;
+
+  private readonly claimFormat: ClaimFormat;
 
   constructor(public readonly options: ISATPManagerOptions) {
     const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
@@ -141,14 +145,13 @@ export class SATPManager {
     this.status = HealthCheckResponseStatusEnum.Available;
     this.connectedDLTs = options.connectedDLTs;
     this.signer = options.signer;
-    this.bridgesManager = options.bridgeManager;
-    this.supportedDLTs = this.bridgesManager.getSupportedDLTs();
+    this.ccManager = options.ccManager;
     this.orchestrator = options.orchestrator;
     this._pubKey = options.pubKey;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
-    this.defaultRepository = options.defaultRepository;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
+    this.claimFormat = options.claimFormat || ClaimFormat.DEFAULT;
 
     this.sessions = options.sessions || new Map<string, SATPSession>();
     const handlersClasses = [
@@ -159,7 +162,6 @@ export class SATPManager {
     ];
 
     const satpLoggerConfig: ISATPLoggerConfig = {
-      defaultRepository: this.defaultRepository,
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
       signer: this.signer,
@@ -190,6 +192,7 @@ export class SATPManager {
       serviceClasses,
       level,
       label,
+      this.claimFormat,
     );
     this.initializeServices(serviceClasses, serviceOptions);
 
@@ -206,6 +209,10 @@ export class SATPManager {
     this.initializeHandlers(handlersClasses, handlersOptions);
 
     this.orchestrator.addHandlers(this.satpHandlers);
+
+    this.orchestrator.addBridgeManager(
+      this.ccManager.getClientBridgeManagerInterface(),
+    );
   }
   private async initializeMonitorService(): Promise<void> {
     const fnTag = `${this.className}#initializeMonitorService()`;
@@ -229,10 +236,6 @@ export class SATPManager {
 
   public getMonitorService(): MonitorService {
     return this.monitorService;
-  }
-
-  public getSupportedDLTs(): LedgerType[] {
-    return this.supportedDLTs;
   }
 
   public getServiceByStage(
@@ -366,6 +369,7 @@ export class SATPManager {
     serviceClasses: SATPServiceInstance[],
     logLevel: LogLevelDesc,
     label: string,
+    claimFormat: ClaimFormat,
   ): ISATPServiceOptions[] {
     const fnTag = `${SATPManager.CLASS_NAME}#initializeServiceOptions()`;
     this.logger.info(`${fnTag}, Initializing services options...`);
@@ -379,8 +383,9 @@ export class SATPManager {
       // we can pass whatever name we wish; in this case we are using the internal service name
       serviceType: serviceClass.SERVICE_TYPE,
       serviceName: serviceClass.SATP_SERVICE_INTERNAL_NAME,
-      bridgeManager: this.bridgesManager,
+      bridgeManager: this.ccManager.getClientBridgeManagerInterface(),
       dbLogger: this.dbLogger,
+      claimFormat: claimFormat,
     }));
   }
 
@@ -446,7 +451,7 @@ export class SATPManager {
           sessions: this.sessions,
           serverService: serverService,
           clientService: clientService,
-          connectedDLTs: this.connectedDLTs,
+          bridgeClient: this.ccManager.getClientBridgeManagerInterface(),
           pubkeys: this.gatewaysPubKeys,
           gatewayId: this.orchestrator.ourGateway.id,
           stage: serviceIndex,
@@ -522,11 +527,6 @@ export class SATPManager {
       }
 
       const clientSessionData = session.getClientSessionData();
-      const bridge = this.bridgesManager.getBridge(
-        clientSessionData.senderGatewayNetworkId,
-      );
-      clientSessionData.senderGatewayNetworkType =
-        bridge.getNetworkType() as string;
       const clientSessionDataJson = safeStableStringify(clientSessionData);
       this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
 
@@ -535,8 +535,13 @@ export class SATPManager {
       }
 
       //maybe get a suitable gateway first.
+
+      if (!clientSessionData.receiverAsset?.networkId?.id) {
+        throw new Error(`${fnTag}, Receiver asset network ID not found`);
+      }
+
       const channel = this.orchestrator.getChannel(
-        clientSessionData.recipientGatewayNetworkId,
+        clientSessionData.receiverAsset?.networkId?.id,
       );
 
       if (!channel) {

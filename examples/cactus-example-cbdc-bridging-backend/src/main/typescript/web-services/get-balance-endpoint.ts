@@ -81,13 +81,13 @@ export class GetBalanceEndpointV1 implements IWebServiceEndpoint {
         (req.query.chain as string) ==
         TransactRequestSourceChainAssetTypeEnum.Besu
       ) {
-        result = await this.options.infrastructure.getBesuBalance(
-          req.query.user as string,
-        );
+        result = await this.options.infrastructure
+          .getBesuEnvironment()
+          .getBesuBalance(req.query.user as string);
       } else {
-        result = await this.options.infrastructure.getFabricBalance(
-          req.query.user as string,
-        );
+        result = await this.options.infrastructure
+          .getFabricEnvironment()
+          .getFabricBalance(req.query.user as string);
       }
       res.status(200).json({
         amount: result,

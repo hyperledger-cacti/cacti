@@ -234,4 +234,18 @@ export class SATPContract
     }
     return true;
   }
+
+  @Transaction(false)
+  @Returns("string")
+  /**
+   * Retrieves the ID of the submitting client identity. This is necessary because fabric do not has an universal address.
+   *
+   * @param {Context} ctx - The transaction context.
+   * @returns {Promise<string>} A promise that resolves to the client account ID.
+   */
+  async ClientAccountID(ctx: Context): Promise<string> {
+    // Get ID of submitting client identity
+    const clientAccountID: string = ctx.clientIdentity.getID();
+    return clientAccountID;
+  }
 }

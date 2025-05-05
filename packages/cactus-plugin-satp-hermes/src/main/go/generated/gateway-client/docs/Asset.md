@@ -4,18 +4,22 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Id** | **string** |  | 
 **Owner** | **string** |  | 
-**Ontology** | **string** |  | 
 **ContractName** | **string** |  | 
 **ContractAddress** | Pointer to **string** |  | [optional] 
 **MspId** | Pointer to **string** |  | [optional] 
 **ChannelName** | Pointer to **string** |  | [optional] 
+**Amount** | Pointer to **string** |  | [optional] 
+**NetworkId** | [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | 
+**TokenType** | **string** | The type of token. | 
+**ReferenceId** | **string** |  | 
 
 ## Methods
 
 ### NewAsset
 
-`func NewAsset(owner string, ontology string, contractName string, ) *Asset`
+`func NewAsset(id string, owner string, contractName string, networkId TransactRequestSourceAssetNetworkId, tokenType string, referenceId string, ) *Asset`
 
 NewAsset instantiates a new Asset object
 This constructor will assign default values to properties that have it defined,
@@ -29,6 +33,26 @@ will change when the set of required properties is changed
 NewAssetWithDefaults instantiates a new Asset object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetId
+
+`func (o *Asset) GetId() string`
+
+GetId returns the Id field if non-nil, zero value otherwise.
+
+### GetIdOk
+
+`func (o *Asset) GetIdOk() (*string, bool)`
+
+GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetId
+
+`func (o *Asset) SetId(v string)`
+
+SetId sets Id field to given value.
+
 
 ### GetOwner
 
@@ -48,26 +72,6 @@ and a boolean to check if the value has been set.
 `func (o *Asset) SetOwner(v string)`
 
 SetOwner sets Owner field to given value.
-
-
-### GetOntology
-
-`func (o *Asset) GetOntology() string`
-
-GetOntology returns the Ontology field if non-nil, zero value otherwise.
-
-### GetOntologyOk
-
-`func (o *Asset) GetOntologyOk() (*string, bool)`
-
-GetOntologyOk returns a tuple with the Ontology field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetOntology
-
-`func (o *Asset) SetOntology(v string)`
-
-SetOntology sets Ontology field to given value.
 
 
 ### GetContractName
@@ -164,6 +168,91 @@ SetChannelName sets ChannelName field to given value.
 `func (o *Asset) HasChannelName() bool`
 
 HasChannelName returns a boolean if a field has been set.
+
+### GetAmount
+
+`func (o *Asset) GetAmount() string`
+
+GetAmount returns the Amount field if non-nil, zero value otherwise.
+
+### GetAmountOk
+
+`func (o *Asset) GetAmountOk() (*string, bool)`
+
+GetAmountOk returns a tuple with the Amount field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAmount
+
+`func (o *Asset) SetAmount(v string)`
+
+SetAmount sets Amount field to given value.
+
+### HasAmount
+
+`func (o *Asset) HasAmount() bool`
+
+HasAmount returns a boolean if a field has been set.
+
+### GetNetworkId
+
+`func (o *Asset) GetNetworkId() TransactRequestSourceAssetNetworkId`
+
+GetNetworkId returns the NetworkId field if non-nil, zero value otherwise.
+
+### GetNetworkIdOk
+
+`func (o *Asset) GetNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
+
+GetNetworkIdOk returns a tuple with the NetworkId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetNetworkId
+
+`func (o *Asset) SetNetworkId(v TransactRequestSourceAssetNetworkId)`
+
+SetNetworkId sets NetworkId field to given value.
+
+
+### GetTokenType
+
+`func (o *Asset) GetTokenType() string`
+
+GetTokenType returns the TokenType field if non-nil, zero value otherwise.
+
+### GetTokenTypeOk
+
+`func (o *Asset) GetTokenTypeOk() (*string, bool)`
+
+GetTokenTypeOk returns a tuple with the TokenType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTokenType
+
+`func (o *Asset) SetTokenType(v string)`
+
+SetTokenType sets TokenType field to given value.
+
+
+### GetReferenceId
+
+`func (o *Asset) GetReferenceId() string`
+
+GetReferenceId returns the ReferenceId field if non-nil, zero value otherwise.
+
+### GetReferenceIdOk
+
+`func (o *Asset) GetReferenceIdOk() (*string, bool)`
+
+GetReferenceIdOk returns a tuple with the ReferenceId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetReferenceId
+
+`func (o *Asset) SetReferenceId(v string)`
+
+SetReferenceId sets ReferenceId field to given value.
+
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

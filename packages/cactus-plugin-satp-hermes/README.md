@@ -6,15 +6,8 @@ The package provides `Hyperledger Cacti` a way to standardize cross-chain transa
 - This package implements [Hermes as defined in the paper](https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337), namely the gateway paradigm and crash recovery.
 
 At the moment, we assume a crash-fault environment under some assumptions detailed in section [Assumptions](#assumptions)
-## Summary
 
-  - [Assumptions](#assumptions)
-  - [Getting Started](#getting-started)
-  - [Architecture](#architecture)
-  - [Use Case](#use-case)
-  - [Running the tests](#running-the-tests)
-  - [Usage](#usage)
-
+## Table of Contents
 
 ## Assumptions
 Regarding the crash recovery procedure in place, at the moment we only support crashes of gateways under certain assumptions detailed as follows:
@@ -136,58 +129,146 @@ These features enhance reliability in scenarios where network or gateway disrupt
 
 - **Single-Gateway Topology Enhancement**  
   The crash recovery and rollback mechanisms are implemented for configurations where client and server data are handled separately. For single-gateway setups, where both client and server data coexist in session, the current implementation of fetching a single log may not suffice. This requires to fetch multiple logs (X logs) `recoverSessions()` to differentiate and handle client and server-specific data accurately, to reconstruct the session back after the crash.
-
-## Running the tests
-### **Unit**
-- #### **SATP Services***
-  - [SATP services test](./src/test/typescript/unit/services.test.ts)
-- #### **Gateway**
-  - [Gateway runner instantiation test](./src/test/typescript/unit/SATPGatewayRunner-instantiation.test.ts)
-- #### **Crash Management**
-  - [Crash detection using cron jobs](./src/test/typescript/unit/crash-management/cron-job.test.ts)
-  - [Rollback services test](./src/test/typescript/unit/crash-management/rollback-factory.test.ts)
-  - [Crash scenarios test](./src/test/typescript/unit/crash-management/scenarios.test.ts)
-
-### **Integration**
-- #### **End-to-End**
-  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer](./src/test/typescript/integration/satp-e2e-transfer-1-gateway.test.ts)
-  - [End-to-end testing of a single SATP Gateways realizing a cross-chain tranfer utilizing the Hyperledger Cacti Api Server](./src/test/typescript/integration/satp-e2e-transfer-1-gateway-with-api-server.test.ts)
-  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer - Docker](./src/test/typescript/integration/satp-e2e-transfer-1-gateways-dockerization.test.ts)
-  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer with Bungee Proofs](./src/test/typescript/integration/satp-e2e-transfer-1-gateway-with-bungee.test.ts)
-  - [End-to-end testing of two SATP Gateways realizing a cross-chain tranfer](./src/test/typescript/integration/satp-e2e-transfer-2-gateway.test.ts)
-  - [End-to-end testing of two SATP Gateways realizing a cross-chain tranfer, gateway create their OAPI server](./src/test/typescript/integration/satp-e2e-transfer-2-gateways-openapi.test.ts)
-  - [End-to-end testing of two SATP Gateways realizing a cross-chain tranfer utilizing the Hyperledger Cacti Api Server](./src/test/typescript/integration/satp-e2e-transfer-2-gateway-with-api-server.test.ts)
-  - [End-to-end testing of a single SATP Gateway realizing a cross-chain tranfer - Docker](./src/test/typescript/integration/satp-e2e-transfer-2-gateways-dockerization.test.ts)
-- #### **Bridge**
-  - [Besu Bridge Test](./src/test/typescript/integration/bridge/besu-bridge.test.ts)
-  - [Fabric Bridge Test](./src/test/typescript/integration/bridge/fabric-bridge.test.ts)
-  - [Ethereum Bridge Test](./src/test/typescript/integration/bridge/ethereum-bridge.test.ts)
-- #### **Crash Recovery**
-  - [Stage 1 recovery test](./src/test/typescript/integration/recovery/recovery-stage-1.test.ts)
-  - [Stage 2 recovery test](./src/test/typescript/integration/recovery/recovery-stage-2.test.ts)
-  - [Stage 3 recovery test](./src/test/typescript/integration/recovery/recovery-stage-3.test.ts)
-  - [Stage 0 rollback test](./src/test/typescript/integration/rollback/rollback-stage-0.test.ts)
-  - [Stage 1 rollback test](./src/test/typescript/integration/rollback/rollback-stage-1.test.ts)
-  - [Stage 2 rollback test](./src/test/typescript/integration/rollback/rollback-stage-2.test.ts)
-  - [Stage 3 rollback test](./src/test/typescript/integration/rollback/rollback-stage-3.test.ts)
-- #### **Business Logic Orchestrator**
-  - [Blo OAPI test](./src/test/typescript/integration/gateway-blo.test.ts)
-- #### **Gateway**
-  - [Gateway Startup Test](./src/test/typescript/integration/gateway-init-startup.test.ts)
-
   
-## Usage
+## Example of a Gateway Configuration
 
-Let us consider two gateways. The client gateway connected to Hyperledger Fabric and the server gateway connected to Hyperledger Besu. Let us also consider:
+```typescript
+const gatewayConfig: {
+  gid: {
+    id: "gatewayId",
+    name: "GatewayWithBesuConnection",
+    version: [
+      {
+        "Core": "v02",
+        "Architecture": "v02",
+        "Crash": "v02"
+      }
+    ],
+    proofID: "mockProofID10",
+    address: "http://gateway1.satp-hermes" // The address of the gateway
+  },
+  logLevel: "TRACE",
+  counterPartyGateways: [],
+  localRepository: localDbKnexConfig,
+  remoteRepository: remoteDbKnexConfig,
+  environment: "development" || "production", // The environment in which the gateway is running
+  ccConfig: { // The configuration of the cross-chain connections
+    bridgeConfig: [ leafConfig... ],  // The configuration of the cross-chain connections
+  },
+  enableCrashRecovery: true || false, // Enable or disable crash recovery
+  ontologyPath: "/opt/cacti/satp-hermes/ontologies" // The path to the ontology files
+}
 
-  - A Hyperledger Fabric API client on URL: http://localhost:8045
-  - A Hyperledger Besu API client on URL: http://localhost:8046
-  - An IPFS API client on URL: http://localhost:8047
-  - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/test/typescript/knex.config.ts)
+```
 
+### Bridge Configuration
 
-Note that these gateways are extensions of the [default SATP Gateway class](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/main/typescript/gateway/plugin-satp-gateway.ts), that implements the gateway functionality. Each of these extensions implements ledger-specific operations.
-
+#### Fabric Configuration Example:
+```typescript
+const leafConfig = {
+  networkIdentification: {
+    id: "FabricLedgerTestNetwork",        // Unique identifier for the network
+    ledgerType: "FABRIC_2"                // Ledger type constant for Fabric v2
+  },
+  userIdentity: {
+    credentials: {
+      certificate: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
+      privateKey: "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+    },
+    mspId: "Org2MSP",                      // Membership Service Provider ID
+    type: "X.509"                          // Credential type; typically X.509 for Fabric
+  },
+  channelName: "mychannel",                // Fabric channel name
+  targetOrganizations: [
+    {
+      CORE_PEER_TLS_ENABLED: "true",
+      CORE_PEER_LOCALMSPID: "Org1MSP",
+      CORE_PEER_TLS_CERT_FILE: "/path/to/tls/server.crt",
+      ...
+      ORDERER_TLS_ROOTCERT_FILE: "/path/to/orderer/tls/ca.crt"
+    },
+    // ... (repeat as needed for other organizations)
+  ],
+  caFile: "/path/to/orderer/tls/ca.crt",      // Path to Certificate Authority root cert
+  ccSequence: 1,                              // Chaincode sequence/version number
+  orderer: "orderer.example.com:7050",        // Orderer endpoint
+  ordererTLSHostnameOverride: "orderer.example.com",
+  connTimeout: 60,                            // Connection timeout in seconds
+  mspId: "Org2MSP",
+  connectorOptions: {
+    dockerBinary: "/usr/local/bin/docker",    // Path to Docker binary (for CLI interaction)
+    peerBinary: "/fabric-samples/bin/peer",   // Path to peer binary
+    goBinary: "/usr/local/go/bin/go",         // Path to Go binary
+    cliContainerEnv: { ... },                 // Environment variables for CLI peer container
+    sshConfig: {                              // SSH access details (if interacting over SSH)
+      host: "172.20.0.6",
+      privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\n...\n-----END OPENSSH PRIVATE KEY-----\n",
+      username: "root",
+      port: 22
+    },
+    connectionProfile: { ... },               // Hyperledger Fabric connection profile object
+    discoveryOptions: {
+      enabled: true,
+      asLocalhost: false
+    },
+    eventHandlerOptions: {
+      strategy: "NETWORK_SCOPE_ALLFORTX",
+      commitTimeout: 300
+    }
+  },
+  wrapperContractName: "exampleWrapperContractName", // Only used if the contract was already deployed, in fabric the name identifies the contract
+  claimFormats: [1]                           // Claim format identifiers (application-specific)
+}
+```
+#### Besu Configuration Example:
+```typescript
+const leafConfig = {
+  networkIdentification: {
+    id: "BesuLedgerTestNetwork",              // Unique identifier for the network
+    ledgerType: "BESU_2X"                     // Ledger type constant for Besu 2.x
+  },
+  signingCredential: {
+    ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",           // Ethereum account address
+    secret: "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986", // Private key in hex
+    type: "PRIVATE_KEY_HEX"
+  },
+  gas: 999999999999999,                       // Default gas limit for transactions
+  connectorOptions: {
+    rpcApiHttpHost: "http://172.20.0.6:8545", // Besu JSON-RPC HTTP endpoint
+    rpcApiWsHost: "ws://172.20.0.6:8546"      // Besu JSON-RPC WebSocket endpoint
+  },
+  wrapperContractName: "exampleWrapperContractName", // Used if we want to use a costum name, if not given it will be provided by the leaf
+  wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Only used if the contract was already deployed
+  claimFormats: [1]                           // Claim format identifiers (application-specific)
+}
+```
+#### Ethereum Configuration Example:
+```typescript
+const leafConfig = {
+  networkIdentification: {
+    id: "EthereumLedgerTestNetwork",          // Unique identifier for the network
+    ledgerType: "ETHEREUM"                    // Ledger type constant for Ethereum
+  },
+  signingCredential: {
+    ethAccount: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Ethereum account address
+    secret: "test",                                // Key store password or secret
+    type: "GETH_KEYCHAIN_PASSWORD"                 // Credential type for geth keychain
+  },
+  gas: 5000000,                                   // Default gas limit for transactions
+  connectorOptions: {
+    rpcApiHttpHost: "http://172.20.0.7:8545",     // Ethereum JSON-RPC HTTP endpoint
+    rpcApiWsHost: "ws://172.20.0.7:8546"          // Ethereum JSON-RPC WebSocket endpoint
+  },
+  wrapperContractName: "exampleWrapperContractName", // Used if we want to use a costum name, if not given it will be provided by the leaf
+  wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Only used if the contract was already deployed
+  claimFormats: [1]                               // Claim format identifiers (application-specific)
+}
+```
+#### Notes:
+- **Field values:** Replace placeholders (such as file paths, endpoint addresses, credentials, etc.) with values appropriate for your environment.
+- **Security**: Credentials and secret material (certificates, private keys, etc.) must be handled securely, never checked into version control, and managed via secure secrets management.
+- **claimFormats**: The claimFormats array may be customized according to the consuming application's expectations.
+- For detailed schema and supported options, refer to your platform's documentation for each supported ledger.
 ## Containerization
 
 ### Building the container image locally

@@ -13,17 +13,16 @@ import type { SATPSession } from "../satp-session";
 import type { ILocalLogRepository } from "../../database/repository/interfaces/repository";
 import type { JsObjectSigner, Logger } from "@hyperledger/cactus-common";
 import { RollbackStrategyFactory } from "./rollback/rollback-strategy-factory";
-import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign, verifySignature } from "../../gateway-utils";
 import { SignatureVerificationError } from "../errors/satp-service-errors";
-import { Type } from "../../generated/proto/cacti/satp/v02/session/session_pb";
+import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
+import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 
 export class CrashRecoveryServerService {
   constructor(
-    private readonly bridgesManager: SATPCrossChainManager,
-    private readonly defaultRepository: boolean,
+    private readonly bridgesManager: BridgeManagerClientInterface,
     private readonly logRepository: ILocalLogRepository,
     private readonly sessions: Map<string, SATPSession>,
     private readonly signer: JsObjectSigner,
@@ -53,10 +52,6 @@ export class CrashRecoveryServerService {
 
       if (!verifySignature(this.signer, req, sessionData.serverGatewayPubkey)) {
         throw new SignatureVerificationError(fnTag);
-      }
-
-      if (this.defaultRepository && !this.logRepository.getCreated()) {
-        this.logRepository.createKnex();
       }
 
       const recoveredLogs = await this.logRepository.fetchLogsFromSequence(

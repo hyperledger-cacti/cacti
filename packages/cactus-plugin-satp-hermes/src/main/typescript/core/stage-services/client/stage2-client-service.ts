@@ -1,5 +1,6 @@
 import { TransferCommenceResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import {
+  ClaimFormat,
   CommonSatpSchema,
   LockAssertionClaimFormatSchema,
   LockAssertionClaimSchema,
@@ -25,7 +26,6 @@ import {
   SATPServiceType,
 } from "../satp-service";
 import { ISATPServiceOptions } from "../satp-service";
-import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
   LockAssertionExpirationError,
@@ -34,16 +34,25 @@ import {
   LockAssertionClaimFormatError,
   SessionError,
   TokenIdMissingError,
+  LedgerAssetError,
+  AmountMissingError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import { create } from "@bufbuild/protobuf";
+import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
+import { protoToAsset } from "../service-utils";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { NetworkId } from "../../../public-api";
 
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
-  private bridgeManager: SATPCrossChainManager;
+  private bridgeManager: BridgeManagerClientInterface;
+
+  private claimFormat: ClaimFormat;
 
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
@@ -62,6 +71,8 @@ export class Stage2ClientService extends SATPService {
         `${this.getServiceIdentifier()}#constructor`,
       );
     }
+
+    this.claimFormat = ops.claimFormat || ClaimFormat.DEFAULT;
     this.bridgeManager = ops.bridgeManager;
   }
 
@@ -259,36 +270,51 @@ export class Stage2ClientService extends SATPService {
       const assetId = sessionData.senderAsset?.tokenId;
       const amount = sessionData.senderAsset?.amount;
 
-      this.Log.debug(`${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`);
+      if (sessionData.senderAsset == undefined) {
+        throw new LedgerAssetError(fnTag);
+      }
 
-      if (assetId == undefined) {
+      const networkId = {
+        id: sessionData.senderAsset.networkId?.id,
+        ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
+      } as NetworkId;
+
+      const token: FungibleAsset = protoToAsset(
+        sessionData.senderAsset,
+        networkId,
+      ) as FungibleAsset;
+
+      if (token.id == undefined) {
         throw new TokenIdMissingError(fnTag);
       }
 
-      if (amount == undefined) {
-        throw new Error(`${fnTag}, Amount is missing`);
+      if (token.amount == undefined) {
+        throw new AmountMissingError(fnTag);
       }
 
-      const bridge = this.bridgeManager.getBridge(
-        sessionData.senderGatewayNetworkId,
+      this.Log.debug(`${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`);
+
+      const bridge = this.bridgeManager.getSATPExecutionLayer(
+        networkId,
+        this.claimFormat,
       );
 
       sessionData.lockAssertionClaim = create(LockAssertionClaimSchema, {});
-      sessionData.lockAssertionClaim.receipt = await bridge.lockAsset(
-        assetId,
-        Number(amount),
-      );
+
+      const res = await bridge.lockAsset(token);
+
+      sessionData.lockAssertionClaim.receipt = res.receipt;
 
       this.Log.debug(
         `${fnTag}, Lock Operation Receipt: ${sessionData.lockAssertionClaim.receipt}`,
       );
 
-      sessionData.lockAssertionClaim.proof = await bridge.getProof(assetId);
+      sessionData.lockAssertionClaim.proof = res.proof;
 
       sessionData.lockAssertionClaimFormat = create(
         LockAssertionClaimFormatSchema,
         {
-          format: bridge.getReceiptFormat(),
+          format: this.claimFormat,
         },
       );
 

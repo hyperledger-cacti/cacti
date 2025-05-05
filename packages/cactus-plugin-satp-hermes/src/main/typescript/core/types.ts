@@ -1,19 +1,12 @@
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { ValidatorOptions } from "class-validator";
 import { BLODispatcher } from "../api1/dispatcher";
-import { ISignerKeyPairs } from "@hyperledger/cactus-common/dist/lib/main/typescript/signer-key-pairs";
 import { SATPSession } from "./satp-session";
 import { ConnectRouter } from "@connectrpc/connect";
 import { SATPGateway } from "../plugin-satp-hermes-gateway";
 import { SATPService } from "../types/satp-protocol";
 import { Client as ConnectClient } from "@connectrpc/connect";
-import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
-import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import { SATPServiceInstance } from "./stage-services/satp-service";
-import { NetworkConfig } from "../types/blockchain-interaction";
-import { Knex } from "knex";
-import { NetworkId } from "../services/network-identification/chainid-list";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { NetworkId } from "../public-api";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,
@@ -57,31 +50,14 @@ export type GatewayIdentity = {
   pubKey?: string;
   name?: string;
   version: DraftVersions[];
-  connectedDLTs: NetworkId[];
-  supportedDLTs?: LedgerType[];
+  connectedDLTs?: NetworkId[];
   proofID?: string;
   gatewayServerPort?: number;
   gatewayClientPort?: number;
-  gatewayOpenAPIPort?: number;
+  gatewayOapiPort?: number;
   gatewayUIPort?: number;
   address?: Address;
 };
-
-export interface SATPGatewayConfig {
-  gid?: GatewayIdentity;
-  counterPartyGateways?: GatewayIdentity[];
-  logLevel?: LogLevelDesc;
-  keyPair?: ISignerKeyPairs;
-  environment?: "development" | "production";
-  enableOpenAPI?: boolean;
-  validationOptions?: ValidatorOptions;
-  privacyPolicies?: IPrivacyPolicyValue[];
-  mergePolicies?: IMergePolicyValue[];
-  bridgesConfig?: NetworkConfig[];
-  knexLocalConfig?: Knex.Config;
-  knexRemoteConfig?: Knex.Config;
-  enableCrashRecovery?: boolean;
-}
 
 export type Immutable<T> = {
   readonly [K in keyof T]: Immutable<T[K]>;

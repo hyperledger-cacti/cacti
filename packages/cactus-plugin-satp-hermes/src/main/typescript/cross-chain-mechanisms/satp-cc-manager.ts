@@ -1,115 +1,133 @@
 import {
+  LoggerProvider,
   type LogLevelDesc,
   type Logger,
-  LoggerProvider,
 } from "@hyperledger/cactus-common";
-import { BesuBridge } from "./satp-bridge/besu-bridge";
-import { FabricBridge } from "./satp-bridge/fabric-bridge";
-import type { NetworkBridge } from "./satp-bridge/network-bridge";
-import { SATPBridgeManager } from "./satp-bridge/satp-bridge-manager";
-import type { SATPBridgeConfig } from "./satp-bridge/types/interact";
-import type {
-  FabricConfig,
-  BesuConfig,
-  NetworkConfig,
-  EthereumConfig,
-} from "../types/blockchain-interaction";
-import type { ValidatorOptions } from "class-validator";
-import { EthereumBridge } from "./satp-bridge/ethereum-bridge";
-import type { NetworkId } from "../services/network-identification/chainid-list";
-import { LedgerType } from "@hyperledger/cactus-core-api";
-
-export const DEFAULT_SUPPORTED_LEDGERS: LedgerType[] = [
-  //add supported ledgers as new bridges are implemented
-  LedgerType.Ethereum,
-  LedgerType.Fabric2,
-  LedgerType.Besu2X,
-  LedgerType.Besu1X,
-];
-export interface ISATPBridgesOptions {
+import { BridgeManager } from "./bridge/bridge-manager";
+import { BridgeManagerClientInterface } from "./bridge/interfaces/bridge-manager-client-interface";
+import { IOntologyManagerOptions } from "./bridge/ontology/ontology-manager";
+import { INetworkOptions } from "./bridge/bridge-types";
+import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
+export interface ISATPCrossChainManagerOptions {
+  orquestrator: GatewayOrchestrator;
   logLevel?: LogLevelDesc;
-  networks: NetworkConfig[];
-  validationOptions?: ValidatorOptions;
-  connectedDLTs: NetworkId[];
-  supportedDLTs?: LedgerType[];
+  ontologyOptions?: IOntologyManagerOptions;
+}
+
+export interface ICrossChainMechanismsOptions {
+  bridgeConfig: INetworkOptions[];
 }
 
 // TODO extend to accomodate oracle
 // does specific on-chain operations by calling bridge manager or oracle manager
+
+/**
+ * The `ISATPCCManager` class is responsible for managing cross-chain mechanisms
+ * within the SATP (Secure Asset Transfer Protocol) framework. It provides methods
+ * to deploy cross-chain mechanisms and bridges based on the provided configuration.
+ */
 export class SATPCrossChainManager {
-  static CLASS_NAME = "SATPCrossChainManager";
-  private supportedDLTs: LedgerType[];
-  bridges: Map<string, SATPBridgeManager> = new Map<
-    string,
-    SATPBridgeManager
-  >();
+  /**
+   * The class name for logging purposes.
+   */
+  public static readonly CLASS_NAME = "SATPCrossChainManager";
 
-  log: Logger;
+  /**
+   * Logger instance for logging messages.
+   */
+  private readonly log: Logger;
 
-  level: LogLevelDesc | undefined;
+  /**
+   * Log level for the logger.
+   */
+  private readonly logLevel: LogLevelDesc;
 
-  constructor(private config: ISATPBridgesOptions) {
-    this.log = LoggerProvider.getOrCreate({
-      level: config.logLevel,
-      label: SATPCrossChainManager.CLASS_NAME,
+  /**
+   * Instance of the BridgeManager to handle bridge-related operations.
+   */
+  private readonly bridgeManager: BridgeManager;
+
+  /**
+   * Instance of the GatewayOrchestrator to handle gateway-related operations.
+   */
+  private readonly gatewayOrchestrator: GatewayOrchestrator;
+
+  /**
+   * Constructs an instance of `ISATPCCManager`.
+   *
+   * @param options - The options for configuring the `ISATPCCManager`.
+   */
+  constructor(private options: ISATPCrossChainManagerOptions) {
+    const label = SATPCrossChainManager.CLASS_NAME;
+    this.logLevel = this.options.logLevel || "INFO";
+    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+
+    this.bridgeManager = new BridgeManager({
+      ontologyOptions: options.ontologyOptions,
+      logLevel: this.logLevel,
     });
 
-    this.level = this.config.logLevel;
-    if (this.config.supportedDLTs) {
-      this.supportedDLTs = this.config.supportedDLTs;
-    } else {
-      this.supportedDLTs = DEFAULT_SUPPORTED_LEDGERS;
+    this.gatewayOrchestrator = options.orquestrator;
+    //TODO create here oracle manager
+  }
+
+  /**
+   * Deploys cross-chain mechanisms based on the provided bridge configurations.
+   *
+   * @param bridgesConfig - An array of bridge configuration options.
+   * @returns A promise that resolves when the deployment is complete.
+   */
+  public async deployCCMechanisms(
+    config: ICrossChainMechanismsOptions,
+  ): Promise<void> {
+    const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployCCMechanisms()`;
+    this.log.debug(`${fnTag}, Deploying Cross Chain Mechanisms...`);
+
+    await this.deployBridgeFromConfig(config.bridgeConfig);
+    //TODO deploy oracle
+  }
+
+  /**
+   * Deploys bridges based on the provided configuration.
+   *
+   * @param bridgesConfig - An array of bridge configuration options.
+   * @returns A promise that resolves when the deployment is complete.
+   */
+  public async deployBridgeFromConfig(bridgesNetworkConfig: INetworkOptions[]) {
+    const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployBridgeFromConfig()`;
+    this.log.debug(`${fnTag}, Deploying Bridge...`);
+
+    //const deploymentPromises = [];
+    for (const config of bridgesNetworkConfig) {
+      //deploymentPromises.push(this.bridgeManager.deployLeaf(config));
+      await this.bridgeManager.deployLeaf(config);
     }
-    this.log.debug(`Creating ${SATPCrossChainManager.CLASS_NAME}...`);
-    config.networks.map((bridgeConfig) => {
-      this.addBridgeFromConfig(bridgeConfig);
-    });
-  }
+    //await Promise.all(deploymentPromises);
 
-  public getBridge(network: string): SATPBridgeManager {
-    if (!this.bridges.has(network)) {
-      throw new Error(`Bridge for network ${network} not found`);
+    const networkIds = [];
+    for (const config of bridgesNetworkConfig) {
+      networkIds.push({ ...config.networkIdentification });
     }
-    return this.bridges.get(network) as SATPBridgeManager;
+    this.gatewayOrchestrator.addGatewayOwnChannels(networkIds);
   }
 
-  public getSupportedDLTs(): LedgerType[] {
-    return this.supportedDLTs;
-  }
-
-  public getBridgesList(): string[] {
-    return Array.from(this.bridges.keys());
-  }
-
-  public addBridgeFromConfig(networkConfig: NetworkConfig) {
-    let bridge: NetworkBridge;
-    switch (networkConfig.network.ledgerType) {
-      case LedgerType.Fabric2:
-        bridge = new FabricBridge(networkConfig as FabricConfig, this.level);
-        break;
-      case LedgerType.Besu2X:
-        bridge = new BesuBridge(networkConfig as BesuConfig, this.level);
-        break;
-      case LedgerType.Besu1X:
-        bridge = new BesuBridge(networkConfig as BesuConfig, this.level);
-        break;
-      case LedgerType.Ethereum:
-        bridge = new EthereumBridge(networkConfig as EthereumConfig);
-        break;
-      default:
-        throw new Error(
-          `Unsupported network technology: ${networkConfig.network.ledgerType}`,
-        );
-    }
-    const config: SATPBridgeConfig = {
-      network: bridge,
-      logLevel: this.level,
-    };
-    const satp = new SATPBridgeManager(config);
-    this.bridges.set(networkConfig.network.id, satp);
-  }
-
-  public addBridge(network: string, bridge: SATPBridgeManager): void {
-    this.bridges.set(network, bridge);
+  /**
+   * Retrieves the Bridge Manager Client Interface.
+   *
+   * @returns {BridgeManagerClientInterface} The interface for the bridge manager client.
+   *
+   * @remarks
+   * This method logs the action of getting the Bridge Manager Interface and then returns the
+   * `bridgeManager` instance.
+   *
+   * @example
+   * ```typescript
+   * const bridgeManagerClient = satpCrossChainManager.getClientBridgeManagerInterface();
+   * ```
+   */
+  public getClientBridgeManagerInterface(): BridgeManagerClientInterface {
+    const fnTag = `${SATPCrossChainManager.CLASS_NAME}#getClientBridgeManagerInterface()`;
+    this.log.debug(`${fnTag}, Getting Bridge Manager Interface...`);
+    return this.bridgeManager;
   }
 }

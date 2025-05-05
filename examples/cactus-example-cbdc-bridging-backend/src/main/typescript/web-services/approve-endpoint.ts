@@ -86,15 +86,13 @@ export class ApproveEndpointV1 implements IWebServiceEndpoint {
         reqBody.ledger.assetType ===
         TransactRequestSourceChainAssetTypeEnum.Besu
       ) {
-        result = await this.options.infrastructure.approveNTokensBesu(
-          reqBody.user,
-          parseInt(reqBody.amount),
-        );
+        result = await this.options.infrastructure
+          .getBesuEnvironment()
+          .approveNTokensBesu(reqBody.user, parseInt(reqBody.amount));
       } else {
-        result = await this.options.infrastructure.approveNTokensFabric(
-          reqBody.user,
-          reqBody.amount,
-        );
+        result = await this.options.infrastructure
+          .getFabricEnvironment()
+          .approveNTokensFabric(reqBody.user, reqBody.amount);
       }
       res.status(200).json(result);
     } catch (ex) {

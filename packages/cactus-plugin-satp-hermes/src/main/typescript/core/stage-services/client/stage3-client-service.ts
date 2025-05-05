@@ -1,6 +1,7 @@
 import {
   BurnAssertionClaimFormatSchema,
   BurnAssertionClaimSchema,
+  ClaimFormat,
   CommonSatpSchema,
   MessageType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -33,11 +34,12 @@ import {
 } from "../satp-service";
 import { SATPSession } from "../../satp-session";
 import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
+  AmountMissingError,
   AssignmentAssertionClaimError,
   BurnAssertionClaimError,
+  LedgerAssetError,
   MintAssertionClaimError,
   MissingBridgeManagerError,
   SessionError,
@@ -46,13 +48,20 @@ import {
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { create } from "@bufbuild/protobuf";
+import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
+import { protoToAsset } from "../service-utils";
+import { NetworkId } from "../../../public-api";
 
 export class Stage3ClientService extends SATPService {
   public static readonly SATP_STAGE = "3";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
-  private bridgeManager: SATPCrossChainManager;
+  private bridgeManager: BridgeManagerClientInterface;
+
+  private claimFormat: ClaimFormat;
 
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
@@ -71,6 +80,8 @@ export class Stage3ClientService extends SATPService {
         `${this.getServiceIdentifier()}#constructor`,
       );
     }
+
+    this.claimFormat = ops.claimFormat || ClaimFormat.DEFAULT;
     this.bridgeManager = ops.bridgeManager;
   }
 
@@ -643,40 +654,56 @@ export class Stage3ClientService extends SATPService {
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });
 
-      const assetId = sessionData.senderAsset?.tokenId;
-      const amount = sessionData.senderAsset?.amount;
+      if (sessionData.senderAsset == undefined) {
+        throw new LedgerAssetError(fnTag);
+      }
 
-      this.Log.debug(`${fnTag}, Burn Asset ID: ${assetId} amount: ${amount}`);
+      const networkId = {
+        id: sessionData.senderAsset.networkId?.id,
+        ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
+      } as NetworkId;
 
-      if (assetId == undefined) {
+      const token: FungibleAsset = protoToAsset(
+        sessionData.senderAsset,
+        networkId,
+      ) as FungibleAsset;
+
+      if (token.id == undefined) {
         throw new TokenIdMissingError(fnTag);
       }
 
-      if (amount == undefined) {
-        throw new Error(`${fnTag}, Amount is missing`);
+      if (token.amount == undefined) {
+        throw new AmountMissingError(fnTag);
       }
 
-      const bridge = this.bridgeManager.getBridge(
-        sessionData.senderGatewayNetworkId,
+      this.Log.debug(
+        `${fnTag}, Burn Asset ID: ${token.id} amount: ${token.amount}`,
+      );
+
+      const bridge = this.bridgeManager.getSATPExecutionLayer(
+        networkId,
+        this.claimFormat,
       );
 
       sessionData.burnAssertionClaim = create(BurnAssertionClaimSchema, {});
-      sessionData.burnAssertionClaim.receipt = await bridge.burnAsset(
-        assetId,
-        Number(amount),
-      );
+
+      const res = await bridge.burnAsset(token);
+
+      sessionData.burnAssertionClaim.receipt = res.receipt;
 
       this.Log.debug(
         `${fnTag}, Burn Operation Receipt: ${sessionData.burnAssertionClaim.receipt}`,
       );
 
-      sessionData.burnAssertionClaim.proof = await bridge.getProof(assetId);
+      sessionData.burnAssertionClaim.proof = res.proof;
 
       sessionData.burnAssertionClaimFormat = create(
         BurnAssertionClaimFormatSchema,
-        {},
+        {
+          format: this.claimFormat,
+        },
       );
-      sessionData.burnAssertionClaimFormat.format = bridge.getReceiptFormat();
+
       sessionData.burnAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.burnAssertionClaim.receipt),
       );

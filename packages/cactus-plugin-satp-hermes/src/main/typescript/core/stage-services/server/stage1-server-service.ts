@@ -45,7 +45,7 @@ import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
 import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { create } from "@bufbuild/protobuf";
-import { NetworkId } from "../../../services/network-identification/chainid-list";
+import { NetworkId } from "../../../public-api";
 export class Stage1ServerService extends SATPService {
   public static readonly SATP_STAGE = "1";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -369,7 +369,14 @@ export class Stage1ServerService extends SATPService {
       return;
     }
 
-    const receiverId = request.transferInitClaims!.recipientGatewayNetworkId;
+    if (sessionData.receiverAsset == undefined) {
+      throw new TransferInitClaimsError(fnTag);
+    }
+    if (sessionData.receiverAsset?.networkId == undefined) {
+      throw new TransferInitClaimsError(fnTag);
+    }
+
+    const receiverId = sessionData.receiverAsset?.networkId?.id;
 
     if (
       !supportedDLTs

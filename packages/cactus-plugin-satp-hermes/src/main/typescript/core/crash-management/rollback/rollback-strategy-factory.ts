@@ -4,7 +4,6 @@ import { Stage0RollbackStrategy } from "./stage0-rollback-strategy";
 import { Stage1RollbackStrategy } from "./stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "./stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "./stage3-rollback-strategy";
-import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import type { RollbackState } from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import {
   type Type,
@@ -12,6 +11,7 @@ import {
   type SessionData,
 } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { getCrashedStage } from "../../session-utils";
+import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 
 // TODO: fix for single-gateway setups to handle both client and server data together
 export interface RollbackStrategy {
@@ -21,9 +21,9 @@ export interface RollbackStrategy {
 
 export class RollbackStrategyFactory {
   private log: Logger;
-  private bridgesManager: SATPCrossChainManager;
+  private bridgesManager: BridgeManagerClientInterface;
 
-  constructor(bridgesManager: SATPCrossChainManager, log: Logger) {
+  constructor(bridgesManager: BridgeManagerClientInterface, log: Logger) {
     this.log = log;
     this.bridgesManager = bridgesManager;
   }

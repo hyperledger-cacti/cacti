@@ -6,19 +6,23 @@ import {
   type RollbackState,
   RollbackStateSchema,
 } from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
-import type { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 import {
   Type,
   SATPStage,
   type SessionData,
 } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
+import { protoToAsset } from "../../stage-services/service-utils";
+import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 
 export class Stage3RollbackStrategy implements RollbackStrategy {
   private log: Logger;
-  private bridgeManager: SATPCrossChainManager;
+  private bridgeManager: BridgeManagerClientInterface;
 
-  constructor(bridgesManager: SATPCrossChainManager, log: Logger) {
+  constructor(bridgesManager: BridgeManagerClientInterface, log: Logger) {
     this.log = log;
     this.bridgeManager = bridgesManager;
   }
@@ -72,26 +76,36 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage3RollbackStrategy#handleClientSideRollback";
     try {
-      const network = clientSessionData.senderGatewayNetworkId;
-      if (!network) {
-        throw new Error(`${fnTag}: Missing senderGatewayNetworkId for client!`);
+      const networkId = {
+        id: clientSessionData.senderGatewayNetworkId,
+        ledgerType: clientSessionData.senderGatewayNetworkId as LedgerType,
+      };
+      if (!networkId) {
+        throw new Error(
+          `${fnTag}: Missing recipientGatewayNetworkId for server!`,
+        );
       }
 
-      const bridge = this.bridgeManager.getBridge(network);
-      if (!bridge) {
-        throw new Error(`${fnTag}: No bridge found for network: ${network}`);
-      }
-
-      const assetId = clientSessionData.senderAsset?.tokenId;
-      const amount = clientSessionData.senderAsset?.amount;
-      if (!assetId || amount === undefined || amount === null) {
-        throw new Error(`${fnTag}: Asset ID or amount is missing for client!`);
-      }
-
-      this.log.info(
-        `${fnTag} Minting Asset ID at source: ${assetId}, Amount: ${amount}`,
+      const bridge = this.bridgeManager.getSATPExecutionLayer(
+        networkId,
+        ClaimFormat.DEFAULT,
       );
-      await bridge.mintAsset(assetId, Number(amount));
+
+      if (!bridge) {
+        throw new Error(`${fnTag}: No bridge found for network: ${networkId}`);
+      }
+
+      if (!clientSessionData.senderAsset) {
+        throw new Error(`${fnTag}: receiverAsset is undefined`);
+      }
+
+      const asset: FungibleAsset = protoToAsset(
+        clientSessionData.senderAsset,
+        networkId,
+      ) as FungibleAsset;
+
+      this.log.info(`${fnTag} Minting Asset ${asset}`);
+      await bridge.mintAsset(asset);
 
       rollbackState.rollbackLogEntries.push(
         create(RollbackLogEntrySchema, {
@@ -124,28 +138,36 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage3RollbackStrategy#handleServerSideRollback";
     try {
-      const network = serverSessionData.recipientGatewayNetworkId;
-      if (!network) {
+      const networkId = {
+        id: serverSessionData.recipientGatewayNetworkId,
+        ledgerType: serverSessionData.recipientGatewayNetworkId as LedgerType,
+      };
+      if (!networkId) {
         throw new Error(
           `${fnTag}: Missing recipientGatewayNetworkId for server!`,
         );
       }
 
-      const bridge = this.bridgeManager.getBridge(network);
-      if (!bridge) {
-        throw new Error(`${fnTag}: No bridge found for network: ${network}`);
-      }
-
-      const assetId = serverSessionData.receiverAsset?.tokenId;
-      const amount = serverSessionData.receiverAsset?.amount;
-      if (!assetId || amount === undefined || amount === null) {
-        throw new Error(`${fnTag}: Asset ID or amount is missing for server!`);
-      }
-
-      this.log.info(
-        `${fnTag} Burning Asset ID at destination: ${assetId}, Amount: ${amount}`,
+      const bridge = this.bridgeManager.getSATPExecutionLayer(
+        networkId,
+        ClaimFormat.DEFAULT,
       );
-      await bridge.burnAsset(assetId, Number(amount));
+
+      if (!bridge) {
+        throw new Error(`${fnTag}: No bridge found for network: ${networkId}`);
+      }
+
+      if (!serverSessionData.receiverAsset) {
+        throw new Error(`${fnTag}: senderAsset is undefined`);
+      }
+
+      const asset: FungibleAsset = protoToAsset(
+        serverSessionData.receiverAsset,
+        networkId,
+      ) as FungibleAsset;
+
+      this.log.info(`${fnTag} Burning Asset: ${asset}`);
+      await bridge.burnAsset(asset);
 
       rollbackState.rollbackLogEntries.push(
         create(RollbackLogEntrySchema, {

@@ -16,6 +16,7 @@ import knex, { Knex } from "knex";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript/common/containers";
 import { EventEmitter } from "events";
+import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
@@ -55,24 +56,25 @@ export function createClient(
 }
 
 // Sets up the necessary configuration and log files for running a SATP Gateway in Docker
-// Creates files with unique timestamps or specified context
-export function setupGatewayDockerFiles(
+// Creates configuration and related data in memory without saving to files
+export function generateGatewayConfig(
   gatewayIdentity: GatewayIdentity,
   logLevel: LogLevelDesc,
   counterPartyGateways: GatewayIdentity[],
-  bridgesConfig: Record<string, unknown>[],
   enableCrashRecovery: boolean = false,
+  ontologiesPath: string,
+  ccConfig?: ICrossChainMechanismsOptions,
   localRepository?: Knex.Config,
   remoteRepository?: Knex.Config,
-  fileContext?: string,
   gatewayKeyPair?: {
     privateKey: string;
     publicKey: string;
   },
 ): {
-  configFile: string;
-  outputLogFile: string;
-  errorLogFile: string;
+  config: object;
+  logs: string;
+  database: string;
+  ontologies: object;
 } {
   const jsonObject = {
     gid: gatewayIdentity,
@@ -81,41 +83,120 @@ export function setupGatewayDockerFiles(
     localRepository,
     remoteRepository,
     environment: "development",
-    enableOpenAPI: true,
-    bridgesConfig,
+    ccConfig,
     gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
+    ontologyPath: ontologiesPath,
   };
-  // Create a timestamp for the files if no context provided
+
+  const logs = "Logs would be generated here.";
+  const database = "Database configuration would be here.";
+  const ontologies = { message: "Ontologies data would be here." };
+
+  return {
+    config: jsonObject,
+    logs,
+    database,
+    ontologies,
+  };
+}
+export interface GatewayDockerConfig {
+  gatewayIdentity: GatewayIdentity;
+  logLevel: LogLevelDesc;
+  counterPartyGateways: GatewayIdentity[];
+  enableCrashRecovery?: boolean;
+  ccConfig?: ICrossChainMechanismsOptions;
+  localRepository?: Knex.Config;
+  remoteRepository?: Knex.Config;
+  gatewayId?: string;
+  fileContext?: string;
+  gatewayKeyPair?: {
+    privateKey: string;
+    publicKey: string;
+  };
+}
+
+export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
+  configFilePath: string;
+  logsPath: string;
+  ontologiesPath: string;
+} {
+  const {
+    gatewayIdentity,
+    logLevel,
+    counterPartyGateways,
+    enableCrashRecovery = false,
+    ccConfig,
+    localRepository,
+    remoteRepository,
+    gatewayId = "gatewayId",
+    fileContext,
+    gatewayKeyPair,
+  } = config;
+
+  const jsonObject = {
+    gid: gatewayIdentity,
+    logLevel,
+    counterPartyGateways,
+    localRepository: localRepository
+      ? ({
+          client: localRepository.client,
+          connection: localRepository.connection,
+        } as Knex.Config)
+      : undefined,
+    remoteRepository: remoteRepository
+      ? ({
+          client: remoteRepository.client,
+          connection: remoteRepository.connection,
+        } as Knex.Config)
+      : undefined,
+    environment: "development",
+    ccConfig,
+    keyPair: gatewayKeyPair,
+    enableCrashRecovery: enableCrashRecovery,
+    ontologyPath: "/opt/cacti/satp-hermes/ontologies",
+  };
+
   const context =
     fileContext ||
     new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
 
-  // creates the configuration file for the gateway setup
-  const configDir = path.join(__dirname, `gateway-info/config`);
+  const directory = `${__dirname}/../../../cache/`;
+  const configDir = path.join(directory, `gateway-info-${gatewayId}/config`);
+
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
   }
-  const configFile = path.join(configDir, `gateway-config-${context}.json`);
-  fs.writeFileSync(configFile, JSON.stringify(jsonObject, null, 2));
-  expect(fs.existsSync(configFile)).toBe(true);
+  const configFilePath = path.join(configDir, `gateway-config-${context}.json`);
+  fs.writeFileSync(configFilePath, JSON.stringify(jsonObject, null, 2));
+  expect(fs.existsSync(configFilePath)).toBe(true);
 
-  // creates the files for logging the output and error:
-  const logDir = path.join(__dirname, `gateway-info/logs`);
+  const logDir = path.join(directory, `gateway-info-${gatewayId}/logs`);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
-  const outputLogFile = path.join(logDir, `gateway-logs-output-${context}.log`);
-  const errorLogFile = path.join(logDir, `gateway-logs-error-${context}.log`);
-  fs.writeFileSync(outputLogFile, "");
-  fs.writeFileSync(errorLogFile, "");
-  expect(fs.existsSync(outputLogFile)).toBe(true);
-  expect(fs.existsSync(errorLogFile)).toBe(true);
+
+  const ontologiesDir = path.join(
+    directory,
+    `gateway-info-${gatewayId}/ontologies`,
+  );
+  if (!fs.existsSync(ontologiesDir)) {
+    fs.mkdirSync(ontologiesDir, { recursive: true });
+  }
+
+  const sourceOntologiesDir = path.join(__dirname, "../ontologies");
+  if (fs.existsSync(sourceOntologiesDir)) {
+    fs.copySync(sourceOntologiesDir, ontologiesDir);
+  } else {
+    throw new Error(
+      `Source ontologies directory does not exist: ${sourceOntologiesDir}`,
+    );
+  }
 
   return {
-    configFile,
-    outputLogFile,
-    errorLogFile,
+    configFilePath,
+    logsPath: logDir,
+    ontologiesPath: ontologiesDir,
   };
 }
 
@@ -129,23 +210,33 @@ export function getTransactRequest(
 ): TransactRequest {
   return {
     contextID,
-    fromDLTNetworkID: from.network.id,
-    toDLTNetworkID: to.network.id,
-    fromAmount,
-    toAmount,
     originatorPubkey: from.transactRequestPubKey,
     beneficiaryPubkey: to.transactRequestPubKey,
-    sourceAsset: from.defaultAsset,
-    receiverAsset: to.defaultAsset,
+    sourceAsset: { ...from.defaultAsset, amount: fromAmount },
+    receiverAsset: { ...to.defaultAsset, amount: toAmount },
   };
 }
 
+export interface PGDatabaseConfig {
+  port: number;
+  toUseInDocker?: boolean;
+  network?: string;
+  postgresUser?: string;
+  postgresPassword?: string;
+  postgresDB?: string;
+}
+
 export async function createPGDatabase(
-  port: number,
-  postgresUser: string = "postgres", // You can set default values or accept them as parameters
-  postgresPassword: string = "password",
-  postgresDB: string = "my_database",
+  config: PGDatabaseConfig,
 ): Promise<{ config: Knex.Config; container: Container }> {
+  const {
+    port,
+    network,
+    postgresUser = "postgres",
+    postgresPassword = "password",
+    postgresDB = "my_database",
+  } = config;
+
   const fnTag = "createPGDatabase()";
   const docker = new Docker();
 
@@ -157,28 +248,37 @@ export async function createPGDatabase(
 
   console.debug(`Starting container with image: ${imageFqn}...`);
 
-  // Define your host configuration
+  if (network) {
+    const networks = await docker.listNetworks();
+    const networkExists = networks.some((n) => n.Name === network);
+    if (!networkExists) {
+      await docker.createNetwork({
+        Name: network,
+        Driver: "bridge",
+      });
+    }
+  }
+
   const hostConfig: Docker.HostConfig = {
     PublishAllPorts: true,
     Binds: [],
     PortBindings: {
       "5432/tcp": [{ HostPort: `${port}` }],
     },
+    NetworkMode: network,
   };
 
-  // Define your health check
   const healthCheck = {
     test: [
       "CMD-SHELL",
       `sh -c 'pg_isready -h localhost -d ${postgresDB} -U ${postgresUser} -p 5432'`,
     ],
-    interval: 1000000, // 1 second (in nanoseconds)
-    timeout: 60000000, // 3 seconds timeout
-    retries: 30, // Retry 3 times
-    startPeriod: 1000000, // 1 second (in nanoseconds)
+    interval: 1000000,
+    timeout: 60000000,
+    retries: 30,
+    startPeriod: 1000000,
   };
 
-  // Running the Docker container with health check
   const container = new Promise<Container>((resolve, reject) => {
     const eventEmitter: EventEmitter = docker.run(
       imageFqn,
@@ -191,9 +291,9 @@ export async function createPGDatabase(
         HostConfig: hostConfig,
         Healthcheck: healthCheck,
         Env: [
-          `POSTGRES_USER=${postgresUser}`, // Set the database user
-          `POSTGRES_PASSWORD=${postgresPassword}`, // Set the database password
-          `POSTGRES_DB=${postgresDB}`, // Optionally set the database name (can be the same as the user)
+          `POSTGRES_USER=${postgresUser}`,
+          `POSTGRES_PASSWORD=${postgresPassword}`,
+          `POSTGRES_DB=${postgresDB}`,
         ],
       },
       {},
@@ -216,7 +316,6 @@ export async function createPGDatabase(
           }
 
           const containerInfos = await docker.listContainers({});
-
           const containerInfo = containerInfos.find(
             (ci) => ci.Id === container.id,
           );
@@ -240,20 +339,45 @@ export async function createPGDatabase(
     });
   });
 
+  const containerData = await docker
+    .getContainer((await container).id)
+    .inspect();
+
+  if (network) {
+    return {
+      config: {
+        client: "pg",
+        connection: {
+          host: containerData.NetworkSettings.Networks[network || "bridge"]
+            .IPAddress,
+          user: postgresUser,
+          password: postgresPassword,
+          database: postgresDB,
+          port: 5432,
+          ssl: false,
+        },
+        migrations: {
+          directory:
+            "./packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations",
+        },
+      } as Knex.Config,
+      container: await container,
+    };
+  }
   return {
     config: {
-      client: "pg", // Specify PostgreSQL as the client
+      client: "pg",
       connection: {
-        host: "172.17.0.1", // Get the container IP address or use default
-        user: postgresUser, // Database user
-        password: postgresPassword, // Database password
-        database: postgresDB, // The name of your PostgreSQL database
-        port: port, // Default PostgreSQL port
-        ssl: false, // Set to true if you're using SSL for a secure connection
+        host: "localhost",
+        user: postgresUser,
+        password: postgresPassword,
+        database: postgresDB,
+        port: port,
+        ssl: false,
       },
       migrations: {
         directory:
-          "./packages/cactus-plugin-satp-hermes/src/main/typescript/knex/migrations",
+          "./packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations",
       },
     } as Knex.Config,
     container: await container,
@@ -261,10 +385,6 @@ export async function createPGDatabase(
 }
 
 export async function setupDBTable(config: Knex.Config): Promise<void> {
-  const clonedConfig = { ...config };
-
-  (clonedConfig.connection as Knex.PgConnectionConfig).host = "localhost";
-
-  const knexInstanceClient = knex(clonedConfig);
+  const knexInstanceClient = knex(config);
   await knexInstanceClient.migrate.latest();
 }
