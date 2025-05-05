@@ -6,9 +6,7 @@ import {
   RunTransactionResponse,
   Web3SigningCredential,
   Web3SigningCredentialCactusKeychainRef,
-  Web3SigningCredentialNone,
   Web3SigningCredentialPrivateKeyHex,
-  Web3SigningCredentialType,
   Web3TransactionReceipt,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -47,7 +45,7 @@ import {
   ClaimFormatError,
   ConnectorOptionsError,
   ApproveAddressError,
-} from "../bridge-errors";
+} from "../../common/errors";
 import { ISignerKeyPair, Secp256k1Keys } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { OntologyManager } from "../ontology/ontology-manager";
@@ -56,6 +54,7 @@ import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
 import { getUint8Key } from "./leafs-utils";
+import { isWeb3SigningCredentialNone } from "../../common/utils";
 
 export interface IBesuLeafNeworkOptions extends INetworkOptions {
   signingCredential: Web3SigningCredential;
@@ -200,7 +199,7 @@ export class BesuLeaf
 
     if (!this.isFullPluginOptions(options.connectorOptions)) {
       throw new ConnectorOptionsError(
-        "Invalid options provided to the FabricLeaf constructor. Please provide a valid IPluginLedgerConnectorBesuOptions object.",
+        "Invalid options provided to the BesuLeaf constructor. Please provide a valid IPluginLedgerConnectorBesuOptions object.",
       );
     }
 
@@ -274,7 +273,7 @@ export class BesuLeaf
    *
    * @example
    * ```typescript
-   * const approveAddress = fabricLeaf.getApproveAddress("FUNGIBLE");
+   * const approveAddress = besuLeaf.getApproveAddress("FUNGIBLE");
    * console.log(approveAddress); // Output: Bridge ID for fungible assets
    * ```
    */
@@ -962,9 +961,4 @@ export class BesuLeaf
       obj.rpcApiWsHost !== undefined
     );
   };
-}
-export function isWeb3SigningCredentialNone(x?: {
-  type?: Web3SigningCredentialType;
-}): x is Web3SigningCredentialNone {
-  return x?.type === Web3SigningCredentialType.None;
 }
