@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  satp-hermes-gateway:
+    build:
+      context: ./
+      dockerfile: satp-hermes-gateway.Dockerfile
+    volumes:
+      - ./satp-hermes-gateway/logs:/logs
+      - ./satp-hermes-gateway/ontologies:/ontologies
+      - ./satp-hermes-gateway/database:/database
+    ports:
+      - 3010:3010/tcp # SERVER_PORT
+      - 3011:3011/tcp # CLIENT_PORT
+      - 4010:4010/tcp # OAPI_PORT

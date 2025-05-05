@@ -90,22 +90,22 @@ export class TransferEndpointV1 implements IWebServiceEndpoint {
         reqBody.receiverChain.assetType ===
           TransactRequestSourceChainAssetTypeEnum.Fabric
       ) {
-        result = await this.options.infrastructure.transferTokensBesu(
-          reqBody.from,
-          reqBody.to,
-          parseInt(reqBody.amount),
-        );
+        result = await this.options.infrastructure
+          .getBesuEnvironment()
+          .transferTokensBesu(
+            reqBody.from,
+            reqBody.to,
+            parseInt(reqBody.amount),
+          );
       } else if (
         reqBody.sourceChain.assetType ===
           TransactRequestSourceChainAssetTypeEnum.Fabric &&
         reqBody.receiverChain.assetType ===
           TransactRequestSourceChainAssetTypeEnum.Besu
       ) {
-        result = await this.options.infrastructure.transferTokensFabric(
-          reqBody.from,
-          reqBody.to,
-          reqBody.amount,
-        );
+        result = await this.options.infrastructure
+          .getFabricEnvironment()
+          .transferTokensFabric(reqBody.from, reqBody.to, reqBody.amount);
       } else {
         throw new Error("Invalid chain combination");
       }

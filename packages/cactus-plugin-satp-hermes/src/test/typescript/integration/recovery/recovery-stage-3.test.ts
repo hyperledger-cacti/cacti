@@ -51,6 +51,7 @@ import {
   knexTargetRemoteConnection,
 } from "../../knex.config";
 import { Knex, knex } from "knex";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
@@ -194,10 +195,10 @@ const createMockSession = (
   if (isClient) {
     sessionData.senderAsset = create(AssetSchema, {
       tokenId: "BESU_ASSET_ID",
-      tokenType: TokenType.NONSTANDARD,
+      referenceId: "BESU_ASSET_REFERENCE_ID",
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_SENDER_ASSET_OWNER",
-      ontology: "MOCK_SENDER_ASSET_ONTOLOGY",
       contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
       contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
     });
@@ -205,10 +206,10 @@ const createMockSession = (
   if (!isClient) {
     sessionData.receiverAsset = create(AssetSchema, {
       tokenId: "FABRIC_ASSET_ID",
-      tokenType: TokenType.NONSTANDARD,
+      referenceId: "FABRIC_ASSET_REFERENCE",
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_RECEIVER_ASSET_OWNER",
-      ontology: "MOCK_RECEIVER_ASSET_ONTOLOGY",
       contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
       mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
       channelName: "MOCK_CHANNEL_ID",
@@ -242,7 +243,6 @@ beforeAll(async () => {
     address: "http://localhost" as Address,
     gatewayServerPort: 3006,
     gatewayClientPort: 3001,
-    gatewayOpenAPIPort: 3002,
   };
 
   const gatewayIdentity2: GatewayIdentity = {
@@ -260,7 +260,6 @@ beforeAll(async () => {
     address: "http://localhost" as Address,
     gatewayServerPort: 3228,
     gatewayClientPort: 3211,
-    gatewayOpenAPIPort: 4210,
   };
 
   knexInstanceClient = knex(knexClientConnection);
@@ -274,9 +273,11 @@ beforeAll(async () => {
     gid: gatewayIdentity1,
     counterPartyGateways: [gatewayIdentity2],
     keyPair: gateway1KeyPair,
-    knexLocalConfig: knexClientConnection,
-    knexRemoteConfig: knexSourceRemoteConnection,
+    localRepository: knexClientConnection,
+    remoteRepository: knexSourceRemoteConnection,
     enableCrashRecovery: true,
+    instanceId: uuidv4(),
+    pluginRegistry: new PluginRegistry({ plugins: [] }),
   };
 
   knexInstanceServer = knex(knexServerConnection);
@@ -290,9 +291,11 @@ beforeAll(async () => {
     gid: gatewayIdentity2,
     counterPartyGateways: [gatewayIdentity1],
     keyPair: gateway2KeyPair,
-    knexLocalConfig: knexServerConnection,
-    knexRemoteConfig: knexTargetRemoteConnection,
+    localRepository: knexServerConnection,
+    remoteRepository: knexTargetRemoteConnection,
     enableCrashRecovery: true,
+    instanceId: uuidv4(),
+    pluginRegistry: new PluginRegistry({ plugins: [] }),
   };
 
   gateway1 = (await factory.create(options1)) as SATPGateway;
