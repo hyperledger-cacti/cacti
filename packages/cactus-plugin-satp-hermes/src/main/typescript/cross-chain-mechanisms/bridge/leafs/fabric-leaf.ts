@@ -44,7 +44,7 @@ import {
   UnsupportedNetworkError,
   WrapperContractAlreadyCreatedError,
   WrapperContractError,
-} from "../bridge-errors";
+} from "../../common/errors";
 import { INetworkOptions, TransactionResponse } from "../bridge-types";
 import { FabricAsset } from "../ontology/assets/fabric-asset";
 import { Asset } from "../ontology/assets/asset";

@@ -249,9 +249,8 @@ TransactRequest:
     - receiverAsset
   properties:
     contextID:
-      type: string
-      format: string
-      example: "123e4567-e89b-12d3-a456-426614174000"
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task."
     payload:
       type: string
       example: '{"data":"example payload"}'
@@ -347,6 +346,10 @@ DLTSubnetworkID:
   description: "The subnetwork of the DLT being interacted with. TODO: implement network identification draft"
 SessionID:
   x-category: satp-core
+  type: string
+  description: Unique identifier (UUID) for the session.
+  example: 000003e8-e0b8-21ee-ba00-325096b39f47
+TaskID:
   type: string
   description: Unique identifier (UUID) for the session.
   example: 000003e8-e0b8-21ee-ba00-325096b39f47
@@ -764,6 +767,428 @@ GetApproveAddressResponse:
       description: The address to approve the token transfer.
   required:
     - approveAddress
+OracleRegisterRequest:
+  description: "Request schema for registering a repeatable task."
+  type: object
+  required:
+    - taskType
+    - taskMode
+  properties:
+    sourceNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+    destinationNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: The source blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+    sourceContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+    destinationContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+    taskMode:
+      type: string
+      description: The mode of operation for the repeatable task.
+      example: POLLING
+      enum:
+        - POLLING
+        - EVENT_LISTENING
+    pollingInterval:
+      type: integer
+      description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+      example: 5000
+    listeningOptions:
+      type: object
+      description: Options for event listening. Only if taskMode is EVENT_LISTENING.
+      required:
+        - eventSignature
+      properties:
+        eventSignature:
+          type: string
+          description: The event signature to listen for on the source network. Only if taskMode is EVENT_LISTENING.
+          example: "Transfer(address,address,uint256)"
+        filterParams:
+          type: array
+          items:
+            type: string
+          description: The parameters to filter in the captured events.
+    taskType:
+      type: string
+      description: The type of task to be registered.
+      example: READ
+      enum:
+        - READ
+        - UPDATE
+        - READ_AND_UPDATE
+OracleExecuteRequest:
+  description: "Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details."
+  type: object
+  properties:
+    sourceNetworkId:
+      description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+      $ref: ./schemas.yml#/NetworkId
+    destinationNetworkId:
+      description: The destination blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+      $ref: ./schemas.yml#/NetworkId
+    sourceContract:
+      description: The contract data on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+      $ref: ./schemas.yml#/BusinessLogicContract
+    destinationContract:
+      description: The contract data on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+      $ref: ./schemas.yml#/BusinessLogicContract
+    taskType:
+      type: string
+      description: The type of task to be registered.
+      example: READ
+      enum:
+        - READ
+        - UPDATE
+        - READ_AND_UPDATE
+BusinessLogicContract:
+  type: object
+  description: "Represents a business logic contract with its associated metadata and method details."
+  properties:
+    contractName:
+      type: string
+      description: "The name of the contract."
+    contractAddress:
+      type: string
+      description: "The address of the contract."
+      nullable: true
+    contractAbi:
+      type: array
+      items:
+        type: object
+      description: "The ABI (Application Binary Interface) of the contract."
+      nullable: true
+    contractBytecode:
+      type: string
+      description: "The bytecode of the contract."
+      nullable: true
+    methodName:
+      type: string
+      description: "The name of the method to be invoked on the contract."
+    params:
+      type: array
+      items:
+        oneOf:
+          - type: string
+          - type: number
+      description: "The parameters to be passed to the contract method."
+OracleTask:
+  type: object
+  description: "Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature."
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier for the Oracle task."
+    type:
+      type: enum
+      description: "The type of the Oracle task."
+      enum:
+        - READ
+        - UPDATE
+        - READ_AND_UPDATE
+    srcNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The source network ID for the Oracle task."
+    srcContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The source contract details for the Oracle task."
+    dstNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The destination network ID for the Oracle task."
+    dstContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The destination contract details for the Oracle task."
+    timestamp:
+      type: integer
+      format: int64
+      description: "The timestamp when the Oracle task was created or last updated."
+      example: 1672531200
+    operations:
+      type: array
+      description: "The list of operations performed by the Oracle task."
+      items:
+        $ref: ./schemas.yml#/OracleOperation
+    status:
+      type: enum
+      description: "The current status of the Oracle task."
+      enum:
+        - ACTIVE
+        - INACTIVE
+    mode:
+      type: string
+      description: "The mode of operation for registered tasks."
+      example: POLLING
+      enum:
+        - POLLING
+        - EVENT_LISTENING
+        - IMMEDIATE
+    pollingInterval:
+      type: integer
+      description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
+      example: 5000
+    listeningOptions:
+      type: object
+      description: "Options for event listening. Only if taskMode is EVENT_LISTENING."
+      required:
+        - eventSignature
+      properties:
+        eventSignature:
+          type: string
+          description: "The event signature to listen for on the source network. Only if taskMode is EVENT_LISTENING."
+          example: "Transfer(address,address,uint256)"
+        filterParams:
+          type: array
+          items:
+            type: string
+          description: "The parameters to filter in the captured events."
+  required:
+    - taskID
+    - type
+    - srcContract
+    - dstContract
+    - timestamp
+    - operations
+    - status
+    - mode
+OracleResponse:
+  type: object
+  description: "Represents the response from an Oracle task execution, including transaction details and outputs."
+  properties:
+    transactionId:
+      type: string
+      description: "The unique identifier for the transaction."
+      example: "0x1234567890abcdef"
+    transactionReceipt:
+      type: object
+      description: "The receipt of the transaction, providing proof of execution."
+    output:
+      type: string
+      description: "The output of the Oracle operation execution."
+    proof:
+      type: object
+      description: "Proof of the Oracle operation execution."
+OracleOperation:
+  type: object
+  description: "Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output."
+  properties:
+    id:
+      type: string
+      description: "A unique identifier for the Oracle operation."
+      example: "123e4567-e89b-12d3-a456-426614174000"
+    type:
+      type: string
+      description: "The type of the Oracle operation."
+      enum:
+        - READ
+        - UPDATE
+      example: READ
+    networkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The network ID where the operation is performed."
+    contract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The contract associated with the Oracle operation."
+    status:
+      type: string
+      description: "The current status of the Oracle operation."
+      enum:
+        - PENDING
+        - SUCCESS
+        - FAILED
+      example: IN_PROGRESS
+    output:
+      $ref: ./schemas.yml#/OracleResponse
+      description: "Optional output generated by the Oracle operation."
+    timestamp:
+      type: integer
+      format: int64
+      description: "The timestamp when the Oracle operation was created or last updated."
+      example: 1672531200
+  required:
+    - id
+    - type
+    - networkId
+    - contract
+    - status
+    - timestamp
+OracleUnregisterRequest:
+  description: "Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered."
+  type: object
+  required:
+    - taskID
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task to be unregistered."
+OracleStatusRequest:
+  description: "Request schema for checking the status of a data transfer task."
+  type: object
+  required:
+    - taskID
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task."
+
+OracleUnregisterResponse:
+  description: "Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration."
+  type: object
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task."
+    status:
+      type: string
+      enum:
+        - SUCCESS
+        - FAILED
+      example: SUCCESS
+
+OracleRegisterResponse:
+  description: "Response schema for registering a repeatable task. Includes the task ID and status of the registration."
+  type: object
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task."
+    status:
+      type: string
+      enum:
+        - SUCCESS
+        - FAILED
+      example: SUCCESS
+
+OracleExecuteResponse:
+  description: "Response schema for executing a data transfer task. Includes the task ID and status of the execution."
+  type: object
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task."
+    type:
+      type: enum
+      description: "The type of the Oracle task."
+      enum:
+        - READ
+        - UPDATE
+        - READ_AND_UPDATE
+    srcNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The source network ID for the Oracle task."
+    srcContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The source contract details for the Oracle task."
+    dstNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The destination network ID for the Oracle task."
+    dstContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The destination contract details for the Oracle task."
+    timestamp:
+      type: integer
+      format: int64
+      description: "The timestamp when the Oracle task was created or last updated."
+      example: 1672531200
+    operations:
+      type: array
+      description: "The list of operations performed by the Oracle task."
+      items:
+        $ref: ./schemas.yml#/OracleOperation
+    status:
+      type: enum
+      description: "The current status of the Oracle task."
+      enum:
+        - ACTIVE
+        - INACTIVE
+    mode:
+      type: string
+      description: "The mode of operation for registered tasks."
+      example: POLLING
+      enum:
+        - POLLING
+        - EVENT_LISTENING
+        - IMMEDIATE
+    pollingInterval:
+      type: integer
+      description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
+      example: 5000
+  required:
+    - id
+    - type
+    - srcContract
+    - dstContract
+    - timestamp
+    - operations
+    - status
+    - mode
+
+OracleStatusResponse:
+  description: "Response schema for checking the status of a data transfer task. Includes the task ID and status of the task."
+  type: object
+  properties:
+    taskID:
+      $ref: ./schemas.yml#/TaskID
+      description: "The unique identifier of the task."
+    type:
+      type: enum
+      description: "The type of the Oracle task."
+      enum:
+        - READ
+        - UPDATE
+        - READ_AND_UPDATE
+    srcNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The source network ID for the Oracle task."
+    srcContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The source contract details for the Oracle task."
+    dstNetworkId:
+      $ref: ./schemas.yml#/NetworkId
+      description: "The destination network ID for the Oracle task."
+    dstContract:
+      $ref: ./schemas.yml#/BusinessLogicContract
+      description: "The destination contract details for the Oracle task."
+    timestamp:
+      type: integer
+      format: int64
+      description: "The timestamp when the Oracle task was created or last updated."
+      example: 1672531200
+    operations:
+      type: array
+      description: "The list of operations performed by the Oracle task."
+      items:
+        $ref: ./schemas.yml#/OracleOperation
+    status:
+      type: enum
+      description: "The current status of the Oracle task."
+      enum:
+        - ACTIVE
+        - INACTIVE
+    mode:
+      type: string
+      description: "The mode of operation for registered tasks."
+      example: POLLING
+      enum:
+        - POLLING
+        - EVENT_LISTENING
+        - IMMEDIATE
+    pollingInterval:
+      type: integer
+      description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
+      example: 5000
+  required:
+    - id
+    - type
+    - srcContract
+    - dstContract
+    - timestamp
+    - operations
+    - status
+    - mode
+
 NetworkId:
   type: object
   description: The network of the DLT being interacted with.

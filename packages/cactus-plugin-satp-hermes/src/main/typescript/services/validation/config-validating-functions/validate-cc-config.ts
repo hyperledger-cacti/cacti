@@ -155,6 +155,12 @@ export function validateCCConfig(opts: {
     );
   }
 
+  if (!NetworkOptionsJSONArray(opts.configValue.bridgeConfig)) {
+    throw new TypeError(
+      "Invalid config.bridgesConfig: " + JSON.stringify(opts.configValue),
+    );
+  }
+
   return {
     bridgeConfig: createBridgeConfig(opts.configValue.bridgeConfig),
   };
