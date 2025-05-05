@@ -46,7 +46,7 @@ beforeAll(async () => {
     });
 
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
     });
     log.info("Ethereum Ledger started successfully");

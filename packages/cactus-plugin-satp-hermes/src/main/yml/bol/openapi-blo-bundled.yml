@@ -64,9 +64,9 @@ paths:
                 - receiverAsset
               properties:
                 contextID:
+                  description: The unique identifier of the task.
                   type: string
-                  format: string
-                  example: 123e4567-e89b-12d3-a456-426614174000
+                  example: 000003e8-e0b8-21ee-ba00-325096b39f47
                 payload:
                   type: string
                   example: '{"data":"example payload"}'
@@ -1996,6 +1996,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -2089,7 +2090,6 @@ paths:
                       example: '0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7'
               required:
                 - counterparty
-        required: true
       responses:
         '200':
           description: Counterparty added successfully
@@ -2106,6 +2106,925 @@ paths:
           description: Bad request
         '404':
           description: Counterparty not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute:
+    post:
+      summary: Execute data transfer task
+      description: Execute a registered data transfer task from source to target blockchain
+      operationId: ExecuteOracleTask
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: 'Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.'
+              type: object
+              properties:
+                sourceNetworkId:
+                  type: object
+                  description: The network of the DLT being interacted with.
+                  properties:
+                    id:
+                      type: string
+                      description: The network of the DLT being interacted with.
+                    ledgerType:
+                      description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                      type: string
+                      enum:
+                        - BESU_1X
+                        - BESU_2X
+                        - BURROW_0X
+                        - CORDA_4X
+                        - ETHEREUM
+                        - FABRIC_2
+                        - SAWTOOTH_1X
+                  required:
+                    - id
+                    - ledgerType
+                destinationNetworkId:
+                  type: object
+                  description: The network of the DLT being interacted with.
+                  properties:
+                    id:
+                      type: string
+                      description: The network of the DLT being interacted with.
+                    ledgerType:
+                      description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                      type: string
+                      enum:
+                        - BESU_1X
+                        - BESU_2X
+                        - BURROW_0X
+                        - CORDA_4X
+                        - ETHEREUM
+                        - FABRIC_2
+                        - SAWTOOTH_1X
+                  required:
+                    - id
+                    - ledgerType
+                sourceContract:
+                  description: The contract data on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  type: object
+                  properties:
+                    contractName:
+                      type: string
+                      description: The name of the contract.
+                    contractAddress:
+                      type: string
+                      description: The address of the contract.
+                      nullable: true
+                    contractAbi:
+                      type: array
+                      items:
+                        type: object
+                      description: The ABI (Application Binary Interface) of the contract.
+                      nullable: true
+                    contractBytecode:
+                      type: string
+                      description: The bytecode of the contract.
+                      nullable: true
+                    methodName:
+                      type: string
+                      description: The name of the method to be invoked on the contract.
+                    params:
+                      type: array
+                      items:
+                        oneOf:
+                          - type: string
+                          - type: number
+                      description: The parameters to be passed to the contract method.
+                destinationContract:
+                  description: The contract data on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  type: object
+                  properties:
+                    contractName:
+                      type: string
+                      description: The name of the contract.
+                    contractAddress:
+                      type: string
+                      description: The address of the contract.
+                      nullable: true
+                    contractAbi:
+                      type: array
+                      items:
+                        type: object
+                      description: The ABI (Application Binary Interface) of the contract.
+                      nullable: true
+                    contractBytecode:
+                      type: string
+                      description: The bytecode of the contract.
+                      nullable: true
+                    methodName:
+                      type: string
+                      description: The name of the method to be invoked on the contract.
+                    params:
+                      type: array
+                      items:
+                        oneOf:
+                          - type: string
+                          - type: number
+                      description: The parameters to be passed to the contract method.
+                taskType:
+                  type: string
+                  description: The type of task to be registered.
+                  example: READ
+                  enum:
+                    - READ
+                    - UPDATE
+                    - READ_AND_UPDATE
+      responses:
+        '200':
+          description: Response schema for executing a data transfer task.
+          content:
+            application/json:
+              schema:
+                description: Response schema for executing a data transfer task. Includes the task ID and status of the execution.
+                type: object
+                properties:
+                  taskID:
+                    description: The unique identifier of the task.
+                    type: string
+                    example: 000003e8-e0b8-21ee-ba00-325096b39f47
+                  type:
+                    type: enum
+                    description: The type of the Oracle task.
+                    enum:
+                      - READ
+                      - UPDATE
+                      - READ_AND_UPDATE
+                  srcNetworkId:
+                    type: object
+                    description: The network of the DLT being interacted with.
+                    properties:
+                      id:
+                        type: string
+                        description: The network of the DLT being interacted with.
+                      ledgerType:
+                        description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                        type: string
+                        enum:
+                          - BESU_1X
+                          - BESU_2X
+                          - BURROW_0X
+                          - CORDA_4X
+                          - ETHEREUM
+                          - FABRIC_2
+                          - SAWTOOTH_1X
+                    required:
+                      - id
+                      - ledgerType
+                  srcContract:
+                    description: The source contract details for the Oracle task.
+                    type: object
+                    properties:
+                      contractName:
+                        type: string
+                        description: The name of the contract.
+                      contractAddress:
+                        type: string
+                        description: The address of the contract.
+                        nullable: true
+                      contractAbi:
+                        type: array
+                        items:
+                          type: object
+                        description: The ABI (Application Binary Interface) of the contract.
+                        nullable: true
+                      contractBytecode:
+                        type: string
+                        description: The bytecode of the contract.
+                        nullable: true
+                      methodName:
+                        type: string
+                        description: The name of the method to be invoked on the contract.
+                      params:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: string
+                            - type: number
+                        description: The parameters to be passed to the contract method.
+                  dstNetworkId:
+                    type: object
+                    description: The network of the DLT being interacted with.
+                    properties:
+                      id:
+                        type: string
+                        description: The network of the DLT being interacted with.
+                      ledgerType:
+                        description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                        type: string
+                        enum:
+                          - BESU_1X
+                          - BESU_2X
+                          - BURROW_0X
+                          - CORDA_4X
+                          - ETHEREUM
+                          - FABRIC_2
+                          - SAWTOOTH_1X
+                    required:
+                      - id
+                      - ledgerType
+                  dstContract:
+                    description: The destination contract details for the Oracle task.
+                    type: object
+                    properties:
+                      contractName:
+                        type: string
+                        description: The name of the contract.
+                      contractAddress:
+                        type: string
+                        description: The address of the contract.
+                        nullable: true
+                      contractAbi:
+                        type: array
+                        items:
+                          type: object
+                        description: The ABI (Application Binary Interface) of the contract.
+                        nullable: true
+                      contractBytecode:
+                        type: string
+                        description: The bytecode of the contract.
+                        nullable: true
+                      methodName:
+                        type: string
+                        description: The name of the method to be invoked on the contract.
+                      params:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: string
+                            - type: number
+                        description: The parameters to be passed to the contract method.
+                  timestamp:
+                    type: integer
+                    format: int64
+                    description: The timestamp when the Oracle task was created or last updated.
+                    example: 1672531200
+                  operations:
+                    type: array
+                    description: The list of operations performed by the Oracle task.
+                    items:
+                      type: object
+                      description: 'Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.'
+                      properties:
+                        id:
+                          type: string
+                          description: A unique identifier for the Oracle operation.
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        type:
+                          type: string
+                          description: The type of the Oracle operation.
+                          enum:
+                            - READ
+                            - UPDATE
+                          example: READ
+                        networkId:
+                          type: object
+                          description: The network of the DLT being interacted with.
+                          properties:
+                            id:
+                              type: string
+                              description: The network of the DLT being interacted with.
+                            ledgerType:
+                              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                              type: string
+                              enum:
+                                - BESU_1X
+                                - BESU_2X
+                                - BURROW_0X
+                                - CORDA_4X
+                                - ETHEREUM
+                                - FABRIC_2
+                                - SAWTOOTH_1X
+                          required:
+                            - id
+                            - ledgerType
+                        contract:
+                          description: The contract associated with the Oracle operation.
+                          type: object
+                          properties:
+                            contractName:
+                              type: string
+                              description: The name of the contract.
+                            contractAddress:
+                              type: string
+                              description: The address of the contract.
+                              nullable: true
+                            contractAbi:
+                              type: array
+                              items:
+                                type: object
+                              description: The ABI (Application Binary Interface) of the contract.
+                              nullable: true
+                            contractBytecode:
+                              type: string
+                              description: The bytecode of the contract.
+                              nullable: true
+                            methodName:
+                              type: string
+                              description: The name of the method to be invoked on the contract.
+                            params:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: string
+                                  - type: number
+                              description: The parameters to be passed to the contract method.
+                        status:
+                          type: string
+                          description: The current status of the Oracle operation.
+                          enum:
+                            - PENDING
+                            - SUCCESS
+                            - FAILED
+                          example: IN_PROGRESS
+                        output:
+                          description: Optional output generated by the Oracle operation.
+                          type: object
+                          properties:
+                            transactionId:
+                              type: string
+                              description: The unique identifier for the transaction.
+                              example: '0x1234567890abcdef'
+                            transactionReceipt:
+                              type: object
+                              description: 'The receipt of the transaction, providing proof of execution.'
+                            output:
+                              type: string
+                              description: The output of the Oracle operation execution.
+                            proof:
+                              type: object
+                              description: Proof of the Oracle operation execution.
+                        timestamp:
+                          type: integer
+                          format: int64
+                          description: The timestamp when the Oracle operation was created or last updated.
+                          example: 1672531200
+                      required:
+                        - id
+                        - type
+                        - networkId
+                        - contract
+                        - status
+                        - timestamp
+                  status:
+                    type: enum
+                    description: The current status of the Oracle task.
+                    enum:
+                      - ACTIVE
+                      - INACTIVE
+                  mode:
+                    type: string
+                    description: The mode of operation for registered tasks.
+                    example: POLLING
+                    enum:
+                      - POLLING
+                      - EVENT_LISTENING
+                      - IMMEDIATE
+                  pollingInterval:
+                    type: integer
+                    description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+                    example: 5000
+                required:
+                  - id
+                  - type
+                  - srcContract
+                  - dstContract
+                  - timestamp
+                  - operations
+                  - status
+                  - mode
+        '400':
+          description: Bad request
+        '404':
+          description: Task not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register:
+    post:
+      summary: Register data transfer task
+      description: Register data transfer from source to target blockchain
+      operationId: RegisterOracleTask
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Request schema for registering a repeatable task.
+              type: object
+              required:
+                - taskType
+                - taskMode
+              properties:
+                sourceNetworkId:
+                  type: object
+                  description: The network of the DLT being interacted with.
+                  properties:
+                    id:
+                      type: string
+                      description: The network of the DLT being interacted with.
+                    ledgerType:
+                      description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                      type: string
+                      enum:
+                        - BESU_1X
+                        - BESU_2X
+                        - BURROW_0X
+                        - CORDA_4X
+                        - ETHEREUM
+                        - FABRIC_2
+                        - SAWTOOTH_1X
+                  required:
+                    - id
+                    - ledgerType
+                destinationNetworkId:
+                  type: object
+                  description: The network of the DLT being interacted with.
+                  properties:
+                    id:
+                      type: string
+                      description: The network of the DLT being interacted with.
+                    ledgerType:
+                      description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                      type: string
+                      enum:
+                        - BESU_1X
+                        - BESU_2X
+                        - BURROW_0X
+                        - CORDA_4X
+                        - ETHEREUM
+                        - FABRIC_2
+                        - SAWTOOTH_1X
+                  required:
+                    - id
+                    - ledgerType
+                sourceContract:
+                  description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  type: object
+                  properties:
+                    contractName:
+                      type: string
+                      description: The name of the contract.
+                    contractAddress:
+                      type: string
+                      description: The address of the contract.
+                      nullable: true
+                    contractAbi:
+                      type: array
+                      items:
+                        type: object
+                      description: The ABI (Application Binary Interface) of the contract.
+                      nullable: true
+                    contractBytecode:
+                      type: string
+                      description: The bytecode of the contract.
+                      nullable: true
+                    methodName:
+                      type: string
+                      description: The name of the method to be invoked on the contract.
+                    params:
+                      type: array
+                      items:
+                        oneOf:
+                          - type: string
+                          - type: number
+                      description: The parameters to be passed to the contract method.
+                destinationContract:
+                  description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  type: object
+                  properties:
+                    contractName:
+                      type: string
+                      description: The name of the contract.
+                    contractAddress:
+                      type: string
+                      description: The address of the contract.
+                      nullable: true
+                    contractAbi:
+                      type: array
+                      items:
+                        type: object
+                      description: The ABI (Application Binary Interface) of the contract.
+                      nullable: true
+                    contractBytecode:
+                      type: string
+                      description: The bytecode of the contract.
+                      nullable: true
+                    methodName:
+                      type: string
+                      description: The name of the method to be invoked on the contract.
+                    params:
+                      type: array
+                      items:
+                        oneOf:
+                          - type: string
+                          - type: number
+                      description: The parameters to be passed to the contract method.
+                taskMode:
+                  type: string
+                  description: The mode of operation for the repeatable task.
+                  example: POLLING
+                  enum:
+                    - POLLING
+                    - EVENT_LISTENING
+                pollingInterval:
+                  type: integer
+                  description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+                  example: 5000
+                listeningOptions:
+                  type: object
+                  description: Options for event listening. Only if taskMode is EVENT_LISTENING.
+                  required:
+                    - eventSignature
+                  properties:
+                    eventSignature:
+                      type: string
+                      description: The event signature to listen for on the source network. Only if taskMode is EVENT_LISTENING.
+                      example: 'Transfer(address,address,uint256)'
+                    filterParams:
+                      type: array
+                      items:
+                        type: string
+                      description: The parameters to filter in the captured events.
+                taskType:
+                  type: string
+                  description: The type of task to be registered.
+                  example: READ
+                  enum:
+                    - READ
+                    - UPDATE
+                    - READ_AND_UPDATE
+      responses:
+        '200':
+          description: Response schema for registering a data transfer task.
+          content:
+            application/json:
+              schema:
+                description: Response schema for registering a repeatable task. Includes the task ID and status of the registration.
+                type: object
+                properties:
+                  taskID:
+                    description: The unique identifier of the task.
+                    type: string
+                    example: 000003e8-e0b8-21ee-ba00-325096b39f47
+                  status:
+                    type: string
+                    enum:
+                      - SUCCESS
+                      - FAILED
+                    example: SUCCESS
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister:
+    post:
+      summary: Unregister data transfer task
+      description: Unregister data transfer task from source to target blockchain
+      operationId: UnregisterOracleTask
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister
+      parameters:
+        - name: taskID
+          in: query
+          schema:
+            type: string
+            description: Unique identifier (UUID) for the session.
+            example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          required: true
+          description: Unique identifier for the task.
+      responses:
+        '200':
+          description: Response schema for unregistering a data transfer task.
+          content:
+            application/json:
+              schema:
+                description: Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
+                type: object
+                properties:
+                  taskID:
+                    description: The unique identifier of the task.
+                    type: string
+                    example: 000003e8-e0b8-21ee-ba00-325096b39f47
+                  status:
+                    type: string
+                    enum:
+                      - SUCCESS
+                      - FAILED
+                    example: SUCCESS
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status:
+    get:
+      summary: Get oracle task status
+      description: Retrieve the status of an oracle task
+      operationId: GetOracleTaskStatus
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status
+      parameters:
+        - name: taskID
+          in: query
+          schema:
+            type: string
+            description: Unique identifier (UUID) for the session.
+            example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          required: true
+          description: Unique identifier for the task.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
+                type: object
+                properties:
+                  taskID:
+                    description: The unique identifier of the task.
+                    type: string
+                    example: 000003e8-e0b8-21ee-ba00-325096b39f47
+                  type:
+                    type: enum
+                    description: The type of the Oracle task.
+                    enum:
+                      - READ
+                      - UPDATE
+                      - READ_AND_UPDATE
+                  srcNetworkId:
+                    type: object
+                    description: The network of the DLT being interacted with.
+                    properties:
+                      id:
+                        type: string
+                        description: The network of the DLT being interacted with.
+                      ledgerType:
+                        description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                        type: string
+                        enum:
+                          - BESU_1X
+                          - BESU_2X
+                          - BURROW_0X
+                          - CORDA_4X
+                          - ETHEREUM
+                          - FABRIC_2
+                          - SAWTOOTH_1X
+                    required:
+                      - id
+                      - ledgerType
+                  srcContract:
+                    description: The source contract details for the Oracle task.
+                    type: object
+                    properties:
+                      contractName:
+                        type: string
+                        description: The name of the contract.
+                      contractAddress:
+                        type: string
+                        description: The address of the contract.
+                        nullable: true
+                      contractAbi:
+                        type: array
+                        items:
+                          type: object
+                        description: The ABI (Application Binary Interface) of the contract.
+                        nullable: true
+                      contractBytecode:
+                        type: string
+                        description: The bytecode of the contract.
+                        nullable: true
+                      methodName:
+                        type: string
+                        description: The name of the method to be invoked on the contract.
+                      params:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: string
+                            - type: number
+                        description: The parameters to be passed to the contract method.
+                  dstNetworkId:
+                    type: object
+                    description: The network of the DLT being interacted with.
+                    properties:
+                      id:
+                        type: string
+                        description: The network of the DLT being interacted with.
+                      ledgerType:
+                        description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                        type: string
+                        enum:
+                          - BESU_1X
+                          - BESU_2X
+                          - BURROW_0X
+                          - CORDA_4X
+                          - ETHEREUM
+                          - FABRIC_2
+                          - SAWTOOTH_1X
+                    required:
+                      - id
+                      - ledgerType
+                  dstContract:
+                    description: The destination contract details for the Oracle task.
+                    type: object
+                    properties:
+                      contractName:
+                        type: string
+                        description: The name of the contract.
+                      contractAddress:
+                        type: string
+                        description: The address of the contract.
+                        nullable: true
+                      contractAbi:
+                        type: array
+                        items:
+                          type: object
+                        description: The ABI (Application Binary Interface) of the contract.
+                        nullable: true
+                      contractBytecode:
+                        type: string
+                        description: The bytecode of the contract.
+                        nullable: true
+                      methodName:
+                        type: string
+                        description: The name of the method to be invoked on the contract.
+                      params:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: string
+                            - type: number
+                        description: The parameters to be passed to the contract method.
+                  timestamp:
+                    type: integer
+                    format: int64
+                    description: The timestamp when the Oracle task was created or last updated.
+                    example: 1672531200
+                  operations:
+                    type: array
+                    description: The list of operations performed by the Oracle task.
+                    items:
+                      type: object
+                      description: 'Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.'
+                      properties:
+                        id:
+                          type: string
+                          description: A unique identifier for the Oracle operation.
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        type:
+                          type: string
+                          description: The type of the Oracle operation.
+                          enum:
+                            - READ
+                            - UPDATE
+                          example: READ
+                        networkId:
+                          type: object
+                          description: The network of the DLT being interacted with.
+                          properties:
+                            id:
+                              type: string
+                              description: The network of the DLT being interacted with.
+                            ledgerType:
+                              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                              type: string
+                              enum:
+                                - BESU_1X
+                                - BESU_2X
+                                - BURROW_0X
+                                - CORDA_4X
+                                - ETHEREUM
+                                - FABRIC_2
+                                - SAWTOOTH_1X
+                          required:
+                            - id
+                            - ledgerType
+                        contract:
+                          description: The contract associated with the Oracle operation.
+                          type: object
+                          properties:
+                            contractName:
+                              type: string
+                              description: The name of the contract.
+                            contractAddress:
+                              type: string
+                              description: The address of the contract.
+                              nullable: true
+                            contractAbi:
+                              type: array
+                              items:
+                                type: object
+                              description: The ABI (Application Binary Interface) of the contract.
+                              nullable: true
+                            contractBytecode:
+                              type: string
+                              description: The bytecode of the contract.
+                              nullable: true
+                            methodName:
+                              type: string
+                              description: The name of the method to be invoked on the contract.
+                            params:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: string
+                                  - type: number
+                              description: The parameters to be passed to the contract method.
+                        status:
+                          type: string
+                          description: The current status of the Oracle operation.
+                          enum:
+                            - PENDING
+                            - SUCCESS
+                            - FAILED
+                          example: IN_PROGRESS
+                        output:
+                          description: Optional output generated by the Oracle operation.
+                          type: object
+                          properties:
+                            transactionId:
+                              type: string
+                              description: The unique identifier for the transaction.
+                              example: '0x1234567890abcdef'
+                            transactionReceipt:
+                              type: object
+                              description: 'The receipt of the transaction, providing proof of execution.'
+                            output:
+                              type: string
+                              description: The output of the Oracle operation execution.
+                            proof:
+                              type: object
+                              description: Proof of the Oracle operation execution.
+                        timestamp:
+                          type: integer
+                          format: int64
+                          description: The timestamp when the Oracle operation was created or last updated.
+                          example: 1672531200
+                      required:
+                        - id
+                        - type
+                        - networkId
+                        - contract
+                        - status
+                        - timestamp
+                  status:
+                    type: enum
+                    description: The current status of the Oracle task.
+                    enum:
+                      - ACTIVE
+                      - INACTIVE
+                  mode:
+                    type: string
+                    description: The mode of operation for registered tasks.
+                    example: POLLING
+                    enum:
+                      - POLLING
+                      - EVENT_LISTENING
+                      - IMMEDIATE
+                  pollingInterval:
+                    type: integer
+                    description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+                    example: 5000
+                required:
+                  - id
+                  - type
+                  - srcContract
+                  - dstContract
+                  - timestamp
+                  - operations
+                  - status
+                  - mode
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
         '500':
           description: Internal server error
 components:
@@ -2483,9 +3402,9 @@ components:
         - receiverAsset
       properties:
         contextID:
+          description: The unique identifier of the task.
           type: string
-          format: string
-          example: 123e4567-e89b-12d3-a456-426614174000
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
         payload:
           type: string
           example: '{"data":"example payload"}'
@@ -2887,6 +3806,10 @@ components:
       description: 'The subnetwork of the DLT being interacted with. TODO: implement network identification draft'
     SessionID:
       x-category: satp-core
+      type: string
+      description: Unique identifier (UUID) for the session.
+      example: 000003e8-e0b8-21ee-ba00-325096b39f47
+    TaskID:
       type: string
       description: Unique identifier (UUID) for the session.
       example: 000003e8-e0b8-21ee-ba00-325096b39f47
@@ -5282,6 +6205,1256 @@ components:
           description: The address to approve the token transfer.
       required:
         - approveAddress
+    OracleRegisterRequest:
+      description: Request schema for registering a repeatable task.
+      type: object
+      required:
+        - taskType
+        - taskMode
+      properties:
+        sourceNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        destinationNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        sourceContract:
+          description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        destinationContract:
+          description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        taskMode:
+          type: string
+          description: The mode of operation for the repeatable task.
+          example: POLLING
+          enum:
+            - POLLING
+            - EVENT_LISTENING
+        pollingInterval:
+          type: integer
+          description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+          example: 5000
+        listeningOptions:
+          type: object
+          description: Options for event listening. Only if taskMode is EVENT_LISTENING.
+          required:
+            - eventSignature
+          properties:
+            eventSignature:
+              type: string
+              description: The event signature to listen for on the source network. Only if taskMode is EVENT_LISTENING.
+              example: 'Transfer(address,address,uint256)'
+            filterParams:
+              type: array
+              items:
+                type: string
+              description: The parameters to filter in the captured events.
+        taskType:
+          type: string
+          description: The type of task to be registered.
+          example: READ
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
+    OracleExecuteRequest:
+      description: 'Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.'
+      type: object
+      properties:
+        sourceNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        destinationNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        sourceContract:
+          description: The contract data on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        destinationContract:
+          description: The contract data on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        taskType:
+          type: string
+          description: The type of task to be registered.
+          example: READ
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
+    BusinessLogicContract:
+      type: object
+      description: Represents a business logic contract with its associated metadata and method details.
+      properties:
+        contractName:
+          type: string
+          description: The name of the contract.
+        contractAddress:
+          type: string
+          description: The address of the contract.
+          nullable: true
+        contractAbi:
+          type: array
+          items:
+            type: object
+          description: The ABI (Application Binary Interface) of the contract.
+          nullable: true
+        contractBytecode:
+          type: string
+          description: The bytecode of the contract.
+          nullable: true
+        methodName:
+          type: string
+          description: The name of the method to be invoked on the contract.
+        params:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - type: number
+          description: The parameters to be passed to the contract method.
+    OracleTask:
+      type: object
+      description: 'Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature.'
+      properties:
+        taskID:
+          description: The unique identifier for the Oracle task.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+        type:
+          type: enum
+          description: The type of the Oracle task.
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
+        srcNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        srcContract:
+          description: The source contract details for the Oracle task.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        dstNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        dstContract:
+          description: The destination contract details for the Oracle task.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        timestamp:
+          type: integer
+          format: int64
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+        operations:
+          type: array
+          description: The list of operations performed by the Oracle task.
+          items:
+            type: object
+            description: 'Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.'
+            properties:
+              id:
+                type: string
+                description: A unique identifier for the Oracle operation.
+                example: 123e4567-e89b-12d3-a456-426614174000
+              type:
+                type: string
+                description: The type of the Oracle operation.
+                enum:
+                  - READ
+                  - UPDATE
+                example: READ
+              networkId:
+                type: object
+                description: The network of the DLT being interacted with.
+                properties:
+                  id:
+                    type: string
+                    description: The network of the DLT being interacted with.
+                  ledgerType:
+                    description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                    type: string
+                    enum:
+                      - BESU_1X
+                      - BESU_2X
+                      - BURROW_0X
+                      - CORDA_4X
+                      - ETHEREUM
+                      - FABRIC_2
+                      - SAWTOOTH_1X
+                required:
+                  - id
+                  - ledgerType
+              contract:
+                description: The contract associated with the Oracle operation.
+                type: object
+                properties:
+                  contractName:
+                    type: string
+                    description: The name of the contract.
+                  contractAddress:
+                    type: string
+                    description: The address of the contract.
+                    nullable: true
+                  contractAbi:
+                    type: array
+                    items:
+                      type: object
+                    description: The ABI (Application Binary Interface) of the contract.
+                    nullable: true
+                  contractBytecode:
+                    type: string
+                    description: The bytecode of the contract.
+                    nullable: true
+                  methodName:
+                    type: string
+                    description: The name of the method to be invoked on the contract.
+                  params:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: number
+                    description: The parameters to be passed to the contract method.
+              status:
+                type: string
+                description: The current status of the Oracle operation.
+                enum:
+                  - PENDING
+                  - SUCCESS
+                  - FAILED
+                example: IN_PROGRESS
+              output:
+                description: Optional output generated by the Oracle operation.
+                type: object
+                properties:
+                  transactionId:
+                    type: string
+                    description: The unique identifier for the transaction.
+                    example: '0x1234567890abcdef'
+                  transactionReceipt:
+                    type: object
+                    description: 'The receipt of the transaction, providing proof of execution.'
+                  output:
+                    type: string
+                    description: The output of the Oracle operation execution.
+                  proof:
+                    type: object
+                    description: Proof of the Oracle operation execution.
+              timestamp:
+                type: integer
+                format: int64
+                description: The timestamp when the Oracle operation was created or last updated.
+                example: 1672531200
+            required:
+              - id
+              - type
+              - networkId
+              - contract
+              - status
+              - timestamp
+        status:
+          type: enum
+          description: The current status of the Oracle task.
+          enum:
+            - ACTIVE
+            - INACTIVE
+        mode:
+          type: string
+          description: The mode of operation for registered tasks.
+          example: POLLING
+          enum:
+            - POLLING
+            - EVENT_LISTENING
+            - IMMEDIATE
+        pollingInterval:
+          type: integer
+          description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+          example: 5000
+        listeningOptions:
+          type: object
+          description: Options for event listening. Only if taskMode is EVENT_LISTENING.
+          required:
+            - eventSignature
+          properties:
+            eventSignature:
+              type: string
+              description: The event signature to listen for on the source network. Only if taskMode is EVENT_LISTENING.
+              example: 'Transfer(address,address,uint256)'
+            filterParams:
+              type: array
+              items:
+                type: string
+              description: The parameters to filter in the captured events.
+      required:
+        - taskID
+        - type
+        - srcContract
+        - dstContract
+        - timestamp
+        - operations
+        - status
+        - mode
+    OracleResponse:
+      type: object
+      description: 'Represents the response from an Oracle task execution, including transaction details and outputs.'
+      properties:
+        transactionId:
+          type: string
+          description: The unique identifier for the transaction.
+          example: '0x1234567890abcdef'
+        transactionReceipt:
+          type: object
+          description: 'The receipt of the transaction, providing proof of execution.'
+        output:
+          type: string
+          description: The output of the Oracle operation execution.
+        proof:
+          type: object
+          description: Proof of the Oracle operation execution.
+    OracleOperation:
+      type: object
+      description: 'Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.'
+      properties:
+        id:
+          type: string
+          description: A unique identifier for the Oracle operation.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        type:
+          type: string
+          description: The type of the Oracle operation.
+          enum:
+            - READ
+            - UPDATE
+          example: READ
+        networkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        contract:
+          description: The contract associated with the Oracle operation.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        status:
+          type: string
+          description: The current status of the Oracle operation.
+          enum:
+            - PENDING
+            - SUCCESS
+            - FAILED
+          example: IN_PROGRESS
+        output:
+          description: Optional output generated by the Oracle operation.
+          type: object
+          properties:
+            transactionId:
+              type: string
+              description: The unique identifier for the transaction.
+              example: '0x1234567890abcdef'
+            transactionReceipt:
+              type: object
+              description: 'The receipt of the transaction, providing proof of execution.'
+            output:
+              type: string
+              description: The output of the Oracle operation execution.
+            proof:
+              type: object
+              description: Proof of the Oracle operation execution.
+        timestamp:
+          type: integer
+          format: int64
+          description: The timestamp when the Oracle operation was created or last updated.
+          example: 1672531200
+      required:
+        - id
+        - type
+        - networkId
+        - contract
+        - status
+        - timestamp
+    OracleUnregisterRequest:
+      description: Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
+      type: object
+      required:
+        - taskID
+      properties:
+        taskID:
+          description: The unique identifier of the task to be unregistered.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+    OracleStatusRequest:
+      description: Request schema for checking the status of a data transfer task.
+      type: object
+      required:
+        - taskID
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+    OracleUnregisterResponse:
+      description: Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
+      type: object
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - FAILED
+          example: SUCCESS
+    OracleRegisterResponse:
+      description: Response schema for registering a repeatable task. Includes the task ID and status of the registration.
+      type: object
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - FAILED
+          example: SUCCESS
+    OracleExecuteResponse:
+      description: Response schema for executing a data transfer task. Includes the task ID and status of the execution.
+      type: object
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+        type:
+          type: enum
+          description: The type of the Oracle task.
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
+        srcNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        srcContract:
+          description: The source contract details for the Oracle task.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        dstNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        dstContract:
+          description: The destination contract details for the Oracle task.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        timestamp:
+          type: integer
+          format: int64
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+        operations:
+          type: array
+          description: The list of operations performed by the Oracle task.
+          items:
+            type: object
+            description: 'Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.'
+            properties:
+              id:
+                type: string
+                description: A unique identifier for the Oracle operation.
+                example: 123e4567-e89b-12d3-a456-426614174000
+              type:
+                type: string
+                description: The type of the Oracle operation.
+                enum:
+                  - READ
+                  - UPDATE
+                example: READ
+              networkId:
+                type: object
+                description: The network of the DLT being interacted with.
+                properties:
+                  id:
+                    type: string
+                    description: The network of the DLT being interacted with.
+                  ledgerType:
+                    description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                    type: string
+                    enum:
+                      - BESU_1X
+                      - BESU_2X
+                      - BURROW_0X
+                      - CORDA_4X
+                      - ETHEREUM
+                      - FABRIC_2
+                      - SAWTOOTH_1X
+                required:
+                  - id
+                  - ledgerType
+              contract:
+                description: The contract associated with the Oracle operation.
+                type: object
+                properties:
+                  contractName:
+                    type: string
+                    description: The name of the contract.
+                  contractAddress:
+                    type: string
+                    description: The address of the contract.
+                    nullable: true
+                  contractAbi:
+                    type: array
+                    items:
+                      type: object
+                    description: The ABI (Application Binary Interface) of the contract.
+                    nullable: true
+                  contractBytecode:
+                    type: string
+                    description: The bytecode of the contract.
+                    nullable: true
+                  methodName:
+                    type: string
+                    description: The name of the method to be invoked on the contract.
+                  params:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: number
+                    description: The parameters to be passed to the contract method.
+              status:
+                type: string
+                description: The current status of the Oracle operation.
+                enum:
+                  - PENDING
+                  - SUCCESS
+                  - FAILED
+                example: IN_PROGRESS
+              output:
+                description: Optional output generated by the Oracle operation.
+                type: object
+                properties:
+                  transactionId:
+                    type: string
+                    description: The unique identifier for the transaction.
+                    example: '0x1234567890abcdef'
+                  transactionReceipt:
+                    type: object
+                    description: 'The receipt of the transaction, providing proof of execution.'
+                  output:
+                    type: string
+                    description: The output of the Oracle operation execution.
+                  proof:
+                    type: object
+                    description: Proof of the Oracle operation execution.
+              timestamp:
+                type: integer
+                format: int64
+                description: The timestamp when the Oracle operation was created or last updated.
+                example: 1672531200
+            required:
+              - id
+              - type
+              - networkId
+              - contract
+              - status
+              - timestamp
+        status:
+          type: enum
+          description: The current status of the Oracle task.
+          enum:
+            - ACTIVE
+            - INACTIVE
+        mode:
+          type: string
+          description: The mode of operation for registered tasks.
+          example: POLLING
+          enum:
+            - POLLING
+            - EVENT_LISTENING
+            - IMMEDIATE
+        pollingInterval:
+          type: integer
+          description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+          example: 5000
+      required:
+        - id
+        - type
+        - srcContract
+        - dstContract
+        - timestamp
+        - operations
+        - status
+        - mode
+    OracleStatusResponse:
+      description: Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
+      type: object
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          type: string
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+        type:
+          type: enum
+          description: The type of the Oracle task.
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
+        srcNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        srcContract:
+          description: The source contract details for the Oracle task.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        dstNetworkId:
+          type: object
+          description: The network of the DLT being interacted with.
+          properties:
+            id:
+              type: string
+              description: The network of the DLT being interacted with.
+            ledgerType:
+              description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+              type: string
+              enum:
+                - BESU_1X
+                - BESU_2X
+                - BURROW_0X
+                - CORDA_4X
+                - ETHEREUM
+                - FABRIC_2
+                - SAWTOOTH_1X
+          required:
+            - id
+            - ledgerType
+        dstContract:
+          description: The destination contract details for the Oracle task.
+          type: object
+          properties:
+            contractName:
+              type: string
+              description: The name of the contract.
+            contractAddress:
+              type: string
+              description: The address of the contract.
+              nullable: true
+            contractAbi:
+              type: array
+              items:
+                type: object
+              description: The ABI (Application Binary Interface) of the contract.
+              nullable: true
+            contractBytecode:
+              type: string
+              description: The bytecode of the contract.
+              nullable: true
+            methodName:
+              type: string
+              description: The name of the method to be invoked on the contract.
+            params:
+              type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+              description: The parameters to be passed to the contract method.
+        timestamp:
+          type: integer
+          format: int64
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+        operations:
+          type: array
+          description: The list of operations performed by the Oracle task.
+          items:
+            type: object
+            description: 'Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.'
+            properties:
+              id:
+                type: string
+                description: A unique identifier for the Oracle operation.
+                example: 123e4567-e89b-12d3-a456-426614174000
+              type:
+                type: string
+                description: The type of the Oracle operation.
+                enum:
+                  - READ
+                  - UPDATE
+                example: READ
+              networkId:
+                type: object
+                description: The network of the DLT being interacted with.
+                properties:
+                  id:
+                    type: string
+                    description: The network of the DLT being interacted with.
+                  ledgerType:
+                    description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                    type: string
+                    enum:
+                      - BESU_1X
+                      - BESU_2X
+                      - BURROW_0X
+                      - CORDA_4X
+                      - ETHEREUM
+                      - FABRIC_2
+                      - SAWTOOTH_1X
+                required:
+                  - id
+                  - ledgerType
+              contract:
+                description: The contract associated with the Oracle operation.
+                type: object
+                properties:
+                  contractName:
+                    type: string
+                    description: The name of the contract.
+                  contractAddress:
+                    type: string
+                    description: The address of the contract.
+                    nullable: true
+                  contractAbi:
+                    type: array
+                    items:
+                      type: object
+                    description: The ABI (Application Binary Interface) of the contract.
+                    nullable: true
+                  contractBytecode:
+                    type: string
+                    description: The bytecode of the contract.
+                    nullable: true
+                  methodName:
+                    type: string
+                    description: The name of the method to be invoked on the contract.
+                  params:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: number
+                    description: The parameters to be passed to the contract method.
+              status:
+                type: string
+                description: The current status of the Oracle operation.
+                enum:
+                  - PENDING
+                  - SUCCESS
+                  - FAILED
+                example: IN_PROGRESS
+              output:
+                description: Optional output generated by the Oracle operation.
+                type: object
+                properties:
+                  transactionId:
+                    type: string
+                    description: The unique identifier for the transaction.
+                    example: '0x1234567890abcdef'
+                  transactionReceipt:
+                    type: object
+                    description: 'The receipt of the transaction, providing proof of execution.'
+                  output:
+                    type: string
+                    description: The output of the Oracle operation execution.
+                  proof:
+                    type: object
+                    description: Proof of the Oracle operation execution.
+              timestamp:
+                type: integer
+                format: int64
+                description: The timestamp when the Oracle operation was created or last updated.
+                example: 1672531200
+            required:
+              - id
+              - type
+              - networkId
+              - contract
+              - status
+              - timestamp
+        status:
+          type: enum
+          description: The current status of the Oracle task.
+          enum:
+            - ACTIVE
+            - INACTIVE
+        mode:
+          type: string
+          description: The mode of operation for registered tasks.
+          example: POLLING
+          enum:
+            - POLLING
+            - EVENT_LISTENING
+            - IMMEDIATE
+        pollingInterval:
+          type: integer
+          description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+          example: 5000
+      required:
+        - id
+        - type
+        - srcContract
+        - dstContract
+        - timestamp
+        - operations
+        - status
+        - mode
     NetworkId:
       type: object
       description: The network of the DLT being interacted with.
