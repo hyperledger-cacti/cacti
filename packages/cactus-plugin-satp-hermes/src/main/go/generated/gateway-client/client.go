@@ -49,7 +49,11 @@ type APIClient struct {
 
 	// API Services
 
+	AddCounterpartyApi AddCounterpartyApi
+
 	AdminApi AdminApi
+
+	GetApproveAddressApi GetApproveAddressApi
 
 	TransactionApi TransactionApi
 }
@@ -70,7 +74,9 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
+	c.AddCounterpartyApi = (*AddCounterpartyApiService)(&c.common)
 	c.AdminApi = (*AdminApiService)(&c.common)
+	c.GetApproveAddressApi = (*GetApproveAddressApiService)(&c.common)
 	c.TransactionApi = (*TransactionApiService)(&c.common)
 
 	return c

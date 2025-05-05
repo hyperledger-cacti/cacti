@@ -1,4 +1,8 @@
-import Docker, { Container, ContainerInfo } from "dockerode";
+import Docker, {
+  Container,
+  ContainerCreateOptions,
+  ContainerInfo,
+} from "dockerode";
 import Joi from "joi";
 import { EventEmitter } from "events";
 import {
@@ -15,13 +19,15 @@ export interface ISATPGatewayRunnerConstructorOptions {
   containerImageName?: string;
   serverPort?: number;
   clientPort?: number;
-  apiPort?: number;
+  oapiPort?: number;
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
-  configFile?: string;
-  outputLogFile?: string;
-  errorLogFile?: string;
-  knexDir?: string;
+  configFilePath?: string;
+  logsPath?: string;
+  ontologiesPath?: string;
+  databasePath?: string;
+  networkName?: string;
+  url?: string; // URL for the SATP gateway
 }
 
 export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
@@ -29,7 +35,7 @@ export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
   containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
   serverPort: 3010,
   clientPort: 3011,
-  apiPort: 4010,
+  oapiPort: 4010,
 });
 
 export const SATP_GATEWAY_RUNNER_OPTIONS_JOI_SCHEMA: Joi.Schema =
@@ -56,12 +62,13 @@ export class SATPGatewayRunner implements ITestLedger {
   public readonly containerImageName: string;
   public readonly serverPort: number;
   public readonly clientPort: number;
-  public readonly apiPort: number;
+  public readonly oapiPort: number;
   public readonly emitContainerLogs: boolean;
-  public readonly configFile?: string;
-  public readonly outputLogFile?: string;
-  public readonly errorLogFile?: string;
-  public readonly knexDir?: string;
+  public readonly logsPath?: string;
+  public readonly configFilePath?: string;
+  public readonly ontologiesPath?: string;
+  private readonly networkName?: string;
+  private readonly url?: string;
 
   private readonly log: Logger;
   private container: Container | undefined;
@@ -83,13 +90,14 @@ export class SATPGatewayRunner implements ITestLedger {
       options.serverPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort;
     this.clientPort =
       options.clientPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort;
-    this.apiPort =
-      options.apiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.apiPort;
+    this.oapiPort =
+      options.oapiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort;
+    this.networkName = options.networkName;
+    this.url = options.url;
 
-    this.configFile = options.configFile;
-    this.outputLogFile = options.outputLogFile;
-    this.errorLogFile = options.errorLogFile;
-    this.knexDir = options.knexDir;
+    this.configFilePath = options.configFilePath;
+    this.logsPath = options.logsPath;
+    this.ontologiesPath = options.ontologiesPath;
 
     this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
       ? (options.emitContainerLogs as boolean)
@@ -115,21 +123,27 @@ export class SATPGatewayRunner implements ITestLedger {
   }
 
   public async getServerHost(): Promise<string> {
-    const hostPort = await this.getHostPort(this.serverPort);
-    this.log.debug(`getServerHost: ${hostPort}`);
-    return `http://localhost:${hostPort}`;
+    const address = "localhost";
+    const hostPort = await this.getHostPort(
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort,
+    );
+    return `${address}:${hostPort}`;
   }
 
   public async getClientHost(): Promise<string> {
-    const hostPort = await this.getHostPort(this.clientPort);
-    this.log.debug(`getClientHost: ${hostPort}`);
-    return `http://localhost:${hostPort}`;
+    const address = "localhost";
+    const hostPort = await this.getHostPort(
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort,
+    );
+    return `${address}:${hostPort}`;
   }
 
-  public async getApiHost(): Promise<string> {
-    const hostPort = await this.getHostPort(this.apiPort);
-    this.log.debug(`getApiHost: ${hostPort}`);
-    return `http://localhost:${hostPort}`;
+  public async getOApiHost(): Promise<string> {
+    const address = "localhost";
+    const hostPort = await this.getHostPort(
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort,
+    );
+    return `${address}:${hostPort}`;
   }
 
   public async getHostPort(configuredPort: number): Promise<number> {
@@ -147,33 +161,54 @@ export class SATPGatewayRunner implements ITestLedger {
     }
   }
 
+  public async getContainerIpAddress(): Promise<string> {
+    if (this.container) {
+      const containerInfo = await this.container.inspect();
+      if (containerInfo.NetworkSettings?.IPAddress) {
+        return containerInfo.NetworkSettings.IPAddress;
+      } else {
+        return "localhost";
+      }
+    }
+    throw new Error("Container not started");
+  }
+
   private createDockerHostConfig(): Docker.HostConfig {
+    this.log.debug("createDockerHostConfig()");
+
     const hostConfig: Docker.HostConfig = {
-      PublishAllPorts: true,
       Binds: [],
-      NetworkMode: "host",
+      PortBindings: {
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort}/tcp`]: [
+          { HostPort: `${this.serverPort}` },
+        ],
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: [
+          { HostPort: `${this.clientPort}` },
+        ],
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort}/tcp`]: [
+          { HostPort: `${this.oapiPort}` },
+        ],
+      },
     };
 
-    if (this.configFile) {
-      const containerPath = "/opt/cacti/satp-hermes/gateway-config.json";
-      hostConfig.Binds!.push(`${this.configFile}:${containerPath}:ro`);
+    const containerPath = "/opt/cacti/satp-hermes";
+
+    if (this.configFilePath) {
+      hostConfig.Binds!.push(
+        `${this.configFilePath}:${containerPath}/config/config.json:ro`,
+      );
     }
 
-    if (this.outputLogFile) {
-      const containerPath =
-        "/opt/cacti/satp-hermes/log/satp-gateway-output.log";
-      hostConfig.Binds!.push(`${this.outputLogFile}:${containerPath}:rw`);
+    if (this.logsPath) {
+      hostConfig.Binds!.push(`${this.logsPath}:${containerPath}/logs:rw`);
     }
 
-    if (this.errorLogFile) {
-      const containerPath = "/opt/cacti/satp-hermes/log/satp-gateway-error.log";
-      hostConfig.Binds!.push(`${this.errorLogFile}:${containerPath}:rw`);
+    if (this.ontologiesPath) {
+      hostConfig.Binds!.push(
+        `${this.ontologiesPath}:${containerPath}/ontologies:rw`,
+      );
     }
 
-    if (this.knexDir) {
-      const containerPath = "/opt/cacti/satp-hermes/src/knex/";
-      hostConfig.Binds!.push(`${this.knexDir}:${containerPath}:rw`);
-    }
     return hostConfig;
   }
 
@@ -192,22 +227,42 @@ export class SATPGatewayRunner implements ITestLedger {
       this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
     }
 
+    const hostConfig: Docker.HostConfig = this.createDockerHostConfig();
+
+    const createOptions: ContainerCreateOptions = {
+      ExposedPorts: {
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort}/tcp`]: {}, // SERVER_PORT
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: {}, // CLIENT_PORT
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort}/tcp`]: {}, // OAPI_PORT
+      },
+      HostConfig: { ...hostConfig, NetworkMode: this.networkName },
+    };
+
+    if (this.networkName) {
+      const networks = await docker.listNetworks();
+      const networkExists = networks.some((n) => n.Name === this.networkName);
+      if (!networkExists) {
+        await docker.createNetwork({
+          Name: this.networkName,
+          Driver: "bridge",
+        });
+      }
+      createOptions.NetworkingConfig = {
+        EndpointsConfig: {
+          [this.networkName]: {
+            Aliases: [this.url || "gateway.satp-hermes"],
+          },
+        },
+      };
+    }
+
     this.log.debug(`Starting container with image: ${imageFqn}...`);
     return new Promise<Container>((resolve, reject) => {
-      const hostConfig: Docker.HostConfig = this.createDockerHostConfig();
-
       const eventEmitter: EventEmitter = docker.run(
         imageFqn,
         [],
         [],
-        {
-          ExposedPorts: {
-            [`${this.serverPort}/tcp`]: {}, // SERVER_PORT
-            [`${this.clientPort}/tcp`]: {}, // CLIENT_PORT
-            [`${this.apiPort}/tcp`]: {}, // API_PORT
-          },
-          HostConfig: hostConfig,
-        },
+        createOptions,
         {},
         (err: unknown) => {
           if (err) {
@@ -240,7 +295,7 @@ export class SATPGatewayRunner implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 60000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 300000): Promise<void> {
     const fnTag = "SATPGatewayRunner#waitForHealthCheck()";
     const startedAt = Date.now();
     let isHealthy = false;
@@ -309,12 +364,32 @@ export class SATPGatewayRunner implements ITestLedger {
       containerImageName: this.containerImageName,
       serverPort: this.serverPort,
       clientPort: this.clientPort,
-      apiPort: this.apiPort,
+      apiPort: this.oapiPort,
     });
 
     if (validationResult.error) {
       throw new Error(
         `SATPGatewayRunner#ctor ${validationResult.error.annotate()}`,
+      );
+    }
+  }
+
+  public async connectToNetwork(networkName: string): Promise<void> {
+    const fnTag = "SATPGatewayRunner#connectToNetwork()";
+    if (!this.container) {
+      throw new Error(`${fnTag} Container is not started.`);
+    }
+
+    const docker = new Docker();
+    const network = docker.getNetwork(networkName);
+
+    try {
+      await network.inspect(); // Check if the network exists
+      await network.connect({ Container: this.container.id });
+      this.log.info(`Connected container to network: ${networkName}`);
+    } catch (error) {
+      throw new Error(
+        `${fnTag} Failed to connect to network "${networkName}": ${error}`,
       );
     }
   }
