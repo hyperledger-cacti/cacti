@@ -10,7 +10,10 @@ import {
   FungibleAsset,
   instanceOfFungibleAsset,
 } from "./ontology/assets/asset";
-import { ClaimFormatError, TransactionIdUndefinedError } from "./bridge-errors";
+import {
+  ClaimFormatError,
+  TransactionIdUndefinedError,
+} from "../common/errors";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   SATPBridgeExecutionLayer,

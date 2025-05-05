@@ -50,7 +50,7 @@ beforeAll(async () => {
     });
 
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
       claimFormat: ClaimFormat.DEFAULT,
     });

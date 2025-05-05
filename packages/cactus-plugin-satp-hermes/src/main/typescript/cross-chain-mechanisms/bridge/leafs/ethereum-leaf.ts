@@ -48,7 +48,7 @@ import {
   UnsupportedNetworkError,
   WrapperContractAlreadyCreatedError,
   WrapperContractError,
-} from "../bridge-errors";
+} from "../../common/errors";
 import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { Asset } from "../ontology/assets/asset";

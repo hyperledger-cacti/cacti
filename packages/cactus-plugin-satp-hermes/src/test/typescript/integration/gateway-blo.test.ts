@@ -12,7 +12,13 @@ import {
 
 import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../test-utils";
-import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
+import {
+  HealthCheckResponseStatusEnum,
+  OracleRegisterRequestTaskModeEnum,
+  OracleRegisterRequestTaskTypeEnum,
+  TransactRequestSourceAssetNetworkId,
+  TransactRequestSourceAssetNetworkIdLedgerTypeEnum,
+} from "../../../main/typescript";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
@@ -131,6 +137,32 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       expect(result.status).toBe(200);
       expect(result.data.integrations).toBeDefined();
       expect(result.data.integrations.length).toBe(0); // No integrations yet
+    } finally {
+      await gateway.shutdown();
+    }
+  });
+
+  test("Oracle endpoints work", async () => {
+    const gateway = await factory.create(options);
+
+    try {
+      await gateway.startup();
+      const address = options.gid!.address!;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
+
+      const oracleApiClient = createClient("OracleApi", address, port, logger);
+
+      try {
+        const result = await oracleApiClient.getOracleTaskStatus("test-task-id");
+        
+        expect(result).toBeDefined();
+        expect(result.status).toBe(200);
+        expect(result.data.taskID).toBe("test-task-id");
+      } catch (error) {
+        expect(error.response.data.error).toContain("test-task-id not found");
+      }
     } finally {
       await gateway.shutdown();
     }
