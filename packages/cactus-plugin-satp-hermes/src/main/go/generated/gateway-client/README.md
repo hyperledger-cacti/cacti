@@ -96,6 +96,10 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**GetStatus**](docs/AdminApi.md#getstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 *AdminApi* | [**Pause**](docs/AdminApi.md#pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
 *GetApproveAddressApi* | [**GetApproveAddress**](docs/GetApproveAddressApi.md#getapproveaddress) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address | Get approve address
+*OracleApi* | [**ExecuteOracleTask**](docs/OracleApi.md#executeoracletask) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute | Execute data transfer task
+*OracleApi* | [**GetOracleTaskStatus**](docs/OracleApi.md#getoracletaskstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status | Get oracle task status
+*OracleApi* | [**RegisterOracleTask**](docs/OracleApi.md#registeroracletask) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register | Register data transfer task
+*OracleApi* | [**UnregisterOracleTask**](docs/OracleApi.md#unregisteroracletask) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister | Unregister data transfer task
 *TransactionApi* | [**Cancel**](docs/TransactionApi.md#cancel) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel | Cancel a transaction session
 *TransactionApi* | [**GetIntegrations**](docs/TransactionApi.md#getintegrations) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations | Get supported integrations
 *TransactionApi* | [**GetRoutes**](docs/TransactionApi.md#getroutes) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes | Get a list of routes for a gateway-to-gateway asset transfer
@@ -116,6 +120,7 @@ Class | Method | HTTP request | Description
  - [AuthzJwtClaim](docs/AuthzJwtClaim.md)
  - [AuthzScope](docs/AuthzScope.md)
  - [BridgeInfo](docs/BridgeInfo.md)
+ - [BusinessLogicContract](docs/BusinessLogicContract.md)
  - [Cancel200Response](docs/Cancel200Response.md)
  - [CancelRequest](docs/CancelRequest.md)
  - [CancelResponse](docs/CancelResponse.md)
@@ -126,6 +131,16 @@ Class | Method | HTTP request | Description
  - [DLTProtocol](docs/DLTProtocol.md)
  - [DraftVersions](docs/DraftVersions.md)
  - [Estimate](docs/Estimate.md)
+ - [ExecuteOracleTask200Response](docs/ExecuteOracleTask200Response.md)
+ - [ExecuteOracleTask200ResponseDstContract](docs/ExecuteOracleTask200ResponseDstContract.md)
+ - [ExecuteOracleTask200ResponseOperationsInner](docs/ExecuteOracleTask200ResponseOperationsInner.md)
+ - [ExecuteOracleTask200ResponseOperationsInnerContract](docs/ExecuteOracleTask200ResponseOperationsInnerContract.md)
+ - [ExecuteOracleTask200ResponseOperationsInnerOutput](docs/ExecuteOracleTask200ResponseOperationsInnerOutput.md)
+ - [ExecuteOracleTask200ResponseSrcContract](docs/ExecuteOracleTask200ResponseSrcContract.md)
+ - [ExecuteOracleTaskRequest](docs/ExecuteOracleTaskRequest.md)
+ - [ExecuteOracleTaskRequestDestinationContract](docs/ExecuteOracleTaskRequestDestinationContract.md)
+ - [ExecuteOracleTaskRequestSourceContract](docs/ExecuteOracleTaskRequestSourceContract.md)
+ - [ExecuteOracleTaskRequestSourceContractParamsInner](docs/ExecuteOracleTaskRequestSourceContractParamsInner.md)
  - [FeeCost](docs/FeeCost.md)
  - [GasCost](docs/GasCost.md)
  - [GatewayIdentity](docs/GatewayIdentity.md)
@@ -139,6 +154,7 @@ Class | Method | HTTP request | Description
  - [GetHealthCheck200Response](docs/GetHealthCheck200Response.md)
  - [GetIntegrations200Response](docs/GetIntegrations200Response.md)
  - [GetIntegrations200ResponseIntegrationsInner](docs/GetIntegrations200ResponseIntegrationsInner.md)
+ - [GetOracleTaskStatus200Response](docs/GetOracleTaskStatus200Response.md)
  - [GetRoutes200Response](docs/GetRoutes200Response.md)
  - [GetRoutes200ResponseRoutesInner](docs/GetRoutes200ResponseRoutesInner.md)
  - [GetRoutes200ResponseRoutesInnerFromToken](docs/GetRoutes200ResponseRoutesInnerFromToken.md)
@@ -158,9 +174,25 @@ Class | Method | HTTP request | Description
  - [IntegrationDetails](docs/IntegrationDetails.md)
  - [IntegrationsResponse](docs/IntegrationsResponse.md)
  - [NetworkId](docs/NetworkId.md)
+ - [OracleExecuteRequest](docs/OracleExecuteRequest.md)
+ - [OracleExecuteResponse](docs/OracleExecuteResponse.md)
+ - [OracleOperation](docs/OracleOperation.md)
+ - [OracleRegisterRequest](docs/OracleRegisterRequest.md)
+ - [OracleRegisterResponse](docs/OracleRegisterResponse.md)
+ - [OracleResponse](docs/OracleResponse.md)
+ - [OracleStatusRequest](docs/OracleStatusRequest.md)
+ - [OracleStatusResponse](docs/OracleStatusResponse.md)
+ - [OracleTask](docs/OracleTask.md)
+ - [OracleUnregisterRequest](docs/OracleUnregisterRequest.md)
+ - [OracleUnregisterResponse](docs/OracleUnregisterResponse.md)
  - [Pause200Response](docs/Pause200Response.md)
  - [PauseRequest](docs/PauseRequest.md)
  - [PauseResponse](docs/PauseResponse.md)
+ - [RegisterOracleTask200Response](docs/RegisterOracleTask200Response.md)
+ - [RegisterOracleTaskRequest](docs/RegisterOracleTaskRequest.md)
+ - [RegisterOracleTaskRequestDestinationContract](docs/RegisterOracleTaskRequestDestinationContract.md)
+ - [RegisterOracleTaskRequestListeningOptions](docs/RegisterOracleTaskRequestListeningOptions.md)
+ - [RegisterOracleTaskRequestSourceContract](docs/RegisterOracleTaskRequestSourceContract.md)
  - [Route](docs/Route.md)
  - [RoutesResponse](docs/RoutesResponse.md)
  - [StatusRequest](docs/StatusRequest.md)
@@ -176,6 +208,7 @@ Class | Method | HTTP request | Description
  - [TransactRequestSourceAsset](docs/TransactRequestSourceAsset.md)
  - [TransactRequestSourceAssetNetworkId](docs/TransactRequestSourceAssetNetworkId.md)
  - [TransactResponse](docs/TransactResponse.md)
+ - [UnregisterOracleTask200Response](docs/UnregisterOracleTask200Response.md)
 
 
 ## Documentation For Authorization

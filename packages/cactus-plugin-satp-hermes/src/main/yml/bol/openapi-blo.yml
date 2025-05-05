@@ -54,20 +54,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ./schemas.yml#/TransactRequest
+              $ref: '#/components/schemas/TransactRequest'
       responses:
         '200':
           description: Transaction successfully queued
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/TransactResponse
+                $ref: '#/components/schemas/TransactResponse'
         default:
           description: An error occurred
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/APIError
+                $ref: '#/components/schemas/APIError'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel:
     post:
       tags:
@@ -83,7 +83,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ./schemas.yml#/CancelRequest
+              $ref: '#/components/schemas/CancelRequest'
         required: true
       responses:
         '200':
@@ -91,13 +91,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/CancelResponse
+                $ref: '#/components/schemas/CancelResponse'
         default:
           description: An error occurred or transaction cannot be cancelled
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/APIError
+                $ref: '#/components/schemas/APIError'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/status:
     get:
       summary: Get SATP current session data
@@ -113,7 +113,7 @@ paths:
         - name: SessionID
           in: query
           schema:
-            $ref: ./schemas.yml#/SessionID
+            $ref: '#/components/schemas/SessionID'
           required: true
           description: Unique identifier for the session.
       responses:
@@ -122,7 +122,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/StatusResponse
+                $ref: '#/components/schemas/StatusResponse'
         '400':
           description: Bad request
         '404':
@@ -144,14 +144,14 @@ paths:
         - name: SessionsRequest
           in: query
           schema:
-            $ref: "./schemas.yml#/AllSessionIdsRequest"
+            $ref: '#/components/schemas/AllSessionIdsRequest'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "./schemas.yml#/AllSessionIdsResponse"
+                $ref: '#/components/schemas/AllSessionIdsResponse'
         '400':
           description: Bad request
         '404':
@@ -175,7 +175,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './schemas.yml#/HealthCheckResponse'
+                $ref: '#/components/schemas/HealthCheckResponse'
         '500':
           description: Internal server error
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
@@ -193,7 +193,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ./schemas.yml#/ContinueRequest
+              $ref: '#/components/schemas/ContinueRequest'
         required: true
       responses:
         '200':
@@ -201,13 +201,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/ContinueResponse
+                $ref: '#/components/schemas/ContinueResponse'
         default:
           description: An error occurred or transaction cannot be continued
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/APIError
+                $ref: '#/components/schemas/APIError'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause:
     post:
       tags:
@@ -223,7 +223,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ./schemas.yml#/PauseRequest
+              $ref: '#/components/schemas/PauseRequest'
         required: true
       responses:
         '200':
@@ -231,13 +231,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/PauseResponse
+                $ref: '#/components/schemas/PauseResponse'
         default:
           description: An error occurred or transaction cannot be paused
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/APIError
+                $ref: '#/components/schemas/APIError'
  
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
     get:
@@ -256,13 +256,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/IntegrationsResponse
+                $ref: '#/components/schemas/IntegrationsResponse'
         default:
           description: An error occurred
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/APIError
+                $ref: '#/components/schemas/APIError'
 
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
     get:
@@ -279,43 +279,43 @@ paths:
         - name: fromNetworkID
           in: query
           schema:
-            $ref: ./schemas.yml#/DLTNetworkID
+            $ref: '#/components/schemas/DLTNetworkID'
           required: true
           description: The sending DLT Network.
         - name: fromAmount
           in: query
           schema:
-            $ref: ./schemas.yml#/AmountString
+            $ref: '#/components/schemas/AmountString'
           required: true
           description: The amount that should be sent including all decimals.
         - name: fromToken
           in: query
           schema:
-            $ref: ./schemas.yml#/Address
+            $ref: '#/components/schemas/Address'
           required: true
           description: The token that should be transferred. Can be the address or the symbol.
         - name: toDLTNetwork
           in: query
           schema:
-            $ref: ./schemas.yml#/DLTNetworkID
+            $ref: '#/components/schemas/DLTNetworkID'
           required: true
           description: The receiving DLT Network.
         - name: toToken
           in: query
           schema:
-            $ref: ./schemas.yml#/Address
+            $ref: '#/components/schemas/Address'
           required: true
           description: The token that should be transferred to. Can be the address or the symbol.
         - name: fromAddress
           in: query
           schema:
-            $ref: ./schemas.yml#/Address
+            $ref: '#/components/schemas/Address'
           required: true
           description: The sending wallet address.
         - name: toAddress
           in: query
           schema:
-            $ref: ./schemas.yml#/Address
+            $ref: '#/components/schemas/Address'
           required: true
           description: The receiving wallet address. If none is provided, the fromAddress will be used.
       responses:
@@ -324,13 +324,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/RoutesResponse
+                $ref: '#/components/schemas/RoutesResponse'
         default:
           description: An error occurred
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/APIError
+                $ref: '#/components/schemas/APIError'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit:
     get:
       tags:
@@ -369,7 +369,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/getAuditResponse
+                $ref: '#/components/schemas/getAuditResponse'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:
@@ -385,7 +385,7 @@ paths:
         - name: ApproveAddressRequest
           in: query
           schema:
-              $ref: ./schemas.yml#/GetApproveAddressRequest
+              $ref: '#/components/schemas/GetApproveAddressRequest'
           required: true
       responses:
         '200':
@@ -393,7 +393,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/GetApproveAddressResponse
+                $ref: '#/components/schemas/GetApproveAddressResponse'
         '400':
           description: Bad request
         '404':
@@ -412,22 +412,147 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: ./schemas.yml#/AddCounterpartyGatewayRequest
-        required: true
+              $ref: '#/components/schemas/AddCounterpartyGatewayRequest'
       responses:
         '200':  
-          description: Counterparty added successfully       
+          description: Counterparty added successfully
           content:
             application/json:
               schema:
-                $ref: ./schemas.yml#/AddCounterpartyGatewayResponse
+                $ref: '#/components/schemas/AddCounterpartyGatewayResponse'
         '400':
           description: Bad request
         '404':
           description: Counterparty not found
+        '500':
+          description: Internal server error
+
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute:
+    post:
+      summary: Execute data transfer task
+      description: Execute a registered data transfer task from source to target blockchain
+      operationId: ExecuteOracleTask
+      tags:
+      - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OracleExecuteRequest'
+      responses:
+        '200':
+          description: Response schema for executing a data transfer task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OracleExecuteResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Task not found
+        '500':
+          description: Internal server error
+
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register:
+    post:
+      summary: Register data transfer task
+      description: Register data transfer from source to target blockchain
+      operationId: RegisterOracleTask
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OracleRegisterRequest'
+      responses:
+        '200':
+          description: Response schema for registering a data transfer task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OracleRegisterResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister:
+    post:
+      summary: Unregister data transfer task
+      description: Unregister data transfer task from source to target blockchain
+      operationId: UnregisterOracleTask
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister
+      parameters:
+        - name: taskID
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskID'
+          required: true
+          description: Unique identifier for the task.
+      responses:
+        '200':
+          description: Response schema for unregistering a data transfer task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OracleUnregisterResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status:
+    get:
+      summary: Get oracle task status
+      description: Retrieve the status of an oracle task
+      operationId: GetOracleTaskStatus
+      tags:
+        - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status
+      parameters:
+        - name: taskID
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskID'
+          required: true
+          description: Unique identifier for the task.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OracleStatusResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Transaction not found
         '500':
           description: Internal server error
 components:
