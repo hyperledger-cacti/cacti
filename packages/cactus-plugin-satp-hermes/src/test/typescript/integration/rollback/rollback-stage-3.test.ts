@@ -49,12 +49,14 @@ import {
   Stage3HashesSchema,
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
-import { SATPCrossChainManager } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
-import SATPInteractionFabric from "../../fabric/satp-erc20-interact.json";
-import SATPInteractionBesu from "../../../solidity/satp-erc20-interact.json";
 import { FabricContractInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { EvmAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/evm-asset";
-import { FabricAsset } from "../../../../main/typescript/cross-chain-mechanisms/satp-bridge/types/fabric-asset";
+import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
+import { FabricLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
+import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
+import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/fabric-asset";
+import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
+import path from "path";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 let besuEnv: BesuTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
@@ -68,7 +70,6 @@ let gateway2: SATPGateway;
 
 let crashManager1: CrashManager;
 let crashManager2: CrashManager;
-let bridgesManager: SATPCrossChainManager;
 const sessionId = uuidv4();
 const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -77,10 +78,10 @@ const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "Rollback-stage-3",
 });
-const FABRIC_ASSET_ID = uuidv4();
-const BESU_ASSET_ID = uuidv4();
-const bridge_id =
-  "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
+
+let ontologyManager: OntologyManager;
+let besuLeaf: BesuLeaf;
+let fabricLeaf: FabricLeaf;
 
 // mock stage-3 rollback
 const createMockSession = (
@@ -140,22 +141,22 @@ const createMockSession = (
   });
   if (isClient) {
     sessionData.senderAsset = create(AssetSchema, {
-      tokenId: BESU_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
+      tokenId: besuEnv.defaultAsset.id,
+      referenceId: besuEnv.defaultAsset.referenceId,
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_SENDER_ASSET_OWNER",
-      ontology: "MOCK_SENDER_ASSET_ONTOLOGY",
       contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
       contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
     });
   }
   if (!isClient) {
     sessionData.receiverAsset = create(AssetSchema, {
-      tokenId: FABRIC_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
+      tokenId: fabricEnv.defaultAsset.id,
+      referenceId: fabricEnv.defaultAsset.referenceId,
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_RECEIVER_ASSET_OWNER",
-      ontology: "MOCK_RECEIVER_ASSET_ONTOLOGY",
       contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
       mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
       channelName: "MOCK_CHANNEL_ID",
@@ -178,45 +179,43 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
   {
-    const satpContractName = "satp-contract";
-    fabricEnv = await FabricTestEnvironment.setupTestEnvironment(
-      satpContractName,
-      bridge_id,
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+    ontologyManager = new OntologyManager({
       logLevel,
-    );
+      ontologiesPath: ontologiesPath,
+    });
+
+    const satpContractName = "satp-contract";
+    fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+      satpContractName,
+      logLevel,
+      claimFormat: ClaimFormat.DEFAULT,
+    });
     log.info("Fabric Ledger started successfully");
 
-    await fabricEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+    await fabricEnv.deployAndSetupContracts();
   }
 
   {
     const erc20TokenContract = "SATPContract";
-    const contractNameWrapper = "SATPWrapperContract";
 
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
-      erc20TokenContract,
-      contractNameWrapper,
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
+      satpContractName: erc20TokenContract,
       logLevel,
-    );
+    });
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
 
-  bridgesManager = new SATPCrossChainManager({
-    logLevel: "DEBUG",
-    networks: [besuEnv.besuConfig, fabricEnv.fabricConfig],
-    connectedDLTs: [
-      {
-        id: "BESU",
-        ledgerType: LedgerType.Besu2X,
-      },
-      {
-        id: "FABRIC",
-        ledgerType: LedgerType.Fabric2,
-      },
-    ],
-  });
+  fabricLeaf = new FabricLeaf(
+    fabricEnv.createFabricLeafConfig(ontologyManager, "DEBUG"),
+  );
+
+  besuLeaf = new BesuLeaf(
+    besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
+  );
 });
 
 afterAll(async () => {
@@ -259,44 +258,42 @@ afterAll(async () => {
 
 describe("Rollback Test stage 3", () => {
   it("should initiate stage-3 rollback strategy", async () => {
-    const besuAsset: EvmAsset = {
-      tokenId: BESU_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
-      amount: Number(100),
+    const besuAsset: EvmFungibleAsset = {
+      id: besuEnv.defaultAsset.id,
+      referenceId: besuEnv.defaultAsset.referenceId,
+      type: TokenType.NONSTANDARD_FUNGIBLE,
+      amount: "100",
       owner: besuEnv.firstHighNetWorthAccount,
       contractName: besuEnv.erc20TokenContract,
-      contractAddress: besuEnv.assetContractAddress,
-      ontology: JSON.stringify(SATPInteractionBesu),
+      contractAddress: besuEnv.assetContractAddress!,
+      network: besuEnv.network,
     };
-    const besuReceipt = await bridgesManager
-      .getBridge("BESU")
-      .wrapAsset(besuAsset);
+    const besuReceipt = await besuLeaf.wrapAsset(besuAsset);
+    expect(besuReceipt).toBeDefined();
     expect(besuReceipt).toBeDefined();
     log.info(`Besu Asset Wrapped: ${besuReceipt}`);
 
-    const besuReceipt1 = await bridgesManager
-      .getBridge("BESU")
-      .lockAsset(BESU_ASSET_ID, 100);
+    const besuReceipt1 = await besuLeaf.lockAsset(besuEnv.defaultAsset.id, 100);
     expect(besuReceipt1).toBeDefined();
     log.info(`Besu Asset locked: ${besuReceipt1}`);
 
-    const fabricAsset: FabricAsset = {
-      tokenId: FABRIC_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
-      amount: Number(100),
+    const fabricAsset: FabricFungibleAsset = {
+      network: fabricEnv.network,
+      id: fabricEnv.defaultAsset.id,
+      referenceId: fabricEnv.defaultAsset.referenceId,
+      type: TokenType.NONSTANDARD_FUNGIBLE,
+      amount: "100",
       owner: fabricEnv.clientId,
       mspId: "Org1MSP",
       channelName: fabricEnv.fabricChannelName,
       contractName: fabricEnv.satpContractName,
-      ontology: JSON.stringify(SATPInteractionFabric),
     };
-    const fabricReceipt = await bridgesManager
-      .getBridge("FABRIC")
-      .wrapAsset(fabricAsset);
+
+    const fabricReceipt = await fabricLeaf.wrapAsset(fabricAsset);
     expect(fabricReceipt).toBeDefined();
     log.info(`Fabric Asset Wrapped: ${fabricReceipt}`);
 
-    const responseMint1 = await fabricEnv.apiClient.runTransactionV1({
+    const responseMint1 = await fabricEnv.connector.transact({
       contractName: fabricEnv.satpContractName,
       channelName: fabricEnv.fabricChannelName,
       params: ["100"],
@@ -307,13 +304,16 @@ describe("Rollback Test stage 3", () => {
     expect(responseMint1).not.toBeUndefined();
 
     log.info(
-      `Mint 100 amount asset by the owner response: ${JSON.stringify(responseMint1.data)}`,
+      `Mint 100 amount asset by the owner response: ${JSON.stringify(responseMint1)}`,
     );
 
-    const responseApprove = await fabricEnv.apiClient.runTransactionV1({
+    const responseApprove = await fabricEnv.connector.transact({
       contractName: fabricEnv.satpContractName,
       channelName: fabricEnv.fabricChannelName,
-      params: [bridge_id, "100"],
+      params: [
+        await fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+        "100",
+      ],
       methodName: "Approve",
       invocationType: FabricContractInvocationType.Send,
       signingCredential: fabricEnv.fabricSigningCredential,
@@ -321,19 +321,21 @@ describe("Rollback Test stage 3", () => {
 
     expect(responseApprove).not.toBeUndefined();
     log.info(
-      `Approve 100 amount asset by the owner response: ${JSON.stringify(responseApprove.data)}`,
+      `Approve 100 amount asset by the owner response: ${JSON.stringify(responseApprove)}`,
     );
 
-    const responseLock = await bridgesManager
-      .getBridge("FABRIC")
-      .lockAsset(FABRIC_ASSET_ID, 100);
+    const responseLock = await fabricLeaf.lockAsset(
+      fabricEnv.defaultAsset.id,
+      100,
+    );
 
     expect(responseLock).not.toBeUndefined();
     log.info(`Lock asset response: ${JSON.stringify(responseLock)}`);
 
-    const responseMint = await bridgesManager
-      .getBridge("FABRIC")
-      .mintAsset(FABRIC_ASSET_ID, 100);
+    const responseMint = await fabricLeaf.mintAsset(
+      fabricEnv.defaultAsset.id,
+      100,
+    );
 
     log.info(`Mint asset response: ${JSON.stringify(responseMint)}`);
 
@@ -363,7 +365,6 @@ describe("Rollback Test stage 3", () => {
       address: "http://localhost" as Address,
       gatewayServerPort: 3005,
       gatewayClientPort: 3001,
-      gatewayOpenAPIPort: 3002,
     };
 
     const gatewayIdentity2: GatewayIdentity = {
@@ -387,7 +388,6 @@ describe("Rollback Test stage 3", () => {
       address: "http://localhost" as Address,
       gatewayServerPort: 3225,
       gatewayClientPort: 3211,
-      gatewayOpenAPIPort: 4210,
     };
 
     knexInstanceClient = knex(knexClientConnection);
@@ -397,14 +397,20 @@ describe("Rollback Test stage 3", () => {
     await knexInstanceRemote1.migrate.latest();
 
     const options1: SATPGatewayConfig = {
+      instanceId: uuidv4(),
       logLevel: "DEBUG",
       gid: gatewayIdentity1,
       counterPartyGateways: [gatewayIdentity2],
       keyPair: gateway1KeyPair,
-      bridgesConfig: [besuEnv.besuConfig],
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      ccConfig: {
+        bridgeConfig: [besuEnv.createBesuConfig()],
+      },
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
       enableCrashRecovery: true,
+      pluginRegistry: new PluginRegistry({
+        plugins: [],
+      }),
     };
 
     knexInstanceServer = knex(knexServerConnection);
@@ -414,14 +420,20 @@ describe("Rollback Test stage 3", () => {
     await knexInstanceRemote2.migrate.latest();
 
     const options2: SATPGatewayConfig = {
+      instanceId: uuidv4(),
       logLevel: "DEBUG",
       gid: gatewayIdentity2,
       counterPartyGateways: [gatewayIdentity1],
       keyPair: gateway2KeyPair,
-      bridgesConfig: [fabricEnv.fabricConfig],
-      knexLocalConfig: knexServerConnection,
-      knexRemoteConfig: knexTargetRemoteConnection,
+      ccConfig: {
+        bridgeConfig: [fabricEnv.createFabricConfig()],
+      },
+      localRepository: knexServerConnection,
+      remoteRepository: knexTargetRemoteConnection,
       enableCrashRecovery: true,
+      pluginRegistry: new PluginRegistry({
+        plugins: [],
+      }),
     };
 
     gateway1 = (await factory.create(options1)) as SATPGateway;

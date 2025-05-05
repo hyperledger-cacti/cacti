@@ -36,7 +36,7 @@ import {
   type IGatewayOrchestratorOptions,
 } from "../../../../main/typescript/services/gateway/gateway-orchestrator";
 import {
-  type ISATPBridgesOptions,
+  ISATPCrossChainManagerOptions,
   SATPCrossChainManager,
 } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
@@ -53,7 +53,7 @@ import type {
   IRemoteLogRepository,
 } from "../../../../main/typescript/database/repository/interfaces/repository";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import path from "path";
 
 let mockSession: SATPSession;
 
@@ -79,7 +79,6 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
     tokenType: TokenType.ERC20,
     amount: BigInt(100),
     owner: "MOCK_SENDER_ASSET_OWNER",
-    ontology: "MOCK_SENDER_ASSET_ONTOLOGY",
     contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
     contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
   });
@@ -87,7 +86,6 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
     tokenType: TokenType.ERC20,
     amount: BigInt(100),
     owner: "MOCK_RECEIVER_ASSET_OWNER",
-    ontology: "MOCK_RECEIVER_ASSET_ONTOLOGY",
     contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
     mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
     channelName: "MOCK_CHANNEL_ID",
@@ -126,12 +124,6 @@ beforeAll(async () => {
         Crash: SATP_CRASH_VERSION,
       },
     ],
-    connectedDLTs: [
-      {
-        id: "BESU",
-        ledgerType: LedgerType.Besu2X,
-      },
-    ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
   } as GatewayIdentity;
@@ -143,20 +135,22 @@ beforeAll(async () => {
     signer: signer,
   };
   const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
-
-  const bridgesManagerOptions: ISATPBridgesOptions = {
+  const ontologiesPath = path.join(__dirname, "../../../ontologies");
+  const bridgesManagerOptions: ISATPCrossChainManagerOptions = {
+    orquestrator: gatewayOrchestrator,
     logLevel: "DEBUG",
-    connectedDLTs: gatewayIdentity.connectedDLTs,
-    networks: [],
+    ontologyOptions: {
+      ontologiesPath: ontologiesPath,
+    },
   };
+
   const bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 
   const crashOptions: ICrashRecoveryManagerOptions = {
     instanceId: "test-instance",
     logLevel: "DEBUG" as LogLevelDesc,
-    bridgeConfig: bridgesManager,
+    ccManager: bridgesManager,
     orchestrator: gatewayOrchestrator,
-    defaultRepository: false,
     localRepository: localRepository,
     remoteRepository: remoteRepository,
     signer: signer,

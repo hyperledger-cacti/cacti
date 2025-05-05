@@ -2,7 +2,7 @@ import { JsObjectSigner } from "@hyperledger/cactus-common";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-export function bufArray2HexStr(array: Uint8Array): string {
+export function bufArray2HexStr(array: Uint8Array | Buffer | string): string {
   return Buffer.from(array).toString("hex");
 }
 

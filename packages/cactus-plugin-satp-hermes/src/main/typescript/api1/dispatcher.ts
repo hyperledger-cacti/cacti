@@ -6,7 +6,7 @@ import {
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
 
-import type { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
+import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 
 //import { GatewayIdentity, GatewayChannel } from "../core/types";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
@@ -14,8 +14,13 @@ import { GetStatusEndpointV1 } from "./admin/status-endpoint";
 
 //import { GetAuditRequest, GetAuditResponse } from "../generated/gateway-client/typescript-axios";
 import type {
+  AddCounterpartyGatewayRequest,
+  AddCounterpartyGatewayResponse,
+  GetApproveAddressRequest,
+  GetApproveAddressResponse,
   HealthCheckResponse,
   IntegrationsResponse,
+  NetworkId,
   StatusRequest,
   StatusResponse,
   TransactRequest,
@@ -35,11 +40,19 @@ import { IntegrationsEndpointV1 } from "./admin/integrations-endpoint";
 import { executeGetHealthCheck } from "./admin/get-healthcheck-handler-service";
 import { executeGetStatus } from "./admin/get-status-handler-service";
 import { executeTransact } from "./transaction/transact-handler-service";
+import { AddCounterpartyGatewayEndpointV1 } from "./admin/add-counterparty-gateway-endpoint";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../database/repository/interfaces/repository";
 import { GatewayShuttingDownError } from "./gateway-errors";
+import {
+  ClaimFormat,
+  TokenType,
+} from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
+import { getEnumValueByKey } from "../services/utils";
+import { GatewayIdentity } from "../core/types";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -47,11 +60,11 @@ export interface BLODispatcherOptions {
   instanceId: string;
   orchestrator: GatewayOrchestrator;
   signer: JsObjectSigner;
-  bridgesManager: SATPCrossChainManager;
+  ccManager: SATPCrossChainManager;
   pubKey: string;
-  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
+  claimFormat?: ClaimFormat;
 }
 
 // TODO: addGateways as an admin endpoint, simply calls orchestrator
@@ -61,12 +74,10 @@ export class BLODispatcher {
   private readonly level: LogLevelDesc;
   private readonly label: string;
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private OAPIEndpoints: IWebServiceEndpoint[] | undefined;
   private readonly instanceId: string;
   private manager: SATPManager;
   private orchestrator: GatewayOrchestrator;
-  private bridgeManager: SATPCrossChainManager;
-  private defaultRepository: boolean;
+  private ccManager: SATPCrossChainManager;
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
   private isShuttingDown = false;
@@ -86,23 +97,22 @@ export class BLODispatcher {
     this.orchestrator = options.orchestrator;
     const signer = options.signer;
     const ourGateway = this.orchestrator.ourGateway;
-    this.defaultRepository = options.defaultRepository;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
 
-    this.bridgeManager = options.bridgesManager;
+    this.ccManager = options.ccManager;
 
     const SATPManagerOpts: ISATPManagerOptions = {
       logLevel: this.level,
       instanceId: ourGateway?.id,
       signer: signer,
       connectedDLTs: this.orchestrator.connectedDLTs,
-      bridgeManager: this.bridgeManager,
+      ccManager: this.ccManager,
       orchestrator: this.orchestrator,
       pubKey: options.pubKey,
-      defaultRepository: this.defaultRepository,
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
+      claimFormat: options.claimFormat,
     };
 
     this.manager = new SATPManager(SATPManagerOpts);
@@ -141,34 +151,33 @@ export class BLODispatcher {
       logLevel: this.options.logLevel,
     });
 
-    // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
-    const endpoints = [
-      getStatusEndpointV1,
-      getHealthCheckEndpoint,
-      getIntegrationsEndpointV1,
-      getSessionIdsEndpointV1,
-    ];
-    this.endpoints = endpoints;
-    return endpoints;
-  }
-
-  public async getOrCreateOAPIWebServices(): Promise<IWebServiceEndpoint[]> {
-    const fnTag = `${BLODispatcher.CLASS_NAME}#getOrCreateOAPIWebServices()`;
-    this.logger.info(
-      `${fnTag}, Registering webservices on instanceId=${this.instanceId}`,
-    );
-
-    if (Array.isArray(this.OAPIEndpoints)) {
-      return this.OAPIEndpoints;
-    }
+    const getApproveAddressEndpointV1 = new GetApproveAddressEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
 
     const transactEndpointV1 = new TransactEndpointV1({
       dispatcher: this,
       logLevel: this.options.logLevel,
     });
 
-    const endpoints = [transactEndpointV1];
-    this.OAPIEndpoints = endpoints;
+    const addCounterpartyGatewayEndpointV1 =
+      new AddCounterpartyGatewayEndpointV1({
+        dispatcher: this,
+        logLevel: this.options.logLevel,
+      });
+
+    // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
+    const endpoints = [
+      getStatusEndpointV1,
+      getHealthCheckEndpoint,
+      getIntegrationsEndpointV1,
+      getSessionIdsEndpointV1,
+      getApproveAddressEndpointV1,
+      transactEndpointV1,
+      addCounterpartyGatewayEndpointV1,
+    ];
+    this.endpoints = endpoints;
     return endpoints;
   }
 
@@ -223,6 +232,103 @@ export class BLODispatcher {
       this.orchestrator,
     );
     return res;
+  }
+
+  public async GetApproveAddress(
+    req: GetApproveAddressRequest,
+  ): Promise<GetApproveAddressResponse> {
+    this.logger.info("Get Approve Address request");
+    if (!req) {
+      throw new Error(`Request is required`);
+    }
+    if (!req.networkId) {
+      throw new Error(`Network ID is required`);
+    }
+    if (!req.tokenType) {
+      throw new Error(`Token type is required`);
+    }
+    if (!req.networkId.id || !req.networkId.ledgerType) {
+      throw new Error(`Network ID and Ledger Type are required`);
+    }
+    if (typeof req.networkId.id !== "string") {
+      throw new Error(`Network ID must be a string`);
+    }
+    const res = this.ccManager
+      .getClientBridgeManagerInterface()
+      .getApproveAddress(
+        req.networkId as NetworkId,
+        (() => {
+          const tokenType = getEnumValueByKey(TokenType, req.tokenType);
+          if (tokenType === undefined) {
+            throw new Error(`Invalid token type: ${req.tokenType}`);
+          }
+          return tokenType;
+        })(),
+      );
+    return {
+      approveAddress: res,
+    } as GetApproveAddressResponse;
+  }
+
+  public async AddCounterpartyGateway(
+    req: AddCounterpartyGatewayRequest,
+  ): Promise<AddCounterpartyGatewayResponse> {
+    this.logger.info("Add Counterparty Gateway request");
+    if (!req) {
+      throw new Error(`Request is required`);
+    }
+    if (!req.counterparty) {
+      throw new Error(`Gateway ID is required`);
+    }
+    if (!req.counterparty.id) {
+      throw new Error(`Gateway ID is required`);
+    }
+    if (!req.counterparty.version) {
+      throw new Error(`Gateway version is required`);
+    }
+    if (!req.counterparty.address) {
+      throw new Error(`Gateway address is required`);
+    }
+    if (!req.counterparty.connectedDLTs) {
+      throw new Error(`Gateway connectedDLTs is required`);
+    }
+    if (!req.counterparty.proofID) {
+      throw new Error(`Gateway proofID is required`);
+    }
+    if (!req.counterparty.gatewayServerPort) {
+      throw new Error(`Gateway gatewayServerPort is required`);
+    }
+    if (!req.counterparty.gatewayClientPort) {
+      throw new Error(`Gateway gatewayClientPort is required`);
+    }
+    if (!req.counterparty.gatewayOapiPort) {
+      throw new Error(`Gateway gatewayOapiPort is required`);
+    }
+    if (!req.counterparty.pubKey) {
+      throw new Error(`Gateway pubKey is required`);
+    }
+    if (!req.counterparty.name) {
+      throw new Error(`Gateway name is required`);
+    }
+
+    try {
+      await this.orchestrator.addGatewayAndCreateChannel(
+        req.counterparty as GatewayIdentity,
+      );
+
+      this.logger.info(`Gateway ${req.counterparty.id} added successfully`);
+      return {
+        status: true,
+      } as AddCounterpartyGatewayResponse;
+    } catch (ex) {
+      this.logger.error(
+        `Error adding gateway ${req.counterparty.id}: ${ex}`,
+        ex,
+      );
+      return {
+        status: false,
+      } as AddCounterpartyGatewayResponse;
+    }
   }
 
   public async GetSessionIds(): Promise<string[]> {

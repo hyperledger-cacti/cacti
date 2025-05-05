@@ -104,6 +104,156 @@ export interface Action {
     'toAddress'?: string;
 }
 /**
+ * Response schema for adding a counterparty.
+ * @export
+ * @interface AddCounterparty200Response
+ */
+export interface AddCounterparty200Response {
+    /**
+     * The status of the request.
+     * @type {boolean}
+     * @memberof AddCounterparty200Response
+     */
+    'status'?: boolean;
+}
+/**
+ * Request schema for adding a counterparty.
+ * @export
+ * @interface AddCounterpartyGatewayRequest
+ */
+export interface AddCounterpartyGatewayRequest {
+    /**
+     * 
+     * @type {AddCounterpartyRequestCounterparty}
+     * @memberof AddCounterpartyGatewayRequest
+     */
+    'counterparty': AddCounterpartyRequestCounterparty;
+}
+/**
+ * Response schema for adding a counterparty.
+ * @export
+ * @interface AddCounterpartyGatewayResponse
+ */
+export interface AddCounterpartyGatewayResponse {
+    /**
+     * The status of the request.
+     * @type {boolean}
+     * @memberof AddCounterpartyGatewayResponse
+     */
+    'status'?: boolean;
+}
+/**
+ * Request schema for adding a counterparty.
+ * @export
+ * @interface AddCounterpartyRequest
+ */
+export interface AddCounterpartyRequest {
+    /**
+     * 
+     * @type {AddCounterpartyRequestCounterparty}
+     * @memberof AddCounterpartyRequest
+     */
+    'counterparty': AddCounterpartyRequestCounterparty;
+}
+/**
+ * The identity of the gateway.
+ * @export
+ * @interface AddCounterpartyRequestCounterparty
+ */
+export interface AddCounterpartyRequestCounterparty {
+    /**
+     * The unique identifier for the gateway.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'id': string;
+    /**
+     * The public key of the gateway.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'pubKey': string;
+    /**
+     * The name of the gateway.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'name': string;
+    /**
+     * The draft versions supported by the gateway.
+     * @type {Array<AddCounterpartyRequestCounterpartyVersionInner>}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'version': Array<AddCounterpartyRequestCounterpartyVersionInner>;
+    /**
+     * The list of connected DLT networks.
+     * @type {Array<TransactRequestSourceAssetNetworkId>}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'connectedDLTs': Array<TransactRequestSourceAssetNetworkId>;
+    /**
+     * The proof ID associated with the gateway.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'proofID': string;
+    /**
+     * The server port of the gateway.
+     * @type {number}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'gatewayServerPort': number;
+    /**
+     * The client port of the gateway.
+     * @type {number}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'gatewayClientPort': number;
+    /**
+     * The OpenAPI port of the gateway.
+     * @type {number}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'gatewayOapiPort'?: number;
+    /**
+     * The UI port of the gateway.
+     * @type {number}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'gatewayUIPort'?: number;
+    /**
+     * A blockchain address.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterparty
+     */
+    'address': string;
+}
+/**
+ * The draft versions supported by the gateway.
+ * @export
+ * @interface AddCounterpartyRequestCounterpartyVersionInner
+ */
+export interface AddCounterpartyRequestCounterpartyVersionInner {
+    /**
+     * Core functionality or component.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterpartyVersionInner
+     */
+    'Core'?: string;
+    /**
+     * System architecture or design.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterpartyVersionInner
+     */
+    'Architecture'?: string;
+    /**
+     * Crash or failure scenario.
+     * @type {string}
+     * @memberof AddCounterpartyRequestCounterpartyVersionInner
+     */
+    'Crash'?: string;
+}
+/**
  * An asset
  * @export
  * @interface Asset
@@ -114,13 +264,13 @@ export interface Asset {
      * @type {string}
      * @memberof Asset
      */
-    'owner': string;
+    'id': string;
     /**
      * 
      * @type {string}
      * @memberof Asset
      */
-    'ontology': string;
+    'owner': string;
     /**
      * 
      * @type {string}
@@ -145,7 +295,42 @@ export interface Asset {
      * @memberof Asset
      */
     'channelName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Asset
+     */
+    'amount'?: string;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof Asset
+     */
+    'networkId': TransactRequestSourceAssetNetworkId;
+    /**
+     * The type of token.
+     * @type {string}
+     * @memberof Asset
+     */
+    'tokenType': AssetTokenTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Asset
+     */
+    'referenceId': string;
 }
+
+export const AssetTokenTypeEnum = {
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155',
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE'
+} as const;
+
+export type AssetTokenTypeEnum = typeof AssetTokenTypeEnum[keyof typeof AssetTokenTypeEnum];
+
 /**
  * Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1
  * @export
@@ -321,6 +506,31 @@ export type DLTProtocol = typeof DLTProtocol[keyof typeof DLTProtocol];
 
 
 /**
+ * The draft versions supported by the gateway.
+ * @export
+ * @interface DraftVersions
+ */
+export interface DraftVersions {
+    /**
+     * Core functionality or component.
+     * @type {string}
+     * @memberof DraftVersions
+     */
+    'Core'?: string;
+    /**
+     * System architecture or design.
+     * @type {string}
+     * @memberof DraftVersions
+     */
+    'Architecture'?: string;
+    /**
+     * Crash or failure scenario.
+     * @type {string}
+     * @memberof DraftVersions
+     */
+    'Crash'?: string;
+}
+/**
  * Provides an estimation for a transaction, including costs, amounts, and execution duration.
  * @export
  * @interface Estimate
@@ -472,6 +682,165 @@ export interface GasCost {
      * @memberof GasCost
      */
     'token'?: GetRoutes200ResponseRoutesInnerFromToken;
+}
+/**
+ * The identity of the gateway.
+ * @export
+ * @interface GatewayIdentity
+ */
+export interface GatewayIdentity {
+    /**
+     * The unique identifier for the gateway.
+     * @type {string}
+     * @memberof GatewayIdentity
+     */
+    'id': string;
+    /**
+     * The public key of the gateway.
+     * @type {string}
+     * @memberof GatewayIdentity
+     */
+    'pubKey': string;
+    /**
+     * The name of the gateway.
+     * @type {string}
+     * @memberof GatewayIdentity
+     */
+    'name': string;
+    /**
+     * The draft versions supported by the gateway.
+     * @type {Array<AddCounterpartyRequestCounterpartyVersionInner>}
+     * @memberof GatewayIdentity
+     */
+    'version': Array<AddCounterpartyRequestCounterpartyVersionInner>;
+    /**
+     * The list of connected DLT networks.
+     * @type {Array<TransactRequestSourceAssetNetworkId>}
+     * @memberof GatewayIdentity
+     */
+    'connectedDLTs': Array<TransactRequestSourceAssetNetworkId>;
+    /**
+     * The proof ID associated with the gateway.
+     * @type {string}
+     * @memberof GatewayIdentity
+     */
+    'proofID': string;
+    /**
+     * The server port of the gateway.
+     * @type {number}
+     * @memberof GatewayIdentity
+     */
+    'gatewayServerPort': number;
+    /**
+     * The client port of the gateway.
+     * @type {number}
+     * @memberof GatewayIdentity
+     */
+    'gatewayClientPort': number;
+    /**
+     * The OpenAPI port of the gateway.
+     * @type {number}
+     * @memberof GatewayIdentity
+     */
+    'gatewayOapiPort'?: number;
+    /**
+     * The UI port of the gateway.
+     * @type {number}
+     * @memberof GatewayIdentity
+     */
+    'gatewayUIPort'?: number;
+    /**
+     * A blockchain address.
+     * @type {string}
+     * @memberof GatewayIdentity
+     */
+    'address': string;
+}
+/**
+ * Response schema for getting the address to approve the token transfer.
+ * @export
+ * @interface GetApproveAddress200Response
+ */
+export interface GetApproveAddress200Response {
+    /**
+     * The address to approve the token transfer.
+     * @type {string}
+     * @memberof GetApproveAddress200Response
+     */
+    'approveAddress': string;
+}
+/**
+ * Request schema for getting the address to approve the token transfer.
+ * @export
+ * @interface GetApproveAddressApproveAddressRequestParameter
+ */
+export interface GetApproveAddressApproveAddressRequestParameter {
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof GetApproveAddressApproveAddressRequestParameter
+     */
+    'networkId': TransactRequestSourceAssetNetworkId;
+    /**
+     * The type of token.
+     * @type {string}
+     * @memberof GetApproveAddressApproveAddressRequestParameter
+     */
+    'tokenType': GetApproveAddressApproveAddressRequestParameterTokenTypeEnum;
+}
+
+export const GetApproveAddressApproveAddressRequestParameterTokenTypeEnum = {
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155',
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE'
+} as const;
+
+export type GetApproveAddressApproveAddressRequestParameterTokenTypeEnum = typeof GetApproveAddressApproveAddressRequestParameterTokenTypeEnum[keyof typeof GetApproveAddressApproveAddressRequestParameterTokenTypeEnum];
+
+/**
+ * Request schema for getting the address to approve the token transfer.
+ * @export
+ * @interface GetApproveAddressRequest
+ */
+export interface GetApproveAddressRequest {
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof GetApproveAddressRequest
+     */
+    'networkId': TransactRequestSourceAssetNetworkId;
+    /**
+     * The type of token.
+     * @type {string}
+     * @memberof GetApproveAddressRequest
+     */
+    'tokenType': GetApproveAddressRequestTokenTypeEnum;
+}
+
+export const GetApproveAddressRequestTokenTypeEnum = {
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155',
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE'
+} as const;
+
+export type GetApproveAddressRequestTokenTypeEnum = typeof GetApproveAddressRequestTokenTypeEnum[keyof typeof GetApproveAddressRequestTokenTypeEnum];
+
+/**
+ * Response schema for getting the address to approve the token transfer.
+ * @export
+ * @interface GetApproveAddressResponse
+ */
+export interface GetApproveAddressResponse {
+    /**
+     * The address to approve the token transfer.
+     * @type {string}
+     * @memberof GetApproveAddressResponse
+     */
+    'approveAddress': string;
 }
 /**
  * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
@@ -1328,6 +1697,38 @@ export interface IntegrationsResponse {
     'integrations': Array<GetIntegrations200ResponseIntegrationsInner>;
 }
 /**
+ * The network of the DLT being interacted with.
+ * @export
+ * @interface NetworkId
+ */
+export interface NetworkId {
+    /**
+     * The network of the DLT being interacted with.
+     * @type {string}
+     * @memberof NetworkId
+     */
+    'id': string;
+    /**
+     * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
+     * @type {string}
+     * @memberof NetworkId
+     */
+    'ledgerType': NetworkIdLedgerTypeEnum;
+}
+
+export const NetworkIdLedgerTypeEnum = {
+    Besu1X: 'BESU_1X',
+    Besu2X: 'BESU_2X',
+    Burrow0X: 'BURROW_0X',
+    Corda4X: 'CORDA_4X',
+    Ethereum: 'ETHEREUM',
+    Fabric2: 'FABRIC_2',
+    Sawtooth1X: 'SAWTOOTH_1X'
+} as const;
+
+export type NetworkIdLedgerTypeEnum = typeof NetworkIdLedgerTypeEnum[keyof typeof NetworkIdLedgerTypeEnum];
+
+/**
  * Response for a pause transaction request. Returns the current status of the SATP session post-pause action.
  * @export
  * @interface Pause200Response
@@ -1709,6 +2110,23 @@ export const TokenChainTypeEnum = {
 export type TokenChainTypeEnum = typeof TokenChainTypeEnum[keyof typeof TokenChainTypeEnum];
 
 /**
+ * The type of token.
+ * @export
+ * @enum {string}
+ */
+
+export const TokenType = {
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155',
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE'
+} as const;
+
+export type TokenType = typeof TokenType[keyof typeof TokenType];
+
+
+/**
  * Response schema for a transaction request. Includes the session ID and the current status of the transaction.
  * @export
  * @interface Transact200Response
@@ -1943,30 +2361,6 @@ export interface TransactRequest {
      * @type {string}
      * @memberof TransactRequest
      */
-    'fromDLTNetworkID': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
-    'toDLTNetworkID': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
-    'fromAmount': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
-    'toAmount': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
     'beneficiaryPubkey': string;
     /**
      * 
@@ -1998,13 +2392,13 @@ export interface TransactRequestSourceAsset {
      * @type {string}
      * @memberof TransactRequestSourceAsset
      */
-    'owner': string;
+    'id': string;
     /**
      * 
      * @type {string}
      * @memberof TransactRequestSourceAsset
      */
-    'ontology': string;
+    'owner': string;
     /**
      * 
      * @type {string}
@@ -2029,7 +2423,74 @@ export interface TransactRequestSourceAsset {
      * @memberof TransactRequestSourceAsset
      */
     'channelName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactRequestSourceAsset
+     */
+    'amount'?: string;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof TransactRequestSourceAsset
+     */
+    'networkId': TransactRequestSourceAssetNetworkId;
+    /**
+     * The type of token.
+     * @type {string}
+     * @memberof TransactRequestSourceAsset
+     */
+    'tokenType': TransactRequestSourceAssetTokenTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactRequestSourceAsset
+     */
+    'referenceId': string;
 }
+
+export const TransactRequestSourceAssetTokenTypeEnum = {
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155',
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE'
+} as const;
+
+export type TransactRequestSourceAssetTokenTypeEnum = typeof TransactRequestSourceAssetTokenTypeEnum[keyof typeof TransactRequestSourceAssetTokenTypeEnum];
+
+/**
+ * The network of the DLT being interacted with.
+ * @export
+ * @interface TransactRequestSourceAssetNetworkId
+ */
+export interface TransactRequestSourceAssetNetworkId {
+    /**
+     * The network of the DLT being interacted with.
+     * @type {string}
+     * @memberof TransactRequestSourceAssetNetworkId
+     */
+    'id': string;
+    /**
+     * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
+     * @type {string}
+     * @memberof TransactRequestSourceAssetNetworkId
+     */
+    'ledgerType': TransactRequestSourceAssetNetworkIdLedgerTypeEnum;
+}
+
+export const TransactRequestSourceAssetNetworkIdLedgerTypeEnum = {
+    Besu1X: 'BESU_1X',
+    Besu2X: 'BESU_2X',
+    Burrow0X: 'BURROW_0X',
+    Corda4X: 'CORDA_4X',
+    Ethereum: 'ETHEREUM',
+    Fabric2: 'FABRIC_2',
+    Sawtooth1X: 'SAWTOOTH_1X'
+} as const;
+
+export type TransactRequestSourceAssetNetworkIdLedgerTypeEnum = typeof TransactRequestSourceAssetNetworkIdLedgerTypeEnum[keyof typeof TransactRequestSourceAssetNetworkIdLedgerTypeEnum];
+
 /**
  * Response schema for a transaction request. Includes the session ID and the current status of the transaction.
  * @export
@@ -2049,6 +2510,113 @@ export interface TransactResponse {
      */
     'statusResponse': Transact200ResponseStatusResponse;
 }
+
+/**
+ * AddCounterpartyApi - axios parameter creator
+ * @export
+ */
+export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Add a counterparty to the Gateway
+         * @summary Add counterparty
+         * @param {AddCounterpartyRequest} addCounterpartyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addCounterparty: async (addCounterpartyRequest: AddCounterpartyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'addCounterpartyRequest' is not null or undefined
+            assertParamExists('addCounterparty', 'addCounterpartyRequest', addCounterpartyRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(addCounterpartyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AddCounterpartyApi - functional programming interface
+ * @export
+ */
+export const AddCounterpartyApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AddCounterpartyApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Add a counterparty to the Gateway
+         * @summary Add counterparty
+         * @param {AddCounterpartyRequest} addCounterpartyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AddCounterparty200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addCounterparty(addCounterpartyRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * AddCounterpartyApi - factory interface
+ * @export
+ */
+export const AddCounterpartyApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AddCounterpartyApiFp(configuration)
+    return {
+        /**
+         * Add a counterparty to the Gateway
+         * @summary Add counterparty
+         * @param {AddCounterpartyRequest} addCounterpartyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: any): AxiosPromise<AddCounterparty200Response> {
+            return localVarFp.addCounterparty(addCounterpartyRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AddCounterpartyApi - object-oriented interface
+ * @export
+ * @class AddCounterpartyApi
+ * @extends {BaseAPI}
+ */
+export class AddCounterpartyApi extends BaseAPI {
+    /**
+     * Add a counterparty to the Gateway
+     * @summary Add counterparty
+     * @param {AddCounterpartyRequest} addCounterpartyRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AddCounterpartyApi
+     */
+    public addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: AxiosRequestConfig) {
+        return AddCounterpartyApiFp(this.configuration).addCounterparty(addCounterpartyRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
 
 /**
  * AdminApi - axios parameter creator
@@ -2508,6 +3076,114 @@ export class AdminApi extends BaseAPI {
      */
     public pause(pauseRequest: PauseRequest, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).pause(pauseRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * GetApproveAddressApi - axios parameter creator
+ * @export
+ */
+export const GetApproveAddressApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Get approve address for the token transfer
+         * @summary Get approve address
+         * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getApproveAddress: async (approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'approveAddressRequest' is not null or undefined
+            assertParamExists('getApproveAddress', 'approveAddressRequest', approveAddressRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (approveAddressRequest !== undefined) {
+                localVarQueryParameter['ApproveAddressRequest'] = approveAddressRequest;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * GetApproveAddressApi - functional programming interface
+ * @export
+ */
+export const GetApproveAddressApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = GetApproveAddressApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Get approve address for the token transfer
+         * @summary Get approve address
+         * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getApproveAddress(approveAddressRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * GetApproveAddressApi - factory interface
+ * @export
+ */
+export const GetApproveAddressApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = GetApproveAddressApiFp(configuration)
+    return {
+        /**
+         * Get approve address for the token transfer
+         * @summary Get approve address
+         * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: any): AxiosPromise<GetApproveAddress200Response> {
+            return localVarFp.getApproveAddress(approveAddressRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * GetApproveAddressApi - object-oriented interface
+ * @export
+ * @class GetApproveAddressApi
+ * @extends {BaseAPI}
+ */
+export class GetApproveAddressApi extends BaseAPI {
+    /**
+     * Get approve address for the token transfer
+     * @summary Get approve address
+     * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GetApproveAddressApi
+     */
+    public getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: AxiosRequestConfig) {
+        return GetApproveAddressApiFp(this.configuration).getApproveAddress(approveAddressRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

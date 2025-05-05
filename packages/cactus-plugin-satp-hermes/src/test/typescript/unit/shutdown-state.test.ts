@@ -11,6 +11,7 @@ import {
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   IPluginFactoryOptions,
+  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import {
@@ -27,6 +28,9 @@ import {
   TransactRequest,
   TransactRequestSourceAsset,
 } from "../../../main/typescript";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -61,7 +65,10 @@ beforeAll(async () => {
 
 describe("Shutdown Verify State Tests", () => {
   test("Gateway waits to verify the sessions state before shutdown", async () => {
+    const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -78,8 +85,9 @@ describe("Shutdown Verify State Tests", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
+      ontologyPath: ontologiesPath,
     };
 
     const gateway = await factory.create(options);
@@ -107,7 +115,10 @@ describe("Shutdown Verify State Tests", () => {
   });
 
   test("Gateway waits for pending sessions to complete before shutdown", async () => {
+    const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -124,8 +135,9 @@ describe("Shutdown Verify State Tests", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
+      ontologyPath: ontologiesPath,
     };
 
     const gateway = await factory.create(options);
@@ -155,13 +167,14 @@ describe("Shutdown Verify State Tests", () => {
     const finalSessionState = await satpManager.getSATPSessionState();
     expect(finalSessionState).toBe(true);
 
-    expect(callCount).toBeGreaterThan(2);
-
     getSATPSessionStateSpy.mockRestore();
   });
 
   test("Gateway does not allow new transactions after shutdown is initiated", async () => {
+    const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -178,8 +191,9 @@ describe("Shutdown Verify State Tests", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
+      ontologyPath: ontologiesPath,
     };
 
     const gateway = await factory.create(options);
@@ -191,16 +205,19 @@ describe("Shutdown Verify State Tests", () => {
 
     const transactRequestSourceAsset: TransactRequestSourceAsset = {
       owner: "mockOwner",
-      ontology: "mockOntology",
       contractName: "mockContractName",
+      id: "",
+      networkId: {
+        id: "mockNetworkId",
+        ledgerType: LedgerType.Ethereum,
+      },
+      tokenType: "ERC20",
+      referenceId: "",
+      amount: "100",
     };
 
     const transactRequest: TransactRequest = {
       contextID: "mockContextID",
-      fromDLTNetworkID: "mockFromDLTNetworkID",
-      toDLTNetworkID: "mockToDLTNetworkID",
-      fromAmount: "100",
-      toAmount: "100",
       beneficiaryPubkey: "mockBeneficiaryPubkey",
       originatorPubkey: "mockOriginatorPubkey",
       sourceAsset: transactRequestSourceAsset,

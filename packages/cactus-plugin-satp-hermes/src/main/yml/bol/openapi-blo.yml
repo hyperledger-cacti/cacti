@@ -370,6 +370,66 @@ paths:
             application/json:
               schema:
                 $ref: ./schemas.yml#/getAuditResponse
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
+    get:
+      tags:
+        - get-approve-address
+      summary: Get approve address
+      description: Get approve address for the token transfer
+      operationId: GetApproveAddress
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address
+      parameters:
+        - name: ApproveAddressRequest
+          in: query
+          schema:
+              $ref: ./schemas.yml#/GetApproveAddressRequest
+          required: true
+      responses:
+        '200':
+          description: Approve address for the token transfer
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/GetApproveAddressResponse
+        '400':
+          description: Bad request
+        '404':
+          description: Approve address not found
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway:
+    post:
+      tags:
+        - add-counterparty
+      summary: Add counterparty
+      description: Add a counterparty to the Gateway
+      operationId: AddCounterparty
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/AddCounterpartyGatewayRequest
+        required: true
+      responses:
+        '200':  
+          description: Counterparty added successfully       
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/AddCounterpartyGatewayResponse
+        '400':
+          description: Bad request
+        '404':
+          description: Counterparty not found
+        '500':
+          description: Internal server error
 components:
   schemas:
     $ref: ./schemas.yml

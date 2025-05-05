@@ -3,8 +3,6 @@ import {
   type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
-import { SATPCrossChainManager } from "../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
-
 import {
   type ISATPServiceOptions,
   type SATPService,
@@ -29,6 +27,7 @@ import {
   LockType,
   MessageType,
   MintAssertionClaimSchema,
+  NetworkIdSchema,
   SignatureAlgorithm,
   WrapAssertionClaimSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
@@ -86,6 +85,8 @@ import { create, isMessage } from "@bufbuild/protobuf";
 let knexInstanceClient: Knex; // test as a client
 let knexInstanceRemote: Knex;
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { BridgeManagerClientInterface } from "../../../main/typescript/cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { BridgeManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-manager";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -114,7 +115,7 @@ let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
 let dbLogger: SATPLogger;
 let persistLogEntrySpy: jest.SpyInstance;
-let bridgeManager: SATPCrossChainManager;
+let bridgeManager: BridgeManagerClientInterface;
 
 let mockSession: SATPSession;
 let satpClientService0: Stage0ClientService;
@@ -146,24 +147,22 @@ let transferCompleteResponseMessage: TransferCompleteResponse;
 const sessionIDs: string[] = [];
 
 beforeAll(async () => {
-  bridgeManager = new SATPCrossChainManager({
-    connectedDLTs: connectedDLTs,
-    networks: [],
+  bridgeManager = new BridgeManager({
     logLevel: logLevel,
   });
 
-  jest.spyOn(bridgeManager, "getBridge").mockImplementation((id) => {
-    if (id === "BESU") {
-      return {
-        getNetworkType() {
-          return LedgerType.Besu2X;
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
-    }
+  jest.spyOn(bridgeManager, "getSATPExecutionLayer").mockImplementation(() => {
     return {
       getNetworkType() {
         return LedgerType.Besu2X;
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+  });
+  jest.spyOn(bridgeManager, "getBridgeEndPoint").mockImplementation(() => {
+    return {
+      getApproveAddress() {
+        return "MOCK_APPROVE_ADDRESS";
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
@@ -178,7 +177,6 @@ beforeAll(async () => {
   localRepository = new LocalLogRepository(knexClientConnection);
   remoteRepository = new RemoteLogRepository(knexSourceRemoteConnection);
   dbLogger = new SATPLogger({
-    defaultRepository: false,
     localRepository,
     remoteRepository,
     signer,
@@ -294,8 +292,6 @@ describe("SATP Services Testing", () => {
     sessionData.accessControlProfile = "MOCK_ACCESS_CONTROL_PROFILE";
     sessionData.resourceUrl = "MOCK_RESOURCE_URL";
     sessionData.lockAssertionExpiration = BigInt(99999);
-    sessionData.receiverContractOntology = "MOCK_RECEIVER_CONTRACT_ONTOLOGY"; //TODO when implemented verification of Contract Ontology change this
-    sessionData.senderContractOntology = "MOCK_SENDER_CONTRACT_ONTOLOGY";
     sessionData.sourceLedgerAssetId = "MOCK_SOURCE_LEDGER_ASSET_ID";
 
     sessionData.senderAsset = create(AssetSchema, {
@@ -303,18 +299,24 @@ describe("SATP Services Testing", () => {
       tokenType: TokenType.ERC20,
       amount: BigInt(0),
       owner: "MOCK_SENDER_ASSET_OWNER",
-      ontology: "MOCK_SENDER_ASSET_ONTOLOGY",
       contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
       contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
+      networkId: create(NetworkIdSchema, {
+        id: "BESU",
+        type: LedgerType.Besu2X,
+      }),
     });
     sessionData.receiverAsset = create(AssetSchema, {
       tokenType: TokenType.ERC20,
       amount: BigInt(0),
       owner: "MOCK_RECEIVER_ASSET_OWNER",
-      ontology: "MOCK_RECEIVER_ASSET_ONTOLOGY",
       contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
       mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
       channelName: "MOCK_CHANNEL_ID",
+      networkId: create(NetworkIdSchema, {
+        id: "FABRIC",
+        type: LedgerType.Fabric2,
+      }),
     });
 
     expect(satpClientService1).toBeDefined();
@@ -330,12 +332,6 @@ describe("SATP Services Testing", () => {
     expect(newSessionRequestMessage).toBeDefined();
     expect(newSessionRequestMessage.contextId).toBe(
       mockSession.getClientSessionData()?.transferContextId,
-    );
-    expect(newSessionRequestMessage.senderGatewayNetworkId).toBe(
-      mockSession.getClientSessionData().senderGatewayNetworkId,
-    );
-    expect(newSessionRequestMessage.recipientGatewayNetworkId).toBe(
-      mockSession.getClientSessionData().recipientGatewayNetworkId,
     );
     expect(newSessionRequestMessage.clientSignature).not.toBe("");
   });
@@ -355,12 +351,6 @@ describe("SATP Services Testing", () => {
     expect(mockSession.getClientSessionData()?.transferContextId).toBe(
       newSessionRequestMessage.contextId,
     );
-    expect(mockSession.getClientSessionData()?.senderGatewayNetworkId).toBe(
-      newSessionRequestMessage.senderGatewayNetworkId,
-    );
-    expect(mockSession.getClientSessionData()?.recipientGatewayNetworkId).toBe(
-      newSessionRequestMessage.recipientGatewayNetworkId,
-    );
   });
   it("Service0Server newSessionResponse", async () => {
     newSessionResponseMessage = await satpServerService0.newSessionResponse(
@@ -373,12 +363,6 @@ describe("SATP Services Testing", () => {
     expect(newSessionResponseMessage).toBeDefined();
     expect(newSessionResponseMessage.contextId).toBe(
       mockSession.getServerSessionData()?.transferContextId,
-    );
-    expect(newSessionResponseMessage.senderGatewayNetworkId).toBe(
-      mockSession.getServerSessionData().senderGatewayNetworkId,
-    );
-    expect(newSessionResponseMessage.recipientGatewayNetworkId).toBe(
-      mockSession.getServerSessionData().recipientGatewayNetworkId,
     );
     expect(newSessionResponseMessage.status).toBe(STATUS.STATUS_ACCEPTED);
     expect(newSessionResponseMessage.hashPreviousMessage).not.toBe("");
@@ -421,9 +405,6 @@ describe("SATP Services Testing", () => {
     expect(preSATPTransferRequestMessage.senderGatewayNetworkId).toBe(
       sessionData.senderGatewayNetworkId,
     );
-    expect(preSATPTransferRequestMessage.recipientGatewayNetworkId).toBe(
-      sessionData.recipientGatewayNetworkId,
-    );
     expect(preSATPTransferRequestMessage.senderAsset).toBeDefined();
     expect(preSATPTransferRequestMessage.receiverAsset).toBeDefined();
     expect(preSATPTransferRequestMessage.wrapAssertionClaim).toBeDefined();
@@ -447,6 +428,9 @@ describe("SATP Services Testing", () => {
     );
     expect(mockSession.getServerSessionData()?.receiverAsset).toBe(
       preSATPTransferRequestMessage.receiverAsset,
+    );
+    expect(mockSession.getServerSessionData()?.senderGatewayNetworkId).toBe(
+      preSATPTransferRequestMessage.senderGatewayNetworkId,
     );
   });
   it("Service0Server preSATPTransferResponse", async () => {
@@ -477,6 +461,9 @@ describe("SATP Services Testing", () => {
     expect(preSATPTransferResponseMessage.hashPreviousMessage).toBeDefined();
     expect(preSATPTransferResponseMessage.serverSignature).toBeDefined();
     expect(preSATPTransferResponseMessage.recipientTokenId).toBeDefined();
+    expect(
+      preSATPTransferResponseMessage.recipientGatewayNetworkId,
+    ).toBeDefined();
   });
   it("Service1Client checkPreSATPTransferResponse", async () => {
     expect(satpClientService1).toBeDefined();
@@ -492,6 +479,9 @@ describe("SATP Services Testing", () => {
     expect(mockSession.getClientSessionData()).toBeDefined();
     expect(mockSession.getClientSessionData()?.receiverAsset?.tokenId).toBe(
       preSATPTransferResponseMessage.recipientTokenId,
+    );
+    expect(mockSession.getClientSessionData().recipientGatewayNetworkId).toBe(
+      preSATPTransferResponseMessage.recipientGatewayNetworkId,
     );
   });
   it("Service1Client transferProposalRequest", async () => {
@@ -553,11 +543,11 @@ describe("SATP Services Testing", () => {
     ).toBe("MOCK_SENDER_GATEWAY_OWNER_ID");
     expect(
       transferProposalRequestMessage.transferInitClaims?.senderGatewayNetworkId,
-    ).toBe("BESU");
+    ).toBe("MOCK_APPROVE_ADDRESS");
     expect(
       transferProposalRequestMessage.transferInitClaims
         ?.recipientGatewayNetworkId,
-    ).toBe("FABRIC");
+    ).toBe("MOCK_APPROVE_ADDRESS");
     expect(
       transferProposalRequestMessage.networkCapabilities?.signatureAlgorithm,
     ).toBe(SignatureAlgorithm.RSA);

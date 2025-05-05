@@ -50,6 +50,25 @@ export class NonExistantGatewayIdentity extends SATPInternalError {
   }
 }
 
+export class GetApproveAddressError extends SATPInternalError {
+  constructor(
+    networkID: string,
+    networkType: string,
+    assetType: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Could not get approve address for network ${networkID}, ${networkType} and asset type ${assetType}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+  }
+}
+
 export class GetStatusError extends SATPInternalError {
   constructor(
     sessionID: string,

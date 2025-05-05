@@ -237,7 +237,7 @@ import (
 )
 
 func main() {
-    transactRequest := *openapiclient.NewTransactRequest("123e4567-e89b-12d3-a456-426614174000", "network1", "network2", "100", "95", "BeneficiaryPubkey_example", "OriginatorPubkey_example", *openapiclient.NewTransactRequestSourceAsset("Owner_example", "Ontology_example", "ContractName_example"), *openapiclient.NewTransactRequestSourceAsset("Owner_example", "Ontology_example", "ContractName_example")) // TransactRequest | 
+    transactRequest := *openapiclient.NewTransactRequest("123e4567-e89b-12d3-a456-426614174000", "BeneficiaryPubkey_example", "OriginatorPubkey_example", *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example"), *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example")) // TransactRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

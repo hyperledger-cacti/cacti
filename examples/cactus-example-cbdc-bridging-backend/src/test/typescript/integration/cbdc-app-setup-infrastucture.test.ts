@@ -38,15 +38,7 @@ describe("Setup CBDC app infrastructure", () => {
   let app: CbdcBridgingApp;
   it("Should setup everything successfully", async () => {
     const options: ICbdcBridgingApp = {
-      apiServer1Port: 4000,
-      apiServer2Port: 4100,
       apiHost: "localhost",
-      apiGateway1ServerPort: 3010,
-      apiGateway1ClientPort: 4011,
-      apiGateway1BloPort: 4010,
-      apiGateway2ServerPort: 3110,
-      apiGateway2ClientPort: 3111,
-      apiGateway2BloPort: 4110,
       logLevel,
     };
     app = new CbdcBridgingApp(options);

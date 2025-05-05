@@ -280,20 +280,27 @@ enum TokenType {
     TOKEN_TYPE_ERC20 = 1;
     TOKEN_TYPE_ERC721 = 2;
     TOKEN_TYPE_ERC1155 = 3;
-    TOKEN_TYPE_NONSTANDARD = 4;
+    TOKEN_TYPE_NONSTANDARD_FUNGIBLE = 4;
+    TOKEN_TYPE_NONSTANDARD_NONFUNGIBLE = 5;
 }
 
 message Asset {
   string token_id = 1;
-  TokenType token_type = 2;
-  string owner = 3;
-  uint64 amount = 4;
-  string ontology = 5;  
-  string contract_name = 7;
+  string reference_id = 2;
+  TokenType token_type = 3;
+  string owner = 4;
+  uint64 amount = 5;
+  string contract_name = 6;
   //besu
-  string contract_address = 6;
+  string contract_address = 7;
   //fabric
   string msp_id = 8;
   string channel_name = 9;
+  NetworkId network_id = 10;
+}
+
+message NetworkId {
+  string id = 1;
+  string type = 2;
 }
 

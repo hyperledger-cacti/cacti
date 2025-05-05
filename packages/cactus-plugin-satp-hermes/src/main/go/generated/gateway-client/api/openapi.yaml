@@ -429,6 +429,68 @@ paths:
         http:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
+    get:
+      description: Get approve address for the token transfer
+      operationId: GetApproveAddress
+      parameters:
+      - explode: true
+        in: query
+        name: ApproveAddressRequest
+        required: true
+        schema:
+          $ref: '#/components/schemas/GetApproveAddress_ApproveAddressRequest_parameter'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetApproveAddress_200_response'
+          description: Approve address for the token transfer
+        "400":
+          description: Bad request
+        "404":
+          description: Approve address not found
+        "500":
+          description: Internal server error
+      summary: Get approve address
+      tags:
+      - get-approve-address
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway:
+    post:
+      description: Add a counterparty to the Gateway
+      operationId: AddCounterparty
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCounterparty_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCounterparty_200_response'
+          description: Counterparty added successfully
+        "400":
+          description: Bad request
+        "404":
+          description: Counterparty not found
+        "500":
+          description: Internal server error
+      summary: Add counterparty
+      tags:
+      - add-counterparty
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
 components:
   schemas:
     AuthzScope:
@@ -649,9 +711,9 @@ components:
     Asset:
       description: An asset
       properties:
-        owner:
+        id:
           type: string
-        ontology:
+        owner:
           type: string
         contractName:
           type: string
@@ -661,10 +723,28 @@ components:
           type: string
         channelName:
           type: string
+        amount:
+          type: string
+        networkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        tokenType:
+          description: The type of token.
+          enum:
+          - ERC20
+          - ERC721
+          - ERC1155
+          - NONSTANDARD_FUNGIBLE
+          - NONSTANDARD_NONFUNGIBLE
+          type: string
+        referenceId:
+          type: string
       required:
       - contractName
-      - ontology
+      - id
+      - networkId
       - owner
+      - referenceId
+      - tokenType
       type: object
     TransactRequest:
       description: "Request schema for initiating a transaction. Includes details\
@@ -673,26 +753,34 @@ components:
       example:
         beneficiaryPubkey: beneficiaryPubkey
         payload: "{\"data\":\"example payload\"}"
-        fromAmount: "100"
-        toAmount: "95"
         sourceAsset:
           owner: owner
           mspId: mspId
+          amount: amount
           contractAddress: contractAddress
           contractName: contractName
           channelName: channelName
-          ontology: ontology
+          networkId:
+            ledgerType: BESU_1X
+            id: id
+          id: id
+          tokenType: ERC20
+          referenceId: referenceId
         originatorPubkey: originatorPubkey
         contextID: 123e4567-e89b-12d3-a456-426614174000
-        toDLTNetworkID: network2
-        fromDLTNetworkID: network1
         receiverAsset:
           owner: owner
           mspId: mspId
+          amount: amount
           contractAddress: contractAddress
           contractName: contractName
           channelName: channelName
-          ontology: ontology
+          networkId:
+            ledgerType: BESU_1X
+            id: id
+          id: id
+          tokenType: ERC20
+          referenceId: referenceId
       properties:
         contextID:
           example: 123e4567-e89b-12d3-a456-426614174000
@@ -700,18 +788,6 @@ components:
           type: string
         payload:
           example: "{\"data\":\"example payload\"}"
-          type: string
-        fromDLTNetworkID:
-          example: network1
-          type: string
-        toDLTNetworkID:
-          example: network2
-          type: string
-        fromAmount:
-          example: "100"
-          type: string
-        toAmount:
-          example: "95"
           type: string
         beneficiaryPubkey:
           type: string
@@ -724,13 +800,9 @@ components:
       required:
       - beneficiaryPubkey
       - contextID
-      - fromAmount
-      - fromDLTNetworkID
       - originatorPubkey
       - receiverAsset
       - sourceAsset
-      - toAmount
-      - toDLTNetworkID
       type: object
     TransactResponse:
       description: Response schema for a transaction request. Includes the session
@@ -1276,19 +1348,197 @@ components:
         token:
           $ref: '#/components/schemas/GetRoutes_200_response_routes_inner_fromToken'
       type: object
+    GetApproveAddressRequest:
+      description: Request schema for getting the address to approve the token transfer.
+      properties:
+        networkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        tokenType:
+          description: The type of token.
+          enum:
+          - ERC20
+          - ERC721
+          - ERC1155
+          - NONSTANDARD_FUNGIBLE
+          - NONSTANDARD_NONFUNGIBLE
+          type: string
+      required:
+      - networkId
+      - tokenType
+      type: object
+    GetApproveAddressResponse:
+      description: Response schema for getting the address to approve the token transfer.
+      properties:
+        approveAddress:
+          description: The address to approve the token transfer.
+          type: string
+      required:
+      - approveAddress
+      type: object
+    NetworkId:
+      description: The network of the DLT being interacted with.
+      properties:
+        id:
+          description: The network of the DLT being interacted with.
+          type: string
+        ledgerType:
+          description: "Enumerates the different ledger vendors and their major versions\
+            \ encoded within the name of the LedgerType. For example \"BESU_1X\" involves\
+            \ all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until,\
+            \ but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further\
+            \ explanation."
+          enum:
+          - BESU_1X
+          - BESU_2X
+          - BURROW_0X
+          - CORDA_4X
+          - ETHEREUM
+          - FABRIC_2
+          - SAWTOOTH_1X
+          type: string
+      required:
+      - id
+      - ledgerType
+      type: object
+    TokenType:
+      description: The type of token.
+      enum:
+      - ERC20
+      - ERC721
+      - ERC1155
+      - NONSTANDARD_FUNGIBLE
+      - NONSTANDARD_NONFUNGIBLE
+      type: string
+    DraftVersions:
+      description: The draft versions supported by the gateway.
+      properties:
+        Core:
+          description: Core functionality or component.
+          example: Core
+          type: string
+        Architecture:
+          description: System architecture or design.
+          example: Architecture
+          type: string
+        Crash:
+          description: Crash or failure scenario.
+          example: Crash
+          type: string
+      type: object
+    GatewayIdentity:
+      description: The identity of the gateway.
+      properties:
+        id:
+          description: The unique identifier for the gateway.
+          type: string
+        pubKey:
+          description: The public key of the gateway.
+          type: string
+        name:
+          description: The name of the gateway.
+          type: string
+        version:
+          description: The draft versions supported by the gateway.
+          items:
+            $ref: '#/components/schemas/AddCounterparty_request_counterparty_version_inner'
+          type: array
+        connectedDLTs:
+          description: The list of connected DLT networks.
+          items:
+            $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+          type: array
+        proofID:
+          description: The proof ID associated with the gateway.
+          type: string
+        gatewayServerPort:
+          description: The server port of the gateway.
+          type: integer
+        gatewayClientPort:
+          description: The client port of the gateway.
+          type: integer
+        gatewayOapiPort:
+          description: The OpenAPI port of the gateway.
+          type: integer
+        gatewayUIPort:
+          description: The UI port of the gateway.
+          type: integer
+        address:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+      required:
+      - address
+      - connectedDLTs
+      - gatewayClientPort
+      - gatewayServerPort
+      - id
+      - name
+      - proofID
+      - pubKey
+      - version
+      type: object
+    AddCounterpartyGatewayRequest:
+      description: Request schema for adding a counterparty.
+      properties:
+        counterparty:
+          $ref: '#/components/schemas/AddCounterparty_request_counterparty'
+      required:
+      - counterparty
+      type: object
+    AddCounterpartyGatewayResponse:
+      description: Response schema for adding a counterparty.
+      properties:
+        status:
+          description: The status of the request.
+          type: boolean
+      type: object
+    Transact_request_sourceAsset_networkId:
+      description: The network of the DLT being interacted with.
+      example:
+        ledgerType: BESU_1X
+        id: id
+      properties:
+        id:
+          description: The network of the DLT being interacted with.
+          type: string
+        ledgerType:
+          description: "Enumerates the different ledger vendors and their major versions\
+            \ encoded within the name of the LedgerType. For example \"BESU_1X\" involves\
+            \ all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until,\
+            \ but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further\
+            \ explanation."
+          enum:
+          - BESU_1X
+          - BESU_2X
+          - BURROW_0X
+          - CORDA_4X
+          - ETHEREUM
+          - FABRIC_2
+          - SAWTOOTH_1X
+          type: string
+      required:
+      - id
+      - ledgerType
+      type: object
     Transact_request_sourceAsset:
       description: An asset
       example:
         owner: owner
         mspId: mspId
+        amount: amount
         contractAddress: contractAddress
         contractName: contractName
         channelName: channelName
-        ontology: ontology
+        networkId:
+          ledgerType: BESU_1X
+          id: id
+        id: id
+        tokenType: ERC20
+        referenceId: referenceId
       properties:
-        owner:
+        id:
           type: string
-        ontology:
+        owner:
           type: string
         contractName:
           type: string
@@ -1298,10 +1548,28 @@ components:
           type: string
         channelName:
           type: string
+        amount:
+          type: string
+        networkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        tokenType:
+          description: The type of token.
+          enum:
+          - ERC20
+          - ERC721
+          - ERC1155
+          - NONSTANDARD_FUNGIBLE
+          - NONSTANDARD_NONFUNGIBLE
+          type: string
+        referenceId:
+          type: string
       required:
       - contractName
-      - ontology
+      - id
+      - networkId
       - owner
+      - referenceId
+      - tokenType
       type: object
     Transact_request:
       description: "Request schema for initiating a transaction. Includes details\
@@ -1315,18 +1583,6 @@ components:
         payload:
           example: "{\"data\":\"example payload\"}"
           type: string
-        fromDLTNetworkID:
-          example: network1
-          type: string
-        toDLTNetworkID:
-          example: network2
-          type: string
-        fromAmount:
-          example: "100"
-          type: string
-        toAmount:
-          example: "95"
-          type: string
         beneficiaryPubkey:
           type: string
         originatorPubkey:
@@ -1338,13 +1594,9 @@ components:
       required:
       - beneficiaryPubkey
       - contextID
-      - fromAmount
-      - fromDLTNetworkID
       - originatorPubkey
       - receiverAsset
       - sourceAsset
-      - toAmount
-      - toDLTNetworkID
       type: object
     Transact_200_response_statusResponse_originNetwork:
       example:
@@ -3257,3 +3509,117 @@ components:
           type: string
       type: object
       x-category: response
+    GetApproveAddress_ApproveAddressRequest_parameter:
+      description: Request schema for getting the address to approve the token transfer.
+      properties:
+        networkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        tokenType:
+          description: The type of token.
+          enum:
+          - ERC20
+          - ERC721
+          - ERC1155
+          - NONSTANDARD_FUNGIBLE
+          - NONSTANDARD_NONFUNGIBLE
+          type: string
+      required:
+      - networkId
+      - tokenType
+      type: object
+    GetApproveAddress_200_response:
+      description: Response schema for getting the address to approve the token transfer.
+      example:
+        approveAddress: approveAddress
+      properties:
+        approveAddress:
+          description: The address to approve the token transfer.
+          type: string
+      required:
+      - approveAddress
+      type: object
+    AddCounterparty_request_counterparty_version_inner:
+      description: The draft versions supported by the gateway.
+      properties:
+        Core:
+          description: Core functionality or component.
+          example: Core
+          type: string
+        Architecture:
+          description: System architecture or design.
+          example: Architecture
+          type: string
+        Crash:
+          description: Crash or failure scenario.
+          example: Crash
+          type: string
+      type: object
+    AddCounterparty_request_counterparty:
+      description: The identity of the gateway.
+      properties:
+        id:
+          description: The unique identifier for the gateway.
+          type: string
+        pubKey:
+          description: The public key of the gateway.
+          type: string
+        name:
+          description: The name of the gateway.
+          type: string
+        version:
+          description: The draft versions supported by the gateway.
+          items:
+            $ref: '#/components/schemas/AddCounterparty_request_counterparty_version_inner'
+          type: array
+        connectedDLTs:
+          description: The list of connected DLT networks.
+          items:
+            $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+          type: array
+        proofID:
+          description: The proof ID associated with the gateway.
+          type: string
+        gatewayServerPort:
+          description: The server port of the gateway.
+          type: integer
+        gatewayClientPort:
+          description: The client port of the gateway.
+          type: integer
+        gatewayOapiPort:
+          description: The OpenAPI port of the gateway.
+          type: integer
+        gatewayUIPort:
+          description: The UI port of the gateway.
+          type: integer
+        address:
+          description: A blockchain address.
+          example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
+          type: string
+      required:
+      - address
+      - connectedDLTs
+      - gatewayClientPort
+      - gatewayServerPort
+      - id
+      - name
+      - proofID
+      - pubKey
+      - version
+      type: object
+    AddCounterparty_request:
+      description: Request schema for adding a counterparty.
+      properties:
+        counterparty:
+          $ref: '#/components/schemas/AddCounterparty_request_counterparty'
+      required:
+      - counterparty
+      type: object
+    AddCounterparty_200_response:
+      description: Response schema for adding a counterparty.
+      example:
+        status: true
+      properties:
+        status:
+          description: The status of the request.
+          type: boolean
+      type: object

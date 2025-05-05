@@ -6,10 +6,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ContextID** | **string** |  | 
 **Payload** | Pointer to **string** |  | [optional] 
-**FromDLTNetworkID** | **string** |  | 
-**ToDLTNetworkID** | **string** |  | 
-**FromAmount** | **string** |  | 
-**ToAmount** | **string** |  | 
 **BeneficiaryPubkey** | **string** |  | 
 **OriginatorPubkey** | **string** |  | 
 **SourceAsset** | [**TransactRequestSourceAsset**](TransactRequestSourceAsset.md) |  | 
@@ -19,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewTransactRequest
 
-`func NewTransactRequest(contextID string, fromDLTNetworkID string, toDLTNetworkID string, fromAmount string, toAmount string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset, ) *TransactRequest`
+`func NewTransactRequest(contextID string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset, ) *TransactRequest`
 
 NewTransactRequest instantiates a new TransactRequest object
 This constructor will assign default values to properties that have it defined,
@@ -78,86 +74,6 @@ SetPayload sets Payload field to given value.
 `func (o *TransactRequest) HasPayload() bool`
 
 HasPayload returns a boolean if a field has been set.
-
-### GetFromDLTNetworkID
-
-`func (o *TransactRequest) GetFromDLTNetworkID() string`
-
-GetFromDLTNetworkID returns the FromDLTNetworkID field if non-nil, zero value otherwise.
-
-### GetFromDLTNetworkIDOk
-
-`func (o *TransactRequest) GetFromDLTNetworkIDOk() (*string, bool)`
-
-GetFromDLTNetworkIDOk returns a tuple with the FromDLTNetworkID field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetFromDLTNetworkID
-
-`func (o *TransactRequest) SetFromDLTNetworkID(v string)`
-
-SetFromDLTNetworkID sets FromDLTNetworkID field to given value.
-
-
-### GetToDLTNetworkID
-
-`func (o *TransactRequest) GetToDLTNetworkID() string`
-
-GetToDLTNetworkID returns the ToDLTNetworkID field if non-nil, zero value otherwise.
-
-### GetToDLTNetworkIDOk
-
-`func (o *TransactRequest) GetToDLTNetworkIDOk() (*string, bool)`
-
-GetToDLTNetworkIDOk returns a tuple with the ToDLTNetworkID field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetToDLTNetworkID
-
-`func (o *TransactRequest) SetToDLTNetworkID(v string)`
-
-SetToDLTNetworkID sets ToDLTNetworkID field to given value.
-
-
-### GetFromAmount
-
-`func (o *TransactRequest) GetFromAmount() string`
-
-GetFromAmount returns the FromAmount field if non-nil, zero value otherwise.
-
-### GetFromAmountOk
-
-`func (o *TransactRequest) GetFromAmountOk() (*string, bool)`
-
-GetFromAmountOk returns a tuple with the FromAmount field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetFromAmount
-
-`func (o *TransactRequest) SetFromAmount(v string)`
-
-SetFromAmount sets FromAmount field to given value.
-
-
-### GetToAmount
-
-`func (o *TransactRequest) GetToAmount() string`
-
-GetToAmount returns the ToAmount field if non-nil, zero value otherwise.
-
-### GetToAmountOk
-
-`func (o *TransactRequest) GetToAmountOk() (*string, bool)`
-
-GetToAmountOk returns a tuple with the ToAmount field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetToAmount
-
-`func (o *TransactRequest) SetToAmount(v string)`
-
-SetToAmount sets ToAmount field to given value.
-
 
 ### GetBeneficiaryPubkey
 

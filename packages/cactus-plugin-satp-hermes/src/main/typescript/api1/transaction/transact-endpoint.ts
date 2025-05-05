@@ -77,9 +77,7 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
-    this.log.debug(reqTag);
     const reqBody: TransactRequest = req.body;
-    this.log.debug("reqBody: ", reqBody);
     try {
       const result = await this.options.dispatcher.Transact(reqBody);
       res.json(result);

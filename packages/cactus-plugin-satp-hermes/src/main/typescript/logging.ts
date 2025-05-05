@@ -22,7 +22,6 @@ interface SATPLogEntry {
 }
 
 export interface ISATPLoggerConfig {
-  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
   signer: JsObjectSigner;
@@ -39,7 +38,6 @@ export class SATPLogger {
   private readonly log: Logger;
 
   constructor(config: ISATPLoggerConfig) {
-    this.defaultRepository = config.defaultRepository;
     this.localRepository = config.localRepository;
     this.remoteRepository = config.remoteRepository;
     this.signer = config.signer;
@@ -143,7 +141,6 @@ export class SATPLogger {
       this.log.info(
         `${fnTag} - Default configuration detected. Creating local repository.`,
       );
-      await this.localRepository.createKnex();
       this.log.info(`${fnTag} - Local repository created.`);
     }
 

@@ -3,16 +3,8 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import {
-  type LogLevelDesc,
-  LoggerProvider,
-  Servers,
-} from "@hyperledger/cactus-common";
-import {
-  ApiServer,
-  AuthorizationProtocol,
-  ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 import { ApiClient } from "@hyperledger/cactus-api-client";
 
 import {
@@ -28,14 +20,12 @@ import {
 } from "@hyperledger/cactus-core-api";
 import type { ShutdownHook } from "./../../../main/typescript/core/types";
 import {
-  DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
-import type { AddressInfo } from "node:net";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { AdminApi } from "../../../main/typescript";
 import {
@@ -66,7 +56,10 @@ beforeAll(async () => {
 
 describe("SATPGateway initialization", () => {
   it("should initiate gateway with default config", async () => {
-    const options: SATPGatewayConfig = {};
+    const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
+    };
     const gateway = await factory.create(options);
 
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -85,12 +78,13 @@ describe("SATPGateway initialization", () => {
     expect(identity.connectedDLTs).toEqual([]);
     expect(identity.gatewayServerPort).toBe(DEFAULT_PORT_GATEWAY_SERVER);
     expect(identity.gatewayClientPort).toBe(DEFAULT_PORT_GATEWAY_CLIENT);
-    expect(identity.gatewayOpenAPIPort).toBe(DEFAULT_PORT_GATEWAY_API);
     expect(identity.address).toBe("http://localhost");
   });
 
   it("should initiate gateway with custom config", async () => {
     const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
       logLevel: logLevel,
       gid: {
         id: "mockID",
@@ -107,11 +101,11 @@ describe("SATPGateway initialization", () => {
           { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
         ],
         proofID: "mockProofID10",
-        gatewayServerPort: 3010,
+        gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -139,6 +133,8 @@ describe("SATPGateway initialization", () => {
 
   it("should launch gateway server", async () => {
     const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
       logLevel: logLevel,
       gid: {
         id: "mockID",
@@ -150,15 +146,11 @@ describe("SATPGateway initialization", () => {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        connectedDLTs: [
-          { id: "BESU", ledgerType: LedgerType.Besu2X },
-          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
-        ],
         proofID: "mockProofID10",
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -174,6 +166,8 @@ describe("SATPGateway initialization", () => {
 
   it("shutdown hooks work", async () => {
     const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -184,17 +178,13 @@ describe("SATPGateway initialization", () => {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        connectedDLTs: [
-          { id: "BESU", ledgerType: LedgerType.Besu2X },
-          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
-        ],
         proofID: "mockProofID10",
         gatewayServerPort: 3014,
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
     };
 
     const gateway = await factory.create(options);
@@ -237,8 +227,10 @@ describe("SATPGateway initialization", () => {
 describe("SATPGateway startup", () => {
   test("initiates with default config", async () => {
     const options: SATPGatewayConfig = {
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -258,12 +250,13 @@ describe("SATPGateway startup", () => {
     expect(identity.connectedDLTs).toEqual([]);
     expect(identity.gatewayServerPort).toBe(DEFAULT_PORT_GATEWAY_SERVER);
     expect(identity.gatewayClientPort).toBe(DEFAULT_PORT_GATEWAY_CLIENT);
-    expect(identity.gatewayOpenAPIPort).toBe(DEFAULT_PORT_GATEWAY_API);
     expect(identity.address).toBe("http://localhost");
   });
 
   test("initiates custom config Gateway Coordinator", async () => {
     const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
       logLevel: logLevel,
       gid: {
         id: "mockID",
@@ -275,16 +268,12 @@ describe("SATPGateway startup", () => {
             Crash: "v1",
           },
         ],
-        connectedDLTs: [
-          { id: "BESU", ledgerType: LedgerType.Besu2X },
-          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
-        ],
         proofID: "mockProofID10",
         gatewayClientPort: 3001,
         address: "https://localhost",
       },
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -301,10 +290,7 @@ describe("SATPGateway startup", () => {
         Crash: "v1",
       },
     ]);
-    expect(identity.connectedDLTs).toEqual([
-      { id: "BESU", ledgerType: LedgerType.Besu2X },
-      { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
-    ]);
+
     expect(identity.proofID).toBe("mockProofID10");
     expect(identity.gatewayClientPort).toBe(3001);
     expect(identity.address).toBe("https://localhost");
@@ -312,6 +298,8 @@ describe("SATPGateway startup", () => {
 
   test("Gateway server launches and shutsdown correctly", async () => {
     const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
       logLevel: logLevel,
       gid: {
         id: "mockID",
@@ -323,19 +311,13 @@ describe("SATPGateway startup", () => {
             Crash: SATP_CRASH_VERSION,
           },
         ],
-        connectedDLTs: [
-          { id: "BESU", ledgerType: LedgerType.Besu2X },
-          { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
-        ],
         proofID: "mockProofID10",
         gatewayServerPort: 13010,
         gatewayClientPort: 13011,
-        gatewayOpenAPIPort: 4010,
         address: "http://localhost",
       },
-      enableOpenAPI: true,
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -344,36 +326,15 @@ describe("SATPGateway startup", () => {
     expect(identity.gatewayServerPort).toBe(13010);
     expect(identity.gatewayClientPort).toBe(13011);
     expect(identity.address).toBe("http://localhost");
-    const httpServer2 = await Servers.startOnPreferredPort(
-      DEFAULT_PORT_GATEWAY_API,
-    );
-    const addressInfo1 = httpServer2.address() as AddressInfo;
-    const node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
-    const pluginRegistry = new PluginRegistry({ plugins: [] });
 
-    const configService = new ConfigService();
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = addressInfo1.port;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.crpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
+    await gateway.startup();
 
-    const config =
-      await configService.newExampleConfigConvict(apiServerOptions);
-    pluginRegistry.add(gateway);
-    await gateway.onPluginInit();
-    const apiServer1 = new ApiServer({
-      httpServerApi: httpServer2,
-      config: config.getProperties(),
-      pluginRegistry,
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
+
+    const config1 = new Configuration({
+      basePath: gateway.getAddressOApiAddress(),
     });
-
-    await apiServer1.start();
-    const config1 = new Configuration({ basePath: node1Host });
     const mainApiClient = new ApiClient(config1);
     const admin = mainApiClient.extendWith(AdminApi);
 
@@ -386,8 +347,56 @@ describe("SATPGateway startup", () => {
     } finally {
       // todo error in the test, something was not properly shutdown
       await gateway.shutdown();
-      await httpServer2.closeAllConnections();
-      await apiServer1.shutdown();
+    }
+  });
+  test("Gateway launches without database config", async () => {
+    const options: SATPGatewayConfig = {
+      instanceId: "gateway-orchestrator-instance-id",
+      pluginRegistry: new PluginRegistry(),
+      logLevel: logLevel,
+      gid: {
+        id: "mockID",
+        name: "CustomGateway",
+        version: [
+          {
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
+          },
+        ],
+        proofID: "mockProofID10",
+        gatewayServerPort: 13010,
+        gatewayClientPort: 13011,
+        address: "http://localhost",
+      },
+    };
+    const gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+
+    const identity = gateway.Identity;
+    expect(identity.gatewayServerPort).toBe(13010);
+    expect(identity.gatewayClientPort).toBe(13011);
+    expect(identity.address).toBe("http://localhost");
+
+    await gateway.startup();
+
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
+
+    const config1 = new Configuration({
+      basePath: gateway.getAddressOApiAddress(),
+    });
+    const mainApiClient = new ApiClient(config1);
+    const admin = mainApiClient.extendWith(AdminApi);
+
+    try {
+      const result = await admin.getHealthCheck();
+      expect(result).toBeDefined();
+      expect(result.status).toBe(200);
+    } catch (error) {
+      logger.error`Error: ${error}`;
+    } finally {
+      await gateway.shutdown();
     }
   });
 });

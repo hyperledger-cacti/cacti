@@ -86,15 +86,13 @@ export class MintEndpointV1 implements IWebServiceEndpoint {
         reqBody.ledger.assetType ===
         TransactRequestSourceChainAssetTypeEnum.Besu
       ) {
-        result = await this.options.infrastructure.mintTokensBesu(
-          reqBody.user,
-          parseInt(reqBody.amount),
-        );
+        result = await this.options.infrastructure
+          .getBesuEnvironment()
+          .mintTokensBesu(reqBody.user, parseInt(reqBody.amount));
       } else {
-        result = await this.options.infrastructure.mintTokensFabric(
-          reqBody.user,
-          reqBody.amount,
-        );
+        result = await this.options.infrastructure
+          .getFabricEnvironment()
+          .mintTokensFabric(reqBody.user, reqBody.amount);
       }
       res.status(200).json(result);
     } catch (ex) {

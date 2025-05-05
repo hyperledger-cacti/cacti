@@ -6,6 +6,7 @@ import {
   LockType,
   MessageType,
   SignatureAlgorithm,
+  NetworkIdSchema,
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   MessageStagesTimestamps,
@@ -53,11 +54,14 @@ import {
   TransferCompleteRequestSchema,
   TransferCompleteResponseSchema,
 } from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { getEnumKeyByValue } from "../services/utils";
+import { getEnumKeyByValue, getEnumValueByKey } from "../services/utils";
 import { SATPInternalError } from "./errors/satp-errors";
 import { SATPSession } from "./satp-session";
 
 import { v4 as uuidv4 } from "uuid";
+import { TokenType } from "../public-api";
+import { TokenType as ProtoTokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+
 export enum TimestampType {
   PROCESSED = "PROCESSED",
   RECEIVED = "RECEIVED",
@@ -75,8 +79,6 @@ export function populateClientSessionData(
   receiverContractAddress: string | undefined,
   originatorPubkey: string,
   beneficiaryPubkey: string,
-  senderGatewayNetworkId: string,
-  recipientGatewayNetworkId: string,
   clientGatewayPubkey: string,
   serverGatewayPubkey: string,
   receiverGatewayOwnerId: string,
@@ -87,10 +89,8 @@ export function populateClientSessionData(
   credentialProfile: CredentialProfile,
   loggingProfile: string,
   accessControlProfile: string,
-  senderContractOntology: string,
-  receiverContractOntology: string,
-  fromAmount: string,
-  toAmount: string,
+  fromAmount: string | undefined,
+  toAmount: string | undefined,
   sourceMspId: string,
   sourceChannelName: string,
   receiverMspId: string,
@@ -99,6 +99,14 @@ export function populateClientSessionData(
   receiverContractName: string,
   sourceOwner: string,
   receiverOwner: string,
+  sourceAssetNetworkId: string,
+  sourceAssetReferenceId: string,
+  sourceAssetNetworkType: string,
+  sourceAssetTokenType: TokenType,
+  receiverAssetNetworkId: string,
+  receiverAssetReferenceId: string,
+  receiverAssetNetworkType: string,
+  receiverAssetTokenType: TokenType,
 ): SATPSession {
   const fn = "session_utils#populateClientSessionData";
   const sessionData = session.getClientSessionData();
@@ -109,8 +117,6 @@ export function populateClientSessionData(
   sessionData.digitalAssetId = uuidv4();
   sessionData.originatorPubkey = originatorPubkey;
   sessionData.beneficiaryPubkey = beneficiaryPubkey;
-  sessionData.senderGatewayNetworkId = senderGatewayNetworkId;
-  sessionData.recipientGatewayNetworkId = recipientGatewayNetworkId;
   sessionData.clientGatewayPubkey = clientGatewayPubkey;
   sessionData.serverGatewayPubkey = serverGatewayPubkey;
   sessionData.receiverGatewayOwnerId = receiverGatewayOwnerId;
@@ -121,28 +127,36 @@ export function populateClientSessionData(
   sessionData.credentialProfile = credentialProfile;
   sessionData.loggingProfile = loggingProfile;
   sessionData.accessControlProfile = accessControlProfile;
-  sessionData.senderContractOntology = senderContractOntology;
-  sessionData.receiverContractOntology = receiverContractOntology;
   sessionData.senderAsset = create(AssetSchema, {
     tokenId: uuidv4() + "-" + sessionData.transferContextId,
+    referenceId: sourceAssetReferenceId,
     owner: sourceOwner,
-    ontology: senderContractOntology,
     contractName: sourceContractName,
     contractAddress: sourceContractAddress || "",
-    amount: BigInt(fromAmount),
+    amount: BigInt(fromAmount || "0"),
     mspId: sourceMspId,
     channelName: sourceChannelName,
+    networkId: create(NetworkIdSchema, {
+      id: sourceAssetNetworkId,
+      type: sourceAssetNetworkType,
+    }),
+    tokenType: getEnumValueByKey(ProtoTokenType, sourceAssetTokenType),
   });
 
   sessionData.receiverAsset = create(AssetSchema, {
     tokenId: "",
+    referenceId: receiverAssetReferenceId,
     owner: receiverOwner,
-    ontology: receiverContractOntology,
     contractName: receiverContractName,
     contractAddress: receiverContractAddress || "",
-    amount: BigInt(toAmount),
+    amount: BigInt(toAmount || "0"),
     mspId: receiverMspId,
     channelName: receiverChannelName,
+    networkId: create(NetworkIdSchema, {
+      id: receiverAssetNetworkId,
+      type: receiverAssetNetworkType,
+    }),
+    tokenType: getEnumValueByKey(ProtoTokenType, receiverAssetTokenType),
   });
 
   sessionData.resourceUrl = "MOCK_RESOURCE_URL";
@@ -231,10 +245,6 @@ export function copySessionDataAttributes(
   destSessionData.lockAssertionExpiration =
     srcSessionData.lockAssertionExpiration;
   destSessionData.assetProfile = srcSessionData.assetProfile;
-  destSessionData.senderContractOntology =
-    srcSessionData.senderContractOntology;
-  destSessionData.receiverContractOntology =
-    srcSessionData.receiverContractOntology;
   destSessionData.resourceUrl = srcSessionData.resourceUrl;
   destSessionData.senderWrapAssertionClaim =
     srcSessionData.senderWrapAssertionClaim;

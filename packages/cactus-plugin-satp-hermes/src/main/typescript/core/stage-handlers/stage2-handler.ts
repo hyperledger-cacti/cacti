@@ -24,20 +24,17 @@ import { getSessionId } from "./handler-utils";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { saveMessageInSessionData, setError } from "../session-utils";
-import { NetworkId } from "../../services/network-identification/chainid-list";
 export class Stage2SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE2;
   private sessions: Map<string, SATPSession>;
   private serverService: Stage2ServerService;
   private clientService: Stage2ClientService;
-  private connectedDLTs: NetworkId[];
   private logger: Logger;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage2ServerService;
     this.clientService = ops.clientService as Stage2ClientService;
-    this.connectedDLTs = ops.connectedDLTs;
     this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
     this.logger.trace(`Initialized ${Stage2SATPHandler.CLASS_NAME}`);
   }

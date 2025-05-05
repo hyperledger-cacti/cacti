@@ -4,7 +4,10 @@ import { Stage0RollbackStrategy } from "../../../../main/typescript/core/crash-m
 import { Stage1RollbackStrategy } from "../../../../main/typescript/core/crash-management/rollback/stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "../../../../main/typescript/core/crash-management/rollback/stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "../../../../main/typescript/core/crash-management/rollback/stage3-rollback-strategy";
-import { SATPCrossChainManager } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
+import {
+  ISATPCrossChainManagerOptions,
+  SATPCrossChainManager,
+} from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { create } from "@bufbuild/protobuf";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import {
@@ -15,8 +18,28 @@ import {
   Stage2HashesSchema,
   Stage3HashesSchema,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import {
+  IJsObjectSignerOptions,
+  JsObjectSigner,
+  type LogLevelDesc,
+  LoggerProvider,
+  Secp256k1Keys,
+} from "@hyperledger/cactus-common";
+import {
+  Address,
+  GatewayIdentity,
+} from "../../../../main/typescript/core/types";
+import path from "path";
+import {
+  SATP_CORE_VERSION,
+  SATP_ARCHITECTURE_VERSION,
+  SATP_CRASH_VERSION,
+} from "../../../../main/typescript/core/constants";
+import {
+  IGatewayOrchestratorOptions,
+  GatewayOrchestrator,
+} from "../../../../main/typescript/services/gateway/gateway-orchestrator";
+import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
   const mockSession = new SATPSession({
@@ -43,22 +66,48 @@ describe("RollbackStrategyFactory Tests", () => {
   let bridgesManager: SATPCrossChainManager;
 
   beforeAll(async () => {
-    bridgesManager = new SATPCrossChainManager({
-      logLevel: "DEBUG",
-      networks: [],
-      connectedDLTs: [
+    const gatewayIdentity = {
+      id: "mockID-1",
+      name: "CustomGateway",
+      version: [
         {
-          id: "BESU",
-          ledgerType: LedgerType.Besu2X,
-        },
-        {
-          id: "FABRIC",
-          ledgerType: LedgerType.Fabric2,
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
         },
       ],
-    });
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+    } as GatewayIdentity;
 
-    factory = new RollbackStrategyFactory(bridgesManager, log);
+    const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
+    const signerOptions: IJsObjectSignerOptions = {
+      privateKey: bufArray2HexStr(keyPairs.privateKey),
+      logLevel: "debug",
+    };
+    const signer = new JsObjectSigner(signerOptions);
+
+    const orchestratorOptions: IGatewayOrchestratorOptions = {
+      logLevel: "DEBUG",
+      localGateway: gatewayIdentity,
+      counterPartyGateways: [],
+      signer: signer,
+    };
+    const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+    const bridgesManagerOptions: ISATPCrossChainManagerOptions = {
+      orquestrator: gatewayOrchestrator,
+      logLevel: "DEBUG",
+      ontologyOptions: {
+        ontologiesPath: ontologiesPath,
+      },
+    };
+    bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
+
+    factory = new RollbackStrategyFactory(
+      bridgesManager.getClientBridgeManagerInterface(),
+      log,
+    );
   });
 
   afterEach(() => {
