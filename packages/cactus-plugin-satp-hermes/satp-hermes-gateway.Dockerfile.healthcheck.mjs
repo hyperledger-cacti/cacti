@@ -21,33 +21,55 @@
  *    complexity is a trade-off we consider worth having because this script is not
  *    part of the API server's own codebase and therefore does not affect the complexity
  *    of that as such.
+ *
+ * Now we are using cURL to perform the healthcheck... We reached a weird problem when
+ * we were forwarding ports, making the node implementation not work.
  */
 
-import http from "http";
-import https from "https";
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const [nodeBinary, script, protocol, host, port, path] = process.argv;
+import { exec } from "child_process";
+
+const [, , protocol, host, port, path] = process.argv;
 
 const thePath =
   path ?? "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck";
-const isSecureHttp = protocol === "https";
-const httpModule = isSecureHttp ? https : http;
 
 const url = `${protocol}://${host}:${port}${thePath}`;
 
-httpModule
-  .get(url, (res) => {
-    const { statusCode, statusMessage } = res;
-    const exitCode = statusCode >= 200 && statusCode <= 300 ? 0 : 1;
-    if (exitCode === 0) {
-      console.log("%s Healthcheck OK: ", url, statusCode, statusMessage);
+function runCurl(url) {
+  return new Promise((resolve, reject) => {
+    const command = `curl "${url}"`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error running curl: ${error.message}`);
+        console.error(`Stderr: ${stderr}`);
+        reject(new Error(`Curl command failed with error: ${error.message}`));
+        return;
+      }
+
+      if (stderr) {
+        console.warn(`Curl reported warnings: ${stderr}`);
+      }
+
+      console.log("Curl output:");
+      console.log(stdout);
+      resolve(stdout);
+    });
+  });
+}
+
+runCurl(url)
+  .then((output) => {
+    if (output.trim() === '{"status":"AVAILABLE"}') {
+      console.log("Healthcheck passed.");
+      process.exit(0);
     } else {
-      console.error("%s Healthcheck FAIL_1: ", url, statusCode, statusMessage);
+      console.error("Healthcheck failed: Unexpected output.");
+      process.exit(1);
     }
-    process.exit(exitCode);
   })
-  .on("error", (ex) => {
-    console.error("%s Healthcheck FAIL_2: ", url, ex);
+  .catch((error) => {
+    console.error("Failed to run curl:", error.message);
     process.exit(1);
   });

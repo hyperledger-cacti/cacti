@@ -2,10 +2,10 @@ import { SATPError } from "../../core/errors/satp-errors";
 import type {
   Integration,
   IntegrationsResponse,
+  NetworkId,
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, type LogLevelDesc } from "@hyperledger/cactus-common";
 import type { SATPManager } from "../../services/gateway/satp-manager";
-import type { NetworkId } from "../../services/network-identification/chainid-list";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export async function executeGetIntegrations(
