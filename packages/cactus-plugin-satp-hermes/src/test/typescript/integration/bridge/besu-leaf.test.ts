@@ -45,7 +45,7 @@ beforeAll(async () => {
     });
 
     besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      satpContractName: erc20TokenContract,
+      contractName: erc20TokenContract,
       logLevel,
     });
     log.info("Besu Ledger started successfully");

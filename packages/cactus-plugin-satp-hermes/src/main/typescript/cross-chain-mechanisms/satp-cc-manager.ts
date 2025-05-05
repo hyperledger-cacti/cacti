@@ -8,6 +8,7 @@ import { BridgeManagerClientInterface } from "./bridge/interfaces/bridge-manager
 import { IOntologyManagerOptions } from "./bridge/ontology/ontology-manager";
 import { INetworkOptions } from "./bridge/bridge-types";
 import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
+import { OracleManager } from "./oracle/oracle-manager";
 export interface ISATPCrossChainManagerOptions {
   orquestrator: GatewayOrchestrator;
   logLevel?: LogLevelDesc;
@@ -15,7 +16,8 @@ export interface ISATPCrossChainManagerOptions {
 }
 
 export interface ICrossChainMechanismsOptions {
-  bridgeConfig: INetworkOptions[];
+  bridgeConfig?: INetworkOptions[];
+  oracleConfig?: INetworkOptions[];
 }
 
 // TODO extend to accomodate oracle
@@ -53,6 +55,11 @@ export class SATPCrossChainManager {
   private readonly gatewayOrchestrator: GatewayOrchestrator;
 
   /**
+   * Instance of the OracleManager to handle oracle-related operations.
+   */
+  private readonly oracleManager: OracleManager;
+
+  /**
    * Constructs an instance of `ISATPCCManager`.
    *
    * @param options - The options for configuring the `ISATPCCManager`.
@@ -68,7 +75,12 @@ export class SATPCrossChainManager {
     });
 
     this.gatewayOrchestrator = options.orquestrator;
-    //TODO create here oracle manager
+
+    this.oracleManager = new OracleManager({
+      logLevel: this.logLevel,
+      bungee: undefined,
+      initialTasks: [],
+    });
   }
 
   /**
@@ -83,8 +95,19 @@ export class SATPCrossChainManager {
     const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployCCMechanisms()`;
     this.log.debug(`${fnTag}, Deploying Cross Chain Mechanisms...`);
 
-    await this.deployBridgeFromConfig(config.bridgeConfig);
-    //TODO deploy oracle
+    if (!config.bridgeConfig && !config.oracleConfig) {
+      throw new Error(
+        `${fnTag}, Missing bridge or oracle configuration. Cannot deploy cross-chain mechanism.`,
+      );
+    }
+
+    if (config.bridgeConfig) {
+      await this.deployBridgeFromConfig(config.bridgeConfig);
+    }
+
+    if (config.oracleConfig) {
+      await this.deployOracleFromConfig(config.oracleConfig);
+    }
   }
 
   /**
@@ -112,6 +135,21 @@ export class SATPCrossChainManager {
   }
 
   /**
+   * Deploys bridges based on the provided configuration.
+   *
+   * @param bridgesConfig - An array of bridge configuration options.
+   * @returns A promise that resolves when the deployment is complete.
+   */
+  public async deployOracleFromConfig(bridgesNetworkConfig: INetworkOptions[]) {
+    const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployOracleFromConfig()`;
+    this.log.debug(`${fnTag}, Deploying Oracles...`);
+
+    for (const config of bridgesNetworkConfig) {
+      await this.oracleManager.deployOracle(config);
+    }
+  }
+
+  /**
    * Retrieves the Bridge Manager Client Interface.
    *
    * @returns {BridgeManagerClientInterface} The interface for the bridge manager client.
@@ -129,5 +167,23 @@ export class SATPCrossChainManager {
     const fnTag = `${SATPCrossChainManager.CLASS_NAME}#getClientBridgeManagerInterface()`;
     this.log.debug(`${fnTag}, Getting Bridge Manager Interface...`);
     return this.bridgeManager;
+  }
+
+  /**
+   * Retrieves the Oracle Manager.
+   *
+   * @returns {OracleManager} The instance of the Oracle Manager.
+   *
+   * @remarks
+   * This method logs the action of getting the Oracle Manager and then returns the
+   * `oracleManager` instance.
+   *
+   * @example
+   * ```typescript
+   * const oracleManager = satpCrossChainManager.getOracleManager();
+   * ```
+   */
+  public getOracleManager(): OracleManager {
+    return this.oracleManager;
   }
 }

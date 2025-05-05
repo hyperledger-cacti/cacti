@@ -37,7 +37,7 @@ export interface IBridgeLeafOptions {
  * Abstract class representing a bridge leaf in a cross-chain mechanism.
  *
  * In DLT bridges, a “leaf” is analogous to a bascule bridge leaf — an independent module forming half of a cross-chain connection.
- * Each leaf handles specific tasks, and together (2 or more leafs) they provide a secure, trustless bridge between ledger.
+ * Each leaf handles specific tasks, and together (2 or more leafs) they provide a secure bridge between ledger.
  *
  * @abstract
  */

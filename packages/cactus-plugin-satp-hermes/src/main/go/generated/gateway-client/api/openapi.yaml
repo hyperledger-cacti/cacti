@@ -491,6 +491,136 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute:
+    post:
+      description: Execute a registered data transfer task from source to target blockchain
+      operationId: ExecuteOracleTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteOracleTask_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteOracleTask_200_response'
+          description: Response schema for executing a data transfer task.
+        "400":
+          description: Bad request
+        "404":
+          description: Task not found
+        "500":
+          description: Internal server error
+      summary: Execute data transfer task
+      tags:
+      - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register:
+    post:
+      description: Register data transfer from source to target blockchain
+      operationId: RegisterOracleTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterOracleTask_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterOracleTask_200_response'
+          description: Response schema for registering a data transfer task.
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Register data transfer task
+      tags:
+      - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister:
+    post:
+      description: Unregister data transfer task from source to target blockchain
+      operationId: UnregisterOracleTask
+      parameters:
+      - description: Unique identifier for the task.
+        explode: true
+        in: query
+        name: taskID
+        required: true
+        schema:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnregisterOracleTask_200_response'
+          description: Response schema for unregistering a data transfer task.
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Unregister data transfer task
+      tags:
+      - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status:
+    get:
+      description: Retrieve the status of an oracle task
+      operationId: GetOracleTaskStatus
+      parameters:
+      - description: Unique identifier for the task.
+        explode: true
+        in: query
+        name: taskID
+        required: true
+        schema:
+          description: Unique identifier (UUID) for the session.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOracleTaskStatus_200_response'
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Transaction not found
+        "500":
+          description: Internal server error
+      summary: Get oracle task status
+      tags:
+      - oracle
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status
 components:
   schemas:
     AuthzScope:
@@ -767,7 +897,7 @@ components:
           tokenType: ERC20
           referenceId: referenceId
         originatorPubkey: originatorPubkey
-        contextID: 123e4567-e89b-12d3-a456-426614174000
+        contextID: 000003e8-e0b8-21ee-ba00-325096b39f47
         receiverAsset:
           owner: owner
           mspId: mspId
@@ -783,8 +913,8 @@ components:
           referenceId: referenceId
       properties:
         contextID:
-          example: 123e4567-e89b-12d3-a456-426614174000
-          format: string
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         payload:
           example: "{\"data\":\"example payload\"}"
@@ -902,6 +1032,10 @@ components:
       example: 000003e8-e0b8-21ee-ba00-325096b39f47
       type: string
       x-category: satp-core
+    TaskID:
+      description: Unique identifier (UUID) for the session.
+      example: 000003e8-e0b8-21ee-ba00-325096b39f47
+      type: string
     Address:
       description: A blockchain address.
       example: 0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7
@@ -1375,6 +1509,394 @@ components:
       required:
       - approveAddress
       type: object
+    OracleRegisterRequest:
+      description: Request schema for registering a repeatable task.
+      properties:
+        sourceNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        destinationNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        sourceContract:
+          $ref: '#/components/schemas/RegisterOracleTask_request_sourceContract'
+        destinationContract:
+          $ref: '#/components/schemas/RegisterOracleTask_request_destinationContract'
+        taskMode:
+          description: The mode of operation for the repeatable task.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+        listeningOptions:
+          $ref: '#/components/schemas/RegisterOracleTask_request_listeningOptions'
+        taskType:
+          description: The type of task to be registered.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          example: READ
+          type: string
+      required:
+      - taskMode
+      - taskType
+      type: object
+    OracleExecuteRequest:
+      description: "Request schema for triggering an immediate transfer task. Includes\
+        \ the task ID, payload, and destination network and contract details."
+      properties:
+        sourceNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        destinationNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        sourceContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract'
+        destinationContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_request_destinationContract'
+        taskType:
+          description: The type of task to be registered.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          example: READ
+          type: string
+      type: object
+    BusinessLogicContract:
+      description: Represents a business logic contract with its associated metadata
+        and method details.
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    OracleTask:
+      description: "Represents a repeatable Oracle task with additional properties\
+        \ for mode, polling interval, and source event signature."
+      properties:
+        taskID:
+          description: The unique identifier for the Oracle task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        type:
+          description: The type of the Oracle task.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          type: enum
+        srcNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        srcContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_srcContract'
+        dstNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        dstContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_dstContract'
+        timestamp:
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+          format: int64
+          type: integer
+        operations:
+          description: The list of operations performed by the Oracle task.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner'
+          type: array
+        status:
+          description: The current status of the Oracle task.
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: enum
+        mode:
+          description: The mode of operation for registered tasks.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          - IMMEDIATE
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+        listeningOptions:
+          $ref: '#/components/schemas/RegisterOracleTask_request_listeningOptions'
+      required:
+      - dstContract
+      - mode
+      - operations
+      - srcContract
+      - status
+      - taskID
+      - timestamp
+      - type
+      type: object
+    OracleResponse:
+      description: "Represents the response from an Oracle task execution, including\
+        \ transaction details and outputs."
+      properties:
+        transactionId:
+          description: The unique identifier for the transaction.
+          example: 0x1234567890abcdef
+          type: string
+        transactionReceipt:
+          description: "The receipt of the transaction, providing proof of execution."
+          type: object
+        output:
+          description: The output of the Oracle operation execution.
+          type: string
+        proof:
+          description: Proof of the Oracle operation execution.
+          type: object
+      type: object
+    OracleOperation:
+      description: "Represents an operation performed by the Oracle, including its\
+        \ type, network, contract, status, and optional output."
+      properties:
+        id:
+          description: A unique identifier for the Oracle operation.
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        type:
+          description: The type of the Oracle operation.
+          enum:
+          - READ
+          - UPDATE
+          example: READ
+          type: string
+        networkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        contract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner_contract'
+        status:
+          description: The current status of the Oracle operation.
+          enum:
+          - PENDING
+          - SUCCESS
+          - FAILED
+          example: IN_PROGRESS
+          type: string
+        output:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner_output'
+        timestamp:
+          description: The timestamp when the Oracle operation was created or last
+            updated.
+          example: 1672531200
+          format: int64
+          type: integer
+      required:
+      - contract
+      - id
+      - networkId
+      - status
+      - timestamp
+      - type
+      type: object
+    OracleUnregisterRequest:
+      description: Request schema for unregistering a data transfer task. Includes
+        the context ID of the task to be unregistered.
+      properties:
+        taskID:
+          description: The unique identifier of the task to be unregistered.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+      required:
+      - taskID
+      type: object
+    OracleStatusRequest:
+      description: Request schema for checking the status of a data transfer task.
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+      required:
+      - taskID
+      type: object
+    OracleUnregisterResponse:
+      description: Response schema for unregistering a data transfer task. Includes
+        the task ID and status of the unregistration.
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        status:
+          enum:
+          - SUCCESS
+          - FAILED
+          example: SUCCESS
+          type: string
+      type: object
+    OracleRegisterResponse:
+      description: Response schema for registering a repeatable task. Includes the
+        task ID and status of the registration.
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        status:
+          enum:
+          - SUCCESS
+          - FAILED
+          example: SUCCESS
+          type: string
+      type: object
+    OracleExecuteResponse:
+      description: Response schema for executing a data transfer task. Includes the
+        task ID and status of the execution.
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        type:
+          description: The type of the Oracle task.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          type: enum
+        srcNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        srcContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_srcContract'
+        dstNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        dstContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_dstContract'
+        timestamp:
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+          format: int64
+          type: integer
+        operations:
+          description: The list of operations performed by the Oracle task.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner'
+          type: array
+        status:
+          description: The current status of the Oracle task.
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: enum
+        mode:
+          description: The mode of operation for registered tasks.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          - IMMEDIATE
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+      required:
+      - dstContract
+      - id
+      - mode
+      - operations
+      - srcContract
+      - status
+      - timestamp
+      - type
+      type: object
+    OracleStatusResponse:
+      description: Response schema for checking the status of a data transfer task.
+        Includes the task ID and status of the task.
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        type:
+          description: The type of the Oracle task.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          type: enum
+        srcNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        srcContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_srcContract'
+        dstNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        dstContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_dstContract'
+        timestamp:
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+          format: int64
+          type: integer
+        operations:
+          description: The list of operations performed by the Oracle task.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner'
+          type: array
+        status:
+          description: The current status of the Oracle task.
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: enum
+        mode:
+          description: The mode of operation for registered tasks.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          - IMMEDIATE
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+      required:
+      - dstContract
+      - id
+      - mode
+      - operations
+      - srcContract
+      - status
+      - timestamp
+      - type
+      type: object
     NetworkId:
       description: The network of the DLT being interacted with.
       properties:
@@ -1577,8 +2099,8 @@ components:
         \ about the source and destination DLT networks."
       properties:
         contextID:
-          example: 123e4567-e89b-12d3-a456-426614174000
-          format: string
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         payload:
           example: "{\"data\":\"example payload\"}"
@@ -3622,4 +4144,735 @@ components:
         status:
           description: The status of the request.
           type: boolean
+      type: object
+    ExecuteOracleTask_request_sourceContract_params_inner:
+      oneOf:
+      - type: string
+      - type: number
+    ExecuteOracleTask_request_sourceContract:
+      description: The contract data on the source blockchain. Only if taskType is
+        READ or READ_AND_UPDATE.
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    ExecuteOracleTask_request_destinationContract:
+      description: The contract data on the destination blockchain. Only if taskType
+        is UPDATE or READ_AND_UPDATE.
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    ExecuteOracleTask_request:
+      description: "Request schema for triggering an immediate transfer task. Includes\
+        \ the task ID, payload, and destination network and contract details."
+      properties:
+        sourceNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        destinationNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        sourceContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract'
+        destinationContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_request_destinationContract'
+        taskType:
+          description: The type of task to be registered.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          example: READ
+          type: string
+      type: object
+    ExecuteOracleTask_200_response_srcContract:
+      description: The source contract details for the Oracle task.
+      example:
+        contractBytecode: contractBytecode
+        contractAbi:
+        - "{}"
+        - "{}"
+        contractAddress: contractAddress
+        methodName: methodName
+        contractName: contractName
+        params:
+        - null
+        - null
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    ExecuteOracleTask_200_response_dstContract:
+      description: The destination contract details for the Oracle task.
+      example:
+        contractBytecode: contractBytecode
+        contractAbi:
+        - "{}"
+        - "{}"
+        contractAddress: contractAddress
+        methodName: methodName
+        contractName: contractName
+        params:
+        - null
+        - null
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    ExecuteOracleTask_200_response_operations_inner_contract:
+      description: The contract associated with the Oracle operation.
+      example:
+        contractBytecode: contractBytecode
+        contractAbi:
+        - "{}"
+        - "{}"
+        contractAddress: contractAddress
+        methodName: methodName
+        contractName: contractName
+        params:
+        - null
+        - null
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    ExecuteOracleTask_200_response_operations_inner_output:
+      description: Optional output generated by the Oracle operation.
+      example:
+        output: output
+        transactionReceipt: "{}"
+        proof: "{}"
+        transactionId: 0x1234567890abcdef
+      properties:
+        transactionId:
+          description: The unique identifier for the transaction.
+          example: 0x1234567890abcdef
+          type: string
+        transactionReceipt:
+          description: "The receipt of the transaction, providing proof of execution."
+          type: object
+        output:
+          description: The output of the Oracle operation execution.
+          type: string
+        proof:
+          description: Proof of the Oracle operation execution.
+          type: object
+      type: object
+    ExecuteOracleTask_200_response_operations_inner:
+      description: "Represents an operation performed by the Oracle, including its\
+        \ type, network, contract, status, and optional output."
+      example:
+        output:
+          output: output
+          transactionReceipt: "{}"
+          proof: "{}"
+          transactionId: 0x1234567890abcdef
+        contract:
+          contractBytecode: contractBytecode
+          contractAbi:
+          - "{}"
+          - "{}"
+          contractAddress: contractAddress
+          methodName: methodName
+          contractName: contractName
+          params:
+          - null
+          - null
+        networkId:
+          ledgerType: BESU_1X
+          id: id
+        id: 123e4567-e89b-12d3-a456-426614174000
+        type: READ
+        status: IN_PROGRESS
+        timestamp: 1672531200
+      properties:
+        id:
+          description: A unique identifier for the Oracle operation.
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        type:
+          description: The type of the Oracle operation.
+          enum:
+          - READ
+          - UPDATE
+          example: READ
+          type: string
+        networkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        contract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner_contract'
+        status:
+          description: The current status of the Oracle operation.
+          enum:
+          - PENDING
+          - SUCCESS
+          - FAILED
+          example: IN_PROGRESS
+          type: string
+        output:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner_output'
+        timestamp:
+          description: The timestamp when the Oracle operation was created or last
+            updated.
+          example: 1672531200
+          format: int64
+          type: integer
+      required:
+      - contract
+      - id
+      - networkId
+      - status
+      - timestamp
+      - type
+      type: object
+    ExecuteOracleTask_200_response:
+      description: Response schema for executing a data transfer task. Includes the
+        task ID and status of the execution.
+      example:
+        mode: POLLING
+        srcContract:
+          contractBytecode: contractBytecode
+          contractAbi:
+          - "{}"
+          - "{}"
+          contractAddress: contractAddress
+          methodName: methodName
+          contractName: contractName
+          params:
+          - null
+          - null
+        dstContract:
+          contractBytecode: contractBytecode
+          contractAbi:
+          - "{}"
+          - "{}"
+          contractAddress: contractAddress
+          methodName: methodName
+          contractName: contractName
+          params:
+          - null
+          - null
+        operations:
+        - output:
+            output: output
+            transactionReceipt: "{}"
+            proof: "{}"
+            transactionId: 0x1234567890abcdef
+          contract:
+            contractBytecode: contractBytecode
+            contractAbi:
+            - "{}"
+            - "{}"
+            contractAddress: contractAddress
+            methodName: methodName
+            contractName: contractName
+            params:
+            - null
+            - null
+          networkId:
+            ledgerType: BESU_1X
+            id: id
+          id: 123e4567-e89b-12d3-a456-426614174000
+          type: READ
+          status: IN_PROGRESS
+          timestamp: 1672531200
+        - output:
+            output: output
+            transactionReceipt: "{}"
+            proof: "{}"
+            transactionId: 0x1234567890abcdef
+          contract:
+            contractBytecode: contractBytecode
+            contractAbi:
+            - "{}"
+            - "{}"
+            contractAddress: contractAddress
+            methodName: methodName
+            contractName: contractName
+            params:
+            - null
+            - null
+          networkId:
+            ledgerType: BESU_1X
+            id: id
+          id: 123e4567-e89b-12d3-a456-426614174000
+          type: READ
+          status: IN_PROGRESS
+          timestamp: 1672531200
+        srcNetworkId:
+          ledgerType: BESU_1X
+          id: id
+        pollingInterval: 5000
+        dstNetworkId:
+          ledgerType: BESU_1X
+          id: id
+        type: ""
+        taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
+        timestamp: 1672531200
+        status: ""
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        type:
+          description: The type of the Oracle task.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          type: enum
+        srcNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        srcContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_srcContract'
+        dstNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        dstContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_dstContract'
+        timestamp:
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+          format: int64
+          type: integer
+        operations:
+          description: The list of operations performed by the Oracle task.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner'
+          type: array
+        status:
+          description: The current status of the Oracle task.
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: enum
+        mode:
+          description: The mode of operation for registered tasks.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          - IMMEDIATE
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+      required:
+      - dstContract
+      - id
+      - mode
+      - operations
+      - srcContract
+      - status
+      - timestamp
+      - type
+      type: object
+    RegisterOracleTask_request_sourceContract:
+      description: The contract address on the source blockchain. Only if taskType
+        is READ or READ_AND_UPDATE.
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    RegisterOracleTask_request_destinationContract:
+      description: The contract address on the destination blockchain. Only if taskType
+        is UPDATE or READ_AND_UPDATE.
+      properties:
+        contractName:
+          description: The name of the contract.
+          type: string
+        contractAddress:
+          description: The address of the contract.
+          nullable: true
+          type: string
+        contractAbi:
+          description: The ABI (Application Binary Interface) of the contract.
+          items:
+            type: object
+          nullable: true
+          type: array
+        contractBytecode:
+          description: The bytecode of the contract.
+          nullable: true
+          type: string
+        methodName:
+          description: The name of the method to be invoked on the contract.
+          type: string
+        params:
+          description: The parameters to be passed to the contract method.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_request_sourceContract_params_inner'
+          type: array
+      type: object
+    RegisterOracleTask_request_listeningOptions:
+      description: Options for event listening. Only if taskMode is EVENT_LISTENING.
+      properties:
+        eventSignature:
+          description: The event signature to listen for on the source network. Only
+            if taskMode is EVENT_LISTENING.
+          example: "Transfer(address,address,uint256)"
+          type: string
+        filterParams:
+          description: The parameters to filter in the captured events.
+          items:
+            type: string
+          type: array
+      required:
+      - eventSignature
+      type: object
+    RegisterOracleTask_request:
+      description: Request schema for registering a repeatable task.
+      properties:
+        sourceNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        destinationNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        sourceContract:
+          $ref: '#/components/schemas/RegisterOracleTask_request_sourceContract'
+        destinationContract:
+          $ref: '#/components/schemas/RegisterOracleTask_request_destinationContract'
+        taskMode:
+          description: The mode of operation for the repeatable task.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+        listeningOptions:
+          $ref: '#/components/schemas/RegisterOracleTask_request_listeningOptions'
+        taskType:
+          description: The type of task to be registered.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          example: READ
+          type: string
+      required:
+      - taskMode
+      - taskType
+      type: object
+    RegisterOracleTask_200_response:
+      description: Response schema for registering a repeatable task. Includes the
+        task ID and status of the registration.
+      example:
+        taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
+        status: SUCCESS
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        status:
+          enum:
+          - SUCCESS
+          - FAILED
+          example: SUCCESS
+          type: string
+      type: object
+    UnregisterOracleTask_200_response:
+      description: Response schema for unregistering a data transfer task. Includes
+        the task ID and status of the unregistration.
+      example:
+        taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
+        status: SUCCESS
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        status:
+          enum:
+          - SUCCESS
+          - FAILED
+          example: SUCCESS
+          type: string
+      type: object
+    GetOracleTaskStatus_200_response:
+      description: Response schema for checking the status of a data transfer task.
+        Includes the task ID and status of the task.
+      example:
+        mode: POLLING
+        srcContract:
+          contractBytecode: contractBytecode
+          contractAbi:
+          - "{}"
+          - "{}"
+          contractAddress: contractAddress
+          methodName: methodName
+          contractName: contractName
+          params:
+          - null
+          - null
+        dstContract:
+          contractBytecode: contractBytecode
+          contractAbi:
+          - "{}"
+          - "{}"
+          contractAddress: contractAddress
+          methodName: methodName
+          contractName: contractName
+          params:
+          - null
+          - null
+        operations:
+        - output:
+            output: output
+            transactionReceipt: "{}"
+            proof: "{}"
+            transactionId: 0x1234567890abcdef
+          contract:
+            contractBytecode: contractBytecode
+            contractAbi:
+            - "{}"
+            - "{}"
+            contractAddress: contractAddress
+            methodName: methodName
+            contractName: contractName
+            params:
+            - null
+            - null
+          networkId:
+            ledgerType: BESU_1X
+            id: id
+          id: 123e4567-e89b-12d3-a456-426614174000
+          type: READ
+          status: IN_PROGRESS
+          timestamp: 1672531200
+        - output:
+            output: output
+            transactionReceipt: "{}"
+            proof: "{}"
+            transactionId: 0x1234567890abcdef
+          contract:
+            contractBytecode: contractBytecode
+            contractAbi:
+            - "{}"
+            - "{}"
+            contractAddress: contractAddress
+            methodName: methodName
+            contractName: contractName
+            params:
+            - null
+            - null
+          networkId:
+            ledgerType: BESU_1X
+            id: id
+          id: 123e4567-e89b-12d3-a456-426614174000
+          type: READ
+          status: IN_PROGRESS
+          timestamp: 1672531200
+        srcNetworkId:
+          ledgerType: BESU_1X
+          id: id
+        pollingInterval: 5000
+        dstNetworkId:
+          ledgerType: BESU_1X
+          id: id
+        type: ""
+        taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
+        timestamp: 1672531200
+        status: ""
+      properties:
+        taskID:
+          description: The unique identifier of the task.
+          example: 000003e8-e0b8-21ee-ba00-325096b39f47
+          type: string
+        type:
+          description: The type of the Oracle task.
+          enum:
+          - READ
+          - UPDATE
+          - READ_AND_UPDATE
+          type: enum
+        srcNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        srcContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_srcContract'
+        dstNetworkId:
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        dstContract:
+          $ref: '#/components/schemas/ExecuteOracleTask_200_response_dstContract'
+        timestamp:
+          description: The timestamp when the Oracle task was created or last updated.
+          example: 1672531200
+          format: int64
+          type: integer
+        operations:
+          description: The list of operations performed by the Oracle task.
+          items:
+            $ref: '#/components/schemas/ExecuteOracleTask_200_response_operations_inner'
+          type: array
+        status:
+          description: The current status of the Oracle task.
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: enum
+        mode:
+          description: The mode of operation for registered tasks.
+          enum:
+          - POLLING
+          - EVENT_LISTENING
+          - IMMEDIATE
+          example: POLLING
+          type: string
+        pollingInterval:
+          description: The interval for polling in milliseconds. Only if taskMode
+            is POLLING.
+          example: 5000
+          type: integer
+      required:
+      - dstContract
+      - id
+      - mode
+      - operations
+      - srcContract
+      - status
+      - timestamp
+      - type
       type: object

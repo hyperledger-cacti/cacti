@@ -6,6 +6,7 @@ import {
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import {
   EthContractInvocationType as BesuContractInvocationType,
+  InvokeContractV1Response,
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
   ReceiptType,
@@ -13,7 +14,6 @@ import {
   Web3SigningCredentialType as Web3SigningCredentialTypeBesu,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
-import { Account } from "web3-core";
 import Web3 from "web3";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -31,7 +31,7 @@ import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-besu.
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
 export interface IBesuTestEnvironment {
-  satpContractName: string;
+  contractName: string;
   logLevel: LogLevelDesc;
   network?: string;
 }
@@ -53,8 +53,8 @@ export class BesuTestEnvironment {
   public keychainEntryValue!: string;
   public web3!: Web3;
   public firstHighNetWorthAccount!: string;
-  public bridgeEthAccount!: Account;
-  public assigneeEthAccount?: Account;
+  public bridgeEthAccount!: { address: string; privateKey: string };
+  public assigneeEthAccount?: { address: string; privateKey: string };
   public erc20TokenContract!: string;
   public assetContractAddress?: string;
   public besuConfig!: IBesuLeafNeworkOptions;
@@ -176,7 +176,7 @@ export class BesuTestEnvironment {
       this.bridgeEthAccount.address,
     );
     expect(balance).toBeTruthy();
-    expect(parseInt(balance, 10)).toBeGreaterThan(10e9);
+    expect(parseInt(balance.toString(), 10)).toBeGreaterThan(10e9);
     this.log.info(`Bridge account funded: New Balance: ${balance} wei`);
   }
 
@@ -188,7 +188,7 @@ export class BesuTestEnvironment {
     config: IBesuTestEnvironment,
   ): Promise<BesuTestEnvironment> {
     const instance = new BesuTestEnvironment(
-      config.satpContractName,
+      config.contractName,
       config.logLevel,
       config.network,
     );
@@ -301,6 +301,50 @@ export class BesuTestEnvironment {
       claimFormats: [claimFormat],
       gas: 999999999999999,
     };
+  }
+
+  // Deploys smart contracts and sets up configurations for testing
+  public async deployAndSetupOracleContracts(
+    claimFormat: ClaimFormat,
+    contract_name: string,
+    contract: { abi: any; bytecode: { object: string } },
+  ): Promise<string> {
+    const blOracleContract = await this.connector.deployContract({
+      keychainId: this.keychainPlugin1.getKeychainId(),
+      contractName: contract_name,
+      contractAbi: contract.abi,
+      constructorArgs: [],
+      web3SigningCredential: {
+        ethAccount: this.bridgeEthAccount.address,
+        secret: this.bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+      },
+      bytecode: contract.bytecode.object,
+      gas: 999999999999999,
+    });
+    expect(blOracleContract).toBeTruthy();
+    expect(blOracleContract.transactionReceipt).toBeTruthy();
+    expect(blOracleContract.transactionReceipt.contractAddress).toBeTruthy();
+
+    this.assetContractAddress =
+      blOracleContract.transactionReceipt.contractAddress ?? "";
+
+    this.log.info("this.businessLogicContract Deployed successfully");
+
+    this.besuConfig = {
+      networkIdentification: this.network,
+      signingCredential: {
+        ethAccount: this.bridgeEthAccount.address,
+        secret: this.bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+      },
+      leafId: "Testing-event-besu-leaf",
+      connectorOptions: this.connectorOptions,
+      claimFormats: [claimFormat],
+      gas: 999999999999999,
+    };
+
+    return blOracleContract.transactionReceipt.contractAddress!;
   }
 
   public async mintTokens(amount: string): Promise<void> {
@@ -439,6 +483,87 @@ export class BesuTestEnvironment {
   // Returns the assignee account address used for testing transactions
   get transactRequestPubKey(): string {
     return this.assigneeEthAccount?.address ?? "";
+  }
+
+  // Oracle related functions
+
+  public getData(
+    contractName: string,
+    contractAddress: string,
+    contractAbi: any,
+    methodName: string,
+    params: string[],
+  ): Promise<any> {
+    return this.connector.invokeContract({
+      contractName,
+      contractAddress,
+      contractAbi,
+      invocationType: BesuContractInvocationType.Call,
+      methodName,
+      params,
+      signingCredential: {
+        ethAccount: this.bridgeEthAccount.address,
+        secret: this.bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+      },
+      gas: 999999999999999,
+    });
+  }
+
+  public async readData(
+    contractName: string,
+    contractAddress: string,
+    contractAbi: any,
+    methodName: string,
+    params: string[],
+  ): Promise<InvokeContractV1Response> {
+    const response = await this.connector.invokeContract({
+      contractName,
+      contractAddress,
+      contractAbi,
+      invocationType: BesuContractInvocationType.Call,
+      methodName,
+      params,
+      signingCredential: {
+        ethAccount: this.bridgeEthAccount.address,
+        secret: this.bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+      },
+      gas: 999999999999999,
+    });
+
+    expect(response).toBeTruthy();
+    expect(response.success).toBeTruthy();
+
+    return response;
+  }
+
+  public async writeData(
+    contractName: string,
+    contractAddress: string,
+    contractAbi: any,
+    methodName: string,
+    params: string[],
+  ): Promise<InvokeContractV1Response> {
+    const response = await this.connector.invokeContract({
+      contractName,
+      contractAddress,
+      contractAbi,
+      invocationType: BesuContractInvocationType.Send,
+      methodName,
+      params,
+      signingCredential: {
+        ethAccount: this.bridgeEthAccount.address,
+        secret: this.bridgeEthAccount.privateKey,
+        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+      },
+      gas: 999999999999999,
+    });
+
+    expect(response).toBeTruthy();
+    expect(response.success).toBeTruthy();
+
+    return response;
   }
 
   // Stops and destroys the test ledger

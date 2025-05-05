@@ -11,7 +11,7 @@ import {
   LeafError,
   UnsupportedNetworkError,
   WrapperContractAlreadyCreatedError,
-} from "./bridge-errors";
+} from "../common/errors";
 import {
   EthereumLeaf,
   IEthereumLeafNeworkOptions,
@@ -245,7 +245,7 @@ export class BridgeManager
     id: NetworkId,
     claimFormat: ClaimFormat = ClaimFormat.DEFAULT,
   ): BridgeLeaf {
-    const fnTag = `${BridgeManager.CLASS_NAME}#deployLeaf()`;
+    const fnTag = `${BridgeManager.CLASS_NAME}#getBridgeEndPoint()`;
     this.log.debug(`${fnTag}, Getting Leaf...`);
     this.log.debug(
       `${fnTag}, Getting Leaf for Network ID: ${safeStableStringify(id)}`,
