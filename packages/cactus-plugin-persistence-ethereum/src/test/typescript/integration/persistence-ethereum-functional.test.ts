@@ -46,7 +46,7 @@ import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import "jest-extended";
 import http from "http";
 import { AddressInfo } from "net";
-import express from "express";
+import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { Server as SocketIoServer } from "socket.io";
 import { v4 as uuidV4 } from "uuid";
@@ -93,6 +93,11 @@ describe("Ethereum persistence plugin tests", () => {
     path: Constants.SocketIoConnectionPathV1,
   });
   let connector: PluginLedgerConnectorEthereum;
+
+  // setting for stimulating about gathering ERC721 metadata from TokenUri()
+  const erc721MetadataApp = express();
+  const erc721MetadataPort = 3000;
+  let erc721MetadataServer: http.Server;
 
   //////////////////////////////////
   // Helper Functions
@@ -296,6 +301,35 @@ describe("Ethereum persistence plugin tests", () => {
     const apiConfig = new Configuration({ basePath: apiHost });
     const apiClient = new EthereumApiClient(apiConfig);
 
+    // activate a server for for stimulating about gathering ERC721 metadata from TokenUri()
+    erc721MetadataApp.get("/metadata/:id", (req: Request, res: Response) => {
+      // get id parameter from route
+      const { id } = req.params;
+      const metadata = {
+        title: "Asset Metadata",
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            description: `NFT${id}`,
+          },
+          description: {
+            type: "string",
+            description: `NFT${id} description`,
+          },
+          image: {
+            type: "string",
+            description: `https://example.com/${id}`,
+          },
+        },
+      };
+      res.json(metadata);
+    });
+    erc721MetadataServer = http.createServer(erc721MetadataApp);
+    erc721MetadataServer.listen(erc721MetadataPort, "127.0.0.1", () => {
+      log.info(`ERC721 TokenUri server is running at http://localhost:${port}`);
+    });
+
     // Create Ethereum persistence plugin
     instanceId = "functional-test";
     DatabaseClientMock.mockClear();
@@ -332,6 +366,11 @@ describe("Ethereum persistence plugin tests", () => {
       log.info("Stop ethereum ledger...");
       await ledger.stop();
       await ledger.destroy();
+    }
+
+    if (erc721MetadataServer) {
+      log.info("Stop ERC721 TokenUri server...");
+      await erc721MetadataServer.close();
     }
 
     log.info("Prune Docker...");
@@ -555,6 +594,9 @@ describe("Ethereum persistence plugin tests", () => {
         expect([1, 2, 3]).toInclude(token.token_id);
         expect(token.account_address).toBeTruthy();
         expect(token.uri).toBeTruthy();
+        expect(token.nft_name).toBeTruthy();
+        expect(token.nft_description).toBeTruthy();
+        expect(token.nft_image).toBeTruthy();
       });
     });
   });
