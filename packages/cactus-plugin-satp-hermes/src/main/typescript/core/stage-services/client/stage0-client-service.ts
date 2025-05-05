@@ -1,5 +1,6 @@
 import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
 import {
+  ClaimFormat,
   MessageType,
   WrapAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -13,20 +14,19 @@ import {
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SATPCrossChainManager } from "../../../cross-chain-mechanisms/satp-cc-manager";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import {
-  GatewayNetworkIdError,
+  AmountMissingError,
   HashError,
   LedgerAssetError,
   LedgerAssetIdError,
   MessageTypeError,
   MissingBridgeManagerError,
-  OntologyContractError,
   SessionError,
   SessionIdError,
   SessionMissMatchError,
   SignatureVerificationError,
+  TokenIdMissingError,
   TransferContextIdError,
 } from "../../errors/satp-service-errors";
 import { SATPSession } from "../../satp-session";
@@ -38,7 +38,7 @@ import {
   SessionType,
 } from "../../session-utils";
 import { signatureVerifier } from "../data-verifier";
-import type { Asset } from "../../../cross-chain-mechanisms/satp-bridge/types/asset";
+import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import {
   SATPService,
   SATPServiceType,
@@ -47,13 +47,18 @@ import {
 } from "../satp-service";
 import { protoToAsset } from "../service-utils";
 import { getMessageTypeName } from "../../satp-utils";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { NetworkId } from "../../../public-api";
 
 export class Stage0ClientService extends SATPService {
   public static readonly SATP_STAGE = "0";
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
-  private bridgeManager: SATPCrossChainManager;
+  private bridgeManager: BridgeManagerClientInterface;
+
+  private claimFormat: ClaimFormat;
 
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
@@ -70,6 +75,8 @@ export class Stage0ClientService extends SATPService {
         `${this.getServiceIdentifier()}#constructor`,
       );
     }
+
+    this.claimFormat = ops.claimFormat || ClaimFormat.DEFAULT;
     this.bridgeManager = ops.bridgeManager;
   }
 
@@ -85,7 +92,7 @@ export class Stage0ClientService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    session.verify(fnTag, SessionType.CLIENT);
+    session.verify(fnTag, SessionType.CLIENT, false, false, true);
     const sessionData = session.getClientSessionData();
 
     await this.dbLogger.persistLogEntry({
@@ -109,9 +116,6 @@ export class Stage0ClientService extends SATPService {
       const newSessionRequestMessage = create(NewSessionRequestSchema, {
         sessionId: sessionData.id,
         contextId: sessionData.transferContextId,
-        recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
-        senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
-        senderGatewayNetworkType: sessionData.senderGatewayNetworkType,
         gatewayId: thisGatewayId,
         messageType: MessageType.NEW_SESSION_REQUEST,
       });
@@ -170,7 +174,7 @@ export class Stage0ClientService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    session.verify(fnTag, SessionType.CLIENT);
+    session.verify(fnTag, SessionType.CLIENT, false, false, true);
 
     const sessionData = session.getClientSessionData();
 
@@ -193,21 +197,6 @@ export class Stage0ClientService extends SATPService {
       throw new SignatureVerificationError(fnTag);
     }
 
-    if (
-      response.recipientGatewayNetworkId == "" ||
-      response.recipientGatewayNetworkId !=
-        sessionData.recipientGatewayNetworkId
-    ) {
-      throw new GatewayNetworkIdError(fnTag);
-    }
-    if (
-      response.senderGatewayNetworkId == "" ||
-      response.senderGatewayNetworkId != sessionData.senderGatewayNetworkId
-    ) {
-      throw new GatewayNetworkIdError(fnTag);
-    }
-    sessionData.recipientGatewayNetworkType =
-      response.receiverGatewayNetworkType;
     if (response.messageType != MessageType.NEW_SESSION_RESPONSE) {
       throw new MessageTypeError(
         fnTag,
@@ -262,7 +251,7 @@ export class Stage0ClientService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    session.verify(fnTag, SessionType.CLIENT);
+    session.verify(fnTag, SessionType.CLIENT, false, false, true);
 
     const sessionData = session.getClientSessionData();
     await this.dbLogger.persistLogEntry({
@@ -282,17 +271,8 @@ export class Stage0ClientService extends SATPService {
         sequenceNumber: Number(sessionData.lastSequenceNumber),
       });
 
-      if (sessionData.receiverContractOntology == "") {
-        //TODO check ontology
-        throw new OntologyContractError(fnTag);
-      }
-
       if (sessionData.senderAsset?.tokenId == "") {
         throw new LedgerAssetIdError(fnTag);
-      }
-
-      if (sessionData.senderGatewayNetworkId == "") {
-        throw new GatewayNetworkIdError(fnTag);
       }
 
       if (sessionData.senderAsset == undefined) {
@@ -303,12 +283,27 @@ export class Stage0ClientService extends SATPService {
         throw new LedgerAssetError(fnTag);
       }
 
+      const bridge = this.bridgeManager.getBridgeEndPoint(
+        {
+          id: sessionData.senderAsset?.networkId?.id,
+          ledgerType: sessionData.senderAsset?.networkId?.type,
+        } as NetworkId,
+        this.claimFormat,
+      );
+
+      if (!sessionData.senderAsset?.tokenType) {
+        throw new LedgerAssetError(`${fnTag}, tokenType is missing`);
+      }
+
+      sessionData.senderGatewayNetworkId = bridge.getApproveAddress(
+        sessionData.senderAsset?.tokenType,
+      );
+
       const preSATPTransferRequest = create(PreSATPTransferRequestSchema, {
         sessionId: sessionData.id,
         contextId: sessionData.transferContextId,
         clientTransferNumber: sessionData.clientTransferNumber,
         senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
-        recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
         senderAsset: sessionData.senderAsset,
         receiverAsset: sessionData.receiverAsset,
         wrapAssertionClaim: sessionData.senderWrapAssertionClaim,
@@ -370,7 +365,7 @@ export class Stage0ClientService extends SATPService {
       throw new SessionError(fnTag);
     }
 
-    session.verify(fnTag, SessionType.CLIENT);
+    session.verify(fnTag, SessionType.CLIENT, false, false, true);
 
     const sessionData = session.getClientSessionData();
     this.dbLogger.persistLogEntry({
@@ -391,31 +386,37 @@ export class Stage0ClientService extends SATPService {
       });
       this.Log.info(`${fnTag}, Wrapping Asset...`);
 
-      if (sessionData.senderGatewayNetworkId == "") {
-        throw new GatewayNetworkIdError(fnTag);
-      }
-
       if (sessionData.senderAsset == undefined) {
         throw new LedgerAssetError(fnTag);
       }
 
-      const token: Asset = protoToAsset(
-        sessionData.senderAsset,
-        sessionData.senderGatewayNetworkId,
-      );
+      const networkId = {
+        id: sessionData.senderAsset.networkId?.id,
+        ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
+      } as NetworkId;
 
-      const assetId = token.tokenId;
-      const amount = token.amount.toString();
+      const token: FungibleAsset = protoToAsset(
+        sessionData.senderAsset,
+        networkId,
+      ) as FungibleAsset;
+
+      if (token.id == undefined) {
+        throw new TokenIdMissingError(fnTag);
+      }
+
+      if (token.amount == undefined) {
+        throw new AmountMissingError(fnTag);
+      }
 
       this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
 
-      this.Log.debug(`${fnTag}, Wrap Asset ID: ${assetId} amount: ${amount}`);
-      if (assetId == undefined) {
-        throw new LedgerAssetIdError(fnTag);
-      }
+      this.Log.debug(
+        `${fnTag}, Wrap Asset ID: ${token.id} amount: ${(token as FungibleAsset).amount.toString()}`,
+      );
 
-      const bridge = this.bridgeManager.getBridge(
-        sessionData.senderGatewayNetworkId,
+      const bridge = this.bridgeManager.getSATPExecutionLayer(
+        networkId,
+        this.claimFormat,
       );
 
       sessionData.senderWrapAssertionClaim = create(
@@ -423,15 +424,15 @@ export class Stage0ClientService extends SATPService {
         {},
       );
 
-      sessionData.senderWrapAssertionClaim.receipt =
-        await bridge.wrapAsset(token);
+      const res = await bridge.wrapAsset(token);
+
+      sessionData.senderWrapAssertionClaim.receipt = res.receipt;
 
       this.Log.debug(
         `${fnTag}, Wrap Operation Receipt: ${sessionData.senderWrapAssertionClaim.receipt}`,
       );
 
-      sessionData.senderWrapAssertionClaim.proof =
-        await bridge.getProof(assetId);
+      sessionData.senderWrapAssertionClaim.proof = res.proof;
 
       sessionData.senderWrapAssertionClaim.signature = bufArray2HexStr(
         sign(this.Signer, sessionData.senderWrapAssertionClaim.receipt),

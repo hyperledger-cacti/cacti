@@ -39,11 +39,10 @@ import { verifySignature } from "../../gateway-utils";
 
 export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
-  defaultRepository: boolean;
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
   instanceId: string;
-  bridgeConfig: SATPCrossChainManager;
+  ccManager: SATPCrossChainManager;
   orchestrator: GatewayOrchestrator;
   signer: JsObjectSigner;
   healthCheckInterval?: string | schedule.RecurrenceRule;
@@ -56,7 +55,6 @@ export class CrashManager {
   public sessions: Map<string, SATPSession>;
   private crashRecoveryHandler: CrashRecoveryHandler;
   private factory: RollbackStrategyFactory;
-  private defaultRepository: boolean;
   public localRepository: ILocalLogRepository;
   public remoteRepository: IRemoteLogRepository | undefined;
   private crashScheduler?: Job;
@@ -65,7 +63,7 @@ export class CrashManager {
   private crashRecoveryClientService: CrashRecoveryClientService;
   private orchestrator: GatewayOrchestrator;
   private gatewaysPubKeys: Map<string, string> = new Map();
-  private readonly bridgesManager: SATPCrossChainManager;
+  private readonly ccManager: SATPCrossChainManager;
   private signer: JsObjectSigner;
 
   constructor(public readonly options: ICrashRecoveryManagerOptions) {
@@ -78,19 +76,20 @@ export class CrashManager {
     this.log.info(`Instantiated ${this.className} OK`);
     this.instanceId = options.instanceId;
     this.sessions = new Map<string, SATPSession>();
-    this.defaultRepository = options.defaultRepository;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
     this.signer = options.signer;
     this.orchestrator = options.orchestrator;
-    this.bridgesManager = options.bridgeConfig;
+    this.ccManager = options.ccManager;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
 
-    this.factory = new RollbackStrategyFactory(this.bridgesManager, this.log);
+    this.factory = new RollbackStrategyFactory(
+      this.ccManager.getClientBridgeManagerInterface(),
+      this.log,
+    );
 
     this.crashRecoveryServerService = new CrashRecoveryServerService(
-      this.bridgesManager,
-      this.defaultRepository,
+      this.ccManager.getClientBridgeManagerInterface(),
       this.localRepository,
       this.sessions,
       this.signer,

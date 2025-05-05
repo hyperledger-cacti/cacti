@@ -10,6 +10,7 @@ import {
   GatewayIdentity,
   GatewayChannel,
   SATPServiceInstance,
+  Address,
 } from "../../core/types";
 import {
   Client as ConnectClient,
@@ -43,7 +44,8 @@ import {
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
 import { SATPHandler, Stage } from "../../types/satp-protocol";
-import { NetworkId } from "../network-identification/chainid-list";
+import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { NetworkId } from "../../public-api";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -52,6 +54,7 @@ export class GatewayOrchestrator {
   private counterPartyGateways: Map<string, GatewayIdentity> = new Map();
   private handlers: Map<string, SATPHandler> = new Map();
   private crashEnabled: boolean = false;
+  private bridgeManager?: BridgeManagerClientInterface;
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   private channels: Map<string, GatewayChannel> = new Map();
@@ -89,23 +92,34 @@ export class GatewayOrchestrator {
       `Gateway Connection Manager bootstrapped with ${allCounterPartyGateways.length} gateways`,
     );
 
-    this.channels.set(
-      this.localGateway.id,
-      this.createChannel(this.localGateway),
-    );
-
     this.addGateways(allCounterPartyGateways);
     const numberGatewayChannels = this.connectToCounterPartyGateways();
     if (numberGatewayChannels > 0) {
       this.logger.info(
         `Gateway Connection Manager connected to ${numberGatewayChannels} gateways.`,
       );
-      this.logger.info("Creating SATPManager");
     }
   }
 
   public get ourGateway(): GatewayIdentity {
     return this.localGateway;
+  }
+
+  public addBridgeManager(bridgeManager: BridgeManagerClientInterface): void {
+    this.bridgeManager = bridgeManager;
+  }
+
+  public addGatewayOwnChannels(connectedDLTs: NetworkId[]): void {
+    // add this gatways bridge channels
+    const id = {
+      ...this.localGateway,
+      address: (this.localGateway.address ?? "").replace(
+        /^(https?:\/\/)[^/]+/,
+        `$1localhost`,
+      ) as Address, // This is necessary, because the adress of the local gateway is localhost for it self
+      connectedDLTs: connectedDLTs,
+    };
+    this.channels.set(this.localGateway.id, this.createChannel(id));
   }
 
   public addGOLServer(server: Express): void {
@@ -257,11 +271,28 @@ export class GatewayOrchestrator {
   }
 
   get connectedDLTs(): NetworkId[] {
-    return this.localGateway.connectedDLTs;
+    if (!this.bridgeManager) return [];
+    return this.bridgeManager.getAvailableEndPoints();
   }
 
   createChannel(identity: GatewayIdentity): GatewayChannel {
+    if (identity.gatewayClientPort === undefined) {
+      throw new Error(
+        `Gateway ${identity.id} does not have a gatewayClientPort defined`,
+      );
+    }
+    if (identity.gatewayServerPort === undefined) {
+      throw new Error(
+        `Gateway ${identity.id} does not have a gatewayServerPort defined`,
+      );
+    }
     const clients = this.createConnectClients(identity);
+
+    if (!identity.connectedDLTs) {
+      throw new Error(
+        `Gateway ${identity.id} does not have connectedDLTs defined`,
+      );
+    }
 
     const channel: GatewayChannel = {
       fromGatewayID: this.localGateway.id,
@@ -450,6 +481,28 @@ export class GatewayOrchestrator {
     return addedIDs;
   }
 
+  public async addGatewayAndCreateChannel(
+    gateway: GatewayIdentity,
+  ): Promise<void> {
+    const fnTag = `${this.label}#addGateway()`;
+    this.logger.trace(`Entering ${fnTag}`);
+    this.logger.info("Connecting to gateway");
+    if (this.localGateway.id === gateway.id) {
+      this.logger.error(
+        `${fnTag}, Cannot add self gateway ${gateway.id} to counterPartyGateways`,
+      );
+      return;
+    }
+    if (this.counterPartyGateways.has(gateway.id)) {
+      this.logger.error(
+        `${fnTag}, Gateway ${gateway.id} already exists in counterPartyGateways`,
+      );
+      return;
+    }
+    this.channels.set(gateway.id, this.createChannel(gateway));
+    this.counterPartyGateways.set(gateway.id, gateway);
+  }
+
   alreadyConnected(ID: string): boolean {
     return this.channels.has(ID);
   }
@@ -461,7 +514,7 @@ export class GatewayOrchestrator {
     this.channels.forEach(async (channel) => {
       this.logger.info(`${fnTag}, Disconnecting from ${channel.toGatewayID}`);
       // ! todo implement disconnect
-      this.logger.error("Not implemented");
+      this.logger.error("Disconnect All Not implemented");
       counter++;
     });
     this.channels.clear();
