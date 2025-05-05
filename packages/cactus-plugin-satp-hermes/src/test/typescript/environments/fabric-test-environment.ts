@@ -42,9 +42,9 @@ import Docker from "dockerode";
 // Test environment for Fabric ledger operations
 
 export interface IFabricTestEnvironment {
-  satpContractName: string;
+  contractName: string;
   logLevel: LogLevelDesc;
-  claimFormat: ClaimFormat;
+  claimFormat?: ClaimFormat;
   network?: string;
 }
 export class FabricTestEnvironment {
@@ -257,9 +257,9 @@ export class FabricTestEnvironment {
   public static async setupTestEnvironment(
     config: IFabricTestEnvironment,
   ): Promise<FabricTestEnvironment> {
-    const { satpContractName, logLevel, claimFormat, network } = config;
+    const { contractName, logLevel, claimFormat, network } = config;
     const instance = new FabricTestEnvironment(
-      satpContractName,
+      contractName,
       logLevel,
       network,
       claimFormat,

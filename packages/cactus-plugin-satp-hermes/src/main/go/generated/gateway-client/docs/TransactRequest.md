@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | **string** |  | 
+**ContextID** | **string** | The unique identifier of the task. | 
 **Payload** | Pointer to **string** |  | [optional] 
 **BeneficiaryPubkey** | **string** |  | 
 **OriginatorPubkey** | **string** |  | 
