@@ -4,12 +4,13 @@ import {
   LoggerProvider,
   type ILoggerOptions,
 } from "@hyperledger/cactus-common";
-import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import type { SATPLogger } from "../../logging";
+import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export enum SATPServiceType {
   Server = "Server",
@@ -24,8 +25,9 @@ export type ISATPServiceOptions = {
   loggerOptions: ILoggerOptions;
   signer: JsObjectSigner;
   serviceType: SATPServiceType;
-  bridgeManager?: SATPCrossChainManager;
+  bridgeManager?: BridgeManagerClientInterface;
   dbLogger: SATPLogger;
+  claimFormat?: ClaimFormat;
 };
 
 export interface SATPServiceStatic {

@@ -1,12 +1,12 @@
 import {
-  IListenOptions,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-  Secp256k1Keys,
-  Servers,
 } from "@hyperledger/cactus-common";
-import { Configuration } from "../../../main/typescript/generated/gateway-client/typescript-axios";
+import {
+  AssetTokenTypeEnum,
+  Configuration,
+} from "../../../main/typescript/generated/gateway-client/typescript-axios";
 import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
@@ -20,9 +20,7 @@ import {
   ConnectionProfile,
   DefaultEventHandlerStrategy,
   FabricSigningCredential,
-  IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
-  DefaultApi as FabricApi,
   FabricContractInvocationType,
   FileBase64,
   ChainCodeProgrammingLanguage,
@@ -30,33 +28,35 @@ import {
 import { DiscoveryOptions, X509Identity } from "fabric-network";
 import { Config } from "node-ssh";
 import { randomUUID as uuidv4 } from "node:crypto";
-import { FabricConfig } from "../../../main/typescript/types/blockchain-interaction";
-import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 import fs from "fs-extra";
 import path from "path";
 import { expect } from "@jest/globals";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import bodyParser from "body-parser";
-import express from "express";
-import http, { Server } from "http";
-import { AddressInfo } from "net";
-import { Asset } from "../../../main/typescript";
-import FabricSATPInteraction from "../../../test/typescript/fabric/satp-erc20-interact.json";
+import { Asset, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { NetworkId } from "../../../main/typescript/services/network-identification/chainid-list";
-
+import { IFabricLeafOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
+import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-fabric.json";
+import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
+import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import Docker from "dockerode";
 // Test environment for Fabric ledger operations
+
+export interface IFabricTestEnvironment {
+  satpContractName: string;
+  logLevel: LogLevelDesc;
+  claimFormat: ClaimFormat;
+  network?: string;
+}
 export class FabricTestEnvironment {
-  public static readonly FABRIC_ASSET_ID: string = uuidv4();
-  public static readonly FABRIC_NETWORK_ID: string = "FABRIC";
+  public static readonly FABRIC_ASSET_ID: string = "FabricExampleAsset";
+  public static readonly FABRIC_REFERENCE_ID: string = ExampleOntology.id;
+  public static readonly FABRIC_NETWORK_ID: string = "FabricLedgerTestNetwork";
   public readonly network: NetworkId = {
     id: FabricTestEnvironment.FABRIC_NETWORK_ID,
     ledgerType: LedgerType.Fabric2,
   };
   public ledger!: FabricTestLedgerV1;
-  public connectorOptions!: IPluginLedgerConnectorFabricOptions;
   public connector!: PluginLedgerConnectorFabric;
-  public bungeeOptions!: IPluginBungeeHermesOptions;
   public userIdentity!: X509Identity;
   public bridgeProfile!: ConnectionProfile;
   public connectionProfile!: ConnectionProfile;
@@ -72,27 +72,37 @@ export class FabricTestEnvironment {
   public fabricChannelName!: string;
   public satpContractName!: string;
   public clientId!: string;
-  public fabricConfig!: FabricConfig;
-  public fabricServer!: Server;
-  public apiClient!: FabricApi;
-  public bridge_id!: string;
+  public wrapperContractName?: string;
+  private channelName: string = "mychannel";
+
+  private dockerContainerIP?: string;
+  private dockerNetwork: string = "fabric";
 
   private readonly log: Logger;
 
+  private bridgeMSPID?: string;
+  public bridgeIdentity?: X509Identity;
+  private claimFormat: number;
+
   private constructor(
     satpContractName: string,
-    bridge_id: string,
     logLevel: LogLevelDesc,
+    network?: string,
+    claimFormat?: ClaimFormat,
   ) {
+    if (network) {
+      this.dockerNetwork = network;
+    }
     this.satpContractName = satpContractName;
-    this.bridge_id = bridge_id;
+
+    this.claimFormat = claimFormat || ClaimFormat.DEFAULT;
 
     const level = logLevel || "INFO";
     const label = "FabricTestEnvironment";
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  // Initializes the Ethereum ledger, accounts, and connector for testing
+  // Initializes the Fabric ledger, accounts, and connector for testing
   public async init(logLevel: LogLevelDesc): Promise<void> {
     this.ledger = new FabricTestLedgerV1({
       emitContainerLogs: true,
@@ -100,12 +110,25 @@ export class FabricTestEnvironment {
       imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
+      networkName: this.dockerNetwork,
     });
-    await this.ledger.start();
+
+    const docker = new Docker();
+
+    const container = await this.ledger.start();
+
+    const containerData = await docker
+      .getContainer((await container).id)
+      .inspect();
+
+    this.dockerContainerIP =
+      containerData.NetworkSettings.Networks[
+        this.dockerNetwork || "bridge"
+      ].IPAddress;
 
     this.fabricChannelName = "mychannel";
 
-    this.connectionProfile = await this.ledger.getConnectionProfileOrg1();
+    this.connectionProfile = await this.ledger.getConnectionProfileOrgX("org1");
     this.bridgeProfile = await this.ledger.getConnectionProfileOrgX("org2");
     expect(this.connectionProfile).not.toBeUndefined();
     expect(this.bridgeProfile).not.toBeUndefined();
@@ -122,7 +145,8 @@ export class FabricTestEnvironment {
       organization: "org2",
       wallet: bridgeWallet,
     };
-    const [bridgeIdentity] = await this.ledger.enrollUserV2(opts);
+    [this.bridgeIdentity] = await this.ledger.enrollUserV2(opts);
+    this.bridgeMSPID = this.bridgeIdentity!.mspId;
     this.sshConfig = await this.ledger.getSshConfig();
 
     this.log.debug("enrolled admin");
@@ -146,8 +170,8 @@ export class FabricTestEnvironment {
 
     const keychainInstanceIdBridge = uuidv4();
     const keychainIdBridge = uuidv4();
-    this.keychainEntryKeyBridge = "bridge1";
-    this.keychainEntryValueBridge = JSON.stringify(bridgeIdentity);
+    this.keychainEntryKeyBridge = "user2";
+    this.keychainEntryValueBridge = JSON.stringify(this.bridgeIdentity);
 
     this.keychainPluginBridge = new PluginKeychainMemory({
       instanceId: keychainInstanceIdBridge,
@@ -168,7 +192,7 @@ export class FabricTestEnvironment {
       asLocalhost: true,
     };
 
-    this.connectorOptions = {
+    const connectorOptions = {
       instanceId: uuidv4(),
       dockerBinary: "/usr/local/bin/docker",
       peerBinary: "/fabric-samples/bin/peer",
@@ -185,7 +209,7 @@ export class FabricTestEnvironment {
       },
     };
 
-    this.connector = new PluginLedgerConnectorFabric(this.connectorOptions);
+    this.connector = new PluginLedgerConnectorFabric(connectorOptions);
 
     this.fabricSigningCredential = {
       keychainId,
@@ -195,109 +219,236 @@ export class FabricTestEnvironment {
       keychainId: keychainIdBridge,
       keychainRef: this.keychainEntryKeyBridge,
     };
+  }
 
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    this.fabricServer = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "127.0.0.1",
-      port: 3000,
-      server: this.fabricServer,
-    };
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    const { address, port } = addressInfo;
+  public getTestContractName(): string {
+    return this.satpContractName;
+  }
 
-    await this.connector.getOrCreateWebServices();
-    await this.connector.registerWebServices(expressApp);
+  public getTestChannelName(): string {
+    return this.fabricChannelName;
+  }
 
-    this.log.info("Fabric Ledger connector check");
+  public getTestOwnerSigningCredential(): FabricSigningCredential {
+    return this.fabricSigningCredential;
+  }
 
-    const apiUrl = `http://${address}:${port}`;
+  public getTestOwnerAccount(): string {
+    return this.clientId;
+  }
 
-    this.configFabric = new Configuration({ basePath: apiUrl });
+  public getBridgeMSPID(): string {
+    if (this.bridgeMSPID === undefined) {
+      throw new Error("Bridge MSPID is undefined");
+    }
+    return this.bridgeMSPID;
+  }
 
-    this.apiClient = new FabricApi(this.configFabric);
+  public getNetworkId(): string {
+    return this.network.id;
+  }
+
+  public getNetworkType(): LedgerType {
+    return this.network.ledgerType;
   }
 
   // Creates and initializes a new FabricTestEnvironment instance
+
   public static async setupTestEnvironment(
-    satpContractName: string,
-    bridge_id: string,
-    logLevel: LogLevelDesc,
+    config: IFabricTestEnvironment,
   ): Promise<FabricTestEnvironment> {
+    const { satpContractName, logLevel, claimFormat, network } = config;
     const instance = new FabricTestEnvironment(
       satpContractName,
-      bridge_id,
       logLevel,
+      network,
+      claimFormat,
     );
     await instance.init(logLevel);
     return instance;
   }
 
-  // Generates the Fabric configuration for use in SATP Gateway Docker container
-  public async createFabricConfigJSON(
-    logLevel?: LogLevelDesc,
-  ): Promise<Record<string, unknown>> {
+  // this is the config to be loaded by the gateway, does not contain the log level because it will use the one in the gateway config
+  public createFabricConfig(): INetworkOptions {
     return {
-      network: this.fabricConfig.network,
-      signingCredential: this.fabricConfig.signingCredential,
-      channelName: this.fabricConfig.channelName,
-      contractName: this.fabricConfig.contractName,
-      options: {
-        instanceId: this.connectorOptions.instanceId,
-        dockerBinary: this.connectorOptions.dockerBinary,
-        peerBinary: this.connectorOptions.peerBinary,
-        goBinary: this.connectorOptions.goBinary,
-        pluginRegistryOptions: {
-          plugins: [
-            {
-              instanceId: this.keychainPluginBridge.getInstanceId(),
-              keychainId: this.keychainPluginBridge.getKeychainId(),
-              logLevel,
-              backend: [
-                {
-                  keychainEntry: this.keychainEntryKeyBridge,
-                  keychainEntryValue: this.keychainEntryValueBridge,
-                },
-                {
-                  keychainEntry: "some-other-entry-key",
-                  keychainEntryValue: "some-other-entry-value",
-                },
-              ],
-            },
-          ],
+      networkIdentification: this.network,
+      userIdentity: this.bridgeIdentity,
+      channelName: this.channelName,
+      targetOrganizations: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+      ],
+      caFile:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.ORDERER_TLS_ROOTCERT_FILE,
+      ccSequence: 1,
+      orderer: "orderer.example.com:7050",
+      ordererTLSHostnameOverride: "orderer.example.com",
+      connTimeout: 60,
+      mspId: this.bridgeMSPID,
+      connectorOptions: {
+        dockerBinary: "/usr/local/bin/docker",
+        peerBinary: "/fabric-samples/bin/peer",
+        goBinary: "/usr/local/go/bin/go",
+        cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        sshConfig: this.sshConfig,
+        connectionProfile: this.bridgeProfile,
+        discoveryOptions: {
+          enabled: true,
+          asLocalhost: true,
         },
-        cliContainerEnv: this.connectorOptions.cliContainerEnv,
-        sshConfig: this.connectorOptions.sshConfig,
-        logLevel: this.connectorOptions.logLevel,
-        connectionProfile: this.connectorOptions.connectionProfile,
-        discoveryOptions: this.connectorOptions.discoveryOptions,
-        eventHandlerOptions: this.connectorOptions.eventHandlerOptions,
-      },
-      bungeeOptions: {
-        keyPair: {
-          privateKey: Buffer.from(
-            this.bungeeOptions.keyPair!.privateKey.buffer,
-          ).toString("hex"),
-          publicKey: Buffer.from(
-            this.bungeeOptions.keyPair!.publicKey.buffer,
-          ).toString("hex"),
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
         },
-        instanceId: this.bungeeOptions.instanceId,
-        logLevel: this.bungeeOptions.logLevel,
       },
-      claimFormat: this.fabricConfig.claimFormat,
+      claimFormats: [this.claimFormat],
+    } as INetworkOptions;
+  }
+
+  // this is the config to be loaded by the gateway, does not contain the log level because it will use the one in the gateway config
+  public async createFabricDockerConfig(): Promise<INetworkOptions> {
+    return {
+      networkIdentification: this.network,
+      userIdentity: this.bridgeIdentity,
+      channelName: this.fabricChannelName,
+      targetOrganizations: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+      ],
+      caFile:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.ORDERER_TLS_ROOTCERT_FILE,
+      ccSequence: 1,
+      orderer: "orderer.example.com:7050",
+      ordererTLSHostnameOverride: "orderer.example.com",
+      connTimeout: 60,
+      mspId: this.bridgeMSPID,
+      connectorOptions: {
+        dockerBinary: "/usr/local/bin/docker",
+        peerBinary: "/fabric-samples/bin/peer",
+        goBinary: "/usr/local/go/bin/go",
+        cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        sshConfig: await this.ledger.getSshConfig(false),
+        connectionProfile: await this.ledger.getConnectionProfileOrgX(
+          "org2",
+          false,
+        ),
+        discoveryOptions: {
+          enabled: true,
+          asLocalhost: false,
+        },
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+        },
+      },
+      claimFormats: [this.claimFormat],
+    } as INetworkOptions;
+  }
+  // this creates the same config as the bridge manager does
+  public createFabricLeafConfig(
+    ontologyManager: OntologyManager,
+    logLevel?: LogLevelDesc,
+  ): IFabricLeafOptions {
+    return {
+      networkIdentification: this.network,
+      signingCredential: this.bridgeFabricSigningCredential,
+      ontologyManager: ontologyManager,
+      channelName: this.fabricChannelName,
+      targetOrganizations: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+      ],
+      caFile:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.ORDERER_TLS_ROOTCERT_FILE,
+      ccSequence: 1,
+      orderer: "orderer.example.com:7050",
+      ordererTLSHostnameOverride: "orderer.example.com",
+      connTimeout: 60,
+      mspId: this.bridgeMSPID,
+      connectorOptions: {
+        instanceId: uuidv4(),
+        dockerBinary: "/usr/local/bin/docker",
+        peerBinary: "/fabric-samples/bin/peer",
+        goBinary: "/usr/local/go/bin/go",
+        pluginRegistry: this.pluginRegistryBridge,
+        cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        sshConfig: this.sshConfig,
+        logLevel: logLevel,
+        connectionProfile: this.bridgeProfile,
+        discoveryOptions: {
+          enabled: true,
+          asLocalhost: true,
+        },
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+        },
+      },
+      claimFormats: [this.claimFormat],
+      logLevel: logLevel,
     };
   }
 
+  public async checkBalance(
+    contractName: string,
+    channelName: string,
+    account: string,
+    amount: string,
+    signingCredential: FabricSigningCredential,
+  ): Promise<void> {
+    const responseBalance1 = await this.connector.transact({
+      contractName: contractName,
+      channelName: channelName,
+      params: [account],
+      methodName: "ClientIDAccountBalance",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: signingCredential,
+    });
+
+    expect(responseBalance1).not.toBeUndefined();
+    expect(responseBalance1.functionOutput).toBe(amount);
+  }
+
+  public async giveRoleToBridge(mspID: string): Promise<void> {
+    const setBridgeResponse = await this.connector.transact({
+      contractName: this.satpContractName,
+      channelName: this.fabricChannelName,
+      params: [mspID],
+      methodName: "setBridge",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: this.fabricSigningCredential,
+    });
+
+    expect(setBridgeResponse).not.toBeUndefined();
+
+    this.log.info(
+      `SATPWrapper.setBridge(): ${JSON.stringify(setBridgeResponse)}`,
+    );
+  }
+
+  public async approveAmount(
+    bridgeAddress: string,
+    amount: string,
+  ): Promise<void> {
+    const response = await this.connector.transact({
+      contractName: this.satpContractName,
+      channelName: this.fabricChannelName,
+      params: [bridgeAddress, amount],
+      methodName: "Approve",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: this.fabricSigningCredential,
+    });
+
+    expect(response).not.toBeUndefined();
+
+    this.log.info(`SATPWrapper.Approve(): ${JSON.stringify(response)}`);
+  }
+
   // Deploys smart contracts and sets up configurations for testing
-  public async deployAndSetupContracts(claimFormat: ClaimFormat) {
+  public async deployAndSetupContracts() {
     this.satpContractName = "satp-contract";
-    const satpWrapperContractName = "satp-wrapper-contract";
     const satpContractRelPath =
       "./../fabric/contracts/satp-contract/chaincode-typescript";
-    const wrapperSatpContractRelPath =
-      "../../../main/typescript/cross-chain-mechanisms/satp-bridge/fabric-contracts/satp-wrapper/chaincode-typescript";
     const satpContractDir = path.join(__dirname, satpContractRelPath);
 
     // ├── package.json
@@ -389,128 +540,7 @@ export class FabricTestEnvironment {
       });
     }
 
-    const wrapperSatpContractDir = path.join(
-      __dirname,
-      wrapperSatpContractRelPath,
-    );
-
-    // ├── package.json
-    // ├── src
-    // │   ├── index.ts
-    // │   ├── interaction-signature.ts
-    // │   ├── ITraceableContract.ts
-    // │   ├── satp-wrapper.ts
-    // │   └── token.ts
-    // ├── tsconfig.json
-    // --------
-    const wrapperSourceFiles: FileBase64[] = [];
-    {
-      const filename = "./tsconfig.json";
-      const relativePath = "./";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./package.json";
-      const relativePath = "./";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./index.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./interaction-signature.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./ITraceableContract.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./satp-wrapper.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./token.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-
-    const res = await this.apiClient.deployContractV1({
+    const res = await this.connector.deployContract({
       channelId: this.fabricChannelName,
       ccVersion: "1.0.0",
       sourceFiles: satpSourceFiles,
@@ -529,8 +559,7 @@ export class FabricTestEnvironment {
       connTimeout: 60,
     });
 
-    const { packageIds, lifecycle, success } = res.data;
-    expect(res.status).toBe(200);
+    const { packageIds, lifecycle, success } = res;
     expect(success).toBe(true);
     expect(lifecycle).not.toBeUndefined();
 
@@ -559,60 +588,7 @@ export class FabricTestEnvironment {
     expect(queryCommitted).toBeTruthy();
     this.log.info("SATP Contract deployed");
 
-    const res2 = await this.apiClient.deployContractV1({
-      channelId: this.fabricChannelName,
-      ccVersion: "1.0.0",
-      sourceFiles: wrapperSourceFiles,
-      ccName: satpWrapperContractName,
-      targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
-      ],
-      caFile:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.ORDERER_TLS_ROOTCERT_FILE,
-      ccLabel: "satp-wrapper-contract",
-      ccLang: ChainCodeProgrammingLanguage.Typescript,
-      ccSequence: 1,
-      orderer: "orderer.example.com:7050",
-      ordererTLSHostnameOverride: "orderer.example.com",
-      connTimeout: 60,
-    });
-
-    const {
-      packageIds: packageIds2,
-      lifecycle: lifecycle2,
-      success: success2,
-    } = res2.data;
-    expect(res2.status).toBe(200);
-    expect(success2).toBe(true);
-
-    const {
-      approveForMyOrgList: approveForMyOrgList2,
-      installList: installList2,
-      queryInstalledList: queryInstalledList2,
-      commit: commit2,
-      packaging: packaging2,
-      queryCommitted: queryCommitted2,
-    } = lifecycle2;
-
-    expect(packageIds2).toBeTruthy();
-    expect(Array.isArray(packageIds2)).toBe(true);
-
-    expect(approveForMyOrgList2).toBeTruthy();
-    expect(Array.isArray(approveForMyOrgList2)).toBe(true);
-
-    expect(installList2).toBeTruthy();
-    expect(Array.isArray(installList2)).toBe(true);
-    expect(queryInstalledList2).toBeTruthy();
-    expect(Array.isArray(queryInstalledList2)).toBe(true);
-
-    expect(commit2).toBeTruthy();
-    expect(packaging2).toBeTruthy();
-    expect(queryCommitted2).toBeTruthy();
-
-    this.log.info("SATP Wrapper Contract deployed");
-
-    const initializeResponse = await this.apiClient.runTransactionV1({
+    const initializeResponse = await this.connector.transact({
       contractName: this.satpContractName,
       channelName: this.fabricChannelName,
       params: [this.userIdentity.mspId, FabricTestEnvironment.FABRIC_ASSET_ID],
@@ -622,58 +598,17 @@ export class FabricTestEnvironment {
     });
 
     expect(initializeResponse).not.toBeUndefined();
-    expect(initializeResponse.status).toBeGreaterThan(199);
-    expect(initializeResponse.status).toBeLessThan(300);
 
     this.log.info(
-      `SATPContract.InitToken(): ${JSON.stringify(initializeResponse.data)}`,
+      `SATPContract.InitToken(): ${JSON.stringify(initializeResponse)}`,
     );
 
-    const initializeResponse2 = await this.apiClient.runTransactionV1({
-      contractName: satpWrapperContractName,
-      channelName: this.fabricChannelName,
-      params: [this.userIdentity.mspId],
-      methodName: "Initialize",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: this.fabricSigningCredential,
-    });
+    if (this.bridgeMSPID === undefined) {
+      throw new Error("Bridge MSPID is undefined");
+    }
 
-    expect(initializeResponse2).not.toBeUndefined();
-    expect(initializeResponse2.status).toBeGreaterThan(199);
-    expect(initializeResponse2.status).toBeLessThan(300);
-
-    this.log.info(
-      `SATPWrapper.Initialize(): ${JSON.stringify(initializeResponse2.data)}`,
-    );
-
-    const setBridgeResponse = await this.apiClient.runTransactionV1({
+    const responseClientId = await this.connector.transact({
       contractName: this.satpContractName,
-      channelName: this.fabricChannelName,
-      params: ["Org2MSP"],
-      methodName: "setBridge",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: this.fabricSigningCredential,
-    });
-
-    const setBridgeResponse2 = await this.apiClient.runTransactionV1({
-      contractName: satpWrapperContractName,
-      channelName: this.fabricChannelName,
-      params: ["Org2MSP", this.bridge_id],
-      methodName: "setBridge",
-      invocationType: FabricContractInvocationType.Send,
-      signingCredential: this.fabricSigningCredential,
-    });
-
-    expect(setBridgeResponse2).not.toBeUndefined();
-    expect(setBridgeResponse2.status).toBeGreaterThan(199);
-    expect(setBridgeResponse2.status).toBeLessThan(300);
-
-    this.log.info(
-      `SATPWrapper.setBridge(): ${JSON.stringify(setBridgeResponse.data)}`,
-    );
-
-    const responseClientId = await this.apiClient.runTransactionV1({
-      contractName: satpWrapperContractName,
       channelName: this.fabricChannelName,
       params: [],
       methodName: "ClientAccountID",
@@ -681,58 +616,40 @@ export class FabricTestEnvironment {
       signingCredential: this.fabricSigningCredential,
     });
 
-    this.clientId = responseClientId.data.functionOutput.toString();
+    this.clientId = responseClientId.functionOutput.toString();
+  }
 
-    this.bungeeOptions = {
-      keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-      instanceId: uuidv4(),
-      pluginRegistry: new PluginRegistry(),
-    };
-
-    this.connectorOptions = {
-      instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
-      pluginRegistry: this.pluginRegistryBridge,
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
-      sshConfig: this.sshConfig,
-      logLevel: "DEBUG",
-      connectionProfile: this.bridgeProfile,
-      discoveryOptions: this.discoveryOptions,
-      eventHandlerOptions: {
-        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-        commitTimeout: 300,
-      },
-    };
-
-    this.fabricConfig = {
-      network: this.network,
-      signingCredential: this.bridgeFabricSigningCredential,
+  public async mintTokens(amount: string): Promise<void> {
+    const responseMint = await this.connector.transact({
+      contractName: this.satpContractName,
       channelName: this.fabricChannelName,
-      contractName: satpWrapperContractName,
-      options: this.connectorOptions,
-      bungeeOptions: this.bungeeOptions,
-      claimFormat: claimFormat,
-    };
+      params: [amount],
+      methodName: "Mint",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: this.fabricSigningCredential,
+    });
+    expect(responseMint).not.toBeUndefined();
 
-    // networkDetails = {
-    //   connectorApiPath: fabricPath,
-    //   signingCredential: this.fabricSigningCredential,
-    //   channelName: this.fabricChannelName,
-    //   contractName: this.satpContractName,
-    //   participant: "Org1MSP",
-    // };
+    this.log.info(
+      `Mint 100 amount asset by the owner response: ${JSON.stringify(responseMint)}`,
+    );
+  }
+
+  public getNetwork(): string {
+    return this.dockerNetwork;
   }
 
   // Gets the default asset configuration for testing
   public get defaultAsset(): Asset {
     return {
+      id: FabricTestEnvironment.FABRIC_ASSET_ID,
+      referenceId: FabricTestEnvironment.FABRIC_REFERENCE_ID,
       owner: this.clientId,
-      ontology: JSON.stringify(FabricSATPInteraction),
       contractName: this.satpContractName,
       mspId: this.userIdentity.mspId,
       channelName: this.fabricChannelName,
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.NonstandardFungible,
     };
   }
 
@@ -745,6 +662,5 @@ export class FabricTestEnvironment {
   public async tearDown(): Promise<void> {
     await this.ledger.stop();
     await this.ledger.destroy();
-    await Servers.shutdown(this.fabricServer);
   }
 }

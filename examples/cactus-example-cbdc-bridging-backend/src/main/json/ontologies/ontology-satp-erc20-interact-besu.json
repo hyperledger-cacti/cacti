@@ -1,0 +1,51 @@
+{
+    "name": "SATP-ERC20",
+    "id": "SATP-ERC20-BESU",
+    "type": "BESU_2X",
+    "ontology": {
+        "lock": [{
+            "functionSignature": "transfer(address,address,uint256)",
+            "variables": ["owner", "bridge", "amount"],
+            "available": true
+        }
+        ],
+        "unlock": [{
+            "functionSignature": "approve(address,uint256)",
+            "variables": ["bridge", "amount"],
+            "available": true
+            },
+            {
+            "functionSignature": "transfer(address,address,uint256)",
+            "variables": ["bridge", "owner", "amount"],
+            "available": true
+            }
+        ],
+        "mint": [{
+            "functionSignature": "mint(address,uint256)",
+            "variables": ["bridge", "amount"],
+            "available": true
+            }
+        ],
+        "burn": [{
+            "functionSignature": "burn(address,uint256)",
+            "variables": ["bridge", "amount"],
+            "available": true
+            }
+        ],
+        "assign": [{
+                "functionSignature": "assign(address,address,uint256)",
+                "variables": ["bridge", "receiver", "amount"],
+                "available": true
+            }
+        ],
+        "checkPermission": [{
+            "functionSignature": "hasPermission(address)",
+            "variables": ["bridge"],
+            "available": true
+            } 
+        ]
+    },
+    "bytecode": "",
+    "ownerSignature": "",
+    "bridgeSignature": ""
+}
