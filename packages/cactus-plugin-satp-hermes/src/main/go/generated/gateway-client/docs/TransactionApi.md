@@ -237,7 +237,7 @@ import (
 )
 
 func main() {
-    transactRequest := *openapiclient.NewTransactRequest("123e4567-e89b-12d3-a456-426614174000", "BeneficiaryPubkey_example", "OriginatorPubkey_example", *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example"), *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example")) // TransactRequest | 
+    transactRequest := *openapiclient.NewTransactRequest("000003e8-e0b8-21ee-ba00-325096b39f47", "BeneficiaryPubkey_example", "OriginatorPubkey_example", *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example"), *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example")) // TransactRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
