@@ -27,7 +27,7 @@ import {
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { AdminApi } from "../../../main/typescript";
+import { AdminApi, OracleApi } from "../../../main/typescript";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
@@ -387,7 +387,7 @@ describe("SATPGateway startup", () => {
       basePath: gateway.getAddressOApiAddress(),
     });
     const mainApiClient = new ApiClient(config1);
-    const admin = mainApiClient.extendWith(AdminApi);
+    const admin = mainApiClient.extendWith(AdminApi).extendWith(OracleApi);
 
     try {
       const result = await admin.getHealthCheck();
