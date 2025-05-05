@@ -12,7 +12,6 @@ import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
 
-// todo
 export async function executeTransact(
   logLevel: LogLevelDesc,
   req: TransactRequest,
@@ -57,8 +56,6 @@ export async function executeTransact(
     req.receiverAsset.contractAddress,
     req.originatorPubkey,
     req.beneficiaryPubkey,
-    req.fromDLTNetworkID,
-    req.toDLTNetworkID,
     manager.pubKey,
     serverGatewayPubkey,
     receiverGatewayOwnerId,
@@ -69,10 +66,8 @@ export async function executeTransact(
     credentialProfile,
     loggingProfile ? loggingProfile : "",
     accessControlProfile,
-    req.sourceAsset.ontology,
-    req.receiverAsset.ontology,
-    req.fromAmount,
-    req.toAmount,
+    req.sourceAsset.amount,
+    req.receiverAsset.amount,
     req.sourceAsset.mspId ? req.sourceAsset.mspId : "",
     req.sourceAsset.channelName ? req.sourceAsset.channelName : "",
     req.receiverAsset.mspId ? req.receiverAsset.mspId : "",
@@ -81,6 +76,14 @@ export async function executeTransact(
     req.receiverAsset.contractName,
     req.sourceAsset.owner,
     req.receiverAsset.owner,
+    req.sourceAsset.networkId.id,
+    req.sourceAsset.referenceId,
+    req.sourceAsset.networkId.ledgerType,
+    req.sourceAsset.tokenType,
+    req.receiverAsset.networkId.id,
+    req.receiverAsset.referenceId,
+    req.receiverAsset.networkId.ledgerType,
+    req.receiverAsset.tokenType,
   );
   await manager.transfer(session);
 

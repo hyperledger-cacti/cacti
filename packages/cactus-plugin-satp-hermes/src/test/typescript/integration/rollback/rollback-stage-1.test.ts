@@ -45,6 +45,7 @@ import {
   Stage1HashesSchema,
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 let knexInstanceClient: Knex;
 let knexInstanceServer: Knex;
@@ -117,10 +118,10 @@ const createMockSession = (
   if (isClient) {
     sessionData.senderAsset = create(AssetSchema, {
       tokenId: BESU_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
+      referenceId: "MOCK_REFERENCE_ID",
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_SENDER_ASSET_OWNER",
-      ontology: "MOCK_SENDER_ASSET_ONTOLOGY",
       contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
       contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
     });
@@ -128,10 +129,10 @@ const createMockSession = (
   if (!isClient) {
     sessionData.receiverAsset = create(AssetSchema, {
       tokenId: FABRIC_ASSET_ID,
-      tokenType: TokenType.NONSTANDARD,
+      referenceId: "MOCK_REFERENCE_ID",
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_RECEIVER_ASSET_OWNER",
-      ontology: "MOCK_RECEIVER_ASSET_ONTOLOGY",
       contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
       mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
       channelName: "MOCK_CHANNEL_ID",
@@ -218,7 +219,6 @@ describe("Rollback Test stage 1", () => {
       address: "http://localhost" as Address,
       gatewayServerPort: 3005,
       gatewayClientPort: 3001,
-      gatewayOpenAPIPort: 3002,
     };
 
     const gatewayIdentity2: GatewayIdentity = {
@@ -242,7 +242,6 @@ describe("Rollback Test stage 1", () => {
       address: "http://localhost" as Address,
       gatewayServerPort: 3225,
       gatewayClientPort: 3211,
-      gatewayOpenAPIPort: 4210,
     };
 
     knexInstanceClient = knex(knexClientConnection);
@@ -252,12 +251,14 @@ describe("Rollback Test stage 1", () => {
     await knexInstanceRemote1.migrate.latest();
 
     const options1: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       logLevel: "DEBUG",
       gid: gatewayIdentity1,
       counterPartyGateways: [gatewayIdentity2],
       keyPair: gateway1KeyPair,
-      knexLocalConfig: knexClientConnection,
-      knexRemoteConfig: knexSourceRemoteConnection,
+      localRepository: knexClientConnection,
+      remoteRepository: knexSourceRemoteConnection,
       enableCrashRecovery: true,
     };
 
@@ -268,12 +269,14 @@ describe("Rollback Test stage 1", () => {
     await knexInstanceRemote2.migrate.latest();
 
     const options2: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       logLevel: "DEBUG",
       gid: gatewayIdentity2,
       counterPartyGateways: [gatewayIdentity1],
       keyPair: gateway2KeyPair,
-      knexLocalConfig: knexServerConnection,
-      knexRemoteConfig: knexTargetRemoteConnection,
+      localRepository: knexServerConnection,
+      remoteRepository: knexTargetRemoteConnection,
       enableCrashRecovery: true,
     };
 

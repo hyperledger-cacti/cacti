@@ -107,9 +107,9 @@ export async function getStatusService(
   const startTime =
     sessionData.receivedTimestamps?.stage0?.newSessionRequestMessageTimestamp;
   const originNetwork: Transact200ResponseStatusResponseOriginNetwork =
-    getNetworkDetails(sessionData.senderGatewayNetworkType as LedgerType);
+    getNetworkDetails(sessionData.senderAsset?.networkId?.type as LedgerType);
   const destinationNetwork: Transact200ResponseStatusResponseOriginNetwork =
-    getNetworkDetails(sessionData.recipientGatewayNetworkType as LedgerType);
+    getNetworkDetails(sessionData.receiverAsset?.networkId?.type as LedgerType);
   if (!sessionData.hashes) {
     return {
       status: StatusResponseStatusEnum.Invalid,
