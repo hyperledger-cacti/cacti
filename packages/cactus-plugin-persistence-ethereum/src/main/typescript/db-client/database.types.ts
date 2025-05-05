@@ -62,6 +62,9 @@ export interface Database {
           uri: string;
           token_id: number;
           id: string;
+          nft_name: string;
+          nft_description: string;
+          nft_image: string;
           last_owner_change: string;
         };
         Insert: {
@@ -70,6 +73,9 @@ export interface Database {
           uri: string;
           token_id: number;
           id?: string;
+          nft_name?: string;
+          nft_description?: string;
+          nft_image?: string;
           last_owner_change?: string;
         };
         Update: {
@@ -78,6 +84,9 @@ export interface Database {
           uri?: string;
           token_id?: number;
           id?: string;
+          nft_name?: string;
+          nft_description?: string;
+          nft_image?: string;
           last_owner_change?: string;
         };
       };
