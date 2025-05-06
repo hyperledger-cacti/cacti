@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | **string** | The unique identifier of the task. | 
+**TaskID** | **string** | Unique identifier (UUID) for the session. | 
 
 ## Methods
 

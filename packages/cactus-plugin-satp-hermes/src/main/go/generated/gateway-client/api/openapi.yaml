@@ -1589,7 +1589,7 @@ components:
         \ for mode, polling interval, and source event signature."
       properties:
         taskID:
-          description: The unique identifier for the Oracle task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         type:
@@ -1598,7 +1598,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -1622,7 +1622,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -1714,7 +1714,7 @@ components:
         the context ID of the task to be unregistered.
       properties:
         taskID:
-          description: The unique identifier of the task to be unregistered.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
       required:
@@ -1724,7 +1724,7 @@ components:
       description: Request schema for checking the status of a data transfer task.
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
       required:
@@ -1735,7 +1735,7 @@ components:
         the task ID and status of the unregistration.
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         status:
@@ -1774,7 +1774,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -1798,7 +1798,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -1814,11 +1814,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
@@ -1827,7 +1827,7 @@ components:
         Includes the task ID and status of the task.
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         type:
@@ -1836,7 +1836,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -1860,7 +1860,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -1876,11 +1876,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
@@ -4499,10 +4499,10 @@ components:
         dstNetworkId:
           ledgerType: BESU_1X
           id: id
-        type: ""
+        type: READ
         taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
         timestamp: 1672531200
-        status: ""
+        status: ACTIVE
       properties:
         taskID:
           description: The unique identifier of the task.
@@ -4514,7 +4514,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -4538,7 +4538,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -4554,11 +4554,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
@@ -4701,7 +4701,7 @@ components:
         status: SUCCESS
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         status:
@@ -4792,13 +4792,13 @@ components:
         dstNetworkId:
           ledgerType: BESU_1X
           id: id
-        type: ""
+        type: READ
         taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
         timestamp: 1672531200
-        status: ""
+        status: ACTIVE
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         type:
@@ -4807,7 +4807,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -4831,7 +4831,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -4847,11 +4847,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
