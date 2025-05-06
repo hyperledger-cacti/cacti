@@ -1,20 +1,20 @@
 {
-    "name": "asset-transfer-basic",
-    "version": "1.0.0",
-    "description": "Asset-Transfer-Basic contract implemented in JavaScript",
-    "main": "index.js",
-    "engines": {
-        "node": ">=12",
-        "npm": ">=5"
-    },
-    "scripts": {
-        "start": "fabric-chaincode-node start"
-    },
-    "engineStrict": true,
-    "author": "Hyperledger",
-    "license": "Apache-2.0",
-    "dependencies": {
-        "fabric-contract-api": "2.2.2",
-        "fabric-shim": "2.2.2"
-    }
+  "name": "asset-transfer-basic",
+  "version": "1.0.0",
+  "description": "Asset-Transfer-Basic contract implemented in JavaScript",
+  "main": "index.js",
+  "engines": {
+    "node": ">=12",
+    "npm": ">=5"
+  },
+  "scripts": {
+    "start": "fabric-chaincode-node start"
+  },
+  "engineStrict": true,
+  "author": "Hyperledger",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "fabric-contract-api": "2.2.2",
+    "fabric-shim": "2.2.2"
+  }
 }
