@@ -10,7 +10,7 @@ import {
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger/cactus-test-tooling";
-import { GatewayIdentity } from "../../../main/typescript/core/types";
+import { GatewayIdentity } from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
   BesuTestEnvironment,
@@ -19,7 +19,7 @@ import {
   EthereumTestEnvironment,
   createPGDatabase,
   setupDBTable,
-} from "../test-utils";
+} from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_OAPI,
@@ -27,8 +27,8 @@ import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
-} from "../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../../main/typescript/core/constants";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
@@ -37,8 +37,8 @@ import {
   GetApproveAddressApi,
   TokenType,
   TransactionApi,
-} from "../../../main/typescript";
-import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../constants";
+} from "../../../../main/typescript";
+import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -68,6 +68,7 @@ const testNetwork = "test-network";
 const gateway1Address = "gateway1.satp-hermes";
 const gateway2Address = "gateway2.satp-hermes";
 
+const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
   await db_local1.stop();
   await db_local1.remove();
@@ -90,7 +91,7 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
 
 afterEach(async () => {
   if (gatewayRunner1) {
@@ -104,7 +105,7 @@ afterEach(async () => {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
-});
+}, TIMEOUT);
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -192,7 +193,7 @@ beforeAll(async () => {
     "100",
     besuEnv.getTestOwnerSigningCredential(),
   );
-});
+}, TIMEOUT);
 
 describe("SATPGateway sending a token from Besu to Fabric", () => {
   it("should realize a transfer", async () => {

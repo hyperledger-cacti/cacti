@@ -878,7 +878,7 @@ OracleTask:
       $ref: ./schemas.yml#/TaskID
       description: "The unique identifier for the Oracle task."
     type:
-      type: enum
+      type: string
       description: "The type of the Oracle task."
       enum:
         - READ
@@ -907,7 +907,7 @@ OracleTask:
       items:
         $ref: ./schemas.yml#/OracleOperation
     status:
-      type: enum
+      type: string
       description: "The current status of the Oracle task."
       enum:
         - ACTIVE
@@ -1064,7 +1064,7 @@ OracleExecuteResponse:
       $ref: ./schemas.yml#/TaskID
       description: "The unique identifier of the task."
     type:
-      type: enum
+      type: string
       description: "The type of the Oracle task."
       enum:
         - READ
@@ -1093,7 +1093,7 @@ OracleExecuteResponse:
       items:
         $ref: ./schemas.yml#/OracleOperation
     status:
-      type: enum
+      type: string
       description: "The current status of the Oracle task."
       enum:
         - ACTIVE
@@ -1111,7 +1111,7 @@ OracleExecuteResponse:
       description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
       example: 5000
   required:
-    - id
+    - taskID
     - type
     - srcContract
     - dstContract
@@ -1128,7 +1128,7 @@ OracleStatusResponse:
       $ref: ./schemas.yml#/TaskID
       description: "The unique identifier of the task."
     type:
-      type: enum
+      type: string
       description: "The type of the Oracle task."
       enum:
         - READ
@@ -1157,7 +1157,7 @@ OracleStatusResponse:
       items:
         $ref: ./schemas.yml#/OracleOperation
     status:
-      type: enum
+      type: string
       description: "The current status of the Oracle task."
       enum:
         - ACTIVE
@@ -1175,7 +1175,7 @@ OracleStatusResponse:
       description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
       example: 5000
   required:
-    - id
+    - taskID
     - type
     - srcContract
     - dstContract

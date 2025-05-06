@@ -691,25 +691,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     }
 
     this.logger.debug("Oracle Manager shut down");
-    this.SATPCCManager.getOracleManager().shutdown();
+    await this.SATPCCManager.getOracleManager().shutdown();
 
     this.logger.info("Shutting down Gateway Connection Manager");
     const connectionsClosed = await this.gatewayOrchestrator.disconnectAll();
 
     this.logger.info(`Closed ${connectionsClosed} connections`);
     this.logger.info("Gateway Coordinator shut down");
-
-    if (this.localRepository) {
-      this.logger.debug("Destroying local repository...");
-      await this.localRepository.destroy();
-      this.logger.info("Local repository destroyed");
-    }
-
-    if (this.remoteRepository) {
-      this.logger.debug("Destroying remote repository...");
-      await this.remoteRepository.destroy();
-      this.logger.info("Remote repository destroyed");
-    }
     return;
   }
 
@@ -718,8 +706,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.debug(`Entering ${fnTag}`);
     if (this.GOLServer) {
       try {
-        await this.GOLServer?.close();
         await this.GOLServer?.closeAllConnections();
+        await this.GOLServer?.close();
         this.logger.info("GOL server shut down");
       } catch (error) {
         this.logger.error(
@@ -762,25 +750,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     }
 
     this.logger.debug("Oracle Manager shut down");
-    this.SATPCCManager.getOracleManager().shutdown();
+    await this.SATPCCManager.getOracleManager().shutdown();
 
     this.logger.info("Shutting down Gateway Connection Manager");
     const connectionsClosed = await this.gatewayOrchestrator.disconnectAll();
 
     this.logger.info(`Closed ${connectionsClosed} connections`);
     this.logger.info("Gateway Coordinator shut down");
-
-    if (this.localRepository) {
-      this.logger.debug("Destroying local repository...");
-      await this.localRepository.destroy();
-      this.logger.info("Local repository destroyed");
-    }
-
-    if (this.remoteRepository) {
-      this.logger.debug("Destroying remote repository...");
-      await this.remoteRepository.destroy();
-      this.logger.info("Remote repository destroyed");
-    }
     return;
   }
 
@@ -807,28 +783,48 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * If they aren't starts a scheduled job to verify session states.
    * The job runs every 20 seconds until all sessions are concluded.
    */
+  // Define an interface for the manager with the required method
+
+  private cleanupRegistered = false;
+
   private async startSessionVerificationJob(manager: any): Promise<void> {
     return new Promise<void>((resolve) => {
+      let resolved = false;
+
       const cleanup = () => {
         if (this.sessionVerificationJob) {
           this.sessionVerificationJob.cancel();
           this.activeJobs.delete(this.sessionVerificationJob);
           this.sessionVerificationJob = null;
         }
+
+        // Remove listeners if they were registered
+        if (this.cleanupRegistered) {
+          process.removeListener("exit", cleanup);
+          process.removeListener("SIGINT", cleanup);
+          process.removeListener("SIGTERM", cleanup);
+          this.cleanupRegistered = false;
+        }
+
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
       };
 
-      const initialCheck = async () => {
+      const initialCheck = async (): Promise<boolean> => {
         try {
           const status = await manager.getSATPSessionState();
           if (status) {
             this.logger.info("All sessions already concluded");
             cleanup();
-            resolve();
             return false;
           }
           this.logger.info("Initial check: sessions pending");
         } catch (error) {
           this.logger.error(`Session check failed: ${error}`);
+          cleanup();
+          return false;
         }
         return true;
       };
@@ -843,7 +839,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
                 if (status) {
                   this.logger.info("All sessions concluded");
                   cleanup();
-                  resolve();
                 } else {
                   this.logger.info("Sessions still pending");
                 }
@@ -852,7 +847,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
               }
             },
           );
-          this.activeJobs.add(this.sessionVerificationJob);
+
+          if (this.sessionVerificationJob) {
+            this.activeJobs.add(this.sessionVerificationJob);
+          }
         }
       });
     });

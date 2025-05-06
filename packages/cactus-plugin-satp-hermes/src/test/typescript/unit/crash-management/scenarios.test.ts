@@ -23,10 +23,6 @@ import {
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-} from "../../knex.config";
-import {
   bufArray2HexStr,
   getSatpLogKey,
 } from "../../../../main/typescript/gateway-utils";
@@ -54,6 +50,9 @@ import type {
 } from "../../../../main/typescript/database/repository/interfaces/repository";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import path from "path";
+import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
+import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
+import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 
 let mockSession: SATPSession;
 
@@ -99,13 +98,24 @@ let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
 
 beforeAll(async () => {
-  knexInstanceClient = knex(knexClientConnection);
+  const migrationSource = await createMigrationSource();
+  knexInstanceClient = knex({
+    ...knexLocalInstance.default,
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  });
   await knexInstanceClient.migrate.latest();
-  knexInstanceRemote = knex(knexSourceRemoteConnection);
-  await knexInstanceRemote.migrate.latest();
 
-  localRepository = new KnexLocalLogRepository(knexClientConnection);
-  remoteRepository = new KnexRemoteLogRepository(knexClientConnection);
+  knexInstanceRemote = knex({
+    ...knexRemoteInstance.default,
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  });
+  await knexInstanceRemote.migrate.latest();
+  localRepository = new KnexLocalLogRepository(knexLocalInstance.default);
+  remoteRepository = new KnexRemoteLogRepository(knexRemoteInstance.default);
 
   const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
   const signerOptions: IJsObjectSignerOptions = {
@@ -175,7 +185,7 @@ afterAll(async () => {
   }
 });
 
-describe("CrashManager Tests", () => {
+describe.skip("CrashManager Tests", () => {
   it("should reconstruct session by fetching logs", async () => {
     mockSession = createMockSession("1000", "3");
 

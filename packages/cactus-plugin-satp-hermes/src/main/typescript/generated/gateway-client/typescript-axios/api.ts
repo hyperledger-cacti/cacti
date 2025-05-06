@@ -695,10 +695,10 @@ export interface ExecuteOracleTask200Response {
      * @type {string}
      * @memberof ExecuteOracleTask200Response
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof ExecuteOracleTask200Response
      */
     'type': ExecuteOracleTask200ResponseTypeEnum;
@@ -740,7 +740,7 @@ export interface ExecuteOracleTask200Response {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof ExecuteOracleTask200Response
      */
     'status': ExecuteOracleTask200ResponseStatusEnum;
@@ -1428,14 +1428,14 @@ export interface GetIntegrations200ResponseIntegrationsInner {
  */
 export interface GetOracleTaskStatus200Response {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof GetOracleTaskStatus200Response
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof GetOracleTaskStatus200Response
      */
     'type': GetOracleTaskStatus200ResponseTypeEnum;
@@ -1477,7 +1477,7 @@ export interface GetOracleTaskStatus200Response {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof GetOracleTaskStatus200Response
      */
     'status': GetOracleTaskStatus200ResponseStatusEnum;
@@ -2319,10 +2319,10 @@ export interface OracleExecuteResponse {
      * @type {string}
      * @memberof OracleExecuteResponse
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleExecuteResponse
      */
     'type': OracleExecuteResponseTypeEnum;
@@ -2364,7 +2364,7 @@ export interface OracleExecuteResponse {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleExecuteResponse
      */
     'status': OracleExecuteResponseStatusEnum;
@@ -2602,7 +2602,7 @@ export interface OracleResponse {
  */
 export interface OracleStatusRequest {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleStatusRequest
      */
@@ -2615,14 +2615,14 @@ export interface OracleStatusRequest {
  */
 export interface OracleStatusResponse {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleStatusResponse
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleStatusResponse
      */
     'type': OracleStatusResponseTypeEnum;
@@ -2664,7 +2664,7 @@ export interface OracleStatusResponse {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleStatusResponse
      */
     'status': OracleStatusResponseStatusEnum;
@@ -2710,14 +2710,14 @@ export type OracleStatusResponseModeEnum = typeof OracleStatusResponseModeEnum[k
  */
 export interface OracleTask {
     /**
-     * The unique identifier for the Oracle task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleTask
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleTask
      */
     'type': OracleTaskTypeEnum;
@@ -2759,7 +2759,7 @@ export interface OracleTask {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleTask
      */
     'status': OracleTaskStatusEnum;
@@ -2811,7 +2811,7 @@ export type OracleTaskModeEnum = typeof OracleTaskModeEnum[keyof typeof OracleTa
  */
 export interface OracleUnregisterRequest {
     /**
-     * The unique identifier of the task to be unregistered.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleUnregisterRequest
      */
@@ -2824,7 +2824,7 @@ export interface OracleUnregisterRequest {
  */
 export interface OracleUnregisterResponse {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleUnregisterResponse
      */
@@ -3860,7 +3860,7 @@ export interface TransactResponse {
  */
 export interface UnregisterOracleTask200Response {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof UnregisterOracleTask200Response
      */
