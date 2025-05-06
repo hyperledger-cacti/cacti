@@ -65,6 +65,7 @@ const gatewayAddress = "gateway.satp-hermes";
 let ethereumContractAddress: string;
 let besuContractAddress: string;
 
+const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
   await gatewayRunner.stop();
   await gatewayRunner.destroy();
@@ -84,7 +85,7 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -219,9 +220,10 @@ beforeAll(async () => {
       basePath: `http://${await gatewayRunner.getOApiHost()}`,
     }),
   );
-});
+}, TIMEOUT);
 
 describe("Oracle executing UPDATE tasks successfully", () => {
+  jest.setTimeout(20000);
   it("should realize a transfer", async () => {
     const response = await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
@@ -254,6 +256,7 @@ describe("Oracle executing UPDATE tasks successfully", () => {
 });
 
 describe("Oracle executing READ_AND_UPDATE tasks successfully", () => {
+  jest.setTimeout(20000);
   const data_hash = keccak256("Hello World!");
   it("should realize a transfer", async () => {
     const response = await oracleApi.executeOracleTask({
@@ -317,6 +320,7 @@ describe("Oracle executing READ_AND_UPDATE tasks successfully", () => {
 });
 
 describe("Oracle event listener for EVM working", () => {
+  jest.setTimeout(20000);
   it("should read and update using an event listener for events in the source contract (EVM)", async () => {
     const payload1 = "Hello World to Emit Event!";
     const payload2 = "Hello World to Emit Event 2!";
