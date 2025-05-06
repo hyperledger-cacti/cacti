@@ -93,6 +93,17 @@ jobs:
           yarn lint-code || echo "Linting completed with warnings"
           yarn lint:oapi || echo "OpenAPI linting completed with warnings"
           yarn lint:protobuf || echo "Protobuf linting completed with warnings"
+      - name: Show yarn build log if it exists
+        if: always()
+        run: |
+          LOG_FILE=$(find /tmp -type f -name build.log | head -n 1)
+          if [ -f "$LOG_FILE" ]; then
+            echo "===== Build Log ====="
+            cat "$LOG_FILE"
+            echo "====================="
+          else
+            echo "No build log found."
+          fi
 
   run-satp-tests:
     needs: build-satp-dev
