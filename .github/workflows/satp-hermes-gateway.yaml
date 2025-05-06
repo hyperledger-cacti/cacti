@@ -66,12 +66,12 @@ jobs:
             foundryup
           fi
 
+      - name: Run a new terminal
+        run: source /home/runner/.bashrc
+
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
-      
-      - name: Run a new terminal
-        run: source /home/runner/.bashrc
 
       - name: Build bundle
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
