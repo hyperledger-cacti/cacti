@@ -363,7 +363,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuditResponse'
+                $ref: ./schemas.yml#/getAuditResponse
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:
