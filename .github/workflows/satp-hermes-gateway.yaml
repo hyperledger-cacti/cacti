@@ -7,7 +7,7 @@ name: SATP CI - tests and docker deployments
 # 2. Runs unit, integration, and forge (smart contract) tests
 # 3. Builds and pushes Docker images to both Docker Hub and GHCR
 # 4. Tags images appropriately (version-specific and latest)
-
+#
 env:
   NODEJS_VERSION: v18.19.0
 on:
