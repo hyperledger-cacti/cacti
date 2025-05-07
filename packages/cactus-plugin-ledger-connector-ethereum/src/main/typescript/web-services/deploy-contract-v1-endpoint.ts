@@ -1,4 +1,6 @@
 import { Express, Request, Response } from "express";
+import { Ajv } from "ajv";
+import RefParser from "@apidevtools/json-schema-ref-parser";
 
 import {
   IWebServiceEndpoint,
@@ -21,6 +23,53 @@ import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethere
 import OAS from "../../json/openapi.json";
 import { ERR_INVALID_RESPONSE } from "web3";
 import { isWeb3Error } from "../public-api";
+
+async function preprocessSchema() {
+  const resolvedSchema = await RefParser.dereference(OAS);
+  function adjustNullable(obj: Record<string, unknown>) {
+    if (typeof obj !== "object" || obj === null) return;
+    if ("nullable" in obj && !("type" in obj)) {
+      delete obj.nullable;
+    }
+    if (obj.nullable === true && obj.type && typeof obj.type === "string") {
+      obj.type = [obj.type, "null"];
+      delete obj.nullable;
+    }
+    if (obj.nullable === false) {
+      delete obj.nullable;
+    }
+    for (const key in obj) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
+        adjustNullable(obj[key] as Record<string, unknown>);
+      }
+    }
+  }
+
+  adjustNullable(resolvedSchema as Record<string, unknown>);
+  return resolvedSchema;
+}
+
+let validateDeployContract: ReturnType<Ajv["compile"]> | undefined;
+async function getValidateDeployContract(): Promise<
+  ReturnType<Ajv["compile"]>
+> {
+  if (validateDeployContract) {
+    return validateDeployContract;
+  }
+
+  const ajv = new Ajv({
+    allErrors: true,
+    strict: false,
+    allowMatchingProperties: true,
+  });
+  const processedSchema = await preprocessSchema();
+  ajv.addSchema(processedSchema, "openapi.json");
+
+  validateDeployContract = ajv.compile({
+    $ref: "openapi.json#/components/schemas/DeployContractV1Request",
+  });
+  return validateDeployContract;
+}
 
 export interface IDeployContractSolidityBytecodeOptions {
   logLevel?: LogLevelDesc;
@@ -88,6 +137,18 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
+
+    const validate = await getValidateDeployContract();
+    const isValid = validate(req.body);
+    if (!isValid) {
+      const errorDetails = JSON.stringify(validate.errors);
+      this.log.debug(`Validation failed for ${reqTag}: ${errorDetails}`);
+      res.status(400).json({
+        message: "Invalid request body",
+        errors: validate.errors,
+      });
+      return;
+    }
     try {
       res
         .status(200)

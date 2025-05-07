@@ -805,6 +805,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@apidevtools/json-schema-ref-parser@npm:12.0.1":
+  version: 12.0.1
+  resolution: "@apidevtools/json-schema-ref-parser@npm:12.0.1"
+  dependencies:
+    "@jsdevtools/ono": "npm:^7.1.3"
+    "@types/json-schema": "npm:^7.0.15"
+    js-yaml: "npm:^4.1.0"
+  checksum: 10/1ebe4b623dc841ac7137abb68e573a91350fcca38185379da52e1ab888fcb4cf706026bc41436dbb61a82ca830c8221e04b8432252bbb34815cfee5f290d0a22
+  languageName: node
+  linkType: hard
+
 "@apidevtools/json-schema-ref-parser@npm:^11.6.2":
   version: 11.6.4
   resolution: "@apidevtools/json-schema-ref-parser@npm:11.6.4"
@@ -10616,6 +10627,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum"
   dependencies:
+    "@apidevtools/json-schema-ref-parser": "npm:12.0.1"
     "@ethereumjs/common": "npm:4.0.0"
     "@ethereumjs/tx": "npm:5.0.0"
     "@hyperledger/cactus-common": "npm:2.1.0"
@@ -10630,6 +10642,7 @@ __metadata:
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/uuid": "npm:10.0.0"
+    ajv: "npm:8.17.1"
     axios: "npm:1.8.4"
     body-parser: "npm:1.20.3"
     chalk: "npm:4.1.2"
