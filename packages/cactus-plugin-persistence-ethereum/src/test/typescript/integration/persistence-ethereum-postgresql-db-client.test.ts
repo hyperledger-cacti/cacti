@@ -291,6 +291,9 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       token_address: contractAddress,
       uri: "test.uri",
       token_id: 1,
+      nft_name: "NFT",
+      nft_description: "NFT description",
+      nft_image: "test.uri",
     };
     await dbClient.upsertTokenERC721(issuedToken);
 
@@ -620,6 +623,9 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       token_address: contractAddress,
       uri: issuedTokenUri,
       token_id: 1,
+      nft_name: "NFT",
+      nft_description: "NFT description",
+      nft_image: issuedTokenUri,
     });
 
     // Transfer our token
@@ -693,6 +699,9 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       token_address: contractAddress,
       uri: issuedTokenUri,
       token_id: 1,
+      nft_name: "NFT",
+      nft_description: "NFT description",
+      nft_image: issuedTokenUri,
     });
 
     // Transfer our token
@@ -737,6 +746,9 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       token_address: contractAddress,
       uri: issuedTokenUri,
       token_id: "1",
+      nft_name: "NFT",
+      nft_description: "NFT description",
+      nft_image: issuedTokenUri,
     });
   });
 });

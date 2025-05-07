@@ -238,7 +238,6 @@ export class PluginPersistenceEthereum
       );
       return false;
     }
-
     if (parseInt(ownerAddress, 16) === 0) {
       this.log.debug(`Found token ID ${tokenId} without the owner - stop.`);
       return false;
@@ -249,17 +248,54 @@ export class PluginPersistenceEthereum
       const checkedOwnerAddress = normalizeAddress(ownerAddress);
       const tokenUri = await tokenClient.tokenURI(tokenId);
 
+      // Fetch token metadata
+      const metadataResponse = await fetch(tokenUri);
+      if (!metadataResponse.ok) {
+        throw new Error(`Failed to fetch metadata: 
+          ${metadataResponse.status} - ${metadataResponse.statusText}`);
+      }
+
+      // Parse token metadata
+      const metadata = await metadataResponse.json();
+      if (typeof metadata.properties.name.description !== "string") {
+        throw new Error(
+          `Invalid type of 'name' from asset metadata for token ID: ${tokenId}`,
+        );
+      }
+      if (typeof metadata.properties.description.description !== "string") {
+        throw new Error(
+          `Invalid type of 'description' from asset metadata for token ID: ${tokenId}`,
+        );
+      }
+      if (typeof metadata.properties.image.description !== "string") {
+        throw new Error(
+          `Invalid type of 'image' from asset metadata for token ID: ${tokenId}`,
+        );
+      }
+
+      // Upsert token information in DB
       await this.dbClient.upsertTokenERC721({
         account_address: checkedOwnerAddress,
         token_address: normalizeAddress(tokenClient.address),
         uri: tokenUri,
         token_id: tokenId,
+        nft_name: metadata.properties.name.description,
+        nft_description: metadata.properties.description.description,
+        nft_image: metadata.properties.image.description,
       });
     } catch (err) {
-      this.log.error(`Could not store issued ERC721 token: ID ${tokenId}`, err);
-      // We return true since failure here means that there might be more tokens to synchronize
+      if (err instanceof SyntaxError) {
+        this.log.error("Error parsing JSON:", err.message);
+      } else if (err.message.includes("Failed to fetch metadata")) {
+        this.log.error(err.message);
+      } else {
+        this.log.error(
+          `Could not store issued ERC721 token: ID ${tokenId}`,
+          err,
+        );
+      }
     }
-
+    // We return true since failure here means that there might be more tokens to synchronize
     return true;
   }
 
@@ -847,7 +883,6 @@ export class PluginPersistenceEthereum
     );
 
     const tokenClient = new TokenClientERC721(this.apiClient, checkedAddress);
-
     try {
       await this.dbClient.insertTokenMetadataERC721({
         address: checkedAddress,
@@ -860,7 +895,6 @@ export class PluginPersistenceEthereum
         getRuntimeErrorCause(err),
       );
     }
-
     await this.refreshMonitoredTokens();
   }
 
