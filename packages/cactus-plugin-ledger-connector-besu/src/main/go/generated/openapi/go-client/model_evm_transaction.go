@@ -1,7 +1,7 @@
 /*
-Hyperledger Cactus Plugin - Connector Besu
+Hyperledger Cacti Plugin - Besu Connector
 
-Can perform basic tasks on a Besu ledger
+Can perform basic tasks on a Besu ledger such as executing transactions, streaming blocks or solidity smart contract events.
 
 API version: 2.1.0
 */
