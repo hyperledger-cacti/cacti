@@ -52,22 +52,14 @@ jobs:
       - name: Set working directory
         run: cd packages/cactus-plugin-satp-hermes
 
-      - name: Install Foundry
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          if [ ! -d "${XDG_CONFIG_HOME:-$HOME}" ]; then
-            echo "$(date +%FT%T%z) [CI] directory ${XDG_CONFIG_HOME:-$HOME} does not exist."
-          else
-            npm run preinstall || { echo "Preinstall failed"; exit 1; }
-            export PATH="${XDG_CONFIG_HOME:-$HOME}/.foundry/bin:$PATH"
-            if [ -f ~/.bashrc ]; then
-              source ~/.bashrc
-            fi
-            foundryup
-          fi
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Run a new terminal
-        run: source /home/runner/.bashrc
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
