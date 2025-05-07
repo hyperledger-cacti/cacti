@@ -5,8 +5,8 @@
   "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "workspaces": {
     "packages": [
-      "packages/cactus-*",
       "extensions/cactus-*",
+      "packages/cactus-*",
       "packages/cacti-*",
       "examples/cactus-*",
       "examples/cacti-*",
