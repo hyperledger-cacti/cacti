@@ -52,23 +52,21 @@ jobs:
       - name: Set working directory
         run: cd packages/cactus-plugin-satp-hermes
 
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - name: Install Foundry
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          if [ ! -d "${XDG_CONFIG_HOME:-$HOME}" ]; then
-            echo "$(date +%FT%T%z) [CI] directory ${XDG_CONFIG_HOME:-$HOME} does not exist."
-          else
-            npm run preinstall || { echo "Preinstall failed"; exit 1; }
-            export PATH="${XDG_CONFIG_HOME:-$HOME}/.foundry/bin:$PATH"
-            if [ -f ~/.bashrc ]; then
-              source ~/.bashrc
-            fi
-            foundryup
-          fi
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
+      
+      - name: Configure
+        run: yarn configure
 
       - name: Build bundle
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
@@ -93,6 +91,17 @@ jobs:
           yarn lint-code || echo "Linting completed with warnings"
           yarn lint:oapi || echo "OpenAPI linting completed with warnings"
           yarn lint:protobuf || echo "Protobuf linting completed with warnings"
+      - name: Show yarn build log if it exists
+        if: always()
+        run: |
+          LOG_FILE=$(find /tmp -type f -name build.log | head -n 1)
+          if [ -f "$LOG_FILE" ]; then
+            echo "===== Build Log ====="
+            cat "$LOG_FILE"
+            echo "====================="
+          else
+            echo "No build log found."
+          fi
 
   run-satp-tests:
     needs: build-satp-dev
