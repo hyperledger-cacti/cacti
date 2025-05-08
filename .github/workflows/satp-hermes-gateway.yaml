@@ -72,7 +72,7 @@ jobs:
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Generate protobuf files
-        run: yarn build-proto
+        run: yarn run build-proto
 
       - name: Generate OpenAPI SDKs
         run: |
@@ -91,6 +91,7 @@ jobs:
           yarn lint-code || echo "Linting completed with warnings"
           yarn lint:oapi || echo "OpenAPI linting completed with warnings"
           yarn lint:protobuf || echo "Protobuf linting completed with warnings"
+          
       - name: Show yarn build log if it exists
         if: always()
         run: |
