@@ -61,6 +61,7 @@
     "@hyperledger/cactus-verifier-client": "2.1.0",
     "key-encoder": "2.0.3",
     "socket.io": "4.6.2",
+    "viem": "2.25.0",
     "web3": "1.6.1",
     "web3js-quorum": "22.4.0"
   },
