@@ -72,25 +72,26 @@ jobs:
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Generate protobuf files
-        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes build-proto
+        continue-on-error: true
+        run: yarn build-proto --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Generate OpenAPI SDKs
         run: |
-          yarn bundle-openapi-yaml
-          yarn bundle-openapi-json
-          yarn generate-sdk:typescript-axios-bol
+          yarn bundle-openapi-yaml --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn bundle-openapi-json --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn generate-sdk:typescript-axios-bol --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Generate ABI types
         run: |
-          yarn forge:all
-          yarn codegen:abi
+          yarn forge:all --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn codegen:abi --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Run linting
         continue-on-error: true
         run: |
-          yarn lint-code || echo "Linting completed with warnings"
-          yarn lint:oapi || echo "OpenAPI linting completed with warnings"
-          yarn lint:protobuf || echo "Protobuf linting completed with warnings"
+          yarn lint-code || echo "Linting completed with warnings" --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn lint:oapi || echo "OpenAPI linting completed with warnings" --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn lint:protobuf || echo "Protobuf linting completed with warnings" --scope=@hyperledger/cactus-plugin-satp-hermes
           
       - name: Show yarn build log if it exists
         if: always()
@@ -143,11 +144,9 @@ jobs:
         run: cd packages/cactus-plugin-satp-hermes
 
       - name: Install Foundry
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          curl -L https://foundry.paradigm.xyz | bash
-          source $HOME/.bashrc && foundryup
-
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
