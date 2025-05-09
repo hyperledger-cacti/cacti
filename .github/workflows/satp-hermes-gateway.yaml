@@ -73,25 +73,25 @@ jobs:
 
       - name: Generate protobuf files
         continue-on-error: true
-        run: yarn build-proto --scope=@hyperledger/cactus-plugin-satp-hermes
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes build-proto
 
       - name: Generate OpenAPI SDKs
         run: |
-          yarn bundle-openapi-yaml --scope=@hyperledger/cactus-plugin-satp-hermes
-          yarn bundle-openapi-json --scope=@hyperledger/cactus-plugin-satp-hermes
-          yarn generate-sdk:typescript-axios-bol --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-yaml
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-json 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
 
       - name: Generate ABI types
         run: |
-          yarn forge:all --scope=@hyperledger/cactus-plugin-satp-hermes
-          yarn codegen:abi --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:all
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:abi
 
       - name: Run linting
         continue-on-error: true
         run: |
-          yarn lint-code || echo "Linting completed with warnings" --scope=@hyperledger/cactus-plugin-satp-hermes
-          yarn lint:oapi || echo "OpenAPI linting completed with warnings" --scope=@hyperledger/cactus-plugin-satp-hermes
-          yarn lint:protobuf || echo "Protobuf linting completed with warnings" --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint-code || echo "Linting completed with warnings" 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:oapi || echo "OpenAPI linting completed with warnings"
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:protobuf || echo "Protobuf linting completed with warnings"
           
       - name: Show yarn build log if it exists
         if: always()
