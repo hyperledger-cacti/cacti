@@ -14,7 +14,6 @@ on:
   # Run tests on PR
   pull_request:
     branches: [main, satp-dev]
-    
   # Run tests and build/push docker images on push
   push:
     branches: [main, satp-dev]
@@ -150,10 +149,23 @@ jobs:
         with:
           version: stable
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
       - name: Configure
         run: yarn configure
+      - name: Build bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+      - name: Generate protobuf files
+        continue-on-error: true
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes build-proto
+      - name: Generate OpenAPI SDKs
+        run: |
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-yaml
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-json 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
+      - name: Generate ABI types
+        run: |
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:all
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:abi
       - name: Run SATP unit tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
 
