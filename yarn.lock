@@ -9205,6 +9205,7 @@ __metadata:
     "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.1.0"
     "@hyperledger/cactus-test-geth-ledger": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
+    "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@opentelemetry/api": "npm:1.9.0"
     "@opentelemetry/auto-instrumentations-node": "npm:0.56.1"
     "@opentelemetry/sdk-metrics": "npm:1.30.1"
