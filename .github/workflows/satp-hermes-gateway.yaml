@@ -72,7 +72,7 @@ jobs:
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Generate protobuf files
-        run: yarn run build-proto
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes build-proto
 
       - name: Generate OpenAPI SDKs
         run: |
