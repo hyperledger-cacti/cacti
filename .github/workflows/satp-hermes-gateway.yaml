@@ -50,7 +50,7 @@ jobs:
             ${{ runner.os }}-deps-
 
       - name: Set working directory
-        run: cd packages/cactus-plugin-satp-hermes
+        run: cd packages/cactus-plugin-satp-hermes && pwd
 
       - uses: actions/checkout@v4
         with:
@@ -150,15 +150,16 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
-
+      - name: Configure
+        run: yarn configure
       - name: Run SATP unit tests
-        run: yarn test:unit
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
 
       - name: Run SATP integration tests
-        run: yarn test:integration
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration
 
       - name: Run SATP forge tests
-        run: yarn test:forge
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:forge
 
   # Set Docker tags based on branch and commit information
   set-docker-tags:
