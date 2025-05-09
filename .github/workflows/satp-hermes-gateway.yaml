@@ -31,12 +31,14 @@ jobs:
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
+      # Install Cacti pre-requisites
       - name: Use Node.js
         uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.7
 
+      # Install Cacti dependencies
       - name: Cache dependencies
         uses: actions/cache@v3
         id: cache
