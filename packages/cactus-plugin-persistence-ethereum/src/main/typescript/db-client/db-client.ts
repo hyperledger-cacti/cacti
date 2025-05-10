@@ -35,6 +35,12 @@ type TokenMetadataERC20InsertType =
 type TokenMetadataERC721RowType = SchemaTables["token_metadata_erc721"]["Row"];
 type TokenMetadataERC721InsertType =
   SchemaTables["token_metadata_erc721"]["Insert"];
+type TokenMetadataERC1155RowType =
+  SchemaTables["token_metadata_erc1155"]["Row"];
+type TokenMetadataERC1155InsertType =
+  SchemaTables["token_metadata_erc1155"]["Insert"];
+type TokenERC1155RowType = SchemaTables["token_erc1155"]["Row"];
+type TokenERC1155InsertType = SchemaTables["token_erc1155"]["Insert"];
 
 type SchemaFunctions = DatabaseSchemaType["ethereum"]["Functions"];
 type GetMissingBlocksInRangeReturnType =
@@ -50,7 +56,9 @@ type TokenERC20RowType = {
 export type BlockDataTransferInput = Omit<
   TokenTransferInsertType,
   "transaction_id"
->;
+> & {
+  token_id?: number; // Added for ERC-1155 and ERC-721 as ERC-20 do not use it
+};
 
 export type BlockDataTransactionInput = Omit<
   TransactionInsertType,
@@ -271,6 +279,24 @@ export default class PostgresDatabaseClient {
   }
 
   /**
+   * Read all ERC1155 token metadata.
+   * @returns ERC1155 token metadata
+   */
+  public async getTokenMetadataERC1155(): Promise<
+    TokenMetadataERC1155RowType[]
+  > {
+    this.assertConnected();
+
+    const queryResponse = await this.client.query(
+      "SELECT * FROM ethereum.token_metadata_erc1155",
+    );
+    this.log.debug(
+      `Received ${queryResponse.rowCount} rows from table token_metadata_erc1155`,
+    );
+    return queryResponse.rows;
+  }
+
+  /**
    * Insert new ERC721 token metadata into the database.
    * @param token ERC721 token metadata
    */
@@ -286,6 +312,55 @@ export default class PostgresDatabaseClient {
     );
     this.log.info(
       `Inserted ${insertResponse.rowCount} rows into table token_metadata_erc721`,
+    );
+  }
+
+  /**
+   * Insert new ERC1155 token metadata into the database.
+   * @param token ERC1155 token metadata
+   */
+  public async insertTokenMetadataERC1155(
+    token: TokenMetadataERC1155InsertType,
+  ): Promise<void> {
+    this.assertConnected();
+
+    this.log.debug("Insert ERC1155 token metadata:", token);
+    const insertResponse = await this.client.query(
+      `INSERT INTO ethereum.token_metadata_erc1155("address", "name", "symbol")
+     VALUES ($1, $2, $3)`,
+      [token.address, token.name, token.symbol],
+    );
+    this.log.info(
+      `Inserted ${insertResponse.rowCount} rows into table token_metadata_erc1155`,
+    );
+  }
+
+  /**
+   * Insert or update data of issued ERC1155 token.
+   * @param token ERC1155 token data
+   */
+  public async upsertTokenERC1155(
+    token: TokenERC1155InsertType,
+  ): Promise<void> {
+    this.assertConnected();
+
+    this.log.debug("Insert ERC1155 token if not present yet:", token);
+    const insertResponse = await this.client.query(
+      `INSERT INTO ethereum.token_erc1155("account_address", "token_address", "token_id", "balance", "uri")
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT ON CONSTRAINT token_erc1155_contract_token_account_unique
+     DO UPDATE SET balance = EXCLUDED.balance,
+                  last_balance_change = NOW();`,
+      [
+        token.account_address,
+        token.token_address,
+        token.token_id,
+        token.balance,
+        token.uri || null,
+      ],
+    );
+    this.log.debug(
+      `Inserted/Updated ${insertResponse.rowCount} rows into table token_erc1155`,
     );
   }
 
@@ -352,6 +427,27 @@ export default class PostgresDatabaseClient {
   }
 
   /**
+   * Read all issued ERC1155 tokens for a specific account.
+   * @param accountAddress The address of the account to query tokens for
+   * @returns ERC1155 tokens owned by the account
+   */
+  public async getTokenERC1155ForAccount(
+    accountAddress: string,
+  ): Promise<TokenERC1155RowType[]> {
+    this.assertConnected();
+
+    const queryResponse = await this.client.query(
+      `SELECT * FROM ethereum.token_erc1155
+     WHERE account_address = $1 AND balance > 0`,
+      [accountAddress],
+    );
+    this.log.debug(
+      `Received ${queryResponse.rowCount} rows from table token_erc1155 for account ${accountAddress}`,
+    );
+    return queryResponse.rows;
+  }
+
+  /**
    * Synchronize current ERC20 token balances in the DB.
    */
   public async syncTokenBalanceERC20(): Promise<void> {
@@ -378,6 +474,23 @@ export default class PostgresDatabaseClient {
       fromBlockNumber,
     ]);
     this.log.debug("Calling update_issued_erc721_tokens procedure done.");
+  }
+
+  /**
+   * Synchronize current ERC1155 token balances in the DB.
+   * @param fromBlockNumber Block number from which token transfers should be checked (for performance reasons)
+   */
+  public async syncTokenBalanceERC1155(fromBlockNumber: number): Promise<void> {
+    this.assertConnected();
+    this.log.debug(
+      "Call update_issued_erc1155_tokens from block",
+      fromBlockNumber,
+    );
+
+    await this.client.query("CALL ethereum.update_issued_erc1155_tokens($1);", [
+      fromBlockNumber,
+    ]);
+    this.log.debug("Calling update_issued_erc1155_tokens procedure done.");
   }
 
   /**
@@ -421,7 +534,7 @@ export default class PostgresDatabaseClient {
       this.log.debug("Insert new block", block);
       const blockInsertResponse = await this.client.query(
         `INSERT INTO ethereum.block("number", "created_at", "hash", "number_of_tx")
-         VALUES ($1, $2, $3, $4)`,
+       VALUES ($1, $2, $3, $4)`,
         [block.number, block.created_at, block.hash, block.number_of_tx],
       );
       if (blockInsertResponse.rowCount !== 1) {
@@ -432,9 +545,9 @@ export default class PostgresDatabaseClient {
         this.log.debug("Insert new transaction", tx);
         const txInsertResponse = await this.client.query(
           `INSERT INTO
-            ethereum.transaction("index", "hash", "block_number", "from", "to", "eth_value", "method_signature", "method_name")
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-           RETURNING id;`,
+          ethereum.transaction("index", "hash", "block_number", "from", "to", "eth_value", "method_signature", "method_name")
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id;`,
           [
             tx.index,
             tx.hash,
@@ -458,9 +571,15 @@ export default class PostgresDatabaseClient {
           this.log.debug("Insert new token transfer", transfer);
           const transInsertResponse = await this.client.query(
             `INSERT INTO
-              ethereum.token_transfer("transaction_id", "sender", "recipient", "value")
-             VALUES ($1, $2, $3, $4)`,
-            [txId, transfer.sender, transfer.recipient, transfer.value],
+            ethereum.token_transfer("transaction_id", "sender", "recipient", "value", "token_id")
+           VALUES ($1, $2, $3, $4, $5)`,
+            [
+              txId,
+              transfer.sender,
+              transfer.recipient,
+              transfer.value,
+              transfer.token_id || null, // token_id is optional (null for ERC-20)
+            ],
           );
           if (transInsertResponse.rowCount !== 1) {
             throw new Error(
@@ -469,6 +588,8 @@ export default class PostgresDatabaseClient {
           }
         }
       }
+      await this.syncTokenBalanceERC721(block.number);
+      await this.syncTokenBalanceERC1155(block.number);
 
       await this.client.query("COMMIT");
     } catch (err: unknown) {
