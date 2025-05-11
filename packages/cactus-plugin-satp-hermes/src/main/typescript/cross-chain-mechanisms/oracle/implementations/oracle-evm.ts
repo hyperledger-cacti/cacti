@@ -259,7 +259,7 @@ export class OracleEVM extends OracleAbstract {
         );
       }
 
-      const output_params = this.extractNamedParams(decoded, filter);
+      const output_params = this.extractNamedParams(this.decodedEventToDict(decoded), filter);
 
       callback(output_params);
     });
@@ -307,28 +307,20 @@ export class OracleEVM extends OracleAbstract {
   }
 
   /**
-   * Extracts named parameters from the decoded event.
-   * @param decodedEvent - The decoded event object.
-   * @param filter - Optional filter for specific parameter names.
-   * @returns An array of parameter values.
+   * Converts a decoded event log into a Record<string, string>.
+   * @param decoded - The decoded event log from ethers.js parseLog.
+   * @returns A record mapping parameter names to their string values.
    */
-  private extractNamedParams(decodedEvent: DecodedParams, filter?: string[]): string[] {
-    const params = [];
+  private decodedEventToDict(decoded: DecodedParams): Record<string, string> {
+    const result: Record<string, string> = {};
 
-    for (const key in decodedEvent) {
-      // skip numeric keys and special properties
-      if (!isNaN(Number(key)) || key === "__length__") {
-        continue;
-      }
+    for (const [key, value] of Object.entries(decoded)) {
+      // Skip numeric keys to avoid indexed parameters
+      if (!isNaN(Number(key))) continue;
 
-      // if filter is provided, check if the key is in the filter
-      if (filter && !filter.includes(key)) {
-        continue;
-      }
-
-      params.push(String(decodedEvent[key]));
+      result[key] = value !== null && value !== undefined ? String(value) : '';
     }
 
-    return params;
+    return result;
   }
 }
