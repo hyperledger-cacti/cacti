@@ -24,6 +24,7 @@ import {
   FabricContractInvocationType,
   FileBase64,
   ChainCodeProgrammingLanguage,
+  RunTransactionResponse,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DiscoveryOptions, X509Identity } from "fabric-network";
 import { Config } from "node-ssh";
@@ -617,6 +618,184 @@ export class FabricTestEnvironment {
     });
 
     this.clientId = responseClientId.functionOutput.toString();
+  }
+
+
+  public async deployAndSetupOracleContracts() {
+    this.satpContractName = "oracle-bl-contract";
+    const satpContractRelPath =
+      "./../fabric/contracts/oracle-bl-contract/chaincode-typescript";
+    const satpContractDir = path.join(__dirname, satpContractRelPath);
+
+    // ├── package.json
+    // ├── src
+    // │   ├── index.ts
+    // │   ├── ITraceableContract.ts
+    // │   ├── satp-contract-interface.ts
+    // │   ├── satp-contract.ts
+    // ├── tsconfig.json
+    // ├── lib
+    // │   └── tokenERC20.js
+    // --------
+    const oracleSourceFiles: FileBase64[] = [];
+    {
+      const filename = "./tsconfig.json";
+      const relativePath = "./";
+      const filePath = path.join(satpContractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      oracleSourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./package.json";
+      const relativePath = "./";
+      const filePath = path.join(satpContractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      oracleSourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./index.ts";
+      const relativePath = "./src/";
+      const filePath = path.join(satpContractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      oracleSourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./data.ts";
+      const relativePath = "./src/";
+      const filePath = path.join(satpContractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      oracleSourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./oracleBusinessLogic.ts";
+      const relativePath = "./src/";
+      const filePath = path.join(satpContractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      oracleSourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+
+    const res = await this.connector.deployContract({
+      channelId: this.fabricChannelName,
+      ccVersion: "1.0.0",
+      sourceFiles: oracleSourceFiles,
+      ccName: this.satpContractName,
+      targetOrganizations: [
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+      ],
+      caFile:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+      ccLabel: "oracle-bl-contract",
+      ccLang: ChainCodeProgrammingLanguage.Typescript,
+      ccSequence: 1,
+      orderer: "orderer.example.com:7050",
+      ordererTLSHostnameOverride: "orderer.example.com",
+      connTimeout: 60,
+    });
+
+    const { packageIds, lifecycle, success } = res;
+    expect(success).toBe(true);
+    expect(lifecycle).not.toBeUndefined();
+
+    const {
+      approveForMyOrgList,
+      installList,
+      queryInstalledList,
+      commit,
+      packaging,
+      queryCommitted,
+    } = lifecycle;
+
+    expect(packageIds).toBeTruthy();
+    expect(Array.isArray(packageIds)).toBe(true);
+
+    expect(approveForMyOrgList).toBeTruthy();
+    expect(Array.isArray(approveForMyOrgList)).toBe(true);
+
+    expect(installList).toBeTruthy();
+    expect(Array.isArray(installList)).toBe(true);
+    expect(queryInstalledList).toBeTruthy();
+    expect(Array.isArray(queryInstalledList)).toBe(true);
+
+    expect(commit).toBeTruthy();
+    expect(packaging).toBeTruthy();
+    expect(queryCommitted).toBeTruthy();
+    this.log.info("Oracle Business Logic Contract deployed");
+
+    const initializeResponse = await this.connector.transact({
+      contractName: "oracle-bl-contract",
+      channelName: this.fabricChannelName,
+      params: [],
+      methodName: "InitLedger",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: this.fabricSigningCredential,
+    });
+
+    expect(initializeResponse).not.toBeUndefined();
+
+    this.log.info(
+      `OracleBLContract.InitLedger(): ${JSON.stringify(initializeResponse)}`,
+    );
+
+    if (this.bridgeMSPID === undefined) {
+      throw new Error("Bridge MSPID is undefined");
+    }
+  }
+
+  public async writeData(
+    contractName: string,
+    methodName: string,
+    params: string[],
+  ): Promise<RunTransactionResponse> {
+    const readData = await this.connector.transact({
+      contractName: contractName,
+      channelName: this.fabricChannelName,
+      params: params,
+      methodName: methodName,
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: this.fabricSigningCredential,
+    });
+    expect(readData).not.toBeUndefined();
+
+    return readData;
+  }
+
+  public async readData(
+    contractName: string,
+    methodName: string,
+    params: string[],
+  ): Promise<RunTransactionResponse> {
+    const readData = await this.connector.transact({
+      contractName: contractName,
+      channelName: this.fabricChannelName,
+      params: params,
+      methodName: methodName,
+      invocationType: FabricContractInvocationType.Call,
+      signingCredential: this.fabricSigningCredential,
+    });
+    expect(readData).not.toBeUndefined();
+
+    return readData;
   }
 
   public async mintTokens(amount: string): Promise<void> {
