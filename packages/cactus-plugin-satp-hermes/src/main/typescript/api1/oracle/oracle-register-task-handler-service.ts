@@ -1,11 +1,13 @@
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { OracleManager } from "../../cross-chain-mechanisms/oracle/oracle-manager";
 import {
+  NetworkIdLedgerTypeEnum,
   OracleRegisterRequest,
   OracleTask,
   OracleTaskModeEnum,
   OracleTaskStatusEnum,
   OracleTaskTypeEnum,
+  TransactRequestSourceAssetNetworkId,
 } from "../../public-api";
 import { v4 as uuidv4 } from "uuid";
 import { InvalidParameterError, MissingParameterRegisterError } from "../../cross-chain-mechanisms/common/errors";
@@ -60,7 +62,15 @@ export async function registerTask(
       );
     }
 
-    if (!isValidEventSignature(req.listeningOptions.eventSignature)) {
+    if (!req.sourceNetworkId) {
+      throw new MissingParameterRegisterError(
+        ["sourceNetworkId"],
+        req.taskType,
+        OracleTaskModeEnum.EventListening,
+      );
+    }
+
+    if (!isValidEventSignature(req.sourceNetworkId, req.listeningOptions.eventSignature)) {
       throw new InvalidParameterError(
         ["listeningOptions.eventSignature"],
         req.taskType,
@@ -241,11 +251,17 @@ export async function registerTask(
   return await manager.registerTask(task);
 }
 
-function isValidEventSignature(signature: string): boolean {
+function isValidEventSignature(network: TransactRequestSourceAssetNetworkId, signature: string): boolean {
   if (!signature || typeof signature !== "string" || signature.length === 0) {
     return false;
   }
 
-  const regex = /^[a-zA-Z_][a-zA-Z0-9_]*\s*\(\s*([a-zA-Z0-9_]+\s*(,\s*[a-zA-Z0-9_]+\s*)*)?\)$/;
-  return regex.test(signature);
+  if (network.ledgerType === NetworkIdLedgerTypeEnum.Fabric2) {
+    // 
+    const regex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+    return regex.test(signature);
+  } else {
+    const regex = /^[a-zA-Z_][a-zA-Z0-9_]*\s*\(\s*([a-zA-Z0-9_]+\s*(,\s*[a-zA-Z0-9_]+\s*)*)?\)$/;
+    return regex.test(signature);
+  }
 }
