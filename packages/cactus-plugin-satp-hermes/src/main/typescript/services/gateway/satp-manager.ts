@@ -175,8 +175,6 @@ export class SATPManager {
       logLevel: options.logLevel,
     });
 
-    void this.initializeMonitorService();
-
     const serviceClasses = [
       Stage0ServerService as unknown as SATPServiceInstance,
       Stage0ClientService as unknown as SATPServiceInstance,
@@ -214,22 +212,7 @@ export class SATPManager {
       this.ccManager.getClientBridgeManagerInterface(),
     );
   }
-  private async initializeMonitorService(): Promise<void> {
-    const fnTag = `${this.className}#initializeMonitorService()`;
-    try {
-      await this.monitorService.init();
-      await this.monitorService.createMetric("satp.active_sessions");
-      await this.monitorService.createMetric("satp.transfer.count");
-      await this.monitorService.createMetric("satp.transfer.success");
-      await this.monitorService.createMetric("satp.transfer.failure");
-      this.logger.info(`${fnTag} Monitoring service initialized`);
-    } catch (error) {
-      // Log error but don't throw - allow service to continue without monitoring
-      this.logger.warn(
-        `${fnTag} Failed to initialize monitoring service: ${error}`,
-      );
-    }
-  }
+
   public get pubKey(): string {
     return this._pubKey;
   }
