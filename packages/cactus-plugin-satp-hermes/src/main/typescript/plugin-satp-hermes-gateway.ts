@@ -80,6 +80,7 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
 import { createMigrationSource } from "./database/knex-migration-source";
+import { MonitorService } from "./services/monitoring/monitor";
 
 export interface SATPGatewayConfig extends ICactusPluginOptions {
   gid?: GatewayIdentity;
@@ -93,6 +94,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
   localRepository?: Knex.Config;
   remoteRepository?: Knex.Config;
   enableCrashRecovery?: boolean;
+  enableMonitorService?: boolean;
   claimFormat?: string;
   ontologyPath?: string;
   pluginRegistry: PluginRegistry;
@@ -136,6 +138,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
   private crashManager?: CrashManager;
+  private monitorService?: MonitorService;
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
 
@@ -277,6 +280,16 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.info("CrashManager has been initialized.");
     } else {
       this.logger.info("CrashManager is disabled!");
+    }
+
+    if (this.config.enableMonitorService) {
+      this.monitorService = MonitorService.createOrGetMonitorService({
+        logLevel: this.config.logLevel,
+      });
+
+      void this.initializeMonitorService();
+    } else {
+      this.logger.info("Monitoring service is disabled!");
     }
   }
 
@@ -461,6 +474,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     if (!pluginOptions.enableCrashRecovery) {
       pluginOptions.enableCrashRecovery = false;
+    }
+
+    if (!pluginOptions.enableMonitorService) {
+      pluginOptions.enableMonitorService = false;
     }
 
     return pluginOptions;
@@ -784,5 +801,28 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         }
       });
     });
+  }
+  private async initializeMonitorService(): Promise<void> {
+    const fnTag = `${this.className}#initializeMonitorService()`;
+
+    if (!this.monitorService) {
+      this.logger.warn(
+        `${fnTag} Monitoring service is not initialized. Skipping initialization.`,
+      );
+      return;
+    }
+
+    try {
+      await this.monitorService.init();
+      await this.monitorService.createMetric("satp.active_sessions");
+      await this.monitorService.createMetric("satp.transfer.count");
+      await this.monitorService.createMetric("satp.transfer.success");
+      await this.monitorService.createMetric("satp.transfer.failure");
+    } catch (error) {
+      // Log error but don't throw - allow service to continue without monitoring
+      this.logger.warn(
+        `${fnTag} Failed to initialize monitoring service: ${error}`,
+      );
+    }
   }
 }

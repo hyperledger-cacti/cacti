@@ -18,6 +18,7 @@ import { validateSatpKeyPairJSON } from "./services/validation/config-validating
 import { validateCCConfig } from "./services/validation/config-validating-functions/validate-cc-config";
 import path from "node:path";
 import { validateSatpEnableCrashRecovery } from "./services/validation/config-validating-functions/validate-satp-enable-crash-recovery";
+import { validateSatpEnableMonitorService } from "./services/validation/config-validating-functions/validate-satp-enable-monitor-service";
 import { validateKnexRepositoryConfig } from "./services/validation/config-validating-functions/validate-knex-repository-config";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { validateInstanceId } from "./services/validation/config-validating-functions/validate-instance-id";
@@ -128,6 +129,12 @@ export async function launchGateway(): Promise<void> {
   });
   logger.debug("SATP Enable Crash Recovery is valid.");
 
+  logger.debug("Validating SATP Enable Monitor Service...");
+  const enableMonitorService = validateSatpEnableMonitorService({
+    configValue: config.enableMonitorService,
+  });
+  logger.debug("SATP Enable Monitor Service is valid.");
+
   logger.debug("SATP Bridges Config is valid.");
 
   logger.debug("Validating Ontologies Path...");
@@ -155,6 +162,7 @@ export async function launchGateway(): Promise<void> {
     mergePolicies,
     ccConfig,
     enableCrashRecovery,
+    enableMonitorService,
     localRepository,
     remoteRepository,
     pluginRegistry: new PluginRegistry({ plugins: [] }),

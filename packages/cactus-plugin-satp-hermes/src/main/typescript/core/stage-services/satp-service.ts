@@ -11,6 +11,10 @@ import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/ser
 import type { SATPLogger } from "../../logging";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  MonitorService,
+  MonitorServiceOptions,
+} from "../../services/monitoring/monitor";
 
 export enum SATPServiceType {
   Server = "Server",
@@ -61,6 +65,7 @@ export abstract class SATPService {
   private readonly signer: JsObjectSigner;
   readonly serviceName: string;
   public dbLogger: SATPLogger;
+  public monitorService: MonitorService;
 
   constructor(ops: ISATPServiceOptions) {
     this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
@@ -68,6 +73,9 @@ export abstract class SATPService {
     this.serviceType = ops.serviceType;
     this.stage = ops.stage;
     this.signer = ops.signer;
+    this.monitorService = MonitorService.createOrGetMonitorService(
+      {} as MonitorServiceOptions,
+    );
     if (!ops.dbLogger) {
       throw new Error("dbLogger is required for SATPService");
     }

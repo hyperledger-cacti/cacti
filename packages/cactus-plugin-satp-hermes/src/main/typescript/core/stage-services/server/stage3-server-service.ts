@@ -509,6 +509,8 @@ export class Stage3ServerService extends SATPService {
 
     sessionData.state = State.COMPLETED;
 
+    this.monitorService.incrementCounter("successful_transactions");
+
     saveHash(
       sessionData,
       MessageType.COMMIT_TRANSFER_COMPLETE,
