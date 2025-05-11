@@ -31,6 +31,7 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -41,6 +42,7 @@ const factoryOptions: IPluginFactoryOptions = {
   pluginImportType: PluginImportType.Local,
 };
 const factory = new PluginFactorySATPGateway(factoryOptions);
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 let mockSession: SATPSession;
 const sessionIDs: string[] = [];
@@ -58,6 +60,7 @@ beforeAll(async () => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   sessionIDs.push(mockSession.getSessionId());

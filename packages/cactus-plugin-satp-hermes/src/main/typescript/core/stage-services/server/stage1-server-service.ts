@@ -61,6 +61,7 @@ export class Stage1ServerService extends SATPService {
       signer: ops.signer,
       serviceType: Stage1ServerService.SERVICE_TYPE,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
   }
@@ -326,6 +327,8 @@ export class Stage1ServerService extends SATPService {
       });
 
       this.Log.info(`${fnTag}, sending TransferCommenceResponseMessage...`);
+
+      this.monitorService.incrementCounter("initiated_transfers");
 
       return transferCommenceResponseMessage;
     } catch (error) {

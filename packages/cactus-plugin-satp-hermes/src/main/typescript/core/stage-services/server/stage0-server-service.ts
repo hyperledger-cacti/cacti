@@ -79,6 +79,7 @@ export class Stage0ServerService extends SATPService {
       signer: ops.signer,
       serviceType: Stage0ServerService.SERVICE_TYPE,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
     if (ops.bridgeManager == undefined) {
@@ -130,6 +131,7 @@ export class Stage0ServerService extends SATPService {
         sessionID: request.sessionId,
         server: true,
         client: false,
+        monitorService: this.monitorService,
       });
     } else if (!session.hasServerSessionData()) {
       this.Log.debug(`${fnTag}, Session does not have server session data`);
@@ -144,6 +146,7 @@ export class Stage0ServerService extends SATPService {
         contextID: request.contextId,
         server: true,
         client: false,
+        monitorService: this.monitorService,
       });
       this.Log.debug(
         `${fnTag}, Session created with new sessionID ${session.getSessionId()}`,
