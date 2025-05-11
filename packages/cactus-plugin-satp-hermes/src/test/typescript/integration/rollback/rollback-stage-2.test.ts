@@ -53,6 +53,7 @@ import { OntologyManager } from "../../../../main/typescript/cross-chain-mechani
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let besuEnv: BesuTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
@@ -67,6 +68,7 @@ let gateway2: SATPGateway;
 let crashManager1: CrashManager;
 let crashManager2: CrashManager;
 const sessionId = uuidv4();
+const monitorService = MonitorService.createOrGetMonitorService({});
 const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const logLevel: LogLevelDesc = "DEBUG";
@@ -88,6 +90,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()

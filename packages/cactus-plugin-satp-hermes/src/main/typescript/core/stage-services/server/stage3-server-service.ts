@@ -77,6 +77,7 @@ export class Stage3ServerService extends SATPService {
       serviceType: Stage3ServerService.SERVICE_TYPE,
       bridgeManager: ops.bridgeManager,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
     if (ops.bridgeManager == undefined) {
@@ -508,6 +509,8 @@ export class Stage3ServerService extends SATPService {
     this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
 
     sessionData.state = State.COMPLETED;
+
+    this.monitorService.incrementCounter("successful_transactions");
 
     saveHash(
       sessionData,

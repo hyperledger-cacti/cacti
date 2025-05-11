@@ -57,6 +57,7 @@ import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mec
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import path from "path";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let besuEnv: BesuTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
@@ -78,6 +79,7 @@ const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "Rollback-stage-3",
 });
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 let ontologyManager: OntologyManager;
 let besuLeaf: BesuLeaf;
@@ -93,6 +95,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()

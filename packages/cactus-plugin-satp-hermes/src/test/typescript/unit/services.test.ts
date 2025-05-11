@@ -87,6 +87,7 @@ let knexInstanceRemote: Knex;
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BridgeManagerClientInterface } from "../../../main/typescript/cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { BridgeManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-manager";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -100,6 +101,8 @@ const serviceClasses = [
   Stage3ServerService,
   Stage3ClientService,
 ];
+
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 
@@ -189,6 +192,7 @@ beforeAll(async () => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   sessionIDs.push(mockSession.getSessionId());
@@ -1108,6 +1112,7 @@ function initializeServiceOptions(
       index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
     bridgeManager: bridgeManager,
     dbLogger: dbLogger,
+    monitorService: monitorService,
   }));
 }
 

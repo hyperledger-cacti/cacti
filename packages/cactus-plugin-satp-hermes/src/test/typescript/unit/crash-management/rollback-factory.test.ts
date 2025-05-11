@@ -40,12 +40,14 @@ import {
   GatewayOrchestrator,
 } from "../../../../main/typescript/services/gateway/gateway-orchestrator";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
   const mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.getClientSessionData();
@@ -60,6 +62,7 @@ const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "RollbackStrategyFactory",
 });
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 describe("RollbackStrategyFactory Tests", () => {
   let factory: RollbackStrategyFactory;
@@ -92,6 +95,7 @@ describe("RollbackStrategyFactory Tests", () => {
       localGateway: gatewayIdentity,
       counterPartyGateways: [],
       signer: signer,
+      monitorService: monitorService,
     };
     const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
