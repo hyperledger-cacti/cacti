@@ -129,6 +129,11 @@ export class OracleSchedulerManager {
       return;
     }
     subscriber.unsubscribe();
+
+    this.eventListeners.delete(taskId);
+    this.logger.debug(
+      `${fnTag}: Event listener with taskId: ${taskId} removed successfully`,
+    );
   }
 
   /**
