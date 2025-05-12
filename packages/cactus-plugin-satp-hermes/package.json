@@ -122,21 +122,23 @@
         "preset": "ts-jest",
         "testEnvironment": "node",
         "transform": {
-        "^.+\\.tsx?$": "ts-jest"
+            "^.+\\.tsx?$": "ts-jest"
         },
         "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
         "moduleFileExtensions": [
-        "ts",
-        "tsx",
-        "js",
-        "jsx",
-        "json",
-        "node"
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
         ],
         "moduleNameMapper": {
-        "^(\\.?\\.?/.*)\\.js$": "$1"
+            "^(\\.?\\.?/.*)\\.js$": "$1"
         },
-        "modulePathIgnorePatterns": ["<rootDir>/dist/"]
+        "modulePathIgnorePatterns": [
+            "<rootDir>/dist/"
+        ]
     },
     "dependencies": {
         "@bufbuild/protobuf": "2.2.2",
@@ -245,6 +247,7 @@
         "prettier": "3.2.5",
         "protobufjs": "7.2.5",
         "swagger-cli": "4.0.4",
+        "ts-jest": "^29.3.2",
         "ts-node": "10.9.1",
         "typescript": "5.5.2"
     },
