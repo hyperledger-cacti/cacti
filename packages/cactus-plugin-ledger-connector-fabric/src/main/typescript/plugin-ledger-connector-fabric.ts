@@ -26,6 +26,8 @@ import {
   X509Identity,
   TransientMap,
   Wallet,
+  ContractEvent,
+  ContractListener,
 } from "fabric-network";
 import {
   BuildProposalRequest,
@@ -110,6 +112,7 @@ import {
   GetChainInfoResponseV1,
   GetDiscoveryResultsRequestV1,
   GetDiscoveryResultsResponseV1,
+  CreateListenerRequest,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -948,7 +951,10 @@ export class PluginLedgerConnectorFabric
    * @param req must contain either gatewayOptions or signingCredential.
    * @returns Fabric SDK Gateway
    */
-  protected async createGateway(req: RunTransactionRequest): Promise<Gateway> {
+  protected async createGateway(req: {
+    gatewayOptions?: GatewayOptions;
+    signingCredential?: FabricSigningCredential;
+  }): Promise<Gateway> {
     if (req.gatewayOptions) {
       return this.createGatewayWithOptions(req.gatewayOptions);
     } else if (req.signingCredential) {
@@ -2012,5 +2018,49 @@ export class PluginLedgerConnectorFabric
     });
 
     return discoveryResults;
+  }
+
+  /**
+   * Creates a new Fabric event listener.
+   *
+   * @param req The request object containing the channel name and contract name.
+   * @param callback The callback function to be called when an event is received.
+   * @returns A promise that resolves to an object containing the listener and a
+   * function to remove it.
+   */
+  public async createFabricListener(
+    req: CreateListenerRequest,
+    callback: (event: ContractEvent) => Promise<void>,
+  ): Promise<{
+    removeListener: () => void;
+    listener: Promise<ContractListener>;
+  }> {
+    const fnTag = `${this.className}#createFabricListener()`;
+
+    const listener = async (contractEvent: ContractEvent) =>
+      callback(contractEvent);
+
+    try {
+      const gateway = await this.createGateway(req);
+      const network = await gateway.getNetwork(req.channelName);
+      const contract = network.getContract(req.contractName);
+
+      this.log.debug(
+        `Subscribing to events emitted in contract ${req.contractName} in channel ${req.channelName}...`,
+      );
+
+      return {
+        listener: contract.addContractListener(listener),
+        removeListener: () => {
+          contract.removeContractListener(listener);
+          gateway.disconnect();
+        },
+      };
+    } catch (error) {
+      throw new Error(
+        `${fnTag} Failed to create fabric listener. ` +
+          `Error: ${error.message}`,
+      );
+    }
   }
 }
