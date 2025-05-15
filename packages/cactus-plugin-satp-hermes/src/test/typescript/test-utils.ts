@@ -8,6 +8,7 @@ import { TransactRequest } from "../../main/typescript";
 import { Configuration } from "../../main/typescript/generated/gateway-client/typescript-axios";
 import fs from "fs-extra";
 import path from "path";
+import { execSync } from "child_process";
 import { expect } from "@jest/globals";
 import { GatewayIdentity } from "../../main/typescript/core/types";
 import { BesuTestEnvironment } from "./environments/besu-test-environment";
@@ -22,6 +23,11 @@ import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
+
+const composeFilePath = path.resolve(
+  __dirname,
+  "../../../../../packages/cactus-plugin-satp-hermes/docker-compose-satp.yml",
+);
 
 // Function overloads for creating different types of API clients
 export function createClient(
@@ -71,6 +77,7 @@ export function generateGatewayConfig(
   logLevel: LogLevelDesc,
   counterPartyGateways: GatewayIdentity[],
   enableCrashRecovery: boolean = false,
+  enableMonitorService: boolean = true,
   ontologiesPath: string,
   ccConfig?: ICrossChainMechanismsOptions,
   localRepository?: Knex.Config,
@@ -95,6 +102,7 @@ export function generateGatewayConfig(
     ccConfig,
     gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
+    enableMonitorService: enableMonitorService,
     ontologyPath: ontologiesPath,
   };
 
@@ -114,6 +122,7 @@ export interface GatewayDockerConfig {
   logLevel: LogLevelDesc;
   counterPartyGateways: GatewayIdentity[];
   enableCrashRecovery?: boolean;
+  enableMonitorService?: boolean;
   ccConfig?: ICrossChainMechanismsOptions;
   localRepository?: Knex.Config;
   remoteRepository?: Knex.Config;
@@ -135,6 +144,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     logLevel,
     counterPartyGateways,
     enableCrashRecovery = false,
+    enableMonitorService = true,
     ccConfig,
     localRepository,
     remoteRepository,
@@ -163,6 +173,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     ccConfig,
     keyPair: gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
+    enableMonitorService: enableMonitorService,
     ontologyPath: "/opt/cacti/satp-hermes/ontologies",
   };
 
@@ -403,4 +414,25 @@ export interface IContractJson {
   bytecode: {
     object: string;
   };
+}
+
+export function startDockerComposeService(serviceName: string) {
+  if (!fs.existsSync(composeFilePath)) {
+    throw new Error(`Compose file does not exist at ${composeFilePath}`);
+  }
+  execSync(`docker compose -f ${composeFilePath} up -d ${serviceName}`, {
+    stdio: "inherit",
+  });
+}
+
+export function stopDockerComposeService(serviceName: string) {
+  if (!fs.existsSync(composeFilePath)) {
+    throw new Error(`Compose file does not exist at ${composeFilePath}`);
+  }
+  execSync(`docker compose -f ${composeFilePath} stop ${serviceName}`, {
+    stdio: "inherit",
+  });
+  execSync(`docker compose -f ${composeFilePath} rm -f ${serviceName}`, {
+    stdio: "inherit",
+  });
 }

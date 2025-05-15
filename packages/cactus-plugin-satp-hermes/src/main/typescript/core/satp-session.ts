@@ -59,6 +59,10 @@ import {
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { SessionType } from "./session-utils";
 import { create } from "@bufbuild/protobuf";
+import {
+  MonitorService,
+  MonitorServiceOptions,
+} from "../services/monitoring/monitor";
 
 // Define interface on protos
 export interface ISATPSessionOptions {
@@ -74,6 +78,9 @@ export class SATPSession {
   private clientSessionData: SessionData | undefined;
   private serverSessionData: SessionData | undefined;
   private readonly logger: Logger;
+  private monitorService = MonitorService.createOrGetMonitorService(
+    {} as MonitorServiceOptions,
+  );
 
   constructor(ops: ISATPSessionOptions) {
     const fnTag = `${SATPSession.CLASS_NAME}#constructor()`;
@@ -140,6 +147,11 @@ export class SATPSession {
     sessionData.satpMessages.stage2 = create(Stage2MessagesSchema, {});
     sessionData.satpMessages.stage3 = create(Stage3MessagesSchema, {});
     sessionData.state = State.ONGOING;
+
+    this.monitorService.incrementCounter("created_sessions");
+    this.monitorService.createLog(
+      `SATP session created with ID: ${sessionData.id}`,
+    );
   }
 
   public getServerSessionData(): SessionData {
