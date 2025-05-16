@@ -130,7 +130,8 @@ jobs:
         uses: actions/setup-node@v4.0.2
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-
+      - name: Print working directory
+        run: pwd
       - name: Cache dependencies
         uses: actions/cache@v3
         id: cache
@@ -142,10 +143,6 @@ jobs:
           key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-
-
-      - name: Set working directory
-        run: cd packages/cactus-plugin-satp-hermes
-
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
