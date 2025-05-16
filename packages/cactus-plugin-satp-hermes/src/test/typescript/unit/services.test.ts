@@ -1,3 +1,4 @@
+import type * as jest from "jest-mock";
 import {
   JsObjectSigner,
   type LogLevelDesc,
