@@ -85,6 +85,8 @@ export class BesuTestEnvironment {
     this.ledger = new BesuTestLedger({
       emitContainerLogs: true,
       envVars: ["BESU_NETWORK=dev"],
+      containerImageVersion: "2024-06-09-cc2f9c5",
+      containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
       networkName: this.dockerNetwork,
     });
 

@@ -9,10 +9,7 @@ import {
   TokenType,
   TransactRequestSourceAsset,
 } from "@hyperledger/cactus-plugin-satp-hermes";
-import {
-  BESU_TEST_LEDGER_DEFAULT_OPTIONS,
-  BesuTestLedger,
-} from "@hyperledger/cactus-test-tooling";
+import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import Docker from "dockerode";
 import { Account } from "web3-core";
 import { randomUUID as uuidv4 } from "node:crypto";
@@ -84,6 +81,8 @@ export class BesuEnvironment {
       emitContainerLogs: true,
       envVars: ["BESU_NETWORK=dev"],
       networkName: this.dockerNetwork,
+      containerImageVersion: "2024-06-09-cc2f9c5",
+      containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
     });
 
     const docker = new Docker();
@@ -99,9 +98,9 @@ export class BesuEnvironment {
         this.dockerNetwork || "bridge"
       ].IPAddress;
 
-    const rpcApiHttpHost = await this.ledger.getRpcApiHttpHost(false);
+    const rpcApiHttpHost = await this.ledger.getRpcApiHttpHost();
 
-    const rpcApiWsHost = await this.ledger.getRpcApiWsHost(false);
+    const rpcApiWsHost = await this.ledger.getRpcApiWsHost();
 
     // Accounts setup
     this.firstHighNetWorthAccount = this.ledger.getGenesisAccountPubKey();
@@ -272,7 +271,7 @@ export class BesuEnvironment {
   }
 
   // this is the config to be loaded by the gateway when in a docker, does not contain the log level because it will use the one in the gateway config
-  public createBesuDockerConfig(): INetworkOptions {
+  public async createBesuDockerConfig(): Promise<INetworkOptions> {
     return {
       networkIdentification: this.network,
       signingCredential: {
@@ -282,16 +281,8 @@ export class BesuEnvironment {
       },
       gas: 9999999999,
       connectorOptions: {
-        rpcApiHttpHost:
-          "http://" +
-          this.dockerContainerIP +
-          ":" +
-          BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort,
-        rpcApiWsHost:
-          "ws://" +
-          this.dockerContainerIP +
-          ":" +
-          BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort,
+        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
+        rpcApiWsHost: await this.ledger.getRpcApiWsHost(false),
       },
       claimFormats: [ClaimFormat.DEFAULT],
     } as INetworkOptions;
