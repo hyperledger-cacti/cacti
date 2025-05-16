@@ -69,7 +69,7 @@ jobs:
         run: yarn configure
 
       - name: Print installed dependencies (Yarn)
-        run: yarn list --depth=0
+        run: yarn info --name-only
 
       - name: Build bundle
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
@@ -155,7 +155,7 @@ jobs:
       - name: Configure
         run: yarn configure
       - name: Print installed dependencies (Yarn)
-        run: yarn list --depth=0
+        run: yarn info --name-only
 
       - name: Run SATP unit tests
         continue-on-error: true
