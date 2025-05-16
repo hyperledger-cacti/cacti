@@ -12,13 +12,7 @@ import {
 
 import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../test-utils";
-import {
-  HealthCheckResponseStatusEnum,
-  OracleRegisterRequestTaskModeEnum,
-  OracleRegisterRequestTaskTypeEnum,
-  TransactRequestSourceAssetNetworkId,
-  TransactRequestSourceAssetNetworkIdLedgerTypeEnum,
-} from "../../../main/typescript";
+import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
@@ -154,9 +148,10 @@ describe("GetStatus Endpoint and Functionality testing", () => {
 
       const oracleApiClient = createClient("OracleApi", address, port, logger);
 
-      try {
-        const result = await oracleApiClient.getOracleTaskStatus("test-task-id");
-        
+      try {
+        const result =
+          await oracleApiClient.getOracleTaskStatus("test-task-id");
+
         expect(result).toBeDefined();
         expect(result.status).toBe(200);
         expect(result.data.taskID).toBe("test-task-id");

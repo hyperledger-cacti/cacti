@@ -291,7 +291,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     const fabricConfig =
       await this.fabricEnvironment.createFabricDockerConfig();
 
-    const besuConfig = this.besuEnvironment.createBesuDockerConfig();
+    const besuConfig = await this.besuEnvironment.createBesuDockerConfig();
 
     const besuGatewayOptions: Partial<SATPGatewayConfig> = {
       gid: besuGatewayIdentity,
