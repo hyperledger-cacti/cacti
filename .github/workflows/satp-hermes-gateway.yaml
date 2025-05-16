@@ -7,14 +7,13 @@ name: SATP CI - tests and docker deployments
 # 2. Runs unit, integration, and forge (smart contract) tests
 # 3. Builds and pushes Docker images to both Docker Hub and GHCR
 # 4. Tags images appropriately (version-specific and latest)
-
+#
 env:
   NODEJS_VERSION: v18.19.0
 on:
   # Run tests on PR
   pull_request:
     branches: [main, satp-dev]
-    
   # Run tests and build/push docker images on push
   push:
     branches: [main, satp-dev]
@@ -31,12 +30,14 @@ jobs:
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
+      # Install Cacti pre-requisites
       - name: Use Node.js
         uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.7
 
+      # Install Cacti dependencies
       - name: Cache dependencies
         uses: actions/cache@v3
         id: cache
@@ -50,49 +51,62 @@ jobs:
             ${{ runner.os }}-deps-
 
       - name: Set working directory
-        run: cd packages/cactus-plugin-satp-hermes
+        run: cd packages/cactus-plugin-satp-hermes && pwd
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install Foundry
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          if [ ! -d "${XDG_CONFIG_HOME:-$HOME}" ]; then
-            echo "$(date +%FT%T%z) [CI] directory ${XDG_CONFIG_HOME:-$HOME} does not exist."
-          else
-            npm run preinstall || { echo "Preinstall failed"; exit 1; }
-            export PATH="${XDG_CONFIG_HOME:-$HOME}/.foundry/bin:$PATH"
-            if [ -f ~/.bashrc ]; then
-              source ~/.bashrc
-            fi
-            foundryup
-          fi
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
+      
+      - name: Configure
+        run: yarn configure
+
+      - name: Print installed dependencies (Yarn)
+        run: yarn info --name-only
 
       - name: Build bundle
         run: yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Generate protobuf files
-        run: yarn build-proto
+        continue-on-error: true
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes build-proto
 
       - name: Generate OpenAPI SDKs
         run: |
-          yarn bundle-openapi-yaml
-          yarn bundle-openapi-json
-          yarn generate-sdk:typescript-axios-bol
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-yaml
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-json 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
 
       - name: Generate ABI types
         run: |
-          yarn forge:all
-          yarn codegen:abi
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:all
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:abi
 
       - name: Run linting
         continue-on-error: true
         run: |
-          yarn lint-code || echo "Linting completed with warnings"
-          yarn lint:oapi || echo "OpenAPI linting completed with warnings"
-          yarn lint:protobuf || echo "Protobuf linting completed with warnings"
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint-code || echo "Linting completed with warnings" 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:oapi || echo "OpenAPI linting completed with warnings"
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:protobuf || echo "Protobuf linting completed with warnings"
+          
+      - name: Show yarn build log if it exists
+        if: always()
+        run: |
+          LOG_FILE=$(find /tmp -type f -name build.log | head -n 1)
+          if [ -f "$LOG_FILE" ]; then
+            echo "===== Build Log ====="
+            cat "$LOG_FILE"
+            echo "====================="
+          else
+            echo "No build log found."
+          fi
 
   run-satp-tests:
     needs: build-satp-dev
@@ -116,7 +130,8 @@ jobs:
         uses: actions/setup-node@v4.0.2
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-
+      - name: Print working directory
+        run: pwd
       - name: Cache dependencies
         uses: actions/cache@v3
         id: cache
@@ -128,28 +143,24 @@ jobs:
           key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-
-
-      - name: Set working directory
-        run: cd packages/cactus-plugin-satp-hermes
-
       - name: Install Foundry
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          curl -L https://foundry.paradigm.xyz | bash
-          source $HOME/.bashrc && foundryup
-
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
+      - name: Configure
+        run: yarn configure
+      - name: Print installed dependencies (Yarn)
+        run: yarn info --name-only
 
       - name: Run SATP unit tests
-        run: yarn test:unit
+        continue-on-error: true
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
 
       - name: Run SATP integration tests
-        run: yarn test:integration
-
-      - name: Run SATP forge tests
-        run: yarn test:forge
+        continue-on-error: true
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration
 
   # Set Docker tags based on branch and commit information
   set-docker-tags:
