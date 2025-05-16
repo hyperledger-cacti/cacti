@@ -342,7 +342,7 @@ export class OracleManager {
           async (params: string[]) => {
             const fnTag = `${OracleManager.CLASS_NAME}#addEventListener`;
             this.logger.debug(
-              `${fnTag}: Captured event emitted for task ${task.taskID} -- listened to ${params} from event ${task.listeningOptions?.eventSignature} in contract ${task.srcContract.contractAddress} on network ${task.srcNetworkId}`,
+              `${fnTag}: Captured event emitted for task ${task.taskID} -- listened to ${params} from event ${task.listeningOptions?.eventSignature} in contract ${task.srcContract.contractAddress} on network ${task.srcNetworkId?.ledgerType}`,
             );
 
             if (!task.dstContract.params) {
