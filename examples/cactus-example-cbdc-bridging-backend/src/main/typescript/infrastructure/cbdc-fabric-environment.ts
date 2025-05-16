@@ -94,6 +94,8 @@ export class FabricEnvironment {
       networkName: this.dockerNetwork,
     });
 
+    await this.ledger.start();
+
     this.connectionProfileOrg1 =
       await this.ledger.getConnectionProfileOrgX("org1");
     this.connectionProfileBridge =
