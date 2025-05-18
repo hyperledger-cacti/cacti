@@ -1,0 +1,64 @@
+{
+    "name": "asset-reference-contract",
+    "version": "1.0.0",
+    "description": "Asset Reference contract implemented in TypeScript",
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "engines": {
+        "node": ">=12",
+        "npm": ">=5"
+    },
+    "scripts": {
+        "lint": "tslint -c tslint.json 'src/**/*.ts'",
+        "test": "nyc mocha -r ts-node/register src/**/*.spec.ts",
+        "start": "fabric-chaincode-node start",
+        "build": "tsc",
+        "build:watch": "tsc -w",
+        "prepublishOnly": "npm run build"
+    },
+    "engineStrict": true,
+    "author": "Hyperledger",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "fabric-contract-api": "^2.4.1",
+        "fabric-shim": "2.4.1"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.11",
+        "@types/chai-as-promised": "^7.1.2",
+        "@types/mocha": "^7.0.2",
+        "@types/node": "18.11.9",
+        "@types/sinon": "^7.5.2",
+        "@types/sinon-chai": "^3.2.3",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^9.2.0",
+        "nyc": "^15.0.0",
+        "sinon": "^9.0.1",
+        "sinon-chai": "^3.5.0",
+        "ts-node": "^8.8.1",
+        "tslint": "^6.1.0",
+        "typescript": "5.5.2",
+        "winston": "^3.2.1"
+    },
+    "nyc": {
+        "extension": [
+            ".ts",
+            ".tsx"
+        ],
+        "exclude": [
+            "coverage/**",
+            "dist/**"
+        ],
+        "reporter": [
+            "text-summary",
+            "html"
+        ],
+        "all": true,
+        "check-coverage": true,
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+    }
+}

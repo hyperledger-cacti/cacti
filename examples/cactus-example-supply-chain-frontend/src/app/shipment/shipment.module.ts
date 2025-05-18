@@ -7,7 +7,7 @@ import { IonicModule } from "@ionic/angular";
 import { ShipmentPageRoutingModule } from "./shipment-routing.module";
 
 import { ShipmentListPage } from "./shipment-list/shipment-list.page";
-import { PageHeadingComponentModule } from "../common/components/page-heading-component.module";
+import { PageHeadingComponentModule } from "../common/page-heading/page-heading-component.module";
 import { ShipmentDetailPage } from "./shipment-detail/shipment-detail.page";
 
 @NgModule({

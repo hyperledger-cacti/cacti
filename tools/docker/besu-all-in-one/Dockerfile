@@ -1,29 +1,23 @@
-ARG BESU_VERSION=22.7.4
-ARG TESSERA_VERSION=22.1.7
+FROM hyperledger/besu:25.4.0
 
-FROM hyperledger/besu:$BESU_VERSION AS besu
-FROM quorumengineering/tessera:$TESSERA_VERSION AS tessera
+LABEL org.opencontainers.image.source="https://github.com/hyperledger-cacti/cacti"
 
-COPY --from=besu /opt/besu/ /opt/besu/
+RUN apt update -y && \
+    apt install --no-install-recommends --yes curl && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /config/
-RUN mkdir /config/orion/
-RUN mkdir /config/besu/
-RUN mkdir /opt/besu/public-keys/
+ADD ./genesis.json /opt/besu/genesis.json
 
-ADD ./log-config.xml /config/log-config.xml
-ADD ./orion.conf /config/orion/orion.conf
-ADD ./nodeKey.pub /config/orion/nodeKey.pub
-ADD ./nodeKey.key /config/orion/nodeKey.key
-ADD ./bootnode_start.sh /opt/besu/bootnode_start.sh
-ADD ./key /opt/besu/keys/key
-ADD ./key.pub /opt/besu/keys/key.pub
-
-RUN apt-get update && apt-get install -y supervisor
-RUN mkdir -p /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-EXPOSE 9001
-
-ENTRYPOINT ["/usr/bin/supervisord"]
-CMD ["--nodaemon"]
+ENV BESU_LOGGING=WARN
+ENV BESU_GENESIS_FILE="/opt/besu/genesis.json"
+ENV BESU_REVERT_REASON_ENABLED=true
+ENV BESU_NETWORK=dev
+ENV BESU_RPC_HTTP_ENABLED="true"
+ENV BESU_RPC_WS_ENABLED="true"
+ENV BESU_HOST_WHITELIST="*"
+ENV BESU_RPC_HTTP_API="ETH,NET,WEB3,CLIQUE,TRACE,DEBUG"
+ENV BESU_RPC_HTTP_CORS_ORIGINS=all
+ENV BESU_RPC_WS_API="ETH,NET,WEB3,CLIQUE,TRACE,DEBUG"
+ENV BESU_MINER_ENABLED="true"
+ENV BESU_MINER_COINBASE="0x0000000000000000000000000000000000000000"
+ENV BESU_MIN_GAS_PRICE="0"

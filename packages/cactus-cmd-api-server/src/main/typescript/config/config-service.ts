@@ -27,6 +27,7 @@ convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
 
 export interface ICactusApiServerOptions {
+  openApiValidationOffPkgs: string[];
   crpcPort: number;
   crpcHost: string;
   pluginManagerOptionsJson: string;
@@ -92,6 +93,23 @@ export class ConfigService {
 
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
+      openApiValidationOffPkgs: {
+        type: Array,
+        arg: "open-api-validation-off-pkgs",
+        env: "OPEN_API_VALIDATION_OFF_PKGS",
+        default: [],
+        doc:
+          "" +
+          "The list of package names for which OpenAPI validation should be disabled." +
+          "This is useful when dealing with plugins that have incorrect or incomplete" +
+          "OpenAPI specifications or when there is a bug in the OpenAPI validator" +
+          "middleware that cause it to have false negatives during validation." +
+          "This option is optional and defaults to an empty array which means that" +
+          "all of the plugins will have the OpenAPI request validation enabled by default." +
+          "   @example Setting this configuration parameter to" +
+          '["@hyperledger/cactus-plugin-ledger-connector-ethereum"]' +
+          "will disable OpenAPI validation for the Ethereum connector plugin.",
+      },
       crpcHost: {
         doc: "The host to bind the CRPC fastify instance to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
         format: "ipaddress",
@@ -570,6 +588,7 @@ export class ConfigService {
     };
 
     return {
+      openApiValidationOffPkgs: [],
       crpcHost: (schema.crpcHost as SchemaObj).default,
       crpcPort: (schema.crpcPort as SchemaObj).default,
       pluginManagerOptionsJson: "{}",

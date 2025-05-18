@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/",
+    "rootDir": "./",
+    "tsBuildInfoFile": "../../.build-cache/cactus-example-electricity-trade.tsbuildinfo"
+  },
+  "include": ["./*.ts"],
+  "references": [
+    {
+      "path": "../../packages/cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../cactus-common-example-server/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-keychain-memory/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-ledger-connector-ethereum/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-verifier-client/tsconfig.json"
+    }
+  ]
+}

@@ -4,21 +4,25 @@
   "description": "Proof of concept of ODAP",
   "keywords": [
     "Hyperledger",
-    "Cactus",
+    "Cacti",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology",
     "Open Digital Asset Protocol"
   ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cactus Contributors",
-    "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cacti"
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "contributors": [
     {
@@ -59,11 +63,11 @@
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
     "@hyperledger/cactus-plugin-object-store-ipfs": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
-    "axios": "1.7.9",
+    "axios": "1.8.4",
     "crypto-js": "4.2.0",
     "fs-extra": "11.2.0",
     "knex": "2.4.0",
-    "secp256k1": "4.0.4",
+    "secp256k1": "5.0.1",
     "socket.io": "4.6.2",
     "sqlite3": "5.1.5",
     "typescript-optional": "2.0.1",
@@ -74,14 +78,14 @@
   "devDependencies": {
     "@types/body-parser": "1.19.4",
     "@types/crypto-js": "4.0.1",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/tape": "4.13.4",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "fabric-network": "2.2.20",
-    "kubo-rpc-client": "3.0.1",
+    "kubo-rpc-client": "3.0.4",
     "typescript": "5.5.2"
   },
   "engines": {

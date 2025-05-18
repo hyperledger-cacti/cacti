@@ -30,7 +30,7 @@ For execute the test plugin, can execute in root directory:
 ```
 
 ## Contact
-* mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
+* mailing list: [cacti@lists.lfdecentralizedtrust.org](mailto:cacti@lists.lfdecentralizedtrust.org)
 * rocketchat channel: [https://chat.hyperledger.org/channel/cactus](https://chat.hyperledger.org/channel/cactus).
 
 ## Contributing

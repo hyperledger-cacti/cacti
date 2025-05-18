@@ -9,32 +9,19 @@
       <ion-card-content>
         <ion-item>
           <ion-label position="stacked">ID</ion-label>
-          <ion-input
-            id="id"
-            type="text"
-            readonly="readonly"
-            formControlName="id"
-          >
+          <ion-input id="id" type="text" readonly="readonly" formControlName="id">
           </ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Location</ion-label>
-          <ion-input
-            id="location"
-            type="text"
-            maxlength="255"
-            placeholder="Refers to the location of the harvest"
-            formControlName="location"
-          ></ion-input>
+          <ion-input id="location" type="text" maxlength="255"
+            placeholder="Refers to the location of the harvest" formControlName="location"></ion-input>
         </ion-item>
-        <ion-label
-          *ngIf="
+        <ion-label *ngIf="
             form.controls.location.invalid &&
             (form.controls.location.dirty || form.controls.location.touched)
-          "
-          class="alert alert-danger"
-        >
+          " class="alert alert-danger">
           <div *ngIf="form.controls.location.errors.required">
             Location is required.
           </div>
@@ -45,70 +32,23 @@
 
         <ion-item>
           <ion-label position="stacked">Started At (UTC)</ion-label>
-          <ion-datetime
-            id="startedAt"
-            formControlName="startedAt"
-            value="new Date().toJSON()"
-            display-timezone="utc"
-          ></ion-datetime>
+          <ion-datetime id="startedAt" formControlName="startedAt" value="new Date().toJSON()" display-timezone="utc"></ion-datetime>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Ended At (UTC)</ion-label>
-          <ion-datetime
-            id="endedAt"
-            formControlName="endedAt"
-            value="new Date().toJSON()"
-            display-timezone="utc"
-          ></ion-datetime>
+          <ion-datetime id="endedAt" formControlName="endedAt" value="new Date().toJSON()" display-timezone="utc"></ion-datetime>
         </ion-item>
-
-        <!-- Manufacturer Data Selector -->
-        <ion-item>
-          <ion-label position="stacked">Manufacturer</ion-label>
-          <ion-select
-            id="manufacturerDataId"
-            formControlName="manufacturerDataId"
-            (ionChange)="onManufacturerChange($event)"
-          >
-            <ion-select-option
-              *ngFor="let manufacturer of manufacturerDataList"
-              [value]="manufacturer.id"
-            >
-              {{ manufacturer.name }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-        <ion-label
-          *ngIf="
-            form.controls.manufacturerDataId.invalid &&
-            (form.controls.manufacturerDataId.dirty || form.controls.manufacturerDataId.touched)
-          "
-          class="alert alert-danger"
-        >
-          <div *ngIf="form.controls.manufacturerDataId.errors.required">
-            Manufacturer is required.
-          </div>
-        </ion-label>
 
         <ion-item>
           <ion-label position="stacked">Harvester</ion-label>
-          <ion-input
-            id="harvester"
-            type="text"
-            maxlength="255"
-            readonly="true"
-            placeholder="This will be set from selected manufacturer"
-            formControlName="harvester"
-          ></ion-input>
+          <ion-input id="harvester" type="text" maxlength="255"
+            placeholder="Refers to the harvester who performed the act" formControlName="harvester"></ion-input>
         </ion-item>
-        <ion-label
-          *ngIf="
+        <ion-label *ngIf="
             form.controls.harvester.invalid &&
             (form.controls.harvester.dirty || form.controls.harvester.touched)
-          "
-          class="alert alert-danger"
-        >
+          " class="alert alert-danger">
           <div *ngIf="form.controls.harvester.errors.required">
             Harvester is required.
           </div>
@@ -120,22 +60,10 @@
         <ion-grid>
           <ion-row>
             <ion-col>
-              <ion-button
-                id="btnCancel"
-                (click)="onClickBtnCancel()"
-                size="medium"
-                color="warning"
-                >Cancel</ion-button
-              >
+              <ion-button id="btnCancel" (click)="onClickBtnCancel()" size="medium" color="warning">Cancel</ion-button>
             </ion-col>
             <ion-col>
-              <ion-button
-                id="btnSubmit"
-                type="submit"
-                color="primary"
-                class="ion-float-right"
-                [disabled]="!form.valid"
-              >
+              <ion-button id="btnSubmit" type="submit" color="primary" class="ion-float-right" [disabled]="!form.valid">
                 Submit
               </ion-button>
             </ion-col>

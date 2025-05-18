@@ -24,25 +24,6 @@ const routes: Routes = [
     loadChildren: () =>
       import("./shipment/shipment.module").then((m) => m.ShipmentPageModule),
   },
-  {
-    path: "manufacturer-data-list",
-    loadChildren: () =>
-      import("./manufacturer-data/manufacturer-data.module").then(
-        (m) => m.ManufacturerDataModule,
-      ),
-  },
-  {
-    path: "role-manager",
-    loadChildren: () =>
-      import("./role-manager/role-manager.module").then(
-        (m) => m.RoleManagerPageModule,
-      ),
-  },
-  {
-    path: "payment",
-    loadChildren: () =>
-      import("./payment/payment.module").then((m) => m.PaymentModule),
-  },
 ];
 
 @NgModule({

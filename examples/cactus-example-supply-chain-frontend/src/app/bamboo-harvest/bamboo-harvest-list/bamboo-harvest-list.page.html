@@ -1,122 +1,25 @@
 <app-page-heading pageTitle="Bamboo Harvest List"></app-page-heading>
 
 <ion-content>
-  <ion-grid>
-    <ion-row *ngIf="!isWalletConnected" class="ion-justify-content-center">
-      <ion-col size="12" class="ion-text-center">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Wallet Connection Required</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>You need to connect your wallet to view bamboo harvests.</p>
-            <ion-button
-              (click)="connectWallet()"
-              expand="block"
-              [disabled]="isLoading"
-              color="primary"
-              class="ion-margin-top"
-            >
-              <ion-spinner name="dots" *ngIf="isLoading"></ion-spinner>
-              <span *ngIf="!isLoading">Connect Wallet</span>
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
 
-    <!-- Role information panel -->
-    <ion-row *ngIf="isWalletConnected">
-      <ion-col size="12">
-        <ion-card color="light">
-          <ion-card-content>
-            <p *ngIf="isManufacturer">
-              <ion-icon name="checkmark-circle" color="success"></ion-icon>
-              You're connected as a <strong>Manufacturer</strong>. You can view
-              <ion-badge color="success">enhanced private data</ion-badge> and
-              add bamboo harvests.
-            </p>
-            <p *ngIf="!isManufacturer">
-              <ion-icon name="information-circle" color="warning"></ion-icon>
-              You're connected as a <strong>Customer</strong>. You can view
-              <ion-badge color="primary">basic public data</ion-badge> only.
-            </p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
+    <ion-list>
+      <ion-item *ngFor="let bambooHarvest of bambooHarvests"
+      button
+      (click)="clickShowDetail(bambooHarvest)"
+      detail
+      class="ion-text-wrap">
 
-    <ion-row *ngIf="isWalletConnected">
-      <ion-col size="12">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>
-              <ion-text *ngIf="isManufacturer" color="success"
-                >Enhanced Bamboo Harvest Data</ion-text
-              >
-              <ion-text *ngIf="!isManufacturer" color="primary"
-                >Basic Bamboo Harvest Data</ion-text
-              >
-            </ion-card-title>
-            <ion-card-subtitle>
-              <ion-text *ngIf="isManufacturer"
-                >Includes private manufacturing information</ion-text
-              >
-              <ion-text *ngIf="!isManufacturer"
-                >Public information only</ion-text
-              >
-            </ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-list>
-              <ion-item *ngIf="bambooHarvests.length === 0">
-                <ion-label class="ion-text-center"
-                  >No bamboo harvests found. {{isManufacturer ? 'Add one using
-                  the + button.' : ''}}</ion-label
-                >
-              </ion-item>
-              <ion-item
-                *ngFor="let bambooHarvest of bambooHarvests"
-                button
-                (click)="clickShowDetail(bambooHarvest)"
-                detail
-                class="ion-text-wrap"
-              >
-                <ion-label>
-                  <h2>Bamboo Harvest #{{bambooHarvest.id}}</h2>
-                  <p>Location: {{bambooHarvest.location}}</p>
-                  <p>{{bambooHarvest.harvester}}</p>
-                  <p>Harvest Time: {{bambooHarvest.startedAt | date}}</p>
-                  <p *ngIf="bambooHarvest.status">
-                    Status: <span [style.color]="bambooHarvest.status === 'SOLD' ? 'green' : 'blue'">{{bambooHarvest.status}}</span>
-                  </p>
-                </ion-label>
-                <!-- Add delete button for manufacturers -->
-                <ion-button
-                  slot="end"
-                  color="danger"
-                  fill="clear"
-                  *ngIf="isWalletConnected && isManufacturer"
-                  (click)="deleteHarvest($event, bambooHarvest)"
-                >
-                  <ion-icon name="trash-outline"></ion-icon>
-                </ion-button>
-              </ion-item>
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <ion-text color="primary">
+        Bamboo Harvest #{{bambooHarvest.id}}
+      </ion-text>
+      </ion-item>
+    </ion-list>
 
-  <ion-fab
-    vertical="bottom"
-    horizontal="end"
-    slot="fixed"
-    *ngIf="isWalletConnected && isManufacturer"
-  >
-    <ion-fab-button>
-      <ion-icon (click)="clickAddNew()" name="add"> </ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button>
+        <ion-icon (click)="clickAddNew()" name="add">
+        </ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
 </ion-content>

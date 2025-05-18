@@ -7,9 +7,8 @@ import { IonicModule } from "@ionic/angular";
 import { BookshelfPageRoutingModule } from "./bookshelf-routing.module";
 
 import { BookshelfListPage } from "./bookshelf-list/bookshelf-list.page";
-import { PageHeadingComponentModule } from "../common/components/page-heading-component.module";
+import { PageHeadingComponentModule } from "../common/page-heading/page-heading-component.module";
 import { BookshelfDetailPage } from "./bookshelf-detail/bookshelf-detail.page";
-import { BookshelfViewModalComponent } from "./bookshelf-view-modal/bookshelf-view-modal.component";
 
 @NgModule({
   imports: [
@@ -20,10 +19,6 @@ import { BookshelfViewModalComponent } from "./bookshelf-view-modal/bookshelf-vi
     BookshelfPageRoutingModule,
     PageHeadingComponentModule,
   ],
-  declarations: [
-    BookshelfListPage,
-    BookshelfDetailPage,
-    BookshelfViewModalComponent,
-  ],
+  declarations: [BookshelfDetailPage, BookshelfListPage],
 })
 export class BookshelfPageModule {}

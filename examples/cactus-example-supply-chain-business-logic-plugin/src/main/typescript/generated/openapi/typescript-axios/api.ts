@@ -26,38 +26,6 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
- * @interface AssignShipmentV1200Response
- */
-export interface AssignShipmentV1200Response {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof AssignShipmentV1200Response
-     */
-    'success'?: boolean;
-}
-/**
- * 
- * @export
- * @interface AssignShipmentV1Request
- */
-export interface AssignShipmentV1Request {
-    /**
-     * ID of the product to assign the shipment to
-     * @type {string}
-     * @memberof AssignShipmentV1Request
-     */
-    'productId': string;
-    /**
-     * ID of the shipment to assign
-     * @type {string}
-     * @memberof AssignShipmentV1Request
-     */
-    'shipmentId': string;
-}
-/**
- * 
- * @export
  * @interface BambooHarvest
  */
 export interface BambooHarvest {
@@ -116,156 +84,6 @@ export interface Bookshelf {
      * @memberof Bookshelf
      */
     'bambooHarvestId': string;
-}
-/**
- * 
- * @export
- * @interface CreatePaymentRequest
- */
-export interface CreatePaymentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'payerAddress': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'payeeAddress': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'amount': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'productId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'productType': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'signature': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentRequest
-     */
-    'message': string;
-}
-/**
- * 
- * @export
- * @interface CreatePaymentResponse
- */
-export interface CreatePaymentResponse {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof CreatePaymentResponse
-     */
-    'success': boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof CreatePaymentResponse
-     */
-    'paymentId'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePaymentResponse
-     */
-    'error'?: string;
-}
-/**
- * 
- * @export
- * @interface DeleteBambooHarvestV1200Response
- */
-export interface DeleteBambooHarvestV1200Response {
-    /**
-     * Indicates if the operation was successful
-     * @type {boolean}
-     * @memberof DeleteBambooHarvestV1200Response
-     */
-    'success'?: boolean;
-    /**
-     * Success message
-     * @type {string}
-     * @memberof DeleteBambooHarvestV1200Response
-     */
-    'message'?: string;
-}
-/**
- * 
- * @export
- * @interface DeleteBambooHarvestV1400Response
- */
-export interface DeleteBambooHarvestV1400Response {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DeleteBambooHarvestV1400Response
-     */
-    'success'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeleteBambooHarvestV1400Response
-     */
-    'error'?: string;
-}
-/**
- * 
- * @export
- * @interface DeleteBambooHarvestV1Request
- */
-export interface DeleteBambooHarvestV1Request {
-    /**
-     * The ID of the bamboo harvest to delete
-     * @type {string}
-     * @memberof DeleteBambooHarvestV1Request
-     */
-    'bambooHarvestId': string;
-}
-/**
- * 
- * @export
- * @interface DeployRoleManager200Response
- */
-export interface DeployRoleManager200Response {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DeployRoleManager200Response
-     */
-    'success'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeployRoleManager200Response
-     */
-    'contractAddress'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeployRoleManager200Response
-     */
-    'message'?: string;
 }
 /**
  * 
@@ -334,32 +152,6 @@ export interface InsertBookshelfResponse {
 /**
  * 
  * @export
- * @interface InsertManufacturerDataRequest
- */
-export interface InsertManufacturerDataRequest {
-    /**
-     * 
-     * @type {ManufacturerData}
-     * @memberof InsertManufacturerDataRequest
-     */
-    'manufacturerData': ManufacturerData;
-}
-/**
- * 
- * @export
- * @interface InsertManufacturerDataResponse
- */
-export interface InsertManufacturerDataResponse {
-    /**
-     * 
-     * @type {{ [key: string]: any; }}
-     * @memberof InsertManufacturerDataResponse
-     */
-    'data': { [key: string]: any; };
-}
-/**
- * 
- * @export
  * @interface InsertShipmentRequest
  */
 export interface InsertShipmentRequest {
@@ -418,19 +210,6 @@ export interface ListBookshelfResponse {
 /**
  * 
  * @export
- * @interface ListManufacturerDataResponse
- */
-export interface ListManufacturerDataResponse {
-    /**
-     * 
-     * @type {Array<ManufacturerData>}
-     * @memberof ListManufacturerDataResponse
-     */
-    'data': Array<ManufacturerData>;
-}
-/**
- * 
- * @export
  * @interface ListShipmentResponse
  */
 export interface ListShipmentResponse {
@@ -440,123 +219,6 @@ export interface ListShipmentResponse {
      * @memberof ListShipmentResponse
      */
     'data': Array<Shipment>;
-}
-/**
- * 
- * @export
- * @interface ManufacturerData
- */
-export interface ManufacturerData {
-    /**
-     * 
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'name': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ManufacturerData
-     */
-    'costPrice': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ManufacturerData
-     */
-    'inventory': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'supplierInfo': string;
-    /**
-     * The shipping address for the product
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'shippingAddress': string;
-    /**
-     * Contact information for the customer
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'customerContact': string;
-    /**
-     * Optional ID of the associated shipment
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'shipmentId'?: string;
-    /**
-     * Private notes for manufacturer only
-     * @type {string}
-     * @memberof ManufacturerData
-     */
-    'privateNotes'?: string;
-}
-/**
- * 
- * @export
- * @interface ProcessPaymentRequest
- */
-export interface ProcessPaymentRequest {
-    /**
-     * 
-     * @type {number}
-     * @memberof ProcessPaymentRequest
-     */
-    'paymentId': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProcessPaymentRequest
-     */
-    'transactionReference': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProcessPaymentRequest
-     */
-    'walletAddress': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProcessPaymentRequest
-     */
-    'signature': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProcessPaymentRequest
-     */
-    'message': string;
-}
-/**
- * 
- * @export
- * @interface ProcessPaymentResponse
- */
-export interface ProcessPaymentResponse {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ProcessPaymentResponse
-     */
-    'success': boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProcessPaymentResponse
-     */
-    'error'?: string;
 }
 /**
  * 
@@ -577,132 +239,6 @@ export interface Shipment {
      */
     'bookshelfId': string;
 }
-/**
- * 
- * @export
- * @interface UpdateBambooHarvestStatusRequest
- */
-export interface UpdateBambooHarvestStatusRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBambooHarvestStatusRequest
-     */
-    'bambooHarvestId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBambooHarvestStatusRequest
-     */
-    'status'?: string;
-}
-/**
- * 
- * @export
- * @interface UpdateBookshelfStatusRequest
- */
-export interface UpdateBookshelfStatusRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBookshelfStatusRequest
-     */
-    'bookshelfId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBookshelfStatusRequest
-     */
-    'status': string;
-}
-/**
- * 
- * @export
- * @interface UpdateBookshelfStatusV1200Response
- */
-export interface UpdateBookshelfStatusV1200Response {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UpdateBookshelfStatusV1200Response
-     */
-    'success'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBookshelfStatusV1200Response
-     */
-    'message'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBookshelfStatusV1200Response
-     */
-    'transactionId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateBookshelfStatusV1200Response
-     */
-    'functionOutput'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UpdateBookshelfStatusV1200Response
-     */
-    'simulated'?: boolean;
-}
-/**
- * 
- * @export
- * @interface UpdateShipmentStatus200Response
- */
-export interface UpdateShipmentStatus200Response {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UpdateShipmentStatus200Response
-     */
-    'success'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateShipmentStatus200Response
-     */
-    'message'?: string;
-}
-/**
- * 
- * @export
- * @interface UpdateShipmentStatus500Response
- */
-export interface UpdateShipmentStatus500Response {
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateShipmentStatus500Response
-     */
-    'error'?: string;
-}
-/**
- * 
- * @export
- * @interface UpdateShipmentStatusRequest
- */
-export interface UpdateShipmentStatusRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateShipmentStatusRequest
-     */
-    'shipmentId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateShipmentStatusRequest
-     */
-    'status'?: string;
-}
 
 /**
  * DefaultApi - axios parameter creator
@@ -710,70 +246,6 @@ export interface UpdateShipmentStatusRequest {
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * 
-         * @summary Create a new payment for a product
-         * @param {CreatePaymentRequest} [createPaymentRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createPayment: async (createPaymentRequest?: CreatePaymentRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/create-payment`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPaymentRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Deploy RoleManager contract
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deployRoleManager: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/deploy-role-manager`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * 
          * @summary Inserts the provided BambooHarvest entity to the ledger.
@@ -836,40 +308,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(insertBookshelfRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Inserts manufacturer data to the Fabric ledger
-         * @param {InsertManufacturerDataRequest} [insertManufacturerDataRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        insertManufacturerDataV1: async (insertManufacturerDataRequest?: InsertManufacturerDataRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-manufacturer-data`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(insertManufacturerDataRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -972,36 +410,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary List all manufacturer data
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listManufacturerDataV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-manufacturer-data`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary Lists all the Shipments entities stored on the ledger.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1030,74 +438,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Process an existing payment
-         * @param {ProcessPaymentRequest} [processPaymentRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        processPayment: async (processPaymentRequest?: ProcessPaymentRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/process-payment`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(processPaymentRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Updates the status of a bookshelf entity on the ledger.
-         * @param {UpdateBookshelfStatusRequest} [updateBookshelfStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateBookshelfStatusV1: async (updateBookshelfStatusRequest?: UpdateBookshelfStatusRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/update-bookshelf-status`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateBookshelfStatusRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -1108,27 +448,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
-        /**
-         * 
-         * @summary Create a new payment for a product
-         * @param {CreatePaymentRequest} [createPaymentRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async createPayment(createPaymentRequest?: CreatePaymentRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreatePaymentResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createPayment(createPaymentRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Deploy RoleManager contract
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deployRoleManager(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployRoleManager200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deployRoleManager(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
         /**
          * 
          * @summary Inserts the provided BambooHarvest entity to the ledger.
@@ -1149,17 +468,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async insertBookshelfV1(insertBookshelfRequest?: InsertBookshelfRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InsertBookshelfResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.insertBookshelfV1(insertBookshelfRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Inserts manufacturer data to the Fabric ledger
-         * @param {InsertManufacturerDataRequest} [insertManufacturerDataRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async insertManufacturerDataV1(insertManufacturerDataRequest?: InsertManufacturerDataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InsertManufacturerDataResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.insertManufacturerDataV1(insertManufacturerDataRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1195,44 +503,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary List all manufacturer data
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listManufacturerDataV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListManufacturerDataResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listManufacturerDataV1(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @summary Lists all the Shipments entities stored on the ledger.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         async listShipmentV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListShipmentResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listShipmentV1(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Process an existing payment
-         * @param {ProcessPaymentRequest} [processPaymentRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async processPayment(processPaymentRequest?: ProcessPaymentRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProcessPaymentResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processPayment(processPaymentRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Updates the status of a bookshelf entity on the ledger.
-         * @param {UpdateBookshelfStatusRequest} [updateBookshelfStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateBookshelfStatusV1(updateBookshelfStatusRequest?: UpdateBookshelfStatusRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UpdateBookshelfStatusV1200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateBookshelfStatusV1(updateBookshelfStatusRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1245,25 +521,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
     return {
-        /**
-         * 
-         * @summary Create a new payment for a product
-         * @param {CreatePaymentRequest} [createPaymentRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createPayment(createPaymentRequest?: CreatePaymentRequest, options?: any): AxiosPromise<CreatePaymentResponse> {
-            return localVarFp.createPayment(createPaymentRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Deploy RoleManager contract
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deployRoleManager(options?: any): AxiosPromise<DeployRoleManager200Response> {
-            return localVarFp.deployRoleManager(options).then((request) => request(axios, basePath));
-        },
         /**
          * 
          * @summary Inserts the provided BambooHarvest entity to the ledger.
@@ -1283,16 +540,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         insertBookshelfV1(insertBookshelfRequest?: InsertBookshelfRequest, options?: any): AxiosPromise<InsertBookshelfResponse> {
             return localVarFp.insertBookshelfV1(insertBookshelfRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Inserts manufacturer data to the Fabric ledger
-         * @param {InsertManufacturerDataRequest} [insertManufacturerDataRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        insertManufacturerDataV1(insertManufacturerDataRequest?: InsertManufacturerDataRequest, options?: any): AxiosPromise<InsertManufacturerDataResponse> {
-            return localVarFp.insertManufacturerDataV1(insertManufacturerDataRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1324,41 +571,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary List all manufacturer data
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listManufacturerDataV1(options?: any): AxiosPromise<ListManufacturerDataResponse> {
-            return localVarFp.listManufacturerDataV1(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Lists all the Shipments entities stored on the ledger.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listShipmentV1(options?: any): AxiosPromise<ListShipmentResponse> {
             return localVarFp.listShipmentV1(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Process an existing payment
-         * @param {ProcessPaymentRequest} [processPaymentRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        processPayment(processPaymentRequest?: ProcessPaymentRequest, options?: any): AxiosPromise<ProcessPaymentResponse> {
-            return localVarFp.processPayment(processPaymentRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Updates the status of a bookshelf entity on the ledger.
-         * @param {UpdateBookshelfStatusRequest} [updateBookshelfStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateBookshelfStatusV1(updateBookshelfStatusRequest?: UpdateBookshelfStatusRequest, options?: any): AxiosPromise<UpdateBookshelfStatusV1200Response> {
-            return localVarFp.updateBookshelfStatusV1(updateBookshelfStatusRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1370,29 +588,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
-    /**
-     * 
-     * @summary Create a new payment for a product
-     * @param {CreatePaymentRequest} [createPaymentRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public createPayment(createPaymentRequest?: CreatePaymentRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).createPayment(createPaymentRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Deploy RoleManager contract
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public deployRoleManager(options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deployRoleManager(options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @summary Inserts the provided BambooHarvest entity to the ledger.
@@ -1415,18 +610,6 @@ export class DefaultApi extends BaseAPI {
      */
     public insertBookshelfV1(insertBookshelfRequest?: InsertBookshelfRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).insertBookshelfV1(insertBookshelfRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Inserts manufacturer data to the Fabric ledger
-     * @param {InsertManufacturerDataRequest} [insertManufacturerDataRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public insertManufacturerDataV1(insertManufacturerDataRequest?: InsertManufacturerDataRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).insertManufacturerDataV1(insertManufacturerDataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1465,17 +648,6 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary List all manufacturer data
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public listManufacturerDataV1(options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listManufacturerDataV1(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary Lists all the Shipments entities stored on the ledger.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1483,376 +655,6 @@ export class DefaultApi extends BaseAPI {
      */
     public listShipmentV1(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listShipmentV1(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Process an existing payment
-     * @param {ProcessPaymentRequest} [processPaymentRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public processPayment(processPaymentRequest?: ProcessPaymentRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).processPayment(processPaymentRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Updates the status of a bookshelf entity on the ledger.
-     * @param {UpdateBookshelfStatusRequest} [updateBookshelfStatusRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public updateBookshelfStatusV1(updateBookshelfStatusRequest?: UpdateBookshelfStatusRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateBookshelfStatusV1(updateBookshelfStatusRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * ManufacturerDataApi - axios parameter creator
- * @export
- */
-export const ManufacturerDataApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * 
-         * @summary Assign a shipment ID to a manufacturer data item
-         * @param {AssignShipmentV1Request} [assignShipmentV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        assignShipmentV1: async (assignShipmentV1Request?: AssignShipmentV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/assign-shipment`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(assignShipmentV1Request, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * ManufacturerDataApi - functional programming interface
- * @export
- */
-export const ManufacturerDataApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = ManufacturerDataApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @summary Assign a shipment ID to a manufacturer data item
-         * @param {AssignShipmentV1Request} [assignShipmentV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async assignShipmentV1(assignShipmentV1Request?: AssignShipmentV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssignShipmentV1200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignShipmentV1(assignShipmentV1Request, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * ManufacturerDataApi - factory interface
- * @export
- */
-export const ManufacturerDataApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = ManufacturerDataApiFp(configuration)
-    return {
-        /**
-         * 
-         * @summary Assign a shipment ID to a manufacturer data item
-         * @param {AssignShipmentV1Request} [assignShipmentV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        assignShipmentV1(assignShipmentV1Request?: AssignShipmentV1Request, options?: any): AxiosPromise<AssignShipmentV1200Response> {
-            return localVarFp.assignShipmentV1(assignShipmentV1Request, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * ManufacturerDataApi - object-oriented interface
- * @export
- * @class ManufacturerDataApi
- * @extends {BaseAPI}
- */
-export class ManufacturerDataApi extends BaseAPI {
-    /**
-     * 
-     * @summary Assign a shipment ID to a manufacturer data item
-     * @param {AssignShipmentV1Request} [assignShipmentV1Request] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ManufacturerDataApi
-     */
-    public assignShipmentV1(assignShipmentV1Request?: AssignShipmentV1Request, options?: AxiosRequestConfig) {
-        return ManufacturerDataApiFp(this.configuration).assignShipmentV1(assignShipmentV1Request, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * SupplyChainApi - axios parameter creator
- * @export
- */
-export const SupplyChainApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * 
-         * @summary Delete a bamboo harvest record
-         * @param {DeleteBambooHarvestV1Request} deleteBambooHarvestV1Request 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteBambooHarvestV1: async (deleteBambooHarvestV1Request: DeleteBambooHarvestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'deleteBambooHarvestV1Request' is not null or undefined
-            assertParamExists('deleteBambooHarvestV1', 'deleteBambooHarvestV1Request', deleteBambooHarvestV1Request)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/delete-bamboo-harvest`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(deleteBambooHarvestV1Request, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Update Bamboo Harvest Status
-         * @param {UpdateBambooHarvestStatusRequest} [updateBambooHarvestStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateBambooHarvestStatus: async (updateBambooHarvestStatusRequest?: UpdateBambooHarvestStatusRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/update-bamboo-harvest-status`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateBambooHarvestStatusRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Update Shipment Status
-         * @param {UpdateShipmentStatusRequest} [updateShipmentStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateShipmentStatus: async (updateShipmentStatusRequest?: UpdateShipmentStatusRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/update-shipment-status`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateShipmentStatusRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * SupplyChainApi - functional programming interface
- * @export
- */
-export const SupplyChainApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = SupplyChainApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @summary Delete a bamboo harvest record
-         * @param {DeleteBambooHarvestV1Request} deleteBambooHarvestV1Request 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deleteBambooHarvestV1(deleteBambooHarvestV1Request: DeleteBambooHarvestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteBambooHarvestV1200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteBambooHarvestV1(deleteBambooHarvestV1Request, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Update Bamboo Harvest Status
-         * @param {UpdateBambooHarvestStatusRequest} [updateBambooHarvestStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateBambooHarvestStatus(updateBambooHarvestStatusRequest?: UpdateBambooHarvestStatusRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UpdateShipmentStatus200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateBambooHarvestStatus(updateBambooHarvestStatusRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Update Shipment Status
-         * @param {UpdateShipmentStatusRequest} [updateShipmentStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateShipmentStatus(updateShipmentStatusRequest?: UpdateShipmentStatusRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UpdateShipmentStatus200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateShipmentStatus(updateShipmentStatusRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * SupplyChainApi - factory interface
- * @export
- */
-export const SupplyChainApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = SupplyChainApiFp(configuration)
-    return {
-        /**
-         * 
-         * @summary Delete a bamboo harvest record
-         * @param {DeleteBambooHarvestV1Request} deleteBambooHarvestV1Request 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteBambooHarvestV1(deleteBambooHarvestV1Request: DeleteBambooHarvestV1Request, options?: any): AxiosPromise<DeleteBambooHarvestV1200Response> {
-            return localVarFp.deleteBambooHarvestV1(deleteBambooHarvestV1Request, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Update Bamboo Harvest Status
-         * @param {UpdateBambooHarvestStatusRequest} [updateBambooHarvestStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateBambooHarvestStatus(updateBambooHarvestStatusRequest?: UpdateBambooHarvestStatusRequest, options?: any): AxiosPromise<UpdateShipmentStatus200Response> {
-            return localVarFp.updateBambooHarvestStatus(updateBambooHarvestStatusRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Update Shipment Status
-         * @param {UpdateShipmentStatusRequest} [updateShipmentStatusRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateShipmentStatus(updateShipmentStatusRequest?: UpdateShipmentStatusRequest, options?: any): AxiosPromise<UpdateShipmentStatus200Response> {
-            return localVarFp.updateShipmentStatus(updateShipmentStatusRequest, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * SupplyChainApi - object-oriented interface
- * @export
- * @class SupplyChainApi
- * @extends {BaseAPI}
- */
-export class SupplyChainApi extends BaseAPI {
-    /**
-     * 
-     * @summary Delete a bamboo harvest record
-     * @param {DeleteBambooHarvestV1Request} deleteBambooHarvestV1Request 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SupplyChainApi
-     */
-    public deleteBambooHarvestV1(deleteBambooHarvestV1Request: DeleteBambooHarvestV1Request, options?: AxiosRequestConfig) {
-        return SupplyChainApiFp(this.configuration).deleteBambooHarvestV1(deleteBambooHarvestV1Request, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Update Bamboo Harvest Status
-     * @param {UpdateBambooHarvestStatusRequest} [updateBambooHarvestStatusRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SupplyChainApi
-     */
-    public updateBambooHarvestStatus(updateBambooHarvestStatusRequest?: UpdateBambooHarvestStatusRequest, options?: AxiosRequestConfig) {
-        return SupplyChainApiFp(this.configuration).updateBambooHarvestStatus(updateBambooHarvestStatusRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Update Shipment Status
-     * @param {UpdateShipmentStatusRequest} [updateShipmentStatusRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SupplyChainApi
-     */
-    public updateShipmentStatus(updateShipmentStatusRequest?: UpdateShipmentStatusRequest, options?: AxiosRequestConfig) {
-        return SupplyChainApiFp(this.configuration).updateShipmentStatus(updateShipmentStatusRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

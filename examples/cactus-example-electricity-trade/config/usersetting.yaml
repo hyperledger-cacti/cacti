@@ -1,0 +1,36 @@
+# Overwrite defaults
+blpRegistry:
+  -
+    businessLogicID: h40Q9eMD
+    validatorID: []
+
+logLevel: debug
+
+signTxInfo:
+  ethereum:
+    chainName: geth1
+    networkID: 10
+    chainID: 10
+    defaultHardfork: petersburg
+
+appRouters:
+  -
+    path: /api/v1/bl/electricity-trade/
+    routerJs:  /root/cactus/dist/electricity-trade.js
+  -
+    path: /api/v1/bl/balance/
+    routerJs:  /root/cactus/dist/balance.js
+
+# BLP Config
+electricityTradeInfo:
+  sawtooth:
+    filterKey: intkey
+    restApiURL: http://localhost:8008
+  ethereum:
+    gethURL: ws://localhost:8546
+    chainName: geth1
+    networkID: 10
+    chainID: 10
+    network: mainnet
+    hardfork: petersburg
+    gas: 21000

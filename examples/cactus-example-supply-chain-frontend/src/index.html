@@ -1,213 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Hyperledger Cacti Example - Supply Chain App</title>
 
-    <base href="/" />
+<head>
+  <meta charset="utf-8" />
+  <title>Hyperledger Cacti Example - Supply Chain App</title>
 
-    <meta name="color-scheme" content="light dark" />
-    <meta
-      name="viewport"
-      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="msapplication-tap-highlight" content="no" />
+  <base href="/" />
 
-    <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
 
-    <!-- add to homescreen for ios -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
+  <!-- add to homescreen for ios -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+</head>
 
-    <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<body>
+  <app-root></app-root>
+</body>
 
-    <script>
-      // Global fix for product status updates
-      // This enhances localStorage functionality to ensure consistent status display
-      (function () {
-        // Helper function to clean up unwanted text nodes that appear in stepper components
-        function cleanupUnwantedElements() {
-          // Remove any unwanted text nodes with patterns like "at", "ch", etc.
-          const patterns = /^(at|ch|up|fl|c|u|fi|co nfo)$/;
-
-          // Wait for DOM to be fully loaded
-          setTimeout(function () {
-            // Find all text nodes
-            const walker = document.createTreeWalker(
-              document.body,
-              NodeFilter.SHOW_TEXT,
-            );
-            const nodesToRemove = [];
-
-            while (walker.nextNode()) {
-              const node = walker.currentNode;
-              const text = node.textContent.trim();
-
-              // Check if this is an unwanted text node
-              if (patterns.test(text)) {
-                nodesToRemove.push(node);
-              }
-            }
-
-            // Remove the unwanted nodes
-            nodesToRemove.forEach(function (node) {
-              if (node.parentNode) {
-                node.parentNode.removeChild(node);
-              }
-            });
-
-            // Also clean up any special "mat-step" elements that might contain unwanted text
-            const stepElements = document.querySelectorAll(
-              ".mat-step, .mat-stepper-horizontal-line",
-            );
-            stepElements.forEach(function (el) {
-              // Find and remove any direct text nodes
-              Array.from(el.childNodes).forEach(function (node) {
-                if (
-                  node.nodeType === Node.TEXT_NODE &&
-                  patterns.test(node.textContent.trim())
-                ) {
-                  el.removeChild(node);
-                }
-              });
-            });
-          }, 1000);
-        }
-
-        // Helper function to force product status refresh from localStorage
-        function refreshProductStatuses() {
-          // Check if we need to refresh statuses
-          if (localStorage.getItem("refresh_all_products")) {
-            console.log("Refreshing all product statuses from localStorage");
-
-            // Find any product status elements and update them from localStorage
-            const statusElements = document.querySelectorAll(
-              "[data-product-id][data-product-type]",
-            );
-            statusElements.forEach(function (el) {
-              const productId = el.getAttribute("data-product-id");
-              const productType = el.getAttribute("data-product-type");
-
-              if (productId && productType) {
-                // Try all possible localStorage key formats
-                const possibleKeys = [
-                  `product_status_${productType.toLowerCase()}_${productId}`,
-                  `${productType.toLowerCase()}_${productId}_status`,
-                ];
-
-                // For bamboo, add special formats
-                if (
-                  ["bamboo", "bambooharvest", "bamboo-harvest"].includes(
-                    productType.toLowerCase(),
-                  )
-                ) {
-                  possibleKeys.push(
-                    `product_status_bamboo_${productId}`,
-                    `product_status_bambooharvest_${productId}`,
-                    `product_status_bamboo-harvest_${productId}`,
-                    `bamboo_${productId}_status`,
-                    `bambooharvest_${productId}_status`,
-                  );
-                }
-
-                // Check all possible keys
-                for (const key of possibleKeys) {
-                  const status = localStorage.getItem(key);
-                  if (status) {
-                    // Update the element's text content
-                    el.textContent = status;
-
-                    // Also update styling if needed
-                    if (status === "SOLD" || status === "SHIPPED") {
-                      el.classList.add("sold-status");
-                    }
-                    break;
-                  }
-                }
-              }
-            });
-          }
-        }
-
-        // Run cleanup on page load
-        window.addEventListener("DOMContentLoaded", function () {
-          cleanupUnwantedElements();
-
-          // Set up periodic refresh for product statuses
-          setInterval(function () {
-            refreshProductStatuses();
-            cleanupUnwantedElements();
-          }, 2000);
-        });
-
-        // Also clean up after route changes in Angular
-        window.addEventListener("load", function () {
-          // Wait for Angular to be loaded
-          setTimeout(function () {
-            // If Angular's router events are available, use them
-            if (window.ng && window.ng.probe) {
-              const router = window.ng.probe(
-                document.querySelector("router-outlet"),
-              );
-              if (router && router.componentInstance) {
-                router.componentInstance.activateEvents.subscribe(function () {
-                  // After route change
-                  setTimeout(cleanupUnwantedElements, 200);
-                  setTimeout(refreshProductStatuses, 500);
-                });
-              }
-            } else {
-              // Fallback to periodic checks
-              setInterval(function () {
-                cleanupUnwantedElements();
-                refreshProductStatuses();
-              }, 2000);
-            }
-          }, 2000);
-        });
-      })();
-    </script>
-
-    <style>
-      /* Fix for stepper display issues */
-      .mat-horizontal-stepper-header-container {
-        position: relative;
-        z-index: 1;
-      }
-      .mat-step-header .mat-step-icon {
-        position: relative;
-        z-index: 2;
-      }
-      .mat-stepper-horizontal-line {
-        position: relative;
-        z-index: 0;
-      }
-      /* Hide unwanted content that can't be removed with JS */
-      .mat-stepper-horizontal-line::before,
-      .mat-stepper-horizontal-line::after {
-        content: none !important;
-      }
-      /* Style for sold products */
-      .sold-status {
-        color: #4caf50 !important;
-        font-weight: bold !important;
-      }
-    </style>
-  </head>
-
-  <body>
-    <app-root></app-root>
-  </body>
 </html>

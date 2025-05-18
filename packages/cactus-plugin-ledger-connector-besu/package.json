@@ -4,24 +4,24 @@
   "description": "Allows Cactus nodes to connect to a Besu ledger.",
   "keywords": [
     "Hyperledger",
-    "Cactus",
+    "Cacti",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cactus Contributors",
-    "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cacti"
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "contributors": [
     {
@@ -59,12 +59,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.12.4",
+    "@grpc/grpc-js": "1.13.3",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.7.9",
-    "express": "4.21.2",
+    "axios": "1.8.4",
+    "express": "5.1.0",
     "google-protobuf": "3.21.4",
     "http-errors": "2.0.0",
     "http-errors-enhanced-cjs": "2.0.1",
@@ -89,7 +89,7 @@
     "@openapitools/openapi-generator-cli": "2.7.0",
     "@types/benchmark": "2.1.5",
     "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/google-protobuf": "3.15.5",
     "@types/http-errors": "2.0.4",

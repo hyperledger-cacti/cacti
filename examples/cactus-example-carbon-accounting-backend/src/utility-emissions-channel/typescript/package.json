@@ -1,0 +1,30 @@
+{
+  "name": "utility_missions_chaincode",
+  "version": "0.0.1",
+  "description": "Utility Emissions Contract",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.test.ts'",
+    "fix_lint": "tslint --fix -c tslint.json 'src/**/*.ts' 'test/**/*.test.ts' || true",
+    "test": "mocha -r ts-node/register 'test/**/*.test.ts'",
+    "start": "node dist/index.js"
+  },
+  "author": "hyperledger",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/chai": "4.3.5",
+    "@types/crypto-js": "4.1.1",
+    "@types/mocha": "8.2.2",
+    "@types/node": "18.11.9",
+    "@types/rewire": "2.5.28",
+    "chai": "4.3.7",
+    "mocha": "8.4.0",
+    "sinon": "10.0.0",
+    "ts-node": "10.9.1"
+  },
+  "dependencies": {
+    "crypto-js": "4.2.0",
+    "fabric-shim": "2.2.2"
+  }
+}

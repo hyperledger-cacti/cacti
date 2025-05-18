@@ -1,0 +1,16 @@
+signTxInfo:
+  fabric:
+    mspID: Org1MSP
+    peers:
+      - name: peer0.org1.example.com
+        requests: grpc://localhost:7051
+    orderer:
+      URL: grpc://localhost:7050
+    ca:
+      name: ca.example.com
+      URL: http://localhost:7054
+    submitter:
+      name: admin
+      secret: adminpw
+    channelName: mychannel
+    chaincodeID: basic

@@ -1,0 +1,9 @@
+version: "3.4"
+
+# Use: docker-compose -f docker-compose.yml -f docker-compose.debug.yml up
+
+services:
+  cactus-example-discounted-asset-trade-blp:
+    ports:
+      - "9034:9034"
+    command: node --inspect=0.0.0.0:9034 ./dist/www.js

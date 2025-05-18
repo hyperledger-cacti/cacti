@@ -5,24 +5,23 @@
   "keywords": [
     "Hyperledger",
     "Cacti",
-    "Cactus",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cacti"
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "contributors": [
     {
@@ -58,15 +57,15 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.7.9",
+    "axios": "1.8.4",
     "sanitize-html": "2.12.1"
   },
   "devDependencies": {
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/node": "18.11.9",
     "@types/sanitize-html": "2.6.2",
     "body-parser": "1.20.3",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "jest-extended": "4.0.1",
     "uuid": "10.0.0"
   },

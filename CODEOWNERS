@@ -1,7 +1,18 @@
 * @petermetz @takeutak @izuru0 @jagpreetsinghsasan @vramakrishna @sandeepnRES @outSH
 
+packages/cactus-plugin-ccmodel-hephaestus @RafaelAPB
 packages/cactus-plugin-satp-hermes @RafaelAPB
 packages/cactus-plugin-bungee-hermes @RafaelAPB
 examples/cactus-example-cbdc-bridging @RafaelAPB
 examples/cactus-example-cbdc-bridging-backend @RafaelAPB
 examples/cactus-example-cbdc-bridging-frontend @RafaelAPB
+packages/cactus-plugin-satp-hermes @LordKubaya
+packages/cactus-plugin-bungee-hermes @LordKubaya
+examples/cactus-example-cbdc-bridging @LordKubaya
+examples/cactus-example-cbdc-bridging-backend @LordKubaya
+examples/cactus-example-cbdc-bridging-frontend @LordKubaya
+packages/cactus-plugin-satp-hermes @AndreAugusto11
+packages/cactus-plugin-bungee-hermes @AndreAugusto11
+examples/cactus-example-cbdc-bridging @AndreAugusto11
+examples/cactus-example-cbdc-bridging-backend @AndreAugusto11
+examples/cactus-example-cbdc-bridging-frontend @AndreAugusto11

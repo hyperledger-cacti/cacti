@@ -1,47 +1,25 @@
 <app-page-heading pageTitle="Shipment List"></app-page-heading>
 
 <ion-content>
-  <!-- Wallet connection section -->
-  <div *ngIf="!isWalletConnected" class="ion-padding">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Wallet Connection Required</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <p>
-          You need to connect your wallet to view and interact with shipment
-          data.
-        </p>
-        <ion-button
-          expand="block"
-          (click)="connectWallet()"
-          [disabled]="isLoading"
-        >
-          <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
-          <span *ngIf="!isLoading">Connect Wallet</span>
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
-  </div>
 
-  <!-- Shipment list section (only visible when wallet is connected) -->
-  <div *ngIf="isWalletConnected">
     <ion-list>
-      <ion-item
-        *ngFor="let shipment of shipments"
-        button
-        (click)="clickShowDetail(shipment)"
-        detail
-        class="ion-text-wrap"
-      >
-        <ion-text color="primary"> Shipment #{{shipment.id}} </ion-text>
+      <ion-item *ngFor="let shipment of shipments"
+      button
+      (click)="clickShowDetail(shipment)"
+      detail
+      class="ion-text-wrap">
+
+      <ion-text color="primary">
+        Shipment #{{shipment.id}}
+      </ion-text>
       </ion-item>
     </ion-list>
 
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
       <ion-fab-button>
-        <ion-icon (click)="clickAddNew()" name="add"> </ion-icon>
+        <ion-icon (click)="clickAddNew()" name="add">
+        </ion-icon>
       </ion-fab-button>
     </ion-fab>
-  </div>
+
 </ion-content>

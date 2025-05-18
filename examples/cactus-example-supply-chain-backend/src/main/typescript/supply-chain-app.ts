@@ -1,19 +1,17 @@
 import { AddressInfo } from "net";
 import { Server } from "http";
 
-import { exportPKCS8, generateKeyPair, KeyLike, exportSPKI } from "jose";
+import {
+  exportPKCS8,
+  generateKeyPair,
+  KeyLike,
+  exportSPKI,
+  SignJWT,
+} from "jose";
 import expressJwt from "express-jwt";
 
 import { v4 as uuidv4 } from "uuid";
 import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
-
-// Validate and get environment variables
-const ETHEREUM_SEPOLIA_RPC_ENDPOINT = process.env.ETHEREUM_SEPOLIA_RPC_ENDPOINT;
-if (!ETHEREUM_SEPOLIA_RPC_ENDPOINT) {
-  throw new Error(
-    "ETHEREUM_SEPOLIA_RPC_ENDPOINT environment variable is required",
-  );
-}
 
 import {
   CactusNode,
@@ -71,11 +69,6 @@ import {
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { DiscoveryOptions } from "fabric-network";
-import { DefaultApi as EthereumApi } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import {
-  PluginLedgerConnectorEthereum,
-  DefaultApi as EthereumApiConnector,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 
 /**
  * The log pattern message that will be printed on stdout when the
@@ -101,6 +94,7 @@ export class SupplyChainApp {
   private _xdaiApiClient?: XdaiApi;
   private _fabricApiClient?: FabricApi;
   private authorizationConfig?: IAuthorizationConfig;
+  private token?: string;
 
   public get besuApiClientOrThrow(): BesuApi {
     if (this._besuApiClient) {
@@ -151,60 +145,51 @@ export class SupplyChainApp {
     }
     this.log.info("KeychainID=%o", this.keychain.getKeychainId());
 
-    // Create a plugin registry for the infrastructure
-    const infrastructurePluginRegistry = new PluginRegistry({ plugins: [] });
-
-    // Create Xdai connector for the infrastructure
-    const xdaiConnector = new PluginLedgerConnectorXdai({
-      instanceId: "PluginLedgerConnectorXdai_Infrastructure",
-      rpcApiHttpHost: ETHEREUM_SEPOLIA_RPC_ENDPOINT as string, // Use the environment variable
-      logLevel: level,
-      pluginRegistry: infrastructurePluginRegistry,
-    });
-
-    // Add the connector to the registry
-    infrastructurePluginRegistry.add(xdaiConnector);
-
     this.ledgers = new SupplyChainAppDummyInfrastructure({
       logLevel,
       keychain: this.keychain,
-      pluginRegistry: infrastructurePluginRegistry,
     });
     this.shutdownHooks = [];
   }
 
-  async getOrCreateToken(): Promise<string | null> {
-    // We're not using JWT tokens anymore
-    return null;
+  async getOrCreateToken(): Promise<string> {
+    if (!this.token) {
+      await this.createAuthorizationConfig();
+    }
+    return this.token as string;
   }
 
   async getOrCreateAuthorizationConfig(): Promise<IAuthorizationConfig> {
     if (!this.authorizationConfig) {
-      // Create a configuration that disables JWT authentication
-      this.authorizationConfig = {
-        unprotectedEndpointExemptions: ["*"], // Allow all endpoints without JWT authentication
-        expressJwtOptions: {
-          secret: "dummy-secret-not-used", // Required by type but not actually used
-          algorithms: ["HS256"],
-        },
-        socketIoJwtOptions: {
-          secret: "dummy-secret-not-used", // Required by type but not actually used
-        },
-      };
+      await this.createAuthorizationConfig();
     }
     return this.authorizationConfig as IAuthorizationConfig;
   }
 
   async createAuthorizationConfig(): Promise<void> {
-    // Configuration that disables JWT authentication
+    const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
+    const jwtPrivateKeyPem = await exportPKCS8(jwtKeyPair.privateKey);
+    const expressJwtOptions: expressJwt.Params & IJoseFittingJwtParams = {
+      algorithms: ["RS256"],
+      secret: jwtPrivateKeyPem,
+      audience: uuidv4(),
+      issuer: uuidv4(),
+    };
+
+    const jwtPayload = { name: "Peter", location: "London" };
+    this.token = await new SignJWT(jwtPayload)
+      .setProtectedHeader({
+        alg: "RS256",
+      })
+      .setIssuer(expressJwtOptions.issuer)
+      .setAudience(expressJwtOptions.audience)
+      .sign(jwtKeyPair.privateKey);
+
     this.authorizationConfig = {
-      unprotectedEndpointExemptions: ["*"], // Allow all endpoints without JWT authentication
-      expressJwtOptions: {
-        secret: "dummy-secret-not-used", // Required by type but not actually used
-        algorithms: ["HS256"],
-      },
+      unprotectedEndpointExemptions: [],
+      expressJwtOptions,
       socketIoJwtOptions: {
-        secret: "dummy-secret-not-used", // Required by type but not actually used
+        secret: jwtPrivateKeyPem,
       },
     };
   }
@@ -248,8 +233,6 @@ export class SupplyChainApp {
 
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
-
-    // Use the original enrollment code that works - enrolls a single user and stores as user2
     const [userIdentity] = await this.ledgers.fabric.enrollUser(adminWallet);
     const fabricUserKeychainKey = "user2";
     const fabricUserKeychainValue = JSON.stringify(userIdentity);
@@ -272,7 +255,8 @@ export class SupplyChainApp {
     const addressInfoC = httpApiC.address() as AddressInfo;
     const nodeApiHostC = `http://127.0.0.1:${addressInfoC.port}`;
 
-    const baseOptions = {}; // Remove JWT authorization headers
+    const token = await this.getOrCreateToken();
+    const baseOptions = { headers: { Authorization: `Bearer ${token}` } };
 
     const besuConfig = new Configuration({
       basePath: nodeApiHostA,
@@ -290,14 +274,6 @@ export class SupplyChainApp {
     const besuApiClient = new BesuApi(besuConfig);
     const xdaiApiClient = new XdaiApi(xdaiBesuConfig);
     const fabricApiClient = new FabricApi(fabricConfig);
-
-    // Initialize Ethereum API client with the Sepolia endpoint
-    const ethereumApiClient = new EthereumApi(
-      new Configuration({
-        basePath: nodeApiHostA,
-        baseOptions,
-      }),
-    );
 
     const keyPairA = await generateKeyPair("ES256K");
     const keyPairPemA = await exportPKCS8(keyPairA.privateKey);
@@ -336,36 +312,27 @@ export class SupplyChainApp {
           keyPairPem: keyPairPemA,
           logLevel: this.options.logLevel,
           ctorArgs: {
-            baseOptions,
+            baseOptions: {
+              headers: { Authorization: `Bearer ${token}` },
+            },
           },
         }),
         new SupplyChainCactusPlugin({
           logLevel: this.options.logLevel,
           contracts: contractsInfo,
           instanceId: uuidv4(),
+          besuApiClient,
+          xdaiApiClient,
           fabricApiClient,
-          ethereumApiClient: ethereumApiClient,
           web3SigningCredential: {
             keychainEntryKey: besuAccount.address,
             keychainId: this.keychain.getKeychainId(),
             type: Web3SigningCredentialType.CactusKeychainRef,
           },
-          infrastructure: this.ledgers,
-          keychainId: "supplychain-keychain",
         }),
         this.keychain,
       ],
     });
-
-    // Add Ethereum connector to expose Ethereum API endpoints
-    const connectorEthereum = new PluginLedgerConnectorEthereum({
-      instanceId: "PluginLedgerConnectorEthereum_Sepolia",
-      rpcApiHttpHost: ETHEREUM_SEPOLIA_RPC_ENDPOINT as string,
-      logLevel: this.options.logLevel,
-      pluginRegistry: registryA,
-    });
-
-    registryA.add(connectorEthereum);
 
     const connectorBesu = new PluginLedgerConnectorBesu({
       instanceId: "PluginLedgerConnectorBesu_A",
@@ -389,22 +356,23 @@ export class SupplyChainApp {
           keyPairPem: keyPairPemB,
           logLevel: this.options.logLevel,
           ctorArgs: {
-            baseOptions,
+            baseOptions: {
+              headers: { Authorization: `Bearer ${token}` },
+            },
           },
         }),
         new SupplyChainCactusPlugin({
           logLevel: this.options.logLevel,
           contracts: contractsInfo,
           instanceId: uuidv4(),
+          besuApiClient,
+          xdaiApiClient,
           fabricApiClient,
-          ethereumApiClient: ethereumApiClient,
           web3SigningCredential: {
             keychainEntryKey: xdaiBesuAccount.address,
             keychainId: this.keychain.getKeychainId(),
             type: Web3SigningCredentialType.CactusKeychainRef,
           },
-          infrastructure: this.ledgers,
-          keychainId: "supplychain-keychain",
         }),
         this.keychain,
       ],
@@ -431,23 +399,19 @@ export class SupplyChainApp {
           keyPairPem: keyPairPemC,
           logLevel: "INFO",
           ctorArgs: {
-            baseOptions,
+            baseOptions: {
+              headers: { Authorization: `Bearer ${token}` },
+            },
           },
         }),
         new SupplyChainCactusPlugin({
           logLevel: "INFO",
           contracts: contractsInfo,
           instanceId: uuidv4(),
+          besuApiClient,
+          xdaiApiClient,
           fabricApiClient,
-          ethereumApiClient: ethereumApiClient,
-          web3SigningCredential: {
-            keychainEntryKey: "user2",
-            keychainId: this.keychain.getKeychainId(),
-            type: Web3SigningCredentialType.CactusKeychainRef,
-          },
           fabricEnvironment: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-          infrastructure: this.ledgers,
-          keychainId: "supplychain-keychain",
         }),
         this.keychain,
       ],
@@ -477,6 +441,8 @@ export class SupplyChainApp {
     registryC.add(fabricConnector);
 
     const apiServerC = await this.startNode(httpApiC, httpGuiC, registryC);
+
+    this.log.info(`JWT generated by the application: ${token}`);
 
     return {
       apiServerA,
@@ -647,7 +613,7 @@ export class SupplyChainApp {
     properties.cockpitPort = addressInfoCockpit.port;
     properties.grpcPort = 0; // TODO - make this configurable as well
     properties.logLevel = "WARN"; // silence the logs about 0.0.0.0 web hosts
-    properties.authorizationProtocol = AuthorizationProtocol.NONE;
+    properties.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     properties.authorizationConfigJson =
       await this.getOrCreateAuthorizationConfig();
     properties.crpcPort = 0;

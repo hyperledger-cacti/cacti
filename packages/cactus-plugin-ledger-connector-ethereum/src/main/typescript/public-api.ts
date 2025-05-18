@@ -10,6 +10,8 @@ export * from "./sign-utils";
 
 export * from "./types/model-type-guards";
 
+export * from "./types/util-types";
+
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";

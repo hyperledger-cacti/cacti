@@ -4,24 +4,24 @@
   "description": "An example application showing how to use Cactus when implementing a supply chain application where two or more blockchains are sharing data with each other to achieve a certain business outcome beneficial to multiple parties (business organizations).",
   "keywords": [
     "Hyperledger",
-    "Cactus",
+    "Cacti",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cactus Contributors",
-    "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cacti"
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "contributors": [
     {
@@ -49,12 +49,7 @@
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "test": "jest",
-    "test:performance": "jest performance/",
-    "test:integration": "jest integration/",
-    "test:unit": "jest unit/",
-    "test:watch": "jest --watch"
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
     "@hyperledger/cactus-api-client": "2.1.0",
@@ -71,7 +66,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "async-exit-hook": "2.0.1",
-    "axios": "1.7.9",
+    "axios": "1.8.4",
     "dotenv": "16.0.0",
     "express": "5.1.0",
     "express-jwt": "8.4.1",
@@ -85,11 +80,7 @@
   },
   "devDependencies": {
     "@types/express": "5.0.1",
-    "@types/jest": "^29.5.14",
-    "@types/uuid": "10.0.0",
-    "jest": "^29.7.0",
-    "jest-extended": "^4.0.2",
-    "ts-jest": "^29.3.2"
+    "@types/uuid": "10.0.0"
   },
   "engines": {
     "node": ">=18",

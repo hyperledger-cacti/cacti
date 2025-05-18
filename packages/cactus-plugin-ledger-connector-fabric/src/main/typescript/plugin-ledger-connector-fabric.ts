@@ -3,6 +3,7 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { Certificate } from "@fidm/x509";
 import { Express } from "express";
+import createHttpError from "http-errors";
 import { RuntimeError } from "run-time-error-cjs";
 import "multer";
 import temp from "temp";
@@ -107,6 +108,8 @@ import {
   GetBlockResponseV1,
   GetChainInfoRequestV1,
   GetChainInfoResponseV1,
+  GetDiscoveryResultsRequestV1,
+  GetDiscoveryResultsResponseV1,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -150,6 +153,7 @@ import {
 
 import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
 import { GetChainInfoEndpointV1 } from "./get-chain-info/get-chain-info-endpoint-v1";
+import { GetDiscoveryResultsEndpointV1 } from "./get-discovery-results/get-discovery-results-endpoint-v1";
 import { querySystemChainCode } from "./common/query-system-chain-code";
 import { isSshExecOk } from "./common/is-ssh-exec-ok";
 import {
@@ -307,15 +311,22 @@ export class PluginLedgerConnectorFabric
     this.sshDebugOn = opts.sshDebugOn === true;
     if (this.opts.sshConfig) {
       this.sshConfig = this.opts.sshConfig;
+
+      if (this.sshDebugOn) {
+        this.sshConfig = this.enableSshDebugLogs(this.sshConfig);
+      }
     } else if (this.opts.sshConfigB64) {
       const sshConfigBuffer = Buffer.from(this.opts.sshConfigB64, "base64");
       const sshConfigString = sshConfigBuffer.toString("utf-8");
       this.sshConfig = JSON.parse(sshConfigString);
+
+      if (this.sshDebugOn) {
+        this.sshConfig = this.enableSshDebugLogs(this.sshConfig);
+      }
     } else {
-      throw new Error("Cannot instantiate Fabric connector without SSH config");
-    }
-    if (this.sshDebugOn) {
-      this.sshConfig = this.enableSshDebugLogs(this.sshConfig);
+      // TODO: Temporarily commenting this code so that we do not have breaking changes, will be fixed by issue #3764
+      // throw new Error("Cannot instantiate Fabric connector without SSH config");
+      this.sshConfig = {};
     }
 
     this.signCallback = opts.signCallback;
@@ -894,6 +905,14 @@ export class PluginLedgerConnectorFabric
 
     {
       const endpoint = new GetChainInfoEndpointV1({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+
+    {
+      const endpoint = new GetDiscoveryResultsEndpointV1({
         connector: this,
         logLevel: this.opts.logLevel,
       });
@@ -1658,10 +1677,10 @@ export class PluginLedgerConnectorFabric
   }
 
   /**
-   * Get fabric block from a channel, using one of selectors.
+   * Get fabric chain info from the system chaincode (qscc.GetChainInfo())
    *
    * @param req input parameters
-   * @returns Entire block object or encoded buffer (if req.skipDecode is true)
+   * @returns {height, currentBlockHash, previousBlockHash}
    */
   public async getChainInfo(
     req: GetChainInfoRequestV1,
@@ -1936,5 +1955,62 @@ export class PluginLedgerConnectorFabric
         );
       }
     }
+  }
+
+  /**
+   * Use fabric discovery service to find all the nodes that are part of specified channel.
+   *
+   * @param req request specification
+   * @returns fabric discovery request results
+   */
+  public async getDiscoveryResults(
+    req: GetDiscoveryResultsRequestV1,
+  ): Promise<GetDiscoveryResultsResponseV1> {
+    // Validate input parameters
+    if (!req.channelName) {
+      throw createHttpError[400]("req.channelName must be provided");
+    }
+    if (!req.gatewayOptions) {
+      throw createHttpError[400]("req.gatewayOptions must be provided");
+    }
+    if (!(req.gatewayOptions.discovery?.enabled ?? true)) {
+      throw createHttpError[400](
+        "req.gatewayOptions discovery must be enabled",
+      );
+    }
+
+    const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
+
+    // We use `discoveryService` member of `Network`, which isn't private according to the sources (as of 2025),
+    // but is not listed in exported TS types for some reason.
+    // Since it's public in the sources, and because this API is deprecated anyways,
+    // I don't think we're at risk of this being changed anyway, so I use it
+    // to prevent unnecessary code duplication (which would be more risky in the end).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const looseNetwork: any = await gateway.getNetwork(req.channelName);
+    const discoveryResultsResponse =
+      await looseNetwork.discoveryService.getDiscoveryResults(true);
+
+    // Rename the response fields
+    const discoveryResults = {
+      msps: discoveryResultsResponse.msps,
+      orderers: discoveryResultsResponse.orderers,
+      peersByMSP: discoveryResultsResponse.peers_by_org,
+      timestamp: discoveryResultsResponse.timestamp,
+    };
+
+    // Convert peer.ledgerHeight from Long to number
+    Object.keys(discoveryResults.peersByMSP).forEach((peerOrg) => {
+      discoveryResults.peersByMSP[peerOrg].peers = discoveryResults.peersByMSP[
+        peerOrg
+      ].peers.map((peer: any) => {
+        return {
+          ...peer,
+          ledgerHeight: fabricLongToNumber(peer.ledgerHeight),
+        };
+      });
+    });
+
+    return discoveryResults;
   }
 }

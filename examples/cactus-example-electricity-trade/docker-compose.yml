@@ -1,0 +1,33 @@
+version: "3.4"
+
+# Start the ledgers first
+# ./etc/cactus should already exist and contain cactus node configs
+
+services:
+  common-server-base-image:
+    # Build base image and immediately exit
+    container_name: cmd-socketio-base-dummy
+    image: cactus-common-example-server
+    build:
+      context: ../../packages/cactus-common-example-server/
+    command: ["echo", "OK - Exit"]
+
+  cactus-example-electricity-trade-blp:
+    container_name: cactus-example-electricity-trade-blp
+    image: cactus-example-electricity-trade-blp
+    build:
+      context: .
+    ports:
+      - "5034:5034"
+    networks:
+     - cactus-example-electricity-trade-net
+    depends_on:
+      - cmd-socketio-base-image
+    volumes:
+        - type: bind
+          source: ./etc/cactus
+          target: /etc/cactus
+
+networks:
+  cactus-example-electricity-trade-net:
+    driver: bridge
