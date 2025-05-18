@@ -1,5 +1,5 @@
 /*
-Hyperledger Cacti - Keychain API for Azure Key Vault
+Hyperledger Cactus - Keychain API
 
 Contains/describes the Keychain API types/paths for Hyperledger Cactus.
 
@@ -41,7 +41,7 @@ var (
 	queryDescape    = strings.NewReplacer( "%5B", "[", "%5D", "]" )
 )
 
-// APIClient manages communication with the Hyperledger Cacti - Keychain API for Azure Key Vault API v2.1.0
+// APIClient manages communication with the Hyperledger Cactus - Keychain API API v2.1.0
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
 	cfg    *Configuration

@@ -38,12 +38,3 @@ export const Web3StringReturnFormat = {
   number: FMT_NUMBER.STR,
   bytes: FMT_BYTES.HEX,
 };
-
-/**
- * Represents a Solidity event log.
- */
-export type SolidityEventLog = {
-  address: string;
-  data: string;
-  topics: string[];
-};

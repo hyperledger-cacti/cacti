@@ -48,7 +48,6 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**deployContractV1**](docs/DefaultApi.md#deploycontractv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract | Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
 *DefaultApi* | [**getBlockV1**](docs/DefaultApi.md#getblockv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
 *DefaultApi* | [**getChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
-*DefaultApi* | [**getDiscoveryResultsV1**](docs/DefaultApi.md#getdiscoveryresultsv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results | Get fabric ledger node structure (from the discovery service).
 *DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 *DefaultApi* | [**getTransactionReceiptByTxIDV1**](docs/DefaultApi.md#gettransactionreceiptbytxidv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid | get a transaction receipt by tx id on a Fabric ledger.
 *DefaultApi* | [**runDelegatedSignTransactionV1**](docs/DefaultApi.md#rundelegatedsigntransactionv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction | Runs a transaction on a Fabric ledger using user-provided signing callback.
@@ -99,14 +98,6 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.GetBlockResponseV1](docs/GetBlockResponseV1.md)
  - [org.openapitools.client.models.GetChainInfoRequestV1](docs/GetChainInfoRequestV1.md)
  - [org.openapitools.client.models.GetChainInfoResponseV1](docs/GetChainInfoResponseV1.md)
- - [org.openapitools.client.models.GetDiscoveryResultsRequestV1](docs/GetDiscoveryResultsRequestV1.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1](docs/GetDiscoveryResultsResponseV1.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1MspsValue](docs/GetDiscoveryResultsResponseV1MspsValue.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1OrderersValue](docs/GetDiscoveryResultsResponseV1OrderersValue.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1OrderersValueEndpointsInner](docs/GetDiscoveryResultsResponseV1OrderersValueEndpointsInner.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1PeersByMSPValue](docs/GetDiscoveryResultsResponseV1PeersByMSPValue.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner](docs/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner.md)
- - [org.openapitools.client.models.GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner](docs/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner.md)
  - [org.openapitools.client.models.GetTransactionReceiptResponse](docs/GetTransactionReceiptResponse.md)
  - [org.openapitools.client.models.RunDelegatedSignTransactionRequest](docs/RunDelegatedSignTransactionRequest.md)
  - [org.openapitools.client.models.RunTransactionRequest](docs/RunTransactionRequest.md)

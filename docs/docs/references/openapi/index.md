@@ -1,1 +1,0 @@
-# THIS PAGE GENERATED AUTOMATICALLY IN CI by docs/scripts/publish_openapi.py

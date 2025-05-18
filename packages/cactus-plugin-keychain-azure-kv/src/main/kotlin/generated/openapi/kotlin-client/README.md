@@ -1,4 +1,4 @@
-# org.openapitools.client - Kotlin client library for Hyperledger Cacti - Keychain API for Azure Key Vault
+# org.openapitools.client - Kotlin client library for Hyperledger Cactus - Keychain API
 
 Contains/describes the Keychain API types/paths for Hyperledger Cactus.
 

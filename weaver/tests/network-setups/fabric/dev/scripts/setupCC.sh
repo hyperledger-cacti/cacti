@@ -4,8 +4,7 @@
 
 directory=$(dirname $0)
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-CACTI_VERSION="v$(head -n 1 $SCRIPT_DIR/../../../../../core/network/fabric-interop-cc/contracts/interop/VERSION)"
+CACTI_VERSION=v2.0.0
 TMP_PATH=$PWD/../shared/tmp
 CHAINCODE_PATH=$PWD/../shared/chaincode
 rm -rf $CHAINCODE_PATH/interop

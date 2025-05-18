@@ -58,12 +58,6 @@ import {
 import { sendTransactionOnFabric } from "../../common/send-transaction-on-fabric";
 import { getBlock } from "../../common/get-block";
 
-// For development on local fabric network
-// 1. leaveLedgerRunning = true, useRunningLedger = false to run ledger and leave it running after test finishes.
-// 2. leaveLedgerRunning = true, useRunningLedger = true to use that ledger in future runs.
-const useRunningLedger = false;
-const leaveLedgerRunning = false;
-
 describe("PluginLedgerConnectorFabric", () => {
   const logLevel: LogLevelDesc = "INFO";
   const log: Logger = LoggerProvider.getOrCreate({
@@ -91,7 +85,6 @@ describe("PluginLedgerConnectorFabric", () => {
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel,
-      useRunningLedger,
     });
 
     await ledger.start({ omitPull: false });
@@ -101,12 +94,7 @@ describe("PluginLedgerConnectorFabric", () => {
 
     const enrollAdminOut = await ledger.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
-
-    const [userIdentity] = await ledger.enrollUserV2({
-      enrollmentID: uuidv4(),
-      organization: "org1",
-      wallet: adminWallet,
-    });
+    const [userIdentity] = await ledger.enrollUser(adminWallet);
     const sshConfig = await ledger.getSshConfig();
 
     const keychainInstanceId = uuidv4();
@@ -179,12 +167,8 @@ describe("PluginLedgerConnectorFabric", () => {
   });
 
   afterAll(async () => {
-    if (ledger && !leaveLedgerRunning) {
-      log.info("Stop the fabric ledger...");
-      await ledger.stop();
-      await ledger.destroy();
-    }
-
+    await ledger.stop();
+    await ledger.destroy();
     await pruneDockerAllIfGithubAction({ logLevel });
     await Servers.shutdown(server);
   });
@@ -483,7 +467,6 @@ describe("PluginLedgerConnectorFabric", () => {
     const channelId = "mychannel";
     const channelName = channelId;
     const contractName = "asset-transfer-private-data";
-    const deployedContractName = `${contractName}-${(Math.random() + 1).toString(36).substring(7)}`;
 
     const contractRelPath =
       "../../fixtures/go/asset-transfer-private-data/chaincode-go";
@@ -546,14 +529,14 @@ describe("PluginLedgerConnectorFabric", () => {
         privateDataCollections,
       ],
       collectionsConfigFile: privateDataCollectionName,
-      ccName: deployedContractName,
+      ccName: contractName,
       targetOrganizations: [
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
       ],
       caFile:
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
-      ccLabel: deployedContractName,
+      ccLabel: contractName,
       ccLang: ChainCodeProgrammingLanguage.Golang,
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
@@ -617,7 +600,7 @@ describe("PluginLedgerConnectorFabric", () => {
     // CreateAsset(id string, color string, size int, owner string, appraisedValue int)
     const createRes = await apiClient.runTransactionV1({
       transientData: rawTmpData,
-      contractName: deployedContractName,
+      contractName,
       channelName,
       //objectType, assetID, color, size, appraisedvalue
       params: [],
@@ -631,7 +614,7 @@ describe("PluginLedgerConnectorFabric", () => {
     expect(createRes).toBeTruthy();
     expect(createRes.status).toBeWithin(199, 300);
     const getRes = await apiClient.runTransactionV1({
-      contractName: deployedContractName,
+      contractName,
       channelName,
       params: [assetId],
       methodName: "ReadAsset",
@@ -652,7 +635,7 @@ describe("PluginLedgerConnectorFabric", () => {
     /*
     const collectionToParse = "Org1MSPPrivateCollection";
     const getResPrivate = await apiClient.runTransactionV1({
-      contractName: deployedContractName,
+      contractName,
       channelName,
       params: [collectionToParse, assetId],
       methodName: "ReadAssetPrivateDetails",
@@ -667,7 +650,7 @@ describe("PluginLedgerConnectorFabric", () => {
     */
 
     const getResQuery = await apiClient.runTransactionV1({
-      contractName: deployedContractName,
+      contractName,
       channelName,
       params: [assetId, assetId + "1"],
       methodName: "GetAssetByRange",
@@ -687,8 +670,8 @@ describe("PluginLedgerConnectorFabric", () => {
   it("deployContractV1() - deploys contract and performs transactions", async () => {
     const channelId = "mychannel";
     const channelName = channelId;
-    const contractName = "basic-asset-transfer";
-    const deployedContractName = `${contractName}-${(Math.random() + 1).toString(36).substring(7)}`;
+    const contractName = "basic-asset-transfer-2";
+
     const contractRelPath = "../../fixtures/go/lock-asset/chaincode-typescript";
     const contractDir = path.join(__dirname, contractRelPath);
 
@@ -759,7 +742,7 @@ describe("PluginLedgerConnectorFabric", () => {
       channelId,
       ccVersion: "1.0.0",
       sourceFiles,
-      ccName: deployedContractName,
+      ccName: contractName,
       targetOrganizations: [
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
@@ -804,7 +787,7 @@ describe("PluginLedgerConnectorFabric", () => {
     const assetId = uuidv4();
 
     const createRes = await apiClient.runTransactionV1({
-      contractName: deployedContractName,
+      contractName,
       channelName,
       params: [assetId, "19"],
       methodName: "CreateAsset",
@@ -819,7 +802,7 @@ describe("PluginLedgerConnectorFabric", () => {
     expect(createRes.status).toBeLessThan(300);
 
     const getRes = await apiClient.runTransactionV1({
-      contractName: deployedContractName,
+      contractName,
       channelName,
       params: [assetId],
       methodName: "ReadAsset",
@@ -842,7 +825,7 @@ describe("PluginLedgerConnectorFabric", () => {
     expect(asset.ID).toBe(assetId);
 
     const lockRes = await apiClient.runTransactionV1({
-      contractName: deployedContractName,
+      contractName,
       channelName,
       params: [assetId],
       methodName: "LockAsset",
@@ -860,104 +843,5 @@ describe("PluginLedgerConnectorFabric", () => {
     expect(lockRes.data.functionOutput).toBe("true");
 
     log.warn(lockRes.data.functionOutput);
-  });
-
-  it("getDiscoveryResults() - request fails when invalid input is provided", async () => {
-    // When channel name is empty
-    await expect(
-      apiClient.getDiscoveryResultsV1({
-        channelName: "",
-        gatewayOptions,
-      }),
-    ).rejects.toMatchObject({
-      message: "Request failed with status code " + StatusCodes.BAD_REQUEST,
-      name: "AxiosError",
-      code: "ERR_BAD_REQUEST",
-      response: {
-        status: StatusCodes.BAD_REQUEST,
-        statusText: "Bad Request",
-      },
-    });
-
-    // When gateway is not provided
-    await expect(
-      apiClient.getDiscoveryResultsV1({
-        channelName: "mychannel",
-        gatewayOptions: undefined as any,
-      }),
-    ).rejects.toMatchObject({
-      message: "Request failed with status code " + StatusCodes.BAD_REQUEST,
-      name: "AxiosError",
-      code: "ERR_BAD_REQUEST",
-      response: {
-        status: StatusCodes.BAD_REQUEST,
-        statusText: "Bad Request",
-      },
-    });
-
-    // When discovery is explicitly disabled in the gateway options
-    await expect(
-      apiClient.getDiscoveryResultsV1({
-        channelName: "mychannel",
-        gatewayOptions: {
-          ...gatewayOptions,
-          discovery: {
-            enabled: false,
-          },
-        },
-      }),
-    ).rejects.toMatchObject({
-      message: "Request failed with status code " + StatusCodes.BAD_REQUEST,
-      name: "AxiosError",
-      code: "ERR_BAD_REQUEST",
-      response: {
-        status: StatusCodes.BAD_REQUEST,
-        statusText: "Bad Request",
-      },
-    });
-  });
-
-  it("getDiscoveryResults() - Get test ledger structure.", async () => {
-    const discoveryResultsResponse = await apiClient.getDiscoveryResultsV1({
-      channelName: "mychannel",
-      gatewayOptions,
-    });
-    const discoveryResults = discoveryResultsResponse.data;
-    log.debug("discoveryResults:", JSON.stringify(discoveryResults));
-    expect(discoveryResults).toBeTruthy();
-
-    // Check MSPs
-    expect(Object.keys(discoveryResults.msps).length).toBeGreaterThan(0);
-    for (const msp of Object.values(discoveryResults.msps)) {
-      expect(msp.id).toBeTruthy();
-      expect(msp.name).toBeTruthy();
-      expect(msp.rootCerts).toBeTruthy();
-    }
-
-    // Check Orderers
-    expect(Object.keys(discoveryResults.orderers).length).toBeGreaterThan(0);
-    for (const orderer of Object.values(discoveryResults.orderers)) {
-      expect(orderer.endpoints).toBeDefined();
-      expect(orderer.endpoints.length).toBeGreaterThan(0);
-      for (const endpoint of orderer.endpoints) {
-        expect(endpoint.host).toBeTruthy();
-        expect(endpoint.port).toBeGreaterThan(0);
-        expect(endpoint.name).toBeTruthy();
-      }
-    }
-
-    // Check Peers
-    expect(Object.keys(discoveryResults.peersByMSP).length).toBeGreaterThan(0);
-    for (const peerMsp of Object.values(discoveryResults.peersByMSP)) {
-      expect(peerMsp.peers).toBeDefined();
-      expect(peerMsp.peers.length).toBeGreaterThan(0);
-      for (const peer of peerMsp.peers) {
-        expect(peer.mspid).toBeTruthy();
-        expect(peer.endpoint).toBeTruthy();
-        expect(peer.name).toBeTruthy();
-        expect(peer.ledgerHeight).toBeGreaterThan(0);
-        expect(peer.chaincodes.length).toBeGreaterThan(0); // all should at least have _lifecycle chaincode
-      }
-    }
   });
 });

@@ -4,24 +4,24 @@
   "description": "Allows Cactus nodes to connect to a Substrate ledger.",
   "keywords": [
     "Hyperledger",
-    "Cacti",
+    "Cactus",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
   },
   "contributors": [
     {
@@ -73,9 +73,9 @@
     "@polkadot/rpc-provider": "10.9.1",
     "@polkadot/types": "10.9.1",
     "@polkadot/util": "12.6.2",
-    "axios": "1.8.4",
-    "bl": "6.1.0",
-    "express": "5.1.0",
+    "axios": "1.7.9",
+    "bl": "6.0.16",
+    "express": "4.21.2",
     "express-openapi-validator": "5.2.0",
     "form-data": "4.0.0",
     "fs-extra": "11.2.0",
@@ -95,7 +95,7 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
-    "@types/express": "5.0.1",
+    "@types/express": "5.0.0",
     "@types/joi": "17.2.3",
     "@types/multer": "1.4.7",
     "@types/ssh2": "0.5.44",
@@ -105,8 +105,8 @@
     "supertest": "6.1.6"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=10",
+    "npm": ">=6"
   },
   "publishConfig": {
     "access": "public"

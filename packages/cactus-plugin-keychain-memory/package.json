@@ -4,24 +4,24 @@
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "keywords": [
     "Hyperledger",
-    "Cacti",
+    "Cactus",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -64,8 +64,8 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
-    "express": "5.1.0",
+    "axios": "1.7.9",
+    "express": "4.21.2",
     "prom-client": "15.1.3",
     "rxjs": "7.8.1",
     "uuid": "10.0.0"
@@ -75,7 +75,7 @@
     "@bufbuild/protoc-gen-es": "1.8.0",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.1",
+    "@types/express": "5.0.0",
     "body-parser": "1.20.3",
     "npm-run-all2": "6.1.2"
   },

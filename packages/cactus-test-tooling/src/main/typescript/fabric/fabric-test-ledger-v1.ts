@@ -66,9 +66,6 @@ export interface IFabricTestLedgerV1ConstructorOptions {
   extraOrgs?: organizationDefinitionFabricV2[];
   // For test development, attach to ledger that is already running, don't spin up new one
   useRunningLedger?: boolean;
-  // Defines the target network for the container.
-  // Configuration will be optimized for this specific network.
-  networkName?: string;
 }
 
 export enum STATE_DATABASE {
@@ -99,7 +96,6 @@ const DEFAULT_OPTS = Object.freeze({
   envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
   stateDatabase: STATE_DATABASE.COUCH_DB,
   orgList: ["org1", "org2"],
-  networkName: "cactus-fabric-test-network",
 });
 export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
 
@@ -136,7 +132,6 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   private readonly log: Logger;
 
-  private readonly networkName: string;
   private container: Container | undefined;
   private containerId: string | undefined;
   private readonly useRunningLedger: boolean;
@@ -163,7 +158,6 @@ export class FabricTestLedgerV1 implements ITestLedger {
     this.stateDatabase = options.stateDatabase || DEFAULT_OPTS.stateDatabase;
     this.orgList = options.orgList || DEFAULT_OPTS.orgList;
     this.extraOrgs = options.extraOrgs;
-    this.networkName = options.networkName || DEFAULT_OPTS.networkName;
 
     if (compareVersions.compare(this.getFabricVersion(), "1.4", "<"))
       this.log.warn(
@@ -378,9 +372,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     }
   }
 
-  public async getConnectionProfileOrg1(
-    asLocalhost: boolean = true,
-  ): Promise<any> {
+  public async getConnectionProfileOrg1(): Promise<any> {
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
     const CCP_JSON_PATH_FABRIC_V2 =
@@ -393,37 +385,20 @@ export class FabricTestLedgerV1 implements ITestLedger {
       // peer0.org1.example.com
       const privatePort = 7051;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-      if (this.networkName && !asLocalhost) {
-        ccp.peers["peer0.org1.example.com"].url =
-          `grpcs://peer0.org1.example.com:${privatePort}`;
-      } else {
-        ccp.peers["peer0.org1.example.com"].url =
-          `grpcs://localhost:${hostPort}`;
-      }
+      ccp.peers["peer0.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
     }
     if (ccp.peers["peer1.org1.example.com"]) {
       // peer1.org1.example.com
       const privatePort = 8051;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-      if (this.networkName && !asLocalhost) {
-        ccp.peers["peer1.org1.example.com"].url =
-          `grpcs://peer1.org1.example.com:${privatePort}`;
-      } else {
-        ccp.peers["peer1.org1.example.com"].url =
-          `grpcs://localhost:${hostPort}`;
-      }
+      ccp.peers["peer1.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
     }
     {
       // ca_peerOrg1
       const privatePort = 7054;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
       const { certificateAuthorities: cas } = ccp;
-      if (this.networkName && !asLocalhost) {
-        cas["ca.org1.example.com"].url =
-          `https://ca.org1.example.com:${privatePort}`;
-      } else {
-        cas["ca.org1.example.com"].url = `https://localhost:${hostPort}`;
-      }
+      cas["ca.org1.example.com"].url = `https://localhost:${hostPort}`;
     }
 
     // FIXME - this still doesn't work. At this moment the only successful tests
@@ -438,13 +413,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       const privatePort = 7050;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-
-      let url;
-      if (this.networkName && !asLocalhost) {
-        url = `grpcs://orderer.example.com:${privatePort}`;
-      } else {
-        url = `grpcs://localhost:${hostPort}`;
-      }
+      const url = `grpcs://localhost:${hostPort}`;
 
       const ORDERER_PEM_PATH_FABRIC_V2 =
         "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
@@ -493,10 +462,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return ccp;
   }
 
-  public async getConnectionProfileOrgX(
-    orgName: string,
-    asLocalhost: boolean = true,
-  ): Promise<any> {
+  public async getConnectionProfileOrgX(orgName: string): Promise<any> {
     const fnTag = `${this.className}:getConnectionProfileOrgX()`;
     this.log.debug(`${fnTag} ENTER - orgName=%s`, orgName);
 
@@ -532,13 +498,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const privatePortPeer0 = parseFloat(urlGrpcs.replace(/^\D+/g, ""));
 
       const hostPort = await Containers.getPublicPort(privatePortPeer0, cInfo);
-
-      if (this.networkName && !asLocalhost) {
-        ccp["peers"][peer0Name]["url"] =
-          `grpcs://peer0.${orgName}.example.com:${privatePortPeer0}`;
-      } else {
-        ccp["peers"][peer0Name]["url"] = `grpcs://localhost:${hostPort}`;
-      }
+      ccp["peers"][peer0Name]["url"] = `grpcs://localhost:${hostPort}`;
 
       // if there is a peer1
       if (ccp.peers["peer1.org" + orgName + ".example.com"]) {
@@ -549,12 +509,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
           privatePortPeer1,
           cInfo,
         );
-        if (this.networkName && !asLocalhost) {
-          ccp["peers"][peer1Name]["url"] =
-            `grpcs://peer1.${orgName}.example.com:${privatePortPeer1}`;
-        } else {
-          ccp["peers"][peer1Name]["url"] = `grpcs://localhost:${hostPortPeer1}`;
-        }
+        ccp["peers"][peer1Name]["url"] = `grpcs://localhost:${hostPortPeer1}`;
       }
       {
         // ca_peerOrg1
@@ -564,11 +519,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
         const caHostPort = await Containers.getPublicPort(caPort, cInfo);
         const { certificateAuthorities: cas } = ccp;
-        if (this.networkName && !asLocalhost) {
-          cas[caName].url = `https://ca.${orgName}.example.com:${caPort}`;
-        } else {
-          cas[caName].url = `https://localhost:${caHostPort}`;
-        }
+        cas[caName].url = `https://localhost:${caHostPort}`;
       }
 
       // FIXME - this still doesn't work. At this moment the only successful tests
@@ -583,13 +534,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
         const privatePort = 7050;
         const hostPort = await Containers.getPublicPort(privatePort, cInfo);
-
-        let url;
-        if (this.networkName && !asLocalhost) {
-          url = `grpcs://orderer.example.com:${privatePort}`;
-        } else {
-          url = `grpcs://localhost:${hostPort}`;
-        }
+        const url = `grpcs://localhost:${hostPort}`;
         const ORDERER_PEM_PATH_FABRIC_V2 =
           "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
         const ordererPemPath = ORDERER_PEM_PATH_FABRIC_V2;
@@ -673,6 +618,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
           break;
         case "compose":
           filename = `docker-compose-org3.yaml`;
+
           break;
         case "ca":
           filename = `docker-compose-ca-org3.yaml`;
@@ -1275,7 +1221,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     }
   }
 
-  public async getSshConfig(asLocalhost: boolean = true): Promise<SshConfig> {
+  public async getSshConfig(): Promise<SshConfig> {
     const fnTag = "FabricTestLedger#getSshConnectionOptions()";
     if (!this.container) {
       throw new Error(`${fnTag} - invalid state no container instance set`);
@@ -1283,21 +1229,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const filePath = "/etc/hyperledger/cactus/fabric-aio-image.key";
     const privateKey = await Containers.pullFile(this.container, filePath);
     const containerInfo = await this.getContainerInfo();
-    let port;
-    let host;
-
-    if (this.networkName && !asLocalhost) {
-      host = await Containers.getContainerNetworkIP(
-        containerInfo,
-        this.networkName,
-      );
-      port = 22;
-    } else {
-      host = "localhost";
-      port = await Containers.getPublicPort(22, containerInfo);
-    }
+    const port = await Containers.getPublicPort(22, containerInfo);
     const sshConfig: SshConfig = {
-      host,
+      host: "localhost",
       privateKey,
       username: "root",
       port,
@@ -1386,10 +1320,15 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       Env: dockerEnvVars,
 
+      // This is a workaround needed for macOS which has issues with routing
+      // to docker container's IP addresses directly...
+      // https://stackoverflow.com/a/39217691
+
+      // needed for Docker-in-Docker support
+      // Privileged: true,
       HostConfig: {
         PublishAllPorts: this.publishAllPorts,
         Privileged: true,
-        NetworkMode: this.networkName,
         PortBindings: {
           "22/tcp": [{ HostPort: "30022" }],
           "7050/tcp": [{ HostPort: "7050" }],
@@ -1402,32 +1341,6 @@ export class FabricTestLedgerV1 implements ITestLedger {
         },
       },
     };
-
-    if (this.networkName) {
-      const networks = await docker.listNetworks();
-      const networkExists = networks.some((n) => n.Name === this.networkName);
-      if (!networkExists) {
-        await docker.createNetwork({
-          Name: this.networkName,
-          Driver: "bridge",
-        });
-      }
-      createOptions.NetworkingConfig = {
-        EndpointsConfig: {
-          [this.networkName]: {
-            Aliases: [
-              "peer0.org1.example.com",
-              "peer1.org1.example.com",
-              "peer0.org2.example.com",
-              "peer1.org2.example.com",
-              "orderer.example.com",
-              "ca.org1.example.com",
-              "ca.org2.example.com",
-            ],
-          },
-        },
-      };
-    }
     if (this.extraOrgs) {
       this.extraOrgs.forEach((org) => {
         const caPort = String(Number(org.port) + 3);
@@ -1602,13 +1515,5 @@ export class FabricTestLedgerV1 implements ITestLedger {
     if (result.error) {
       throw new Error(`${fnTag} ${result.error.annotate()}`);
     }
-  }
-
-  public getNetworkName(): string {
-    const fnTag = "FabricTestLedgerV1#getNetworkName()";
-    if (this.networkName) {
-      return this.networkName;
-    }
-    throw new Error(`${fnTag} network name not set`);
   }
 }

@@ -1,6 +1,4 @@
 /**
- * @deprecated Use `bigIntToDecimalStringReplacer` from the common package.
- *
  * `JSON.stringify` replacer function to handle BigInt.
  * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
  */

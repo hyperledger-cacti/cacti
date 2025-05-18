@@ -1,7 +1,7 @@
- [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://vscode.dev/github/hyperledger-cacti/cacti)
- [![License](https://img.shields.io/github/license/hyperledger-cacti/cacti)](https://opensource.org/licenses/Apache-2.0) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
- [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger-cacti/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger-cacti/cacti)
- [![GitHub issues](https://img.shields.io/github/issues/hyperledger-cacti/cacti)](https://github.com/hyperledger-cacti/cacti/issues)
+ [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/hyperledger/cactus)
+ ![license](https://img.shields.io/github/license/hyperledger/cacti) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
+ [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger/cacti)
+ ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus)
 
 ![Cacti Logo Color](./images/HL_Cacti_Logo_Color.png#gh-light-mode-only)
 ![Cacti Logo Color](./images/HL_Cacti_Logo_Colorreverse.svg#gh-dark-mode-only)
@@ -30,37 +30,3 @@ The current Cacti code base contains the legacy Cactus and Weaver source code in
 ## Documentation
 
 See the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
-
-## Roadmap
-
-See [ROADMAP.md](./ROADMAP.md) for details on the envisioned integration.
-
-## Inclusive Language Statement
-
-These guiding principles are very important to the maintainers and therefore
-we respectfully ask all contributors to abide by them as well:
-
-- Consider that users who will read the docs are from different backgrounds and
-cultures and that they have different preferences.
-- Avoid potential offensive terms and, for instance, prefer "allow list and
-deny list" to "white list and black list".
-- We believe that we all have a role to play to improve our world, and even if
-writing inclusive documentation might not look like a huge improvement, it's a
-first step in the right direction.
-- We suggest to refer to
-[Microsoft bias free writing guidelines](https://docs.microsoft.com/en-us/style-guide/bias-free-communication)
-and
-[Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation)
-as starting points.
-
-## Contact
-* mailing list: [cacti@lists.hyperledger.org](mailto:cacti@lists.hyperledger.org)
-* discord channel: [https://discord.com/invite/hyperledger](https://discord.com/invite/hyperledger)
-
-## Contributing
-We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
-
-Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
-
-## License
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](/LICENSE) file.

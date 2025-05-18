@@ -25,9 +25,6 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.plugin_status
     OWNER to postgres;
 
-ALTER TABLE public.plugin_status
-ENABLE ROW LEVEL SECURITY;
-
 GRANT ALL ON TABLE public.plugin_status TO anon;
 GRANT ALL ON TABLE public.plugin_status TO authenticated;
 GRANT ALL ON TABLE public.plugin_status TO postgres;
@@ -44,27 +41,8 @@ CREATE TABLE fabric.block (
     transaction_count numeric DEFAULT '0'::numeric NOT NULL
 );
 
+
 ALTER TABLE fabric.block OWNER TO postgres;
-
-ALTER TABLE fabric.block
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY block_select ON fabric.block
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY block_insert ON fabric.block
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY block_update ON fabric.block
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY block_delete ON fabric.block
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
 
 ALTER TABLE ONLY fabric.block
     ADD CONSTRAINT block_pkey PRIMARY KEY (id);
@@ -72,6 +50,9 @@ ALTER TABLE ONLY fabric.block
     ADD CONSTRAINT block_hash_key UNIQUE (hash);
 ALTER TABLE ONLY fabric.block
     ADD CONSTRAINT block_number_key UNIQUE (number);
+
+CREATE UNIQUE INDEX block_hash_unique_idx ON fabric.block USING btree (hash);
+CREATE UNIQUE INDEX block_number_unique_idx ON fabric.block USING btree (number);
 
 --
 -- Name: certificate; Type: TABLE; Schema: fabric; Owner: postgres
@@ -101,32 +82,14 @@ CREATE TABLE fabric.certificate (
 
 ALTER TABLE fabric.certificate OWNER TO postgres;
 
-ALTER TABLE fabric.certificate
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY certificate_select ON fabric.certificate
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY certificate_insert ON fabric.certificate
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY certificate_update ON fabric.certificate
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY certificate_delete ON fabric.certificate
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
-
 ALTER TABLE ONLY fabric.certificate
     ADD CONSTRAINT certifiate_pk PRIMARY KEY (id);
 ALTER TABLE ONLY fabric.certificate
     ADD CONSTRAINT certifiate_pem_unique UNIQUE (pem);
 ALTER TABLE ONLY fabric.certificate
     ADD CONSTRAINT certifiate_serial_number_unique UNIQUE (serial_number);
+
+CREATE UNIQUE INDEX certifiate_serial_number_unique_idx ON fabric.certificate USING btree (serial_number);
 
 --
 -- Name: transaction; Type: TABLE; Schema: fabric; Owner: postgres
@@ -146,26 +109,6 @@ CREATE TABLE fabric.transaction (
 
 
 ALTER TABLE fabric.transaction OWNER TO postgres;
-
-ALTER TABLE fabric.transaction
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY transaction_select ON fabric.transaction
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY transaction_insert ON fabric.transaction
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY transaction_update ON fabric.transaction
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY transaction_delete ON fabric.transaction
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
 
 ALTER TABLE ONLY fabric.transaction
     ADD CONSTRAINT transaction_pkey PRIMARY KEY (id);
@@ -188,26 +131,6 @@ CREATE TABLE fabric.transaction_action (
 
 ALTER TABLE fabric.transaction_action OWNER TO postgres;
 
-ALTER TABLE fabric.transaction_action
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY transaction_action_select ON fabric.transaction_action
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY transaction_action_insert ON fabric.transaction_action
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY transaction_action_update ON fabric.transaction_action
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY transaction_action_delete ON fabric.transaction_action
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
-
 ALTER TABLE ONLY fabric.transaction_action
     ADD CONSTRAINT transaction_action_pkey PRIMARY KEY (id);
 
@@ -226,26 +149,6 @@ CREATE TABLE fabric.transaction_action_endorsement (
 
 ALTER TABLE fabric.transaction_action_endorsement OWNER TO postgres;
 
-ALTER TABLE fabric.transaction_action_endorsement
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY transaction_action_endorsement_select ON fabric.transaction_action_endorsement
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY transaction_action_endorsement_insert ON fabric.transaction_action_endorsement
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY transaction_action_endorsement_update ON fabric.transaction_action_endorsement
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY transaction_action_endorsement_delete ON fabric.transaction_action_endorsement
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
-
 ALTER TABLE ONLY fabric.transaction_action_endorsement
     ADD CONSTRAINT transaction_action_endorsements_pkey PRIMARY KEY (id);
 
@@ -258,7 +161,6 @@ CREATE OR REPLACE FUNCTION fabric.get_missing_blocks_in_range(
   end_number integer)
 RETURNS TABLE(block_number integer)
 LANGUAGE 'plpgsql'
-SET search_path = fabric
 COST 100
 VOLATILE PARALLEL UNSAFE
 ROWS 1000

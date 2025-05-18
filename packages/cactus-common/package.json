@@ -4,24 +4,24 @@
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
   "keywords": [
     "Hyperledger",
-    "Cacti",
+    "Cactus",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -62,12 +62,12 @@
     "loglevel-plugin-prefix": "0.8.4",
     "run-time-error-cjs": "1.4.0",
     "sanitize-html": "2.12.1",
-    "secp256k1": "5.0.1",
+    "secp256k1": "4.0.4",
     "sha3": "2.1.4"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.13.3",
-    "@types/json-stable-stringify": "1.0.33",
+    "@grpc/grpc-js": "1.12.4",
+    "@types/json-stable-stringify": "1.0.34",
     "@types/sanitize-html": "2.9.5",
     "@types/secp256k1": "4.0.3",
     "@types/uuid": "10.0.0",

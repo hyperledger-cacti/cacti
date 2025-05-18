@@ -59,7 +59,6 @@ import {
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import {
-  bigIntToDecimalStringReplacer,
   Bools,
   isExpressHttpVerbMethodName,
   Logger,
@@ -137,7 +136,6 @@ export class ApiServer {
   private readonly expressCockpit: express.Express;
   private readonly pluginsPath: string;
   private readonly enableShutdownHook: boolean;
-  private readonly openApiValidationOffPlugins: Array<ICactusPlugin>;
 
   public prometheusExporter: PrometheusExporter;
   public boundGrpcHostPort: string;
@@ -154,7 +152,6 @@ export class ApiServer {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
 
-    this.openApiValidationOffPlugins = [];
     this.boundGrpcHostPort = "127.0.0.1:-1";
 
     this.enableShutdownHook = Bools.isBooleanStrict(
@@ -248,12 +245,6 @@ export class ApiServer {
 
     this.pluginsPath = pluginsPath;
     this.log.debug("pluginsPath: %o", pluginsPath);
-  }
-
-  public async getOpenApiValidationOffPlugins(): Promise<
-    ReadonlyArray<ICactusPlugin>
-  > {
-    return this.openApiValidationOffPlugins;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -911,7 +902,6 @@ export class ApiServer {
     const {
       authorizationConfigJson: authzConf,
       authorizationProtocol: authzProtocol,
-      openApiValidationOffPkgs,
       logLevel,
     } = config;
     const apiServerOptions = config;
@@ -933,7 +923,7 @@ export class ApiServer {
     app.use(corsMiddleware);
     app.use(bodyParser.json({ limit: "50mb" }));
     // Add custom replacer to handle bigint responses correctly
-    app.set("json replacer", bigIntToDecimalStringReplacer);
+    app.set("json replacer", this.stringifyBigIntReplacer);
 
     const authzFactoryOptions = { apiServerOptions, pluginRegistry, logLevel };
     const authzFactory = new AuthorizerFactory(authzFactoryOptions);
@@ -952,7 +942,6 @@ export class ApiServer {
     this.getOrCreateWebServices(app); // The API server's own endpoints
 
     this.log.info(`Starting to install web services...`);
-    this.log.info(`openApiValidationOffPkgs: `, openApiValidationOffPkgs);
 
     const webServicesInstalled = pluginRegistry
       .getPlugins()
@@ -961,19 +950,8 @@ export class ApiServer {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
         const apiSpec = p.getOpenApiSpec() as OpenAPIV3.Document;
-        const pkgName = p.getPackageName();
-        const oApiValidationOn = !openApiValidationOffPkgs.includes(pkgName);
-
-        const ctxPojo = { pkgName, hasSpec: !!apiSpec, oApiValidationOn };
-        const ctx = JSON.stringify(ctxPojo);
-
-        if (apiSpec && oApiValidationOn) {
-          this.log.debug("Installing OpenAPI validator %s", ctx);
+        if (apiSpec)
           await installOpenapiValidationMiddleware({ app, apiSpec, logLevel });
-        } else {
-          this.openApiValidationOffPlugins.push(p);
-          this.log.debug("Skipped OpenAPI validator install %s", ctx);
-        }
         const webSvcs = await p.registerWebServices(app, wsApi);
         return webSvcs;
       });
@@ -1061,5 +1039,19 @@ export class ApiServer {
       callback(null, corsOptions); // callback expects two parameters: error and options
     };
     return cors(corsOptionsDelegate);
+  }
+
+  /**
+   * `JSON.stringify` replacer function to handle BigInt.
+   * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
+   */
+  private stringifyBigIntReplacer(
+    _key: string,
+    value: bigint | unknown,
+  ): string | unknown {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
   }
 }

@@ -5,23 +5,24 @@
   "keywords": [
     "Hyperledger",
     "Cacti",
+    "Cactus",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    "email": "cacti@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -70,10 +71,10 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.7.9",
     "ethers": "6.8.1",
-    "express": "5.1.0",
-    "http-proxy-middleware": "3.0.5",
+    "express": "4.21.2",
+    "http-proxy-middleware": "2.0.7",
     "minimist": "1.2.8",
     "prom-client": "15.1.3",
     "run-time-error-cjs": "1.4.0",
@@ -90,7 +91,7 @@
     "@hyperledger/cactus-test-geth-ledger": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.4",
-    "@types/express": "5.0.1",
+    "@types/express": "5.0.0",
     "@types/js-yaml": "4.0.5",
     "@types/minimist": "1.2.2",
     "@types/sanitize-html": "2.9.5",

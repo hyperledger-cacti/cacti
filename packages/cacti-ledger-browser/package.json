@@ -9,19 +9,19 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    "email": "cacti@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -63,7 +63,7 @@
     "@supabase/supabase-js": "1.35.6",
     "@tanstack/react-query": "5.29.2",
     "apexcharts": "3.45.2",
-    "axios": "1.8.4",
+    "axios": "1.7.9",
     "buffer": "6.0.3",
     "ethers": "6.12.1",
     "react": "18.2.0",
@@ -79,7 +79,7 @@
     "@types/react-dom": "18.2.17",
     "@vitejs/plugin-react": "4.2.1",
     "typescript": "5.5.2",
-    "vite": "6.2.6"
+    "vite": "5.4.11"
   },
   "engines": {
     "node": ">=18",

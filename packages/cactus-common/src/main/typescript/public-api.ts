@@ -50,5 +50,3 @@ export {
 export { isGrpcStatusObjectWithCode } from "./grpc/is-grpc-status-object-with-code";
 
 export { HttpHeader } from "./http/http-header";
-
-export { bigIntToDecimalStringReplacer } from "./serde/json/big-int";

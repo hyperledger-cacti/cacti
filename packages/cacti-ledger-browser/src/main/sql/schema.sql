@@ -1,9 +1,5 @@
-CREATE SCHEMA IF NOT EXISTS public;
-
 ALTER SCHEMA extensions OWNER TO postgres;
 ALTER SCHEMA public OWNER TO postgres;
-
-GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
 -- Table: public.plugin_status
 -- DROP TABLE IF EXISTS public.plugin_status;
@@ -23,26 +19,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.plugin_status
     OWNER to postgres;
-    
-ALTER TABLE public.plugin_status
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY plugin_status_select ON public.plugin_status
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY plugin_status_insert ON public.plugin_status
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY plugin_status_update ON public.plugin_status
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY plugin_status_delete ON public.plugin_status
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
 
 GRANT ALL ON TABLE public.plugin_status TO anon;
 GRANT ALL ON TABLE public.plugin_status TO authenticated;
@@ -69,26 +45,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.gui_app_config
     OWNER to postgres;
-
-ALTER TABLE public.gui_app_config
-ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY gui_app_config_select ON public.gui_app_config
-FOR SELECT TO anon, authenticated, service_role
-USING (true);
-
-CREATE POLICY gui_app_config_insert ON public.gui_app_config
-FOR INSERT TO anon, authenticated, service_role
-WITH CHECK (true);
-
-CREATE POLICY gui_app_config_update ON public.gui_app_config
-FOR UPDATE TO anon, authenticated, service_role
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY gui_app_config_delete ON public.gui_app_config
-FOR DELETE TO anon, authenticated, service_role
-USING (true);
 
 GRANT ALL ON TABLE public.gui_app_config TO anon;
 GRANT ALL ON TABLE public.gui_app_config TO authenticated;

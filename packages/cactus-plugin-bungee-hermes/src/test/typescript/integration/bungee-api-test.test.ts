@@ -1,5 +1,4 @@
 import {
-  bigIntToDecimalStringReplacer,
   IListenOptions,
   LogLevelDesc,
   LoggerProvider,
@@ -764,7 +763,7 @@ async function setupEthereumTestLedger(): Promise<string> {
   ethereumServer = server;
   // set to address Type Error returned by Response.json()
   // "Can't serialize BigInt"
-  expressApp.set("json replacer", bigIntToDecimalStringReplacer);
+  expressApp.set("json replacer", stringifyBigIntReplacer);
 
   const wsApi = new SocketIoServer(server, {
     path: Constants.SocketIoConnectionPathV1,
@@ -902,4 +901,11 @@ async function setupEthereumTestLedger(): Promise<string> {
     .contractAddress as string;
 
   return "Ethereum Network setup successful";
+}
+
+function stringifyBigIntReplacer(key: string, value: bigint): string {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
 }

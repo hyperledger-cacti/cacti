@@ -29,8 +29,6 @@ import org.openapitools.client.models.GetBlockRequestV1
 import org.openapitools.client.models.GetBlockResponseV1
 import org.openapitools.client.models.GetChainInfoRequestV1
 import org.openapitools.client.models.GetChainInfoResponseV1
-import org.openapitools.client.models.GetDiscoveryResultsRequestV1
-import org.openapitools.client.models.GetDiscoveryResultsResponseV1
 import org.openapitools.client.models.GetTransactionReceiptResponse
 import org.openapitools.client.models.RunDelegatedSignTransactionRequest
 import org.openapitools.client.models.RunTransactionRequest
@@ -341,78 +339,6 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-            body = localVariableBody
-        )
-    }
-
-    /**
-     * Get fabric ledger node structure (from the discovery service).
-     * 
-     * @param getDiscoveryResultsRequestV1  (optional)
-     * @return GetDiscoveryResultsResponseV1
-     * @throws IllegalStateException If the request is not correctly configured
-     * @throws IOException Rethrows the OkHttp execute method exception
-     * @throws UnsupportedOperationException If the API returns an informational or redirection response
-     * @throws ClientException If the API returns a client error response
-     * @throws ServerException If the API returns a server error response
-     */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getDiscoveryResultsV1(getDiscoveryResultsRequestV1: GetDiscoveryResultsRequestV1? = null) : GetDiscoveryResultsResponseV1 {
-        val localVarResponse = getDiscoveryResultsV1WithHttpInfo(getDiscoveryResultsRequestV1 = getDiscoveryResultsRequestV1)
-
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetDiscoveryResultsResponseV1
-            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
-            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
-            ResponseType.ClientError -> {
-                val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
-            }
-            ResponseType.ServerError -> {
-                val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
-            }
-        }
-    }
-
-    /**
-     * Get fabric ledger node structure (from the discovery service).
-     * 
-     * @param getDiscoveryResultsRequestV1  (optional)
-     * @return ApiResponse<GetDiscoveryResultsResponseV1?>
-     * @throws IllegalStateException If the request is not correctly configured
-     * @throws IOException Rethrows the OkHttp execute method exception
-     */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(IllegalStateException::class, IOException::class)
-    fun getDiscoveryResultsV1WithHttpInfo(getDiscoveryResultsRequestV1: GetDiscoveryResultsRequestV1?) : ApiResponse<GetDiscoveryResultsResponseV1?> {
-        val localVariableConfig = getDiscoveryResultsV1RequestConfig(getDiscoveryResultsRequestV1 = getDiscoveryResultsRequestV1)
-
-        return request<GetDiscoveryResultsRequestV1, GetDiscoveryResultsResponseV1>(
-            localVariableConfig
-        )
-    }
-
-    /**
-     * To obtain the request config of the operation getDiscoveryResultsV1
-     *
-     * @param getDiscoveryResultsRequestV1  (optional)
-     * @return RequestConfig
-     */
-    fun getDiscoveryResultsV1RequestConfig(getDiscoveryResultsRequestV1: GetDiscoveryResultsRequestV1?) : RequestConfig<GetDiscoveryResultsRequestV1> {
-        val localVariableBody = getDiscoveryResultsRequestV1
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Content-Type"] = "application/json"
-        localVariableHeaders["Accept"] = "application/json"
-
-        return RequestConfig(
-            method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

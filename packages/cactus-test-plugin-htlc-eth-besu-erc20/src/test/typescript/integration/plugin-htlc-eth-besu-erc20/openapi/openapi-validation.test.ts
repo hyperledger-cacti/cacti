@@ -1,7 +1,6 @@
-import "jest-extended";
-
 import http from "http";
 import type { AddressInfo } from "net";
+import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import express from "express";
 import bodyParser from "body-parser";
@@ -60,17 +59,115 @@ const web3SigningCredential: Web3SigningCredential = {
   secret: privateKey,
   type: Web3SigningCredentialType.PrivateKeyHex,
 } as Web3SigningCredential;
-let besuTestLedger = new BesuTestLedger({ logLevel });
-let api: BesuApi;
-let connector: PluginLedgerConnectorBesu;
-
-const timeout = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
 
 const testCase = "Test cactus-plugin-htlc-eth-besu-erc20 openapi validation";
 
-describe(testCase, () => {
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning did not throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
+  const secretEthAbiEncoded = encodeParameter("uint256", secret);
+  const hashLock = keccak256(secretEthAbiEncoded);
+
+  const timeout = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  t.comment("Starting Besu Test Ledger");
+  const besuTestLedger = new BesuTestLedger({ logLevel });
+
+  test.onFailure(async () => {
+    await besuTestLedger.stop();
+    await besuTestLedger.destroy();
+  });
+
+  test.onFinish(async () => {
+    await besuTestLedger.stop();
+    await besuTestLedger.destroy();
+  });
+
+  await besuTestLedger.start();
+
+  const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
+  const keychainId = uuidv4();
+  const keychainPlugin = new PluginKeychainMemory({
+    instanceId: uuidv4(),
+    keychainId,
+    // pre-provision keychain with mock backend holding the private key of the
+    // test account that we'll reference while sending requests with the
+    // signing credential pointing to this keychain entry.
+    backend: new Map([
+      [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
+    ]),
+    logLevel,
+  });
+  keychainPlugin.set(
+    DemoHelperJSON.contractName,
+    JSON.stringify(DemoHelperJSON),
+  );
+  keychainPlugin.set(
+    HashTimeLockJSON.contractName,
+    JSON.stringify(HashTimeLockJSON),
+  );
+
+  const factory = new PluginFactoryLedgerConnector({
+    pluginImportType: PluginImportType.Local,
+  });
+
+  const pluginRegistry = new PluginRegistry({});
+  const connector: PluginLedgerConnectorBesu = await factory.create({
+    rpcApiHttpHost,
+    rpcApiWsHost,
+    logLevel,
+    instanceId: connectorId,
+    pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+  });
+
+  pluginRegistry.add(connector);
+  const pluginOptions: IPluginHtlcEthBesuErc20Options = {
+    logLevel,
+    instanceId: uuidv4(),
+    pluginRegistry,
+  };
+
+  const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
+    pluginImportType: PluginImportType.Local,
+  });
+
+  const pluginHtlc = await factoryHTLC.create(pluginOptions);
+  pluginRegistry.add(pluginHtlc);
+
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  const listenOptions: IListenOptions = {
+    hostname: "127.0.0.1",
+    port: 0,
+    server,
+  };
+  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+  test.onFinish(async () => await Servers.shutdown(server));
+  const { address, port } = addressInfo;
+  const apiHost = `http://${address}:${port}`;
+
+  const configuration = new Configuration({ basePath: apiHost });
+  const api = new BesuApi(configuration);
+
+  const OAS = (pluginHtlc as PluginHtlcEthBesuErc20).getOpenApiSpec();
+
+  await installOpenapiValidationMiddleware({
+    logLevel,
+    app: expressApp,
+    apiSpec: OAS,
+  });
+
+  await pluginHtlc.getOrCreateWebServices();
+  await pluginHtlc.registerWebServices(expressApp);
+
   const fInitialize = "initializeV1";
   const fNew = "newContractV1";
   const fRefund = "refundV1";
@@ -86,112 +183,8 @@ describe(testCase, () => {
   let timestamp: number;
   let tokenAddress: string;
   let txId: string;
-  const keychainId = uuidv4();
 
-  const secretEthAbiEncoded = encodeParameter("uint256", secret);
-  const hashLock = keccak256(secretEthAbiEncoded);
-
-  let server: http.Server;
-
-  beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
-    await expect(pruning).resolves.toBeTruthy();
-  });
-
-  afterAll(async () => {
-    await besuTestLedger.stop();
-    await besuTestLedger.destroy();
-  });
-
-  afterAll(async () => await Servers.shutdown(server));
-
-  afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
-    await expect(pruning).resolves.toBeTruthy();
-  });
-
-  beforeAll(async () => {
-    besuTestLedger = new BesuTestLedger();
-    await besuTestLedger.start();
-
-    const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
-    const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
-
-    const keychainPlugin = new PluginKeychainMemory({
-      instanceId: uuidv4(),
-      keychainId,
-      // pre-provision keychain with mock backend holding the private key of the
-      // test account that we'll reference while sending requests with the
-      // signing credential pointing to this keychain entry.
-      backend: new Map([
-        [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
-      ]),
-      logLevel,
-    });
-    keychainPlugin.set(
-      DemoHelperJSON.contractName,
-      JSON.stringify(DemoHelperJSON),
-    );
-    keychainPlugin.set(
-      HashTimeLockJSON.contractName,
-      JSON.stringify(HashTimeLockJSON),
-    );
-
-    const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
-    });
-
-    const pluginRegistry = new PluginRegistry({});
-    connector = await factory.create({
-      rpcApiHttpHost,
-      rpcApiWsHost,
-      logLevel,
-      instanceId: connectorId,
-      pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-    });
-
-    pluginRegistry.add(connector);
-    const pluginOptions: IPluginHtlcEthBesuErc20Options = {
-      logLevel,
-      instanceId: uuidv4(),
-      pluginRegistry,
-    };
-
-    const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
-    });
-
-    const pluginHtlc = await factoryHTLC.create(pluginOptions);
-    pluginRegistry.add(pluginHtlc);
-
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    server = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "127.0.0.1",
-      port: 0,
-      server: server,
-    };
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    const { address, port } = addressInfo;
-    const apiHost = `http://${address}:${port}`;
-
-    const configuration = new Configuration({ basePath: apiHost });
-    api = new BesuApi(configuration);
-
-    const OAS = (pluginHtlc as PluginHtlcEthBesuErc20).getOpenApiSpec();
-
-    await installOpenapiValidationMiddleware({
-      logLevel,
-      app: expressApp,
-      apiSpec: OAS,
-    });
-
-    await pluginHtlc.getOrCreateWebServices();
-    await pluginHtlc.registerWebServices(expressApp);
-  });
-
-  test(`${testCase} - ${fInitialize} - ${cOk}`, async () => {
+  test(`${testCase} - ${fInitialize} - ${cOk}`, async (t2: Test) => {
     const parameters = {
       connectorId,
       keychainId,
@@ -201,37 +194,48 @@ describe(testCase, () => {
     };
 
     const res = await api.initializeV1(parameters);
-
-    expect(res).toBeTruthy();
-    expect(res.data).toBeTruthy();
-    expect(res.status).toEqual(200);
+    t2.ok(res, "initialize called successfully");
+    t2.equal(
+      res.status,
+      200,
+      `Endpoint ${fInitialize}: response.status === 200 OK`,
+    );
 
     hashTimeLockAddress = res.data.transactionReceipt.contractAddress as string;
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fInitialize} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fInitialize} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
+      // connectorId,
       keychainId,
       constructorArgs: [],
       web3SigningCredential,
       gas: estimatedGas,
     };
 
-    await expect(
-      api.initializeV1(parameters as any as InitializeRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({
-            path: expect.stringContaining("/body/connectorId"),
-          }),
-        ]),
-      },
-    });
+    try {
+      await api.initializeV1(parameters as any as InitializeRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fInitialize} without required connectorId: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("connectorId"),
+        "Rejected because connectorId is required",
+      );
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fInitialize} - ${cInvalidParams}`, async () => {
+  test(`${testCase} - ${fInitialize} - ${cInvalidParams}`, async (t2: Test) => {
     const parameters = {
       connectorId,
       keychainId,
@@ -241,19 +245,27 @@ describe(testCase, () => {
       fake: 4,
     };
 
-    await expect(
-      api.initializeV1(parameters as any as InitializeRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/fake" }),
-        ]),
-      },
-    });
+    try {
+      await api.initializeV1(parameters as any as InitializeRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fInitialize} with fake=4: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("fake"),
+        "Rejected because fake is not a valid parameter",
+      );
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fNew} - ${cOk}`, async () => {
+  test(`${testCase} - ${fNew} - ${cOk}`, async (t2: Test) => {
     const deployOutToken = await connector.deployContract({
       contractName: TestTokenJSON.contractName,
       contractAbi: TestTokenJSON.abi,
@@ -263,11 +275,15 @@ describe(testCase, () => {
       constructorArgs: ["100", "token", "2", "TKN"],
       gas: estimatedGas,
     });
-
-    expect(deployOutToken).toBeTruthy();
-    expect(deployOutToken.transactionReceipt).toBeTruthy();
-    expect(deployOutToken.transactionReceipt.contractAddress).toBeTruthy();
-
+    t2.ok(deployOutToken, "deployOutToken is truthy OK");
+    t2.ok(
+      deployOutToken.transactionReceipt,
+      "deployOutToken.transactionReceipt is truthy OK",
+    );
+    t2.ok(
+      deployOutToken.transactionReceipt.contractAddress,
+      "deployOutToken.transactionReceipt.contractAddress is truthy OK",
+    );
     tokenAddress = deployOutToken.transactionReceipt.contractAddress as string;
 
     const deployOutDemo = await connector.deployContract({
@@ -279,8 +295,7 @@ describe(testCase, () => {
       constructorArgs: [],
       gas: estimatedGas,
     });
-
-    expect(deployOutDemo).toBeTruthy();
+    t2.ok(deployOutDemo, "deployOutToken is truthy OK");
 
     const { success } = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,
@@ -291,8 +306,7 @@ describe(testCase, () => {
       params: [hashTimeLockAddress, "10"],
       gas: estimatedGas,
     });
-
-    expect(success).toBe(true);
+    t2.equal(success, true, "approve() transactionReceipt.status is true OK");
 
     const { callOutput } = await connector.invokeContract({
       contractName: DemoHelperJSON.contractName,
@@ -302,11 +316,11 @@ describe(testCase, () => {
       methodName: "getTimestamp",
       params: [],
     });
-
-    expect(callOutput).toBeTruthy();
+    t2.ok(callOutput, "callOutput() output.callOutput is truthy OK");
     timestamp = callOutput as number;
     timestamp = +timestamp + +10;
 
+    t2.comment("Call to newContract endpoint");
     const parameters = {
       contractAddress: hashTimeLockAddress,
       inputAmount: 10,
@@ -323,13 +337,15 @@ describe(testCase, () => {
       gas: estimatedGas,
     };
     const res = await api.newContractV1(parameters);
+    t2.ok(res, "newContract called successfully");
+    t2.equal(res.status, 200, `Endpoint ${fNew}: response.status === 200 OK`);
 
-    expect(res).toBeTruthy();
-    expect(res.status).toEqual(200);
+    t2.end();
   });
 
-  test(`${testCase} - ${fNew} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fNew} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
+      // contractAddress: hashTimeLockAddress,
       inputAmount: 10,
       outputAmount: 1,
       expiration: timestamp,
@@ -343,20 +359,27 @@ describe(testCase, () => {
       web3SigningCredential,
       gas: estimatedGas,
     };
+    try {
+      await api.newContractV1(parameters as any as NewContractRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fNew} without required contractAddress: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("contractAddress"),
+        "Rejected because contractAddress is required",
+      );
+    }
 
-    await expect(
-      api.newContractV1(parameters as any as NewContractRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/contractAddress" }),
-        ]),
-      },
-    });
+    t2.end();
   });
 
-  test(`${testCase} - ${fNew} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fNew} - ${cInvalidParams}`, async (t2: Test) => {
     const parameters = {
       contractAddress: hashTimeLockAddress,
       inputAmount: 10,
@@ -373,20 +396,27 @@ describe(testCase, () => {
       gas: estimatedGas,
       fake: 4,
     };
+    try {
+      await api.newContractV1(parameters as any as NewContractRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fNew} with fake=4: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("fake"),
+        "Rejected because fake is not a valid parameter",
+      );
+    }
 
-    await expect(
-      api.newContractV1(parameters as any as NewContractRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/fake" }),
-        ]),
-      },
-    });
+    t2.end();
   });
 
-  test(`${testCase} - ${fRefund} - ${cOk}`, async () => {
+  test(`${testCase} - ${fRefund} - ${cOk}`, async (t2: Test) => {
     const responseTxId = await connector.invokeContract({
       contractName: DemoHelperJSON.contractName,
       keychainId,
@@ -402,11 +432,11 @@ describe(testCase, () => {
         tokenAddress,
       ],
     });
-
-    expect(responseTxId.callOutput).toBeTruthy();
-
+    t2.ok(responseTxId.callOutput, "result is truthy OK");
     txId = responseTxId.callOutput as string;
+
     await timeout(6000);
+
     const parameters = {
       id: txId,
       web3SigningCredential,
@@ -414,31 +444,40 @@ describe(testCase, () => {
       keychainId,
     };
     const res = await api.refundV1(parameters);
+    t2.equal(
+      res.status,
+      200,
+      `Endpoint ${fRefund}: response.status === 200 OK`,
+    );
 
-    expect(res).toBeTruthy();
-    expect(res.status).toEqual(200);
+    t2.end();
   });
 
-  test(`${testCase} - ${fRefund} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fRefund} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
+      // id,
       web3SigningCredential,
       connectorId,
       keychainId,
     };
+    try {
+      await api.refundV1(parameters as any as RefundRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fRefund} without required id: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(fields.includes("id"), "Rejected because id is required");
+    }
 
-    await expect(
-      api.refundV1(parameters as any as RefundRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/id" }),
-        ]),
-      },
-    });
+    t2.end();
   });
 
-  test(`${testCase} - ${fRefund} - ${cInvalidParams}`, async () => {
+  test(`${testCase} - ${fRefund} - ${cInvalidParams}`, async (t2: Test) => {
     const parameters = {
       id: "",
       web3SigningCredential,
@@ -446,20 +485,27 @@ describe(testCase, () => {
       keychainId,
       fake: 4,
     };
+    try {
+      await api.refundV1(parameters as any as RefundRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fRefund} with fake=4: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("fake"),
+        "Rejected because fake is not a valid parameter",
+      );
+    }
 
-    await expect(
-      api.refundV1(parameters as any as RefundRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/fake" }),
-        ]),
-      },
-    });
+    t2.end();
   });
 
-  test(`${testCase} - ${fWithdraw} - ${cOk}`, async () => {
+  test(`${testCase} - ${fWithdraw} - ${cOk}`, async (t2: Test) => {
     const deployOutToken = await connector.deployContract({
       contractName: TestTokenJSON.contractName,
       contractAbi: TestTokenJSON.abi,
@@ -469,9 +515,10 @@ describe(testCase, () => {
       constructorArgs: ["100", "token", "2", "TKN"],
       gas: estimatedGas,
     });
-
-    expect(deployOutToken.transactionReceipt.contractAddress).toBeTruthy();
-
+    t2.ok(
+      deployOutToken.transactionReceipt.contractAddress,
+      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
+    );
     const tokenAddress = deployOutToken.transactionReceipt
       .contractAddress as string;
 
@@ -526,9 +573,7 @@ describe(testCase, () => {
         tokenAddress,
       ],
     });
-
-    expect(responseTxId.callOutput).toBeTruthy();
-
+    t2.ok(responseTxId.callOutput, "result is truthy OK");
     const id = responseTxId.callOutput as string;
 
     const withdrawRequest: WithdrawRequest = {
@@ -539,32 +584,42 @@ describe(testCase, () => {
       keychainId,
     };
     const resWithdraw = await api.withdrawV1(withdrawRequest);
+    t2.equal(
+      resWithdraw.status,
+      200,
+      `Endpoint ${fWithdraw}: response.status === 200 OK`,
+    );
 
-    expect(resWithdraw).toBeTruthy();
-    expect(resWithdraw.status).toEqual(200);
+    t2.end();
   });
 
-  test(`${testCase} - ${fWithdraw} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fWithdraw} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
+      // id,
       secret,
       web3SigningCredential,
       connectorId,
       keychainId,
     };
 
-    await expect(
-      api.withdrawV1(parameters as any as WithdrawRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/id" }),
-        ]),
-      },
-    });
+    try {
+      await api.withdrawV1(parameters as any as WithdrawRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fWithdraw} without required id: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(fields.includes("id"), "Rejected because id is required");
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fWithdraw} - ${cInvalidParams}`, async () => {
+  test(`${testCase} - ${fWithdraw} - ${cInvalidParams}`, async (t2: Test) => {
     const parameters = {
       id: "",
       secret,
@@ -574,19 +629,27 @@ describe(testCase, () => {
       fake: 4,
     };
 
-    await expect(
-      api.withdrawV1(parameters as any as WithdrawRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/fake" }),
-        ]),
-      },
-    });
+    try {
+      await api.withdrawV1(parameters as any as WithdrawRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fWithdraw} with fake=4: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("fake"),
+        "Rejected because fake is not a valid parameter",
+      );
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fStatus} - ${cOk}`, async () => {
+  test(`${testCase} - ${fStatus} - ${cOk}`, async (t2: Test) => {
     const ids = [txId as string];
 
     const parameters = {
@@ -596,31 +659,41 @@ describe(testCase, () => {
       keychainId,
     };
     const res = await api.getStatusV1(parameters);
+    t2.equal(
+      res.status,
+      200,
+      `Endpoint ${fStatus}: response.status === 200 OK`,
+    );
 
-    expect(res.status).toBeTruthy();
-    expect(res.status).toEqual(200);
+    t2.end();
   });
 
-  test(`${testCase} - ${fStatus} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fStatus} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
+      // ids,
       web3SigningCredential,
       connectorId,
       keychainId,
     };
 
-    await expect(
-      api.getStatusV1(parameters as any as GetStatusRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/ids" }),
-        ]),
-      },
-    });
+    try {
+      await api.getStatusV1(parameters as any as GetStatusRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fStatus} without required id: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(fields.includes("ids"), "Rejected because ids is required");
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fStatus} - ${cInvalidParams}`, async () => {
+  test(`${testCase} - ${fStatus} - ${cInvalidParams}`, async (t2: Test) => {
     const parameters = {
       ids: [""],
       web3SigningCredential,
@@ -629,19 +702,27 @@ describe(testCase, () => {
       fake: 4,
     };
 
-    await expect(
-      api.getStatusV1(parameters as any as GetStatusRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/fake" }),
-        ]),
-      },
-    });
+    try {
+      await api.getStatusV1(parameters as any as GetStatusRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fStatus} with fake=4: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("fake"),
+        "Rejected because fake is not a valid parameter",
+      );
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fSingleStatus} - ${cOk}`, async () => {
+  test(`${testCase} - ${fSingleStatus} - ${cOk}`, async (t2: Test) => {
     const parameters = {
       id: txId,
       web3SigningCredential,
@@ -649,30 +730,41 @@ describe(testCase, () => {
       keychainId,
     };
     const res = await api.getSingleStatusV1(parameters);
+    t2.equal(
+      res.status,
+      200,
+      `Endpoint ${fSingleStatus}: response.status === 200 OK`,
+    );
 
-    expect(res.status).toEqual(200);
+    t2.end();
   });
 
-  test(`${testCase} - ${fSingleStatus} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fSingleStatus} - ${cWithoutParams}`, async (t2: Test) => {
     const parameters = {
+      // id: callOutput,
       web3SigningCredential,
       connectorId,
       keychainId,
     };
 
-    await expect(
-      api.getSingleStatusV1(parameters as any as GetSingleStatusRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/id" }),
-        ]),
-      },
-    });
+    try {
+      await api.getSingleStatusV1(parameters as any as GetSingleStatusRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fSingleStatus} without required id: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(fields.includes("id"), "Rejected because id is required");
+    }
+
+    t2.end();
   });
 
-  test(`${testCase} - ${fSingleStatus} - ${cWithoutParams}`, async () => {
+  test(`${testCase} - ${fSingleStatus} - ${cInvalidParams}`, async (t2: Test) => {
     const parameters = {
       id: "",
       web3SigningCredential,
@@ -681,15 +773,32 @@ describe(testCase, () => {
       fake: 4,
     };
 
-    await expect(
-      api.getSingleStatusV1(parameters as any as GetSingleStatusRequest),
-    ).rejects.toMatchObject({
-      response: {
-        status: 400,
-        data: expect.arrayContaining([
-          expect.objectContaining({ path: "/body/fake" }),
-        ]),
-      },
-    });
+    try {
+      // eslint-disable-next-line prettier/prettier
+      await api.getSingleStatusV1(parameters as any as GetSingleStatusRequest);
+    } catch (e) {
+      t2.equal(
+        e.response.status,
+        400,
+        `Endpoint ${fSingleStatus} with fake=4: response.status === 400 OK`,
+      );
+      const fields = e.response.data.map((param: any) =>
+        param.path.replace("/body/", ""),
+      );
+      t2.ok(
+        fields.includes("fake"),
+        "Rejected because fake is not a valid parameter",
+      );
+    }
+
+    t2.end();
   });
+
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning did not throw OK");
+  t.end();
 });

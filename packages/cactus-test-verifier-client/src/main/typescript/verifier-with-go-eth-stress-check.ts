@@ -15,7 +15,6 @@ const containerImageVersion = "2023-07-27-2a8c48ed6";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
-  bigIntToDecimalStringReplacer,
   LogLevelDesc,
   LoggerProvider,
   Logger,
@@ -59,7 +58,12 @@ const wsApi = new SocketIoServer(server, {
   path: Constants.SocketIoConnectionPathV1,
 });
 // Add custom replacer to handle bigint responses correctly
-expressApp.set("json replacer", bigIntToDecimalStringReplacer);
+expressApp.set("json replacer", (_key: string, value: bigint | unknown) => {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
+});
 
 /**
  * Check current memory usage, log it to the screen and write it to a file for future analysis.

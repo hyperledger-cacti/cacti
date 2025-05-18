@@ -21,7 +21,6 @@ import { Server as SocketIoServer } from "socket.io";
 import Web3 from "web3";
 
 import {
-  bigIntToDecimalStringReplacer,
   LogLevelDesc,
   IListenOptions,
   Servers,
@@ -119,7 +118,7 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     // set to address Type Error returned by Response.json()
     // "Can't serialize BigInt"
-    expressApp.set("json replacer", bigIntToDecimalStringReplacer);
+    expressApp.set("json replacer", stringifyBigIntReplacer);
 
     server = http.createServer(expressApp);
 
@@ -285,7 +284,7 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
         const originalStringify = JSON.stringify;
         const mock = jest.spyOn(JSON, "stringify");
         mock.mockImplementation((value: any) => {
-          return originalStringify(value, bigIntToDecimalStringReplacer);
+          return originalStringify(value, stringifyBigIntReplacer);
         });
       }
 
@@ -401,3 +400,10 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
     },
   );
 });
+
+function stringifyBigIntReplacer(key: string, value: bigint): string {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
+}

@@ -93,6 +93,7 @@ export async function deployContractGoSourceImplFabricV256(
           // just in case go modules would be otherwise disabled
           GO111MODULE: "on",
           FABRIC_LOGGING_SPEC: "DEBUG",
+          GOPROXY: "https://proxy.golang.org,direct",
         },
       },
       cwd: remoteDirPath,

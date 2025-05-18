@@ -2,11 +2,12 @@ import type { Express } from "express";
 import bodyParser, { OptionsJson } from "body-parser";
 
 import {
-  bigIntToDecimalStringReplacer,
   Checks,
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+
+import { stringifyBigIntReplacer } from "./stringify-big-int-replacer";
 
 export const CACTI_CORE_CONFIGURE_EXPRESS_APP_BASE_MARKER =
   "CACTI_CORE_CONFIGURE_EXPRESS_APP_BASE_MARKER";
@@ -82,7 +83,7 @@ export async function configureExpressAppBase(
   ctx.app.use(bodyParserMiddleware);
 
   // Add custom replacer to handle bigint responses correctly
-  ctx.app.set("json replacer", bigIntToDecimalStringReplacer);
+  ctx.app.set("json replacer", stringifyBigIntReplacer);
 
   ctx.app.set(CACTI_CORE_CONFIGURE_EXPRESS_APP_BASE_MARKER, true);
 

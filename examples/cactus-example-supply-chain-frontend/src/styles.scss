@@ -1,0 +1,246 @@
+/* Fix text truncation in modal dialogs */
+.cdk-overlay-pane {
+  max-width: 90vw !important;
+
+  .mat-dialog-container {
+    padding: 16px;
+    overflow: auto;
+  }
+}
+
+/* Fix for copy info or other truncated badges */
+.badge,
+.status,
+.copy-info {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+
+  .mat-icon {
+    margin-right: 4px !important;
+  }
+}
+
+/* Fix ion header styling to ensure no truncation */
+ion-header {
+  ion-title {
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+}
+
+/* Ensure stepper labels are fully visible */
+.mat-step-label {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Handle mobile responsiveness better */
+@media (max-width: 599px) {
+  .mat-horizontal-stepper-header-container {
+    flex-direction: column !important;
+  }
+
+  .mat-horizontal-stepper-header {
+    padding: 12px 0 !important;
+    width: 100% !important;
+  }
+
+  .mat-stepper-horizontal-line {
+    display: none !important;
+  }
+}
+
+/* Fix transaction receipt display issues */
+.transaction-receipt,
+app-transaction-receipt,
+.transaction-modal-container {
+  /* Force light theme */
+  color: #000000 !important;
+  background-color: #ffffff !important;
+
+  /* Fix "ch" and "--" text at top */
+  &::before,
+  &::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* Fix all copy buttons */
+  .copy-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    mat-icon {
+      margin-right: 0 !important;
+    }
+  }
+
+  /* Fix for labels showing as "c", "u", etc. */
+  .step-content {
+    display: block !important;
+    width: 100% !important;
+    min-height: 60px !important;
+
+    mat-icon {
+      display: inline-block !important;
+      margin-bottom: 8px !important;
+    }
+
+    p {
+      display: block !important;
+      width: 100% !important;
+      margin: 8px 0 0 0 !important;
+      text-align: center !important;
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      color: rgba(0, 0, 0, 0.87) !important;
+      word-wrap: break-word !important;
+      white-space: normal !important;
+    }
+  }
+
+  /* Fix stepper labels */
+  .mat-step-label {
+    white-space: normal !important;
+    overflow: visible !important;
+    display: block !important;
+    text-align: center !important;
+  }
+
+  /* Fix "co nfo" issue */
+  .copy-info,
+  .status-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    background-color: #f0f0f0 !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    color: #333333 !important;
+
+    mat-icon + span {
+      display: inline !important;
+      white-space: nowrap !important;
+      overflow: visible !important;
+    }
+  }
+}
+
+/* Dark theme overrides for transaction receipt */
+app-transaction-receipt,
+.transaction-receipt,
+.transaction-modal-container,
+.custom-stepper {
+  color: #ffffff !important;
+  background-color: #121212 !important;
+
+  /* Clear all pseudo-elements that might be showing the problematic text */
+  &::before,
+  &::after,
+  *::before,
+  *::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* Make cards dark */
+  .mat-card {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  .mat-card-title,
+  .mat-card-subtitle {
+    color: #ffffff !important;
+  }
+}
+
+/* Force visible full text in custom step elements */
+.custom-step,
+.step-header,
+.step-content {
+  color: #ffffff !important;
+
+  /* Remove any generated content */
+  &::before,
+  &::after {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+/* Fix for copy info or other truncated badges - dark theme version */
+.badge,
+.status,
+.copy-info,
+.status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  background-color: #333333 !important;
+  color: #ffffff !important;
+
+  /* Remove any generated content before/after */
+  &::before,
+  &::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .mat-icon {
+    margin-right: 4px !important;
+    color: #bbbbbb !important;
+  }
+}
+
+/* Fix ion header styling to ensure no truncation */
+ion-header {
+  ion-title {
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+
+  /* Remove any generated content */
+  &::before,
+  &::after,
+  *::before,
+  *::after {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+/* Fix modal dialog */
+.cdk-overlay-pane {
+  max-width: 90vw !important;
+
+  .mat-dialog-container {
+    padding: 16px;
+    overflow: auto;
+    background-color: #121212 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Global fix for unwanted "ch", "at", "c", "u", "fi" text */
+body,
+app-root,
+ion-app,
+ion-content,
+ion-modal {
+  &::before,
+  &::after,
+  *::before,
+  *::after {
+    content: none !important;
+    display: none !important;
+  }
+}

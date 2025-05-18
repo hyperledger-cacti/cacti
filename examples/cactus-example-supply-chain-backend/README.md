@@ -1,21 +1,20 @@
 # Hyperledger Cactus Example - Supply Chain App
 
-
 ## Usage
 
 1. Execute the following from:
-    ```sh
-    docker run \
-      --rm \
-      --privileged \
-      -p 3000:3000 \
-      -p 3100:3100 \
-      -p 3200:3200 \
-      -p 4000:4000 \
-      -p 4100:4100 \
-      -p 4200:4200 \
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2024-03-08--pr-3059-1
-    ```
+   ```sh
+   docker run \
+     --rm \
+     --privileged \
+     -p 3000:3000 \
+     -p 3100:3100 \
+     -p 3200:3200 \
+     -p 4000:4000 \
+     -p 4100:4100 \
+     -p 4200:4200 \
+     ghcr.io/hyperledger/cactus-example-supply-chain-app:2024-03-08--pr-3059-1
+   ```
 2. Observe the example application pulling up in the logs
    1. the test ledger containers,
    2. a test consortium with multiple members and their Cactus nodes
@@ -66,7 +65,7 @@ On the terminal, issue the following commands:
 
 On the terminal, issue the following commands (steps 1 to 6) and then perform the rest of the steps manually.
 
-1. `npm run enable-corepack`
+1. `yarn install` && `npm run enable-corepack`
 2. `yarn run configure`
 3. `yarn build:dev`
 4. `cd ./examples/cactus-example-supply-chain-backend/`
@@ -93,3 +92,24 @@ On the terminal, issue the following commands (steps 1 to 6) and then perform th
 10. When the application finishes loading, the JWT token generated is displayed on the terminal
 11. Visit http://localhost:8000 in a web browser with Javascript enabled and insert the token when prompted
 12. At this point if you modify the source code of the GUI application under the `./examples/cactus-example-supply-chain-frontend/` path it will automatically reload the browser window (you will need to paste in the JWT again when this happens)
+
+## Environment Variables
+
+This project uses environment variables for configuration. Create a `process.env` file in the root directory of this project with the following variables:
+
+```
+# Ethereum RPC Endpoints
+ETHEREUM_SEPOLIA_RPC_ENDPOINT=https://eth-sepolia.g.alchemy.com/v2/your-api-key-here
+
+# Wallet credentials
+PRIVATE_KEY=your-private-key-here
+
+# Contract addresses (will be filled after deployment)
+ROLE_MANAGER_CONTRACT_ADDRESS=YOUR_DEPLOYED_CONTRACT_ADDRESS
+PAYMENT_CONTRACT_ADDRESS=YOUR_DEPLOYED_CONTRACT_ADDRESS
+
+# Logging
+LOG_LEVEL=INFO
+```
+
+This approach keeps sensitive information like API keys, private keys, and contract addresses out of the codebase. The application will check for these required environment variables at startup.

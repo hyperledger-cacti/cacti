@@ -1,5 +1,3 @@
-import { DefaultAzureCredential } from "@azure/identity";
-
 /**
  * This class mocks the SecretClient class of "@azure/keyvault-secrets" library
  * by overriding the SecretClient class methods and storing the secrets In-Memory
@@ -28,7 +26,7 @@ export interface ISecretClientMock {
   logLevel?: LogLevelDesc;
 }
 
-export class SecretClientMock extends SecretClient {
+export class SecretClientMock implements SecretClient {
   public static readonly CLASS_NAME = "SecretClientMock";
   private readonly log: Logger;
   readonly vaultUrl: string;
@@ -39,7 +37,6 @@ export class SecretClientMock extends SecretClient {
   }
 
   constructor(public readonly options: ISecretClientMock) {
-    super(options.azureKvUrl, new DefaultAzureCredential());
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
 
@@ -51,7 +48,6 @@ export class SecretClientMock extends SecretClient {
   }
 
   async setSecret(secretName: string, value: string): Promise<KeyVaultSecret> {
-    this.log.debug("Setting secret: name=%s, value=%s", secretName, value);
     this.secrets.set(secretName, value);
     const secretProperties: SecretProperties = {
       vaultUrl: this.vaultUrl,
@@ -61,7 +57,6 @@ export class SecretClientMock extends SecretClient {
       properties: secretProperties,
       name: secretName,
     };
-    this.log.debug("Set secret as: %s", JSON.stringify(keyVaultSecret));
     return keyVaultSecret;
   }
 

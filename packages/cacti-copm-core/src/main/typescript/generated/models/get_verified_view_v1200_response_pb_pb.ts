@@ -1,7 +1,7 @@
 //
 //Hyperledger Cacti Plugin - Common Operator Primitives
 //
-//Contains/describes the Hyperledger Cacti Common Operator Primitives plugin.  These primitives require specific chaincode and Weaver relays to be deployed on the network as described at https://hyperledger-cacti.github.io/cacti/weaver/introduction/.
+//Contains/describes the Hyperledger Cacti Common Operator Primitives plugin.  These primitives require specific chaincode and weaver relays to be deployed on the network as described at https://hyperledger-cacti.github.io/cacti/weaver/introduction/.
 //
 //The version of the OpenAPI document: 2.1.0
 //

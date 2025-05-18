@@ -328,7 +328,7 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 	return pledgeBytes64, nil
 }
 
-// GetTokenAssetPledgeDetails returns the asset pledge details.
+// GetAssetPledgeDetails returns the asset pledge details.
 func (s *SmartContract) GetTokenAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId string) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 

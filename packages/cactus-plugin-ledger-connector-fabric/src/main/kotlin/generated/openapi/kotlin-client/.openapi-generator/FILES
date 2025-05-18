@@ -62,14 +62,6 @@ src/main/kotlin/org/openapitools/client/models/GetBlockResponseTypeV1.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/GetChainInfoRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/GetChainInfoResponseV1.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsRequestV1.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1MspsValue.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1OrderersValue.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1OrderersValueEndpointsInner.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1PeersByMSPValue.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner.kt
-src/main/kotlin/org/openapitools/client/models/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner.kt
 src/main/kotlin/org/openapitools/client/models/GetTransactionReceiptResponse.kt
 src/main/kotlin/org/openapitools/client/models/RunDelegatedSignTransactionRequest.kt
 src/main/kotlin/org/openapitools/client/models/RunTransactionRequest.kt

@@ -3,52 +3,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
+import { hasProperty } from "./has-property";
 import { isStdLibRecord } from "./is-std-lib-record";
-
-/**
- * Determines if a given `propertyKey` is present within `anObject`.
- *
- * @param anObject The object to check the presence of `propertyKey` for.
- * @param propertyKey The key whose presence will be checked.
- */
-export function hasProperty<T extends PropertyKey>(
-  anObject: unknown,
-  propertyKey: T,
-): anObject is Record<T, unknown> {
-  if (typeof anObject !== "object") {
-    return false;
-  }
-  if (!anObject) {
-    return false;
-  }
-  return propertyKey in anObject;
-}
-
-//  OpenAPI 3.0 supports get, post, put, patch, delete, head, options, and trace.
-export const OPEN_API_V3_SUPPORTED_HTTP_VERBS = [
-  "get",
-  "post",
-  "put",
-  "patch",
-  "delete",
-  "head",
-  "options",
-  "trace",
-] as const;
-
-export type OPEN_API_V3_SUPPORTED_HTTP_VERB =
-  (typeof OPEN_API_V3_SUPPORTED_HTTP_VERBS)[number];
-
-export function isOpenApiV3SupportedHttpVerb(
-  x: unknown,
-): x is OPEN_API_V3_SUPPORTED_HTTP_VERB {
-  return (
-    typeof x === "string" &&
-    OPEN_API_V3_SUPPORTED_HTTP_VERBS.includes(
-      x as OPEN_API_V3_SUPPORTED_HTTP_VERB,
-    )
-  );
-}
+import { isOpenApiV3SupportedHttpVerb } from "./open-api-http-verbs";
 
 /**
  * Verifies that the openapi.json files in the entire project are conformant to

@@ -27,7 +27,6 @@ import {
   LoggerProvider,
   Logger,
   Servers,
-  bigIntToDecimalStringReplacer,
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
@@ -85,9 +84,22 @@ describe("Ethereum persistence plugin tests", () => {
   let erc20ContractCreationReceipt: Required<TransactionReceipt>;
   let erc721ContractCreationReceipt: Required<TransactionReceipt>;
 
+  /**
+   * Replace bigint to print web3js outputs in test.
+   */
+  function stringifyBigIntReplacer(
+    _key: string,
+    value: bigint | unknown,
+  ): string | unknown {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
+  }
+
   const expressAppConnector = express();
   expressAppConnector.use(bodyParser.json({ limit: "250mb" }));
-  expressAppConnector.set("json replacer", bigIntToDecimalStringReplacer);
+  expressAppConnector.set("json replacer", stringifyBigIntReplacer);
   const connectorServer = http.createServer(expressAppConnector);
   const connectorWsApi = new SocketIoServer(connectorServer, {
     path: Constants.SocketIoConnectionPathV1,

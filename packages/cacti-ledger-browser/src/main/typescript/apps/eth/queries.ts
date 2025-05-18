@@ -168,9 +168,6 @@ export interface EthAllERC721TokensByAccountResponseType {
   uri: string;
   account_address: string;
   last_owner_change: string;
-  nft_name: string;
-  nft_description: string;
-  nft_image: string;
   token_metadata_erc721: TokenMetadata721;
 }
 
@@ -187,7 +184,7 @@ export function ethAllERC721TokensByAccount(accountAddress: string) {
       const { data, error } = await supabase
         .from("token_erc721")
         .select(
-          "token_id, uri, account_address, last_owner_change, nft_name, nft_description, nft_image, token_metadata_erc721(*)",
+          "token_id, uri, account_address, last_owner_change, token_metadata_erc721(*)",
         )
         .eq("account_address", accountAddress);
 

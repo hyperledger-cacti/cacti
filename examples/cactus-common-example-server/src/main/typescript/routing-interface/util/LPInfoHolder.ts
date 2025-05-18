@@ -6,7 +6,7 @@
  */
 
 import { DBAccess } from "./DBAccess";
-import { ConfigUtil } from "../util/ConfigUtil";
+import { ConfigUtil } from "./ConfigUtil";
 import { LedgerPluginInfo } from "../../verifier/validator-registry";
 
 const fs = require("fs");

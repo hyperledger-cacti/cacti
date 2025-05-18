@@ -24,16 +24,14 @@ export interface IBesuTestLedgerConstructorOptions {
   envVars?: string[];
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
-  networkName?: string;
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: "v2.2.0-rc.2",
-  containerImageName: "ghcr.io/hyperledger-cacti/besu-all-in-one",
+  containerImageVersion: "2021-01-08-7a055c3",
+  containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
   rpcApiWsPort: 8546,
   envVars: ["BESU_NETWORK=dev"],
-  networkName: "cactus-besu-test-network",
 });
 
 export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
@@ -50,7 +48,6 @@ export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
   });
 
 export class BesuTestLedger implements ITestLedger {
-  public static readonly CLASS_NAME = "BesuTestLedger";
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
@@ -62,13 +59,9 @@ export class BesuTestLedger implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
 
-  private readonly networkName: string;
-
   constructor(public readonly options: IBesuTestLedgerConstructorOptions = {}) {
     if (!options) {
-      throw new TypeError(
-        `${BesuTestLedger.CLASS_NAME}#constructor options was falsy.`,
-      );
+      throw new TypeError(`BesuTestLedger#ctor options was falsy.`);
     }
     this.containerImageVersion =
       options.containerImageVersion ||
@@ -81,8 +74,6 @@ export class BesuTestLedger implements ITestLedger {
     this.rpcApiWsPort =
       options.rpcApiWsPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
-    this.networkName =
-      options.networkName || BESU_TEST_LEDGER_DEFAULT_OPTIONS.networkName;
 
     this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
       ? (options.emitContainerLogs as boolean)
@@ -107,28 +98,18 @@ export class BesuTestLedger implements ITestLedger {
     return `${this.containerImageName}:${this.containerImageVersion}`;
   }
 
-  public async getRpcApiHttpHost(asLocalhost: boolean = true): Promise<string> {
-    if (asLocalhost) {
-      const ipAddress = "127.0.0.1";
-      const hostPort: number = await this.getRpcApiPublicPort();
-      return `http://${ipAddress}:${hostPort}`;
-    } else {
-      const hostIp: string = await this.getContainerIpAddress();
-      return `http://${hostIp}:${this.rpcApiHttpPort}`;
-    }
+  public async getRpcApiHttpHost(): Promise<string> {
+    const ipAddress = "127.0.0.1";
+    const hostPort: number = await this.getRpcApiPublicPort();
+    return `http://${ipAddress}:${hostPort}`;
   }
 
-  public async getRpcApiWsHost(asLocalhost: boolean = true): Promise<string> {
-    if (asLocalhost) {
-      const { rpcApiWsPort } = this;
-      const ipAddress = "127.0.0.1";
-      const containerInfo = await this.getContainerInfo();
-      const port = await Containers.getPublicPort(rpcApiWsPort, containerInfo);
-      return `ws://${ipAddress}:${port}`;
-    } else {
-      const hostIp: string = await this.getContainerIpAddress();
-      return `ws://${hostIp}:${this.rpcApiWsPort}`;
-    }
+  public async getRpcApiWsHost(): Promise<string> {
+    const { rpcApiWsPort } = this;
+    const ipAddress = "127.0.0.1";
+    const containerInfo = await this.getContainerInfo();
+    const port = await Containers.getPublicPort(rpcApiWsPort, containerInfo);
+    return `ws://${ipAddress}:${port}`;
   }
 
   public async getFileContents(filePath: string): Promise<string> {
@@ -227,36 +208,16 @@ export class BesuTestLedger implements ITestLedger {
     return receipt;
   }
 
-  public async getBesuKeyPair(
-    opts: { genesisAllocIdx: number } = { genesisAllocIdx: 1 },
-  ): Promise<IKeyPair> {
-    const fn = `BesuTestLedger#getBesuKeyPair()`;
-    const genesisFile = await this.getFileContents("/opt/besu/genesis.json");
-    const { genesisAllocIdx: idx } = opts;
-    const { alloc } = JSON.parse(genesisFile);
-
-    const keyPair = Object.entries(alloc).find((_, i) => i === idx);
-
-    if (!keyPair) {
-      throw new Error(`${fn} genesis alloc missing entry with idx: ${idx}`);
-    }
-    const [pubKey, keyData] = keyPair;
-
-    const publicKey = pubKey.startsWith("0x") ? pubKey : `0x${pubKey}`;
-    if (!keyData || typeof keyData !== "object" || !("privateKey" in keyData)) {
-      throw new Error(`${fn} invalid key data within genesis alloc`);
-    }
-
-    const { privateKey } = keyData;
-    if (typeof privateKey !== "string") {
-      throw new Error(`${fn} invalid genesis alloc: privateKey must be string`);
-    }
-    const pKey0x = privateKey.startsWith("0x") ? privateKey : "0x" + privateKey;
-    return { publicKey, privateKey: pKey0x };
+  public async getBesuKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents("/opt/besu/keys/key.pub");
+    const privateKey = await this.getFileContents("/opt/besu/keys/key");
+    return { publicKey, privateKey };
   }
 
   public async getOrionKeyPair(): Promise<IKeyPair> {
-    return this.getBesuKeyPair({ genesisAllocIdx: 2 });
+    const publicKey = await this.getFileContents("/config/orion/nodeKey.pub");
+    const privateKey = await this.getFileContents("/config/orion/nodeKey.key");
+    return { publicKey, privateKey };
   }
 
   public async start(omitPull = false): Promise<Container> {
@@ -272,17 +233,6 @@ export class BesuTestLedger implements ITestLedger {
       this.log.debug(`Pulling container image ${imageFqn} ...`);
       await this.pullContainerImage(imageFqn);
       this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
-    }
-
-    if (this.networkName) {
-      const networks = await docker.listNetworks();
-      const networkExists = networks.some((n) => n.Name === this.networkName);
-      if (!networkExists) {
-        await docker.createNetwork({
-          Name: this.networkName,
-          Driver: "bridge",
-        });
-      }
     }
 
     return new Promise<Container>((resolve, reject) => {
@@ -313,7 +263,6 @@ export class BesuTestLedger implements ITestLedger {
           },
           HostConfig: {
             PublishAllPorts: true,
-            NetworkMode: this.networkName,
           },
           Env: this.envVars,
         },
@@ -434,22 +383,23 @@ export class BesuTestLedger implements ITestLedger {
     }
   }
 
-  public async getContainerIpAddress(
-    network: string = this.networkName || "bridge",
-  ): Promise<string> {
+  public async getContainerIpAddress(): Promise<string> {
     const fnTag = "BesuTestLedger#getContainerIpAddress()";
     const aContainerInfo = await this.getContainerInfo();
 
-    if (!aContainerInfo) {
+    if (aContainerInfo) {
+      const { NetworkSettings } = aContainerInfo;
+      const networkNames: string[] = Object.keys(NetworkSettings.Networks);
+      if (networkNames.length < 1) {
+        throw new Error(`${fnTag} container not connected to any networks`);
+      } else {
+        // return IP address of container on the first network that we found
+        // it connected to. Make this configurable?
+        return NetworkSettings.Networks[networkNames[0]].IPAddress;
+      }
+    } else {
       throw new Error(`${fnTag} cannot find image: ${this.containerImageName}`);
     }
-    const { NetworkSettings } = aContainerInfo;
-    const networkNames: string[] = Object.keys(NetworkSettings.Networks);
-    if (networkNames.length < 1) {
-      throw new Error(`${fnTag} container not connected to any networks`);
-    }
-
-    return NetworkSettings.Networks[network].IPAddress;
   }
 
   private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
@@ -487,13 +437,5 @@ export class BesuTestLedger implements ITestLedger {
         `BesuTestLedger#ctor ${validationResult.error.annotate()}`,
       );
     }
-  }
-
-  public getNetworkName(): string {
-    const fnTag = `${BesuTestLedger.CLASS_NAME}#getNetworkName()`;
-    if (this.networkName) {
-      return this.networkName;
-    }
-    throw new Error(`${fnTag} network name not set`);
   }
 }

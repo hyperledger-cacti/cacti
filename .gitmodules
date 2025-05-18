@@ -1,0 +1,3 @@
+[submodule "examples/cactus-example-supply-chain-backend/lib/forge-std"]
+	path = examples/cactus-example-supply-chain-backend/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
