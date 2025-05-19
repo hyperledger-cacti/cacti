@@ -98,10 +98,7 @@ describe("Shutdown Verify State Tests", () => {
       "verifySessionsState",
     );
 
-    const shutdownBLOServerSpy = jest.spyOn(
-      gateway as any,
-      "shutdownBLOServer",
-    );
+    const shutdownBLOServerSpy = jest.spyOn(gateway as any, "shutdown");
 
     await gateway.startup();
     await gateway.shutdown();
