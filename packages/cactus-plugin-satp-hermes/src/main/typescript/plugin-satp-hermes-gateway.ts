@@ -656,11 +656,30 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     }
 
     this.isShutdown = true;
+
+    try {
+      this.logger.debug("Shutting down BLO");
+      await this.verifySessionsState();
+    } catch (error) {
+      this.logger.error(
+        `Error verifying sessions state: ${error}. Proceeding with shutdown.`,
+      );
+    }
+
     if (this.OApiServer) {
       this.logger.debug("Shutting down OpenAPI server");
       await this.OApiServer?.shutdown();
       this.logger.debug("OpenAPI server shut down");
       return;
+    }
+
+    const satpManager = await this.BLODispatcher?.getManager();
+
+    const monitorService = satpManager?.getMonitorService() || undefined;
+    if (monitorService) {
+      this.logger.debug("Shutting down monitor service");
+      await monitorService.shutdown();
+      this.logger.debug("Monitor service shut down");
     }
 
     this.logger.debug("Shutting down Gateway Coordinator");
@@ -710,6 +729,59 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     } else {
       this.logger.warn("Server is not running.");
     }
+  }
+
+  public async kill(): Promise<void> {
+    const fnTag = `${this.className}#kill()`;
+    this.logger.debug(`Entering ${fnTag}`);
+    this.logger.debug("Killing Gateway Application");
+
+    this.isShutdown = true;
+
+    if (this.OApiServer) {
+      this.logger.debug("Shutting down OpenAPI server");
+      await this.OApiServer?.shutdown();
+      this.logger.debug("OpenAPI server shut down");
+      return;
+    }
+
+    const satpManager = await this.BLODispatcher?.getManager();
+
+    const monitorService = satpManager?.getMonitorService() || undefined;
+    if (monitorService) {
+      this.logger.debug("Shutting down monitor service");
+      await monitorService.shutdown();
+      this.logger.debug("Monitor service shut down");
+    }
+
+    this.logger.debug("Shutting down Gateway Coordinator");
+    this.logger.debug("Running shutdown hooks");
+    for (const hook of this.shutdownHooks) {
+      this.logger.debug(`Running shutdown hook: ${hook.name}`);
+      await hook.hook();
+    }
+
+    this.logger.debug("Oracle Manager shut down");
+    this.SATPCCManager.getOracleManager().shutdown();
+
+    this.logger.info("Shutting down Gateway Connection Manager");
+    const connectionsClosed = await this.gatewayOrchestrator.disconnectAll();
+
+    this.logger.info(`Closed ${connectionsClosed} connections`);
+    this.logger.info("Gateway Coordinator shut down");
+
+    if (this.localRepository) {
+      this.logger.debug("Destroying local repository...");
+      await this.localRepository.destroy();
+      this.logger.info("Local repository destroyed");
+    }
+
+    if (this.remoteRepository) {
+      this.logger.debug("Destroying remote repository...");
+      await this.remoteRepository.destroy();
+      this.logger.info("Remote repository destroyed");
+    }
+    return;
   }
 
   /**
