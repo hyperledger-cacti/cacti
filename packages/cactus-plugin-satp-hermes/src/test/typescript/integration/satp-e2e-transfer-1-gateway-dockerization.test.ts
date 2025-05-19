@@ -56,6 +56,8 @@ let gatewayRunner: SATPGatewayRunner;
 
 const testNetwork = "test-network";
 
+const gatewayAddress = "gateway.satp-hermes";
+
 afterAll(async () => {
   await gatewayRunner.stop();
   await gatewayRunner.destroy();
@@ -152,7 +154,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     );
   });
   it("should realize a transfer", async () => {
-    const address: Address = `http://localhost`;
+    const address: Address = `http://${gatewayAddress}`;
 
     // gateway setup:
     const gatewayIdentity = {
@@ -199,6 +201,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
+      url: gatewayAddress,
     };
 
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
@@ -206,10 +209,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     await gatewayRunner.start(false);
     log.debug("gatewayRunner started sucessfully");
 
-    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
-
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({
+        basePath: `http://${await gatewayRunner.getOApiHost()}`,
+      }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
@@ -248,7 +251,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     await fabricEnv.giveRoleToBridge("Org2MSP");
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({
+        basePath: `http://${await gatewayRunner.getOApiHost()}`,
+      }),
     );
 
     const req = getTransactRequest(
@@ -316,7 +321,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     );
   });
   it("should realize a transfer", async () => {
-    const address: Address = `http://localhost`;
+    const address: Address = `http://${gatewayAddress}`;
 
     // gateway setup:
     const gatewayIdentity = {
@@ -330,7 +335,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
         },
       ],
       proofID: "mockProofID10",
-      address: "http://localhost" as Address,
+      address,
     } as GatewayIdentity;
 
     // ethereumConfig Json object setup:
@@ -360,6 +365,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
+      url: gatewayAddress,
     };
 
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
@@ -367,10 +373,10 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     await gatewayRunner.start(true);
     log.debug("gatewayRunner started sucessfully");
 
-    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
-
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({
+        basePath: `http://${await gatewayRunner.getOApiHost()}`,
+      }),
     );
 
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress({
@@ -409,7 +415,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({
+        basePath: `http://${await gatewayRunner.getOApiHost()}`,
+      }),
     );
 
     const req = getTransactRequest(
@@ -478,7 +486,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
   });
   it("should realize a transfer", async () => {
-    const address: Address = `http://localhost`;
+    const address: Address = `http://${gatewayAddress}`;
 
     // gateway setup:
     const gatewayIdentity = {
@@ -525,6 +533,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
+      url: gatewayAddress,
     };
 
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
@@ -532,10 +541,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     await gatewayRunner.start(true);
     log.debug("gatewayRunner started sucessfully");
 
-    const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
-
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({
+        basePath: `http://${await gatewayRunner.getOApiHost()}`,
+      }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
@@ -579,7 +588,9 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({
+        basePath: `http://${await gatewayRunner.getOApiHost()}`,
+      }),
     );
 
     const req = getTransactRequest(
