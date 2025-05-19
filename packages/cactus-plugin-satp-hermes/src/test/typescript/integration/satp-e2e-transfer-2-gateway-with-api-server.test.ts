@@ -808,7 +808,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-  
+
     await shutdownGateways();
   });
 });
