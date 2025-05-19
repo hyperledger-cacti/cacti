@@ -15,7 +15,6 @@ model_chain_code_life_cycle_command_responses.go
 model_chain_code_programming_language.go
 model_connection_profile.go
 model_connection_profile_client.go
-model_create_listener_request.go
 model_default_event_handler_strategy.go
 model_deploy_contract_go_source_v1_501_response.go
 model_deploy_contract_go_source_v1_request.go

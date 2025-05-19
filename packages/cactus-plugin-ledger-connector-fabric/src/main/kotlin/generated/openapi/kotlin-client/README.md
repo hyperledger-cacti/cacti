@@ -67,7 +67,6 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.ChainCodeProgrammingLanguage](docs/ChainCodeProgrammingLanguage.md)
  - [org.openapitools.client.models.ConnectionProfile](docs/ConnectionProfile.md)
  - [org.openapitools.client.models.ConnectionProfileClient](docs/ConnectionProfileClient.md)
- - [org.openapitools.client.models.CreateListenerRequest](docs/CreateListenerRequest.md)
  - [org.openapitools.client.models.DefaultEventHandlerStrategy](docs/DefaultEventHandlerStrategy.md)
  - [org.openapitools.client.models.DeployContractGoSourceV1501Response](docs/DeployContractGoSourceV1501Response.md)
  - [org.openapitools.client.models.DeployContractGoSourceV1Request](docs/DeployContractGoSourceV1Request.md)

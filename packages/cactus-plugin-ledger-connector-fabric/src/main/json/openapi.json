@@ -1063,35 +1063,6 @@
           }
         }
       },
-      "CreateListenerRequest": {
-        "description": "Request for Create Listener endpoint.",
-        "type": "object",
-        "required": ["channelName", "contractName"],
-        "properties": {
-          "channelName": {
-            "type": "string",
-            "description": "Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used",
-            "minLength": 1,
-            "maxLength": 100,
-            "nullable": false
-          },
-          "contractName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100,
-            "nullable": false
-          },
-          "gatewayOptions": {
-            "$ref": "#/components/schemas/GatewayOptions",
-            "description": "Fabric SDK gateway options.",
-            "nullable": false
-          },
-          "signingCredential": {
-            "$ref": "#/components/schemas/FabricSigningCredential",
-            "nullable": false
-          }
-        }
-      },
       "GetChainInfoRequestV1": {
         "description": "Request for GetChainInfo endpoint.",
         "type": "object",

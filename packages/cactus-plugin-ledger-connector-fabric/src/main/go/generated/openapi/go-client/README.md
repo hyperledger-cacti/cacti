@@ -99,7 +99,6 @@ Class | Method | HTTP request | Description
  - [ChainCodeProgrammingLanguage](docs/ChainCodeProgrammingLanguage.md)
  - [ConnectionProfile](docs/ConnectionProfile.md)
  - [ConnectionProfileClient](docs/ConnectionProfileClient.md)
- - [CreateListenerRequest](docs/CreateListenerRequest.md)
  - [DefaultEventHandlerStrategy](docs/DefaultEventHandlerStrategy.md)
  - [DeployContractGoSourceV1501Response](docs/DeployContractGoSourceV1501Response.md)
  - [DeployContractGoSourceV1Request](docs/DeployContractGoSourceV1Request.md)

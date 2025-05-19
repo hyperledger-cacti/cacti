@@ -1,4 +1,8 @@
 import Long from "long";
+import {
+  FabricSigningCredential,
+  GatewayOptions,
+} from "../generated/openapi/typescript-axios/api";
 
 /**
  * Check if provided variable is a function. Throws otherwise.
@@ -52,4 +56,31 @@ export function fabricLongToNumber(longNumberObject: FabricLong) {
     longNumberObject.unsigned,
   );
   return longValue.toNumber();
+}
+
+export interface CreateListenerRequest {
+  /**
+   * Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used
+   * @type {string}
+   * @memberof CreateListenerRequest
+   */
+  channelName: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateListenerRequest
+   */
+  contractName: string;
+  /**
+   *
+   * @type {GatewayOptions}
+   * @memberof CreateListenerRequest
+   */
+  gatewayOptions?: GatewayOptions;
+  /**
+   *
+   * @type {FabricSigningCredential}
+   * @memberof CreateListenerRequest
+   */
+  signingCredential?: FabricSigningCredential;
 }

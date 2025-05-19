@@ -280,37 +280,6 @@ export interface ConnectionProfileClient {
     'organization'?: string;
 }
 /**
- * Request for Create Listener endpoint.
- * @export
- * @interface CreateListenerRequest
- */
-export interface CreateListenerRequest {
-    /**
-     * Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used
-     * @type {string}
-     * @memberof CreateListenerRequest
-     */
-    'channelName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateListenerRequest
-     */
-    'contractName': string;
-    /**
-     * 
-     * @type {GatewayOptions}
-     * @memberof CreateListenerRequest
-     */
-    'gatewayOptions'?: GatewayOptions;
-    /**
-     * 
-     * @type {FabricSigningCredential}
-     * @memberof CreateListenerRequest
-     */
-    'signingCredential'?: FabricSigningCredential;
-}
-/**
  * 
  * @export
  * @enum {string}

@@ -43,11 +43,8 @@ import {
 } from "../../../../main/typescript/public-api";
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
-import {
-  CreateListenerRequest,
-  GatewayOptions,
-} from "../../../../main/typescript/generated/openapi/typescript-axios/api";
-
+import { GatewayOptions } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
+import { CreateListenerRequest } from "../../../../main/typescript/common/utils";
 // For development on local fabric network
 // 1. leaveLedgerRunning = true, useRunningLedger = false to run ledger and leave it running after test finishes.
 // 2. leaveLedgerRunning = true, useRunningLedger = true to use that ledger in future runs.
