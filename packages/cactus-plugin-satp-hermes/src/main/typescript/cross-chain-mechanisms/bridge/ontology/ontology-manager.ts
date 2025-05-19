@@ -9,16 +9,31 @@ import { InteractionsRequest as EvmInteractionSignature } from "../../../generat
 import {
   fabricInteractionList,
   FabricInteractionSignature,
+  VarType as FabricVarTypes,
 } from "./assets/fabric-asset";
-import { evmInteractionList } from "./assets/evm-asset";
-import { LedgerNotSupported, OntologyNotFoundError } from "./ontology-errors";
+import { evmInteractionList, VarType as EvmVarTypes } from "./assets/evm-asset";
+import {
+  InvalidSignatureError,
+  LedgerNotSupported,
+  OntologyNotFoundError,
+  HashNotMatchingError,
+} from "./ontology-errors";
 import * as fs from "fs";
 import * as path from "path";
 import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
+  Secp256k1Keys,
+  JsObjectSigner,
 } from "@hyperledger/cactus-common";
+import { InteractionType } from "./assets/interact-types";
+import {
+  validateOntologyJsonFormat,
+  validateOntologyFormat,
+  validateOntologyHash,
+  validateOntologySignature,
+} from "./ontology-validation-functions";
 
 /**
  * Options for configuring the OntologyManager.
@@ -31,6 +46,19 @@ export interface IOntologyManagerOptions {
   ontologiesPath?: string;
 }
 
+export interface OntologyJsonFormat {
+  name: string;
+  id: string;
+  type: string;
+  contract: string;
+  ontology: object;
+  bytecode: string;
+  signature: string;
+  hash: string;
+}
+
+export type InteractionElements = Record<keyof typeof InteractionType, number>;
+
 /**
  * Manages ontologies for different ledger types.
  * @class OntologyManager
@@ -39,6 +67,11 @@ export class OntologyManager {
   public static readonly CLASS_NAME = "OntologyManager";
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
+  private publicKeyArray: Uint8Array[] = [];
+  private managerKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  private managerJsObjectSigner = new JsObjectSigner({
+    privateKey: this.managerKeyPair.privateKey,
+  });
 
   private ontologies: Map<LedgerType, Map<string, string>> = new Map<
     LedgerType,
@@ -50,11 +83,14 @@ export class OntologyManager {
    * @constructor
    * @param {IOntologyManagerOptions} options - The options for configuring the OntologyManager.
    */
-  constructor(options: IOntologyManagerOptions) {
+  constructor(options: IOntologyManagerOptions, pubKeyArray?: Uint8Array[]) {
     const label = OntologyManager.CLASS_NAME;
     this.logLevel = options.logLevel || "INFO";
     this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
     const ontologiesPath = options.ontologiesPath;
+    if (pubKeyArray != undefined) {
+      this.publicKeyArray = pubKeyArray;
+    }
 
     if (ontologiesPath) {
       const files = fs.readdirSync(ontologiesPath);
@@ -77,6 +113,7 @@ export class OntologyManager {
             this.ontologies.get(ledgerType)?.set(tokenId, content);
           } catch (error) {
             this.log.error(`Error reading ontology file ${file}: ${error}`);
+            throw error;
           }
         }
       });
@@ -140,7 +177,62 @@ export class OntologyManager {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private checkOntology(ontology: string): void {
-    //TODO: implement
+    const ontologyJson = validateOntologyJsonFormat(JSON.stringify(ontology));
+    const fnTag = `${OntologyManager.CLASS_NAME}#getOntology()`;
+    const ontologyID = ontologyJson.id;
+    const ontologyType = ontologyJson.type as LedgerType;
+    const ontologyOntology = ontologyJson.ontology as InteractionElements;
+    const ontologySignature = ontologyJson.signature;
+    const ontologyHash = ontologyJson.hash;
+    switch (ontologyType) {
+      case LedgerType.Besu1X:
+      case LedgerType.Besu2X:
+      case LedgerType.Ethereum:
+        validateOntologyFormat(
+          ontologyOntology as InteractionElements,
+          Object.values(EvmVarTypes) as string[],
+          ontologyID,
+          ontologyType,
+        );
+      case LedgerType.Fabric2:
+        validateOntologyFormat(
+          ontologyOntology,
+          Object.values(FabricVarTypes) as string[],
+          ontologyID,
+          ontologyType,
+        );
+      default:
+        console.log(ontologyType);
+    }
+
+    let validSignature = false;
+    if (this.publicKeyArray.length !== 0) {
+      for (const pubKey of this.publicKeyArray) {
+        validSignature = validateOntologySignature(
+          ontologyOntology,
+          pubKey,
+          ontologySignature,
+          this.managerJsObjectSigner,
+        );
+      }
+      if (!validSignature) {
+        throw new InvalidSignatureError(
+          `${fnTag}, Ontology of ledger: ${ontologyType} with id: ${ontologyID} with an invalid signature`,
+        );
+      }
+    }
+
+    if (
+      !validateOntologyHash(
+        ontologyOntology,
+        ontologyHash,
+        this.managerJsObjectSigner,
+      )
+    ) {
+      throw new HashNotMatchingError(
+        `${fnTag}, Ontology of ledger: ${ontologyType} with id: ${ontologyID} has an invalid hash`,
+      );
+    }
   }
 
   /**
