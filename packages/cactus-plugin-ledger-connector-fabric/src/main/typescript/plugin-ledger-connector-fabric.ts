@@ -162,6 +162,7 @@ import { isSshExecOk } from "./common/is-ssh-exec-ok";
 import {
   asBuffer,
   assertFabricFunctionIsAvailable,
+  FabricLong,
   fabricLongToNumber,
 } from "./common/utils";
 import { findAndReplaceFabricLoggingSpec } from "./common/find-and-replace-fabric-logging-spec";
@@ -1714,7 +1715,9 @@ export class PluginLedgerConnectorFabric
     }
 
     return {
-      height: fabricLongToNumber(decodedResponse.height),
+      height: fabricLongToNumber(
+        decodedResponse.height as unknown as FabricLong,
+      ),
       currentBlockHash:
         "0x" + Buffer.from(decodedResponse.currentBlockHash).toString("hex"),
       previousBlockHash:
