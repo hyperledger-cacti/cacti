@@ -112,7 +112,6 @@ import {
   GetChainInfoResponseV1,
   GetDiscoveryResultsRequestV1,
   GetDiscoveryResultsResponseV1,
-  CreateListenerRequest,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -162,6 +161,7 @@ import { isSshExecOk } from "./common/is-ssh-exec-ok";
 import {
   asBuffer,
   assertFabricFunctionIsAvailable,
+  CreateListenerRequest,
   FabricLong,
   fabricLongToNumber,
 } from "./common/utils";

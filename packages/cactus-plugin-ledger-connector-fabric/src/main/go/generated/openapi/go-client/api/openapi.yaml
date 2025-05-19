@@ -1547,29 +1547,6 @@ components:
       - gatewayOptions
       - query
       type: object
-    CreateListenerRequest:
-      description: Request for Create Listener endpoint.
-      properties:
-        channelName:
-          description: "Fabric channel we want to connect to. If not provided, then\
-            \ one from channelName parameter will be used"
-          maxLength: 100
-          minLength: 1
-          nullable: false
-          type: string
-        contractName:
-          maxLength: 100
-          minLength: 1
-          nullable: false
-          type: string
-        gatewayOptions:
-          $ref: '#/components/schemas/GatewayOptions'
-        signingCredential:
-          $ref: '#/components/schemas/FabricSigningCredential'
-      required:
-      - channelName
-      - contractName
-      type: object
     GetChainInfoRequestV1:
       description: Request for GetChainInfo endpoint.
       example:
