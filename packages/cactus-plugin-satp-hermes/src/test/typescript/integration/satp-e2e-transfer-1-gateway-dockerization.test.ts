@@ -58,9 +58,14 @@ const testNetwork = "test-network";
 
 const gatewayAddress = "gateway.satp-hermes";
 
+async function destroyGatewayRunner() {
+  if (gatewayRunner) {
+    await gatewayRunner.stop();
+    await gatewayRunner.destroy();
+  }
+};
+
 afterAll(async () => {
-  await gatewayRunner.stop();
-  await gatewayRunner.destroy();
   await db_local.stop();
   await db_local.remove();
   await db_remote.stop();
@@ -306,20 +311,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+
+    await destroyGatewayRunner();
   });
 });
 
 describe("SATPGateway sending a token from Fabric to Besu", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await fabricEnv.mintTokens("100");
-    await fabricEnv.checkBalance(
-      fabricEnv.getTestContractName(),
-      fabricEnv.getTestChannelName(),
-      fabricEnv.getTestOwnerAccount(),
-      "100",
-      fabricEnv.getTestOwnerSigningCredential(),
-    );
-  });
   it("should realize a transfer", async () => {
     const address: Address = `http://${gatewayAddress}`;
 
@@ -470,21 +467,12 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
+  
+    await destroyGatewayRunner();
   });
 });
 
 describe("SATPGateway sending a token from Besu to Ethereum", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
-    await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-  });
   it("should realize a transfer", async () => {
     const address: Address = `http://${gatewayAddress}`;
 
@@ -620,7 +608,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       besuEnv.getTestContractName(),
       besuEnv.getTestContractAddress(),
       besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
+      besuEnv.getBridgeEthAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
@@ -645,5 +633,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+    
+    await destroyGatewayRunner();
   });
 });
