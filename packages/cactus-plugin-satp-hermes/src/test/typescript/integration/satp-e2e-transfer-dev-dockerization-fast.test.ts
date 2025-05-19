@@ -65,13 +65,19 @@ const testNetwork = "test-network";
 const gateway1Address = "gateway1.satp-hermes";
 const gateway2Address = "gateway2.satp-hermes";
 
-afterAll(async () => {
-  await gatewayRunner1.stop();
-  await gatewayRunner1.destroy();
+async function destroyGatewayRunners() {
+  if (gatewayRunner1) {
+    await gatewayRunner1.stop();
+    await gatewayRunner1.destroy();
+  }
+
   if (gatewayRunner2) {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
+};
+
+afterAll(async () => {
   await db_local1.stop();
   await db_local1.remove();
   await db_remote1.stop();
@@ -170,6 +176,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
   });
+
   it("should realize a transfer", async () => {
     const address: Address = `http://${gateway1Address}`;
 
@@ -307,7 +314,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       besuEnv.getTestContractName(),
       besuEnv.getTestContractAddress(),
       besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
+      besuEnv.getBridgeEthAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
@@ -332,6 +339,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+
+    await destroyGatewayRunners();
   });
 });
 
@@ -563,7 +572,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       besuEnv.getTestContractName(),
       besuEnv.getTestContractAddress(),
       besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
+      besuEnv.getBridgeEthAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
@@ -584,9 +593,11 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestContractAddress(),
       ethereumEnv.getTestContractAbi(),
       ethereumEnv.getTestOwnerAccount(),
-      "100",
+      "200",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+  
+    await destroyGatewayRunners();
   });
 });

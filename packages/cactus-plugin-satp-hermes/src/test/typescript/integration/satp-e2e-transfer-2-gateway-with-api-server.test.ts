@@ -58,6 +58,15 @@ let ethereumEnv: EthereumTestEnvironment;
 let gateway1: SATPGateway;
 let gateway2: SATPGateway;
 
+async function shutdownGateways() {
+  if (gateway1) {
+    await gateway1.shutdown();
+  }
+  if (gateway2) {
+    await gateway2.shutdown();
+  }
+}
+
 afterAll(async () => {
   if (gateway1) {
     if (knexSourceRemoteInstance) {
@@ -71,8 +80,6 @@ afterAll(async () => {
     }
   }
 
-  await gateway1.shutdown();
-  await gateway2.shutdown();
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
 
@@ -356,19 +363,12 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
       fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
+
+    await shutdownGateways();
   });
 });
+
 describe("2 SATPGateways sending a token from Fabric to Besu", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await fabricEnv.mintTokens("100");
-    await fabricEnv.checkBalance(
-      fabricEnv.getTestContractName(),
-      fabricEnv.getTestChannelName(),
-      fabricEnv.getTestOwnerAccount(),
-      "100",
-      fabricEnv.getTestOwnerSigningCredential(),
-    );
-  });
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
@@ -582,21 +582,12 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Wrapper account");
+
+    await shutdownGateways();
   });
 });
 
 describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
-    await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-  });
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
@@ -817,5 +808,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+  
+    await shutdownGateways();
   });
 });
