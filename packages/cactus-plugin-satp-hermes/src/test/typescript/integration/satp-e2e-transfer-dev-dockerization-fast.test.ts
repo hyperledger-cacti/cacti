@@ -75,7 +75,7 @@ async function destroyGatewayRunners() {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
-};
+}
 
 afterAll(async () => {
   await db_local1.stop();
@@ -597,7 +597,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-  
+
     await destroyGatewayRunners();
   });
 });
