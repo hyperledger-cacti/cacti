@@ -63,7 +63,7 @@ async function destroyGatewayRunner() {
     await gatewayRunner.stop();
     await gatewayRunner.destroy();
   }
-};
+}
 
 afterAll(async () => {
   await db_local.stop();
@@ -467,7 +467,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
-  
+
     await destroyGatewayRunner();
   });
 });
@@ -633,7 +633,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-    
+
     await destroyGatewayRunner();
   });
 });
