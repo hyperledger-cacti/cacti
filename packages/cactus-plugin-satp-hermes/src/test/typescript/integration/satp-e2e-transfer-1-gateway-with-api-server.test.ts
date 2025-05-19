@@ -434,7 +434,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
-    
+
     await gateway.shutdown();
   });
 });
