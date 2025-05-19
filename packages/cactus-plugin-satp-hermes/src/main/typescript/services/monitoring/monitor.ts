@@ -113,4 +113,17 @@ export class MonitorService {
 
     return newSpan;
   }
+
+  public shutdown(): void {
+    this.logger.info("Shutting down MonitorService...");
+    if (this.tracerProvider) {
+      this.tracerProvider.shutdown();
+      this.tracerProvider = undefined;
+    }
+    if (this.meterProvider) {
+      this.meterProvider.shutdown();
+      this.meterProvider = undefined;
+    }
+    this.logger.info("MonitorService shutdown complete");
+  }
 }
