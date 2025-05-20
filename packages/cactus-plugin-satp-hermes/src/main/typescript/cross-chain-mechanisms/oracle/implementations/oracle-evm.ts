@@ -12,6 +12,7 @@ import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/
 import {
   ContractJSON,
   EthContractInvocationType,
+  GasTransactionConfig,
   IPluginLedgerConnectorEthereumOptions,
   isWeb3SigningCredentialNone,
   PluginLedgerConnectorEthereum,
@@ -62,6 +63,7 @@ export class OracleEVM extends OracleAbstract {
   protected readonly bungee?: PluginBungeeHermes;
   protected readonly claimFormats: ClaimFormat[];
   protected readonly keyPair: ISignerKeyPair;
+  protected readonly gasConfig: GasTransactionConfig | undefined;
 
   private readonly signingCredential:
     | Web3SigningCredentialPrivateKeyHex
@@ -87,6 +89,8 @@ export class OracleEVM extends OracleAbstract {
         `${OracleEVM.CLASS_NAME}#constructor, supports only Ethereum networks but got ${options.networkIdentification.ledgerType}`,
       );
     }
+
+    this.gasConfig = options.gasConfig;
 
     this.networkIdentification = {
       id: options.networkIdentification.id,
@@ -159,6 +163,7 @@ export class OracleEVM extends OracleAbstract {
       methodName: args.methodName,
       params: args.params,
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as {
       success: boolean;
       out: { transactionReceipt: { transactionHash?: string } };
@@ -259,7 +264,10 @@ export class OracleEVM extends OracleAbstract {
         );
       }
 
-      const output_params = this.extractNamedParams(this.decodedEventToDict(decoded), filter);
+      const output_params = this.extractNamedParams(
+        this.decodedEventToDict(decoded),
+        filter,
+      );
 
       callback(output_params);
     });
@@ -318,7 +326,7 @@ export class OracleEVM extends OracleAbstract {
       // Skip numeric keys to avoid indexed parameters
       if (!isNaN(Number(key))) continue;
 
-      result[key] = value !== null && value !== undefined ? String(value) : '';
+      result[key] = value !== null && value !== undefined ? String(value) : "";
     }
 
     return result;
