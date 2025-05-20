@@ -10,6 +10,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import {
   EthContractInvocationType,
+  GasTransactionConfig,
   InvokeContractV1Response,
   IPluginLedgerConnectorEthereumOptions,
   PluginLedgerConnectorEthereum,
@@ -61,6 +62,10 @@ export class EthereumTestEnvironment {
   public assetContractAddress!: string;
   public wrapperContractAddress!: string;
   public ethereumConfig!: IEthereumLeafNeworkOptions;
+  public gasConfig: GasTransactionConfig | undefined = {
+    gas: "6721975",
+    gasPrice: "20000000000",
+  };
 
   private dockerNetwork?: string;
 
@@ -211,7 +216,7 @@ export class EthereumTestEnvironment {
       ontologyManager: ontologyManager,
       wrapperContractName: this.ethereumConfig.wrapperContractName,
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
-      gas: this.ethereumConfig.gas,
+      gasConfig: this.ethereumConfig.gasConfig,
       connectorOptions: {
         instanceId: this.connectorOptions.instanceId,
         rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
@@ -231,7 +236,7 @@ export class EthereumTestEnvironment {
       signingCredential: this.ethereumConfig.signingCredential,
       wrapperContractName: this.ethereumConfig.wrapperContractName,
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
-      gas: this.ethereumConfig.gas,
+      gasConfig: this.ethereumConfig.gasConfig,
       connectorOptions: {
         rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
         rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
@@ -247,7 +252,7 @@ export class EthereumTestEnvironment {
       signingCredential: this.ethereumConfig.signingCredential,
       wrapperContractName: this.ethereumConfig.wrapperContractName,
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
-      gas: this.ethereumConfig.gas,
+      gasConfig: this.ethereumConfig.gasConfig,
       connectorOptions: {
         rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
         rpcApiWsHost: await this.ledger.getRpcApiWebSocketHost(false),
@@ -294,7 +299,7 @@ export class EthereumTestEnvironment {
       leafId: "Testing-event-ethereum-leaf",
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: 5000000,
+      gasConfig: this.gasConfig,
     };
 
     this.log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
@@ -317,6 +322,7 @@ export class EthereumTestEnvironment {
       },
       constructorArgs: [],
       web3SigningCredential: this.getTestOracleSigningCredential(),
+      gasConfig: this.gasConfig,
     });
     expect(blOracleContract).toBeTruthy();
     expect(blOracleContract.transactionReceipt).toBeTruthy();
@@ -332,7 +338,7 @@ export class EthereumTestEnvironment {
       signingCredential: this.getTestOracleSigningCredential(),
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: 5000000,
+      gasConfig: this.gasConfig,
     };
 
     return blOracleContract.transactionReceipt.contractAddress!;

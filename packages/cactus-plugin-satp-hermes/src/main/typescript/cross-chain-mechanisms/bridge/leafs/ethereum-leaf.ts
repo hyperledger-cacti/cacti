@@ -1,6 +1,7 @@
 import { INetworkOptions, TransactionResponse } from "../bridge-types";
 import {
   EthContractInvocationType,
+  GasTransactionConfig,
   InvokeRawWeb3EthMethodV1Request,
   IPluginLedgerConnectorEthereumOptions,
   isWeb3SigningCredentialNone,
@@ -62,7 +63,7 @@ export interface IEthereumLeafNeworkOptions extends INetworkOptions {
   connectorOptions: Partial<IPluginLedgerConnectorEthereumOptions>;
   wrapperContractName?: string;
   wrapperContractAddress?: string;
-  gas?: number;
+  gasConfig?: GasTransactionConfig;
   leafId?: string;
   keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
@@ -141,7 +142,7 @@ export class EthereumLeaf
     | Web3SigningCredentialGethKeychainPassword
     | Web3SigningCredentialCactiKeychainRef;
 
-  private readonly gas: number;
+  private readonly gasConfig: GasTransactionConfig | undefined;
 
   private wrapperFungibleDeployReceipt: Web3TransactionReceipt | undefined;
 
@@ -205,7 +206,7 @@ export class EthereumLeaf
     }
     this.signingCredential = options.signingCredential;
 
-    this.gas = options.gas || 999999999999999; // TODO: set default gas
+    this.gasConfig = options.gasConfig;
 
     for (const claim of this.claimFormats) {
       switch (claim) {
@@ -374,7 +375,7 @@ export class EthereumLeaf
       },
       constructorArgs: [this.signingCredential.ethAccount],
       web3SigningCredential: this.signingCredential,
-      // gasConfig: {};
+      gasConfig: this.gasConfig,
     });
 
     if (!deployOutWrapperContract.transactionReceipt) {
