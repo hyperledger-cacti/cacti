@@ -44,29 +44,59 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**createPayment**](docs/DefaultApi.md#createpayment) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/create-payment | Create a new payment for a product
+*DefaultApi* | [**deployRoleManager**](docs/DefaultApi.md#deployrolemanager) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/deploy-role-manager | Deploy RoleManager contract
 *DefaultApi* | [**insertBambooHarvestV1**](docs/DefaultApi.md#insertbambooharvestv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest | Inserts the provided BambooHarvest entity to the ledger.
 *DefaultApi* | [**insertBookshelfV1**](docs/DefaultApi.md#insertbookshelfv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf | Inserts the provided Bookshelf entity to the ledger.
+*DefaultApi* | [**insertManufacturerDataV1**](docs/DefaultApi.md#insertmanufacturerdatav1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-manufacturer-data | Inserts manufacturer data to the Fabric ledger
 *DefaultApi* | [**insertShipmentV1**](docs/DefaultApi.md#insertshipmentv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment | Inserts the provided Shipment entity to the ledger.
 *DefaultApi* | [**listBambooHarvestV1**](docs/DefaultApi.md#listbambooharvestv1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest | Lists all the BambooHarvest entities stored on the ledger.
 *DefaultApi* | [**listBookshelfV1**](docs/DefaultApi.md#listbookshelfv1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf | Lists all the Bookshelf entities stored on the ledger.
+*DefaultApi* | [**listManufacturerDataV1**](docs/DefaultApi.md#listmanufacturerdatav1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-manufacturer-data | List all manufacturer data
 *DefaultApi* | [**listShipmentV1**](docs/DefaultApi.md#listshipmentv1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment | Lists all the Shipments entities stored on the ledger.
+*DefaultApi* | [**processPayment**](docs/DefaultApi.md#processpayment) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/process-payment | Process an existing payment
+*DefaultApi* | [**updateBookshelfStatusV1**](docs/DefaultApi.md#updatebookshelfstatusv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/update-bookshelf-status | Updates the status of a bookshelf entity on the ledger.
+*ManufacturerDataApi* | [**assignShipmentV1**](docs/ManufacturerDataApi.md#assignshipmentv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/assign-shipment | Assign a shipment ID to a manufacturer data item
+*SupplyChainApi* | [**deleteBambooHarvestV1**](docs/SupplyChainApi.md#deletebambooharvestv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/delete-bamboo-harvest | Delete a bamboo harvest record
+*SupplyChainApi* | [**updateBambooHarvestStatus**](docs/SupplyChainApi.md#updatebambooharveststatus) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/update-bamboo-harvest-status | Update Bamboo Harvest Status
+*SupplyChainApi* | [**updateShipmentStatus**](docs/SupplyChainApi.md#updateshipmentstatus) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/update-shipment-status | Update Shipment Status
 
 
 <a id="documentation-for-models"></a>
 ## Documentation for Models
 
+ - [org.openapitools.client.models.AssignShipmentV1200Response](docs/AssignShipmentV1200Response.md)
+ - [org.openapitools.client.models.AssignShipmentV1Request](docs/AssignShipmentV1Request.md)
  - [org.openapitools.client.models.BambooHarvest](docs/BambooHarvest.md)
  - [org.openapitools.client.models.Bookshelf](docs/Bookshelf.md)
+ - [org.openapitools.client.models.CreatePaymentRequest](docs/CreatePaymentRequest.md)
+ - [org.openapitools.client.models.CreatePaymentResponse](docs/CreatePaymentResponse.md)
+ - [org.openapitools.client.models.DeleteBambooHarvestV1200Response](docs/DeleteBambooHarvestV1200Response.md)
+ - [org.openapitools.client.models.DeleteBambooHarvestV1400Response](docs/DeleteBambooHarvestV1400Response.md)
+ - [org.openapitools.client.models.DeleteBambooHarvestV1Request](docs/DeleteBambooHarvestV1Request.md)
+ - [org.openapitools.client.models.DeployRoleManager200Response](docs/DeployRoleManager200Response.md)
  - [org.openapitools.client.models.InsertBambooHarvestRequest](docs/InsertBambooHarvestRequest.md)
  - [org.openapitools.client.models.InsertBambooHarvestResponse](docs/InsertBambooHarvestResponse.md)
  - [org.openapitools.client.models.InsertBookshelfRequest](docs/InsertBookshelfRequest.md)
  - [org.openapitools.client.models.InsertBookshelfResponse](docs/InsertBookshelfResponse.md)
+ - [org.openapitools.client.models.InsertManufacturerDataRequest](docs/InsertManufacturerDataRequest.md)
+ - [org.openapitools.client.models.InsertManufacturerDataResponse](docs/InsertManufacturerDataResponse.md)
  - [org.openapitools.client.models.InsertShipmentRequest](docs/InsertShipmentRequest.md)
  - [org.openapitools.client.models.InsertShipmentResponse](docs/InsertShipmentResponse.md)
  - [org.openapitools.client.models.ListBambooHarvestResponse](docs/ListBambooHarvestResponse.md)
  - [org.openapitools.client.models.ListBookshelfResponse](docs/ListBookshelfResponse.md)
+ - [org.openapitools.client.models.ListManufacturerDataResponse](docs/ListManufacturerDataResponse.md)
  - [org.openapitools.client.models.ListShipmentResponse](docs/ListShipmentResponse.md)
+ - [org.openapitools.client.models.ManufacturerData](docs/ManufacturerData.md)
+ - [org.openapitools.client.models.ProcessPaymentRequest](docs/ProcessPaymentRequest.md)
+ - [org.openapitools.client.models.ProcessPaymentResponse](docs/ProcessPaymentResponse.md)
  - [org.openapitools.client.models.Shipment](docs/Shipment.md)
+ - [org.openapitools.client.models.UpdateBambooHarvestStatusRequest](docs/UpdateBambooHarvestStatusRequest.md)
+ - [org.openapitools.client.models.UpdateBookshelfStatusRequest](docs/UpdateBookshelfStatusRequest.md)
+ - [org.openapitools.client.models.UpdateBookshelfStatusV1200Response](docs/UpdateBookshelfStatusV1200Response.md)
+ - [org.openapitools.client.models.UpdateShipmentStatus200Response](docs/UpdateShipmentStatus200Response.md)
+ - [org.openapitools.client.models.UpdateShipmentStatus500Response](docs/UpdateShipmentStatus500Response.md)
+ - [org.openapitools.client.models.UpdateShipmentStatusRequest](docs/UpdateShipmentStatusRequest.md)
 
 
 <a id="documentation-for-authorization"></a>
