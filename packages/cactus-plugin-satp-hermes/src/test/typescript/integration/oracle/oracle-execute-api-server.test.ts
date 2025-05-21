@@ -229,7 +229,9 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       OracleOperationStatusEnum.Success,
     );
 
-    let response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    let response2 = await oracleApi.getOracleTaskStatus(
+      response.data.taskID ?? "",
+    );
 
     expect(response2).toBeDefined();
     expect(response2.data.taskID).toBe(response.data.taskID);
@@ -261,7 +263,6 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
   });
 
   it("should read the data from the contract calling a function with args (EVM and Fabric)", async () => {
-
     let response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
@@ -279,8 +280,9 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     expect(response.data.taskID).toBeDefined();
     expect(response.data.operations?.length).toBe(1);
 
-
-    let response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    let response2 = await oracleApi.getOracleTaskStatus(
+      response.data.taskID ?? "",
+    );
 
     expect(response2).toBeDefined();
     expect(response2?.data.status).toBe(OracleTaskStatusEnum.Inactive);
@@ -313,7 +315,6 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
   });
 
   it("should read data and write it to another blockchain (EVM to Besu)", async () => {
-
     const response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
@@ -337,10 +338,14 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
 
     expect(response).toBeDefined();
     expect(response.data.taskID).toBeDefined();
-    expect(response.data.type).toBe(OracleExecuteRequestTaskTypeEnum.ReadAndUpdate);
+    expect(response.data.type).toBe(
+      OracleExecuteRequestTaskTypeEnum.ReadAndUpdate,
+    );
     expect(response.data.operations.length).toBe(2);
     expect(response.data.operations[0].type).toBe(OracleOperationTypeEnum.Read);
-    expect(response.data.operations[1].type).toBe(OracleOperationTypeEnum.Update);
+    expect(response.data.operations[1].type).toBe(
+      OracleOperationTypeEnum.Update,
+    );
     expect(response.data.operations[0].status).toBe(
       OracleOperationStatusEnum.Success,
     );
@@ -348,7 +353,9 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       OracleOperationStatusEnum.Success,
     );
 
-    let response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    const response2 = await oracleApi.getOracleTaskStatus(
+      response.data.taskID ?? "",
+    );
 
     expect(response2).toBeDefined();
     expect(response2).toBeDefined();
