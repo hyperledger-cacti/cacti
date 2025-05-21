@@ -68,6 +68,7 @@ import { unregisterTask } from "./oracle/oracle-unregister-task-handler-service"
 import { OracleRegisterTaskEndpointV1 } from "./oracle/oracle-register-task-endpoint";
 import { OracleUnregisterTaskEndpointV1 } from "./oracle/oracle-unregister-task-endpoint";
 import { GetOracleStatusEndpointV1 } from "./oracle/oracle-get-status-endpoint";
+import safeStableStringify from "safe-stable-stringify";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -388,7 +389,9 @@ export class BLODispatcher {
   public async OracleExecuteTask(
     req: OracleExecuteRequest,
   ): Promise<OracleTask> {
-    this.logger.info(`Oracle Execute Task request: ${req}`);
+    this.logger.info(
+      `Oracle Execute Task request: ${safeStableStringify(req)}`,
+    );
     if (this.isShuttingDown) {
       throw new GatewayShuttingDownError(
         `${BLODispatcher.CLASS_NAME}#OracleExecuteTask()`,
@@ -404,7 +407,7 @@ export class BLODispatcher {
   public async OracleRegisterTask(
     req: OracleRegisterRequest,
   ): Promise<OracleTask> {
-    this.logger.info(`Oracle Register Request: ${req}`);
+    this.logger.info(`Oracle Register Request: ${safeStableStringify(req)}`);
     if (this.isShuttingDown) {
       throw new GatewayShuttingDownError(
         `${BLODispatcher.CLASS_NAME}#OracleRegisterTask()`,
@@ -420,7 +423,7 @@ export class BLODispatcher {
   public async OracleUnregisterTask(
     req: OracleUnregisterRequest,
   ): Promise<OracleTask> {
-    this.logger.info(`Oracle Unregister Request: ${req}`);
+    this.logger.info(`Oracle Unregister Request: ${safeStableStringify(req)}`);
     if (this.isShuttingDown) {
       throw new GatewayShuttingDownError(
         `${BLODispatcher.CLASS_NAME}#OracleUnregisterTask()`,
@@ -436,7 +439,7 @@ export class BLODispatcher {
   public async OracleGetTaskStatus(
     req: OracleStatusRequest,
   ): Promise<OracleTask> {
-    this.logger.info(`Oracle Get Status request: ${req}`);
+    this.logger.info(`Oracle Get Status request: ${safeStableStringify(req)}`);
     if (this.isShuttingDown) {
       throw new GatewayShuttingDownError(
         `${BLODispatcher.CLASS_NAME}#OracleGetStatus()`,
