@@ -1,4 +1,5 @@
 import {
+  GasTransactionConfig,
   type Web3SigningCredential,
   type Web3SigningCredentialCactiKeychainRef,
   type Web3SigningCredentialGethKeychainPassword,
@@ -21,7 +22,7 @@ export interface EthereumConfigJSON extends NetworkOptionsJSON {
   connectorOptions: EthereumOptionsJSON;
   wrapperContractName?: string;
   wrapperContractAddress?: string;
-  gas?: number;
+  gasConfig?: GasTransactionConfig;
   leafId?: string;
   keyPair?: KeyPairJSON;
   claimFormats?: ClaimFormat[];
@@ -119,6 +120,29 @@ function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
   );
 }
 
+function isGasConfig(obj: unknown): obj is GasTransactionConfig {
+  if (!obj || typeof obj !== "object") {
+    throw new TypeError(
+      "isGasConfig: obj null or not obj" + JSON.stringify(obj),
+    );
+  }
+
+  const objRecord = obj as Record<string, unknown>;
+
+  return (
+    ("gas" in obj &&
+      typeof objRecord.gas === "string" &&
+      "gasPrice" in obj &&
+      typeof objRecord.gasPrice === "string") ||
+    ("gasLimit" in obj &&
+      typeof objRecord.gasLimit === "string" &&
+      "maxFeePerGas" in obj &&
+      typeof objRecord.maxFeePerGas === "string" &&
+      "maxPriorityFeePerGas" in obj &&
+      typeof objRecord.maxPriorityFeePerGas === "string")
+  );
+}
+
 // Type guard for EthereumConfigJSON
 export function isEthereumConfigJSON(obj: unknown): obj is EthereumConfigJSON {
   if (typeof obj !== "object" || obj === null) {
@@ -136,7 +160,7 @@ export function isEthereumConfigJSON(obj: unknown): obj is EthereumConfigJSON {
       typeof objRecord.wrapperContractName === "string") &&
     (!("wrapperContractAddress" in obj) ||
       typeof objRecord.wrapperContractAddress === "string") &&
-    (!("gas" in obj) || typeof objRecord.gas === "number") &&
+    (!("gasConfig" in obj) || isGasConfig(objRecord.gasConfig)) &&
     (!("leafId" in obj) || typeof objRecord.leafId === "string") &&
     (!("keyPair" in obj) || typeof objRecord.keyPair === "object") &&
     (!("claimFormats" in obj) ||
