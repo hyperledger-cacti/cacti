@@ -95,22 +95,14 @@ afterAll(async () => {
 afterEach(async () => {
   if (gatewayRunner1) {
     log.debug("Stopping gatewayRunner1...");
-    try {
-      await gatewayRunner1.stop();
-      await gatewayRunner1.destroy();
-    } catch (e) {
-      log.error("Error stopping gatewayRunner1", e);
-    }
+    await gatewayRunner1.stop();
+    await gatewayRunner1.destroy();
   }
 
   if (gatewayRunner2) {
     log.debug("Stopping gatewayRunner2...");
-    try {
-      await gatewayRunner2.stop();
-      await gatewayRunner2.destroy();
-    } catch (e) {
-      log.error("Error stopping gatewayRunner1", e);
-    }
+    await gatewayRunner2.stop();
+    await gatewayRunner2.destroy();
   }
 });
 
