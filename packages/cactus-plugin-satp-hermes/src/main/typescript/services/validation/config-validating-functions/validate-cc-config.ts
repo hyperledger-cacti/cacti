@@ -54,14 +54,16 @@ function isCCConfigJSON(obj: unknown): obj is ICrossChainMechanismsOptions {
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "bridgeConfig" in obj &&
-    NetworkOptionsJSONArray(obj.bridgeConfig)
+    (("bridgeConfig" in obj && NetworkOptionsJSONArray(obj.bridgeConfig)) ||
+      ("oracleConfig" in obj && NetworkOptionsJSONArray(obj.oracleConfig)))
   );
-  // && "oracleConfig" in obj
 }
 
-function createBridgeConfig(configs: NetworkOptionsJSON[]): INetworkOptions[] {
+function createBridgeConfig(
+  configs: NetworkOptionsJSON[] | undefined = [],
+): INetworkOptions[] {
   const bridgesConfigParsed: INetworkOptions[] = [];
+
   configs.forEach((config) => {
     if (isFabricConfigJSON(config)) {
       const fabricOptions = createFabricOptions(config.connectorOptions);
@@ -131,7 +133,7 @@ function createBridgeConfig(configs: NetworkOptionsJSON[]): INetworkOptions[] {
         claimFormats: config.claimFormats,
         wrapperContractAddress: config.wrapperContractAddress,
         wrapperContractName: config.wrapperContractName,
-        gas: config.gas,
+        gasConfig: config.gasConfig,
       } as Partial<IEthereumLeafNeworkOptions> & INetworkOptions;
 
       bridgesConfigParsed.push(ethereumConfig);
@@ -146,22 +148,29 @@ export function validateCCConfig(opts: {
   if (!opts || !opts.configValue) {
     return {
       bridgeConfig: [],
+      oracleConfig: [],
     };
   }
 
   if (!isCCConfigJSON(opts.configValue)) {
     throw new TypeError(
-      "Invalid config.bridgesConfig: " + JSON.stringify(opts.configValue),
+      "Invalid config.bridgesConfig || config.oracleConfig: " +
+        JSON.stringify(opts.configValue),
     );
   }
 
-  if (!NetworkOptionsJSONArray(opts.configValue.bridgeConfig)) {
+  if (
+    !NetworkOptionsJSONArray(opts.configValue.bridgeConfig) &&
+    !NetworkOptionsJSONArray(opts.configValue.oracleConfig)
+  ) {
     throw new TypeError(
-      "Invalid config.bridgesConfig: " + JSON.stringify(opts.configValue),
+      "Invalid config.bridgesConfig && config.oracleConfig: " +
+        JSON.stringify(opts.configValue),
     );
   }
 
   return {
     bridgeConfig: createBridgeConfig(opts.configValue.bridgeConfig),
+    oracleConfig: createBridgeConfig(opts.configValue.oracleConfig),
   };
 }
