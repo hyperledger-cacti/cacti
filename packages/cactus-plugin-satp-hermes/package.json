@@ -113,7 +113,7 @@
         "db:seed": "knex seed:run --knexfile src/knex/knexfile.ts",
         "db:cleanup": "find src/knex/ -name '.dev.local-*.sqlite3' -delete",
         "docker:build:stable": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').version)\")",
-        "docker:build:dev": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag kubaya/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",
+        "docker:build:dev": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag aaugusto11/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",
         "docker:build:latest": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag hyperledger/cacti-satp-hermes-gateway:latest",
         "docker:run:stable": "docker run -it hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').version)\")",
         "docker:run:dev": "docker run -it hyperledger/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",

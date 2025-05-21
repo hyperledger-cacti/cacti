@@ -148,7 +148,7 @@ export class OracleEVM extends OracleAbstract {
 
   public async updateEntry(args: IEVMOracleEntry): Promise<OracleResponse> {
     const fnTag = `${OracleEVM.CLASS_NAME}#updateEntry`;
-    this.logger.debug(`${fnTag}: Updating args}`);
+    this.logger.debug(`${fnTag}: Writing data in EVM blockchain}`);
 
     const response = (await this.connector.invokeContract({
       contract: {

@@ -58,12 +58,12 @@ const testNetwork = "test-network";
 
 const gatewayAddress = "gateway.satp-hermes";
 
-async function destroyGatewayRunner() {
+afterEach(async () => {
   if (gatewayRunner) {
     await gatewayRunner.stop();
     await gatewayRunner.destroy();
   }
-}
+});
 
 afterAll(async () => {
   await db_local.stop();
@@ -311,8 +311,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    await destroyGatewayRunner();
   });
 });
 
@@ -467,8 +465,6 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
-
-    await destroyGatewayRunner();
   });
 });
 
@@ -633,7 +629,5 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    await destroyGatewayRunner();
   });
 });
