@@ -344,11 +344,9 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
 
     let response2;
     try {
-      response2 = await fabricEnv.readData(
-        "oracle-bl-contract",
-        "ReadData",
-        [keccak256(payload1)],
-      );
+      response2 = await fabricEnv.readData("oracle-bl-contract", "ReadData", [
+        keccak256(payload1),
+      ]);
     } catch (error) {
       log.info("Expected error occurred while reading data:", error);
       response2 = { success: false, callOutput: null };
@@ -358,11 +356,9 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
 
     let response3;
     try {
-      response3 = await fabricEnv.readData(
-        "oracle-bl-contract",
-        "ReadData",
-        [keccak256(payload2)],
-      );
+      response3 = await fabricEnv.readData("oracle-bl-contract", "ReadData", [
+        keccak256(payload2),
+      ]);
     } catch (error) {
       log.info("Expected error occurred while reading data:", error);
       response3 = { success: false, callOutput: null };
@@ -478,8 +474,6 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
   it("should read data from a solidity contract calling a function with args with polling mode (5 seconds)", async () => {
     data_hash = keccak256("Hello World!");
 
-
-
     const response = await oracleApi.registerOracleTask({
       destinationNetworkId: besuEnv.network,
       destinationContract: {
@@ -515,7 +509,9 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
       taskType: OracleExecuteRequestTaskTypeEnum.Read,
     });
 
-    const task = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    const task = await oracleApi.getOracleTaskStatus(
+      response.data.taskID ?? "",
+    );
     expect(task).toBeDefined();
     expect(task?.data.taskID).toBe(response.data.taskID);
     expect(task.data.type).toBe(OracleTaskTypeEnum.Update);
@@ -523,7 +519,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     expect(task.data.status).toBe(OracleTaskStatusEnum.Inactive);
     expect(task.data.operations.length).toBe(4);
 
-    for (const operation of task.data.operations?? []) {
+    for (const operation of task.data.operations ?? []) {
       expect(operation.status).toBe(OracleOperationStatusEnum.Success);
       expect(operation.type).toBe(OracleOperationTypeEnum.Update);
     }
@@ -570,14 +566,16 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
       taskType: OracleExecuteRequestTaskTypeEnum.Read,
     });
 
-    const task = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    const task = await oracleApi.getOracleTaskStatus(
+      response.data.taskID ?? "",
+    );
     expect(task).toBeDefined();
     expect(task?.data.taskID).toBe(response.data.taskID);
     expect(task.data.status).toBe(OracleTaskStatusEnum.Inactive);
     expect(task.data.operations.length).toBeGreaterThanOrEqual(3);
     expect(task.data.operations.length).toBeLessThanOrEqual(5);
 
-    for (const operation of task.data.operations?? []) {
+    for (const operation of task.data.operations ?? []) {
       expect(operation.status).toBe(OracleOperationStatusEnum.Success);
       expect(operation.type).toBe(OracleOperationTypeEnum.Update);
     }

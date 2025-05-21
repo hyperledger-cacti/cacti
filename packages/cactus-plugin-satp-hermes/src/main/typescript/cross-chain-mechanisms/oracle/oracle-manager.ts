@@ -238,7 +238,7 @@ export class OracleManager {
       }
       this.oracles.get(networkKey)?.set(oracle.getId(), oracle);
     } catch (error) {
-      this.logger.error(`${fnTag}, Error deploying oracle: ${error}`);
+      this.logger.debug(`${fnTag}, Error deploying oracle: ${error}`);
       throw new DeployOracleError(error);
     }
   }
@@ -290,7 +290,7 @@ export class OracleManager {
     claimType: ClaimFormat = ClaimFormat.DEFAULT,
   ): OracleExecutionLayer {
     const fnTag = `${OracleManager.CLASS_NAME}#getOracleExecutionLayer()`;
-    this.logger.debug(`${fnTag}, Getting SATP Execution Layer...`);
+    this.logger.debug(`${fnTag}, Getting Oracle Execution Layer...`);
 
     return new OracleExecutionLayer({
       oracleImpl: this.getNetworkOracle(id, claimType),
@@ -305,7 +305,9 @@ export class OracleManager {
 
   public async registerTask(task: OracleTask): Promise<OracleTask> {
     const fnTag = `${OracleManager.CLASS_NAME}#registerTask()`;
-    this.logger.info(`${fnTag}: Registering task`);
+    this.logger.info(
+      `${fnTag}: Registering task. ${safeStableStringify(task)}`,
+    );
 
     try {
       this.taskStatusMap.set(task.taskID, task);
@@ -360,8 +362,8 @@ export class OracleManager {
       this.logger.info(`${fnTag}: Task registered successfully`);
       return task;
     } catch (error) {
-      this.logger.error(`${fnTag}: Error registering task: ${error}`);
-      throw error;
+      this.logger.debug(`${fnTag}: Error registering task: ${error}`);
+      throw new OracleError(error);
     }
   }
 
@@ -404,7 +406,6 @@ export class OracleManager {
       // TODO: Dispatch a success notification.
     } catch (error) {
       // TODO: Dispatch a failure notification.
-
     } finally {
       task.status = OracleTaskStatusEnum.Inactive;
     }
@@ -487,9 +488,7 @@ export class OracleManager {
         const readResponse = await this.relayOperation(task, readOperation);
 
         if (readResponse.output === undefined) {
-          throw new ReadAndUpdateTaskNoDataError(
-            task.taskID,
-          );
+          throw new ReadAndUpdateTaskNoDataError(task.taskID);
         }
 
         writeContent = [readResponse.output];
@@ -528,7 +527,7 @@ export class OracleManager {
   ): Promise<OracleResponse> {
     const fnTag = `${OracleManager.CLASS_NAME}#relayOperation`;
     this.logger.debug(
-      `${fnTag}: Relaying operation ${operation.id} to network ${operation.networkId}`,
+      `${fnTag}: Relaying operation ${operation.id} to network ${safeStableStringify(operation.networkId)}`,
     );
 
     let response: OracleResponse;
@@ -564,7 +563,7 @@ export class OracleManager {
         response,
       );
       task.operations.push(operation);
-      throw error;
+      throw new OracleError(error);
     }
 
     this.logger.debug(
@@ -572,56 +571,6 @@ export class OracleManager {
     );
     return response;
   }
-
-  // protected isTriggered(condition?: OracleTaskTriggerCondition): boolean {
-  //   if (!condition) return false;
-  //   if (condition.scheduleTime && condition.scheduleTime <= new Date())
-  //     return true;
-  //   return false;
-  // }
-
-  // /**
-  //  * Starts a polling mechanism that checks all listeners at a regular interval.
-  //  */
-  // private pollAllTasks(intervalMs: number): void {
-  //   const fnTag = `${OracleRelayer.CLASS_NAME}#pollAllTasks`;
-  //   this.pollerId = setInterval(async () => {
-  //     for (const listener of this.listeners) {
-  //       const scheduledTask = this.scheduledTasks.find(
-  //         (t) => t.id === listener.taskId,
-  //       );
-  //       if (!scheduledTask) {
-  //         this.log.warn(
-  //           `${fnTag}: No scheduled task found for listener ${listener.taskId}`,
-  //         );
-  //         continue;
-  //       }
-  //       try {
-  //         this.relayOperation(scheduledTask);
-  //       } catch (err) {
-  //         this.log.error(
-  //           `${fnTag}: Error polling task ${listener.taskId}`,
-  //           err,
-  //         );
-  //       }
-  //     }
-  //   }, intervalMs);
-  // }
-
-  // public removeListener(taskId: string): void {
-  //   const fnTag = `${OracleRelayer.CLASS_NAME}#removeListener`;
-  //   const idx = this.listeners.findIndex((l) => l.taskId === taskId);
-  //   if (idx !== -1) {
-  //     this.listeners.splice(idx, 1);
-  //     this.log.debug(`${fnTag}: Removed listener for task ${taskId}`);
-  //     if (this.listeners.length === 0 && this.pollerId) {
-  //       clearInterval(this.pollerId);
-  //       this.pollerId = undefined;
-  //     }
-  //   } else {
-  //     this.log.debug(`${fnTag}: No active listener for task ${taskId}`);
-  //   }
-  // }
 
   public async shutdown(): Promise<void> {
     const fnTag = `${OracleManager.CLASS_NAME}#shutdown`;

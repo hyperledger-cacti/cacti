@@ -31,7 +31,6 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/oracle-contract.sol/OracleTestContract.json";
-import { keccak256 } from "web3-utils";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -78,8 +77,7 @@ beforeAll(async () => {
     logLevel: "DEBUG",
     gid: gatewayIdentity,
     ccConfig: {
-      oracleConfig: [
-      ],
+      oracleConfig: [],
     },
     pluginRegistry: new PluginRegistry({ plugins: [] }),
   };
@@ -117,122 +115,146 @@ afterAll(async () => {
 
 describe("Oracle throws errors when invalid requests", () => {
   it("should fail when executing an Update task without methodName, contractName, params", async () => {
-    await oracleApi.executeOracleTask({
-      destinationNetworkId: {
-        id: "invalid-network-id",
-        ledgerType: LedgerType.Ethereum,
-      },
-      destinationContract: {
-        contractAddress: "address",
-        contractAbi: OracleTestContract.abi,
-        contractBytecode: OracleTestContract.bytecode.object,
-      },
-      taskType: OracleExecuteRequestTaskTypeEnum.Update,
-    }).catch((err) => {
-      const errorObject = JSON.parse(err.response.data.error);
+    await oracleApi
+      .executeOracleTask({
+        destinationNetworkId: {
+          id: "invalid-network-id",
+          ledgerType: LedgerType.Ethereum,
+        },
+        destinationContract: {
+          contractAddress: "address",
+          contractAbi: OracleTestContract.abi,
+          contractBytecode: OracleTestContract.bytecode.object,
+        },
+        taskType: OracleExecuteRequestTaskTypeEnum.Update,
+      })
+      .catch((err) => {
+        const errorObject = JSON.parse(err.response.data.error);
 
-      expect(errorObject).toBeDefined();
-      expect(errorObject.cause.message).toBe("Missing required parameters for UPDATE task: methodName, contractName, params");
-      expect(errorObject.cause.name).toBe("MissingParameterError");
-    });
+        expect(errorObject).toBeDefined();
+        expect(errorObject.cause.message).toBe(
+          "Missing required parameters for UPDATE task: methodName, contractName, params",
+        );
+        expect(errorObject.cause.name).toBe("MissingParameterError");
+      });
   });
 
   it("should fail when executing a Read task without sourceNetworkId, sourceContract", async () => {
-    await oracleApi.executeOracleTask({
-      taskType: OracleExecuteRequestTaskTypeEnum.Read,
-    }).catch((err) => {
-      const errorObject = JSON.parse(err.response.data.error);
+    await oracleApi
+      .executeOracleTask({
+        taskType: OracleExecuteRequestTaskTypeEnum.Read,
+      })
+      .catch((err) => {
+        const errorObject = JSON.parse(err.response.data.error);
 
-      expect(errorObject).toBeDefined();
-      expect(errorObject.cause.message).toBe("Missing required parameters for READ task: sourceNetworkId, sourceContract");
-      expect(errorObject.cause.name).toBe("MissingParameterError");
-    });
+        expect(errorObject).toBeDefined();
+        expect(errorObject.cause.message).toBe(
+          "Missing required parameters for READ task: sourceNetworkId, sourceContract",
+        );
+        expect(errorObject.cause.name).toBe("MissingParameterError");
+      });
   });
 
   it("should fail when executing a ReadAndUpdate task without sourceNetworkId, sourceContract, destinationNetworkId, destinationContract", async () => {
-    await oracleApi.executeOracleTask({
-      taskType: OracleExecuteRequestTaskTypeEnum.ReadAndUpdate,
-    }).catch((err) => {
-      const errorObject = JSON.parse(err.response.data.error);
+    await oracleApi
+      .executeOracleTask({
+        taskType: OracleExecuteRequestTaskTypeEnum.ReadAndUpdate,
+      })
+      .catch((err) => {
+        const errorObject = JSON.parse(err.response.data.error);
 
-      expect(errorObject).toBeDefined();
-      expect(errorObject.cause.message).toBe("Missing required parameters for READ_AND_UPDATE task: sourceNetworkId, sourceContract, destinationNetworkId, destinationContract");
-      expect(errorObject.cause.name).toBe("MissingParameterError");
-    });
+        expect(errorObject).toBeDefined();
+        expect(errorObject.cause.message).toBe(
+          "Missing required parameters for READ_AND_UPDATE task: sourceNetworkId, sourceContract, destinationNetworkId, destinationContract",
+        );
+        expect(errorObject.cause.name).toBe("MissingParameterError");
+      });
   });
 
   it("should fail when registering a Polling task without pollingInterval", async () => {
-    await oracleApi.registerOracleTask({
-      destinationNetworkId: {
-        id: "invalid-network-id",
-        ledgerType: LedgerType.Ethereum,
-      },
-      destinationContract: {
-        contractAddress: "address",
-        contractAbi: OracleTestContract.abi,
-        contractBytecode: OracleTestContract.bytecode.object,
-      },
-      taskType: OracleRegisterRequestTaskTypeEnum.Update,
-      taskMode: OracleRegisterRequestTaskModeEnum.Polling,
-    }).catch((err) => {
-      const errorObject = JSON.parse(err.response.data.error);
+    await oracleApi
+      .registerOracleTask({
+        destinationNetworkId: {
+          id: "invalid-network-id",
+          ledgerType: LedgerType.Ethereum,
+        },
+        destinationContract: {
+          contractAddress: "address",
+          contractAbi: OracleTestContract.abi,
+          contractBytecode: OracleTestContract.bytecode.object,
+        },
+        taskType: OracleRegisterRequestTaskTypeEnum.Update,
+        taskMode: OracleRegisterRequestTaskModeEnum.Polling,
+      })
+      .catch((err) => {
+        const errorObject = JSON.parse(err.response.data.error);
 
-      expect(errorObject).toBeDefined();
-      expect(errorObject.cause.message).toBe("Missing required parameter for UPDATE task and mode POLLING: pollingInterval");
-      expect(errorObject.cause.name).toBe("MissingParameterRegisterError");
-    });
+        expect(errorObject).toBeDefined();
+        expect(errorObject.cause.message).toBe(
+          "Missing required parameter for UPDATE task and mode POLLING: pollingInterval",
+        );
+        expect(errorObject.cause.name).toBe("MissingParameterRegisterError");
+      });
   });
 
   it("should fail when registering an Event Listening task without eventSignature", async () => {
-    await oracleApi.registerOracleTask({
-      sourceNetworkId: {
-        id: "invalid-network-id",
-        ledgerType: LedgerType.Ethereum,
-      },
-      sourceContract: {
-        contractName: "OracleTestContract",
-        contractAddress: "address",
-        contractAbi: OracleTestContract.abi,
-        contractBytecode: OracleTestContract.bytecode.object,
-      },
-      listeningOptions: {
-        eventSignature: "",
-      },
-      taskType: OracleRegisterRequestTaskTypeEnum.Read,
-      taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
-    }).catch((err) => {
-      const errorObject = JSON.parse(err.response.data.error);
+    await oracleApi
+      .registerOracleTask({
+        sourceNetworkId: {
+          id: "invalid-network-id",
+          ledgerType: LedgerType.Ethereum,
+        },
+        sourceContract: {
+          contractName: "OracleTestContract",
+          contractAddress: "address",
+          contractAbi: OracleTestContract.abi,
+          contractBytecode: OracleTestContract.bytecode.object,
+        },
+        listeningOptions: {
+          eventSignature: "",
+        },
+        taskType: OracleRegisterRequestTaskTypeEnum.Read,
+        taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
+      })
+      .catch((err) => {
+        const errorObject = JSON.parse(err.response.data.error);
 
-      expect(errorObject).toBeDefined();
-      expect(errorObject.cause.message).toBe("Missing required parameter for READ task and mode EVENT_LISTENING: listeningOptions.eventSignature");
-      expect(errorObject.cause.name).toBe("MissingParameterRegisterError");
-    });
+        expect(errorObject).toBeDefined();
+        expect(errorObject.cause.message).toBe(
+          "Missing required parameter for READ task and mode EVENT_LISTENING: listeningOptions.eventSignature",
+        );
+        expect(errorObject.cause.name).toBe("MissingParameterRegisterError");
+      });
   });
 
   it("should fail when registering an Event Listening task with pollingInterval", async () => {
-    await oracleApi.registerOracleTask({
-      sourceNetworkId: {
-        id: "invalid-network-id",
-        ledgerType: LedgerType.Ethereum,
-      },
-      sourceContract: {
-        contractName: "OracleTestContract",
-        contractAddress: "address",
-        contractAbi: OracleTestContract.abi,
-        contractBytecode: OracleTestContract.bytecode.object,
-      },
-      listeningOptions: {
-        eventSignature: "event(bytes32)",
-      },
-      taskType: OracleRegisterRequestTaskTypeEnum.Read,
-      taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
-      pollingInterval: 1000,
-    }).catch((err) => {
-      const errorObject = JSON.parse(err.response.data.error);
+    await oracleApi
+      .registerOracleTask({
+        sourceNetworkId: {
+          id: "invalid-network-id",
+          ledgerType: LedgerType.Ethereum,
+        },
+        sourceContract: {
+          contractName: "OracleTestContract",
+          contractAddress: "address",
+          contractAbi: OracleTestContract.abi,
+          contractBytecode: OracleTestContract.bytecode.object,
+        },
+        listeningOptions: {
+          eventSignature: "event(bytes32)",
+        },
+        taskType: OracleRegisterRequestTaskTypeEnum.Read,
+        taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
+        pollingInterval: 1000,
+      })
+      .catch((err) => {
+        const errorObject = JSON.parse(err.response.data.error);
 
-      expect(errorObject).toBeDefined();
-      expect(errorObject.cause.message).toBe("Invalid parameter for READ task and mode EVENT_LISTENING: pollingInterval");
-      expect(errorObject.cause.name).toBe("InvalidParameterError");
-    });
+        expect(errorObject).toBeDefined();
+        expect(errorObject.cause.message).toBe(
+          "Invalid parameter for READ task and mode EVENT_LISTENING: pollingInterval",
+        );
+        expect(errorObject.cause.name).toBe("InvalidParameterError");
+      });
   });
 });

@@ -70,6 +70,10 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
     try {
       return await this.oracleImpl.readEntry(args);
     } catch (error) {
+      this.log.error(
+        `${fnTag} - Error reading entry from oracle implementation`,
+        error,
+      );
       throw new TransactionError(fnTag, error);
     }
   }
@@ -85,6 +89,10 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
     try {
       return await this.oracleImpl.updateEntry(args);
     } catch (error) {
+      this.log.error(
+        `${fnTag} - Error writing entry to oracle implementation`,
+        error,
+      );
       throw new TransactionError(fnTag, error);
     }
   }
@@ -102,7 +110,10 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
     try {
       return this.oracleImpl.convertOperationToEntry(operation);
     } catch (error) {
-      this.log.error(`${fnTag} - Conversion from Operation to blockchain transaction failed`, error);
+      this.log.error(
+        `${fnTag} - Conversion from Operation to blockchain transaction failed`,
+        error,
+      );
       throw error;
     }
   }
