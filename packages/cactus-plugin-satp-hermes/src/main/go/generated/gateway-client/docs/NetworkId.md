@@ -1,70 +1,80 @@
-# NetworkId
+# NetworkID
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | The network of the DLT being interacted with. | 
-**LedgerType** | **string** | Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \&quot;BESU_1X\&quot; involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation. | 
+**Id** | Pointer to **string** | The network of the DLT being interacted with. | [optional] 
+**Type** | Pointer to **string** | Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \&quot;BESU_1X\&quot; involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation. | [optional] 
 
 ## Methods
 
-### NewNetworkId
+### NewNetworkID
 
-`func NewNetworkId(id string, ledgerType string, ) *NetworkId`
+`func NewNetworkID() *NetworkID`
 
-NewNetworkId instantiates a new NetworkId object
+NewNetworkID instantiates a new NetworkID object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewNetworkIdWithDefaults
+### NewNetworkIDWithDefaults
 
-`func NewNetworkIdWithDefaults() *NetworkId`
+`func NewNetworkIDWithDefaults() *NetworkID`
 
-NewNetworkIdWithDefaults instantiates a new NetworkId object
+NewNetworkIDWithDefaults instantiates a new NetworkID object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *NetworkId) GetId() string`
+`func (o *NetworkID) GetId() string`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *NetworkId) GetIdOk() (*string, bool)`
+`func (o *NetworkID) GetIdOk() (*string, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *NetworkId) SetId(v string)`
+`func (o *NetworkID) SetId(v string)`
 
 SetId sets Id field to given value.
 
+### HasId
 
-### GetLedgerType
+`func (o *NetworkID) HasId() bool`
 
-`func (o *NetworkId) GetLedgerType() string`
+HasId returns a boolean if a field has been set.
 
-GetLedgerType returns the LedgerType field if non-nil, zero value otherwise.
+### GetType
 
-### GetLedgerTypeOk
+`func (o *NetworkID) GetType() string`
 
-`func (o *NetworkId) GetLedgerTypeOk() (*string, bool)`
+GetType returns the Type field if non-nil, zero value otherwise.
 
-GetLedgerTypeOk returns a tuple with the LedgerType field if it's non-nil, zero value otherwise
+### GetTypeOk
+
+`func (o *NetworkID) GetTypeOk() (*string, bool)`
+
+GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetLedgerType
+### SetType
 
-`func (o *NetworkId) SetLedgerType(v string)`
+`func (o *NetworkID) SetType(v string)`
 
-SetLedgerType sets LedgerType field to given value.
+SetType sets Type field to given value.
 
+### HasType
+
+`func (o *NetworkID) HasType() bool`
+
+HasType returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
