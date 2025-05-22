@@ -319,7 +319,15 @@ export class OracleManager {
         this.schedulerManager.addPoller(
           task.taskID,
           async () => {
-            await this.processTask(task as OracleTask);
+            try {
+              await this.processTask(task as OracleTask);
+              this.logger.info(
+                `${fnTag}: Task ${task.taskID} executed successfully`,
+              );
+              // TODO: Dispatch a success notification.
+            } catch (error) {
+              // TODO: Dispatch a failure notification.
+            }
           },
           task.pollingInterval!,
         );
