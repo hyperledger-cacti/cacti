@@ -620,7 +620,6 @@ export class FabricTestEnvironment {
     this.clientId = responseClientId.functionOutput.toString();
   }
 
-
   public async deployAndSetupOracleContracts() {
     this.satpContractName = "oracle-bl-contract";
     const satpContractRelPath =

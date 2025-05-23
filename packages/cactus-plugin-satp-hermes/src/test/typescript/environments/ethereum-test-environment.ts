@@ -72,7 +72,11 @@ export class EthereumTestEnvironment {
   private readonly log: Logger;
 
   // eslint-disable-next-line prettier/prettier
-  private constructor(erc20TokenContract: string, logLevel: LogLevelDesc, network?: string) {
+  private constructor(
+    erc20TokenContract: string,
+    logLevel: LogLevelDesc,
+    network?: string,
+  ) {
     if (network) {
       this.dockerNetwork = network;
     }

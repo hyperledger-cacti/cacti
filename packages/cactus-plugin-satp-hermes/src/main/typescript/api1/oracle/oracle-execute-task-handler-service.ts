@@ -11,7 +11,10 @@ import {
 } from "../../public-api";
 
 import { v4 as uuidv4 } from "uuid";
-import { InvalidTaskTypeError, MissingParameterError } from "../../cross-chain-mechanisms/common/errors";
+import {
+  InvalidTaskTypeError,
+  MissingParameterError,
+} from "../../cross-chain-mechanisms/common/errors";
 
 export async function executeTask(
   logLevel: LogLevelDesc,
@@ -128,9 +131,7 @@ export async function executeTask(
       break;
     }
     default:
-      throw new InvalidTaskTypeError(
-        req.taskType,
-      )
+      throw new InvalidTaskTypeError(req.taskType);
   }
 
   const task: OracleTask = {
