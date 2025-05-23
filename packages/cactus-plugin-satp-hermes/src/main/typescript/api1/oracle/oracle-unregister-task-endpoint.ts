@@ -93,16 +93,15 @@ export class OracleUnregisterTaskEndpointV1 implements IWebServiceEndpoint {
 
     const taskID = req.query.taskID as string;
     if (!taskID) {
-      res
-        .status(400)
-        .json({ message: "taskID query parameter is required." });
+      res.status(400).json({ message: "taskID query parameter is required." });
       return;
     }
     const unregisterRequest: OracleUnregisterRequest = {
       taskID: taskID,
     };
     try {
-      const result = await this.options.dispatcher.OracleUnregisterTask(unregisterRequest);
+      const result =
+        await this.options.dispatcher.OracleUnregisterTask(unregisterRequest);
       res.status(200).json(result);
     } catch (ex) {
       const errorMsg = `Failed to unregister task: ${ex}`;
