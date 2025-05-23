@@ -217,33 +217,34 @@ export class OracleFabric extends OracleAbstract {
       `${fnTag}: Subscribing to event with args: ${safeStableStringify(args)}`,
     );
 
-    const { removeListener } = await this.connector.createFabricListener({
-      channelName: this.channelName,
-      contractName: args.contractName,
-      signingCredential: this.signingCredential,
-    },
-    async (event: ContractEvent) => {
-      this.log.debug(
-        `${fnTag}: Received event log: ${safeStableStringify(event)}`,
-      );
+    const { removeListener } = await this.connector.createFabricListener(
+      {
+        channelName: this.channelName,
+        contractName: args.contractName,
+        signingCredential: this.signingCredential,
+      },
+      async (event: ContractEvent) => {
+        this.log.debug(
+          `${fnTag}: Received event log: ${safeStableStringify(event)}`,
+        );
 
-      if (event) {
-        if (event.eventName === args.eventSignature && event.payload) {
-          const payload = event.payload.toString("utf-8");
-          const payloadJson = JSON.parse(payload);
+        if (event) {
+          if (event.eventName === args.eventSignature && event.payload) {
+            const payload = event.payload.toString("utf-8");
+            const payloadJson = JSON.parse(payload);
 
-          const output_params = this.extractNamedParams(payloadJson, filter);
+            const output_params = this.extractNamedParams(payloadJson, filter);
 
-          callback(output_params);
-
-        } else {
-          this.log.debug(
-            `${fnTag}: Event name ${event.eventName} does not match expected ${args.eventSignature}. Will not process.`,
-          );
-          return;
+            callback(output_params);
+          } else {
+            this.log.debug(
+              `${fnTag}: Event name ${event.eventName} does not match expected ${args.eventSignature}. Will not process.`,
+            );
+            return;
+          }
         }
-      }
-    });
+      },
+    );
 
     return {
       unsubscribe: () => removeListener(),
