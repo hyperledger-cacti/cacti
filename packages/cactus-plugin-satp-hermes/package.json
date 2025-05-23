@@ -245,7 +245,8 @@
             "satp-core": "02",
             "satp-architecture": "02",
             "satp-crash": "02"
-        }
+        },
+        "satp-package-version": "0.0.1-beta"
     },
     "watch": {
         "tsc": {

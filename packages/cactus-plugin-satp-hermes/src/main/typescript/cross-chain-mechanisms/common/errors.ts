@@ -218,13 +218,7 @@ export class InvalidTaskTypeError extends BridgeInternalError {
     traceID?: string,
     trace?: string,
   ) {
-    super(
-      `Invalid task type: ${taskType}`,
-      cause ?? null,
-      400,
-      traceID,
-      trace,
-    );
+    super(`Invalid task type: ${taskType}`, cause ?? null, 400, traceID, trace);
   }
 }
 
