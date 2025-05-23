@@ -46,6 +46,7 @@ import {
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let knexInstanceClient: Knex;
 let knexInstanceServer: Knex;
@@ -59,6 +60,7 @@ let crashManager1: CrashManager;
 let crashManager2: CrashManager;
 
 const sessionId = uuidv4();
+const monitorService = MonitorService.createOrGetMonitorService({});
 const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const logLevel: LogLevelDesc = "DEBUG";
@@ -79,6 +81,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()

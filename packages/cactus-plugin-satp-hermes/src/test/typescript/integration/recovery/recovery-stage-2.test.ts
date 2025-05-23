@@ -48,11 +48,14 @@ import {
 } from "../../knex.config";
 import { Knex, knex } from "knex";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
 let knexInstanceServer: Knex;
 let knexInstanceTargetRemote: Knex;
+
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 let gateway1: SATPGateway;
 let gateway2: SATPGateway;
@@ -77,6 +80,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const baseTime = new Date();

@@ -54,8 +54,10 @@ import type {
 } from "../../../../main/typescript/database/repository/interfaces/repository";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import path from "path";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let mockSession: SATPSession;
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 const createMockSession = (maxTimeout: string, maxRetries: string) => {
   const sessionId = uuidv4();
@@ -63,6 +65,7 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()
@@ -133,6 +136,7 @@ beforeAll(async () => {
     localGateway: gatewayIdentity,
     counterPartyGateways: [],
     signer: signer,
+    monitorService: monitorService,
   };
   const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
   const ontologiesPath = path.join(__dirname, "../../../ontologies");
@@ -154,6 +158,7 @@ beforeAll(async () => {
     localRepository: localRepository,
     remoteRepository: remoteRepository,
     signer: signer,
+    monitorService: monitorService,
   };
   crashManager = new CrashManager(crashOptions);
 });

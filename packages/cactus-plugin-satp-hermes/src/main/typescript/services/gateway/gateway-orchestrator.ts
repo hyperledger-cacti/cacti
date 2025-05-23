@@ -34,6 +34,7 @@ export interface IGatewayOrchestratorOptions {
   counterPartyGateways?: GatewayIdentity[];
   signer: JsObjectSigner;
   enableCrashRecovery?: boolean;
+  monitorService: MonitorService;
 }
 
 //import { COREDispatcher, COREDispatcherOptions } from "../../core/dispatcher";
@@ -46,6 +47,7 @@ import {
 import { SATPHandler, Stage } from "../../types/satp-protocol";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { NetworkId } from "../../public-api";
+import { MonitorService } from "../monitoring/monitor";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -55,6 +57,7 @@ export class GatewayOrchestrator {
   private handlers: Map<string, SATPHandler> = new Map();
   private crashEnabled: boolean = false;
   private bridgeManager?: BridgeManagerClientInterface;
+  private monitorService: MonitorService;
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   private channels: Map<string, GatewayChannel> = new Map();
@@ -68,6 +71,7 @@ export class GatewayOrchestrator {
       level: level,
       label: this.label,
     };
+    this.monitorService = options.monitorService;
 
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.logger.info("Initializing Gateway Connection Manager");
@@ -478,6 +482,7 @@ export class GatewayOrchestrator {
       addedIDs.push(gateway.id);
     }
     this.logger.debug(`Added ${addedIDs.length} gateways: ${addedIDs}`);
+    this.monitorService.incrementCounter("gateways", addedIDs.length);
     return addedIDs;
   }
 
