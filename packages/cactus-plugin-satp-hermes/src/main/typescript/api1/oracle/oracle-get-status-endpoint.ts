@@ -89,16 +89,15 @@ export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
 
     const taskID = req.query.taskID as string;
     if (!taskID) {
-      res
-        .status(400)
-        .json({ message: "taskID query parameter is required." });
+      res.status(400).json({ message: "taskID query parameter is required." });
       return;
     }
     const statusRequest: OracleStatusRequest = {
       taskID: taskID,
     };
     try {
-      const result = await this.options.dispatcher.OracleGetTaskStatus(statusRequest);
+      const result =
+        await this.options.dispatcher.OracleGetTaskStatus(statusRequest);
       res.status(200).json(result);
     } catch (ex) {
       const errorMsg = `${reqTag} Failed to get status:`;

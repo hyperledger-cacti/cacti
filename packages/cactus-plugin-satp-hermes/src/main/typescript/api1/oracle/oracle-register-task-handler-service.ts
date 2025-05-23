@@ -10,7 +10,10 @@ import {
   TransactRequestSourceAssetNetworkId,
 } from "../../public-api";
 import { v4 as uuidv4 } from "uuid";
-import { InvalidParameterError, MissingParameterRegisterError } from "../../cross-chain-mechanisms/common/errors";
+import {
+  InvalidParameterError,
+  MissingParameterRegisterError,
+} from "../../cross-chain-mechanisms/common/errors";
 
 export async function registerTask(
   logLevel: LogLevelDesc,
@@ -70,7 +73,12 @@ export async function registerTask(
       );
     }
 
-    if (!isValidEventSignature(req.sourceNetworkId, req.listeningOptions.eventSignature)) {
+    if (
+      !isValidEventSignature(
+        req.sourceNetworkId,
+        req.listeningOptions.eventSignature,
+      )
+    ) {
       throw new InvalidParameterError(
         ["listeningOptions.eventSignature"],
         req.taskType,
@@ -133,15 +141,9 @@ export async function registerTask(
         );
       }
 
-      if (
-        !req.destinationNetworkId ||
-        !req.destinationContract
-      ) {
+      if (!req.destinationNetworkId || !req.destinationContract) {
         throw new MissingParameterRegisterError(
-          [
-            "destinationNetworkId",
-            "destinationContract",
-          ],
+          ["destinationNetworkId", "destinationContract"],
           OracleTaskTypeEnum.Update,
           req.taskMode,
         );
@@ -152,10 +154,7 @@ export async function registerTask(
         !req.destinationContract.params
       ) {
         throw new MissingParameterRegisterError(
-          [
-            "destinationContract.methodName",
-            "destinationContract.params",
-          ],
+          ["destinationContract.methodName", "destinationContract.params"],
           OracleTaskTypeEnum.Update,
           req.taskMode,
         );
@@ -167,10 +166,7 @@ export async function registerTask(
           !req.destinationContract.params
         ) {
           throw new MissingParameterRegisterError(
-            [
-              "destinationContract.methodName",
-              "destinationContract.params",
-            ],
+            ["destinationContract.methodName", "destinationContract.params"],
             OracleTaskTypeEnum.Update,
             req.taskMode,
           );
@@ -251,17 +247,21 @@ export async function registerTask(
   return await manager.registerTask(task);
 }
 
-function isValidEventSignature(network: TransactRequestSourceAssetNetworkId, signature: string): boolean {
+function isValidEventSignature(
+  network: TransactRequestSourceAssetNetworkId,
+  signature: string,
+): boolean {
   if (!signature || typeof signature !== "string" || signature.length === 0) {
     return false;
   }
 
   if (network.ledgerType === NetworkIdLedgerTypeEnum.Fabric2) {
-    // 
+    //
     const regex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
     return regex.test(signature);
   } else {
-    const regex = /^[a-zA-Z_][a-zA-Z0-9_]*\s*\(\s*([a-zA-Z0-9_]+\s*(,\s*[a-zA-Z0-9_]+\s*)*)?\)$/;
+    const regex =
+      /^[a-zA-Z_][a-zA-Z0-9_]*\s*\(\s*([a-zA-Z0-9_]+\s*(,\s*[a-zA-Z0-9_]+\s*)*)?\)$/;
     return regex.test(signature);
   }
 }
