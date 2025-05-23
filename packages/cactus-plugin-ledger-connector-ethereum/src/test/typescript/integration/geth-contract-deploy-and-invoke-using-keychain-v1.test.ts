@@ -50,7 +50,6 @@ import {
   signTransaction,
 } from "../../../main/typescript/public-api";
 import { K_CACTI_ETHEREUM_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
-import { AddressLike } from "ethers";
 
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";

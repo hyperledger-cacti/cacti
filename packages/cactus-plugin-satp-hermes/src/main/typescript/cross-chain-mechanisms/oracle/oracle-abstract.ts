@@ -196,23 +196,26 @@ export abstract class OracleAbstract {
    * @param filter - Optional filter for specific parameter names.
    * @returns An array of parameter values.
    */
-    extractNamedParams(decodedEvent: Record<string, string>, filter?: string[]): string[] {
-      const params = [];
-  
-      for (const key in decodedEvent) {
-        // skip numeric keys and special properties
-        if (!isNaN(Number(key))) {
-          continue;
-        }
-  
-        // if filter is provided, check if the key is in the filter
-        if (filter && !filter.includes(key)) {
-          continue;
-        }
-  
-        params.push(String(decodedEvent[key]));
+  extractNamedParams(
+    decodedEvent: Record<string, string>,
+    filter?: string[],
+  ): string[] {
+    const params = [];
+
+    for (const key in decodedEvent) {
+      // skip numeric keys and special properties
+      if (!isNaN(Number(key))) {
+        continue;
       }
-  
-      return params;
+
+      // if filter is provided, check if the key is in the filter
+      if (filter && !filter.includes(key)) {
+        continue;
+      }
+
+      params.push(String(decodedEvent[key]));
     }
+
+    return params;
+  }
 }
