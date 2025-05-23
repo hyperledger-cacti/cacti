@@ -2,12 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Context,
-  Contract,
-  Info,
-  Transaction,
-} from "fabric-contract-api";
+import { Context, Contract, Info, Transaction } from "fabric-contract-api";
 import { Data } from "./data";
 
 @Info({
