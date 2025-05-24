@@ -49,7 +49,6 @@ docs/GasCost.md
 docs/GatewayIdentity.md
 docs/GetApproveAddress200Response.md
 docs/GetApproveAddressApi.md
-docs/GetApproveAddressApproveAddressRequestParameter.md
 docs/GetApproveAddressRequest.md
 docs/GetApproveAddressResponse.md
 docs/GetAudit200Response.md
@@ -155,7 +154,6 @@ model_fee_cost.go
 model_gas_cost.go
 model_gateway_identity.go
 model_get_approve_address_200_response.go
-model_get_approve_address_approve_address_request_parameter.go
 model_get_approve_address_request.go
 model_get_approve_address_response.go
 model_get_audit_200_response.go

@@ -42,11 +42,17 @@ type GetApproveAddressApiService service
 type ApiGetApproveAddressRequest struct {
 	ctx context.Context
 	ApiService GetApproveAddressApi
-	approveAddressRequest *GetApproveAddressApproveAddressRequestParameter
+	networkID *TransactRequestSourceAssetNetworkId
+	tokenType *string
 }
 
-func (r ApiGetApproveAddressRequest) ApproveAddressRequest(approveAddressRequest GetApproveAddressApproveAddressRequestParameter) ApiGetApproveAddressRequest {
-	r.approveAddressRequest = &approveAddressRequest
+func (r ApiGetApproveAddressRequest) NetworkID(networkID TransactRequestSourceAssetNetworkId) ApiGetApproveAddressRequest {
+	r.networkID = &networkID
+	return r
+}
+
+func (r ApiGetApproveAddressRequest) TokenType(tokenType string) ApiGetApproveAddressRequest {
+	r.tokenType = &tokenType
 	return r
 }
 
@@ -89,11 +95,15 @@ func (a *GetApproveAddressApiService) GetApproveAddressExecute(r ApiGetApproveAd
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.approveAddressRequest == nil {
-		return localVarReturnValue, nil, reportError("approveAddressRequest is required and must be specified")
+	if r.networkID == nil {
+		return localVarReturnValue, nil, reportError("networkID is required and must be specified")
+	}
+	if r.tokenType == nil {
+		return localVarReturnValue, nil, reportError("tokenType is required and must be specified")
 	}
 
-	parameterAddToHeaderOrQuery(localVarQueryParams, "ApproveAddressRequest", r.approveAddressRequest, "")
+	parameterAddToHeaderOrQuery(localVarQueryParams, "networkID", r.networkID, "")
+	parameterAddToHeaderOrQuery(localVarQueryParams, "tokenType", r.tokenType, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

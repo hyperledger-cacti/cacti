@@ -1272,36 +1272,6 @@ export interface GetApproveAddress200Response {
 /**
  * Request schema for getting the address to approve the token transfer.
  * @export
- * @interface GetApproveAddressApproveAddressRequestParameter
- */
-export interface GetApproveAddressApproveAddressRequestParameter {
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof GetApproveAddressApproveAddressRequestParameter
-     */
-    'networkId': TransactRequestSourceAssetNetworkId;
-    /**
-     * The type of token.
-     * @type {string}
-     * @memberof GetApproveAddressApproveAddressRequestParameter
-     */
-    'tokenType': GetApproveAddressApproveAddressRequestParameterTokenTypeEnum;
-}
-
-export const GetApproveAddressApproveAddressRequestParameterTokenTypeEnum = {
-    Erc20: 'ERC20',
-    Erc721: 'ERC721',
-    Erc1155: 'ERC1155',
-    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
-    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE'
-} as const;
-
-export type GetApproveAddressApproveAddressRequestParameterTokenTypeEnum = typeof GetApproveAddressApproveAddressRequestParameterTokenTypeEnum[keyof typeof GetApproveAddressApproveAddressRequestParameterTokenTypeEnum];
-
-/**
- * Request schema for getting the address to approve the token transfer.
- * @export
  * @interface GetApproveAddressRequest
  */
 export interface GetApproveAddressRequest {
@@ -4495,13 +4465,16 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+         * @param {TransactRequestSourceAssetNetworkId} networkId 
+         * @param {'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getApproveAddress: async (approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'approveAddressRequest' is not null or undefined
-            assertParamExists('getApproveAddress', 'approveAddressRequest', approveAddressRequest)
+        getApproveAddress: async (networkId: TransactRequestSourceAssetNetworkId, tokenType: 'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'networkId' is not null or undefined
+            assertParamExists('getApproveAddress', 'networkId', networkId)
+            // verify required parameter 'tokenType' is not null or undefined
+            assertParamExists('getApproveAddress', 'tokenType', tokenType)
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4514,8 +4487,12 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (approveAddressRequest !== undefined) {
-                localVarQueryParameter['ApproveAddressRequest'] = approveAddressRequest;
+            if (networkId !== undefined) {
+                localVarQueryParameter['networkId'] = networkId;
+            }
+
+            if (tokenType !== undefined) {
+                localVarQueryParameter['tokenType'] = tokenType;
             }
 
 
@@ -4542,12 +4519,13 @@ export const GetApproveAddressApiFp = function(configuration?: Configuration) {
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+         * @param {TransactRequestSourceAssetNetworkId} networkId 
+         * @param {'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getApproveAddress(approveAddressRequest, options);
+        async getApproveAddress(networkId: TransactRequestSourceAssetNetworkId, tokenType: 'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getApproveAddress(networkId, tokenType, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4563,12 +4541,13 @@ export const GetApproveAddressApiFactory = function (configuration?: Configurati
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+         * @param {TransactRequestSourceAssetNetworkId} networkId 
+         * @param {'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: any): AxiosPromise<GetApproveAddress200Response> {
-            return localVarFp.getApproveAddress(approveAddressRequest, options).then((request) => request(axios, basePath));
+        getApproveAddress(networkId: TransactRequestSourceAssetNetworkId, tokenType: 'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: any): AxiosPromise<GetApproveAddress200Response> {
+            return localVarFp.getApproveAddress(networkId, tokenType, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4583,13 +4562,14 @@ export class GetApproveAddressApi extends BaseAPI {
     /**
      * Get approve address for the token transfer
      * @summary Get approve address
-     * @param {GetApproveAddressApproveAddressRequestParameter} approveAddressRequest 
+     * @param {TransactRequestSourceAssetNetworkId} networkId 
+     * @param {'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GetApproveAddressApi
      */
-    public getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: AxiosRequestConfig) {
-        return GetApproveAddressApiFp(this.configuration).getApproveAddress(approveAddressRequest, options).then((request) => request(this.axios, this.basePath));
+    public getApproveAddress(networkId: TransactRequestSourceAssetNetworkId, tokenType: 'ERC20' | 'ERC721' | 'ERC1155' | 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig) {
+        return GetApproveAddressApiFp(this.configuration).getApproveAddress(networkId, tokenType, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -4985,17 +4965,17 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
         /**
          * Get a list of possible routes for swapping one asset for another across multiple exchanges
          * @summary Get a list of routes for a gateway-to-gateway asset transfer
-         * @param {string} fromNetworkID The sending DLT Network.
+         * @param {TransactRequestSourceAssetNetworkId} fromNetworkID The sending DLT Network.
          * @param {string} fromAmount The amount that should be sent including all decimals.
          * @param {string} fromToken The token that should be transferred. Can be the address or the symbol.
-         * @param {string} toDLTNetwork The receiving DLT Network.
+         * @param {TransactRequestSourceAssetNetworkId} toDLTNetwork The receiving DLT Network.
          * @param {string} toToken The token that should be transferred to. Can be the address or the symbol.
          * @param {string} fromAddress The sending wallet address.
          * @param {string} toAddress The receiving wallet address. If none is provided, the fromAddress will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRoutes: async (fromNetworkID: string, fromAmount: string, fromToken: string, toDLTNetwork: string, toToken: string, fromAddress: string, toAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRoutes: async (fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'fromNetworkID' is not null or undefined
             assertParamExists('getRoutes', 'fromNetworkID', fromNetworkID)
             // verify required parameter 'fromAmount' is not null or undefined
@@ -5131,17 +5111,17 @@ export const TransactionApiFp = function(configuration?: Configuration) {
         /**
          * Get a list of possible routes for swapping one asset for another across multiple exchanges
          * @summary Get a list of routes for a gateway-to-gateway asset transfer
-         * @param {string} fromNetworkID The sending DLT Network.
+         * @param {TransactRequestSourceAssetNetworkId} fromNetworkID The sending DLT Network.
          * @param {string} fromAmount The amount that should be sent including all decimals.
          * @param {string} fromToken The token that should be transferred. Can be the address or the symbol.
-         * @param {string} toDLTNetwork The receiving DLT Network.
+         * @param {TransactRequestSourceAssetNetworkId} toDLTNetwork The receiving DLT Network.
          * @param {string} toToken The token that should be transferred to. Can be the address or the symbol.
          * @param {string} fromAddress The sending wallet address.
          * @param {string} toAddress The receiving wallet address. If none is provided, the fromAddress will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRoutes(fromNetworkID: string, fromAmount: string, fromToken: string, toDLTNetwork: string, toToken: string, fromAddress: string, toAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRoutes200Response>> {
+        async getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRoutes200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRoutes(fromNetworkID, fromAmount, fromToken, toDLTNetwork, toToken, fromAddress, toAddress, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -5188,17 +5168,17 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
         /**
          * Get a list of possible routes for swapping one asset for another across multiple exchanges
          * @summary Get a list of routes for a gateway-to-gateway asset transfer
-         * @param {string} fromNetworkID The sending DLT Network.
+         * @param {TransactRequestSourceAssetNetworkId} fromNetworkID The sending DLT Network.
          * @param {string} fromAmount The amount that should be sent including all decimals.
          * @param {string} fromToken The token that should be transferred. Can be the address or the symbol.
-         * @param {string} toDLTNetwork The receiving DLT Network.
+         * @param {TransactRequestSourceAssetNetworkId} toDLTNetwork The receiving DLT Network.
          * @param {string} toToken The token that should be transferred to. Can be the address or the symbol.
          * @param {string} fromAddress The sending wallet address.
          * @param {string} toAddress The receiving wallet address. If none is provided, the fromAddress will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRoutes(fromNetworkID: string, fromAmount: string, fromToken: string, toDLTNetwork: string, toToken: string, fromAddress: string, toAddress: string, options?: any): AxiosPromise<GetRoutes200Response> {
+        getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: any): AxiosPromise<GetRoutes200Response> {
             return localVarFp.getRoutes(fromNetworkID, fromAmount, fromToken, toDLTNetwork, toToken, fromAddress, toAddress, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5247,10 +5227,10 @@ export class TransactionApi extends BaseAPI {
     /**
      * Get a list of possible routes for swapping one asset for another across multiple exchanges
      * @summary Get a list of routes for a gateway-to-gateway asset transfer
-     * @param {string} fromNetworkID The sending DLT Network.
+     * @param {TransactRequestSourceAssetNetworkId} fromNetworkID The sending DLT Network.
      * @param {string} fromAmount The amount that should be sent including all decimals.
      * @param {string} fromToken The token that should be transferred. Can be the address or the symbol.
-     * @param {string} toDLTNetwork The receiving DLT Network.
+     * @param {TransactRequestSourceAssetNetworkId} toDLTNetwork The receiving DLT Network.
      * @param {string} toToken The token that should be transferred to. Can be the address or the symbol.
      * @param {string} fromAddress The sending wallet address.
      * @param {string} toAddress The receiving wallet address. If none is provided, the fromAddress will be used.
@@ -5258,7 +5238,7 @@ export class TransactionApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransactionApi
      */
-    public getRoutes(fromNetworkID: string, fromAmount: string, fromToken: string, toDLTNetwork: string, toToken: string, fromAddress: string, toAddress: string, options?: AxiosRequestConfig) {
+    public getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: AxiosRequestConfig) {
         return TransactionApiFp(this.configuration).getRoutes(fromNetworkID, fromAmount, fromToken, toDLTNetwork, toToken, fromAddress, toAddress, options).then((request) => request(this.axios, this.basePath));
     }
 

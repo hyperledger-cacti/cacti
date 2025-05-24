@@ -13,7 +13,6 @@ import {
   Configuration,
   GetApproveAddressApi,
   TokenType,
-  GetApproveAddressRequest,
 } from "../../../main/typescript";
 import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
@@ -24,7 +23,6 @@ import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp
 import {
   BesuTestEnvironment,
   EthereumTestEnvironment,
-  //EthereumTestEnvironment,
   FabricTestEnvironment,
   getTransactRequest,
 } from "../test-utils";
@@ -191,10 +189,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -214,10 +212,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     }
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
-    const reqApproveFabricAddress = await approveAddressApi.getApproveAddress({
-      networkId: fabricEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
+      fabricEnv.network,
+      TokenType.NonstandardFungible,
+    );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
@@ -345,10 +343,10 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
-    const reqApproveFabricAddress = await approveAddressApi.getApproveAddress({
-      networkId: fabricEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
+      fabricEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -367,10 +365,10 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     log.debug("Approved 100 amount to the Fabric Bridge Address");
 
-    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
 
@@ -500,10 +498,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -523,10 +521,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
-      {
-        networkId: ethereumEnv.network,
-        tokenType: TokenType.NonstandardFungible,
-      } as GetApproveAddressRequest,
+      ethereumEnv.network,
+      TokenType.NonstandardFungible,
     );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();

@@ -436,10 +436,24 @@ paths:
       parameters:
       - explode: true
         in: query
-        name: ApproveAddressRequest
+        name: networkID
         required: true
         schema:
-          $ref: '#/components/schemas/GetApproveAddress_ApproveAddressRequest_parameter'
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
+        style: form
+      - explode: true
+        in: query
+        name: tokenType
+        required: true
+        schema:
+          description: The type of token.
+          enum:
+          - ERC20
+          - ERC721
+          - ERC1155
+          - NONSTANDARD_FUNGIBLE
+          - NONSTANDARD_NONFUNGIBLE
+          type: string
         style: form
       responses:
         "200":
@@ -4031,24 +4045,6 @@ components:
           type: string
       type: object
       x-category: response
-    GetApproveAddress_ApproveAddressRequest_parameter:
-      description: Request schema for getting the address to approve the token transfer.
-      properties:
-        networkId:
-          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
-        tokenType:
-          description: The type of token.
-          enum:
-          - ERC20
-          - ERC721
-          - ERC1155
-          - NONSTANDARD_FUNGIBLE
-          - NONSTANDARD_NONFUNGIBLE
-          type: string
-      required:
-      - networkId
-      - tokenType
-      type: object
     GetApproveAddress_200_response:
       description: Response schema for getting the address to approve the token transfer.
       example:
