@@ -34,7 +34,6 @@ import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
 import {
   GetApproveAddressApi,
-  GetApproveAddressRequest,
   TokenType,
   TransactionApi,
 } from "../../../main/typescript";
@@ -334,10 +333,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -363,10 +362,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       }),
     );
 
-    const reqApproveFabricAddress = await approveAddressApi2.getApproveAddress({
-      networkId: fabricEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveFabricAddress = await approveAddressApi2.getApproveAddress(
+      fabricEnv.network,
+      TokenType.NonstandardFungible,
+    );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
@@ -574,10 +573,10 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       }),
     );
 
-    const reqApproveFabricAddress = await approveAddressApi1.getApproveAddress({
-      networkId: fabricEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveFabricAddress = await approveAddressApi1.getApproveAddress(
+      fabricEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -602,10 +601,10 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
 
@@ -675,6 +674,17 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 });
 
 describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
+  it("should mint 100 tokens to the owner account", async () => {
+    await besuEnv.mintTokens("100");
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "100",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+  });
   it("should realize a transfer", async () => {
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -813,10 +823,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -843,10 +853,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveEthereumAddress =
-      await approveAddressApi2.getApproveAddress({
-        networkId: ethereumEnv.network,
-        tokenType: TokenType.NonstandardFungible,
-      } as GetApproveAddressRequest);
+      await approveAddressApi2.getApproveAddress(
+        ethereumEnv.network,
+        TokenType.NonstandardFungible,
+      );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
 
