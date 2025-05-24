@@ -84,25 +84,24 @@ export class GetApproveAddressEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`${fnTag}, ${reqTag}`);
     const request = req.query;
     if (
-      !request["ApproveAddressRequest.networkId.id"] ||
-      !request["ApproveAddressRequest.networkId.ledgerType"] ||
-      !request["ApproveAddressRequest.tokenType"]
+      !request["networkId.id"] ||
+      !request["networkId.ledgerType"] ||
+      !request["tokenType"]
     ) {
-      res
-        .status(400)
-        .json({ message: "ApproveAddressRequest query parameter is required" });
+      res.status(400).json({
+        message:
+          "networkId.id, networkId.ledgerType, and tokenType are required parameters is required",
+      });
       return;
     }
     try {
       const result = await this.options.dispatcher.GetApproveAddress({
         networkId: {
-          id: request["ApproveAddressRequest.networkId.id"] as string,
-          ledgerType: request[
-            "ApproveAddressRequest.networkId.ledgerType"
-          ] as LedgerType,
+          id: request["networkId.id"] as string,
+          ledgerType: request["networkId.ledgerType"] as LedgerType,
         },
         tokenType: request[
-          "ApproveAddressRequest.tokenType"
+          "tokenType"
         ] as GetApproveAddressRequestTokenTypeEnum,
       });
       res.json(result);
