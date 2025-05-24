@@ -279,7 +279,7 @@ paths:
         - name: fromNetworkID
           in: query
           schema:
-            $ref: '#/components/schemas/DLTNetworkID'
+            $ref: '#/components/schemas/NetworkId'
           required: true
           description: The sending DLT Network.
         - name: fromAmount
@@ -297,7 +297,7 @@ paths:
         - name: toDLTNetwork
           in: query
           schema:
-            $ref: '#/components/schemas/DLTNetworkID'
+            $ref: '#/components/schemas/NetworkId'
           required: true
           description: The receiving DLT Network.
         - name: toToken
@@ -382,10 +382,15 @@ paths:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address
       parameters:
-        - name: ApproveAddressRequest
+        - name: networkId
           in: query
           schema:
-              $ref: '#/components/schemas/GetApproveAddressRequest'
+            $ref: '#/components/schemas/NetworkId'
+          required: true
+        - name: tokenType
+          in: query
+          schema:
+            $ref: '#/components/schemas/TokenType'
           required: true
       responses:
         '200':

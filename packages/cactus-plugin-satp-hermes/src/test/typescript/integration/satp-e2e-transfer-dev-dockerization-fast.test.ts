@@ -33,7 +33,6 @@ import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
 import {
   GetApproveAddressApi,
-  GetApproveAddressRequest,
   TokenType,
   TransactionApi,
 } from "../../../main/typescript";
@@ -241,10 +240,10 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -265,10 +264,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
-      {
-        networkId: ethereumEnv.network,
-        tokenType: TokenType.NonstandardFungible,
-      } as GetApproveAddressRequest,
+      ethereumEnv.network,
+      TokenType.NonstandardFungible,
     );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
@@ -494,10 +491,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress({
-      networkId: besuEnv.network,
-      tokenType: TokenType.NonstandardFungible,
-    } as GetApproveAddressRequest);
+    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -524,10 +521,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveEthereumAddress =
-      await approveAddressApi2.getApproveAddress({
-        networkId: ethereumEnv.network,
-        tokenType: TokenType.NonstandardFungible,
-      } as GetApproveAddressRequest);
+      await approveAddressApi2.getApproveAddress(
+        ethereumEnv.network,
+        TokenType.NonstandardFungible,
+      );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
 
