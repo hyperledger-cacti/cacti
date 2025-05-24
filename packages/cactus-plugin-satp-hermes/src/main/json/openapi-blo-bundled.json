@@ -1503,9 +1503,31 @@
             "name": "fromNetworkID",
             "in": "query",
             "schema": {
-              "x-category": "satp-core",
-              "type": "string",
-              "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+              "type": "object",
+              "description": "The network of the DLT being interacted with.",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The network of the DLT being interacted with."
+                },
+                "ledgerType": {
+                  "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
+                  "type": "string",
+                  "enum": [
+                    "BESU_1X",
+                    "BESU_2X",
+                    "BURROW_0X",
+                    "CORDA_4X",
+                    "ETHEREUM",
+                    "FABRIC_2",
+                    "SAWTOOTH_1X"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "ledgerType"
+              ]
             },
             "required": true,
             "description": "The sending DLT Network."
@@ -1537,9 +1559,31 @@
             "name": "toDLTNetwork",
             "in": "query",
             "schema": {
-              "x-category": "satp-core",
-              "type": "string",
-              "description": "The network of the DLT being interacted with. TODO: implement network identification draft"
+              "type": "object",
+              "description": "The network of the DLT being interacted with.",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The network of the DLT being interacted with."
+                },
+                "ledgerType": {
+                  "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
+                  "type": "string",
+                  "enum": [
+                    "BESU_1X",
+                    "BESU_2X",
+                    "BURROW_0X",
+                    "CORDA_4X",
+                    "ETHEREUM",
+                    "FABRIC_2",
+                    "SAWTOOTH_1X"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "ledgerType"
+              ]
             },
             "required": true,
             "description": "The receiving DLT Network."
@@ -2534,55 +2578,50 @@
         },
         "parameters": [
           {
-            "name": "ApproveAddressRequest",
+            "name": "networkId",
             "in": "query",
             "schema": {
               "type": "object",
-              "description": "Request schema for getting the address to approve the token transfer.",
+              "description": "The network of the DLT being interacted with.",
               "properties": {
-                "networkId": {
-                  "type": "object",
-                  "description": "The network of the DLT being interacted with.",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "The network of the DLT being interacted with."
-                    },
-                    "ledgerType": {
-                      "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
-                      "type": "string",
-                      "enum": [
-                        "BESU_1X",
-                        "BESU_2X",
-                        "BURROW_0X",
-                        "CORDA_4X",
-                        "ETHEREUM",
-                        "FABRIC_2",
-                        "SAWTOOTH_1X"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "ledgerType"
-                  ]
+                "id": {
+                  "type": "string",
+                  "description": "The network of the DLT being interacted with."
                 },
-                "tokenType": {
+                "ledgerType": {
+                  "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
                   "type": "string",
                   "enum": [
-                    "ERC20",
-                    "ERC721",
-                    "ERC1155",
-                    "NONSTANDARD_FUNGIBLE",
-                    "NONSTANDARD_NONFUNGIBLE"
-                  ],
-                  "description": "The type of token."
+                    "BESU_1X",
+                    "BESU_2X",
+                    "BURROW_0X",
+                    "CORDA_4X",
+                    "ETHEREUM",
+                    "FABRIC_2",
+                    "SAWTOOTH_1X"
+                  ]
                 }
               },
               "required": [
-                "networkId",
-                "tokenType"
+                "id",
+                "ledgerType"
               ]
+            },
+            "required": true
+          },
+          {
+            "name": "tokenType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ERC20",
+                "ERC721",
+                "ERC1155",
+                "NONSTANDARD_FUNGIBLE",
+                "NONSTANDARD_NONFUNGIBLE"
+              ],
+              "description": "The type of token."
             },
             "required": true
           }

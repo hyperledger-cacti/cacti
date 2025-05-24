@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 ## GetApproveAddress
 
-> GetApproveAddress200Response GetApproveAddress(ctx).ApproveAddressRequest(approveAddressRequest).Execute()
+> GetApproveAddress200Response GetApproveAddress(ctx).NetworkID(networkID).TokenType(tokenType).Execute()
 
 Get approve address
 
@@ -29,11 +29,12 @@ import (
 )
 
 func main() {
-    approveAddressRequest := map[string][]openapiclient.GetApproveAddressApproveAddressRequestParameter{ ... } // GetApproveAddressApproveAddressRequestParameter | 
+    networkID := map[string][]openapiclient.TransactRequestSourceAssetNetworkId{ ... } // TransactRequestSourceAssetNetworkId | 
+    tokenType := "tokenType_example" // string | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.GetApproveAddressApi.GetApproveAddress(context.Background()).ApproveAddressRequest(approveAddressRequest).Execute()
+    resp, r, err := apiClient.GetApproveAddressApi.GetApproveAddress(context.Background()).NetworkID(networkID).TokenType(tokenType).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `GetApproveAddressApi.GetApproveAddress``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -54,7 +55,8 @@ Other parameters are passed through a pointer to a apiGetApproveAddressRequest s
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **approveAddressRequest** | [**GetApproveAddressApproveAddressRequestParameter**](GetApproveAddressApproveAddressRequestParameter.md) |  | 
+ **networkID** | [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | 
+ **tokenType** | **string** |  | 
 
 ### Return type
 

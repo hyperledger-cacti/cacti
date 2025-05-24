@@ -14,7 +14,6 @@ import {
 import {
   Configuration,
   GetApproveAddressApi,
-  GetApproveAddressRequest,
   SATPGatewayConfig,
   TokenType,
 } from "@hyperledger/cactus-plugin-satp-hermes";
@@ -411,13 +410,13 @@ export class CbdcBridgingAppDummyInfrastructure {
     );
 
     const reqApproveBesuAddress =
-      await besuGatewayApproveAddressApi.getApproveAddress({
-        networkId: {
+      await besuGatewayApproveAddressApi.getApproveAddress(
+        {
           id: BesuEnvironment.BESU_NETWORK_ID,
           ledgerType: LedgerType.Besu2X,
         },
-        tokenType: TokenType.NonstandardFungible,
-      } as GetApproveAddressRequest);
+        TokenType.NonstandardFungible,
+      );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
@@ -433,13 +432,13 @@ export class CbdcBridgingAppDummyInfrastructure {
       }),
     );
     const reqApproveFabricAddress =
-      await fabricGatewayApproveAddressApi.getApproveAddress({
-        networkId: {
+      await fabricGatewayApproveAddressApi.getApproveAddress(
+        {
           id: FabricEnvironment.FABRIC_NETWORK_ID,
           ledgerType: LedgerType.Fabric2,
         },
-        tokenType: TokenType.NonstandardFungible,
-      } as GetApproveAddressRequest);
+        TokenType.NonstandardFungible,
+      );
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");

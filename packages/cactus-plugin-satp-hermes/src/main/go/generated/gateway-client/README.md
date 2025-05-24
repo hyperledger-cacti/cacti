@@ -145,7 +145,6 @@ Class | Method | HTTP request | Description
  - [GasCost](docs/GasCost.md)
  - [GatewayIdentity](docs/GatewayIdentity.md)
  - [GetApproveAddress200Response](docs/GetApproveAddress200Response.md)
- - [GetApproveAddressApproveAddressRequestParameter](docs/GetApproveAddressApproveAddressRequestParameter.md)
  - [GetApproveAddressRequest](docs/GetApproveAddressRequest.md)
  - [GetApproveAddressResponse](docs/GetApproveAddressResponse.md)
  - [GetAudit200Response](docs/GetAudit200Response.md)
