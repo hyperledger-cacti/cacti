@@ -243,8 +243,6 @@ TransactRequest:
   type: object
   required:
     - contextID
-    - beneficiaryPubkey
-    - originatorPubkey
     - sourceAsset
     - receiverAsset
   properties:
@@ -254,10 +252,6 @@ TransactRequest:
     payload:
       type: string
       example: '{"data":"example payload"}'
-    beneficiaryPubkey:
-      type: string
-    originatorPubkey:
-      type: string
     sourceAsset:
       $ref: ./schemas.yml#/Asset
     receiverAsset:

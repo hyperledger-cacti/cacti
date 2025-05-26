@@ -65,8 +65,6 @@
                 "type": "object",
                 "required": [
                   "contextID",
-                  "beneficiaryPubkey",
-                  "originatorPubkey",
                   "sourceAsset",
                   "receiverAsset"
                 ],
@@ -79,12 +77,6 @@
                   "payload": {
                     "type": "string",
                     "example": "{\"data\":\"example payload\"}"
-                  },
-                  "beneficiaryPubkey": {
-                    "type": "string"
-                  },
-                  "originatorPubkey": {
-                    "type": "string"
                   },
                   "sourceAsset": {
                     "description": "An asset",
@@ -4569,8 +4561,6 @@
         "type": "object",
         "required": [
           "contextID",
-          "beneficiaryPubkey",
-          "originatorPubkey",
           "sourceAsset",
           "receiverAsset"
         ],
@@ -4583,12 +4573,6 @@
           "payload": {
             "type": "string",
             "example": "{\"data\":\"example payload\"}"
-          },
-          "beneficiaryPubkey": {
-            "type": "string"
-          },
-          "originatorPubkey": {
-            "type": "string"
           },
           "sourceAsset": {
             "description": "An asset",

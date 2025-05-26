@@ -309,17 +309,17 @@ func (a *TransactionApiService) GetIntegrationsExecute(r ApiGetIntegrationsReque
 type ApiGetRoutesRequest struct {
 	ctx context.Context
 	ApiService TransactionApi
-	fromNetworkID *string
+	fromNetworkID *TransactRequestSourceAssetNetworkId
 	fromAmount *string
 	fromToken *string
-	toDLTNetwork *string
+	toDLTNetwork *TransactRequestSourceAssetNetworkId
 	toToken *string
 	fromAddress *string
 	toAddress *string
 }
 
 // The sending DLT Network.
-func (r ApiGetRoutesRequest) FromNetworkID(fromNetworkID string) ApiGetRoutesRequest {
+func (r ApiGetRoutesRequest) FromNetworkID(fromNetworkID TransactRequestSourceAssetNetworkId) ApiGetRoutesRequest {
 	r.fromNetworkID = &fromNetworkID
 	return r
 }
@@ -337,7 +337,7 @@ func (r ApiGetRoutesRequest) FromToken(fromToken string) ApiGetRoutesRequest {
 }
 
 // The receiving DLT Network.
-func (r ApiGetRoutesRequest) ToDLTNetwork(toDLTNetwork string) ApiGetRoutesRequest {
+func (r ApiGetRoutesRequest) ToDLTNetwork(toDLTNetwork TransactRequestSourceAssetNetworkId) ApiGetRoutesRequest {
 	r.toDLTNetwork = &toDLTNetwork
 	return r
 }
