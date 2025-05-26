@@ -3707,18 +3707,6 @@ export interface TransactRequest {
     'payload'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
-    'beneficiaryPubkey': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
-    'originatorPubkey': string;
-    /**
-     * 
      * @type {TransactRequestSourceAsset}
      * @memberof TransactRequest
      */
