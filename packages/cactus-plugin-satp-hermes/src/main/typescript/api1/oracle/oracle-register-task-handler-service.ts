@@ -46,6 +46,15 @@ export async function registerTask(
         OracleTaskModeEnum.Polling,
       );
     }
+
+    if (req.pollingInterval < 500 || req.pollingInterval > 3600000) {
+      throw new InvalidParameterError(
+        ["pollingInterval"],
+        req.taskType,
+        OracleTaskModeEnum.Polling,
+        `Polling interval must be between 500ms and 3600000ms.`,
+      );
+    }
   }
 
   if (req.taskMode === OracleTaskModeEnum.EventListening) {
