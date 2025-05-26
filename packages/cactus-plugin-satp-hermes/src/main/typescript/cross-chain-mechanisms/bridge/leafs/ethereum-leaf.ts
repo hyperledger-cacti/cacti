@@ -471,6 +471,7 @@ export class EthereumLeaf
         interactions,
       ],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
 
     if (!response.success) {
@@ -513,6 +514,7 @@ export class EthereumLeaf
       methodName: "unwrap",
       params: [assetId],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -557,6 +559,7 @@ export class EthereumLeaf
       methodName: "lock",
       params: [assetId, amount.toString()],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
       this.log.debug(response);
@@ -602,6 +605,7 @@ export class EthereumLeaf
       methodName: "unlock",
       params: [assetId, amount.toString()],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -646,6 +650,7 @@ export class EthereumLeaf
       methodName: "mint",
       params: [assetId, amount.toString()],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -690,6 +695,7 @@ export class EthereumLeaf
       methodName: "burn",
       params: [assetId, amount.toString()],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -738,6 +744,7 @@ export class EthereumLeaf
       methodName: "assign",
       params: [assetId, to, amount],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
       throw new TransactionError(fnTag);
@@ -777,6 +784,7 @@ export class EthereumLeaf
       methodName: "getAllAssetsIDs",
       params: [],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
 
     if (!response.success) {
@@ -815,6 +823,7 @@ export class EthereumLeaf
       methodName: "getToken",
       params: [assetId],
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
 
     if (!response.success) {
@@ -872,6 +881,7 @@ export class EthereumLeaf
       methodName: methodName,
       params: params,
       web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
     })) as EthereumResponse;
 
     if (!response.success) {
