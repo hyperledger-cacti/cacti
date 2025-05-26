@@ -293,10 +293,7 @@ paths:
         name: fromNetworkID
         required: true
         schema:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
-          type: string
-          x-category: satp-core
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         style: form
       - description: The amount that should be sent including all decimals.
         explode: true
@@ -326,10 +323,7 @@ paths:
         name: toDLTNetwork
         required: true
         schema:
-          description: "The network of the DLT being interacted with. TODO: implement\
-            \ network identification draft"
-          type: string
-          x-category: satp-core
+          $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         style: form
       - description: The token that should be transferred to. Can be the address or
           the symbol.
@@ -436,7 +430,7 @@ paths:
       parameters:
       - explode: true
         in: query
-        name: networkID
+        name: networkId
         required: true
         schema:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
@@ -895,7 +889,6 @@ components:
         \ such as the transaction context, mode (data or transfer), payload, and information\
         \ about the source and destination DLT networks."
       example:
-        beneficiaryPubkey: beneficiaryPubkey
         payload: "{\"data\":\"example payload\"}"
         sourceAsset:
           owner: owner
@@ -910,7 +903,6 @@ components:
           id: id
           tokenType: ERC20
           referenceId: referenceId
-        originatorPubkey: originatorPubkey
         contextID: 000003e8-e0b8-21ee-ba00-325096b39f47
         receiverAsset:
           owner: owner
@@ -933,18 +925,12 @@ components:
         payload:
           example: "{\"data\":\"example payload\"}"
           type: string
-        beneficiaryPubkey:
-          type: string
-        originatorPubkey:
-          type: string
         sourceAsset:
           $ref: '#/components/schemas/Transact_request_sourceAsset'
         receiverAsset:
           $ref: '#/components/schemas/Transact_request_sourceAsset'
       required:
-      - beneficiaryPubkey
       - contextID
-      - originatorPubkey
       - receiverAsset
       - sourceAsset
       type: object
@@ -2119,18 +2105,12 @@ components:
         payload:
           example: "{\"data\":\"example payload\"}"
           type: string
-        beneficiaryPubkey:
-          type: string
-        originatorPubkey:
-          type: string
         sourceAsset:
           $ref: '#/components/schemas/Transact_request_sourceAsset'
         receiverAsset:
           $ref: '#/components/schemas/Transact_request_sourceAsset'
       required:
-      - beneficiaryPubkey
       - contextID
-      - originatorPubkey
       - receiverAsset
       - sourceAsset
       type: object

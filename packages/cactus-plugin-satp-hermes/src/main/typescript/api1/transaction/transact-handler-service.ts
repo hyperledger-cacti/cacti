@@ -54,8 +54,6 @@ export async function executeTransact(
     SATP_VERSION,
     req.sourceAsset.contractAddress,
     req.receiverAsset.contractAddress,
-    req.originatorPubkey,
-    req.beneficiaryPubkey,
     manager.pubKey,
     serverGatewayPubkey,
     receiverGatewayOwnerId,

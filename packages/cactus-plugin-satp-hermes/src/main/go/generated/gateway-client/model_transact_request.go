@@ -22,8 +22,6 @@ type TransactRequest struct {
 	// The unique identifier of the task.
 	ContextID string `json:"contextID"`
 	Payload *string `json:"payload,omitempty"`
-	BeneficiaryPubkey string `json:"beneficiaryPubkey"`
-	OriginatorPubkey string `json:"originatorPubkey"`
 	SourceAsset TransactRequestSourceAsset `json:"sourceAsset"`
 	ReceiverAsset TransactRequestSourceAsset `json:"receiverAsset"`
 }
@@ -32,11 +30,9 @@ type TransactRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransactRequest(contextID string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset) *TransactRequest {
+func NewTransactRequest(contextID string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset) *TransactRequest {
 	this := TransactRequest{}
 	this.ContextID = contextID
-	this.BeneficiaryPubkey = beneficiaryPubkey
-	this.OriginatorPubkey = originatorPubkey
 	this.SourceAsset = sourceAsset
 	this.ReceiverAsset = receiverAsset
 	return &this
@@ -106,54 +102,6 @@ func (o *TransactRequest) SetPayload(v string) {
 	o.Payload = &v
 }
 
-// GetBeneficiaryPubkey returns the BeneficiaryPubkey field value
-func (o *TransactRequest) GetBeneficiaryPubkey() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.BeneficiaryPubkey
-}
-
-// GetBeneficiaryPubkeyOk returns a tuple with the BeneficiaryPubkey field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetBeneficiaryPubkeyOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.BeneficiaryPubkey, true
-}
-
-// SetBeneficiaryPubkey sets field value
-func (o *TransactRequest) SetBeneficiaryPubkey(v string) {
-	o.BeneficiaryPubkey = v
-}
-
-// GetOriginatorPubkey returns the OriginatorPubkey field value
-func (o *TransactRequest) GetOriginatorPubkey() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.OriginatorPubkey
-}
-
-// GetOriginatorPubkeyOk returns a tuple with the OriginatorPubkey field value
-// and a boolean to check if the value has been set.
-func (o *TransactRequest) GetOriginatorPubkeyOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.OriginatorPubkey, true
-}
-
-// SetOriginatorPubkey sets field value
-func (o *TransactRequest) SetOriginatorPubkey(v string) {
-	o.OriginatorPubkey = v
-}
-
 // GetSourceAsset returns the SourceAsset field value
 func (o *TransactRequest) GetSourceAsset() TransactRequestSourceAsset {
 	if o == nil {
@@ -216,8 +164,6 @@ func (o TransactRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Payload) {
 		toSerialize["payload"] = o.Payload
 	}
-	toSerialize["beneficiaryPubkey"] = o.BeneficiaryPubkey
-	toSerialize["originatorPubkey"] = o.OriginatorPubkey
 	toSerialize["sourceAsset"] = o.SourceAsset
 	toSerialize["receiverAsset"] = o.ReceiverAsset
 	return toSerialize, nil

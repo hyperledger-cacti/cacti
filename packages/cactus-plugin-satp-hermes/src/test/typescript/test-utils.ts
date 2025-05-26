@@ -219,8 +219,6 @@ export function getTransactRequest(
 ): TransactRequest {
   return {
     contextID,
-    originatorPubkey: from.transactRequestPubKey,
-    beneficiaryPubkey: to.transactRequestPubKey,
     sourceAsset: { ...from.defaultAsset, amount: fromAmount },
     receiverAsset: { ...to.defaultAsset, amount: toAmount },
   };

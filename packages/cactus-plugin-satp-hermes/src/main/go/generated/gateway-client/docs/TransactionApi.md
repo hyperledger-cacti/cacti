@@ -159,10 +159,10 @@ import (
 )
 
 func main() {
-    fromNetworkID := "fromNetworkID_example" // string | The sending DLT Network.
+    fromNetworkID := map[string][]openapiclient.TransactRequestSourceAssetNetworkId{ ... } // TransactRequestSourceAssetNetworkId | The sending DLT Network.
     fromAmount := "1000000000000000000" // string | The amount that should be sent including all decimals.
     fromToken := "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7" // string | The token that should be transferred. Can be the address or the symbol.
-    toDLTNetwork := "toDLTNetwork_example" // string | The receiving DLT Network.
+    toDLTNetwork := map[string][]openapiclient.TransactRequestSourceAssetNetworkId{ ... } // TransactRequestSourceAssetNetworkId | The receiving DLT Network.
     toToken := "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7" // string | The token that should be transferred to. Can be the address or the symbol.
     fromAddress := "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7" // string | The sending wallet address.
     toAddress := "0x102A0F6D9F0F507288fE1e26740cFaD61184CCC7" // string | The receiving wallet address. If none is provided, the fromAddress will be used.
@@ -190,10 +190,10 @@ Other parameters are passed through a pointer to a apiGetRoutesRequest struct vi
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **fromNetworkID** | **string** | The sending DLT Network. | 
+ **fromNetworkID** | [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) | The sending DLT Network. | 
  **fromAmount** | **string** | The amount that should be sent including all decimals. | 
  **fromToken** | **string** | The token that should be transferred. Can be the address or the symbol. | 
- **toDLTNetwork** | **string** | The receiving DLT Network. | 
+ **toDLTNetwork** | [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) | The receiving DLT Network. | 
  **toToken** | **string** | The token that should be transferred to. Can be the address or the symbol. | 
  **fromAddress** | **string** | The sending wallet address. | 
  **toAddress** | **string** | The receiving wallet address. If none is provided, the fromAddress will be used. | 
@@ -237,7 +237,7 @@ import (
 )
 
 func main() {
-    transactRequest := *openapiclient.NewTransactRequest("000003e8-e0b8-21ee-ba00-325096b39f47", "BeneficiaryPubkey_example", "OriginatorPubkey_example", *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example"), *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example")) // TransactRequest | 
+    transactRequest := *openapiclient.NewTransactRequest("000003e8-e0b8-21ee-ba00-325096b39f47", *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example"), *openapiclient.NewTransactRequestSourceAsset("Id_example", "Owner_example", "ContractName_example", *openapiclient.NewTransactRequestSourceAssetNetworkId("Id_example", "LedgerType_example"), "TokenType_example", "ReferenceId_example")) // TransactRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
