@@ -215,8 +215,6 @@ describe("Shutdown Verify State Tests", () => {
 
     const transactRequest: TransactRequest = {
       contextID: "mockContextID",
-      beneficiaryPubkey: "mockBeneficiaryPubkey",
-      originatorPubkey: "mockOriginatorPubkey",
       sourceAsset: transactRequestSourceAsset,
       receiverAsset: transactRequestSourceAsset,
     };
