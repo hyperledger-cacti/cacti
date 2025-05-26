@@ -135,8 +135,6 @@ export class Stage1ClientService extends SATPService {
         assetProfileId: sessionData.assetProfileId,
         verifiedOriginatorEntityId: sessionData.verifiedOriginatorEntityId,
         verifiedBeneficiaryEntityId: sessionData.verifiedBeneficiaryEntityId,
-        originatorPubkey: sessionData.originatorPubkey,
-        beneficiaryPubkey: sessionData.beneficiaryPubkey,
         senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
         recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
         clientGatewayPubkey: sessionData.clientGatewayPubkey,
