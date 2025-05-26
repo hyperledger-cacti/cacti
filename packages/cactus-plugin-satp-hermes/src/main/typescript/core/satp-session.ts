@@ -290,12 +290,6 @@ export class SATPSession {
       if (sessionData.digitalAssetId == "") {
         throw new DigitalAssetIdError(tag);
       }
-      if (sessionData.originatorPubkey == "") {
-        throw new PubKeyError(tag);
-      }
-      if (sessionData.beneficiaryPubkey == "") {
-        throw new PubKeyError(tag);
-      }
       if (!stage0 && sessionData.senderGatewayNetworkId == "") {
         throw new GatewayNetworkIdError(tag);
       }
