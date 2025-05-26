@@ -342,17 +342,6 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
 });
 
 describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
-    await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-  });
   it("should realize a transfer", async () => {
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -592,6 +581,253 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerAccount(),
       "200",
       ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly to the Owner account");
+
+    await destroyGatewayRunners();
+  });
+});
+
+describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
+  it("should realize a transfer", async () => {
+    // gatewayIds setup:
+    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+    const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
+    const gatewayIdentity1 = {
+      id: "mockID-1",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: EthereumTestEnvironment.ETH_NETWORK_ID,
+          ledgerType: LedgerType.Ethereum,
+        },
+      ],
+      proofID: "mockProofID10",
+      address: `http://${gateway1Address}`,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+    } as GatewayIdentity;
+
+    // gateway setup:
+    const gatewayIdentity2 = {
+      id: "mockID-2",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: BesuTestEnvironment.BESU_NETWORK_ID,
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
+      proofID: "mockProofID11",
+      address: `http://${gateway2Address}`,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+    } as GatewayIdentity;
+
+    // besuConfig Json object setup:
+    const besuConfig = await besuEnv.createBesuDockerConfig();
+
+    // fabricConfig Json object setup:
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
+
+    const files1 = setupGatewayDockerFiles({
+      gatewayIdentity: gatewayIdentity1,
+      logLevel,
+      counterPartyGateways: [gatewayIdentity2],
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [ethereumConfig] },
+      localRepository: db_local_config1,
+      remoteRepository: db_remote_config1,
+      gatewayId: "gateway-1",
+      gatewayKeyPair: {
+        privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
+        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
+    });
+
+    const files2 = setupGatewayDockerFiles({
+      gatewayIdentity: gatewayIdentity2,
+      logLevel,
+      counterPartyGateways: [gatewayIdentity1],
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [besuConfig] },
+      localRepository: db_local_config2,
+      remoteRepository: db_remote_config2,
+      gatewayId: "gateway-2",
+      gatewayKeyPair: {
+        privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
+        publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
+    });
+
+    // gatewayRunner setup:
+    const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: DOCKER_IMAGE_VERSION,
+      containerImageName: DOCKER_IMAGE_NAME,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      logLevel,
+      emitContainerLogs: true,
+      configFilePath: files1.configFilePath,
+      logsPath: files1.logsPath,
+      ontologiesPath: files1.ontologiesPath,
+      networkName: testNetwork,
+      url: gateway1Address,
+    };
+
+    // gatewayRunner setup:
+    const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: DOCKER_IMAGE_VERSION,
+      containerImageName: DOCKER_IMAGE_NAME,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
+      logLevel,
+      emitContainerLogs: true,
+      configFilePath: files2.configFilePath,
+      logsPath: files2.logsPath,
+      ontologiesPath: files2.ontologiesPath,
+      networkName: testNetwork,
+      url: gateway2Address,
+    };
+
+    gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
+    log.debug("starting gatewayRunner...");
+    await gatewayRunner1.start();
+    log.debug("gatewayRunner started sucessfully");
+
+    gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
+    log.debug("starting gatewayRunner...");
+    await gatewayRunner2.start();
+    log.debug("gatewayRunner started sucessfully");
+
+    const approveAddressApi1 = new GetApproveAddressApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
+      }),
+    );
+
+    const reqApproveEthereumAddress =
+      await approveAddressApi1.getApproveAddress(
+        ethereumEnv.network,
+        TokenType.NonstandardFungible,
+      );
+
+    if (!reqApproveEthereumAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
+
+    await ethereumEnv.giveRoleToBridge(
+      reqApproveEthereumAddress?.data.approveAddress,
+    );
+
+    if (reqApproveEthereumAddress?.data.approveAddress) {
+      await ethereumEnv.approveAmount(
+        reqApproveEthereumAddress.data.approveAddress,
+        "200",
+      );
+    } else {
+      throw new Error("Approve address is undefined");
+    }
+    log.debug("Approved 200 amout to the Ethereum Bridge Address");
+
+    const approveAddressApi2 = new GetApproveAddressApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner2.getOApiHost()}`,
+      }),
+    );
+
+    const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
+      besuEnv.network,
+      TokenType.NonstandardFungible,
+    );
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
+
+    const satpApi = new TransactionApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
+      }),
+    );
+
+    const req = getTransactRequest(
+      "mockContext",
+      ethereumEnv,
+      besuEnv,
+      "200",
+      "200",
+    );
+
+    const res = await satpApi.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestContractName(),
+      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestContractAbi(),
+      ethereumEnv.getTestOwnerAccount(),
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly from the Owner account");
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestContractName(),
+      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestContractAbi(),
+      ethereumEnv.getBridgeEthAccount(),
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly to the Wrapper account");
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      reqApproveEthereumAddress?.data.approveAddress,
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly from the Bridge account");
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestContractName(),
+      besuEnv.getTestContractAddress(),
+      besuEnv.getTestContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "200",
+      besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
 
