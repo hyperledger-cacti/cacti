@@ -693,8 +693,6 @@ export class CbdcBridgingAppDummyInfrastructure {
     try {
       const request: TransactRequest = {
         contextID: uuidv4(),
-        originatorPubkey: senderAddress,
-        beneficiaryPubkey: receiverAddress,
         sourceAsset,
         receiverAsset,
       };
