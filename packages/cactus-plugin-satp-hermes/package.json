@@ -65,7 +65,7 @@
         "dist/*"
     ],
     "scripts": {
-        "build:bundle": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil",
+        "build:bundle": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --out=./dist/bundle/ncc/ --external=fabric-common --external=pg-cloudflare --external=bufferutil",
         "build:bundle:prod": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --minify --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil",
         "build": "run-s codegen tsc",
         "build-proto": "buf build --path src/main/proto --verbose",
