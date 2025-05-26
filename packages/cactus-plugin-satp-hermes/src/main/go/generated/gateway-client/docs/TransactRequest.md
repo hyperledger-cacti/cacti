@@ -6,8 +6,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ContextID** | **string** | The unique identifier of the task. | 
 **Payload** | Pointer to **string** |  | [optional] 
-**BeneficiaryPubkey** | **string** |  | 
-**OriginatorPubkey** | **string** |  | 
 **SourceAsset** | [**TransactRequestSourceAsset**](TransactRequestSourceAsset.md) |  | 
 **ReceiverAsset** | [**TransactRequestSourceAsset**](TransactRequestSourceAsset.md) |  | 
 
@@ -15,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewTransactRequest
 
-`func NewTransactRequest(contextID string, beneficiaryPubkey string, originatorPubkey string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset, ) *TransactRequest`
+`func NewTransactRequest(contextID string, sourceAsset TransactRequestSourceAsset, receiverAsset TransactRequestSourceAsset, ) *TransactRequest`
 
 NewTransactRequest instantiates a new TransactRequest object
 This constructor will assign default values to properties that have it defined,
@@ -74,46 +72,6 @@ SetPayload sets Payload field to given value.
 `func (o *TransactRequest) HasPayload() bool`
 
 HasPayload returns a boolean if a field has been set.
-
-### GetBeneficiaryPubkey
-
-`func (o *TransactRequest) GetBeneficiaryPubkey() string`
-
-GetBeneficiaryPubkey returns the BeneficiaryPubkey field if non-nil, zero value otherwise.
-
-### GetBeneficiaryPubkeyOk
-
-`func (o *TransactRequest) GetBeneficiaryPubkeyOk() (*string, bool)`
-
-GetBeneficiaryPubkeyOk returns a tuple with the BeneficiaryPubkey field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetBeneficiaryPubkey
-
-`func (o *TransactRequest) SetBeneficiaryPubkey(v string)`
-
-SetBeneficiaryPubkey sets BeneficiaryPubkey field to given value.
-
-
-### GetOriginatorPubkey
-
-`func (o *TransactRequest) GetOriginatorPubkey() string`
-
-GetOriginatorPubkey returns the OriginatorPubkey field if non-nil, zero value otherwise.
-
-### GetOriginatorPubkeyOk
-
-`func (o *TransactRequest) GetOriginatorPubkeyOk() (*string, bool)`
-
-GetOriginatorPubkeyOk returns a tuple with the OriginatorPubkey field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetOriginatorPubkey
-
-`func (o *TransactRequest) SetOriginatorPubkey(v string)`
-
-SetOriginatorPubkey sets OriginatorPubkey field to given value.
-
 
 ### GetSourceAsset
 

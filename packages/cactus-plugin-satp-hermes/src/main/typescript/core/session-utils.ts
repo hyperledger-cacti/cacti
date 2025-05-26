@@ -77,8 +77,6 @@ export function populateClientSessionData(
   version: string,
   sourceContractAddress: string | undefined,
   receiverContractAddress: string | undefined,
-  originatorPubkey: string,
-  beneficiaryPubkey: string,
   clientGatewayPubkey: string,
   serverGatewayPubkey: string,
   receiverGatewayOwnerId: string,
@@ -115,8 +113,6 @@ export function populateClientSessionData(
   }
   sessionData.version = version;
   sessionData.digitalAssetId = uuidv4();
-  sessionData.originatorPubkey = originatorPubkey;
-  sessionData.beneficiaryPubkey = beneficiaryPubkey;
   sessionData.clientGatewayPubkey = clientGatewayPubkey;
   sessionData.serverGatewayPubkey = serverGatewayPubkey;
   sessionData.receiverGatewayOwnerId = receiverGatewayOwnerId;
@@ -200,8 +196,6 @@ export function copySessionDataAttributes(
     srcSessionData.verifiedBeneficiaryEntityId;
   destSessionData.assetProfileId = srcSessionData.assetProfileId;
   destSessionData.digitalAssetId = srcSessionData.digitalAssetId;
-  destSessionData.originatorPubkey = srcSessionData.originatorPubkey;
-  destSessionData.beneficiaryPubkey = srcSessionData.beneficiaryPubkey;
   destSessionData.senderGatewayOwnerId = srcSessionData.senderGatewayOwnerId;
   destSessionData.receiverGatewayOwnerId =
     srcSessionData.receiverGatewayOwnerId;
