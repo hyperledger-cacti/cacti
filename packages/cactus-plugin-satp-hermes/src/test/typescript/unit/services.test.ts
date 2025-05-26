@@ -272,8 +272,6 @@ describe("SATP Services Testing", () => {
       "hex",
     );
     sessionData.serverGatewayPubkey = sessionData.clientGatewayPubkey;
-    sessionData.originatorPubkey = "MOCK_ORIGINATOR_PUBKEY";
-    sessionData.beneficiaryPubkey = "MOCK_BENEFICIARY_PUBKEY";
     sessionData.digitalAssetId = "MOCK_DIGITAL_ASSET_ID";
     sessionData.assetProfileId = "MOCK_ASSET_PROFILE_ID";
     sessionData.verifiedOriginatorEntityId =
@@ -515,12 +513,6 @@ describe("SATP Services Testing", () => {
     expect(transferProposalRequestMessage.common?.serverGatewayPubkey).toBe(
       sessionData.serverGatewayPubkey,
     );
-    expect(
-      transferProposalRequestMessage.transferInitClaims?.originatorPubkey,
-    ).toBe(sessionData.originatorPubkey);
-    expect(
-      transferProposalRequestMessage.transferInitClaims?.beneficiaryPubkey,
-    ).toBe(sessionData.beneficiaryPubkey);
     expect(
       transferProposalRequestMessage.transferInitClaims?.digitalAssetId,
     ).toBe("MOCK_DIGITAL_ASSET_ID");

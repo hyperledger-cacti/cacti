@@ -58,8 +58,6 @@ paths:
               type: object
               required:
                 - contextID
-                - beneficiaryPubkey
-                - originatorPubkey
                 - sourceAsset
                 - receiverAsset
               properties:
@@ -70,10 +68,6 @@ paths:
                 payload:
                   type: string
                   example: '{"data":"example payload"}'
-                beneficiaryPubkey:
-                  type: string
-                originatorPubkey:
-                  type: string
                 sourceAsset:
                   description: An asset
                   type: object
@@ -3426,8 +3420,6 @@ components:
       type: object
       required:
         - contextID
-        - beneficiaryPubkey
-        - originatorPubkey
         - sourceAsset
         - receiverAsset
       properties:
@@ -3438,10 +3430,6 @@ components:
         payload:
           type: string
           example: '{"data":"example payload"}'
-        beneficiaryPubkey:
-          type: string
-        originatorPubkey:
-          type: string
         sourceAsset:
           description: An asset
           type: object

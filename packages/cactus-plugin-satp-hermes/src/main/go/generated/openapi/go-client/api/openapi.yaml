@@ -493,10 +493,6 @@ components:
           type: string
         recipientBasePath:
           type: string
-        originatorPubkey:
-          type: string
-        beneficiaryPubkey:
-          type: string
         sourceGatewayPubkey:
           type: string
         sourceGatewayDltSystem:
@@ -1240,7 +1236,6 @@ components:
           keyWord:
           - ""
           - ""
-        beneficiaryPubkey: beneficiaryPubkey
         recipientLedgerAssetID: recipientLedgerAssetID
         clientIdentityPubkey: clientIdentityPubkey
         serverDltSystem: serverDltSystem

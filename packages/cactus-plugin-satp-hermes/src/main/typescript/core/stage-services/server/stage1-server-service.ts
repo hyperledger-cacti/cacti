@@ -390,9 +390,6 @@ export class Stage1ServerService extends SATPService {
 
     sessionData.version = request.common!.version;
     sessionData.digitalAssetId = request.transferInitClaims!.digitalAssetId;
-    sessionData.originatorPubkey = request.transferInitClaims!.originatorPubkey;
-    sessionData.beneficiaryPubkey =
-      request.transferInitClaims!.beneficiaryPubkey;
     sessionData.senderGatewayNetworkId =
       request.transferInitClaims!.senderGatewayNetworkId;
     sessionData.recipientGatewayNetworkId =
@@ -508,14 +505,6 @@ export class Stage1ServerService extends SATPService {
     }
     if (transferClaims.verifiedBeneficiaryEntityId == "") {
       this.Log.error(`${tag}, verifiedBeneficiaryEntityId is missing`);
-    }
-    if (transferClaims.originatorPubkey == "") {
-      this.Log.error(`${tag}, originatorPubkey is missing`);
-      //return false;
-    }
-    if (transferClaims.beneficiaryPubkey == "") {
-      this.Log.error(`${tag}, beneficiaryPubkey is missing`);
-      return false;
     }
     if (transferClaims.senderGatewayNetworkId != "") {
       this.Log.info(`${tag}, optional variable senderGatewayNetworkId loaded`);
