@@ -10,7 +10,10 @@ import {
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger/cactus-test-tooling";
-import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
+import {
+  Address,
+  GatewayIdentity,
+} from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
   BesuTestEnvironment,
@@ -18,7 +21,7 @@ import {
   EthereumTestEnvironment,
   createPGDatabase,
   setupDBTable,
-} from "../test-utils";
+} from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_OAPI,
@@ -26,8 +29,8 @@ import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
-} from "../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../../main/typescript/core/constants";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
@@ -36,8 +39,8 @@ import {
   GetApproveAddressApi,
   TokenType,
   TransactionApi,
-} from "../../../main/typescript";
-import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../constants";
+} from "../../../../main/typescript";
+import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../../constants";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -65,17 +68,21 @@ const testNetwork = "test-network";
 const gateway1Address = "gateway1.satp-hermes";
 const gateway2Address = "gateway2.satp-hermes";
 
-async function destroyGatewayRunners() {
+const TIMEOUT = 900000; // 15 minutes
+
+afterEach(async () => {
   if (gatewayRunner1) {
+    log.debug("Stopping gatewayRunner1...");
     await gatewayRunner1.stop();
     await gatewayRunner1.destroy();
   }
 
   if (gatewayRunner2) {
+    log.debug("Stopping gatewayRunner2...");
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
-}
+}, TIMEOUT);
 
 afterAll(async () => {
   await db_local1.stop();
@@ -98,7 +105,7 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -162,21 +169,21 @@ beforeAll(async () => {
 
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
-});
+
+  // feeding the owner account with 200 tokens in Besu that will be used in the various transfers
+  await besuEnv.mintTokens("200");
+  await besuEnv.checkBalance(
+    besuEnv.getTestContractName(),
+    besuEnv.getTestContractAddress(),
+    besuEnv.getTestContractAbi(),
+    besuEnv.getTestOwnerAccount(),
+    "200",
+    besuEnv.getTestOwnerSigningCredential(),
+  );
+}, TIMEOUT);
 
 describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
-    await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-  });
-
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     const address: Address = `http://${gateway1Address}`;
 
@@ -303,7 +310,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       besuEnv.getTestContractAddress(),
       besuEnv.getTestContractAbi(),
       besuEnv.getTestOwnerAccount(),
-      "0",
+      "100",
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly from the Owner account");
@@ -337,12 +344,11 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    await destroyGatewayRunners();
   });
 });
 
 describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -593,16 +599,15 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestContractAddress(),
       ethereumEnv.getTestContractAbi(),
       ethereumEnv.getTestOwnerAccount(),
-      "100",
+      "200",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    await destroyGatewayRunners();
   });
 });
 
 describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -786,11 +791,43 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
 
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
 
-    const satpApi = new TransactionApi(
+    const satpApi1 = new TransactionApi(
       new Configuration({
         basePath: `http://${await gatewayRunner1.getOApiHost()}`,
       }),
     );
+
+    const integrations1 = await satpApi1.getIntegrations();
+
+    expect(integrations1?.data.integrations).toBeDefined();
+    expect(integrations1?.data.integrations.length).toEqual(1);
+
+    const integration = integrations1?.data.integrations[0];
+    expect(integration).toBeDefined();
+    expect(integration.environment).toBe("testnet");
+    expect(integration.id).toBe("EthereumLedgerTestNetwork");
+    expect(integration.name).toBe("Ethereum");
+    expect(integration.type).toBe("ETHEREUM");
+
+    log.info("Integration 1 is correct");
+
+    const satpApi2 = new TransactionApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner2.getOApiHost()}`,
+      }),
+    );
+
+    const integrations2 = await satpApi2.getIntegrations();
+    expect(integrations2?.data.integrations).toBeDefined();
+    expect(integrations2?.data.integrations.length).toEqual(1);
+
+    const integration2 = integrations2?.data.integrations[0];
+    expect(integration2).toBeDefined();
+    expect(integration2.environment).toBe("testnet");
+    expect(integration2.id).toBe("BesuLedgerTestNetwork");
+    expect(integration2.name).toBe("Hyperledger Besu");
+    expect(integration2.type).toBe("BESU_2X");
+    log.info("Integration 2 is correct");
 
     const req = getTransactRequest(
       "mockContext",
@@ -800,7 +837,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       "200",
     );
 
-    const res = await satpApi.transact(req);
+    const res = await satpApi1.transact(req);
     log.info(res?.status);
     log.info(res.data.statusResponse);
     expect(res?.status).toBe(200);
@@ -845,6 +882,26 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
     );
     log.info("Amount was transfer correctly to the Owner account");
 
-    await destroyGatewayRunners();
+    // check audit endpoint and get audit data
+    const adminApi = new AdminApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
+      }),
+    );
+
+    const auditResponse = await adminApi.performAudit(0, Date.now());
+
+    expect(auditResponse?.data.sessions).toBeDefined();
+    expect(auditResponse?.data.sessions?.length).toEqual(1);
+
+    log.info(
+      `Audit response: ${JSON.stringify(auditResponse?.data.sessions?.[0])}`,
+    );
+
+    const json_parsed = JSON.parse(
+      auditResponse?.data.sessions?.[0] || "{}",
+    ) as { id: string };
+    expect(json_parsed).toBeDefined();
+    expect(json_parsed.id).toBe(res.data.sessionID);
   });
 });

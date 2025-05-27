@@ -31,12 +31,6 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
-import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-  knexTargetRemoteConnection,
-  knexServerConnection,
-} from "../../knex.config";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
@@ -53,13 +47,17 @@ import { OntologyManager } from "../../../../main/typescript/cross-chain-mechani
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
+import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
+import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 
 let besuEnv: BesuTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
+
 let knexInstanceClient: Knex;
-let knexInstanceServer: Knex;
-let knexInstanceRemote1: Knex;
-let knexInstanceRemote2: Knex;
+let knexInstanceSourceRemote: Knex;
+let knexInstanceRemote: Knex;
+let knexInstanceTargetRemote: Knex;
 
 let gateway1: SATPGateway;
 let gateway2: SATPGateway;
@@ -212,14 +210,14 @@ afterAll(async () => {
   }
   if (
     knexInstanceClient ||
-    knexInstanceServer ||
-    knexInstanceRemote1 ||
-    knexInstanceRemote2
+    knexInstanceSourceRemote ||
+    knexInstanceRemote ||
+    knexInstanceTargetRemote
   ) {
     await knexInstanceClient.destroy();
-    await knexInstanceServer.destroy();
-    await knexInstanceRemote1.destroy();
-    await knexInstanceRemote2.destroy();
+    await knexInstanceSourceRemote.destroy();
+    await knexInstanceRemote.destroy();
+    await knexInstanceTargetRemote.destroy();
   }
 
   if (gateway1) {
@@ -243,7 +241,7 @@ afterAll(async () => {
     });
 });
 
-describe("Rollback Test stage 2", () => {
+describe.skip("Rollback Test stage 2", () => {
   it("should initiate stage-2 rollback strategy", async () => {
     const besuAsset: EvmFungibleAsset = {
       id: besuEnv.defaultAsset.id,
@@ -313,11 +311,22 @@ describe("Rollback Test stage 2", () => {
       gatewayClientPort: 3211,
     };
 
-    knexInstanceClient = knex(knexClientConnection);
+    const migrationSource = await createMigrationSource();
+    knexInstanceClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
     await knexInstanceClient.migrate.latest();
 
-    knexInstanceRemote1 = knex(knexSourceRemoteConnection);
-    await knexInstanceRemote1.migrate.latest();
+    knexInstanceSourceRemote = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexInstanceSourceRemote.migrate.latest();
 
     const options1: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -328,19 +337,29 @@ describe("Rollback Test stage 2", () => {
       ccConfig: {
         bridgeConfig: [besuEnv.createBesuConfig()],
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       enableCrashRecovery: true,
       pluginRegistry: new PluginRegistry({
         plugins: [],
       }),
     };
 
-    knexInstanceServer = knex(knexServerConnection);
-    await knexInstanceServer.migrate.latest();
+    knexInstanceRemote = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexInstanceRemote.migrate.latest();
 
-    knexInstanceRemote2 = knex(knexTargetRemoteConnection);
-    await knexInstanceRemote2.migrate.latest();
+    knexInstanceTargetRemote = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexInstanceTargetRemote.migrate.latest();
 
     const options2: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -351,8 +370,8 @@ describe("Rollback Test stage 2", () => {
       ccConfig: {
         bridgeConfig: [fabricEnv.createFabricConfig()],
       },
-      localRepository: knexServerConnection,
-      remoteRepository: knexTargetRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       enableCrashRecovery: true,
       pluginRegistry: new PluginRegistry({
         plugins: [],

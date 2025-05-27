@@ -97,11 +97,10 @@ import { MonitorService } from "../monitoring/monitor";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
-  instanceId: string;
+  ourGateway: GatewayIdentity;
   sessions?: Map<string, SATPSession>;
   signer: JsObjectSigner;
   pubKey: string;
-  connectedDLTs: NetworkId[];
   ccManager: SATPCrossChainManager;
   orchestrator: GatewayOrchestrator;
   localRepository: ILocalLogRepository;
@@ -111,11 +110,10 @@ export interface ISATPManagerOptions {
 export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
   private readonly logger: Logger;
-  private readonly instanceId: string;
+  private readonly ourGateway: GatewayIdentity;
   private status: HealthCheckResponseStatusEnum;
 
   private signer: JsObjectSigner;
-  public connectedDLTs: NetworkId[] = [];
   private sessions: Map<string, SATPSession>;
   // maps stage to client/service and service class
   private readonly satpServices: Map<
@@ -144,10 +142,9 @@ export class SATPManager {
     const level = this.options.logLevel || "DEBUG";
     const label = this.className;
     this.logger = LoggerProvider.getOrCreate({ level, label });
-    this.instanceId = options.instanceId;
+    this.ourGateway = options.ourGateway;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.status = HealthCheckResponseStatusEnum.Available;
-    this.connectedDLTs = options.connectedDLTs;
     this.signer = options.signer;
     this.ccManager = options.ccManager;
     this.orchestrator = options.orchestrator;
@@ -317,7 +314,7 @@ export class SATPManager {
   }
 
   public getConnectedDLTs(): NetworkId[] {
-    return this.connectedDLTs;
+    return this.ourGateway.connectedDLTs || [];
   }
 
   public getSATPHandler(type: SATPHandlerType): SATPHandler | undefined {
