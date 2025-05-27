@@ -120,9 +120,8 @@ export class BLODispatcher {
 
     const SATPManagerOpts: ISATPManagerOptions = {
       logLevel: this.level,
-      instanceId: ourGateway?.id,
+      ourGateway: ourGateway,
       signer: signer,
-      connectedDLTs: this.orchestrator.connectedDLTs,
       ccManager: this.ccManager,
       orchestrator: this.orchestrator,
       pubKey: options.pubKey,
