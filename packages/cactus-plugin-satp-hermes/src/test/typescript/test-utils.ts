@@ -18,6 +18,7 @@ import Docker, { Container, ContainerInfo } from "dockerode";
 import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript/common/containers";
 import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
+import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";
 
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
@@ -350,6 +351,8 @@ export async function createPGDatabase(
     .getContainer((await container).id)
     .inspect();
 
+  const migrationSource = await createMigrationSource();
+
   if (network) {
     return {
       config: {
@@ -364,8 +367,7 @@ export async function createPGDatabase(
           ssl: false,
         },
         migrations: {
-          directory:
-            "./packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations",
+          migrationSource: migrationSource,
         },
       } as Knex.Config,
       container: await container,
@@ -383,8 +385,7 @@ export async function createPGDatabase(
         ssl: false,
       },
       migrations: {
-        directory:
-          "./packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations",
+        migrationSource: migrationSource,
       },
     } as Knex.Config,
     container: await container,

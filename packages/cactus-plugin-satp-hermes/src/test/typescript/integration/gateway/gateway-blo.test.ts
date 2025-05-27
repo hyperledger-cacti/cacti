@@ -4,19 +4,15 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
+import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   type IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
-import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-hermes-gateway";
-import { createClient } from "../test-utils";
-import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
-import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-} from "../knex.config";
+import type { SATPGatewayConfig } from "../../../../main/typescript/plugin-satp-hermes-gateway";
+import { createClient } from "../../test-utils";
+import { HealthCheckResponseStatusEnum } from "../../../../main/typescript";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -58,8 +54,6 @@ const options: SATPGatewayConfig = {
     gatewayClientPort: 3011,
     address: "http://localhost",
   },
-  localRepository: knexClientConnection,
-  remoteRepository: knexSourceRemoteConnection,
   pluginRegistry: new PluginRegistry({ plugins: [] }),
 };
 

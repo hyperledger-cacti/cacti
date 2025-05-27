@@ -995,6 +995,20 @@ export class EthereumLeaf
     }
   }
 
+  public async shutdownConnection(): Promise<void> {
+    try {
+      await this.connector.shutdown();
+      this.log.debug(
+        `${EthereumLeaf.CLASS_NAME}#shutdownConnection, Connector shutdown successfully`,
+      );
+    } catch (error) {
+      this.log.error(
+        `${EthereumLeaf.CLASS_NAME}#shutdownConnection, Error shutting down connector: ${error}`,
+      );
+      throw error;
+    }
+  }
+
   private isFullPluginOptions = (
     obj: Partial<IPluginLedgerConnectorEthereumOptions>,
   ): obj is IPluginLedgerConnectorEthereumOptions => {

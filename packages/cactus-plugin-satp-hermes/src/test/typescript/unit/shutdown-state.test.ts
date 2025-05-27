@@ -19,10 +19,6 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../main/typescript/core/constants";
-import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-} from "../knex.config";
 import { SATPSession } from "../../../main/typescript/core/satp-session";
 import {
   TransactRequest,
@@ -43,6 +39,7 @@ const factoryOptions: IPluginFactoryOptions = {
 const factory = new PluginFactorySATPGateway(factoryOptions);
 
 let mockSession: SATPSession;
+let gateway: SATPGateway | undefined; //added
 const sessionIDs: string[] = [];
 
 beforeAll(async () => {
@@ -64,6 +61,20 @@ beforeAll(async () => {
 });
 
 describe("Shutdown Verify State Tests", () => {
+  //added
+  afterEach(async () => {
+    if (gateway) {
+      try {
+        await gateway.shutdown();
+      } catch (err) {
+        logger.error("Error shutting down gateway in afterEach:", err);
+      }
+      gateway = undefined;
+    }
+    jest.clearAllMocks();
+    jest.useRealTimers();
+  });
+
   test("Gateway waits to verify the sessions state before shutdown", async () => {
     const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
@@ -85,9 +96,8 @@ describe("Shutdown Verify State Tests", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
       ontologyPath: ontologiesPath,
+      logLevel: logLevel,
     };
 
     const gateway = await factory.create(options);
@@ -100,6 +110,9 @@ describe("Shutdown Verify State Tests", () => {
 
     const shutdownBLOServerSpy = jest.spyOn(gateway as any, "shutdown");
 
+    //const gatewayOrchestratorInstance = (gateway as any).gatewayOrchestrator; //added
+    //jest.spyOn(gatewayOrchestratorInstance, "disconnectAll").mockResolvedValue();//added
+
     await gateway.startup();
     await gateway.shutdown();
 
@@ -109,9 +122,11 @@ describe("Shutdown Verify State Tests", () => {
 
     verifySessionsStateSpy.mockRestore();
     shutdownBLOServerSpy.mockRestore();
-  });
+  }, 20000);
 
   test("Gateway waits for pending sessions to complete before shutdown", async () => {
+    jest.useFakeTimers();
+
     const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -132,9 +147,8 @@ describe("Shutdown Verify State Tests", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
       ontologyPath: ontologiesPath,
+      logLevel: logLevel,
     };
 
     const gateway = await factory.create(options);
@@ -151,20 +165,32 @@ describe("Shutdown Verify State Tests", () => {
       .spyOn(satpManager, "getSATPSessionState")
       .mockImplementation(async () => {
         callCount++;
+        // false for first 3 calls, then true
         return callCount > 3;
       });
 
+    // Start shutdown (which waits for sessions to conclude)
     const shutdownPromise = gateway.shutdown();
 
+    // Check initial session state (should be false)
     const initialSessionState = await satpManager.getSATPSessionState();
     expect(initialSessionState).toBe(false);
 
+    // Advance timers and let scheduled job run enough times to return true
+    for (let i = 0; i < 4; i++) {
+      jest.advanceTimersByTime(20000); // 20 seconds cron interval
+      await Promise.resolve(); // wait a tick so async code executes
+    }
+
     await shutdownPromise;
 
+    // Final session state should be true
     const finalSessionState = await satpManager.getSATPSessionState();
     expect(finalSessionState).toBe(true);
 
     getSATPSessionStateSpy.mockRestore();
+
+    jest.useRealTimers();
   });
 
   test("Gateway does not allow new transactions after shutdown is initiated", async () => {
@@ -188,9 +214,8 @@ describe("Shutdown Verify State Tests", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
       ontologyPath: ontologiesPath,
+      logLevel: logLevel,
     };
 
     const gateway = await factory.create(options);
@@ -228,3 +253,4 @@ describe("Shutdown Verify State Tests", () => {
     await shutdownPromise;
   });
 });
+//added

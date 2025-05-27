@@ -12,37 +12,37 @@ import {
   GetApproveAddressApi,
   TransactionApi,
   AdminApi,
-} from "../../../main/typescript";
-import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
+} from "../../../../main/typescript";
+import {
+  Address,
+  GatewayIdentity,
+} from "../../../../main/typescript/core/types";
 import {
   Configuration,
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   BesuTestEnvironment,
   EthereumTestEnvironment,
   FabricTestEnvironment,
   getTransactRequest,
-} from "../test-utils";
+} from "../../test-utils";
 import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
-} from "../../../main/typescript/core/constants";
-import {
-  knexClientConnection,
-  knexServerConnection,
-  knexSourceRemoteConnection,
-  knexTargetRemoteConnection,
-} from "../knex.config";
+} from "../../../../main/typescript/core/constants";
 import { Knex, knex } from "knex";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
+import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -50,36 +50,18 @@ const log = LoggerProvider.getOrCreate({
   label: "SATP - Hermes",
 });
 
-let knexSourceRemoteInstance: Knex;
-let knexTargetRemoteInstance: Knex;
+let knexSourceRemoteClient: Knex;
+let knexTargetRemoteClient: Knex;
+let knexLocalClient: Knex;
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
 let gateway1: SATPGateway;
 let gateway2: SATPGateway;
 
-async function shutdownGateways() {
-  if (gateway1) {
-    await gateway1.shutdown();
-  }
-  if (gateway2) {
-    await gateway2.shutdown();
-  }
-}
+const TIMEOUT = 900000; // 15 minutes
 
 afterAll(async () => {
-  if (gateway1) {
-    if (knexSourceRemoteInstance) {
-      await knexSourceRemoteInstance.destroy();
-    }
-  }
-
-  if (gateway2) {
-    if (knexTargetRemoteInstance) {
-      await knexTargetRemoteInstance.destroy();
-    }
-  }
-
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
 
@@ -91,7 +73,25 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
+
+afterEach(async () => {
+  if (gateway1) {
+    await gateway1.shutdown();
+  }
+  if (gateway2) {
+    await gateway2.shutdown();
+  }
+  if (knexLocalClient) {
+    await knexLocalClient.destroy();
+  }
+  if (knexSourceRemoteClient) {
+    await knexSourceRemoteClient.destroy();
+  }
+  if (knexTargetRemoteClient) {
+    await knexTargetRemoteClient.destroy();
+  }
+}, TIMEOUT);
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -134,20 +134,19 @@ beforeAll(async () => {
     log.info("Ethereum Ledger started successfully");
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   }
-});
+  await besuEnv.mintTokens("100");
+  await besuEnv.checkBalance(
+    besuEnv.getTestContractName(),
+    besuEnv.getTestContractAddress(),
+    besuEnv.getTestContractAbi(),
+    besuEnv.getTestOwnerAccount(),
+    "100",
+    besuEnv.getTestOwnerSigningCredential(),
+  );
+}, TIMEOUT);
 
 describe("2 SATPGateways sending a token from Besu to Fabric", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
-    await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-  });
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     // Setup SATP gateways
     const factoryOptions: IPluginFactoryOptions = {
@@ -201,16 +200,33 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
       gatewayClientPort: 3013,
     } as GatewayIdentity;
 
-    knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
-    await knexSourceRemoteInstance.migrate.latest();
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
-    knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
-    await knexTargetRemoteInstance.migrate.latest();
+    knexTargetRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
     const fabricNetworkOptions = fabricEnv.createFabricConfig();
     const besuNetworkOptions = besuEnv.createBesuConfig();
 
-    const ontologiesPath = path.join(__dirname, "../../ontologies");
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
     const options1: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -220,8 +236,8 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
         bridgeConfig: [besuNetworkOptions],
       },
       counterPartyGateways: [gatewayIdentity2],
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       ontologyPath: ontologiesPath,
     };
@@ -234,8 +250,8 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
         bridgeConfig: [fabricNetworkOptions],
       },
       counterPartyGateways: [gatewayIdentity1],
-      localRepository: knexServerConnection,
-      remoteRepository: knexTargetRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       ontologyPath: ontologiesPath,
     };
@@ -364,12 +380,11 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
       fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
-
-    await shutdownGateways();
   });
 });
 
 describe("2 SATPGateways sending a token from Fabric to Besu", () => {
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
@@ -423,16 +438,33 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
       gatewayClientPort: 3013,
     } as GatewayIdentity;
 
-    knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
-    await knexSourceRemoteInstance.migrate.latest();
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
-    knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
-    await knexTargetRemoteInstance.migrate.latest();
+    knexTargetRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
     const fabricNetworkOptions = fabricEnv.createFabricConfig();
     const besuNetworkOptions = besuEnv.createBesuConfig();
 
-    const ontologiesPath = path.join(__dirname, "../../ontologies");
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
     const options1: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -442,8 +474,8 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
         bridgeConfig: [fabricNetworkOptions],
       },
       counterPartyGateways: [gatewayIdentity2],
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       ontologyPath: ontologiesPath,
     };
@@ -456,8 +488,8 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
         bridgeConfig: [besuNetworkOptions],
       },
       counterPartyGateways: [gatewayIdentity1],
-      localRepository: knexServerConnection,
-      remoteRepository: knexTargetRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       ontologyPath: ontologiesPath,
     };
@@ -584,12 +616,11 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Wrapper account");
-
-    await shutdownGateways();
   });
 });
 
 describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
@@ -643,16 +674,34 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: 3013,
     } as GatewayIdentity;
 
-    knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
-    await knexSourceRemoteInstance.migrate.latest();
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
 
-    knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
-    await knexTargetRemoteInstance.migrate.latest();
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
+
+    knexTargetRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
     const besuNetworkOptions = besuEnv.createBesuConfig();
     const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
 
-    const ontologiesPath = path.join(__dirname, "../../ontologies");
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
     const options1: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -662,8 +711,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
         bridgeConfig: [besuNetworkOptions],
       },
       counterPartyGateways: [gatewayIdentity2],
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       ontologyPath: ontologiesPath,
     };
@@ -676,8 +725,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
         bridgeConfig: [ethereumNetworkOptions],
       },
       counterPartyGateways: [gatewayIdentity1],
-      localRepository: knexServerConnection,
-      remoteRepository: knexTargetRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       ontologyPath: ontologiesPath,
     };
@@ -761,6 +810,36 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       new Configuration({ basePath: gateway1.getAddressOApiAddress() }),
     );
 
+    const integrations1 = await satpApi1.getIntegrations();
+    expect(integrations1?.data.integrations).toBeDefined();
+    expect(integrations1?.data.integrations.length).toEqual(1);
+
+    const integration = integrations1?.data.integrations[0];
+    expect(integration).toBeDefined();
+    expect(integration.environment).toBe("testnet");
+    expect(integration.id).toBe("BesuLedgerTestNetwork");
+    expect(integration.name).toBe("Hyperledger Besu");
+    expect(integration.type).toBe("BESU_2X");
+    log.info("Integration 1 is correct");
+
+    const satpApi2 = new TransactionApi(
+      new Configuration({
+        basePath: gateway2.getAddressOApiAddress(),
+      }),
+    );
+
+    const integrations2 = await satpApi2.getIntegrations();
+    expect(integrations2?.data.integrations).toBeDefined();
+    expect(integrations2?.data.integrations.length).toEqual(1);
+
+    const integration2 = integrations2?.data.integrations[0];
+    expect(integration2).toBeDefined();
+    expect(integration2.environment).toBe("testnet");
+    expect(integration2.id).toBe("EthereumLedgerTestNetwork");
+    expect(integration2.name).toBe("Ethereum");
+    expect(integration2.type).toBe("ETHEREUM");
+    log.info("Integration 2 is correct");
+
     const req = getTransactRequest(
       "mockContext",
       besuEnv,
@@ -821,6 +900,20 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     );
     log.info("Amount was transfer correctly to the Owner account");
 
-    await shutdownGateways();
+    // check audit endpoint and get audit data
+    const auditResponse = await adminApi.performAudit(0, Date.now());
+
+    expect(auditResponse?.data.sessions).toBeDefined();
+    expect(auditResponse?.data.sessions?.length).toEqual(1);
+
+    log.info(
+      `Audit response: ${JSON.stringify(auditResponse?.data.sessions?.[0])}`,
+    );
+
+    const json_parsed = JSON.parse(
+      auditResponse?.data.sessions?.[0] || "{}",
+    ) as any;
+    expect(json_parsed).toBeDefined();
+    expect(json_parsed.id).toBe(res.data.sessionID);
   });
 });

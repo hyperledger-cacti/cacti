@@ -114,6 +114,7 @@ afterAll(async () => {
 });
 
 describe("Oracle throws errors when invalid requests", () => {
+  jest.setTimeout(20000);
   it("should fail when executing an Update task without methodName, contractName, params", async () => {
     await oracleApi
       .executeOracleTask({

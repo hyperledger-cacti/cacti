@@ -90,11 +90,11 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AddCounterpartyApi* | [**AddCounterparty**](docs/AddCounterpartyApi.md#addcounterparty) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway | Add counterparty
 *AdminApi* | [**CallContinue**](docs/AdminApi.md#callcontinue) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue | Continue a paused transaction session
-*AdminApi* | [**GetAudit**](docs/AdminApi.md#getaudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 *AdminApi* | [**GetHealthCheck**](docs/AdminApi.md#gethealthcheck) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck | Health check endpoint
 *AdminApi* | [**GetSessionIds**](docs/AdminApi.md#getsessionids) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids | Get SATP session ids
 *AdminApi* | [**GetStatus**](docs/AdminApi.md#getstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 *AdminApi* | [**Pause**](docs/AdminApi.md#pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
+*AdminApi* | [**PerformAudit**](docs/AdminApi.md#performaudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 *GetApproveAddressApi* | [**GetApproveAddress**](docs/GetApproveAddressApi.md#getapproveaddress) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address | Get approve address
 *OracleApi* | [**ExecuteOracleTask**](docs/OracleApi.md#executeoracletask) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute | Execute data transfer task
 *OracleApi* | [**GetOracleTaskStatus**](docs/OracleApi.md#getoracletaskstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status | Get oracle task status
@@ -117,6 +117,8 @@ Class | Method | HTTP request | Description
  - [AddCounterpartyRequestCounterparty](docs/AddCounterpartyRequestCounterparty.md)
  - [AddCounterpartyRequestCounterpartyVersionInner](docs/AddCounterpartyRequestCounterpartyVersionInner.md)
  - [Asset](docs/Asset.md)
+ - [AuditRequest](docs/AuditRequest.md)
+ - [AuditResponse](docs/AuditResponse.md)
  - [AuthzJwtClaim](docs/AuthzJwtClaim.md)
  - [AuthzScope](docs/AuthzScope.md)
  - [BridgeInfo](docs/BridgeInfo.md)
@@ -147,9 +149,6 @@ Class | Method | HTTP request | Description
  - [GetApproveAddress200Response](docs/GetApproveAddress200Response.md)
  - [GetApproveAddressRequest](docs/GetApproveAddressRequest.md)
  - [GetApproveAddressResponse](docs/GetApproveAddressResponse.md)
- - [GetAudit200Response](docs/GetAudit200Response.md)
- - [GetAuditRequest](docs/GetAuditRequest.md)
- - [GetAuditResponse](docs/GetAuditResponse.md)
  - [GetHealthCheck200Response](docs/GetHealthCheck200Response.md)
  - [GetIntegrations200Response](docs/GetIntegrations200Response.md)
  - [GetIntegrations200ResponseIntegrationsInner](docs/GetIntegrations200ResponseIntegrationsInner.md)
@@ -187,6 +186,7 @@ Class | Method | HTTP request | Description
  - [Pause200Response](docs/Pause200Response.md)
  - [PauseRequest](docs/PauseRequest.md)
  - [PauseResponse](docs/PauseResponse.md)
+ - [PerformAudit200Response](docs/PerformAudit200Response.md)
  - [RegisterOracleTask200Response](docs/RegisterOracleTask200Response.md)
  - [RegisterOracleTaskRequest](docs/RegisterOracleTaskRequest.md)
  - [RegisterOracleTaskRequestDestinationContract](docs/RegisterOracleTaskRequestDestinationContract.md)

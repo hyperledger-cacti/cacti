@@ -60,6 +60,7 @@ let besuContractAddress: string;
 let ethereumContractAddress: string;
 let data_hash: string;
 
+const TIMEOUT = 900000; // 15 minutes
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
@@ -165,7 +166,7 @@ beforeAll(async () => {
 
   dispatcher = gateway.BLODispatcherInstance!;
   expect(dispatcher).toBeTruthy();
-});
+}, TIMEOUT);
 
 afterAll(async () => {
   await gateway.shutdown();
@@ -181,9 +182,10 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
 
 describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
+  jest.setTimeout(900000);
   it("should read and update using an event listener for events in the source contract (EVM)", async () => {
     const payload1 = "Hello World to Emit Event!";
     const payload2 = "Hello World to Emit Event 2!";

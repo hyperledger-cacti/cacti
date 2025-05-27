@@ -19,7 +19,7 @@ var _ MappedNullable = &OracleUnregisterResponse{}
 
 // OracleUnregisterResponse Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
 type OracleUnregisterResponse struct {
-	// The unique identifier of the task.
+	// Unique identifier (UUID) for the session.
 	TaskID *string `json:"taskID,omitempty"`
 	Status *string `json:"status,omitempty"`
 }

@@ -114,14 +114,14 @@ export class MonitorService {
     return newSpan;
   }
 
-  public shutdown(): void {
+  public async shutdown(): Promise<void> {
     this.logger.info("Shutting down MonitorService...");
     if (this.tracerProvider) {
-      this.tracerProvider.shutdown();
+      await this.tracerProvider.shutdown();
       this.tracerProvider = undefined;
     }
     if (this.meterProvider) {
-      this.meterProvider.shutdown();
+      await this.meterProvider.shutdown();
       this.meterProvider = undefined;
     }
     this.logger.info("MonitorService shutdown complete");

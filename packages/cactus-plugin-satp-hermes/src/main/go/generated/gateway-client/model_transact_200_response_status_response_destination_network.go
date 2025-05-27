@@ -19,6 +19,8 @@ var _ MappedNullable = &Transact200ResponseStatusResponseDestinationNetwork{}
 
 // Transact200ResponseStatusResponseDestinationNetwork struct for Transact200ResponseStatusResponseDestinationNetwork
 type Transact200ResponseStatusResponseDestinationNetwork struct {
+	// The unique identifier of the origin network.
+	Id *string `json:"id,omitempty"`
 	DltProtocol interface{} `json:"dltProtocol,omitempty"`
 	DltSubnetworkID interface{} `json:"dltSubnetworkID,omitempty"`
 }
@@ -38,6 +40,38 @@ func NewTransact200ResponseStatusResponseDestinationNetwork() *Transact200Respon
 func NewTransact200ResponseStatusResponseDestinationNetworkWithDefaults() *Transact200ResponseStatusResponseDestinationNetwork {
 	this := Transact200ResponseStatusResponseDestinationNetwork{}
 	return &this
+}
+
+// GetId returns the Id field value if set, zero value otherwise.
+func (o *Transact200ResponseStatusResponseDestinationNetwork) GetId() string {
+	if o == nil || IsNil(o.Id) {
+		var ret string
+		return ret
+	}
+	return *o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Transact200ResponseStatusResponseDestinationNetwork) GetIdOk() (*string, bool) {
+	if o == nil || IsNil(o.Id) {
+		return nil, false
+	}
+	return o.Id, true
+}
+
+// HasId returns a boolean if a field has been set.
+func (o *Transact200ResponseStatusResponseDestinationNetwork) HasId() bool {
+	if o != nil && !IsNil(o.Id) {
+		return true
+	}
+
+	return false
+}
+
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *Transact200ResponseStatusResponseDestinationNetwork) SetId(v string) {
+	o.Id = &v
 }
 
 // GetDltProtocol returns the DltProtocol field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -116,6 +150,9 @@ func (o Transact200ResponseStatusResponseDestinationNetwork) MarshalJSON() ([]by
 
 func (o Transact200ResponseStatusResponseDestinationNetwork) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
 	if o.DltProtocol != nil {
 		toSerialize["dltProtocol"] = o.DltProtocol
 	}

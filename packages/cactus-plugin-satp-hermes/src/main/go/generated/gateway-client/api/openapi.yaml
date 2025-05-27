@@ -381,40 +381,32 @@ paths:
     get:
       description: Audits transactions based on provided filters such as start and
         end dates. Optionally includes proofs generated from each gateway transaction.
-      operationId: GetAudit
+      operationId: PerformAudit
       parameters:
-      - description: The start date for the audit period.
+      - description: The start timestamp for the audit period.
         explode: true
         in: query
-        name: auditStartDate
+        name: startTimestamp
         required: false
         schema:
-          format: date-time
-          type: string
+          format: int64
+          type: integer
         style: form
-      - description: The end date for the audit period.
+      - description: The end timestamp for the audit period.
         explode: true
         in: query
-        name: auditEndDate
+        name: endTimestamp
         required: false
         schema:
-          format: date-time
-          type: string
-        style: form
-      - description: Include proofs generated from each gateway transaction.
-        explode: true
-        in: query
-        name: includeProofs
-        required: false
-        schema:
-          type: boolean
+          format: int64
+          type: integer
         style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetAudit_200_response'
+                $ref: '#/components/schemas/PerformAudit_200_response'
           description: Audit results
       summary: Audit transactions
       tags:
@@ -675,48 +667,43 @@ components:
         nullable: false
         type: string
       type: array
-    getAuditRequest:
-      description: Request schema for initiating an audit. Includes the start and
-        end dates for the audit period and an option to include proofs.
-      properties:
-        auditStartDate:
-          description: The start datetime for the audit.
-          example: 2023-01-01T00:00:00Z
-          format: date-time
-          type: string
-        auditEndDate:
-          description: The end datetime for the audit.
-          example: 2023-01-31T23:59:59Z
-          format: date-time
-          type: string
-        includeProofs:
-          description: Include proofs generated from each gateway transaction.
-          example: true
-          type: boolean
-      type: object
-      x-category: request
-    getAuditResponse:
+    AuditRequest:
       description: Response schema for an audit request. Contains the proofs generated
         during the audit period and the start and end datetimes.
       properties:
-        proofs:
-          description: An array of strings representing proofs.
-          example:
-          - proof1
-          - proof2
+        startTimestamp:
+          description: "The start timestamp for the audit period, as a Unix timestamp\
+            \ (milliseconds since epoch)."
+          format: int64
+          type: integer
+        endTimestamp:
+          description: "The end timestamp for the audit period, as a Unix timestamp\
+            \ (milliseconds since epoch)."
+          format: int64
+          type: integer
+      required:
+      - endTimestamp
+      - startTimestamp
+      type: object
+      x-category: request
+    AuditResponse:
+      description: Response schema for an audit request. Contains the proofs generated
+        during the audit period and the start and end datetimes.
+      properties:
+        sessions:
           items:
             type: string
           type: array
-        auditStartTime:
-          description: The start datetime of the audit period.
-          example: 2023-01-01T00:00:00Z
-          format: date-time
-          type: string
-        auditEndTime:
-          description: The end datetime of the audit period.
-          example: 2023-01-31T23:59:59Z
-          format: date-time
-          type: string
+        startTimestamp:
+          description: "The start timestamp for the audit period, as a Unix timestamp\
+            \ (milliseconds since epoch)."
+          format: int64
+          type: integer
+        endTimestamp:
+          description: "The end timestamp for the audit period, as a Unix timestamp\
+            \ (milliseconds since epoch)."
+          format: int64
+          type: integer
       type: object
       x-category: response
     StatusResponse:
@@ -1602,7 +1589,7 @@ components:
         \ for mode, polling interval, and source event signature."
       properties:
         taskID:
-          description: The unique identifier for the Oracle task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         type:
@@ -1611,7 +1598,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -1635,7 +1622,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -1727,7 +1714,7 @@ components:
         the context ID of the task to be unregistered.
       properties:
         taskID:
-          description: The unique identifier of the task to be unregistered.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
       required:
@@ -1737,7 +1724,7 @@ components:
       description: Request schema for checking the status of a data transfer task.
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
       required:
@@ -1748,7 +1735,7 @@ components:
         the task ID and status of the unregistration.
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         status:
@@ -1787,7 +1774,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -1811,7 +1798,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -1827,11 +1814,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
@@ -1840,7 +1827,7 @@ components:
         Includes the task ID and status of the task.
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         type:
@@ -1849,7 +1836,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -1873,7 +1860,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -1889,11 +1876,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
@@ -2117,8 +2104,13 @@ components:
     Transact_200_response_statusResponse_originNetwork:
       example:
         dltSubnetworkID: subnetwork1
+        id: network1
         dltProtocol: HyperledgerFabric
       properties:
+        id:
+          description: The unique identifier of the origin network.
+          example: network1
+          type: string
         dltProtocol:
           example: HyperledgerFabric
         dltSubnetworkID:
@@ -2127,8 +2119,13 @@ components:
     Transact_200_response_statusResponse_destinationNetwork:
       example:
         dltSubnetworkID: subnetwork2
+        id: network2
         dltProtocol: HyperledgerBesu
       properties:
+        id:
+          description: The unique identifier of the origin network.
+          example: network2
+          type: string
         dltProtocol:
           example: HyperledgerBesu
         dltSubnetworkID:
@@ -2145,10 +2142,12 @@ components:
         startTime: 2023-01-01T00:00:00Z
         originNetwork:
           dltSubnetworkID: subnetwork1
+          id: network1
           dltProtocol: HyperledgerFabric
         status: DONE
         destinationNetwork:
           dltSubnetworkID: subnetwork2
+          id: network2
           dltProtocol: HyperledgerBesu
       properties:
         status:
@@ -2247,10 +2246,12 @@ components:
           startTime: 2023-01-01T00:00:00Z
           originNetwork:
             dltSubnetworkID: subnetwork1
+            id: network1
             dltProtocol: HyperledgerFabric
           status: DONE
           destinationNetwork:
             dltSubnetworkID: subnetwork2
+            id: network2
             dltProtocol: HyperledgerBesu
         sessionID: 000003e8-e0b8-21ee-ba00-325096b39f47
       properties:
@@ -2321,10 +2322,12 @@ components:
           startTime: 2023-01-01T00:00:00Z
           originNetwork:
             dltSubnetworkID: subnetwork1
+            id: network1
             dltProtocol: HyperledgerFabric
           status: DONE
           destinationNetwork:
             dltSubnetworkID: subnetwork2
+            id: network2
             dltProtocol: HyperledgerBesu
         cancelSuccessful: true
       properties:
@@ -2374,10 +2377,12 @@ components:
           startTime: 2023-01-01T00:00:00Z
           originNetwork:
             dltSubnetworkID: subnetwork1
+            id: network1
             dltProtocol: HyperledgerFabric
           status: DONE
           destinationNetwork:
             dltSubnetworkID: subnetwork2
+            id: network2
             dltProtocol: HyperledgerBesu
       properties:
         statusResponse:
@@ -2409,10 +2414,12 @@ components:
           startTime: 2023-01-01T00:00:00Z
           originNetwork:
             dltSubnetworkID: subnetwork1
+            id: network1
             dltProtocol: HyperledgerFabric
           status: DONE
           destinationNetwork:
             dltSubnetworkID: subnetwork2
+            id: network2
             dltProtocol: HyperledgerBesu
       properties:
         statusResponse:
@@ -3995,34 +4002,30 @@ components:
       required:
       - routes
       type: object
-    GetAudit_200_response:
+    PerformAudit_200_response:
       description: Response schema for an audit request. Contains the proofs generated
         during the audit period and the start and end datetimes.
       example:
-        proofs:
-        - proof1
-        - proof2
-        auditEndTime: 2023-01-31T23:59:59Z
-        auditStartTime: 2023-01-01T00:00:00Z
+        sessions:
+        - sessions
+        - sessions
+        endTimestamp: 6
+        startTimestamp: 0
       properties:
-        proofs:
-          description: An array of strings representing proofs.
-          example:
-          - proof1
-          - proof2
+        sessions:
           items:
             type: string
           type: array
-        auditStartTime:
-          description: The start datetime of the audit period.
-          example: 2023-01-01T00:00:00Z
-          format: date-time
-          type: string
-        auditEndTime:
-          description: The end datetime of the audit period.
-          example: 2023-01-31T23:59:59Z
-          format: date-time
-          type: string
+        startTimestamp:
+          description: "The start timestamp for the audit period, as a Unix timestamp\
+            \ (milliseconds since epoch)."
+          format: int64
+          type: integer
+        endTimestamp:
+          description: "The end timestamp for the audit period, as a Unix timestamp\
+            \ (milliseconds since epoch)."
+          format: int64
+          type: integer
       type: object
       x-category: response
     GetApproveAddress_200_response:
@@ -4496,10 +4499,10 @@ components:
         dstNetworkId:
           ledgerType: BESU_1X
           id: id
-        type: ""
+        type: READ
         taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
         timestamp: 1672531200
-        status: ""
+        status: ACTIVE
       properties:
         taskID:
           description: The unique identifier of the task.
@@ -4511,7 +4514,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -4535,7 +4538,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -4551,11 +4554,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object
@@ -4698,7 +4701,7 @@ components:
         status: SUCCESS
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         status:
@@ -4789,13 +4792,13 @@ components:
         dstNetworkId:
           ledgerType: BESU_1X
           id: id
-        type: ""
+        type: READ
         taskID: 000003e8-e0b8-21ee-ba00-325096b39f47
         timestamp: 1672531200
-        status: ""
+        status: ACTIVE
       properties:
         taskID:
-          description: The unique identifier of the task.
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
           type: string
         type:
@@ -4804,7 +4807,7 @@ components:
           - READ
           - UPDATE
           - READ_AND_UPDATE
-          type: enum
+          type: string
         srcNetworkId:
           $ref: '#/components/schemas/Transact_request_sourceAsset_networkId'
         srcContract:
@@ -4828,7 +4831,7 @@ components:
           enum:
           - ACTIVE
           - INACTIVE
-          type: enum
+          type: string
         mode:
           description: The mode of operation for registered tasks.
           enum:
@@ -4844,11 +4847,11 @@ components:
           type: integer
       required:
       - dstContract
-      - id
       - mode
       - operations
       - srcContract
       - status
+      - taskID
       - timestamp
       - type
       type: object

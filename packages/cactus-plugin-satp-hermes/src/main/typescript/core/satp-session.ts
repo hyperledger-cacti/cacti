@@ -43,7 +43,6 @@ import {
   lockExpirationTimeError,
   LockTypeError,
   LoggingProfileError,
-  PubKeyError,
   SATPVersionError,
   ServerGatewayPubkeyError,
   SessionCompletedError,
@@ -351,5 +350,11 @@ export class SATPSession {
         error,
       );
     }
+  }
+
+  public toString(): string {
+    return this.serverSessionData
+      ? safeStableStringify(this.serverSessionData)
+      : safeStableStringify(this.clientSessionData!);
   }
 }
