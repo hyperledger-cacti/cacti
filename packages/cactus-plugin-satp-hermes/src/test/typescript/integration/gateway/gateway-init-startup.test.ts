@@ -10,28 +10,24 @@ import { ApiClient } from "@hyperledger/cactus-api-client";
 import {
   SATPGateway,
   type SATPGatewayConfig,
-} from "../../../main/typescript/plugin-satp-hermes-gateway";
-import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
+} from "../../../../main/typescript/plugin-satp-hermes-gateway";
+import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   Configuration,
   type IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import type { ShutdownHook } from "./../../../main/typescript/core/types";
+import type { ShutdownHook } from "../../../../main/typescript/core/types";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
-} from "../../../main/typescript/core/constants";
+} from "../../../../main/typescript/core/constants";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { AdminApi, OracleApi } from "../../../main/typescript";
-import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-} from "../knex.config";
+import { AdminApi, OracleApi } from "../../../../main/typescript";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -104,8 +100,6 @@ describe("SATPGateway initialization", () => {
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -149,8 +143,6 @@ describe("SATPGateway initialization", () => {
         proofID: "mockProofID10",
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -183,8 +175,6 @@ describe("SATPGateway initialization", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
     };
 
     const gateway = await factory.create(options);
@@ -229,8 +219,6 @@ describe("SATPGateway startup", () => {
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -272,8 +260,6 @@ describe("SATPGateway startup", () => {
         gatewayClientPort: 3001,
         address: "https://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
 
@@ -316,8 +302,6 @@ describe("SATPGateway startup", () => {
         gatewayClientPort: 13011,
         address: "http://localhost",
       },
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);

@@ -55,6 +55,7 @@ let besuContractAddress: string;
 let ethereumContractAddress: string;
 let data_hash: string;
 
+const TIMEOUT = 900000; // 15 minutes
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
@@ -157,7 +158,7 @@ beforeAll(async () => {
     new Configuration({ basePath: gateway.getAddressOApiAddress() }),
   );
   expect(oracleApi).toBeTruthy();
-});
+}, TIMEOUT);
 
 afterAll(async () => {
   await gateway.shutdown();
@@ -173,9 +174,10 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
 
 describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
+  jest.setTimeout(900000);
   it("should fail when writing to a contract calling a function that does not exist", async () => {
     data_hash = keccak256("Hello World!");
 

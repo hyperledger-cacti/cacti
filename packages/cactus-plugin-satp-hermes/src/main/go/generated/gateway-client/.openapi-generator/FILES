@@ -20,6 +20,8 @@ docs/AddCounterpartyRequestCounterparty.md
 docs/AddCounterpartyRequestCounterpartyVersionInner.md
 docs/AdminApi.md
 docs/Asset.md
+docs/AuditRequest.md
+docs/AuditResponse.md
 docs/AuthzJwtClaim.md
 docs/AuthzScope.md
 docs/BridgeInfo.md
@@ -51,9 +53,6 @@ docs/GetApproveAddress200Response.md
 docs/GetApproveAddressApi.md
 docs/GetApproveAddressRequest.md
 docs/GetApproveAddressResponse.md
-docs/GetAudit200Response.md
-docs/GetAuditRequest.md
-docs/GetAuditResponse.md
 docs/GetHealthCheck200Response.md
 docs/GetIntegrations200Response.md
 docs/GetIntegrations200ResponseIntegrationsInner.md
@@ -92,6 +91,7 @@ docs/OracleUnregisterResponse.md
 docs/Pause200Response.md
 docs/PauseRequest.md
 docs/PauseResponse.md
+docs/PerformAudit200Response.md
 docs/RegisterOracleTask200Response.md
 docs/RegisterOracleTaskRequest.md
 docs/RegisterOracleTaskRequestDestinationContract.md
@@ -126,6 +126,8 @@ model_add_counterparty_request_counterparty.go
 model_add_counterparty_request_counterparty_version_inner.go
 model_api_error.go
 model_asset.go
+model_audit_request.go
+model_audit_response.go
 model_authz_jwt_claim.go
 model_authz_scope.go
 model_bridge_info.go
@@ -156,9 +158,6 @@ model_gateway_identity.go
 model_get_approve_address_200_response.go
 model_get_approve_address_request.go
 model_get_approve_address_response.go
-model_get_audit_200_response.go
-model_get_audit_request.go
-model_get_audit_response.go
 model_get_health_check_200_response.go
 model_get_integrations_200_response.go
 model_get_integrations_200_response_integrations_inner.go
@@ -196,6 +195,7 @@ model_oracle_unregister_response.go
 model_pause_200_response.go
 model_pause_request.go
 model_pause_response.go
+model_perform_audit_200_response.go
 model_register_oracle_task_200_response.go
 model_register_oracle_task_request.go
 model_register_oracle_task_request_destination_contract.go

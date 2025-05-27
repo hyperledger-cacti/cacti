@@ -13,7 +13,7 @@ const log = LoggerProvider.getOrCreate({
   label: "BUNGEE - Hermes",
 });
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

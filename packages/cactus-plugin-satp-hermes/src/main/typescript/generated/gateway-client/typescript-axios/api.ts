@@ -332,6 +332,50 @@ export const AssetTokenTypeEnum = {
 export type AssetTokenTypeEnum = typeof AssetTokenTypeEnum[keyof typeof AssetTokenTypeEnum];
 
 /**
+ * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * @export
+ * @interface AuditRequest
+ */
+export interface AuditRequest {
+    /**
+     * The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof AuditRequest
+     */
+    'startTimestamp': number;
+    /**
+     * The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof AuditRequest
+     */
+    'endTimestamp': number;
+}
+/**
+ * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * @export
+ * @interface AuditResponse
+ */
+export interface AuditResponse {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AuditResponse
+     */
+    'sessions'?: Array<string>;
+    /**
+     * The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof AuditResponse
+     */
+    'startTimestamp'?: number;
+    /**
+     * The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof AuditResponse
+     */
+    'endTimestamp'?: number;
+}
+/**
  * Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1
  * @export
  * @enum {string}
@@ -651,10 +695,10 @@ export interface ExecuteOracleTask200Response {
      * @type {string}
      * @memberof ExecuteOracleTask200Response
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof ExecuteOracleTask200Response
      */
     'type': ExecuteOracleTask200ResponseTypeEnum;
@@ -696,7 +740,7 @@ export interface ExecuteOracleTask200Response {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof ExecuteOracleTask200Response
      */
     'status': ExecuteOracleTask200ResponseStatusEnum;
@@ -1313,81 +1357,6 @@ export interface GetApproveAddressResponse {
     'approveAddress': string;
 }
 /**
- * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
- * @export
- * @interface GetAudit200Response
- */
-export interface GetAudit200Response {
-    /**
-     * An array of strings representing proofs.
-     * @type {Array<string>}
-     * @memberof GetAudit200Response
-     */
-    'proofs'?: Array<string>;
-    /**
-     * The start datetime of the audit period.
-     * @type {string}
-     * @memberof GetAudit200Response
-     */
-    'auditStartTime'?: string;
-    /**
-     * The end datetime of the audit period.
-     * @type {string}
-     * @memberof GetAudit200Response
-     */
-    'auditEndTime'?: string;
-}
-/**
- * Request schema for initiating an audit. Includes the start and end dates for the audit period and an option to include proofs.
- * @export
- * @interface GetAuditRequest
- */
-export interface GetAuditRequest {
-    /**
-     * The start datetime for the audit.
-     * @type {string}
-     * @memberof GetAuditRequest
-     */
-    'auditStartDate'?: string;
-    /**
-     * The end datetime for the audit.
-     * @type {string}
-     * @memberof GetAuditRequest
-     */
-    'auditEndDate'?: string;
-    /**
-     * Include proofs generated from each gateway transaction.
-     * @type {boolean}
-     * @memberof GetAuditRequest
-     */
-    'includeProofs'?: boolean;
-}
-/**
- * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
- * @export
- * @interface GetAuditResponse
- */
-export interface GetAuditResponse {
-    /**
-     * An array of strings representing proofs.
-     * @type {Array<string>}
-     * @memberof GetAuditResponse
-     */
-    'proofs'?: Array<string>;
-    /**
-     * The start datetime of the audit period.
-     * @type {string}
-     * @memberof GetAuditResponse
-     */
-    'auditStartTime'?: string;
-    /**
-     * The end datetime of the audit period.
-     * @type {string}
-     * @memberof GetAuditResponse
-     */
-    'auditEndTime'?: string;
-}
-/**
  * 
  * @export
  * @interface GetHealthCheck200Response
@@ -1459,14 +1428,14 @@ export interface GetIntegrations200ResponseIntegrationsInner {
  */
 export interface GetOracleTaskStatus200Response {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof GetOracleTaskStatus200Response
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof GetOracleTaskStatus200Response
      */
     'type': GetOracleTaskStatus200ResponseTypeEnum;
@@ -1508,7 +1477,7 @@ export interface GetOracleTaskStatus200Response {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof GetOracleTaskStatus200Response
      */
     'status': GetOracleTaskStatus200ResponseStatusEnum;
@@ -2350,10 +2319,10 @@ export interface OracleExecuteResponse {
      * @type {string}
      * @memberof OracleExecuteResponse
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleExecuteResponse
      */
     'type': OracleExecuteResponseTypeEnum;
@@ -2395,7 +2364,7 @@ export interface OracleExecuteResponse {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleExecuteResponse
      */
     'status': OracleExecuteResponseStatusEnum;
@@ -2633,7 +2602,7 @@ export interface OracleResponse {
  */
 export interface OracleStatusRequest {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleStatusRequest
      */
@@ -2646,14 +2615,14 @@ export interface OracleStatusRequest {
  */
 export interface OracleStatusResponse {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleStatusResponse
      */
-    'taskID'?: string;
+    'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleStatusResponse
      */
     'type': OracleStatusResponseTypeEnum;
@@ -2695,7 +2664,7 @@ export interface OracleStatusResponse {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleStatusResponse
      */
     'status': OracleStatusResponseStatusEnum;
@@ -2741,14 +2710,14 @@ export type OracleStatusResponseModeEnum = typeof OracleStatusResponseModeEnum[k
  */
 export interface OracleTask {
     /**
-     * The unique identifier for the Oracle task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleTask
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleTask
      */
     'type': OracleTaskTypeEnum;
@@ -2790,7 +2759,7 @@ export interface OracleTask {
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {Enum}
+     * @type {string}
      * @memberof OracleTask
      */
     'status': OracleTaskStatusEnum;
@@ -2842,7 +2811,7 @@ export type OracleTaskModeEnum = typeof OracleTaskModeEnum[keyof typeof OracleTa
  */
 export interface OracleUnregisterRequest {
     /**
-     * The unique identifier of the task to be unregistered.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleUnregisterRequest
      */
@@ -2855,7 +2824,7 @@ export interface OracleUnregisterRequest {
  */
 export interface OracleUnregisterResponse {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof OracleUnregisterResponse
      */
@@ -2919,6 +2888,31 @@ export interface PauseResponse {
      * @memberof PauseResponse
      */
     'statusResponse': Transact200ResponseStatusResponse;
+}
+/**
+ * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * @export
+ * @interface PerformAudit200Response
+ */
+export interface PerformAudit200Response {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof PerformAudit200Response
+     */
+    'sessions'?: Array<string>;
+    /**
+     * The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof PerformAudit200Response
+     */
+    'startTimestamp'?: number;
+    /**
+     * The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof PerformAudit200Response
+     */
+    'endTimestamp'?: number;
 }
 /**
  * Response schema for registering a repeatable task. Includes the task ID and status of the registration.
@@ -3619,6 +3613,12 @@ export type Transact200ResponseStatusResponseStepEnum = typeof Transact200Respon
  */
 export interface Transact200ResponseStatusResponseDestinationNetwork {
     /**
+     * The unique identifier of the origin network.
+     * @type {string}
+     * @memberof Transact200ResponseStatusResponseDestinationNetwork
+     */
+    'id'?: string;
+    /**
      * 
      * @type {any}
      * @memberof Transact200ResponseStatusResponseDestinationNetwork
@@ -3637,6 +3637,12 @@ export interface Transact200ResponseStatusResponseDestinationNetwork {
  * @interface Transact200ResponseStatusResponseOriginNetwork
  */
 export interface Transact200ResponseStatusResponseOriginNetwork {
+    /**
+     * The unique identifier of the origin network.
+     * @type {string}
+     * @memberof Transact200ResponseStatusResponseOriginNetwork
+     */
+    'id'?: string;
     /**
      * 
      * @type {any}
@@ -3854,7 +3860,7 @@ export interface TransactResponse {
  */
 export interface UnregisterOracleTask200Response {
     /**
-     * The unique identifier of the task.
+     * Unique identifier (UUID) for the session.
      * @type {string}
      * @memberof UnregisterOracleTask200Response
      */
@@ -4025,55 +4031,6 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
-         * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-         * @summary Audit transactions
-         * @param {string} [auditStartDate] The start date for the audit period.
-         * @param {string} [auditEndDate] The end date for the audit period.
-         * @param {boolean} [includeProofs] Include proofs generated from each gateway transaction.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getAudit: async (auditStartDate?: string, auditEndDate?: string, includeProofs?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (auditStartDate !== undefined) {
-                localVarQueryParameter['auditStartDate'] = (auditStartDate as any instanceof Date) ?
-                    (auditStartDate as any).toISOString() :
-                    auditStartDate;
-            }
-
-            if (auditEndDate !== undefined) {
-                localVarQueryParameter['auditEndDate'] = (auditEndDate as any instanceof Date) ?
-                    (auditEndDate as any).toISOString() :
-                    auditEndDate;
-            }
-
-            if (includeProofs !== undefined) {
-                localVarQueryParameter['includeProofs'] = includeProofs;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Responds if SATP Hermes is on
          * @summary Health check endpoint
          * @param {*} [options] Override http request option.
@@ -4211,6 +4168,46 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
+         * @summary Audit transactions
+         * @param {number} [startTimestamp] The start timestamp for the audit period.
+         * @param {number} [endTimestamp] The end timestamp for the audit period.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        performAudit: async (startTimestamp?: number, endTimestamp?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (startTimestamp !== undefined) {
+                localVarQueryParameter['startTimestamp'] = startTimestamp;
+            }
+
+            if (endTimestamp !== undefined) {
+                localVarQueryParameter['endTimestamp'] = endTimestamp;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -4230,19 +4227,6 @@ export const AdminApiFp = function(configuration?: Configuration) {
          */
         async _continue(continueRequest: ContinueRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Continue200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator._continue(continueRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-         * @summary Audit transactions
-         * @param {string} [auditStartDate] The start date for the audit period.
-         * @param {string} [auditEndDate] The end date for the audit period.
-         * @param {boolean} [includeProofs] Include proofs generated from each gateway transaction.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getAudit(auditStartDate?: string, auditEndDate?: string, includeProofs?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAudit200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAudit(auditStartDate, auditEndDate, includeProofs, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4288,6 +4272,18 @@ export const AdminApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.pause(pauseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
+         * @summary Audit transactions
+         * @param {number} [startTimestamp] The start timestamp for the audit period.
+         * @param {number} [endTimestamp] The end timestamp for the audit period.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async performAudit(startTimestamp?: number, endTimestamp?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PerformAudit200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.performAudit(startTimestamp, endTimestamp, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -4307,18 +4303,6 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          */
         _continue(continueRequest: ContinueRequest, options?: any): AxiosPromise<Continue200Response> {
             return localVarFp._continue(continueRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-         * @summary Audit transactions
-         * @param {string} [auditStartDate] The start date for the audit period.
-         * @param {string} [auditEndDate] The end date for the audit period.
-         * @param {boolean} [includeProofs] Include proofs generated from each gateway transaction.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getAudit(auditStartDate?: string, auditEndDate?: string, includeProofs?: boolean, options?: any): AxiosPromise<GetAudit200Response> {
-            return localVarFp.getAudit(auditStartDate, auditEndDate, includeProofs, options).then((request) => request(axios, basePath));
         },
         /**
          * Responds if SATP Hermes is on
@@ -4359,6 +4343,17 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
         pause(pauseRequest: PauseRequest, options?: any): AxiosPromise<Pause200Response> {
             return localVarFp.pause(pauseRequest, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
+         * @summary Audit transactions
+         * @param {number} [startTimestamp] The start timestamp for the audit period.
+         * @param {number} [endTimestamp] The end timestamp for the audit period.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        performAudit(startTimestamp?: number, endTimestamp?: number, options?: any): AxiosPromise<PerformAudit200Response> {
+            return localVarFp.performAudit(startTimestamp, endTimestamp, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -4379,20 +4374,6 @@ export class AdminApi extends BaseAPI {
      */
     public _continue(continueRequest: ContinueRequest, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration)._continue(continueRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-     * @summary Audit transactions
-     * @param {string} [auditStartDate] The start date for the audit period.
-     * @param {string} [auditEndDate] The end date for the audit period.
-     * @param {boolean} [includeProofs] Include proofs generated from each gateway transaction.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AdminApi
-     */
-    public getAudit(auditStartDate?: string, auditEndDate?: string, includeProofs?: boolean, options?: AxiosRequestConfig) {
-        return AdminApiFp(this.configuration).getAudit(auditStartDate, auditEndDate, includeProofs, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4440,6 +4421,19 @@ export class AdminApi extends BaseAPI {
      */
     public pause(pauseRequest: PauseRequest, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).pause(pauseRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
+     * @summary Audit transactions
+     * @param {number} [startTimestamp] The start timestamp for the audit period.
+     * @param {number} [endTimestamp] The end timestamp for the audit period.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public performAudit(startTimestamp?: number, endTimestamp?: number, options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).performAudit(startTimestamp, endTimestamp, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

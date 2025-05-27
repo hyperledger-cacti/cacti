@@ -511,10 +511,11 @@ export class GatewayOrchestrator {
     const fnTag = `${this.label}#disconnectAll()`;
 
     let counter = 0;
-    this.channels.forEach(async (channel) => {
+    //removed async
+    this.channels.forEach((channel) => {
       this.logger.info(`${fnTag}, Disconnecting from ${channel.toGatewayID}`);
       // ! todo implement disconnect
-      this.logger.error("Disconnect All Not implemented");
+      this.logger.warn("Disconnect All Not implemented");
       counter++;
     });
     this.channels.clear();

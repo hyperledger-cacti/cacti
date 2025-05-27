@@ -19,7 +19,7 @@ var _ MappedNullable = &OracleUnregisterRequest{}
 
 // OracleUnregisterRequest Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
 type OracleUnregisterRequest struct {
-	// The unique identifier of the task to be unregistered.
+	// Unique identifier (UUID) for the session.
 	TaskID string `json:"taskID"`
 }
 

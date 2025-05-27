@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | Pointer to **string** | The unique identifier of the task. | [optional] 
+**TaskID** | Pointer to **string** | Unique identifier (UUID) for the session. | [optional] 
 **Status** | Pointer to **string** |  | [optional] 
 
 ## Methods

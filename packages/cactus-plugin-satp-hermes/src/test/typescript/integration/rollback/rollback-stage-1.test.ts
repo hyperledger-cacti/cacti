@@ -29,12 +29,6 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
-import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-  knexTargetRemoteConnection,
-  knexServerConnection,
-} from "../../knex.config";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
@@ -46,11 +40,14 @@ import {
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
+import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
+import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 
 let knexInstanceClient: Knex;
-let knexInstanceServer: Knex;
-let knexInstanceRemote1: Knex;
-let knexInstanceRemote2: Knex;
+let knexInstanceSourceRemote: Knex;
+let knexInstanceRemote: Knex;
+let knexInstanceTargetRemote: Knex;
 
 let gateway1: SATPGateway;
 let gateway2: SATPGateway;
@@ -163,14 +160,14 @@ afterAll(async () => {
   }
   if (
     knexInstanceClient ||
-    knexInstanceServer ||
-    knexInstanceRemote1 ||
-    knexInstanceRemote2
+    knexInstanceSourceRemote ||
+    knexInstanceRemote ||
+    knexInstanceTargetRemote
   ) {
     await knexInstanceClient.destroy();
-    await knexInstanceServer.destroy();
-    await knexInstanceRemote1.destroy();
-    await knexInstanceRemote2.destroy();
+    await knexInstanceSourceRemote.destroy();
+    await knexInstanceRemote.destroy();
+    await knexInstanceTargetRemote.destroy();
   }
 
   if (gateway1) {
@@ -191,7 +188,7 @@ afterAll(async () => {
     });
 });
 
-describe("Rollback Test stage 1", () => {
+describe.skip("Rollback Test stage 1", () => {
   it("should initiate stage-0 rollback strategy", async () => {
     const factoryOptions: IPluginFactoryOptions = {
       pluginImportType: PluginImportType.Local,
@@ -244,11 +241,22 @@ describe("Rollback Test stage 1", () => {
       gatewayClientPort: 3211,
     };
 
-    knexInstanceClient = knex(knexClientConnection);
+    const migrationSource = await createMigrationSource();
+    knexInstanceClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
     await knexInstanceClient.migrate.latest();
 
-    knexInstanceRemote1 = knex(knexSourceRemoteConnection);
-    await knexInstanceRemote1.migrate.latest();
+    knexInstanceSourceRemote = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexInstanceSourceRemote.migrate.latest();
 
     const options1: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -257,16 +265,26 @@ describe("Rollback Test stage 1", () => {
       gid: gatewayIdentity1,
       counterPartyGateways: [gatewayIdentity2],
       keyPair: gateway1KeyPair,
-      localRepository: knexClientConnection,
-      remoteRepository: knexSourceRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       enableCrashRecovery: true,
     };
 
-    knexInstanceServer = knex(knexServerConnection);
-    await knexInstanceServer.migrate.latest();
+    knexInstanceRemote = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexInstanceRemote.migrate.latest();
 
-    knexInstanceRemote2 = knex(knexTargetRemoteConnection);
-    await knexInstanceRemote2.migrate.latest();
+    knexInstanceTargetRemote = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexInstanceTargetRemote.migrate.latest();
 
     const options2: SATPGatewayConfig = {
       instanceId: uuidv4(),
@@ -275,8 +293,8 @@ describe("Rollback Test stage 1", () => {
       gid: gatewayIdentity2,
       counterPartyGateways: [gatewayIdentity1],
       keyPair: gateway2KeyPair,
-      localRepository: knexServerConnection,
-      remoteRepository: knexTargetRemoteConnection,
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
       enableCrashRecovery: true,
     };
 

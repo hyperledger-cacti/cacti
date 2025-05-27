@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Id** | Pointer to **string** | The unique identifier of the origin network. | [optional] 
 **DltProtocol** | Pointer to **interface{}** |  | [optional] 
 **DltSubnetworkID** | Pointer to **interface{}** |  | [optional] 
 
@@ -25,6 +26,31 @@ will change when the set of required properties is changed
 NewTransact200ResponseStatusResponseOriginNetworkWithDefaults instantiates a new Transact200ResponseStatusResponseOriginNetwork object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetId
+
+`func (o *Transact200ResponseStatusResponseOriginNetwork) GetId() string`
+
+GetId returns the Id field if non-nil, zero value otherwise.
+
+### GetIdOk
+
+`func (o *Transact200ResponseStatusResponseOriginNetwork) GetIdOk() (*string, bool)`
+
+GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetId
+
+`func (o *Transact200ResponseStatusResponseOriginNetwork) SetId(v string)`
+
+SetId sets Id field to given value.
+
+### HasId
+
+`func (o *Transact200ResponseStatusResponseOriginNetwork) HasId() bool`
+
+HasId returns a boolean if a field has been set.
 
 ### GetDltProtocol
 
