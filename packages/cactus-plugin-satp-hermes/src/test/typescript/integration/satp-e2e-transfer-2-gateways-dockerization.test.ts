@@ -33,6 +33,7 @@ import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
 import {
+  AdminApi,
   GetApproveAddressApi,
   TokenType,
   TransactionApi,
@@ -862,6 +863,11 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
         basePath: `http://${await gatewayRunner1.getOApiHost()}`,
       }),
     );
+    const adminApi = new AdminApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
+      }),
+    );
 
     const req = getTransactRequest(
       "mockContext",
@@ -875,6 +881,13 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     log.info(res?.status);
     log.info(res.data.statusResponse);
     expect(res?.status).toBe(200);
+
+    const statusResponse = await adminApi.getStatus(res.data.sessionID);
+
+    expect(statusResponse?.data.startTime).toBeDefined();
+    expect(statusResponse?.data.status).toBe("DONE");
+    expect(statusResponse?.data.substatus).toBe("COMPLETED");
+    expect(statusResponse?.data.stage).toBe("SATP_STAGE_3");
 
     await besuEnv.checkBalance(
       besuEnv.getTestContractName(),

@@ -35,7 +35,9 @@ import {
   getMessageHash,
   saveHash,
   saveSignature,
+  saveTimestamp,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import { signatureVerifier } from "../data-verifier";
 import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
@@ -138,6 +140,12 @@ export class Stage0ClientService extends SATPService {
         getHash(newSessionRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.NEW_SESSION_REQUEST,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -217,6 +225,12 @@ export class Stage0ClientService extends SATPService {
     }
 
     signatureVerifier(fnTag, this.Signer, response, sessionData);
+
+    saveTimestamp(
+      sessionData,
+      MessageType.NEW_SESSION_RESPONSE,
+      TimestampType.RECEIVED,
+    );
 
     if (sessionData.id != response.sessionId) {
       if (sessionIds.includes(response.sessionId)) {
@@ -331,6 +345,12 @@ export class Stage0ClientService extends SATPService {
         sessionData,
         MessageType.PRE_SATP_TRANSFER_REQUEST,
         getHash(preSATPTransferRequest),
+      );
+
+      saveTimestamp(
+        sessionData,
+        MessageType.PRE_SATP_TRANSFER_REQUEST,
+        TimestampType.PROCESSED,
       );
 
       await this.dbLogger.persistLogEntry({

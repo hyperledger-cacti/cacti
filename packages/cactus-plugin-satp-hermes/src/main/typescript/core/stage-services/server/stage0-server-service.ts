@@ -38,7 +38,9 @@ import {
   getMessageHash,
   saveHash,
   saveSignature,
+  saveTimestamp,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import {
   createAssetId,
@@ -162,6 +164,12 @@ export class Stage0ServerService extends SATPService {
 
     saveHash(newSessionData, MessageType.NEW_SESSION_REQUEST, getHash(request));
 
+    saveTimestamp(
+      newSessionData,
+      MessageType.NEW_SESSION_REQUEST,
+      TimestampType.RECEIVED,
+    );
+
     this.Log.info(`${fnTag}, NewSessionRequest passed all checks.`);
     return session;
   }
@@ -259,6 +267,12 @@ export class Stage0ServerService extends SATPService {
       getHash(request),
     );
 
+    saveTimestamp(
+      sessionData,
+      MessageType.PRE_SATP_TRANSFER_REQUEST,
+      TimestampType.RECEIVED,
+    );
+
     //TODO maybe do a hard copy, reason: after the hash because this changes the req object
     sessionData.receiverAsset = request.receiverAsset;
 
@@ -332,6 +346,12 @@ export class Stage0ServerService extends SATPService {
       );
 
       saveHash(sessionData, MessageType.NEW_SESSION_REQUEST, fnTag);
+
+      saveTimestamp(
+        sessionData,
+        MessageType.NEW_SESSION_REQUEST,
+        TimestampType.PROCESSED,
+      );
 
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
@@ -485,6 +505,12 @@ export class Stage0ServerService extends SATPService {
       );
 
       saveHash(sessionData, MessageType.PRE_SATP_TRANSFER_REQUEST, fnTag);
+
+      saveTimestamp(
+        sessionData,
+        MessageType.PRE_SATP_TRANSFER_REQUEST,
+        TimestampType.PROCESSED,
+      );
 
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
