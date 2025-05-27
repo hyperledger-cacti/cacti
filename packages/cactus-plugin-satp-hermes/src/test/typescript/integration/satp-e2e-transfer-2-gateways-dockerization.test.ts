@@ -182,20 +182,19 @@ beforeAll(async () => {
 
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
+
+  await besuEnv.mintTokens("100");
+  await besuEnv.checkBalance(
+    besuEnv.getTestContractName(),
+    besuEnv.getTestContractAddress(),
+    besuEnv.getTestContractAbi(),
+    besuEnv.getTestOwnerAccount(),
+    "100",
+    besuEnv.getTestOwnerSigningCredential(),
+  );
 });
 
 describe("SATPGateway sending a token from Besu to Fabric", () => {
-  it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
-    await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-  });
   it("should realize a transfer", async () => {
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
