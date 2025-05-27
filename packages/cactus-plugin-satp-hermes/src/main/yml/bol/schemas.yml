@@ -37,46 +37,39 @@ AllSessionIdsResponse:
     type: string
     nullable: false
   description: Array with session Ids
-getAuditRequest:
-  description: "Request schema for initiating an audit. Includes the start and end dates for the audit period and an option to include proofs."
+AuditRequest:
+  description: "Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes."
   type: object
   x-category: request
+  required:
+    - startTimestamp
+    - endTimestamp
   properties:
-    auditStartDate:
-      type: string
-      format: date-time
-      description: The start datetime for the audit.
-      example: "2023-01-01T00:00:00Z"
-    auditEndDate:
-      type: string
-      format: date-time
-      description: The end datetime for the audit.
-      example: "2023-01-31T23:59:59Z"
-    includeProofs:
-      type: boolean
-      description: Include proofs generated from each gateway transaction.
-      example: true
-getAuditResponse:
+    startTimestamp:
+      type: integer
+      format: int64
+      description: The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+    endTimestamp:
+      type: integer
+      format: int64
+      description: The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+AuditResponse:
   description: "Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes."
   type: object
   x-category: response
   properties:
-    proofs:
+    sessions:
       type: array
       items:
         type: string
-      description: An array of strings representing proofs.
-      example: ["proof1", "proof2"]
-    auditStartTime:
-      type: string
-      format: date-time
-      description: The start datetime of the audit period.
-      example: "2023-01-01T00:00:00Z"
-    auditEndTime:
-      type: string
-      format: date-time
-      description: The end datetime of the audit period.
-      example: "2023-01-31T23:59:59Z"
+    startTimestamp:
+      type: integer
+      format: int64
+      description: The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
+    endTimestamp:
+      type: integer
+      format: int64
+      description: The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
 StatusResponse:
   description: "Provides the current status of the SATP session including detailed information on the progress, such as substatus, stage, and step, along with the session start time and chain information."
   type: object
@@ -164,6 +157,10 @@ StatusResponse:
     originNetwork:
       type: object
       properties:
+        id:
+          type: string
+          description: The unique identifier of the origin network.
+          example: network1
         dltProtocol:
           example: HyperledgerFabric
         dltSubnetworkID:
@@ -171,6 +168,10 @@ StatusResponse:
     destinationNetwork:
       type: object
       properties:
+        id:
+          type: string
+          description: The unique identifier of the origin network.
+          example: network2
         dltProtocol:
           example: HyperledgerBesu
         dltSubnetworkID:
@@ -877,7 +878,7 @@ OracleTask:
       $ref: ./schemas.yml#/TaskID
       description: "The unique identifier for the Oracle task."
     type:
-      type: enum
+      type: string
       description: "The type of the Oracle task."
       enum:
         - READ
@@ -906,7 +907,7 @@ OracleTask:
       items:
         $ref: ./schemas.yml#/OracleOperation
     status:
-      type: enum
+      type: string
       description: "The current status of the Oracle task."
       enum:
         - ACTIVE
@@ -1063,7 +1064,7 @@ OracleExecuteResponse:
       $ref: ./schemas.yml#/TaskID
       description: "The unique identifier of the task."
     type:
-      type: enum
+      type: string
       description: "The type of the Oracle task."
       enum:
         - READ
@@ -1092,7 +1093,7 @@ OracleExecuteResponse:
       items:
         $ref: ./schemas.yml#/OracleOperation
     status:
-      type: enum
+      type: string
       description: "The current status of the Oracle task."
       enum:
         - ACTIVE
@@ -1110,7 +1111,7 @@ OracleExecuteResponse:
       description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
       example: 5000
   required:
-    - id
+    - taskID
     - type
     - srcContract
     - dstContract
@@ -1127,7 +1128,7 @@ OracleStatusResponse:
       $ref: ./schemas.yml#/TaskID
       description: "The unique identifier of the task."
     type:
-      type: enum
+      type: string
       description: "The type of the Oracle task."
       enum:
         - READ
@@ -1156,7 +1157,7 @@ OracleStatusResponse:
       items:
         $ref: ./schemas.yml#/OracleOperation
     status:
-      type: enum
+      type: string
       description: "The current status of the Oracle task."
       enum:
         - ACTIVE
@@ -1174,7 +1175,7 @@ OracleStatusResponse:
       description: "The interval for polling in milliseconds. Only if taskMode is POLLING."
       example: 5000
   required:
-    - id
+    - taskID
     - type
     - srcContract
     - dstContract

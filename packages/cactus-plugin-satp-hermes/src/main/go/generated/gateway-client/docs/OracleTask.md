@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | **string** | The unique identifier for the Oracle task. | 
-**Type** | [**Enum**](enum.md) | The type of the Oracle task. | 
+**TaskID** | **string** | Unique identifier (UUID) for the session. | 
+**Type** | **string** | The type of the Oracle task. | 
 **SrcNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
 **SrcContract** | [**ExecuteOracleTask200ResponseSrcContract**](ExecuteOracleTask200ResponseSrcContract.md) |  | 
 **DstNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
 **DstContract** | [**ExecuteOracleTask200ResponseDstContract**](ExecuteOracleTask200ResponseDstContract.md) |  | 
 **Timestamp** | **int64** | The timestamp when the Oracle task was created or last updated. | 
 **Operations** | [**[]ExecuteOracleTask200ResponseOperationsInner**](ExecuteOracleTask200ResponseOperationsInner.md) | The list of operations performed by the Oracle task. | 
-**Status** | [**Enum**](enum.md) | The current status of the Oracle task. | 
+**Status** | **string** | The current status of the Oracle task. | 
 **Mode** | **string** | The mode of operation for registered tasks. | 
 **PollingInterval** | Pointer to **int32** | The interval for polling in milliseconds. Only if taskMode is POLLING. | [optional] 
 **ListeningOptions** | Pointer to [**RegisterOracleTaskRequestListeningOptions**](RegisterOracleTaskRequestListeningOptions.md) |  | [optional] 
@@ -21,7 +21,7 @@ Name | Type | Description | Notes
 
 ### NewOracleTask
 
-`func NewOracleTask(taskID string, type_ Enum, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status Enum, mode string, ) *OracleTask`
+`func NewOracleTask(taskID string, type_ string, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status string, mode string, ) *OracleTask`
 
 NewOracleTask instantiates a new OracleTask object
 This constructor will assign default values to properties that have it defined,
@@ -58,20 +58,20 @@ SetTaskID sets TaskID field to given value.
 
 ### GetType
 
-`func (o *OracleTask) GetType() Enum`
+`func (o *OracleTask) GetType() string`
 
 GetType returns the Type field if non-nil, zero value otherwise.
 
 ### GetTypeOk
 
-`func (o *OracleTask) GetTypeOk() (*Enum, bool)`
+`func (o *OracleTask) GetTypeOk() (*string, bool)`
 
 GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetType
 
-`func (o *OracleTask) SetType(v Enum)`
+`func (o *OracleTask) SetType(v string)`
 
 SetType sets Type field to given value.
 
@@ -208,20 +208,20 @@ SetOperations sets Operations field to given value.
 
 ### GetStatus
 
-`func (o *OracleTask) GetStatus() Enum`
+`func (o *OracleTask) GetStatus() string`
 
 GetStatus returns the Status field if non-nil, zero value otherwise.
 
 ### GetStatusOk
 
-`func (o *OracleTask) GetStatusOk() (*Enum, bool)`
+`func (o *OracleTask) GetStatusOk() (*string, bool)`
 
 GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStatus
 
-`func (o *OracleTask) SetStatus(v Enum)`
+`func (o *OracleTask) SetStatus(v string)`
 
 SetStatus sets Status field to given value.
 

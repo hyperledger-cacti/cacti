@@ -1,5 +1,6 @@
 import { GetStatusError } from "../../core/errors/satp-errors";
 import {
+  NetworkId,
   StatusRequest,
   StatusResponse,
   StatusResponseStageEnum,
@@ -46,26 +47,30 @@ export async function executeGetStatus(
 }
 
 function getNetworkDetails(
-  networkType: LedgerType,
+  networkId: NetworkId,
 ): Transact200ResponseStatusResponseOriginNetwork {
-  switch (networkType) {
+  switch (networkId.ledgerType) {
     case LedgerType.Besu2X:
       return {
+        id: networkId.id,
         dltProtocol: "besu",
         dltSubnetworkID: "v24.4.0-RC1",
       };
     case LedgerType.Fabric2:
       return {
+        id: networkId.id,
         dltProtocol: "fabric",
         dltSubnetworkID: "v2.0.0",
       };
     case LedgerType.Ethereum:
       return {
+        id: networkId.id,
         dltProtocol: "ethereum",
         dltSubnetworkID: "v24.4.0-RC1",
       };
     default:
       return {
+        id: networkId.id,
         dltProtocol: "unknown",
         dltSubnetworkID: "unknown",
       };
@@ -107,9 +112,15 @@ export async function getStatusService(
   const startTime =
     sessionData.receivedTimestamps?.stage0?.newSessionRequestMessageTimestamp;
   const originNetwork: Transact200ResponseStatusResponseOriginNetwork =
-    getNetworkDetails(sessionData.senderAsset?.networkId?.type as LedgerType);
+    getNetworkDetails({
+      id: sessionData.senderAsset?.networkId?.id,
+      ledgerType: sessionData.senderAsset?.networkId?.type as LedgerType,
+    } as NetworkId);
   const destinationNetwork: Transact200ResponseStatusResponseOriginNetwork =
-    getNetworkDetails(sessionData.receiverAsset?.networkId?.type as LedgerType);
+    getNetworkDetails({
+      id: sessionData.senderAsset?.networkId?.id,
+      ledgerType: sessionData.senderAsset?.networkId?.type as LedgerType,
+    } as NetworkId);
   if (!sessionData.hashes) {
     return {
       status: StatusResponseStatusEnum.Invalid,
