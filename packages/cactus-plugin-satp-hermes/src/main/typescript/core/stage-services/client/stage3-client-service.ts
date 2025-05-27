@@ -22,7 +22,9 @@ import {
   getMessageHash,
   saveHash,
   saveSignature,
+  saveTimestamp,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -167,6 +169,12 @@ export class Stage3ClientService extends SATPService {
         getHash(commitPreparationRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.COMMIT_PREPARE,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -292,6 +300,12 @@ export class Stage3ClientService extends SATPService {
         getHash(commitFinalAssertionRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.COMMIT_FINAL,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -405,6 +419,12 @@ export class Stage3ClientService extends SATPService {
         getHash(transferCompleteRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.COMMIT_TRANSFER_COMPLETE,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -466,6 +486,12 @@ export class Stage3ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
 
+    saveTimestamp(
+      sessionData,
+      MessageType.ASSERTION_RECEIPT,
+      TimestampType.RECEIVED,
+    );
+
     this.Log.info(`${fnTag}, LockAssertionResponse passed all checks.`);
   }
 
@@ -521,6 +547,12 @@ export class Stage3ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
 
+    saveTimestamp(
+      sessionData,
+      MessageType.COMMIT_READY,
+      TimestampType.RECEIVED,
+    );
+
     this.Log.info(`${fnTag}, CommitPreparationResponse passed all checks.`);
   }
 
@@ -575,6 +607,12 @@ export class Stage3ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
 
+    saveTimestamp(
+      sessionData,
+      MessageType.ACK_COMMIT_FINAL,
+      TimestampType.RECEIVED,
+    );
+
     this.Log.info(`${fnTag}, CommitFinalAssertionResponse passed all checks.`);
   }
 
@@ -619,6 +657,12 @@ export class Stage3ClientService extends SATPService {
       sessionData,
       MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
       getHash(response),
+    );
+
+    saveTimestamp(
+      sessionData,
+      MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+      TimestampType.RECEIVED,
     );
 
     this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
