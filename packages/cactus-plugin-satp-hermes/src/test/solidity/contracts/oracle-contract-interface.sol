@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNKNOWN 
 
-pragma solidity >=0.7.0;
+pragma solidity 0.8.20;
 
 /*
  *  Smart Contract Interface to define the methods needed by a contract to be handled by the oracle.
