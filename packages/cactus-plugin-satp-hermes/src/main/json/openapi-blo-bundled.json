@@ -347,6 +347,11 @@
                         "originNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network1"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerFabric"
                             },
@@ -358,6 +363,11 @@
                         "destinationNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network2"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerBesu"
                             },
@@ -570,6 +580,11 @@
                         "originNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network1"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerFabric"
                             },
@@ -581,6 +596,11 @@
                         "destinationNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network2"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerBesu"
                             },
@@ -786,6 +806,11 @@
                     "originNetwork": {
                       "type": "object",
                       "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The unique identifier of the origin network.",
+                          "example": "network1"
+                        },
                         "dltProtocol": {
                           "example": "HyperledgerFabric"
                         },
@@ -797,6 +822,11 @@
                     "destinationNetwork": {
                       "type": "object",
                       "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The unique identifier of the origin network.",
+                          "example": "network2"
+                        },
                         "dltProtocol": {
                           "example": "HyperledgerBesu"
                         },
@@ -1061,6 +1091,11 @@
                         "originNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network1"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerFabric"
                             },
@@ -1072,6 +1107,11 @@
                         "destinationNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network2"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerBesu"
                             },
@@ -1284,6 +1324,11 @@
                         "originNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network1"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerFabric"
                             },
@@ -1295,6 +1340,11 @@
                         "destinationNetwork": {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "The unique identifier of the origin network.",
+                              "example": "network2"
+                            },
                             "dltProtocol": {
                               "example": "HyperledgerBesu"
                             },
@@ -2475,7 +2525,7 @@
         ],
         "summary": "Audit transactions",
         "description": "Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.",
-        "operationId": "GetAudit",
+        "operationId": "PerformAudit",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
@@ -2484,32 +2534,23 @@
         },
         "parameters": [
           {
-            "name": "auditStartDate",
+            "name": "startTimestamp",
             "in": "query",
-            "description": "The start date for the audit period.",
+            "description": "The start timestamp for the audit period.",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "date-time"
+              "type": "integer",
+              "format": "int64"
             }
           },
           {
-            "name": "auditEndDate",
+            "name": "endTimestamp",
             "in": "query",
-            "description": "The end date for the audit period.",
+            "description": "The end timestamp for the audit period.",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "includeProofs",
-            "in": "query",
-            "description": "Include proofs generated from each gateway transaction.",
-            "required": false,
-            "schema": {
-              "type": "boolean"
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],
@@ -2523,28 +2564,21 @@
                   "type": "object",
                   "x-category": "response",
                   "properties": {
-                    "proofs": {
+                    "sessions": {
                       "type": "array",
                       "items": {
                         "type": "string"
-                      },
-                      "description": "An array of strings representing proofs.",
-                      "example": [
-                        "proof1",
-                        "proof2"
-                      ]
+                      }
                     },
-                    "auditStartTime": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "The start datetime of the audit period.",
-                      "example": "2023-01-01T00:00:00Z"
+                    "startTimestamp": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch)."
                     },
-                    "auditEndTime": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "The end datetime of the audit period.",
-                      "example": "2023-01-31T23:59:59Z"
+                    "endTimestamp": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch)."
                     }
                   }
                 }
@@ -3019,7 +3053,7 @@
                       "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
                     },
                     "type": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The type of the Oracle task.",
                       "enum": [
                         "READ",
@@ -3324,7 +3358,7 @@
                       }
                     },
                     "status": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The current status of the Oracle task.",
                       "enum": [
                         "ACTIVE",
@@ -3348,7 +3382,7 @@
                     }
                   },
                   "required": [
-                    "id",
+                    "taskID",
                     "type",
                     "srcContract",
                     "dstContract",
@@ -3671,8 +3705,8 @@
                   "type": "object",
                   "properties": {
                     "taskID": {
-                      "description": "The unique identifier of the task.",
                       "type": "string",
+                      "description": "Unique identifier (UUID) for the session.",
                       "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
                     },
                     "status": {
@@ -3737,12 +3771,12 @@
                   "type": "object",
                   "properties": {
                     "taskID": {
-                      "description": "The unique identifier of the task.",
                       "type": "string",
+                      "description": "Unique identifier (UUID) for the session.",
                       "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
                     },
                     "type": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The type of the Oracle task.",
                       "enum": [
                         "READ",
@@ -4047,7 +4081,7 @@
                       }
                     },
                     "status": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The current status of the Oracle task.",
                       "enum": [
                         "ACTIVE",
@@ -4071,7 +4105,7 @@
                     }
                   },
                   "required": [
-                    "id",
+                    "taskID",
                     "type",
                     "srcContract",
                     "dstContract",
@@ -4150,57 +4184,47 @@
         },
         "description": "Array with session Ids"
       },
-      "getAuditRequest": {
-        "description": "Request schema for initiating an audit. Includes the start and end dates for the audit period and an option to include proofs.",
+      "AuditRequest": {
+        "description": "Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.",
         "type": "object",
         "x-category": "request",
+        "required": [
+          "startTimestamp",
+          "endTimestamp"
+        ],
         "properties": {
-          "auditStartDate": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The start datetime for the audit.",
-            "example": "2023-01-01T00:00:00Z"
+          "startTimestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch)."
           },
-          "auditEndDate": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The end datetime for the audit.",
-            "example": "2023-01-31T23:59:59Z"
-          },
-          "includeProofs": {
-            "type": "boolean",
-            "description": "Include proofs generated from each gateway transaction.",
-            "example": true
+          "endTimestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch)."
           }
         }
       },
-      "getAuditResponse": {
+      "AuditResponse": {
         "description": "Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.",
         "type": "object",
         "x-category": "response",
         "properties": {
-          "proofs": {
+          "sessions": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "description": "An array of strings representing proofs.",
-            "example": [
-              "proof1",
-              "proof2"
-            ]
+            }
           },
-          "auditStartTime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The start datetime of the audit period.",
-            "example": "2023-01-01T00:00:00Z"
+          "startTimestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch)."
           },
-          "auditEndTime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The end datetime of the audit period.",
-            "example": "2023-01-31T23:59:59Z"
+          "endTimestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch)."
           }
         }
       },
@@ -4301,6 +4325,11 @@
           "originNetwork": {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "description": "The unique identifier of the origin network.",
+                "example": "network1"
+              },
               "dltProtocol": {
                 "example": "HyperledgerFabric"
               },
@@ -4312,6 +4341,11 @@
           "destinationNetwork": {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "description": "The unique identifier of the origin network.",
+                "example": "network2"
+              },
               "dltProtocol": {
                 "example": "HyperledgerBesu"
               },
@@ -4439,6 +4473,11 @@
               "originNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network1"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerFabric"
                   },
@@ -4450,6 +4489,11 @@
               "destinationNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network2"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerBesu"
                   },
@@ -4835,6 +4879,11 @@
               "originNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network1"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerFabric"
                   },
@@ -4846,6 +4895,11 @@
               "destinationNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network2"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerBesu"
                   },
@@ -4978,6 +5032,11 @@
               "originNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network1"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerFabric"
                   },
@@ -4989,6 +5048,11 @@
               "destinationNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network2"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerBesu"
                   },
@@ -6806,6 +6870,11 @@
               "originNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network1"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerFabric"
                   },
@@ -6817,6 +6886,11 @@
               "destinationNetwork": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The unique identifier of the origin network.",
+                    "example": "network2"
+                  },
                   "dltProtocol": {
                     "example": "HyperledgerBesu"
                   },
@@ -8628,12 +8702,12 @@
         "description": "Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature.",
         "properties": {
           "taskID": {
-            "description": "The unique identifier for the Oracle task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "type": {
-            "type": "enum",
+            "type": "string",
             "description": "The type of the Oracle task.",
             "enum": [
               "READ",
@@ -8938,7 +9012,7 @@
             }
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "description": "The current status of the Oracle task.",
             "enum": [
               "ACTIVE",
@@ -9164,8 +9238,8 @@
         ],
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task to be unregistered.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           }
         }
@@ -9178,8 +9252,8 @@
         ],
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           }
         }
@@ -9189,8 +9263,8 @@
         "type": "object",
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "status": {
@@ -9232,7 +9306,7 @@
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "type": {
-            "type": "enum",
+            "type": "string",
             "description": "The type of the Oracle task.",
             "enum": [
               "READ",
@@ -9537,7 +9611,7 @@
             }
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "description": "The current status of the Oracle task.",
             "enum": [
               "ACTIVE",
@@ -9561,7 +9635,7 @@
           }
         },
         "required": [
-          "id",
+          "taskID",
           "type",
           "srcContract",
           "dstContract",
@@ -9576,12 +9650,12 @@
         "type": "object",
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "type": {
-            "type": "enum",
+            "type": "string",
             "description": "The type of the Oracle task.",
             "enum": [
               "READ",
@@ -9886,7 +9960,7 @@
             }
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "description": "The current status of the Oracle task.",
             "enum": [
               "ACTIVE",
@@ -9910,7 +9984,7 @@
           }
         },
         "required": [
-          "id",
+          "taskID",
           "type",
           "srcContract",
           "dstContract",

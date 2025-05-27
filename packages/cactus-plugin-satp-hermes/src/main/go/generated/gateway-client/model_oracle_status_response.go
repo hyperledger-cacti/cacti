@@ -19,10 +19,10 @@ var _ MappedNullable = &OracleStatusResponse{}
 
 // OracleStatusResponse Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
 type OracleStatusResponse struct {
-	// The unique identifier of the task.
-	TaskID *string `json:"taskID,omitempty"`
+	// Unique identifier (UUID) for the session.
+	TaskID string `json:"taskID"`
 	// The type of the Oracle task.
-	Type Enum `json:"type"`
+	Type string `json:"type"`
 	SrcNetworkId *TransactRequestSourceAssetNetworkId `json:"srcNetworkId,omitempty"`
 	SrcContract ExecuteOracleTask200ResponseSrcContract `json:"srcContract"`
 	DstNetworkId *TransactRequestSourceAssetNetworkId `json:"dstNetworkId,omitempty"`
@@ -32,7 +32,7 @@ type OracleStatusResponse struct {
 	// The list of operations performed by the Oracle task.
 	Operations []ExecuteOracleTask200ResponseOperationsInner `json:"operations"`
 	// The current status of the Oracle task.
-	Status Enum `json:"status"`
+	Status string `json:"status"`
 	// The mode of operation for registered tasks.
 	Mode string `json:"mode"`
 	// The interval for polling in milliseconds. Only if taskMode is POLLING.
@@ -43,8 +43,9 @@ type OracleStatusResponse struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleStatusResponse(type_ Enum, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status Enum, mode string) *OracleStatusResponse {
+func NewOracleStatusResponse(taskID string, type_ string, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status string, mode string) *OracleStatusResponse {
 	this := OracleStatusResponse{}
+	this.TaskID = taskID
 	this.Type = type_
 	this.SrcContract = srcContract
 	this.DstContract = dstContract
@@ -63,42 +64,34 @@ func NewOracleStatusResponseWithDefaults() *OracleStatusResponse {
 	return &this
 }
 
-// GetTaskID returns the TaskID field value if set, zero value otherwise.
+// GetTaskID returns the TaskID field value
 func (o *OracleStatusResponse) GetTaskID() string {
-	if o == nil || IsNil(o.TaskID) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.TaskID
+
+	return o.TaskID
 }
 
-// GetTaskIDOk returns a tuple with the TaskID field value if set, nil otherwise
+// GetTaskIDOk returns a tuple with the TaskID field value
 // and a boolean to check if the value has been set.
 func (o *OracleStatusResponse) GetTaskIDOk() (*string, bool) {
-	if o == nil || IsNil(o.TaskID) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TaskID, true
+	return &o.TaskID, true
 }
 
-// HasTaskID returns a boolean if a field has been set.
-func (o *OracleStatusResponse) HasTaskID() bool {
-	if o != nil && !IsNil(o.TaskID) {
-		return true
-	}
-
-	return false
-}
-
-// SetTaskID gets a reference to the given string and assigns it to the TaskID field.
+// SetTaskID sets field value
 func (o *OracleStatusResponse) SetTaskID(v string) {
-	o.TaskID = &v
+	o.TaskID = v
 }
 
 // GetType returns the Type field value
-func (o *OracleStatusResponse) GetType() Enum {
+func (o *OracleStatusResponse) GetType() string {
 	if o == nil {
-		var ret Enum
+		var ret string
 		return ret
 	}
 
@@ -107,7 +100,7 @@ func (o *OracleStatusResponse) GetType() Enum {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *OracleStatusResponse) GetTypeOk() (*Enum, bool) {
+func (o *OracleStatusResponse) GetTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -115,7 +108,7 @@ func (o *OracleStatusResponse) GetTypeOk() (*Enum, bool) {
 }
 
 // SetType sets field value
-func (o *OracleStatusResponse) SetType(v Enum) {
+func (o *OracleStatusResponse) SetType(v string) {
 	o.Type = v
 }
 
@@ -280,9 +273,9 @@ func (o *OracleStatusResponse) SetOperations(v []ExecuteOracleTask200ResponseOpe
 }
 
 // GetStatus returns the Status field value
-func (o *OracleStatusResponse) GetStatus() Enum {
+func (o *OracleStatusResponse) GetStatus() string {
 	if o == nil {
-		var ret Enum
+		var ret string
 		return ret
 	}
 
@@ -291,7 +284,7 @@ func (o *OracleStatusResponse) GetStatus() Enum {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *OracleStatusResponse) GetStatusOk() (*Enum, bool) {
+func (o *OracleStatusResponse) GetStatusOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -299,7 +292,7 @@ func (o *OracleStatusResponse) GetStatusOk() (*Enum, bool) {
 }
 
 // SetStatus sets field value
-func (o *OracleStatusResponse) SetStatus(v Enum) {
+func (o *OracleStatusResponse) SetStatus(v string) {
 	o.Status = v
 }
 
@@ -369,9 +362,7 @@ func (o OracleStatusResponse) MarshalJSON() ([]byte, error) {
 
 func (o OracleStatusResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.TaskID) {
-		toSerialize["taskID"] = o.TaskID
-	}
+	toSerialize["taskID"] = o.TaskID
 	toSerialize["type"] = o.Type
 	if !IsNil(o.SrcNetworkId) {
 		toSerialize["srcNetworkId"] = o.SrcNetworkId

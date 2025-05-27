@@ -54,20 +54,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactRequest'
+              $ref: ./schemas.yml#/TransactRequest
       responses:
         '200':
           description: Transaction successfully queued
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactResponse'
+                $ref: ./schemas.yml#/TransactResponse
         default:
           description: An error occurred
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIError'
+                $ref: ./schemas.yml#/APIError
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel:
     post:
       tags:
@@ -83,7 +83,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancelRequest'
+              $ref: ./schemas.yml#/CancelRequest
         required: true
       responses:
         '200':
@@ -91,13 +91,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CancelResponse'
+                $ref: ./schemas.yml#/CancelResponse
         default:
           description: An error occurred or transaction cannot be cancelled
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIError'
+                $ref: ./schemas.yml#/APIError
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/status:
     get:
       summary: Get SATP current session data
@@ -113,7 +113,7 @@ paths:
         - name: SessionID
           in: query
           schema:
-            $ref: '#/components/schemas/SessionID'
+            $ref: ./schemas.yml#/SessionID
           required: true
           description: Unique identifier for the session.
       responses:
@@ -122,7 +122,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusResponse'
+                $ref: ./schemas.yml#/StatusResponse
         '400':
           description: Bad request
         '404':
@@ -144,14 +144,14 @@ paths:
         - name: SessionsRequest
           in: query
           schema:
-            $ref: '#/components/schemas/AllSessionIdsRequest'
+            $ref: ./schemas.yml#/AllSessionIdsRequest
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AllSessionIdsResponse'
+                $ref: ./schemas.yml#/AllSessionIdsResponse
         '400':
           description: Bad request
         '404':
@@ -175,7 +175,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthCheckResponse'
+                $ref: ./schemas.yml#/HealthCheckResponse
         '500':
           description: Internal server error
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
@@ -193,7 +193,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ContinueRequest'
+              $ref: ./schemas.yml#/ContinueRequest
         required: true
       responses:
         '200':
@@ -201,13 +201,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContinueResponse'
+                $ref: ./schemas.yml#/ContinueResponse
         default:
           description: An error occurred or transaction cannot be continued
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIError'
+                $ref: ./schemas.yml#/APIError
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause:
     post:
       tags:
@@ -223,7 +223,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PauseRequest'
+              $ref: ./schemas.yml#/PauseRequest
         required: true
       responses:
         '200':
@@ -231,13 +231,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PauseResponse'
+                $ref: ./schemas.yml#/PauseResponse
         default:
           description: An error occurred or transaction cannot be paused
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIError'
+                $ref: ./schemas.yml#/APIError
  
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
     get:
@@ -256,13 +256,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IntegrationsResponse'
+                $ref: ./schemas.yml#/IntegrationsResponse
         default:
           description: An error occurred
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIError'
+                $ref: ./schemas.yml#/APIError
 
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
     get:
@@ -285,13 +285,13 @@ paths:
         - name: fromAmount
           in: query
           schema:
-            $ref: '#/components/schemas/AmountString'
+            $ref: ./schemas.yml#/AmountString
           required: true
           description: The amount that should be sent including all decimals.
         - name: fromToken
           in: query
           schema:
-            $ref: '#/components/schemas/Address'
+            $ref: ./schemas.yml#/Address
           required: true
           description: The token that should be transferred. Can be the address or the symbol.
         - name: toDLTNetwork
@@ -303,19 +303,19 @@ paths:
         - name: toToken
           in: query
           schema:
-            $ref: '#/components/schemas/Address'
+            $ref: ./schemas.yml#/Address
           required: true
           description: The token that should be transferred to. Can be the address or the symbol.
         - name: fromAddress
           in: query
           schema:
-            $ref: '#/components/schemas/Address'
+            $ref: ./schemas.yml#/Address
           required: true
           description: The sending wallet address.
         - name: toAddress
           in: query
           schema:
-            $ref: '#/components/schemas/Address'
+            $ref: ./schemas.yml#/Address
           required: true
           description: The receiving wallet address. If none is provided, the fromAddress will be used.
       responses:
@@ -324,52 +324,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RoutesResponse'
+                $ref: ./schemas.yml#/RoutesResponse
         default:
           description: An error occurred
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIError'
+                $ref: ./schemas.yml#/APIError
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit:
     get:
       tags:
         - admin
       summary: Audit transactions
       description: Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-      operationId: GetAudit
+      operationId: PerformAudit
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit
       parameters:
-        - name: auditStartDate
+        - name: startTimestamp
           in: query
-          description: The start date for the audit period.
+          description: The start timestamp for the audit period.
           required: false
           schema:
-            type: string
-            format: date-time
-        - name: auditEndDate
+            type: integer
+            format: int64
+        - name: endTimestamp
           in: query
-          description: The end date for the audit period.
+          description: The end timestamp for the audit period.
           required: false
           schema:
-            type: string
-            format: date-time
-        - name: includeProofs
-          in: query
-          description: Include proofs generated from each gateway transaction.
-          required: false
-          schema:
-            type: boolean
+            type: integer
+            format: int64
       responses:
         '200':
           description: Audit results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAuditResponse'
+                $ref: ./schemas.yml#/AuditResponse
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:
@@ -398,7 +392,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetApproveAddressResponse'
+                $ref: ./schemas.yml#/GetApproveAddressResponse
         '400':
           description: Bad request
         '404':
@@ -421,14 +415,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddCounterpartyGatewayRequest'
+              $ref: ./schemas.yml#/AddCounterpartyGatewayRequest
       responses:
         '200':  
           description: Counterparty added successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddCounterpartyGatewayResponse'
+                $ref: ./schemas.yml#/AddCounterpartyGatewayResponse
         '400':
           description: Bad request
         '404':
@@ -452,14 +446,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OracleExecuteRequest'
+              $ref: ./schemas.yml#/OracleExecuteRequest
       responses:
         '200':
           description: Response schema for executing a data transfer task.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OracleExecuteResponse'
+                $ref: ./schemas.yml#/OracleExecuteResponse
         '400':
           description: Bad request
         '404':
@@ -483,14 +477,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OracleRegisterRequest'
+              $ref: ./schemas.yml#/OracleRegisterRequest
       responses:
         '200':
           description: Response schema for registering a data transfer task.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OracleRegisterResponse'
+                $ref: ./schemas.yml#/OracleRegisterResponse
         '400':
           description: Bad request
         '404':
@@ -513,7 +507,7 @@ paths:
         - name: taskID
           in: query
           schema:
-            $ref: '#/components/schemas/TaskID'
+            $ref: ./schemas.yml#/TaskID
           required: true
           description: Unique identifier for the task.
       responses:
@@ -522,7 +516,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OracleUnregisterResponse'
+                $ref: ./schemas.yml#/OracleUnregisterResponse
         '400':
           description: Bad request
         '404':
@@ -544,7 +538,7 @@ paths:
         - name: taskID
           in: query
           schema:
-            $ref: '#/components/schemas/TaskID'
+            $ref: ./schemas.yml#/TaskID
           required: true
           description: Unique identifier for the task.
       responses:
@@ -553,7 +547,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OracleStatusResponse'
+                $ref: ./schemas.yml#/OracleStatusResponse
         '400':
           description: Bad request
         '404':

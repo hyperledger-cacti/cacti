@@ -48,7 +48,7 @@ export async function getIntegrationsService(
 
   logger.info(`${fnTag}, getting integrations service...`);
 
-  const supportedSystems = manager.connectedDLTs;
+  const supportedSystems = manager.getConnectedDLTs();
 
   return supportedSystems.map((supportedSystem) =>
     convertconnectedDLTsIntoIntegrations(supportedSystem),
