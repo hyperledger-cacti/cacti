@@ -48,7 +48,11 @@ import {
   ClaimFormat,
   MessageType,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
-import { getMessageInSessionData } from "../../core/session-utils";
+import {
+  getMessageInSessionData,
+  saveTimestamp,
+  TimestampType,
+} from "../../core/session-utils";
 import {
   TransferProposalRequest,
   TransferProposalResponse,
@@ -609,6 +613,12 @@ export class SATPManager {
         | undefined;
       let transferCompleteRequest: TransferCompleteRequest | undefined;
       let transferCompleteResponse: TransferCompleteResponse | undefined;
+
+      saveTimestamp(
+        sessionData,
+        MessageType.NEW_SESSION_REQUEST,
+        TimestampType.RECEIVED,
+      );
 
       switch (stage) {
         case undefined:

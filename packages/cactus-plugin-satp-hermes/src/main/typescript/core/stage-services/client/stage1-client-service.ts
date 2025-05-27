@@ -17,7 +17,9 @@ import {
   getMessageHash,
   saveHash,
   saveSignature,
+  saveTimestamp,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -227,6 +229,12 @@ export class Stage1ClientService extends SATPService {
         getHash(transferProposalRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.PRE_SATP_TRANSFER_REQUEST,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -328,6 +336,12 @@ export class Stage1ClientService extends SATPService {
         getHash(transferCommenceRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_REQUEST,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -417,6 +431,12 @@ export class Stage1ClientService extends SATPService {
 
     saveHash(sessionData, MessageType.PRE_SATP_TRANSFER_RESPONSE, fnTag);
 
+    saveTimestamp(
+      sessionData,
+      MessageType.PRE_SATP_TRANSFER_RESPONSE,
+      TimestampType.RECEIVED,
+    );
+
     this.Log.info(`${fnTag}, PreSATPTransferResponse passed all checks.`);
   }
 
@@ -445,6 +465,9 @@ export class Stage1ClientService extends SATPService {
     );
 
     signatureVerifier(fnTag, this.Signer, response, sessionData);
+
+    // assume that it is INIT_REJECT. otherwise it will be overriden with INIT_RECEIPT below
+    saveTimestamp(sessionData, MessageType.INIT_REJECT, TimestampType.RECEIVED);
 
     if (
       response.common!.messageType == MessageType.INIT_REJECT &&
@@ -478,6 +501,12 @@ export class Stage1ClientService extends SATPService {
     }
 
     saveHash(sessionData, MessageType.INIT_RECEIPT, getHash(response));
+
+    saveTimestamp(
+      sessionData,
+      MessageType.INIT_RECEIPT,
+      TimestampType.RECEIVED,
+    );
 
     this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
     return true;
