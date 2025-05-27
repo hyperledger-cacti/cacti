@@ -16,6 +16,8 @@ import { GetStatusEndpointV1 } from "./admin/status-endpoint";
 import type {
   AddCounterpartyGatewayRequest,
   AddCounterpartyGatewayResponse,
+  AuditRequest,
+  AuditResponse,
   GetApproveAddressRequest,
   GetApproveAddressResponse,
   HealthCheckResponse,
@@ -69,6 +71,8 @@ import { OracleRegisterTaskEndpointV1 } from "./oracle/oracle-register-task-endp
 import { OracleUnregisterTaskEndpointV1 } from "./oracle/oracle-unregister-task-endpoint";
 import { GetOracleStatusEndpointV1 } from "./oracle/oracle-get-status-endpoint";
 import safeStableStringify from "safe-stable-stringify";
+import { executeAudit } from "./admin/get-audit-handler-service";
+import { AuditEndpointV1 } from "./admin/audit-endpoint";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -120,9 +124,8 @@ export class BLODispatcher {
 
     const SATPManagerOpts: ISATPManagerOptions = {
       logLevel: this.level,
-      instanceId: ourGateway?.id,
+      ourGateway: ourGateway,
       signer: signer,
-      connectedDLTs: this.orchestrator.connectedDLTs,
       ccManager: this.ccManager,
       orchestrator: this.orchestrator,
       pubKey: options.pubKey,
@@ -182,6 +185,12 @@ export class BLODispatcher {
         dispatcher: this,
         logLevel: this.options.logLevel,
       });
+
+    const auditEndpointV1 = new AuditEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
     const oracleExecuteTaskEndpointV1 = new OracleExecuteTaskEndpointV1({
       dispatcher: this,
       logLevel: this.options.logLevel,
@@ -211,6 +220,7 @@ export class BLODispatcher {
       getApproveAddressEndpointV1,
       transactEndpointV1,
       addCounterpartyGatewayEndpointV1,
+      auditEndpointV1,
       oracleExecuteTaskEndpointV1,
       oracleRegisterTaskEndpointV1,
       oracleUnregisterTaskEndpointV1,
@@ -260,7 +270,8 @@ export class BLODispatcher {
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
     const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
-    this.logger.info(`Transact request: ${req}`);
+    this.logger.info(`Transact request: ${safeStableStringify(req)}`);
+
     if (this.isShuttingDown) {
       throw new GatewayShuttingDownError(fnTag);
     }
@@ -368,6 +379,11 @@ export class BLODispatcher {
         status: false,
       } as AddCounterpartyGatewayResponse;
     }
+  }
+
+  public async PerformAudit(req: AuditRequest): Promise<AuditResponse> {
+    this.logger.info(`Perform Audit request: ${safeStableStringify(req)}`);
+    return executeAudit(this.level, req, this.manager);
   }
 
   public async GetSessionIds(): Promise<string[]> {

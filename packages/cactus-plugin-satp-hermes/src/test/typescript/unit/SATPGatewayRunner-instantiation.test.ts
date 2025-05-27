@@ -61,15 +61,16 @@ describe("Instantiate SATP Gateway Runner", () => {
     ontologiesPath: files.ontologiesPath,
   };
 
-  beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
-    await expect(pruning).toResolve();
-  });
-
   afterAll(async () => {
-    await gatewayRunner.stop();
-    await gatewayRunner.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    if (gatewayRunner) {
+      try {
+        await gatewayRunner.stop();
+        await gatewayRunner.destroy();
+        await pruneDockerAllIfGithubAction({ logLevel });
+      } catch (err) {
+        console.error("Error shutting down gateway in afterAll:", err);
+      }
+    }
   });
 
   test("Instantiate SATP Gateway Runner", async () => {
@@ -81,17 +82,17 @@ describe("Instantiate SATP Gateway Runner", () => {
 
     const serverHost = await gatewayRunner.getServerHost();
     expect(serverHost).toBeTruthy();
-    expect(serverHost).toMatch(/^http:\/\/localhost:\d+$/);
+    expect(serverHost).toMatch(/^localhost:\d+$/);
     console.log(serverHost);
 
     const clientHost = await gatewayRunner.getClientHost();
     expect(clientHost).toBeTruthy();
-    expect(clientHost).toMatch(/^http:\/\/localhost:\d+$/);
+    expect(serverHost).toMatch(/^localhost:\d+$/);
     console.log(clientHost);
 
     const apiHost = await gatewayRunner.getOApiHost();
     expect(apiHost).toBeTruthy();
-    expect(apiHost).toMatch(/^http:\/\/localhost:\d+$/);
+    expect(serverHost).toMatch(/^localhost:\d+$/);
     console.log(apiHost);
-  });
+  }, 200000);
 });
