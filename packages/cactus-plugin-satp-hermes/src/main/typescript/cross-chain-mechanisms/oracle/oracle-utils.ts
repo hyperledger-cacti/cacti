@@ -12,12 +12,3 @@ export function updateOracleOperation(
   operation.status = newStatus;
   operation.output = output;
 }
-
-/**
- * Represents a Solidity event log.
- */
-export type SolidityEventLog = {
-  address: string;
-  data: string;
-  topics: string[];
-};

@@ -5,11 +5,11 @@ All URIs are relative to *http://localhost:3011/api/v1/@hyperledger/cactus-plugi
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**CallContinue**](AdminApi.md#CallContinue) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue | Continue a paused transaction session
-[**GetAudit**](AdminApi.md#GetAudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 [**GetHealthCheck**](AdminApi.md#GetHealthCheck) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck | Health check endpoint
 [**GetSessionIds**](AdminApi.md#GetSessionIds) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids | Get SATP session ids
 [**GetStatus**](AdminApi.md#GetStatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 [**Pause**](AdminApi.md#Pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
+[**PerformAudit**](AdminApi.md#PerformAudit) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit | Audit transactions
 
 
 
@@ -72,77 +72,6 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## GetAudit
-
-> GetAudit200Response GetAudit(ctx).AuditStartDate(auditStartDate).AuditEndDate(auditEndDate).IncludeProofs(includeProofs).Execute()
-
-Audit transactions
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    "time"
-    openapiclient "github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated"
-)
-
-func main() {
-    auditStartDate := time.Now() // time.Time | The start date for the audit period. (optional)
-    auditEndDate := time.Now() // time.Time | The end date for the audit period. (optional)
-    includeProofs := true // bool | Include proofs generated from each gateway transaction. (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.GetAudit(context.Background()).AuditStartDate(auditStartDate).AuditEndDate(auditEndDate).IncludeProofs(includeProofs).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.GetAudit``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetAudit`: GetAudit200Response
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.GetAudit`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiGetAuditRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **auditStartDate** | **time.Time** | The start date for the audit period. | 
- **auditEndDate** | **time.Time** | The end date for the audit period. | 
- **includeProofs** | **bool** | Include proofs generated from each gateway transaction. | 
-
-### Return type
-
-[**GetAudit200Response**](GetAudit200Response.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
@@ -402,6 +331,74 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## PerformAudit
+
+> PerformAudit200Response PerformAudit(ctx).StartTimestamp(startTimestamp).EndTimestamp(endTimestamp).Execute()
+
+Audit transactions
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated"
+)
+
+func main() {
+    startTimestamp := int64(789) // int64 | The start timestamp for the audit period. (optional)
+    endTimestamp := int64(789) // int64 | The end timestamp for the audit period. (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.AdminApi.PerformAudit(context.Background()).StartTimestamp(startTimestamp).EndTimestamp(endTimestamp).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.PerformAudit``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `PerformAudit`: PerformAudit200Response
+    fmt.Fprintf(os.Stdout, "Response from `AdminApi.PerformAudit`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiPerformAuditRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **startTimestamp** | **int64** | The start timestamp for the audit period. | 
+ **endTimestamp** | **int64** | The end timestamp for the audit period. | 
+
+### Return type
+
+[**PerformAudit200Response**](PerformAudit200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
