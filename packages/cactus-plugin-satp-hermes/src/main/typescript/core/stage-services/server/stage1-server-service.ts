@@ -23,6 +23,7 @@ import {
   getMessageTimestamp,
   saveHash,
   saveSignature,
+  saveTimestamp,
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -167,6 +168,12 @@ export class Stage1ServerService extends SATPService {
         sessionData,
         commonBody.messageType,
         getHash(transferProposalReceiptMessage),
+      );
+
+      saveTimestamp(
+        sessionData,
+        commonBody.messageType,
+        TimestampType.PROCESSED,
       );
 
       await this.dbLogger.persistLogEntry({
@@ -317,6 +324,12 @@ export class Stage1ServerService extends SATPService {
         getHash(transferCommenceResponseMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.TRANSFER_COMMENCE_RESPONSE,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -431,6 +444,12 @@ export class Stage1ServerService extends SATPService {
 
     saveHash(sessionData, MessageType.INIT_PROPOSAL, getHash(request));
 
+    saveTimestamp(
+      sessionData,
+      MessageType.INIT_PROPOSAL,
+      TimestampType.RECEIVED,
+    );
+
     this.Log.info(`${fnTag}, TransferProposalRequest passed all checks.`);
   }
 
@@ -476,6 +495,12 @@ export class Stage1ServerService extends SATPService {
       sessionData,
       MessageType.TRANSFER_COMMENCE_REQUEST,
       getHash(request),
+    );
+
+    saveTimestamp(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_REQUEST,
+      TimestampType.RECEIVED,
     );
 
     //if the conditional parameters where accepted, the session state is still ongoing
