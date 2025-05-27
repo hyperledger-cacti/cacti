@@ -12,7 +12,9 @@ import {
   getMessageHash,
   saveHash,
   saveSignature,
+  saveTimestamp,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import {
   SATPService,
@@ -130,6 +132,12 @@ export class Stage2ServerService extends SATPService {
         getHash(lockAssertionReceiptMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.ASSERTION_RECEIPT,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -232,6 +240,8 @@ export class Stage2ServerService extends SATPService {
     }
 
     saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
+
+    saveTimestamp(sessionData, MessageType.LOCK_ASSERT, TimestampType.RECEIVED);
 
     this.Log.info(`${fnTag}, LockAssertionRequest passed all checks.`);
   }

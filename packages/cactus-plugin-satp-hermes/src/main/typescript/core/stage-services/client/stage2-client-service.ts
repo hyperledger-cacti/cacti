@@ -15,7 +15,9 @@ import {
   getMessageHash,
   saveHash,
   saveSignature,
+  saveTimestamp,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import { SATPSession } from "../../../core/satp-session";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -173,6 +175,12 @@ export class Stage2ClientService extends SATPService {
         getHash(lockAssertionRequestMessage),
       );
 
+      saveTimestamp(
+        sessionData,
+        MessageType.LOCK_ASSERT,
+        TimestampType.PROCESSED,
+      );
+
       await this.dbLogger.persistLogEntry({
         sessionID: sessionData.id,
         type: messageType,
@@ -233,6 +241,12 @@ export class Stage2ClientService extends SATPService {
       sessionData,
       MessageType.TRANSFER_COMMENCE_RESPONSE,
       getHash(response),
+    );
+
+    saveTimestamp(
+      sessionData,
+      MessageType.TRANSFER_COMMENCE_RESPONSE,
+      TimestampType.RECEIVED,
     );
 
     this.Log.info(`${fnTag}, TransferCommenceResponse passed all checks.`);
