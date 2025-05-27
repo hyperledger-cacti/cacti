@@ -16,7 +16,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"time"
 )
 
 
@@ -35,20 +34,6 @@ type AdminApi interface {
 	// CallContinueExecute executes the request
 	//  @return Continue200Response
 	CallContinueExecute(r ApiCallContinueRequest) (*Continue200Response, *http.Response, error)
-
-	/*
-	GetAudit Audit transactions
-
-	Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetAuditRequest
-	*/
-	GetAudit(ctx context.Context) ApiGetAuditRequest
-
-	// GetAuditExecute executes the request
-	//  @return GetAudit200Response
-	GetAuditExecute(r ApiGetAuditRequest) (*GetAudit200Response, *http.Response, error)
 
 	/*
 	GetHealthCheck Health check endpoint
@@ -105,6 +90,20 @@ type AdminApi interface {
 	// PauseExecute executes the request
 	//  @return Pause200Response
 	PauseExecute(r ApiPauseRequest) (*Pause200Response, *http.Response, error)
+
+	/*
+	PerformAudit Audit transactions
+
+	Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiPerformAuditRequest
+	*/
+	PerformAudit(ctx context.Context) ApiPerformAuditRequest
+
+	// PerformAuditExecute executes the request
+	//  @return PerformAudit200Response
+	PerformAuditExecute(r ApiPerformAuditRequest) (*PerformAudit200Response, *http.Response, error)
 }
 
 // AdminApiService AdminApi service
@@ -213,135 +212,6 @@ func (a *AdminApiService) CallContinueExecute(r ApiCallContinueRequest) (*Contin
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiGetAuditRequest struct {
-	ctx context.Context
-	ApiService AdminApi
-	auditStartDate *time.Time
-	auditEndDate *time.Time
-	includeProofs *bool
-}
-
-// The start date for the audit period.
-func (r ApiGetAuditRequest) AuditStartDate(auditStartDate time.Time) ApiGetAuditRequest {
-	r.auditStartDate = &auditStartDate
-	return r
-}
-
-// The end date for the audit period.
-func (r ApiGetAuditRequest) AuditEndDate(auditEndDate time.Time) ApiGetAuditRequest {
-	r.auditEndDate = &auditEndDate
-	return r
-}
-
-// Include proofs generated from each gateway transaction.
-func (r ApiGetAuditRequest) IncludeProofs(includeProofs bool) ApiGetAuditRequest {
-	r.includeProofs = &includeProofs
-	return r
-}
-
-func (r ApiGetAuditRequest) Execute() (*GetAudit200Response, *http.Response, error) {
-	return r.ApiService.GetAuditExecute(r)
-}
-
-/*
-GetAudit Audit transactions
-
-Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetAuditRequest
-*/
-func (a *AdminApiService) GetAudit(ctx context.Context) ApiGetAuditRequest {
-	return ApiGetAuditRequest{
-		ApiService: a,
-		ctx: ctx,
-	}
-}
-
-// Execute executes the request
-//  @return GetAudit200Response
-func (a *AdminApiService) GetAuditExecute(r ApiGetAuditRequest) (*GetAudit200Response, *http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *GetAudit200Response
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.GetAudit")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	if r.auditStartDate != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "auditStartDate", r.auditStartDate, "")
-	}
-	if r.auditEndDate != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "auditEndDate", r.auditEndDate, "")
-	}
-	if r.includeProofs != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "includeProofs", r.includeProofs, "")
-	}
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -777,6 +647,125 @@ func (a *AdminApiService) PauseExecute(r ApiPauseRequest) (*Pause200Response, *h
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiPerformAuditRequest struct {
+	ctx context.Context
+	ApiService AdminApi
+	startTimestamp *int64
+	endTimestamp *int64
+}
+
+// The start timestamp for the audit period.
+func (r ApiPerformAuditRequest) StartTimestamp(startTimestamp int64) ApiPerformAuditRequest {
+	r.startTimestamp = &startTimestamp
+	return r
+}
+
+// The end timestamp for the audit period.
+func (r ApiPerformAuditRequest) EndTimestamp(endTimestamp int64) ApiPerformAuditRequest {
+	r.endTimestamp = &endTimestamp
+	return r
+}
+
+func (r ApiPerformAuditRequest) Execute() (*PerformAudit200Response, *http.Response, error) {
+	return r.ApiService.PerformAuditExecute(r)
+}
+
+/*
+PerformAudit Audit transactions
+
+Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiPerformAuditRequest
+*/
+func (a *AdminApiService) PerformAudit(ctx context.Context) ApiPerformAuditRequest {
+	return ApiPerformAuditRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return PerformAudit200Response
+func (a *AdminApiService) PerformAuditExecute(r ApiPerformAuditRequest) (*PerformAudit200Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PerformAudit200Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.PerformAudit")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.startTimestamp != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "startTimestamp", r.startTimestamp, "")
+	}
+	if r.endTimestamp != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "endTimestamp", r.endTimestamp, "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 

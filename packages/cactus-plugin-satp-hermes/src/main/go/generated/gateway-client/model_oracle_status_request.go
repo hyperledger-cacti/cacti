@@ -19,7 +19,7 @@ var _ MappedNullable = &OracleStatusRequest{}
 
 // OracleStatusRequest Request schema for checking the status of a data transfer task.
 type OracleStatusRequest struct {
-	// The unique identifier of the task.
+	// Unique identifier (UUID) for the session.
 	TaskID string `json:"taskID"`
 }
 

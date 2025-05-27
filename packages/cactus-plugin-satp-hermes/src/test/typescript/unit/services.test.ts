@@ -72,10 +72,6 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../../main/typescript/database/repository/interfaces/repository";
-import {
-  knexClientConnection,
-  knexSourceRemoteConnection,
-} from "../knex.config";
 import { Knex, knex } from "knex";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/database/repository/knex-remote-log-repository";
@@ -87,6 +83,9 @@ let knexInstanceRemote: Knex;
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BridgeManagerClientInterface } from "../../../main/typescript/cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { BridgeManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-manager";
+import { createMigrationSource } from "../../../main/typescript/database/knex-migration-source";
+import { knexLocalInstance } from "../../../main/typescript/database/knexfile";
+import { knexRemoteInstance } from "../../../main/typescript/database/knexfile-remote";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -167,15 +166,25 @@ beforeAll(async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   });
-
-  knexInstanceClient = knex(knexClientConnection);
+  const migrationSource = await createMigrationSource();
+  knexInstanceClient = knex({
+    ...knexLocalInstance.default,
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  });
   await knexInstanceClient.migrate.latest();
 
-  knexInstanceRemote = knex(knexSourceRemoteConnection);
+  knexInstanceRemote = knex({
+    ...knexRemoteInstance.default,
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  });
   await knexInstanceRemote.migrate.latest();
 
-  localRepository = new LocalLogRepository(knexClientConnection);
-  remoteRepository = new RemoteLogRepository(knexSourceRemoteConnection);
+  localRepository = new LocalLogRepository(knexLocalInstance.default);
+  remoteRepository = new RemoteLogRepository(knexRemoteInstance.default);
   dbLogger = new SATPLogger({
     localRepository,
     remoteRepository,
