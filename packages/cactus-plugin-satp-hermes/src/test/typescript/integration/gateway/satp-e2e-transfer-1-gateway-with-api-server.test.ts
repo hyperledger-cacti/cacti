@@ -1,75 +1,62 @@
 import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { v4 as uuidv4 } from "uuid";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
-  SATPGatewayRunner,
-  ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger/cactus-test-tooling";
-import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import {
-  setupGatewayDockerFiles,
+  SATPGatewayConfig,
+  SATPGateway,
+  PluginFactorySATPGateway,
+  TransactionApi,
+  Configuration,
+  GetApproveAddressApi,
+  TokenType,
+} from "../../../../main/typescript";
+import {
+  Address,
+  GatewayIdentity,
+} from "../../../../main/typescript/core/types";
+import {
+  IPluginFactoryOptions,
+  PluginImportType,
+} from "@hyperledger/cactus-core-api";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import {
   BesuTestEnvironment,
+  EthereumTestEnvironment,
   FabricTestEnvironment,
   getTransactRequest,
-  EthereumTestEnvironment,
-  createPGDatabase,
-  setupDBTable,
-} from "../test-utils";
+} from "../../test-utils";
 import {
-  DEFAULT_PORT_GATEWAY_CLIENT,
-  DEFAULT_PORT_GATEWAY_OAPI,
-  DEFAULT_PORT_GATEWAY_SERVER,
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
-} from "../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { Container } from "dockerode";
-import { Knex } from "knex";
-import { Configuration } from "@hyperledger/cactus-core-api";
-import {
-  GetApproveAddressApi,
-  TokenType,
-  TransactionApi,
-} from "../../../main/typescript";
-import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../constants";
+} from "../../../../main/typescript/core/constants";
+import { Knex, knex } from "knex";
+import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import path from "path";
+import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
+import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
 });
 
+let knexSourceRemoteClient: Knex;
+let knexLocalClient: Knex;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
+let gateway: SATPGateway;
 
-const erc20TokenContract = "SATPContract";
-
-let db_local_config: Knex.Config;
-let db_remote_config: Knex.Config;
-let db_local: Container;
-let db_remote: Container;
-let gatewayRunner: SATPGatewayRunner;
-
-const testNetwork = "test-network";
-
-const gatewayAddress = "gateway.satp-hermes";
-
-afterEach(async () => {
-  if (gatewayRunner) {
-    await gatewayRunner.stop();
-    await gatewayRunner.destroy();
-  }
-});
-
+const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
-  await db_local.stop();
-  await db_local.remove();
-  await db_remote.stop();
-  await db_remote.remove();
-
   await besuEnv.tearDown();
   await ethereumEnv.tearDown();
   await fabricEnv.tearDown();
@@ -82,7 +69,19 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
+}, TIMEOUT);
+
+afterEach(async () => {
+  if (gateway) {
+    await gateway.shutdown();
+  }
+  if (knexLocalClient) {
+    await knexLocalClient.destroy();
+  }
+  if (knexSourceRemoteClient) {
+    await knexSourceRemoteClient.destroy();
+  }
+}, TIMEOUT);
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -94,29 +93,12 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  ({ config: db_local_config, container: db_local } = await createPGDatabase({
-    port: 5432,
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
-
-  ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
-    port: 5450,
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
-
-  await setupDBTable(db_remote_config);
-
   {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
+      claimFormat: ClaimFormat.BUNGEE,
       logLevel,
-      network: testNetwork,
-      claimFormat: ClaimFormat.DEFAULT,
     });
     log.info("Fabric Ledger started successfully");
 
@@ -124,28 +106,28 @@ beforeAll(async () => {
   }
 
   {
+    const erc20TokenContract = "SATPContract";
     besuEnv = await BesuTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
       logLevel,
-      network: testNetwork,
     });
     log.info("Besu Ledger started successfully");
 
-    await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+    await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   }
   {
+    const erc20TokenContract = "SATPContract";
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
       logLevel,
-      network: testNetwork,
     });
     log.info("Ethereum Ledger started successfully");
-
-    await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
+    await ethereumEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   }
-});
+}, TIMEOUT);
 
 describe("SATPGateway sending a token from Besu to Fabric", () => {
+  jest.setTimeout(TIMEOUT);
   it("should mint 100 tokens to the owner account", async () => {
     await besuEnv.mintTokens("100");
     await besuEnv.checkBalance(
@@ -158,9 +140,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     );
   });
   it("should realize a transfer", async () => {
-    const address: Address = `http://${gatewayAddress}`;
+    //setup satp gateway
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
 
-    // gateway setup:
     const gatewayIdentity = {
       id: "mockID",
       name: "CustomGateway",
@@ -172,51 +157,59 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
         },
       ],
       proofID: "mockProofID10",
-      address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      address: "http://localhost" as Address,
     } as GatewayIdentity;
 
-    // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
-
-    // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
-
-    // gateway configuration setup:
-    const files = setupGatewayDockerFiles({
-      gatewayIdentity,
-      logLevel,
-      counterPartyGateways: [], //only knows itself
-      enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [besuConfigJSON, fabricConfigJSON] },
-      localRepository: db_local_config,
-      remoteRepository: db_remote_config,
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
     });
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
-    // gatewayRunner setup:
-    const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
-      logLevel,
-      emitContainerLogs: true,
-      configFilePath: files.configFilePath,
-      logsPath: files.logsPath,
-      ontologiesPath: files.ontologiesPath,
-      networkName: testNetwork,
-      url: gatewayAddress,
+    const fabricNetworkOptions = fabricEnv.createFabricConfig();
+    const besuNetworkOptions = besuEnv.createBesuConfig();
+
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+    const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity,
+      ccConfig: {
+        bridgeConfig: [fabricNetworkOptions, besuNetworkOptions],
+      },
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
+      pluginRegistry: new PluginRegistry({
+        plugins: [],
+      }),
+      ontologyPath: ontologiesPath,
     };
+    gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+    await gateway.onPluginInit();
 
-    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
-    log.debug("starting gatewayRunner...");
-    await gatewayRunner.start(false);
-    log.debug("gatewayRunner started sucessfully");
+    const identity = gateway.Identity;
+    // default servers
+    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.gatewayOapiPort).toBe(4010);
+    expect(identity.address).toBe("http://localhost");
+
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
 
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner.getOApiHost()}`,
-      }),
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
@@ -224,11 +217,11 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       TokenType.NonstandardFungible,
     );
 
-    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
-
     if (!reqApproveBesuAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
     }
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
 
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.data.approveAddress);
 
@@ -255,9 +248,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     await fabricEnv.giveRoleToBridge("Org2MSP");
 
     const satpApi = new TransactionApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner.getOApiHost()}`,
-      }),
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const req = getTransactRequest(
@@ -310,14 +301,18 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       fabricEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+
+    await gateway.shutdown();
   });
 });
-
 describe("SATPGateway sending a token from Fabric to Besu", () => {
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
-    const address: Address = `http://${gatewayAddress}`;
-
-    // gateway setup:
+    //setup satp gateway
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
     const gatewayIdentity = {
       id: "mockID",
       name: "CustomGateway",
@@ -329,48 +324,59 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
         },
       ],
       proofID: "mockProofID10",
-      address,
+      address: "http://localhost" as Address,
     } as GatewayIdentity;
 
-    // ethereumConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
-
-    // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
-
-    // gateway configuration setup:
-    const files = setupGatewayDockerFiles({
-      gatewayIdentity,
-      logLevel,
-      counterPartyGateways: [], //only knows itself
-      enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [besuConfigJSON, fabricConfigJSON] },
-      localRepository: db_local_config,
-      remoteRepository: db_remote_config,
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
     });
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
-    // gatewayRunner setup:
-    const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
-      logLevel,
-      emitContainerLogs: true,
-      configFilePath: files.configFilePath,
-      logsPath: files.logsPath,
-      ontologiesPath: files.ontologiesPath,
-      networkName: testNetwork,
-      url: gatewayAddress,
+    const fabricNetworkOptions = fabricEnv.createFabricConfig();
+    const besuNetworkOptions = besuEnv.createBesuConfig();
+
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+    const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity,
+      ccConfig: {
+        bridgeConfig: [fabricNetworkOptions, besuNetworkOptions],
+      },
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
+      pluginRegistry: new PluginRegistry({
+        plugins: [],
+      }),
+      ontologyPath: ontologiesPath,
     };
+    gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+    await gateway.onPluginInit();
 
-    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
-    log.debug("starting gatewayRunner...");
-    await gatewayRunner.start(true);
-    log.debug("gatewayRunner started sucessfully");
+    const identity = gateway.Identity;
+    // default servers
+    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.gatewayOapiPort).toBe(4010);
+    expect(identity.address).toBe("http://localhost");
+
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
 
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner.getOApiHost()}`,
-      }),
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
@@ -409,9 +415,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
 
     const satpApi = new TransactionApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner.getOApiHost()}`,
-      }),
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const req = getTransactRequest(
@@ -464,14 +468,19 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transferred correctly to the Owner account");
+
+    await gateway.shutdown();
   });
 });
-
 describe("SATPGateway sending a token from Besu to Ethereum", () => {
+  jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
-    const address: Address = `http://${gatewayAddress}`;
+    //setup satp gateway
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
 
-    // gateway setup:
     const gatewayIdentity = {
       id: "mockID",
       name: "CustomGateway",
@@ -483,51 +492,59 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
         },
       ],
       proofID: "mockProofID10",
-      address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      address: "http://localhost" as Address,
     } as GatewayIdentity;
 
-    // besuConfig Json object setup:
-    const besuConfig = await besuEnv.createBesuDockerConfig();
-
-    // fabricConfig Json object setup:
-    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
-
-    // gateway configuration setup:
-    const files = setupGatewayDockerFiles({
-      gatewayIdentity,
-      logLevel,
-      counterPartyGateways: [], //only knows itself
-      enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [besuConfig, ethereumConfig] },
-      localRepository: db_local_config,
-      remoteRepository: db_remote_config,
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
     });
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
 
-    // gatewayRunner setup:
-    const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
-      logLevel,
-      emitContainerLogs: true,
-      configFilePath: files.configFilePath,
-      logsPath: files.logsPath,
-      ontologiesPath: files.ontologiesPath,
-      networkName: testNetwork,
-      url: gatewayAddress,
+    const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
+    const besuNetworkOptions = besuEnv.createBesuConfig();
+
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+    const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity,
+      ccConfig: {
+        bridgeConfig: [ethereumNetworkOptions, besuNetworkOptions],
+      },
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
+      pluginRegistry: new PluginRegistry({
+        plugins: [],
+      }),
+      ontologyPath: ontologiesPath,
     };
+    gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+    await gateway.onPluginInit();
 
-    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
-    log.debug("starting gatewayRunner...");
-    await gatewayRunner.start(true);
-    log.debug("gatewayRunner started sucessfully");
+    const identity = gateway.Identity;
+    // default servers
+    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.gatewayOapiPort).toBe(4010);
+    expect(identity.address).toBe("http://localhost");
+
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
 
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner.getOApiHost()}`,
-      }),
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
@@ -548,9 +565,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
         reqApproveBesuAddress.data.approveAddress,
         "100",
       );
-    } else {
-      throw new Error("Approve address is undefined");
     }
+
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
@@ -569,9 +585,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const satpApi = new TransactionApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner.getOApiHost()}`,
-      }),
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const req = getTransactRequest(
@@ -601,7 +615,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       besuEnv.getTestContractName(),
       besuEnv.getTestContractAddress(),
       besuEnv.getTestContractAbi(),
-      besuEnv.getBridgeEthAccount(),
+      besuEnv.getTestOwnerAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
@@ -626,5 +640,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+
+    await gateway.shutdown();
   });
 });

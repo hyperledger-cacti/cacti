@@ -669,7 +669,7 @@ export class Stage3ClientService extends SATPService {
   }
 
   async burnAsset(session: SATPSession): Promise<void> {
-    const stepTag = `lockAsset()`;
+    const stepTag = `burnAsset()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
     if (session == undefined) {
