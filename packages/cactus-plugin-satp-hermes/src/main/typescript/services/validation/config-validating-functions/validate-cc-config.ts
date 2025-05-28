@@ -160,8 +160,12 @@ export function validateCCConfig(opts: {
   }
 
   if (
-    !NetworkOptionsJSONArray(opts.configValue.bridgeConfig) &&
-    !NetworkOptionsJSONArray(opts.configValue.oracleConfig)
+    "bridgeConfig" in opts.configValue &&
+    "oracleConfig" in opts.configValue &&
+    !(
+      NetworkOptionsJSONArray(opts.configValue.bridgeConfig) &&
+      NetworkOptionsJSONArray(opts.configValue.oracleConfig)
+    )
   ) {
     throw new TypeError(
       "Invalid config.bridgesConfig && config.oracleConfig: " +
