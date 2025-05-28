@@ -337,39 +337,33 @@ paths:
         - admin
       summary: Audit transactions
       description: Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
-      operationId: GetAudit
+      operationId: PerformAudit
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit
       parameters:
-        - name: auditStartDate
+        - name: startTimestamp
           in: query
-          description: The start date for the audit period.
+          description: The start timestamp for the audit period.
           required: false
           schema:
-            type: string
-            format: date-time
-        - name: auditEndDate
+            type: integer
+            format: int64
+        - name: endTimestamp
           in: query
-          description: The end date for the audit period.
+          description: The end timestamp for the audit period.
           required: false
           schema:
-            type: string
-            format: date-time
-        - name: includeProofs
-          in: query
-          description: Include proofs generated from each gateway transaction.
-          required: false
-          schema:
-            type: boolean
+            type: integer
+            format: int64
       responses:
         '200':
           description: Audit results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAuditResponse'
+                $ref: '#/components/schemas/AuditResponse'
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:
