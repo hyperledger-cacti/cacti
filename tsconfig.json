@@ -149,9 +149,6 @@
       "path": "./examples/cactus-common-example-server/tsconfig.json"
     },
     {
-      "path": "./examples/cactus-example-cbdc-bridging-backend/tsconfig.json"
-    },
-    {
       "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"
     },
     {
@@ -170,9 +167,6 @@
       "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-satp-hermes/tsconfig.json"
-    },
-    {
       "path": "./examples/cactus-example-electricity-trade/tsconfig.json"
     },
     {
@@ -183,6 +177,12 @@
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-satp-hermes/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-cbdc-bridging-backend/tsconfig.json"
     },
     {
       "path": "./extensions/cactus-plugin-htlc-coordinator-besu/tsconfig.json"
