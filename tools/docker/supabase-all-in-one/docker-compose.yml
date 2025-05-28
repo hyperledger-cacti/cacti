@@ -12,4 +12,3 @@ services:
       - "3000:3000" # Supabase Studio
       - "8000:8000" # Supabase API
       - "5432:5432" # Postgres
-    network_mode: host
