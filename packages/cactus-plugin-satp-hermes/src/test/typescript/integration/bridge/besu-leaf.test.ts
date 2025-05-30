@@ -27,7 +27,7 @@ let besuEnv: BesuTestEnvironment;
 const TIMEOUT = 60000;
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

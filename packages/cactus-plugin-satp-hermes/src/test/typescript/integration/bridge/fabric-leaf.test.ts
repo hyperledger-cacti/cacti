@@ -31,7 +31,7 @@ let fabricEnv: FabricTestEnvironment;
 const TIMEOUT = 900000; // 15 minutes
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

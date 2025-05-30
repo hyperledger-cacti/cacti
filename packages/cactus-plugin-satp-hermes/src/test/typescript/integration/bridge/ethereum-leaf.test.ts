@@ -28,7 +28,7 @@ let ethereumEnv: EthereumTestEnvironment;
 const TIMEOUT = 60000;
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -60,6 +60,13 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await ethereumEnv.tearDown();
+
+  await ethereumLeaf.shutdownConnection().catch((err) => {
+    log.error("Error shutting down Ethereum Leaf connector:", err);
+    fail("Error shutting down Ethereum Leaf connector");
+  });
+
+  log.info("Ethereum Leaf connector shutdown successfully");
 
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
