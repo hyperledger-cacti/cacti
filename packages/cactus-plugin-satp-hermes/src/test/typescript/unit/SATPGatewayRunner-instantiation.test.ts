@@ -1,0 +1,97 @@
+import "jest-extended";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import {
+  ISATPGatewayRunnerConstructorOptions,
+  pruneDockerAllIfGithubAction,
+  SATPGatewayRunner,
+} from "@hyperledger/cactus-test-tooling";
+import {
+  DEFAULT_PORT_GATEWAY_OAPI,
+  DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_SERVER,
+  SATP_ARCHITECTURE_VERSION,
+  SATP_CORE_VERSION,
+  SATP_CRASH_VERSION,
+} from "../../../main/typescript/core/constants";
+import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
+import { setupGatewayDockerFiles } from "../test-utils";
+import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../constants";
+
+const logLevel: LogLevelDesc = "DEBUG";
+
+describe("Instantiate SATP Gateway Runner", () => {
+  let gatewayRunner: SATPGatewayRunner;
+  const address: Address = `http://localhost`;
+
+  // gateway setup:
+  const gatewayIdentity = {
+    id: "mockID",
+    name: "CustomGateway",
+    version: [
+      {
+        Core: SATP_CORE_VERSION,
+        Architecture: SATP_ARCHITECTURE_VERSION,
+        Crash: SATP_CRASH_VERSION,
+      },
+    ],
+    proofID: "mockProofID10",
+    address,
+    gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+    gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+    gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+  } as GatewayIdentity;
+
+  const files = setupGatewayDockerFiles({
+    gatewayIdentity,
+    logLevel,
+    counterPartyGateways: [], //only knows itself
+    enableCrashRecovery: false, // Crash recovery disabled
+  });
+
+  const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
+    containerImageVersion: DOCKER_IMAGE_VERSION,
+    containerImageName: DOCKER_IMAGE_NAME,
+    serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+    clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+    oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+    logLevel,
+    emitContainerLogs: true,
+    configFilePath: files.configFilePath,
+    logsPath: files.logsPath,
+    ontologiesPath: files.ontologiesPath,
+  };
+
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).toResolve();
+  });
+
+  afterAll(async () => {
+    await gatewayRunner.stop();
+    await gatewayRunner.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
+  });
+
+  test("Instantiate SATP Gateway Runner", async () => {
+    gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
+
+    await gatewayRunner.start();
+    expect(gatewayRunner).toBeTruthy();
+    expect(gatewayRunner.getContainer()).toBeTruthy();
+
+    const serverHost = await gatewayRunner.getServerHost();
+    expect(serverHost).toBeTruthy();
+    expect(serverHost).toMatch(/^http:\/\/localhost:\d+$/);
+    console.log(serverHost);
+
+    const clientHost = await gatewayRunner.getClientHost();
+    expect(clientHost).toBeTruthy();
+    expect(clientHost).toMatch(/^http:\/\/localhost:\d+$/);
+    console.log(clientHost);
+
+    const apiHost = await gatewayRunner.getOApiHost();
+    expect(apiHost).toBeTruthy();
+    expect(apiHost).toMatch(/^http:\/\/localhost:\d+$/);
+    console.log(apiHost);
+  });
+});

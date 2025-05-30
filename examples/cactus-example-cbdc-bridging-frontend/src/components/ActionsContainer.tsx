@@ -1,72 +1,42 @@
 import { useState, useEffect } from "react";
-import { styled } from '@mui/material/styles';
-import Button, { ButtonProps } from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
 import MintDialog from "./dialogs/MintDialog";
+import CrossChainTransferDialog from "./dialogs/CrossChainTransferDialog";
 import TransferDialog from "./dialogs/TransferDialog";
-import EscrowDialog from "./dialogs/EscrowDialog";
-import BridgeOutDialog from "./dialogs/BridgeOutDialog";
-import BridgeBackDialog from "./dialogs/BridgeBackDialog";
-import { getFabricBalance } from "../api-calls/fabric-api";
-import { getBesuBalance } from "../api-calls/besu-api";
-import { AssetReference } from "../models/AssetReference";
-
-const NormalButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  margin: "auto",
-  width: "100%",
-  fontSize: "13px",
-  textTransform: "none",
-  background: "#2B9BF6",
-  color: "#FFFFFF",
-  border: "0.5px solid #000000",
-  '&:disabled': {
-    border: "0",
-  },
-}));
-
-const CriticalButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  margin: "auto",
-  width: "100%",
-  fontSize: "13px",
-  textTransform: "none",
-  background: "#FF584B",
-  color: "#FFFFFF",
-  border: "0.5px solid #000000",
-  "&:hover": {
-    backgroundColor: "#444444",
-    color: "#FFFFFF",
-  },
-  '&:disabled': {
-    border: "0",
-  },
-}));
+import ApprovalDialog from "./dialogs/ApprovalDialog";
+import { getBalance } from "../api-calls/ledgers-api";
+import { SessionReference } from "@hyperledger/cactus-example-cbdc-bridging-backend/src/main/typescript/types";
+import { NormalButton } from "./buttons/NormalButton";
+import { CriticalButton } from "./buttons/CriticalButton";
 
 export interface IActionsContainerOptions {
-    user: string;
-    ledger: string;
-    assetRefs: Array<AssetReference>
+  path: string;
+  user: string;
+  ledger: string;
+  sessionRefs: Array<SessionReference>;
+  tokensApproved: number;
 }
 
 export default function ActionsContainer(props: IActionsContainerOptions) {
   const [amount, setAmount] = useState(0);
   const [mintDialog, setMintDialog] = useState(false);
   const [transferDialog, setTransferDialog] = useState(false);
-  const [escrowDialog, setEscrowDialog] = useState(false);
-  const [bridgeOutDialog, setBridgeOutDialog] = useState(false);
-  const [bridgeBackDialog, setBridgeBackDialog] = useState(false);
+  const [, setErrorMessage] = useState<string>("");
+  const [crossChainTransferDialog, setCrossChainTransferDialog] =
+    useState(false);
+  const [approvalDialog, setGiveApprovalDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      let response;
-      if (props.ledger === "Fabric") {
-        response = await getFabricBalance(props.user);
-        setAmount(response);
-      } else if (props.ledger === "Besu") {
-        response = await getBesuBalance(props.user);
-        setAmount(response);
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        setErrorMessage("Invalid ledger");
+        return;
       }
+      const response = await getBalance(props.path, props.ledger, props.user);
+      setAmount(response);
       setLoading(false);
     }
 
@@ -75,32 +45,48 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
   }, [props.user, props.ledger]);
 
   return (
-    <div>
+    <Paper
+      elevation={0}
+      sx={{
+        background: "#EAEAEA",
+        padding: "0.5rem 1.1rem 1.1rem 1.1rem",
+      }}
+    >
       {loading ? (
         <center>
-          <CircularProgress  sx={{
-            marginTop: "1rem",
-          }}/>
+          <CircularProgress
+            sx={{
+              marginTop: "1rem",
+            }}
+          />
         </center>
       ) : (
         <Grid container spacing={1}>
-          <Grid item lg={5} sx={{
-            textAlign: "left",
-            fontSize: "17px",
-            marginBottom: "0.2rem",
-          }}>
+          <Grid
+            item
+            lg={5}
+            sx={{
+              textAlign: "left",
+              fontSize: "17px",
+              marginBottom: "0.2rem",
+            }}
+          >
             <span>{props.user}</span>
           </Grid>
           <Grid item lg={1} />
-          <Grid item lg={6} sx={{
-            textAlign: "right",
-            fontSize: "17px",
-            marginBottom: "0.2rem",
-          }}>
+          <Grid
+            item
+            lg={6}
+            sx={{
+              textAlign: "right",
+              fontSize: "17px",
+              marginBottom: "0.2rem",
+            }}
+          >
             <span>{amount} CBDC</span>
           </Grid>
 
-          {props.user !== "Bridge" && props.ledger !== "Besu" && (
+          {props.user !== "Bridge" && (
             <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
@@ -111,24 +97,13 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             </Grid>
           )}
           {props.user === "Bridge" ? (
-            <Grid item xs={12} lg={12}>
-              <NormalButton
-                variant="contained"
-                fullWidth
-                disabled={amount === 0}
-                onClick={() => setTransferDialog(true)}
-            
-              >
-                Transfer
-              </NormalButton>
-            </Grid>
+            <Grid item xs={12} lg={12}></Grid>
           ) : props.ledger === "Besu" ? (
-            <Grid item xs={12} lg={12}>
+            <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
-                disabled={amount === 0}
+                disabled={amount <= 0}
                 onClick={() => setTransferDialog(true)}
-            
               >
                 Transfer
               </NormalButton>
@@ -137,9 +112,8 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <Grid item xs={12} lg={6}>
               <NormalButton
                 variant="contained"
-                disabled={amount === 0}
+                disabled={amount <= 0}
                 onClick={() => setTransferDialog(true)}
-            
               >
                 Transfer
               </NormalButton>
@@ -149,74 +123,63 @@ export default function ActionsContainer(props: IActionsContainerOptions) {
             <Grid item xs={12} lg={6}>
               <CriticalButton
                 variant="contained"
-                disabled={amount === 0}
-                onClick={() => setEscrowDialog(true)}
-            
+                disabled={amount <= 0}
+                onClick={() => setGiveApprovalDialog(true)}
               >
-                Escrow
+                Approval
+              </CriticalButton>
+            </Grid>
+          )}
+          {props.user !== "Bridge" && (
+            <Grid item xs={12} lg={6}>
+              <CriticalButton
+                variant="contained"
+                disabled={amount <= 0 || props.tokensApproved == 0}
+                onClick={() => setCrossChainTransferDialog(true)}
+              >
+                Bridge
               </CriticalButton>
             </Grid>
           )}
           {props.ledger === "Fabric" && props.user !== "Bridge" && (
-            <Grid item xs={12} lg={6}>
-              <CriticalButton
-                variant="contained"
-                disabled={
-                  props.assetRefs.filter(
-                    (asset) => asset.recipient === props.user,
-                  ).length === 0
-                }
-                onClick={() => setBridgeOutDialog(true)}
-              >
-                Bridge Out
-              </CriticalButton>
-            </Grid>
+            <Grid item xs={12} lg={6}></Grid>
           )}
           {props.ledger === "Besu" && props.user !== "Bridge" && (
-            <Grid item xs={12} lg={6}>
-              <CriticalButton
-                variant="contained"
-                disabled={
-                  props.assetRefs.filter(
-                    (asset) => asset.recipient === props.user,
-                  ).length === 0
-                }
-                onClick={() => setBridgeBackDialog(true)}
-            
-              >
-                Bridge Back
-              </CriticalButton>
-            </Grid>
+            <Grid item xs={12} lg={6}></Grid>
           )}
         </Grid>
       )}
       <MintDialog
+        path={props.path}
         open={mintDialog}
         user={props.user}
+        ledger={props.ledger}
         onClose={() => setMintDialog(false)}
       />
       <TransferDialog
+        path={props.path}
         open={transferDialog}
         user={props.user}
         ledger={props.ledger}
+        balance={amount}
         onClose={() => setTransferDialog(false)}
       />
-      <EscrowDialog
-        open={escrowDialog}
+      <CrossChainTransferDialog
+        path={props.path}
+        open={crossChainTransferDialog}
         user={props.user}
         ledger={props.ledger}
-        onClose={() => setEscrowDialog(false)}
+        tokensApproved={props.tokensApproved}
+        onClose={() => setCrossChainTransferDialog(false)}
       />
-      <BridgeOutDialog
-        open={bridgeOutDialog}
+      <ApprovalDialog
+        path={props.path}
+        open={approvalDialog}
         user={props.user}
-        onClose={() => setBridgeOutDialog(false)}
+        ledger={props.ledger}
+        balance={amount}
+        onClose={() => setGiveApprovalDialog(false)}
       />
-      <BridgeBackDialog
-        open={bridgeBackDialog}
-        user={props.user}
-        onClose={() => setBridgeBackDialog(false)}
-      />
-    </div>
+    </Paper>
   );
 }
