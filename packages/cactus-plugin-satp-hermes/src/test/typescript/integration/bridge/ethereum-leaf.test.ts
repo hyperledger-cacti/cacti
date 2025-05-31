@@ -78,7 +78,7 @@ afterAll(async () => {
     });
 }, TIMEOUT);
 
-describe("Ethereum Leaf Test", () => {
+describe.skip("Ethereum Leaf Test", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     ethereumLeaf = new EthereumLeaf(

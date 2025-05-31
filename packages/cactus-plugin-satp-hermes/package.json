@@ -99,7 +99,7 @@
         "pretsc": "npm run generate-sdk",
         "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
         "test:integration:gateway": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/gateway --runInBand --forceExit",
-        "test:integration:bridge": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/bridge --runInBand --forceExit",
+        "test:integration:bridge": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/bridge --runInBand --forceExit --detectOpenHandles",
         "test:integration:oracle": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/oracle --runInBand --forceExit",
         "test:unit": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/unit --runInBand --forceExit",
         "tsc": "tsc --project ./tsconfig.json",

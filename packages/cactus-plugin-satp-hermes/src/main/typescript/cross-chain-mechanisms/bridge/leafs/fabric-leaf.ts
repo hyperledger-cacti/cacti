@@ -1193,6 +1193,20 @@ export class FabricLeaf
     }
   }
 
+  public async shutdownConnection(): Promise<void> {
+    try {
+      await this.connector.shutdown();
+      this.log.debug(
+        `${FabricLeaf.CLASS_NAME}#shutdownConnection, Connector shutdown successfully`,
+      );
+    } catch (error) {
+      this.log.error(
+        `${FabricLeaf.CLASS_NAME}#shutdownConnection, Error shutting down connector: ${error}`,
+      );
+      throw error;
+    }
+  }
+
   private isFullPluginOptions = (
     obj: Partial<IPluginLedgerConnectorFabricOptions>,
   ): obj is IPluginLedgerConnectorFabricOptions => {
