@@ -22,7 +22,7 @@ type GetOracleTaskStatus200Response struct {
 	// The unique identifier of the task.
 	TaskID *string `json:"taskID,omitempty"`
 	// The type of the Oracle task.
-	Type Enum `json:"type"`
+	Type string `json:"type"`
 	SrcNetworkId *TransactRequestSourceAssetNetworkId `json:"srcNetworkId,omitempty"`
 	SrcContract ExecuteOracleTask200ResponseSrcContract `json:"srcContract"`
 	DstNetworkId *TransactRequestSourceAssetNetworkId `json:"dstNetworkId,omitempty"`
@@ -32,7 +32,7 @@ type GetOracleTaskStatus200Response struct {
 	// The list of operations performed by the Oracle task.
 	Operations []ExecuteOracleTask200ResponseOperationsInner `json:"operations"`
 	// The current status of the Oracle task.
-	Status Enum `json:"status"`
+	Status string `json:"status"`
 	// The mode of operation for registered tasks.
 	Mode string `json:"mode"`
 	// The interval for polling in milliseconds. Only if taskMode is POLLING.
@@ -43,7 +43,7 @@ type GetOracleTaskStatus200Response struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetOracleTaskStatus200Response(type_ Enum, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status Enum, mode string) *GetOracleTaskStatus200Response {
+func NewGetOracleTaskStatus200Response(type_ string, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status string, mode string) *GetOracleTaskStatus200Response {
 	this := GetOracleTaskStatus200Response{}
 	this.Type = type_
 	this.SrcContract = srcContract
@@ -96,9 +96,9 @@ func (o *GetOracleTaskStatus200Response) SetTaskID(v string) {
 }
 
 // GetType returns the Type field value
-func (o *GetOracleTaskStatus200Response) GetType() Enum {
+func (o *GetOracleTaskStatus200Response) GetType() string {
 	if o == nil {
-		var ret Enum
+		var ret string
 		return ret
 	}
 
@@ -107,7 +107,7 @@ func (o *GetOracleTaskStatus200Response) GetType() Enum {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *GetOracleTaskStatus200Response) GetTypeOk() (*Enum, bool) {
+func (o *GetOracleTaskStatus200Response) GetTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -115,7 +115,7 @@ func (o *GetOracleTaskStatus200Response) GetTypeOk() (*Enum, bool) {
 }
 
 // SetType sets field value
-func (o *GetOracleTaskStatus200Response) SetType(v Enum) {
+func (o *GetOracleTaskStatus200Response) SetType(v string) {
 	o.Type = v
 }
 
@@ -280,9 +280,9 @@ func (o *GetOracleTaskStatus200Response) SetOperations(v []ExecuteOracleTask200R
 }
 
 // GetStatus returns the Status field value
-func (o *GetOracleTaskStatus200Response) GetStatus() Enum {
+func (o *GetOracleTaskStatus200Response) GetStatus() string {
 	if o == nil {
-		var ret Enum
+		var ret string
 		return ret
 	}
 
@@ -291,7 +291,7 @@ func (o *GetOracleTaskStatus200Response) GetStatus() Enum {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *GetOracleTaskStatus200Response) GetStatusOk() (*Enum, bool) {
+func (o *GetOracleTaskStatus200Response) GetStatusOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -299,7 +299,7 @@ func (o *GetOracleTaskStatus200Response) GetStatusOk() (*Enum, bool) {
 }
 
 // SetStatus sets field value
-func (o *GetOracleTaskStatus200Response) SetStatus(v Enum) {
+func (o *GetOracleTaskStatus200Response) SetStatus(v string) {
 	o.Status = v
 }
 

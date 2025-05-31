@@ -39,39 +39,9 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-  {
-    const erc20TokenContract = "SATPContract";
-
-    const ontologiesPath = path.join(__dirname, "../../../ontologies");
-
-    ontologyManager = new OntologyManager({
-      logLevel,
-      ontologiesPath: ontologiesPath,
-    });
-
-    fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-      claimFormat: ClaimFormat.DEFAULT,
-    });
-    log.info("Fabric Ledger started successfully");
-
-    await fabricEnv.deployAndSetupContracts();
-
-    await fabricEnv.mintTokens("100");
-  }
 }, TIMEOUT);
 
 afterAll(async () => {
-  await fabricEnv.tearDown();
-
-  await fabricLeaf.shutdownConnection().catch((err) => {
-    log.error("Error shutting down Fabric Leaf connector:", err);
-    fail("Error shutting down Fabric Leaf connector");
-  });
-
-  log.info("Ethereum Leaf connector shutdown successfully");
-
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -82,30 +52,69 @@ afterAll(async () => {
     });
 }, TIMEOUT);
 
-describe.skip("Fabric Bridge Test", () => {
-  jest.setTimeout(20000);
+beforeEach(async () => {
+  const erc20TokenContract = "SATPContract";
+
+  const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+  ontologyManager = new OntologyManager({
+    logLevel,
+    ontologiesPath: ontologiesPath,
+  });
+
+  fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+    contractName: erc20TokenContract,
+    logLevel,
+    claimFormat: ClaimFormat.DEFAULT,
+  });
+  log.info("Fabric Ledger started successfully");
+
+  await fabricEnv.deployAndSetupContracts();
+
+  await fabricEnv.mintTokens("100");
+
+  log.info("Starting a new test case");
+  fabricLeaf = new FabricLeaf(
+    fabricEnv.createFabricLeafConfig(ontologyManager, "DEBUG"),
+  );
+});
+
+afterEach(async () => {
+  await fabricEnv.tearDown();
+
+  await fabricLeaf.shutdownConnection().catch((err) => {
+    log.error("Error shutting down Fabric Leaf connector:", err);
+    fail("Error shutting down Fabric Leaf connector");
+  });
+
+  log.info("Fabric Leaf connector shutdown successfully");
+});
+
+describe("Fabric Bridge Test", () => {
+  jest.setTimeout(TIMEOUT);
+  jest.setTimeout(TIMEOUT);
   it("Should Initialize the bridge", async () => {
-    fabricLeaf = new FabricLeaf(
-      fabricEnv.createFabricLeafConfig(ontologyManager, "DEBUG"),
-    );
     expect(fabricLeaf).toBeDefined();
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await fabricLeaf.deployContracts();
     expect(fabricLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
   });
-  it("Should return the wrapper contract name", async () => {
+  /*
+  it.skip("Should return the wrapper contract name", async () => {
+    await fabricLeaf.deployContracts();
     const wrapperContractName = fabricLeaf.getWrapperContract("FUNGIBLE");
     expect(wrapperContractName).toBeDefined();
-
+  });
+  it.skip("Should Wrap a token", async () => {
+  it.skip("Should Wrap a token", async () => {
+    await fabricLeaf.deployContracts();
     await fabricEnv.giveRoleToBridge(fabricEnv.getBridgeMSPID());
 
     await fabricEnv.approveAmount(
       await fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
       "100",
     );
-  });
-  it("Should Wrap a token", async () => {
     asset = {
       id: fabricEnv.defaultAsset.id,
       referenceId: fabricEnv.defaultAsset.referenceId,
@@ -149,8 +158,9 @@ describe.skip("Fabric Bridge Test", () => {
     expect(response3.contractName).toBe(asset.contractName);
     expect(response3.channelName).toBe(asset.channelName);
   });
-
-  it("Should Lock a token", async () => {
+  //Stopped here
+  it.skip("Should Lock a token", async () => {
+  it.skip("Should Lock a token", async () => {
     const responseLock = await fabricLeaf.lockAsset(asset.id, 100);
     expect(responseLock).toBeDefined();
     expect(responseLock.transactionId).toBeDefined();
@@ -192,7 +202,8 @@ describe.skip("Fabric Bridge Test", () => {
     log.info("Amount was transfer correctly from the Owner account");
   });
 
-  it("Should Unlock a token", async () => {
+  it.skip("Should Unlock a token", async () => {
+  it.skip("Should Unlock a token", async () => {
     const responseUnlock = await fabricLeaf.unlockAsset(asset.id, 100);
 
     expect(responseUnlock).toBeDefined();
@@ -234,7 +245,8 @@ describe.skip("Fabric Bridge Test", () => {
     log.info("Amount was transfer correctly to the Owner account");
   });
 
-  it("Should Burn a token", async () => {
+  it.skip("Should Burn a token", async () => {
+  it.skip("Should Burn a token", async () => {
     await fabricEnv.approveAmount(
       fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
       "100",
@@ -285,7 +297,8 @@ describe.skip("Fabric Bridge Test", () => {
     log.info("Amount was burned correctly from the Bridge account");
   });
 
-  it("Should Mint a token", async () => {
+  it.skip("Should Mint a token", async () => {
+  it.skip("Should Mint a token", async () => {
     const responseMint = await fabricLeaf.mintAsset(asset.id, 100);
     expect(responseMint).toBeDefined();
     expect(responseMint.transactionId).toBeDefined();
@@ -316,7 +329,8 @@ describe.skip("Fabric Bridge Test", () => {
     log.info("Amount was minted correctly to the Bridge account");
   });
 
-  it("Should Assign a token", async () => {
+  it.skip("Should Assign a token", async () => {
+  it.skip("Should Assign a token", async () => {
     const responseAssign = await fabricLeaf.assignAsset(
       asset.id,
       asset.owner,
@@ -358,7 +372,8 @@ describe.skip("Fabric Bridge Test", () => {
     log.info("Amount was assigned correctly to the Owner account");
   });
 
-  it("Should Unwrap a token", async () => {
+  it.skip("Should Unwrap a token", async () => {
+  it.skip("Should Unwrap a token", async () => {
     const responseUnwrap = await fabricLeaf.unwrapAsset(asset.id);
     expect(responseUnwrap).not.toBeUndefined();
     expect(responseUnwrap.transactionId).not.toBeUndefined();
@@ -370,5 +385,5 @@ describe.skip("Fabric Bridge Test", () => {
     expect(response2).toBeDefined();
     expect(response2.length).toBe(0);
     log.info("Unwrapped 100 tokens successfully");
-  });
+  });*/
 });

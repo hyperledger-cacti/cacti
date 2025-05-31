@@ -2305,7 +2305,7 @@ paths:
                     type: string
                     example: 000003e8-e0b8-21ee-ba00-325096b39f47
                   type:
-                    type: enum
+                    type: string
                     description: The type of the Oracle task.
                     enum:
                       - READ
@@ -2528,7 +2528,7 @@ paths:
                         - status
                         - timestamp
                   status:
-                    type: enum
+                    type: string
                     description: The current status of the Oracle task.
                     enum:
                       - ACTIVE
@@ -2546,7 +2546,7 @@ paths:
                     description: The interval for polling in milliseconds. Only if taskMode is POLLING.
                     example: 5000
                 required:
-                  - id
+                  - taskID
                   - type
                   - srcContract
                   - dstContract
@@ -2775,8 +2775,8 @@ paths:
                 type: object
                 properties:
                   taskID:
-                    description: The unique identifier of the task.
                     type: string
+                    description: Unique identifier (UUID) for the session.
                     example: 000003e8-e0b8-21ee-ba00-325096b39f47
                   status:
                     type: string
@@ -2820,11 +2820,11 @@ paths:
                 type: object
                 properties:
                   taskID:
-                    description: The unique identifier of the task.
                     type: string
+                    description: Unique identifier (UUID) for the session.
                     example: 000003e8-e0b8-21ee-ba00-325096b39f47
                   type:
-                    type: enum
+                    type: string
                     description: The type of the Oracle task.
                     enum:
                       - READ
@@ -3047,7 +3047,7 @@ paths:
                         - status
                         - timestamp
                   status:
-                    type: enum
+                    type: string
                     description: The current status of the Oracle task.
                     enum:
                       - ACTIVE
@@ -3065,7 +3065,7 @@ paths:
                     description: The interval for polling in milliseconds. Only if taskMode is POLLING.
                     example: 5000
                 required:
-                  - id
+                  - taskID
                   - type
                   - srcContract
                   - dstContract
@@ -6579,11 +6579,11 @@ components:
       description: 'Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature.'
       properties:
         taskID:
-          description: The unique identifier for the Oracle task.
           type: string
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
         type:
-          type: enum
+          type: string
           description: The type of the Oracle task.
           enum:
             - READ
@@ -6806,7 +6806,7 @@ components:
               - status
               - timestamp
         status:
-          type: enum
+          type: string
           description: The current status of the Oracle task.
           enum:
             - ACTIVE
@@ -6975,8 +6975,8 @@ components:
         - taskID
       properties:
         taskID:
-          description: The unique identifier of the task to be unregistered.
           type: string
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
     OracleStatusRequest:
       description: Request schema for checking the status of a data transfer task.
@@ -6985,16 +6985,16 @@ components:
         - taskID
       properties:
         taskID:
-          description: The unique identifier of the task.
           type: string
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
     OracleUnregisterResponse:
       description: Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
       type: object
       properties:
         taskID:
-          description: The unique identifier of the task.
           type: string
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
         status:
           type: string
@@ -7025,7 +7025,7 @@ components:
           type: string
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
         type:
-          type: enum
+          type: string
           description: The type of the Oracle task.
           enum:
             - READ
@@ -7248,7 +7248,7 @@ components:
               - status
               - timestamp
         status:
-          type: enum
+          type: string
           description: The current status of the Oracle task.
           enum:
             - ACTIVE
@@ -7266,7 +7266,7 @@ components:
           description: The interval for polling in milliseconds. Only if taskMode is POLLING.
           example: 5000
       required:
-        - id
+        - taskID
         - type
         - srcContract
         - dstContract
@@ -7279,11 +7279,11 @@ components:
       type: object
       properties:
         taskID:
-          description: The unique identifier of the task.
           type: string
+          description: Unique identifier (UUID) for the session.
           example: 000003e8-e0b8-21ee-ba00-325096b39f47
         type:
-          type: enum
+          type: string
           description: The type of the Oracle task.
           enum:
             - READ
@@ -7506,7 +7506,7 @@ components:
               - status
               - timestamp
         status:
-          type: enum
+          type: string
           description: The current status of the Oracle task.
           enum:
             - ACTIVE
@@ -7524,7 +7524,7 @@ components:
           description: The interval for polling in milliseconds. Only if taskMode is POLLING.
           example: 5000
       required:
-        - id
+        - taskID
         - type
         - srcContract
         - dstContract

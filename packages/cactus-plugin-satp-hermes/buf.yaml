@@ -1,4 +1,6 @@
 version: v2
+modules:
+  - path: src/main/proto
 lint:
   use:
     - STANDARD
@@ -9,7 +11,6 @@ lint:
   rpc_allow_google_protobuf_empty_requests: true
   rpc_allow_google_protobuf_empty_responses: true
   service_suffix: Service
-
 breaking:
   use:
     - FILE
