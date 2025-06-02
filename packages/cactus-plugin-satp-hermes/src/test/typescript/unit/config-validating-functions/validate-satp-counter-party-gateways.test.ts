@@ -34,11 +34,10 @@ describe("validateSatpCounterPartyGateways", () => {
       gatewayServerPort: 3010,
       gatewayClientPort: 3011,
     } as GatewayIdentity;
-    expect(() =>
-      validateSatpCounterPartyGateways({
-        configValue: [validGatewayIdentity],
-      }),
-    ).not.toThrow();
+    const result = validateSatpCounterPartyGateways({
+      configValue: [validGatewayIdentity],
+    });
+    expect(result).toEqual([validGatewayIdentity]);
   });
 
   it("should throw if input is not an array", () => {
@@ -68,6 +67,40 @@ describe("validateSatpCounterPartyGateways", () => {
       validateSatpCounterPartyGateways({
         configValue: validGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.counterPartyGateways: ${JSON.stringify(validGatewayIdentity)}`,
+    );
+  });
+
+  it("should throw if input is not a valid GatewayIdentity", () => {
+    const validGatewayIdentity = {
+      id: "mockID-1",
+      name: "CustomGateway1",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: "EthereumLedgerTestNetwork",
+          ledgerType: "ETHEREUM",
+        },
+      ],
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+      gatewayOapiPort: 4010,
+      gatewayServerPort: "3010",
+      gatewayClientPort: 3011,
+    };
+    expect(() =>
+      validateSatpCounterPartyGateways({
+        configValue: [validGatewayIdentity],
+      }),
+    ).toThrowError(
+      `Invalid config.counterPartyGateways: ${JSON.stringify([validGatewayIdentity])}`,
+    );
   });
 });

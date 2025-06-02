@@ -3,86 +3,88 @@ import { validateSatpMergePolicies } from "../../../../main/typescript/services/
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import { MergePolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/src/main/typescript/generated/openapi/typescript-axios/api";
 
-/*export interface IMergePolicyValue {
-  policy: MergePolicyOpts;
-  policyHash?: string;
-}*/
 describe("validateSatpMergePolicies", () => {
   it("should pass with a valid array", () => {
     let mergePolicyValue = {
       policy: MergePolicyOpts.NONE,
       policyHash: "test",
     } as IMergePolicyValue;
-    expect(() =>
-      validateSatpMergePolicies({
-        configValue: [mergePolicyValue],
-      }),
-    ).not.toThrow();
+    let result = validateSatpMergePolicies({
+      configValue: [mergePolicyValue],
+    });
+    expect(result).toEqual([mergePolicyValue]);
 
     mergePolicyValue = {
       policy: MergePolicyOpts.PruneState,
       policyHash: "test",
     } as IMergePolicyValue;
-    expect(() =>
-      validateSatpMergePolicies({
-        configValue: [mergePolicyValue],
-      }),
-    ).not.toThrow();
+    result = validateSatpMergePolicies({
+      configValue: [mergePolicyValue],
+    });
+    expect(result).toEqual([mergePolicyValue]);
 
     mergePolicyValue = {
       policy: MergePolicyOpts.PruneStateFromView,
       policyHash: "test",
     } as IMergePolicyValue;
-    expect(() =>
-      validateSatpMergePolicies({
-        configValue: [mergePolicyValue],
-      }),
-    ).not.toThrow();
+    result = validateSatpMergePolicies({
+      configValue: [mergePolicyValue],
+    });
+    expect(result).toEqual([mergePolicyValue]);
 
     mergePolicyValue = {
       policy: MergePolicyOpts.PruneStateFromView,
     } as IMergePolicyValue;
-    expect(() =>
-      validateSatpMergePolicies({
-        configValue: [mergePolicyValue],
-      }),
-    ).not.toThrow();
+    result = validateSatpMergePolicies({
+      configValue: [mergePolicyValue],
+    });
+    expect(result).toEqual([mergePolicyValue]);
   });
 
   it("should throw when input is not an array", () => {
+    const iMergePolicyValue = {
+      policy: MergePolicyOpts.NONE,
+      policyHash: "test",
+    } as IMergePolicyValue;
     expect(() =>
       validateSatpMergePolicies({
-        configValue: {
-          policy: MergePolicyOpts.NONE,
-          policyHash: "test",
-        } as IMergePolicyValue,
+        configValue: iMergePolicyValue,
       }),
-    ).toThrow();
+    ).toThrowError(`Invalid config.mergePolicies: ${iMergePolicyValue}.`);
   });
 
   it("should throw when array contains a non-string policyHash", () => {
+    const input = [
+      {
+        policy: MergePolicyOpts.NONE,
+        policyHash: 123,
+      },
+    ];
     expect(() =>
       validateSatpMergePolicies({
-        configValue: [
-          {
-            policy: MergePolicyOpts.NONE,
-            policyHash: 123,
-          },
-        ],
+        configValue: input,
       }),
-    ).toThrow();
+    ).toThrowError(`Invalid config.mergePolicies: ${input}.`);
   });
 
   it("should throw when array contains a policy that is not a MergePolicyOpts", () => {
+    const input = [
+      {
+        policy: "MergePolicyOpts",
+        policyHash: "test",
+      },
+    ];
     expect(() =>
       validateSatpMergePolicies({
-        configValue: [
-          {
-            policy: "MergePolicyOpts",
-            policyHash: "test",
-          },
-        ],
+        configValue: input,
       }),
-    ).toThrow();
+    ).toThrowError(`Invalid config.mergePolicies: ${input}.`);
+  });
+
+  it("should throw when the configValue is a non object", () => {
+    const result = validateSatpMergePolicies({
+      configValue: undefined,
+    });
+    expect(result).toEqual([]);
   });
 });

@@ -3,19 +3,17 @@ import { validateSatpEnableCrashRecovery } from "../../../../main/typescript/ser
 
 describe("validateSatpEnableCrashRecovery", () => {
   it("should pass when flag is true", () => {
-    expect(() =>
-      validateSatpEnableCrashRecovery({
-        configValue: true,
-      }),
-    ).not.toThrow();
+    const result = validateSatpEnableCrashRecovery({
+      configValue: true,
+    });
+    expect(result).toEqual(true);
   });
 
   it("should pass when flag is false", () => {
-    expect(() =>
-      validateSatpEnableCrashRecovery({
-        configValue: false,
-      }),
-    ).not.toThrow();
+    const result = validateSatpEnableCrashRecovery({
+      configValue: false,
+    });
+    expect(result).toEqual(false);
   });
 
   it("should throw when flag is a string", () => {
@@ -23,7 +21,9 @@ describe("validateSatpEnableCrashRecovery", () => {
       validateSatpEnableCrashRecovery({
         configValue: "true",
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.enableCrashRecovery: ${"true"}. Expected a boolean`,
+    );
   });
 
   it("should throw when flag is a number", () => {
@@ -31,7 +31,9 @@ describe("validateSatpEnableCrashRecovery", () => {
       validateSatpEnableCrashRecovery({
         configValue: 1,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.enableCrashRecovery: ${1}. Expected a boolean`,
+    );
   });
 
   it("should throw when flag is null", () => {
@@ -39,7 +41,9 @@ describe("validateSatpEnableCrashRecovery", () => {
       validateSatpEnableCrashRecovery({
         configValue: null,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.enableCrashRecovery: ${null}. Expected a boolean`,
+    );
   });
 
   it("should throw when flag is undefined", () => {
@@ -54,6 +58,8 @@ describe("validateSatpEnableCrashRecovery", () => {
       validateSatpEnableCrashRecovery({
         configValue: {},
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.enableCrashRecovery: [object Object]. Expected a boolean`,
+    );
   });
 });
