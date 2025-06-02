@@ -27,5 +27,16 @@ export function validateSatpKeyPairJSON(opts: {
       `Invalid config.keyPair: ${JSON.stringify(opts.configValue)}. Expected a keyPair object with 'publicKey' and 'privateKey' string fields.`,
     );
   }
+
+  const { publicKey, privateKey } = opts.configValue;
+
+  const isValidHex = (str: string) =>
+    typeof str === "string" && /^0x[0-9a-fA-F]+$/.test(str) && str.length >= 10;
+
+  if (!isValidHex(publicKey) || !isValidHex(privateKey)) {
+    throw new TypeError(
+      `Invalid config.keyPair values: ${JSON.stringify(opts.configValue)}. 'publicKey' and 'privateKey' must be valid hex strings (e.g. starting with 0x and containing only hex digits).`,
+    );
+  }
   return opts.configValue as KeyPairJSON;
 }
