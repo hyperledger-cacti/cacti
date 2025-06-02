@@ -1,0 +1,104 @@
+<div class="payment-list-container">
+  <h2>Blockchain Payment Transactions</h2>
+
+  <div class="actions">
+    <button
+      class="refresh-btn"
+      (click)="refreshPayments()"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-sync-alt"></i> Refresh from Blockchain
+    </button>
+  </div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading payment transactions from blockchain...</p>
+  </div>
+
+  <div class="error-container" *ngIf="error">
+    <p class="error-message">{{ error }}</p>
+    <button class="retry-btn" (click)="refreshPayments()">Retry</button>
+  </div>
+
+  <div
+    class="empty-state"
+    *ngIf="!isLoading && !error && payments.length === 0"
+  >
+    <p>No payment transactions found on the blockchain.</p>
+  </div>
+
+  <div class="mock-data-notice" *ngIf="isUsingMockData">
+    <p>
+      <i class="fas fa-info-circle"></i>
+      Showing sample payment data. Could not connect to blockchain.
+      <button class="retry-btn" (click)="refreshPayments()">Try Again</button>
+    </p>
+  </div>
+
+  <div
+    class="data-source-indicator"
+    *ngIf="payments.length > 0 && !isUsingMockData"
+  >
+    <p>
+      <i class="fas fa-database"></i>
+      Data source: <span class="source-type">{{ dataSource }}</span>
+      <span class="transaction-count"
+        >({{ payments.length }} transactions found)</span
+      >
+    </p>
+  </div>
+
+  <div class="payment-list" *ngIf="!isLoading && !error && payments.length > 0">
+    <div class="payment-table-header">
+      <div class="header-item date-column">Transaction Date</div>
+      <div class="header-item product-column">Details</div>
+      <div class="header-item amount-column">ETH Amount</div>
+      <div class="header-item status-column">Status</div>
+      <div class="header-item tx-column">Transaction Hash</div>
+    </div>
+
+    <div
+      class="payment-item"
+      *ngFor="let payment of payments"
+      (click)="viewPayment(payment)"
+    >
+      <div class="item-cell date-column">
+        {{ formatDate(payment.timestamp) }}
+      </div>
+      <div class="item-cell product-column">
+        <div class="product-name">{{ payment.productType }}</div>
+        <div class="product-id">ID: {{ payment.productId }}</div>
+        <div class="address-info" *ngIf="payment.payer">
+          <span class="address-label">From:</span>
+          <span class="address-value"
+            >{{ payment.payer | slice: 0 : 10 }}...</span
+          >
+        </div>
+      </div>
+      <div class="item-cell amount-column">{{ payment.amount }} ETH</div>
+      <div class="item-cell status-column">
+        <span class="status-badge" [ngClass]="getStatusClass(payment.status)">
+          {{ payment.status | titlecase }}
+        </span>
+      </div>
+      <div class="item-cell tx-column">
+        <a
+          [href]="
+            'https://sepolia.etherscan.io/tx/' + payment.transactionReference
+          "
+          target="_blank"
+          class="tx-hash"
+          [title]="payment.transactionReference || 'No transaction hash'"
+          (click)="$event.stopPropagation()"
+        >
+          {{
+            payment.transactionReference
+              ? (payment.transactionReference | slice: 0 : 10) + "..."
+              : "N/A"
+          }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

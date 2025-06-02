@@ -2,10 +2,8 @@ import { Component, Input } from "@angular/core";
 
 @Component({
   selector: "app-page-heading",
-  templateUrl: "page-heading.component.html",
-  styleUrls: [],
+  templateUrl: "./page-heading.component.html",
 })
 export class PageHeadingComponent {
-  @Input()
-  public pageTitle: string;
+  @Input() title: string = "";
 }

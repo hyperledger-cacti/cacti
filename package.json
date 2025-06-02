@@ -326,5 +326,20 @@
       "built": false
     }
   },
-  "packageManager": "yarn@4.3.1"
+  "packageManager": "yarn@4.3.1",
+  "dependencies": {
+    "@angular/animations": "17.3.0",
+    "@angular/cdk": "17.3.0",
+    "@angular/common": "17.3.11",
+    "@angular/core": "17.3.11",
+    "@angular/forms": "17.3.11",
+    "@angular/material": "17.3.0",
+    "@angular/platform-browser": "17.3.11",
+    "@angular/platform-browser-dynamic": "17.3.11",
+    "@angular/router": "17.3.11",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "workspace:^",
+    "@metamask/detect-provider": "^2.0.0",
+    "ether": "^0.0.9",
+    "ethers": "6.13.5"
+  }
 }

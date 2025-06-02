@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bamboo Harvest Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Bamboo Harvest #{{ bambooHarvest?.id }}</ion-card-title>
+      <ion-card-subtitle>Harvest Information</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list lines="full">
+        <ion-item>
+          <ion-label>
+            <strong>ID:</strong>
+            <p>{{ bambooHarvest?.id }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <strong>Harvester:</strong>
+            <p>{{ bambooHarvest?.harvester }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <strong>Location:</strong>
+            <p>{{ bambooHarvest?.location }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <strong>Started:</strong>
+            <p>{{ bambooHarvest?.startedAt | date: "medium" }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <strong>Ended:</strong>
+            <p>{{ bambooHarvest?.endedAt | date: "medium" }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item *ngIf="bambooHarvest?.status">
+          <ion-label>
+            <strong>Status:</strong>
+            <p
+              [style.color]="
+                bambooHarvest?.status === 'SOLD' ? 'green' : 'blue'
+              "
+            >
+              {{ bambooHarvest?.status }}
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="ion-padding ion-text-center">
+    <ion-button fill="outline" color="medium" (click)="dismiss()">
+      Close
+    </ion-button>
+  </div>
+</ion-content>

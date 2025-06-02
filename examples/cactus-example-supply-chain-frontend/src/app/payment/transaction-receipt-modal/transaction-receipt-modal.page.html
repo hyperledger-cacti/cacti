@@ -1,0 +1,65 @@
+<ion-header class="dark-header">
+  <ion-toolbar color="dark">
+    <ion-title>Transaction Receipt</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="dark-content">
+  <div class="transaction-modal-container">
+    <app-transaction-receipt
+      [txHash]="txHash"
+      [productId]="productId"
+      [productType]="productType"
+    >
+    </app-transaction-receipt>
+  </div>
+</ion-content>
+
+<style>
+  /* Force dark theme for the modal */
+  :host {
+    --ion-background-color: #121212;
+    --ion-text-color: #ffffff;
+    --ion-toolbar-background: #1e1e1e;
+    --ion-toolbar-color: #ffffff;
+    color: #ffffff;
+    background-color: #121212;
+  }
+
+  .dark-header ion-toolbar {
+    --background: #1e1e1e;
+    --color: #ffffff;
+  }
+
+  .dark-content {
+    --background: #121212;
+    --color: #ffffff;
+  }
+
+  .transaction-modal-container {
+    padding: 12px;
+    max-width: 100%;
+    overflow-x: hidden;
+    background-color: #121212;
+    color: #ffffff;
+  }
+
+  /* Remove any unwanted text */
+  ::ng-deep .transaction-receipt::before,
+  ::ng-deep .transaction-modal-container::before,
+  ::ng-deep .stepper-container::before,
+  ::ng-deep .dark-theme::before,
+  ::ng-deep .custom-stepper::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  ion-content::part(scroll) {
+    padding-bottom: 24px;
+  }
+</style>
