@@ -15,7 +15,7 @@ import {
   FullBlockTransactionEndorsementV1,
   FullBlockTransactionEventV1,
 } from "../generated/openapi/typescript-axios";
-import { fabricLongToNumber } from "../common/utils";
+import { FabricLong, fabricLongToNumber } from "../common/utils";
 
 const level = "INFO";
 const label = "cacti-block-formatters";
@@ -64,7 +64,9 @@ export function formatCactiFullBlockResponse(
       JSON.stringify(blockEvent),
     );
   }
-  const blockNumber = header ? fabricLongToNumber(header.number) : -1;
+  const blockNumber = header
+    ? fabricLongToNumber(header.number as unknown as FabricLong)
+    : -1;
   const blockHash =
     "0x" + Buffer.from(blockEvent.header?.data_hash ?? "").toString("hex");
   const previousBlockHash =

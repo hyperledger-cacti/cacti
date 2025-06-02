@@ -62,7 +62,7 @@
     "spellcheck": "cspell lint --no-progress \"*/*/src/**/*.{js,ts}\"",
     "tsc": "NODE_OPTIONS=\"--max_old_space_size=3072\" tsc --build --verbose",
     "codegen": "run-s 'codegen:warmup-*' codegen:lerna codegen:cleanup",
-    "codegen:cleanup": "rm --force --verbose ./openapitools.json",
+    "codegen:cleanup": "rm -f -v ./openapitools.json",
     "codegen:lerna": "lerna run codegen",
     "codegen:warmup-bundle": "yarn tools:bundle-open-api-tpl-files",
     "codegen:warmup-cleancodegendir": "node tools/clear-openapi-codegen-folders.js",
