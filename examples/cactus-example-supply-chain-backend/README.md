@@ -113,3 +113,159 @@ LOG_LEVEL=INFO
 ```
 
 This approach keeps sensitive information like API keys, private keys, and contract addresses out of the codebase. The application will check for these required environment variables at startup.
+
+## Cross-Chain Functionality
+
+This example demonstrates Hyperledger Cactus's powerful cross-chain capabilities, particularly in the context of a supply chain application for bamboo harvesting. Key features include:
+
+### Role-Based Access Control via Ethereum
+
+- User authentication leverages Sepolia(Ethereum) wallet signatures
+- The RoleManager smart contract on Ethereum Sepolia manages roles (manufacturer, customer)
+- Users' Sepolia(Ethereum) wallet addresses are mapped to corresponding Fabric identities
+
+### Supply Chain Data Management via Hyperledger Fabric
+
+- Bamboo harvest data is stored on a Hyperledger Fabric network
+- Different access levels are maintained for public and private data
+- Manufacturers can insert and view detailed records
+- Customers can view only basic public information
+
+### Cross-Chain Integration
+
+- Ethereum handles authentication and role verification
+- Fabric manages the actual supply chain data
+- Cactus connectors provide seamless integration between chains
+- Role verification on Ethereum determines access permissions for Fabric operations
+
+### Data Linking Features
+
+- Manufacturers can link private data records with public data
+- Support for private notes visible only to authorized parties
+- Enhanced traceability while maintaining privacy where needed
+
+This implementation showcases how Hyperledger Cactus enables different ledgers to work together, leveraging the strengths of each platform while providing a unified interface for applications.
+
+## Component Documentation
+
+### Backend Endpoints
+
+#### Manufacturer Data Management
+
+##### InsertManufacturerDataEndpoint
+
+Located at `examples/cactus-example-supply-chain-business-logic-plugin/src/main/typescript/business-logic-plugin/web-services/insert-manufacturer-data-endpoint.ts`
+
+This endpoint allows manufacturers to insert product data into the supply chain. Key features:
+
+- **Authentication**: Uses Sepolia(Ethereum) wallet signatures for secure identity verification
+- **Role Verification**: Checks if the sender has manufacturer privileges using RoleManager smart contract
+- **Cross-Chain Logic**: Stores data on Hyperledger Fabric after verifying permissions on Ethereum
+- **Data Privacy**: Manages both public data (visible to all) and private data (visible only to manufacturers)
+- **Connector Integration**: Leverages Cactus connectors for Ethereum and Fabric
+
+##### ListManufacturerDataEndpoint
+
+Located at `examples/cactus-example-supply-chain-business-logic-plugin/src/main/typescript/business-logic-plugin/web-services/list-manufacturer-data-endpoint.ts`
+
+This endpoint allows users to fetch manufacturer data from the supply chain with role-based access control:
+
+- **Role-Based Data Access**: Different data visibility based on user role (manufacturer vs. customer)
+- **Authentication**: Secure wallet signature verification
+- **Enhanced Record Handling**: Support for retrieving both basic and detailed records
+- **MSP Management**: Maps Ethereum identities to appropriate Fabric MSP IDs
+- **Error Handling**: Comprehensive error handling with detailed feedback
+
+#### Payment Processing
+
+##### ProcessPaymentEndpoint
+
+Located at `examples/cactus-example-supply-chain-business-logic-plugin/src/main/typescript/business-logic-plugin/web-services/process-payment-endpoint.ts`
+
+This endpoint enables payment processing across different chains:
+
+- **Transaction Verification**: Verifies payment transactions using signature validation
+- **Cross-Chain Status Updates**: Updates product status on Fabric after payment on Ethereum
+- **Reference Management**: Maintains transaction references for tracking across chains
+- **Security**: Ensures proper authentication and authorization for transactions
+- **Failure Handling**: Robust error handling for failed transactions
+
+### Frontend Modules
+
+#### Role Manager Module
+
+Located at `examples/cactus-example-supply-chain-frontend/src/app/role-manager/`
+
+This Angular module manages user roles across the application:
+
+- **Role Assignment**: Interface for admins to assign manufacturer/customer roles
+- **Role Verification**: Checks user roles for proper UI rendering and access control
+- **Smart Contract Integration**: Communicates with RoleManager contract on Ethereum
+- **Identity Mapping**: Maps Ethereum wallet addresses to Fabric identities
+- **UI Components**: User interface for role management (add/remove roles)
+
+#### Payment Module
+
+Located at `examples/cactus-example-supply-chain-frontend/src/app/payment/`
+
+This Angular module handles all payment-related functionality:
+
+- **Payment List**: View and manage payment records
+- **Payment Detail**: View detailed information about specific payments
+- **Transaction Receipt**: Display transaction receipts after payments
+- **Transaction Receipt Modal**: Interactive modal for payment confirmation
+- **Smart Contract Integration**: Interacts with Payment contract on Ethereum
+- **Status Tracking**: Monitors payment status and updates UI accordingly
+
+#### Manufacturer Data Module
+
+Located at `examples/cactus-example-supply-chain-frontend/src/app/manufacturer-data/`
+
+This Angular module manages manufacturer product data:
+
+- **Manufacturer Data List**: View all manufacturer products
+- **Manufacturer Data Detail**: View and edit detailed product information
+- **Access Control**: Shows different data based on user role
+- **Data Validation**: Validates manufacturer data before submission
+- **Integration**: Communicates with backend endpoints for data operations
+
+### Frontend Services
+
+#### PaymentService
+
+Located at `examples/cactus-example-supply-chain-frontend/src/app/common/services/payment.service.ts`
+
+This service handles all payment-related operations:
+
+- **Payment Creation**: Create new payment records on the blockchain
+- **Payment Processing**: Process payments with Ethereum transactions
+- **Status Management**: Track and update payment status
+- **Product Status Updates**: Update product status after successful payments
+- **Cross-Chain Coordination**: Ensure consistent state across Ethereum and Fabric
+- **Transaction History**: Track and display transaction history
+- **Error Handling**: Comprehensive error handling for payment operations
+
+#### WalletService
+
+Located at `examples/cactus-example-supply-chain-frontend/src/app/common/services/wallet.service.ts`
+
+This service manages wallet connections and authentication:
+
+- **Wallet Connection**: Connect/disconnect to Ethereum wallets (MetaMask)
+- **Signature Management**: Sign messages for authentication
+- **Role Checking**: Verify user roles (manufacturer, customer, admin)
+- **Header Generation**: Generate authentication headers for API calls
+- **Smart Contract Integration**: Initialize and interact with role management contracts
+- **Event Handling**: Manage wallet events and state changes
+- **Security**: Ensure secure authentication flow with signature verification
+
+#### AuthConfig
+
+Located at `examples/cactus-example-supply-chain-frontend/src/app/common/auth-config.ts`
+
+This service manages authentication configuration:
+
+- **Token Management**: Store and manage authentication tokens
+- **Role Verification**: Provide methods to check user roles
+- **Configuration**: Central configuration for authentication-related settings
+- **JWT Handling**: Process JWT payloads for user information
