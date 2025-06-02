@@ -4,11 +4,10 @@ import { validateInstanceId } from "../../../../main/typescript/services/validat
 describe("Validate Instance Id", () => {
   it("should pass with a valid UUID", () => {
     const instanceId = "123e4567-e89b-12d3-a456-426614174000";
-    expect(() =>
-      validateInstanceId({
-        configValue: instanceId,
-      }),
-    ).not.toThrow();
+    const result = validateInstanceId({
+      configValue: instanceId,
+    });
+    expect(result).toEqual(instanceId);
   });
 
   it("should throw for a non-string ID", () => {
@@ -17,13 +16,15 @@ describe("Validate Instance Id", () => {
       validateInstanceId({
         configValue: invalidId,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.instanceId: ${invalidId}. Expected a string.`,
+    );
   });
 
-  /*it("should throw for an empty string", () => {
-        const invalidId = "";
-        expect(() => validateInstanceId({
-            configValue: invalidId,
-        })).toThrow();
-    });*/
+  it("should throw for an empty string", () => {
+    const result = validateInstanceId({
+      configValue: "",
+    });
+    expect(result).toEqual(undefined);
+  });
 });

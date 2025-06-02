@@ -9,57 +9,65 @@ describe("validateSatpPrivacyPolicies", () => {
       policy: PrivacyPolicyOpts.PruneState,
       policyHash: "test",
     } as IPrivacyPolicyValue;
-    expect(() =>
-      validateSatpPrivacyPolicies({
-        configValue: [iPrivacyPolicyValue],
-      }),
-    ).not.toThrow();
+    let result = validateSatpPrivacyPolicies({
+      configValue: [iPrivacyPolicyValue],
+    });
+    expect(result).toEqual([iPrivacyPolicyValue]);
 
     iPrivacyPolicyValue = {
       policy: PrivacyPolicyOpts.SingleTransaction,
       policyHash: "test",
     } as IPrivacyPolicyValue;
-    expect(() =>
-      validateSatpPrivacyPolicies({
-        configValue: [iPrivacyPolicyValue],
-      }),
-    ).not.toThrow();
+    result = validateSatpPrivacyPolicies({
+      configValue: [iPrivacyPolicyValue],
+    });
+    expect(result).toEqual([iPrivacyPolicyValue]);
   });
 
   it("should throw when input is not an array", () => {
+    const iPrivacyPolicyValue = {
+      policy: PrivacyPolicyOpts.PruneState,
+      policyHash: "test",
+    } as IPrivacyPolicyValue;
     expect(() =>
       validateSatpPrivacyPolicies({
-        configValue: {
-          policy: PrivacyPolicyOpts.PruneState,
-          policyHash: "test",
-        } as IPrivacyPolicyValue,
+        configValue: iPrivacyPolicyValue,
       }),
-    ).toThrow();
+    ).toThrowError(`Invalid config.privacyPolicies: ${iPrivacyPolicyValue}.`);
   });
 
   it("should throw when array contains a non-string policyHash", () => {
+    const iPrivacyPolicyValue = [
+      {
+        policy: PrivacyPolicyOpts.PruneState,
+        policyHash: 123,
+      },
+    ];
     expect(() =>
       validateSatpPrivacyPolicies({
-        configValue: [
-          {
-            policy: PrivacyPolicyOpts.PruneState,
-            policyHash: 123,
-          },
-        ],
+        configValue: iPrivacyPolicyValue,
       }),
-    ).toThrow();
+    ).toThrowError(`Invalid config.privacyPolicies: ${iPrivacyPolicyValue}.`);
   });
 
   it("should throw when array contains a policy that is not a PrivacyPolicyOpts", () => {
+    const iPrivacyPolicyValue = [
+      {
+        policy: "PrivacyPolicyOpts",
+        policyHash: "test",
+      },
+    ];
     expect(() =>
       validateSatpPrivacyPolicies({
-        configValue: [
-          {
-            policy: "PrivacyPolicyOpts",
-            policyHash: "test",
-          },
-        ],
+        configValue: iPrivacyPolicyValue,
       }),
-    ).toThrow();
+    ).toThrowError(`Invalid config.privacyPolicies: ${iPrivacyPolicyValue}.`);
+  });
+
+  it("should pass with an array", () => {
+    const result = validateSatpPrivacyPolicies({
+      configValue: undefined,
+    });
+    expect(result).toEqual([]);
   });
 });
