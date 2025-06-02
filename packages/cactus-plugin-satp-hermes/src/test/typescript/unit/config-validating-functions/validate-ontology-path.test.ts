@@ -1,31 +1,48 @@
 import "jest-extended";
+import path from "path";
 import { validateOntologyPath } from "../../../../main/typescript/services/validation/config-validating-functions/validate-ontology-path";
 
 describe("validateOntologyPath", () => {
-  it("should pass when path exists and is a file", () => {
-    const validPath = "/valid/path.ttl";
+  it("should pass when the path exists and is a file", () => {
+    const validPath = path.resolve(
+      __dirname,
+      "../../../../test/ontologies/ontology-satp-erc20-interact-besu.json",
+    );
+    const result = validateOntologyPath({
+      configValue: validPath,
+    });
+    expect(result).toEqual(validPath);
+  });
+
+  it("should fail when the path does not exist or is not a file", () => {
+    const invalidPath = "/invalid/path.ttl";
     expect(() =>
       validateOntologyPath({
-        configValue: validPath,
+        configValue: invalidPath,
       }),
-    ).not.toThrow();
+    ).toThrowError(
+      `Invalid config.ontologyPath: ${invalidPath}. File does not exist or is not a file.`,
+    );
   });
 
   it("should throw if path is not a string", () => {
-    const validPath = 123;
+    const inValidPath = 123;
     expect(() =>
       validateOntologyPath({
-        configValue: validPath,
+        configValue: inValidPath,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.ontologyPath: ${JSON.stringify(
+        inValidPath,
+      )}. Expected a string.`,
+    );
   });
 
-  /*it("should throw if path is an empty string", () => {
-    const validPath = "";
-    expect(() =>
-      validateOntologyPath({
-        configValue: validPath,
-      }),
-    ).toThrow();
-  });*/
+  it("should throw if path is an empty string", () => {
+    const inValidPath = "";
+    const result = validateOntologyPath({
+      configValue: inValidPath,
+    });
+    expect(result).toEqual(undefined);
+  });
 });

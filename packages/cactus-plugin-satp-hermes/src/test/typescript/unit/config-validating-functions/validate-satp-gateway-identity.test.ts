@@ -36,15 +36,14 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayClientPort: 3011,
       gatewayUIPort: 3012,
     } as GatewayIdentity;
-    expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
-      }),
-    ).not.toThrow();
+    const result = validateSatpGatewayIdentity({
+      configValue: validGatewayIdentity,
+    });
+    expect(result).toEqual(validGatewayIdentity);
   });
 
   it("should throw if the Gateway Id is not a string", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: 123,
       name: "CustomGateway1",
       version: [
@@ -70,13 +69,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if is missing the Gateway Id", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       name: "CustomGateway1",
       version: [
         {
@@ -101,13 +102,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if is missing the Gateway version", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
       connectedDLTs: [
@@ -126,13 +129,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if the Gateway version is not a array", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
       version: {
@@ -156,13 +161,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if the Gateway DraftVersions is not a string", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
       version: [
@@ -188,13 +195,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if the Gateway connectedDLTs is not a array", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
       version: [
@@ -218,13 +227,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if the Gateway connectedDLTs Id is not a string", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
       version: [
@@ -250,13 +261,15 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 
   it("should throw if the Gateway connectedDLTs ledgerType is not a LedgerType", () => {
-    const validGatewayIdentity = {
+    const invalidGatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
       version: [
@@ -282,8 +295,10 @@ describe("validateSatpGatewayIdentity", () => {
     };
     expect(() =>
       validateSatpGatewayIdentity({
-        configValue: validGatewayIdentity,
+        configValue: invalidGatewayIdentity,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
+    );
   });
 });

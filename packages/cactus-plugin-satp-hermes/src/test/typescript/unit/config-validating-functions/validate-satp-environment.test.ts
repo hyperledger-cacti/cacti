@@ -3,19 +3,17 @@ import { validateSatpEnvironment } from "../../../../main/typescript/services/va
 
 describe("validateSatpEnvironment", () => {
   it("should pass with valid environment 'development'", () => {
-    expect(() =>
-      validateSatpEnvironment({
-        configValue: "development",
-      }),
-    ).not.toThrow();
+    const result = validateSatpEnvironment({
+      configValue: "development",
+    });
+    expect(result).toEqual("development");
   });
 
   it("should pass with valid environment 'production'", () => {
-    expect(() =>
-      validateSatpEnvironment({
-        configValue: "production",
-      }),
-    ).not.toThrow();
+    const result = validateSatpEnvironment({
+      configValue: "production",
+    });
+    expect(result).toEqual("production");
   });
 
   it("should throw with invalid string", () => {
@@ -23,14 +21,16 @@ describe("validateSatpEnvironment", () => {
       validateSatpEnvironment({
         configValue: "staging",
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.environment: ${"staging"}. Expected "development" or "production"`,
+    );
   });
 
   it("should throw with empty string", () => {
     const result = validateSatpEnvironment({
       configValue: "",
     });
-    expect(result).toBe("development");
+    expect(result).toEqual("development");
   });
 
   it("should throw with non-string input (number)", () => {
@@ -38,7 +38,9 @@ describe("validateSatpEnvironment", () => {
       validateSatpEnvironment({
         configValue: 123,
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.environment: ${123}. Expected "development" or "production"`,
+    );
   });
 
   it("should throw with non-string input (object)", () => {
@@ -46,7 +48,9 @@ describe("validateSatpEnvironment", () => {
       validateSatpEnvironment({
         configValue: {},
       }),
-    ).toThrow();
+    ).toThrowError(
+      `Invalid config.environment: [object Object]. Expected "development" or "production"`,
+    );
   });
 
   it("should throw with null", () => {
