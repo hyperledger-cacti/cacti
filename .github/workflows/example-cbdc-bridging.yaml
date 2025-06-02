@@ -196,7 +196,7 @@ jobs:
       - run: git status --porcelain | wc -l
 
       - name: yarn lint
-        run: yarn workspace @hyperledger/examples/cactus-example-cbdc-bridging-backend lint
+        run: yarn workspace @hyperledger/cacti-example-cbdc-bridging-frontend lint && yarn workspace @hyperledger/cacti-example-cbdc-bridging-backend
       
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
@@ -284,9 +284,10 @@ jobs:
       
       - name: Configure
         run: yarn configure
-
-      - name: Build bundle
-        run: yarn lerna run build:bundle --scope=@hyperledger/examples/cactus-example-cbdc-bridging-backend
+      - name: Build bundle - backend
+        run: yarn lerna run build:bundle --scope=@hyperledger/cacti-example-cbdc-bridging-backend
+      - name: Build bundle - frontend
+        run: yarn lerna run build:bundle --scope=@hyperledger/cacti-example-cbdc-bridging-frontend
 
   run-cbdc-tests-unit:
     needs: build
