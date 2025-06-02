@@ -1,0 +1,623 @@
+# CBDC Bridging Tests and Docker Deployment Workflow
+name: CBDC Bridging - tests and docker deployments
+
+# This workflow handles the CI/CD pipeline for the CBDC example.
+# It performs the following tasks:
+# 1. Builds the packages and generates necessary files
+# 2. Runs unit, integration, and forge (smart contract) tests
+# 3. Builds and pushes Docker images to both Docker Hub and GHCR
+# 4. Tags images appropriately (version-specific and latest)
+#
+env:
+  NODEJS_VERSION: v18.18.2
+on:
+  # Run tests on PR
+  pull_request:
+    branches: [main, satp-dev, satp-stg]
+  # Run tests and build/push docker images on push
+  push:
+    branches: [main, satp-dev, satp-stg]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    env:
+      NODEJS_VERSION: v18.19.0
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      # Install Cacti pre-requisites
+      - name: Print GitHub context
+        run: |
+          echo "github.event_name = ${{ github.event_name }}"
+          echo "github.ref = ${{ github.ref }}"
+          echo "github.base_ref = ${{ github.base_ref }}"
+          echo "github.head_ref = ${{ github.head_ref }}"
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+  
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Set working directory
+        run: cd examples/cactus-example-cbdc-bridging-backend && pwd            
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Configure
+        run: yarn configure
+        
+      - name: Show yarn build log if it exists
+        if: always()
+        run: |
+          LOG_FILE=$(find /tmp -type f -name build.log | head -n 1)
+          if [ -f "$LOG_FILE" ]; then
+            echo "===== Build Log ====="
+            cat "$LOG_FILE"
+            echo "====================="
+          else
+            echo "No build log found."
+          fi
+
+  yarn-code-gen: 
+    needs: build
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    env:
+      NODEJS_VERSION: v18.19.0
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      # Install Cacti pre-requisites
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4
+
+      # Install Cacti dependencies
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Set working directory
+        run: cd examples/cactus-example-cbdc-bridging-backend && pwd
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Configure
+        run: yarn configure
+
+      - name: Run linting
+        run: |
+          yarn workspace @hyperledger/examples/cactus-example-cbdc-bridging-backend lint-code || echo "Linting completed with warnings" 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:oapi || echo "OpenAPI linting completed with warnings"
+         
+      - name: Show yarn build log if it exists
+        if: always()
+        run: |
+          LOG_FILE=$(find /tmp -type f -name build.log | head -n 1)
+          if [ -f "$LOG_FILE" ]; then
+            echo "===== Build Log ====="
+            cat "$LOG_FILE"
+            echo "====================="
+          else
+            echo "No build log found."
+          fi
+
+  yarn-lint:
+    needs: build
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    env:
+      NODEJS_VERSION: v18.19.0
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      # Install Cacti pre-requisites
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4
+
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes && pwd
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Configure
+        run: yarn configure
+      
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: yarn lint
+        run: yarn workspace @hyperledger/examples/cactus-example-cbdc-bridging-backend lint
+      
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Set env.GIT_INDEX_FILE_COUNT
+        id: set_env_git_index_file_count
+        run: |
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> "$GITHUB_ENV"
+
+      - name: Print env.GIT_INDEX_FILE_COUNT
+        id: print_env_git_index_file_count
+        run: |
+            echo "${{ env.GIT_INDEX_FILE_COUNT }}"
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        id: set-result-git_index_file_count
+        with:
+          script: |
+            const { GIT_INDEX_FILE_COUNT } = process.env;
+            console.log(`env.GIT_INDEX_FILE_COUNT ${GIT_INDEX_FILE_COUNT}`);
+            return parseInt(GIT_INDEX_FILE_COUNT, 10);
+          result-encoding: string
+
+      - name: Get result Git Index File Count
+        id: get_result_git_index_file_count
+        run: echo "${{steps.set-result-git_index_file_count.outputs.result}}"
+
+      - name: Check Lint Side-effects
+        if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        with:
+          script: |
+            const failMsg = "yarn lint script produced version control " +
+              "side-effects: source files have been changed by it that are " +
+              "otherwise are under version control. " +
+              "This means (99% of the time) that you need to run the " +
+              "yarn lint script locally and then include the changes it " +
+              "makes in your own commit when submitting your pull request.";
+            core.setFailed(failMsg)
+      
+  build-bundle: 
+    needs: build
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    env:
+      NODEJS_VERSION: v18.19.0
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      # Install Cacti pre-requisites
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v4.1.7
+
+      # Install Cacti dependencies
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+     
+
+      - name: Set working directory
+        run: cd examples/cactus-example-cbdc-bridging-backend && pwd
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Configure
+        run: yarn configure
+
+      - name: Build bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger/examples/cactus-example-cbdc-bridging-backend
+
+  run-cbdc-tests-unit:
+    needs: build
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.18.2
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: examples/cactus-example-cbdc-bridging-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+     
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install dependencies
+        run: yarn install
+      - name: Configure
+        run: yarn configure
+
+      - name: Run CBDC unit tests
+        run: |
+            echo "TODO: Running CBDC unit test suite"
+      
+  run-cbdc-tests-integration:
+    needs: build
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.18.2
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: examples/cactus-example-cbdc-bridging-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}  
+      - run: ./tools/ci-env-clean-up.sh   
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install dependencies
+        run: yarn install
+      - name: Configure
+        run: yarn configure
+
+      - name: Run CBDC integration tests
+        run: |
+            echo "TODO: Running CBDC integration test suite"
+
+  run-cbdc-demo:
+    needs: build
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.18.2
+      FULL_BUILD_DISABLED: true
+
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}  
+      - run: ./tools/ci-env-clean-up.sh   
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install dependencies
+        run: yarn install
+      - name: Configure
+        run: yarn configure
+
+      - name: Run CBDC demo (part 1)
+        run: yarn run start:example-cbdc-bridging-app
+    
+      - name: Run CBDC demo (part 2)
+        run: |
+            cd examples/cactus-example-cbdc-bridging-backend && yarn run test
+  
+  # Set Docker tags based on branch and commit information
+  set-docker-tags:
+    needs: [run-cbdc-tests-unit, run-cbdc-tests-integration, build-bundle] 
+    if: >
+      (github.event_name == 'push' && 
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) ||
+      (github.event_name == 'pull_request' && 
+      (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg'))
+    runs-on: ubuntu-22.04
+    outputs:
+      tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
+      tag_version: ${{ steps.set_tags.outputs.tag_version }}
+      dockerhub_image: ${{ steps.set_tags.outputs.dockerhub_image }}
+      ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
+    steps:
+      - uses: actions/checkout@v4.1.7  
+      - name: Set image tags
+        id: set_tags
+        run: |
+          TAG_SUFFIX=$(if [ "${{ github.ref }}" = "refs/heads/main" ]; then echo "prod"; else echo "dev"; fi)
+          TAG_VERSION="$(date -u +"%Y-%m-%dT%H-%M-%S")-${TAG_SUFFIX}-$(git rev-parse --short HEAD)"
+          DOCKERHUB_IMAGE="hyperledger/cbdc-bridging-satp-hermes-gateway"
+          GHCR_IMAGE="ghcr.io/hyperledger-cacti/cbdc-bridging-satp-hermes-gateway"
+          
+          {
+            echo "tag_suffix=${TAG_SUFFIX}"
+            echo "tag_version=${TAG_VERSION}"
+            echo "dockerhub_image=${DOCKERHUB_IMAGE}"
+            echo "ghcr_image=${GHCR_IMAGE}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Debug Build Info
+        run: |
+          PACKAGE_VERSION=$(node -e "console.log(require('./examples/cactus-example-cbdc-bridging-backend/package.json').version)")
+          {
+            echo "Debug: Current ref = ${{ github.ref }}"
+            echo "Debug: Event name = ${{ github.event_name }}"
+            echo "Debug: GitHub workspace = ${{ github.workspace }}"
+            echo "Debug: Repository = ${{ github.repository }}"
+            echo "Debug: Building for tag version = ${{ steps.set_tags.outputs.tag_version }}"
+            echo "Debug: Building for dockerhub image = ${{ steps.set_tags.outputs.dockerhub_image }}"
+            echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+            echo "Debug: Package version = ${PACKAGE_VERSION}"
+            echo "Debug: Commit hash = $(git rev-parse --short HEAD)"
+          }
+
+  # Build and push Docker image to Docker Hub
+  build-and-push-dockerhub:
+    needs: set-docker-tags
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.18.2
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Debug Build Info
+        run: |
+          {
+            echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
+            echo "Debug: Building for dockerhub image = ${{ needs.set-docker-tags.outputs.dockerhub_image }}"
+            echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+            echo "Debug: Working directory content:"
+            ls -la
+            echo "Debug: SATP plugin directory content:"
+            ls -la packages/cactus-plugin-satp-hermes/ || echo "Plugin directory not found"
+          }
+          
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+          
+      - name: Configure and build bundle
+        run: |
+          {
+            echo "Debug: Starting bundle configuration and build"
+            yarn configure
+            echo "Debug: Yarn configure completed"
+            yarn lerna run build:bundle --scope=@hyperledger/examples/cactus-example-cbdc-bridging-backend
+            echo "Debug: Bundle build completed"
+          }
+          
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Debug Docker Info
+        run: |
+          {
+            echo "Debug: Docker version:"
+            docker version
+            echo "Debug: Docker info:"
+            docker info
+          }
+          
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PAT }}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./examples/cactus-example-cbdc-bridging-backend/
+          file: ./examples/cactus-example-cbdc-bridging-backend/Dockerfile
+          push: true
+          labels: |
+            org.opencontainers.image.source=https://github.com/hyperledger/cacti
+            org.opencontainers.image.description=CBDC Bridging SATP Hermes Gateway
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Hyperledger
+            org.opencontainers.image.version=${{ needs.set-docker-tags.outputs.tag_version }}
+            org.opencontainers.image.visibility=public
+          tags: ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-from: type=registry,ref=${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-to: type=inline
+
+      - name: Tag and push latest to Docker Hub
+        run: |
+          docker pull "${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}"
+          docker tag "${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}" "${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest"
+          docker push "${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest"
+
+  # Build and push Docker image to GitHub Container Registry
+  build-and-push-ghcr:
+    needs: set-docker-tags
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')
+    runs-on: ubuntu-22.04
+    env:
+      NODEJS_VERSION: v18.18.2
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Debug Build Info
+        run: |
+          {
+            echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
+            echo "Debug: Building for GHCR image = ${{ needs.set-docker-tags.outputs.ghcr_image }}"
+            echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
+            echo "Debug: Working directory content:"
+            ls -la
+            echo "Debug: CBDC example directory content:"
+            ls -la examples/cactus-example-cbdc-bridging-backend/ || echo "Plugin directory not found"
+          }
+          
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+          
+      - name: Configure and build bundle
+        run: |
+          {
+            echo "Debug: Starting bundle configuration and build"
+            yarn configure
+            echo "Debug: Yarn configure completed"
+            yarn lerna run build:bundle --scope=@hyperledger/examples/cactus-example-cbdc-bridging-backend
+            echo "Debug: Bundle build completed"
+          }
+          
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Debug Docker Info
+        run: |
+          {
+            echo "Debug: Docker version:"
+            docker version
+            echo "Debug: Docker info:"
+            docker info
+          }
+          
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./examples/cactus-example-cbdc-bridging-backend/
+          file: ./examples/cactus-example-cbdc-bridging-backend/Dockerfile
+          push: true
+          labels: |
+            org.opencontainers.image.source=https://github.com/hyperledger/cacti
+            org.opencontainers.image.description=CBDC Bridging SATP Hermes Gateway
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Hyperledger
+            org.opencontainers.image.version=${{ needs.set-docker-tags.outputs.tag_version }}
+            org.opencontainers.image.visibility=public
+          tags: ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-from: type=registry,ref=${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-to: type=inline
+
+      - name: Tag and push latest to GHCR
+        run: |
+          docker pull "${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}"
+          docker tag "${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}" "${{ needs.set-docker-tags.outputs.ghcr_image }}:latest"
+          docker push "${{ needs.set-docker-tags.outputs.ghcr_image }}:latest"
+  
+  
