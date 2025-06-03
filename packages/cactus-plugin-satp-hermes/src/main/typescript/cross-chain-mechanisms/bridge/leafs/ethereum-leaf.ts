@@ -825,10 +825,17 @@ export class EthereumLeaf
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#assignAsset`;
 
-    if (typeof assetAtt)
-    this.log.debug(
-      `${fnTag}, Assigning Asset: ${assetId} amount: ${assetAttribute} to: ${to}`,
-    );
+    if (typeof assetAttribute === "number") {
+      this.log.debug(
+        `${fnTag}, Assigning Asset: ${assetId} amount: ${assetAttribute} to: ${to}`,
+      );
+    } else if (typeof assetAttribute === "string") {
+      this.log.debug(
+        `${fnTag}, Assigning Asset: ${assetId} generated from: ${assetAttribute} to: ${to}`,
+      );
+    } else {
+      throw new Error("Unique asset attribute is of an unexpected type");
+    }
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);

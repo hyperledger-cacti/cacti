@@ -49,7 +49,7 @@ export abstract class BridgeLeafNonFungible {
   public abstract assignAsset(
     assetId: string,
     to: string,
-    uniqueDescriptor: string
+    uniqueDescriptor: string,
   ): Promise<TransactionResponse>;
 
   public abstract runTransaction(
