@@ -340,7 +340,7 @@ No authorization required
 
 ## PerformAudit
 
-> PerformAudit200Response PerformAudit(ctx).StartTimestamp(startTimestamp).EndTimestamp(endTimestamp).IncludeProofs(includeProofs).Execute()
+> PerformAudit200Response PerformAudit(ctx).StartTimestamp(startTimestamp).EndTimestamp(endTimestamp).Execute()
 
 Audit transactions
 
@@ -361,11 +361,10 @@ import (
 func main() {
     startTimestamp := int64(789) // int64 | The start timestamp for the audit period. (optional)
     endTimestamp := int64(789) // int64 | The end timestamp for the audit period. (optional)
-    includeProofs := true // bool | Include proofs generated from each gateway transaction. Defaults to false. (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.PerformAudit(context.Background()).StartTimestamp(startTimestamp).EndTimestamp(endTimestamp).IncludeProofs(includeProofs).Execute()
+    resp, r, err := apiClient.AdminApi.PerformAudit(context.Background()).StartTimestamp(startTimestamp).EndTimestamp(endTimestamp).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.PerformAudit``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -388,7 +387,6 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **startTimestamp** | **int64** | The start timestamp for the audit period. | 
  **endTimestamp** | **int64** | The end timestamp for the audit period. | 
- **includeProofs** | **bool** | Include proofs generated from each gateway transaction. Defaults to false. | 
 
 ### Return type
 
