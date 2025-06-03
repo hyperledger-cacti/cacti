@@ -3053,7 +3053,7 @@
                       "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
                     },
                     "type": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The type of the Oracle task.",
                       "enum": [
                         "READ",
@@ -3358,7 +3358,7 @@
                       }
                     },
                     "status": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The current status of the Oracle task.",
                       "enum": [
                         "ACTIVE",
@@ -3382,7 +3382,7 @@
                     }
                   },
                   "required": [
-                    "id",
+                    "taskID",
                     "type",
                     "srcContract",
                     "dstContract",
@@ -3705,8 +3705,8 @@
                   "type": "object",
                   "properties": {
                     "taskID": {
-                      "description": "The unique identifier of the task.",
                       "type": "string",
+                      "description": "Unique identifier (UUID) for the session.",
                       "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
                     },
                     "status": {
@@ -3771,12 +3771,12 @@
                   "type": "object",
                   "properties": {
                     "taskID": {
-                      "description": "The unique identifier of the task.",
                       "type": "string",
+                      "description": "Unique identifier (UUID) for the session.",
                       "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
                     },
                     "type": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The type of the Oracle task.",
                       "enum": [
                         "READ",
@@ -4081,7 +4081,7 @@
                       }
                     },
                     "status": {
-                      "type": "enum",
+                      "type": "string",
                       "description": "The current status of the Oracle task.",
                       "enum": [
                         "ACTIVE",
@@ -4105,7 +4105,7 @@
                     }
                   },
                   "required": [
-                    "id",
+                    "taskID",
                     "type",
                     "srcContract",
                     "dstContract",
@@ -8702,12 +8702,12 @@
         "description": "Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature.",
         "properties": {
           "taskID": {
-            "description": "The unique identifier for the Oracle task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "type": {
-            "type": "enum",
+            "type": "string",
             "description": "The type of the Oracle task.",
             "enum": [
               "READ",
@@ -9012,7 +9012,7 @@
             }
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "description": "The current status of the Oracle task.",
             "enum": [
               "ACTIVE",
@@ -9238,8 +9238,8 @@
         ],
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task to be unregistered.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           }
         }
@@ -9252,8 +9252,8 @@
         ],
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           }
         }
@@ -9263,8 +9263,8 @@
         "type": "object",
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "status": {
@@ -9306,7 +9306,7 @@
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "type": {
-            "type": "enum",
+            "type": "string",
             "description": "The type of the Oracle task.",
             "enum": [
               "READ",
@@ -9611,7 +9611,7 @@
             }
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "description": "The current status of the Oracle task.",
             "enum": [
               "ACTIVE",
@@ -9635,7 +9635,7 @@
           }
         },
         "required": [
-          "id",
+          "taskID",
           "type",
           "srcContract",
           "dstContract",
@@ -9650,12 +9650,12 @@
         "type": "object",
         "properties": {
           "taskID": {
-            "description": "The unique identifier of the task.",
             "type": "string",
+            "description": "Unique identifier (UUID) for the session.",
             "example": "000003e8-e0b8-21ee-ba00-325096b39f47"
           },
           "type": {
-            "type": "enum",
+            "type": "string",
             "description": "The type of the Oracle task.",
             "enum": [
               "READ",
@@ -9960,7 +9960,7 @@
             }
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "description": "The current status of the Oracle task.",
             "enum": [
               "ACTIVE",
@@ -9984,7 +9984,7 @@
           }
         },
         "required": [
-          "id",
+          "taskID",
           "type",
           "srcContract",
           "dstContract",

@@ -667,7 +667,6 @@ type ApiPerformAuditRequest struct {
 	ApiService AdminApi
 	startTimestamp *int64
 	endTimestamp *int64
-	includeProofs *bool
 }
 
 // The start timestamp for the audit period.
@@ -679,12 +678,6 @@ func (r ApiPerformAuditRequest) StartTimestamp(startTimestamp int64) ApiPerformA
 // The end timestamp for the audit period.
 func (r ApiPerformAuditRequest) EndTimestamp(endTimestamp int64) ApiPerformAuditRequest {
 	r.endTimestamp = &endTimestamp
-	return r
-}
-
-// Include proofs generated from each gateway transaction. Defaults to false.
-func (r ApiPerformAuditRequest) IncludeProofs(includeProofs bool) ApiPerformAuditRequest {
-	r.includeProofs = &includeProofs
 	return r
 }
 
@@ -733,9 +726,6 @@ func (a *AdminApiService) PerformAuditExecute(r ApiPerformAuditRequest) (*Perfor
 	}
 	if r.endTimestamp != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "endTimestamp", r.endTimestamp, "")
-	}
-	if r.includeProofs != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "includeProofs", r.includeProofs, "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
