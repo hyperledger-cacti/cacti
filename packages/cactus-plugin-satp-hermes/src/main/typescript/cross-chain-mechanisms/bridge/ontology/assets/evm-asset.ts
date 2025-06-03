@@ -1,4 +1,4 @@
-import { Asset, FungibleAsset } from "./asset";
+import { Asset, FungibleAsset, NonFungibleAsset } from "./asset";
 import { InteractionsRequest as EvmInteractionSignature } from "../../../../generated/SATPWrapperContract";
 import { getInteractionType, InteractionData } from "./interact-types";
 
@@ -7,6 +7,8 @@ export interface EvmAsset extends Asset {
 }
 
 export interface EvmFungibleAsset extends EvmAsset, FungibleAsset {}
+
+export interface EvmNonFungibleAsset extends EvmAsset, NonFungibleAsset {}
 
 export enum VarType {
   CONTRACTADDRESS = 0,

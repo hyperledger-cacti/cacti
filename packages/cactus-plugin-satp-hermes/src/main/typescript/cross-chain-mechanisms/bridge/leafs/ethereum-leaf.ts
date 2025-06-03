@@ -146,6 +146,8 @@ export class EthereumLeaf
 
   private wrapperFungibleDeployReceipt: Web3TransactionReceipt | undefined;
 
+  private wrapperNonFungibleDeployReceipt: Web3TransactionReceipt | undefined;
+
   private wrapperContractAddress: string | undefined;
 
   private wrapperContractName: string | undefined;
@@ -282,9 +284,12 @@ export class EthereumLeaf
       case TokenType.ERC721:
       case TokenType.NONSTANDARD_NONFUNGIBLE:
         //TODO implement
-        throw new ApproveAddressError(
-          `${fnTag}, Non-fungible wrapper contract not implemented`,
-        );
+        if (!this.wrapperContractAddress) {
+          throw new ApproveAddressError(
+            `${fnTag}, Non-fungible wrapper contract not implemented`,
+          );
+        }
+        return this.wrapperContractAddress;
       default:
         throw new ApproveAddressError(
           `${fnTag}, Invalid asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
@@ -304,7 +309,8 @@ export class EthereumLeaf
   public async deployContracts(): Promise<void> {
     await Promise.all([
       this.deployFungibleWrapperContract(),
-      // this.deployNonFungibleWrapperContract(),
+      //TODO ----> this.deployNonFungibleWrapperContract(),
+      //DEPLOY THE PREVIOUS CONTRACT
     ]);
   }
 
@@ -323,9 +329,56 @@ export class EthereumLeaf
    * Deploys a non-fungible wrapper contract.
    *
    **/
-  public async deployNonFungibleWrapperContract(): Promise<void> {
+  public async deployNonFungibleWrapperContract(
+    contractName?: string,
+  ): Promise<void> {
     //TODO implement
-    throw new Error("Method not implemented.");
+    const fnTag = `${EthereumLeaf.CLASS_NAME}#deployWrapperContract`;
+    this.log.debug(`${fnTag}, Deploying Wrapper Contract`);
+
+    if (this.wrapperContractAddress && this.wrapperContractName) {
+      throw new WrapperContractAlreadyCreatedError(fnTag);
+    }
+
+    this.wrapperContractName =
+      contractName || `${this.id}-non-fungible-wrapper-contract`;
+
+    const deployOutWrapperContract = await this.connector.deployContract({
+      contract: {
+        contractJSON: {
+          contractName: this.wrapperContractName,
+          abi: SATPWrapperContract.abi,
+          bytecode: SATPWrapperContract.bytecode.object,
+        },
+      },
+      constructorArgs: [this.signingCredential.ethAccount],
+      web3SigningCredential: this.signingCredential,
+      gasConfig: this.gasConfig,
+    });
+
+    if (!deployOutWrapperContract.transactionReceipt) {
+      throw new TransactionReceiptError(
+        `${fnTag}, Wrapper Contract deployment failed: ${safeStableStringify(deployOutWrapperContract)}`,
+      );
+    }
+
+    if (!deployOutWrapperContract.transactionReceipt.contractAddress) {
+      throw new ContractAddressError(
+        `${fnTag}, Wrapper Contract address not found in deploy receipt: ${safeStableStringify(deployOutWrapperContract.transactionReceipt)}`,
+      );
+    }
+
+    this.wrapperNonFungibleDeployReceipt =
+      deployOutWrapperContract.transactionReceipt;
+
+    this.wrapperContractAddress =
+      deployOutWrapperContract.transactionReceipt.contractAddress;
+
+    this.log.debug(
+      `${fnTag}, Wrapper Contract deployed receipt: ${safeStableStringify(deployOutWrapperContract.transactionReceipt)}`,
+    );
+
+    //throw new Error("Method not implemented.");
   }
 
   /**
@@ -410,7 +463,7 @@ export class EthereumLeaf
    */
   public getWrapperContract(type: "FUNGIBLE" | "NONFUNGIBLE"): string {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#getWrapperContract`;
-    this.log.debug(`${fnTag}, Getting Wrapper Contract Adress`);
+    this.log.debug(`${fnTag}, Getting Wrapper Contract Address`);
     switch (type) {
       case "FUNGIBLE":
         if (!this.wrapperContractAddress) {
@@ -421,7 +474,13 @@ export class EthereumLeaf
         return this.wrapperContractAddress;
       case "NONFUNGIBLE":
         //TODO implement
-        throw new Error("Method not implemented.");
+        if (!this.wrapperContractAddress) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
+        return this.wrapperContractAddress;
+      //throw new Error("Method not implemented.");
       default:
         throw new Error("Invalid type");
     }
@@ -537,10 +596,20 @@ export class EthereumLeaf
    */
   public async lockAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#lockAsset`;
-    this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
+    if (typeof assetAttribute === "number") {
+      this.log.debug(
+        `${fnTag}, Locking Asset: ${assetId} amount: ${assetAttribute}`,
+      );
+    } else if (typeof assetAttribute === "string") {
+      this.log.debug(
+        `${fnTag}, Locking Asset: ${assetId} with an unique Id: ${assetAttribute}`,
+      );
+    } else {
+      throw new Error("Unique asset attribute is of an unexpected type");
+    }
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -557,7 +626,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "lock",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute.toString()],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -583,10 +652,20 @@ export class EthereumLeaf
    */
   public async unlockAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#unlockAsset`;
-    this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
+    if (typeof assetAttribute === "number") {
+      this.log.debug(
+        `${fnTag}, Unlocking Asset: ${assetId} amount: ${assetAttribute}`,
+      );
+    } else if (typeof assetAttribute === "string") {
+      this.log.debug(
+        `${fnTag}, Unlocking Asset: ${assetId} with an unique Id: ${assetAttribute}`,
+      );
+    } else {
+      throw new Error("Unique asset attribute is of an unexpected type");
+    }
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -603,7 +682,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "unlock",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute.toString()],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -628,10 +707,21 @@ export class EthereumLeaf
    */
   public async mintAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#mintAsset`;
-    this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
+
+    if (typeof assetAttribute === "number") {
+      this.log.debug(
+        `${fnTag}, Minting Asset: ${assetId} amount: ${assetAttribute}`,
+      );
+    } else if (typeof assetAttribute === "string") {
+      this.log.debug(
+        `${fnTag}, Minting Asset: ${assetId} from asset with identifier: ${assetAttribute}`,
+      );
+    } else {
+      throw new Error("Unique asset attribute is of an unexpected type");
+    }
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -648,7 +738,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute.toString()],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -673,10 +763,21 @@ export class EthereumLeaf
    */
   public async burnAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#burnAsset`;
-    this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
+
+    if (typeof assetAttribute === "number") {
+      this.log.debug(
+        `${fnTag}, Burning Asset: ${assetId} amount: ${assetAttribute}`,
+      );
+    } else if (typeof assetAttribute === "string") {
+      this.log.debug(
+        `${fnTag}, Burning Asset: ${assetId} generated from original asset: ${assetAttribute}`,
+      );
+    } else {
+      throw new Error("Unique asset attribute is of an unexpected type");
+    }
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -693,7 +794,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "burn",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute.toString()],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -720,11 +821,13 @@ export class EthereumLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#assignAsset`;
+
+    if (typeof assetAtt)
     this.log.debug(
-      `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
+      `${fnTag}, Assigning Asset: ${assetId} amount: ${assetAttribute} to: ${to}`,
     );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
@@ -742,7 +845,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "assign",
-      params: [assetId, to, amount],
+      params: [assetId, to, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;

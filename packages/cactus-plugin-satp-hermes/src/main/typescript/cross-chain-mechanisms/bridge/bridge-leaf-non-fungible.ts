@@ -1,3 +1,6 @@
+import { Asset } from "./ontology/assets/asset";
+import { TransactionResponse } from "./bridge-types";
+
 /**
  * Abstract class representing a non-fungible bridge leaf.
  * This class provides the structure for deploying and retrieving
@@ -19,4 +22,41 @@ export abstract class BridgeLeafNonFungible {
   public abstract getDeployNonFungibleWrapperContractReceipt(): unknown;
 
   //TODO: Implement this NON-FUNGIBLE bridge
+  public abstract wrapAsset(asset: Asset): Promise<TransactionResponse>;
+
+  public abstract unwrapAsset(assetId: string): Promise<TransactionResponse>;
+
+  public abstract lockAsset(
+    assetId: string,
+    uniqueDescriptor: string,
+  ): Promise<TransactionResponse>;
+
+  public abstract unlockAsset(
+    assetId: string,
+    uniqueDescriptor: string,
+  ): Promise<TransactionResponse>;
+
+  public abstract mintAsset(
+    assetId: string,
+    uniqueDescriptor: string,
+  ): Promise<TransactionResponse>;
+
+  public abstract burnAsset(
+    assetId: string,
+    uniqueDescriptor: string,
+  ): Promise<TransactionResponse>;
+
+  public abstract assignAsset(
+    assetId: string,
+    to: string,
+    uniqueDescriptor: string
+  ): Promise<TransactionResponse>;
+
+  public abstract runTransaction(
+    methodName: string,
+    params: string[],
+    invocationType: unknown,
+  ): Promise<TransactionResponse>;
+
+  public abstract getReceipt(transactionId: string): Promise<string>;
 }

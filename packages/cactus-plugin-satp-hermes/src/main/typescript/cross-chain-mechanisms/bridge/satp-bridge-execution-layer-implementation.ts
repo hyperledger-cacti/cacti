@@ -9,6 +9,7 @@ import {
   Asset,
   FungibleAsset,
   instanceOfFungibleAsset,
+  instanceOfNonFungibleAsset,
 } from "./ontology/assets/asset";
 import {
   ClaimFormatError,
@@ -20,6 +21,7 @@ import {
   TransactionReceipt,
 } from "./satp-bridge-execution-layer";
 import { BridgeLeafFungible } from "./bridge-leaf-fungible";
+import { BridgeLeafNonFungible } from "./bridge-leaf-non-fungible";
 import { BridgeLeaf } from "./bridge-leaf";
 
 /**
@@ -101,8 +103,30 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.wrapAsset(asset);
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible wrapAsset not implemented");
+      throw new Error("wrapAsset not implemented for current asset type");
+      //throw new Error("Non-fungible wrapAsset not implemented");
     }
   }
 

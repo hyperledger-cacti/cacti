@@ -15,6 +15,10 @@ export interface FungibleAsset extends Asset {
   amount: string;
 }
 
+export interface NonFungibleAsset extends Asset {
+  uniqueDescriptor: string;
+}
+
 export function getTokenType(stringType: string) {
   return TokenType[stringType.toUpperCase() as keyof typeof TokenType];
 }
@@ -29,4 +33,8 @@ export function createAssetId(
 
 export function instanceOfFungibleAsset(asset: Asset) {
   return "amount" in asset;
+}
+
+export function instanceOfNonFungibleAsset(asset: Asset) {
+  return "uniqueDescriptor" in asset;
 }
