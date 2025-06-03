@@ -5,18 +5,22 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ITraceableContract.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+import { console } from "forge-std/console.sol";
+
 /**
  * @dev Enum for the supported token types.
  */
-enum TokenType { UNSPECIFIED, ERC20, ERC721, ERC1155, OTHER } //TODO: FIX THIS ENUM TO BE THE SAME OF THE BRIDGE
+enum TokenType { UNSPECIFIED, ERC20, ERC721, ERC1155, OTHER, NONSTANDARD_FUNGIBLE, NONSTANDARD_NONFUNGIBLE } //TODO: FIX THIS ENUM TO BE THE SAME OF THE BRIDGE
 /**
  * @dev Enum for the supported interaction types.
  */
-enum InteractionType { MINT, BURN, ASSIGN, CHECKPERMITION, LOCK, UNLOCK }
+enum InteractionType { MINT, BURN, ASSIGN, CHECKPERMITION, LOCK, UNLOCK, APPROVE }
 /**
  * @dev Enum representing the supported variable types used for contract-to-contract calls.
  */
-enum VarType {CONTRACTADDRESS, TOKENTYPE, TOKENID, OWNER, AMOUNT, BRIDGE, RECEIVER}
+enum VarType {CONTRACTADDRESS, TOKENTYPE, TOKENID, OWNER, AMOUNT, BRIDGE, RECEIVER, UNIQUEDESCRIPTOR}
  
 
 /**
@@ -35,8 +39,8 @@ struct Token {
     string tokenId;
     string referenceId;
     address owner;
-    uint amount; //amount that is approved by the contract owner
-    //uint locked_amount; //amount that is approved by the contract owner 
+    uint tokenAttribute; //amount that is approved by the contract owner OR unique token ID
+    //uint locked_amount; //amount that is approved by the contract owner
 }
 
 /**
@@ -66,6 +70,8 @@ error TokenNotUnlocked(string tokenId);
 
 error InsuficientAmountLocked(string tokenId, uint256 amount);
 
+error TokenTypeNotSupported(string tokenId);
+
 
 /**
  * @title SATPWrapper
@@ -82,6 +88,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
      * Maping of token IDs to Token structs.
      */
     mapping (string  => Token) public tokens; 
+    mapping (uint256 => bool) internal nft_ids;
 
     /**
      * Mapping of token IDs to InteractionSignature structs.
@@ -98,11 +105,11 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
     event Wrap(string indexed tokenId, string contractName, address contractAddress, TokenType tokenType, address owner);
     event Unwrap(string indexed tokenId);
-    event Lock(string indexed tokenId, uint256 amount);
-    event Unlock(string indexed tokenId, uint256 amount);
-    event Mint(string indexed tokenId, uint256 amount);
-    event Burn(string indexed tokenId, uint256 amount);
-    event Assign(string indexed tokenId, address receiver_account, uint256 amount);
+    event Lock(string indexed tokenId, uint256 tokenAttribute);
+    event Unlock(string indexed tokenId, uint256 tokenAttribute);
+    event Mint(string indexed tokenId, uint256 tokenAttribute);
+    event Burn(string indexed tokenId, uint256 tokenAttribute);
+    event Assign(string indexed tokenId, address receiver_account, uint256 tokenAttribute);
 
 
     /**
@@ -160,9 +167,23 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         if(tokens[tokenId].contractAddress == address(0)) {
             revert TokenNotAvailable(tokenId);
         }
-        if(tokens[tokenId].amount > 0) {
-            revert TokenLocked(tokenId);
+
+        TokenType tt = tokens[tokenId].tokenType;
+
+        if(tt == TokenType.NONSTANDARD_FUNGIBLE || tt == TokenType.ERC20) {
+            if(tokens[tokenId].tokenAttribute > 0) {
+                revert TokenLocked(tokenId);
+            }
         }
+        else if(tt == TokenType.NONSTANDARD_NONFUNGIBLE || tt == TokenType.ERC721) {
+            if(tokens[tokenId].tokenAttribute != 0) {
+                revert TokenLocked(tokenId);
+            }
+        }
+        else {
+            revert TokenTypeNotSupported(tokenId);
+        }
+        
         deleteFromArray(tokens[tokenId].tokenId);
         delete tokens[tokenId];
 
@@ -173,100 +194,124 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     /**
      * Locks a given amount of tokens with the given token ID. This method calls the lock function of the token contract.
      * @param tokenId The unique identifier of the token.
-     * @param amount The amount of tokens to be locked.
+     * @param assetAttribute The amount of tokens to be locked.
      */
-    function lock(string memory tokenId, uint256 amount) external onlyOwner returns (bool success) {
+    function lock(string memory tokenId, uint256 assetAttribute) external onlyOwner returns (bool success) {
         if(tokens[tokenId].contractAddress == address(0)){
             revert TokenNotAvailable(tokenId);
         }
 
-        bool lockSuccess = interact(tokenId, InteractionType.LOCK, amount);
-
+        bool lockSuccess = interact(tokenId, InteractionType.LOCK, assetAttribute);
         if(lockSuccess) {
-            // The locked amount is added to the amount of the token struct
-            tokens[tokenId].amount += amount;
-            emit Lock(tokenId, amount);
-            return true;
+            console.log("lock executed successfully on token contract");
+            TokenType tt = tokens[tokenId].tokenType;
+            if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
+                tokens[tokenId].tokenAttribute += assetAttribute;
+                emit Lock(tokenId, assetAttribute);
+                return true;
+            }
+            else if (tt == TokenType.ERC721 || tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
+                tokens[tokenId].tokenAttribute = assetAttribute;
+                emit Lock(tokenId, assetAttribute);
+                return true;
+            }
         }
-
         revert TokenNotLocked(tokenId);
     } 
 
     /**
      * Unlocks a given amount of tokens with the given token ID. This method calls the unlock function of the token contract.
      * @param tokenId The unique identifier of the token.
-     * @param amount The amount of tokens to be unlocked.
+     * @param assetAttribute The amount of tokens to be unlocked.
      */
-    function unlock(string memory tokenId, uint256 amount) external onlyOwner returns (bool success) { //ammount
-        if(tokens[tokenId].contractAddress == address(0)){
-            revert TokenNotAvailable(tokenId);
-        }
-
-        if(tokens[tokenId].amount < amount) {
-            revert InsuficientAmountLocked(tokenId, amount);
-        }
-
-        bool unlockSuccess = interact(tokenId, InteractionType.UNLOCK, amount);
-
-        if(unlockSuccess) {
-            // The unlocked amount is subtracted from the amount of the token struct
-            tokens[tokenId].amount -= amount;
-            emit Unlock(tokenId, amount);
+    function unlock(string memory tokenId, uint256 assetAttribute) external onlyOwner returns (bool success) {
+        TokenType tt = tokens[tokenId].tokenType;
+        if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
+            if(tokens[tokenId].tokenAttribute < assetAttribute) {
+                revert InsuficientAmountLocked(tokenId, assetAttribute);
+            }
+            require(interact(tokenId, InteractionType.UNLOCK, assetAttribute), "Unlocking amount as failed");
+            tokens[tokenId].tokenAttribute -= assetAttribute;
+            emit Unlock(tokenId, assetAttribute);
             return true;
         }
-
+        else if (tt == TokenType.ERC721 || tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
+            require(tokens[tokenId].tokenAttribute != 0, "Trying to Unlock an asset that is not locked");
+            require(tokens[tokenId].tokenAttribute == assetAttribute, "Unlocking NFT cannot be done due to wrong uniqueID");
+            require(interact(tokenId, InteractionType.UNLOCK, assetAttribute), "Unlocking NFT failed");
+            emit Unlock(tokenId, assetAttribute);
+            return true;
+        }
         revert TokenNotUnlocked(tokenId);
     } 
 
     /**
      * Mints a given amount of tokens with the given token ID. This method calls the mint function of the token contract.
      * @param tokenId The unique identifier of the token.
-     * @param amount The amount of tokens to be minted.
+     * @param assetAttribute The amount of tokens to be minted.
      */
-    function mint(string memory tokenId, uint256 amount) external onlyOwner returns (bool success) {
+    function mint(string memory tokenId, uint256 assetAttribute) external onlyOwner returns (bool success) {
         if(tokens[tokenId].contractAddress == address(0)){
             revert TokenNotAvailable(tokenId);
         }
-        
-        require(interact(tokenId, InteractionType.MINT, amount) , "mint asset call failed");
+        require(interact(tokenId, InteractionType.MINT, assetAttribute) , "mint asset call failed");
 
-        tokens[tokenId].amount = amount;
-        emit Mint(tokenId, amount);
+        tokens[tokenId].tokenAttribute = assetAttribute;
+        emit Mint(tokenId, assetAttribute);
         return true;
     }
 
     /**
      * Burns a given amount of tokens with the given token ID. This method calls the burn function of the token contract.
      * @param tokenId The unique identifier of the token.
-     * @param amount The amount of tokens to be burned.
+     * @param assetAttribute The amount of tokens to be burned.
      */
-    function burn(string memory tokenId, uint256 amount) external onlyOwner returns (bool success) {
-        require(tokens[tokenId].amount >= amount, "burn asset asset is not locked");
-
-        require(interact(tokenId, InteractionType.BURN, amount), "burn asset call failed");
-
-        tokens[tokenId].amount -= amount;
-
-        emit Burn(tokenId, amount);
-        return true;
+    function burn(string memory tokenId, uint256 assetAttribute) external onlyOwner returns (bool success) {
+        TokenType tt = tokens[tokenId].tokenType;
+        if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
+            require(tokens[tokenId].tokenAttribute >= assetAttribute, "Burning more assets than locked quantity");
+            require(interact(tokenId, InteractionType.BURN, assetAttribute), "burn asset call failed");
+            tokens[tokenId].tokenAttribute -= assetAttribute;
+            emit Burn(tokenId, assetAttribute);
+            return true;
+        }
+        else if (tt == TokenType.ERC721 || tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
+            require(tokens[tokenId].tokenAttribute != 0, "Burning unminted asset");
+            require(tokens[tokenId].tokenAttribute == assetAttribute, "Burning NFT failed due to UniqueID missmatch");
+            require(interact(tokenId, InteractionType.BURN, assetAttribute), "burn asset call failed");
+            tokens[tokenId].tokenAttribute = 0;
+            emit Burn(tokenId, assetAttribute);
+            return true;
+        }       
     }
+    
 
     /**
      * Assigns a given amount of tokens with the given token ID to a receiver account. This method calls the assign function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param receiver_account The address of the receiver account.
-     * @param amount The amount of tokens to be assigned.
+     * @param assetAttribute The amount of tokens to be assigned.
      */
-    function assign(string memory tokenId, address receiver_account, uint256 amount) external onlyOwner returns (bool success) {
-        require(tokens[tokenId].amount >= amount, "assign asset asset is not locked");
+    function assign(string memory tokenId, address receiver_account, uint256 assetAttribute) external onlyOwner returns (bool success) {
+        TokenType tt = tokens[tokenId].tokenType;
+        if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
+            require(tokens[tokenId].tokenAttribute >= assetAttribute, "Assigning more assets than those locked");
+            require(interact(tokenId, InteractionType.ASSIGN, assetAttribute, receiver_account), "assign asset call failed");
 
-        require(interact(tokenId, InteractionType.ASSIGN, amount, receiver_account), "assign asset call failed");
-
-        tokens[tokenId].amount -= amount;
-        
-        emit Assign(tokenId, receiver_account, amount);
-        return true;
-    }   
+            tokens[tokenId].tokenAttribute -= assetAttribute;
+            
+            emit Assign(tokenId, receiver_account, assetAttribute);
+            return true;
+        }
+        else if (tt == TokenType.ERC721 || tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
+            require(tokens[tokenId].tokenAttribute == assetAttribute, "Assign nft - asset is not locked");
+            require(interact(tokenId, InteractionType.ASSIGN, assetAttribute, receiver_account), "assign nft call failed");
+            tokens[tokenId].tokenAttribute = 0;
+            
+            emit Assign(tokenId, receiver_account, assetAttribute);
+            return true;
+        }
+    }
 
     /**
      * Gets all the token IDs.
@@ -299,15 +344,18 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         return tokens[tokenId];
     }
 
+    //function balanceOf() {}
+
     /**
      * Creates the ontology of a non-standard token with the given token ID and interactions.
      * @param tokenId The unique identifier of the token.
      * @param interactions The interactions to be used for the token.
      */
-    function createNonStandardTokenOntology(string memory tokenId, InteractionSignature[] memory interactions) internal {
+    function createNonStandardTokenOntology(string memory tokenId, InteractionSignature[] memory interactions) internal returns (bool success){
         for(uint i = 0; i < interactions.length; i++) {
             tokensInteractions[tokenId][interactions[i].interactionType] = interactions[i];
         }
+        return true;
     }
 
     /**
@@ -323,10 +371,10 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
      * Interacts with the token contract using the given token ID, interaction type, and amount.
      * @param tokenId The unique identifier of the token.
      * @param interactionType The type of the interaction.
-     * @param amount The amount of tokens to be interacted with.
+     * @param assetAttribute The amount of tokens to be interacted with.
      */
-    function interact(string memory tokenId, InteractionType interactionType, uint256 amount) internal returns (bool success) {
-        return interact(tokenId, interactionType, amount, address(0));
+    function interact(string memory tokenId, InteractionType interactionType, uint256 assetAttribute) internal returns (bool success) {
+        return interact(tokenId, interactionType, assetAttribute, address(0));
     }
 
     /**
@@ -335,18 +383,16 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
      * To mitigate the risk of attacks, this method only allows the usage of known variables and only variables that are assigned to the specific token.
      * @param tokenId The unique identifier of the token.
      * @param interactionType The type of the interaction.
-     * @param amount The amount of tokens to be interacted with.
+     * @param assetAttribute The amount of tokens to be interacted with.
      * @param receiver The address of the receiver account.
      */
-    function interact(string memory tokenId, InteractionType interactionType, uint256 amount, address receiver) internal returns (bool) {
+    function interact(string memory tokenId, InteractionType interactionType, uint256 assetAttribute, address receiver) internal returns (bool) {
         if (!tokensInteractions[tokenId][interactionType].available) {
             return false;
         }
-
         for (uint i = 0; i < tokensInteractions[tokenId][interactionType].functionsSignature.length; i++) {
             bytes4 functionSelector = bytes4(keccak256(abi.encodePacked(tokensInteractions[tokenId][interactionType].functionsSignature[i])));
-
-            bytes memory encodedParams = encodeDynamicParams(functionSelector, encodeParams(tokensInteractions[tokenId][interactionType].variables[i], tokenId, receiver, amount));
+            bytes memory encodedParams = encodeDynamicParams(functionSelector, encodeParams(tokensInteractions[tokenId][interactionType].variables[i], tokenId, receiver, assetAttribute));
 
             (bool callSuccess, ) = tokens[tokenId].contractAddress.call(encodedParams);
             if (!callSuccess) {
@@ -375,9 +421,9 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
      * @param variables The variables to be encoded.
      * @param tokenId The unique identifier of the token.
      * @param receiver The address of the receiver account.
-     * @param amount The amount of tokens to be encoded.
+     * @param assetAttribute The amount of tokens to be encoded.
      */
-    function encodeParams(VarType[] memory variables, string memory tokenId, address receiver, uint256 amount)  internal view returns (bytes[] memory){
+    function encodeParams(VarType[] memory variables, string memory tokenId, address receiver, uint256 assetAttribute)  internal view returns (bytes[] memory){
         bytes[] memory dynamicParams = new bytes[](variables.length);
         for (uint i = 0; i < variables.length; i++) {
             if (variables[i] == VarType.BRIDGE) {
@@ -385,17 +431,24 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
             } else if (variables[i] == VarType.TOKENID) {
                 dynamicParams[i] = abi.encode(tokenId);
             } else if (variables[i] == VarType.AMOUNT) {
-                dynamicParams[i] = abi.encode(amount);
+                dynamicParams[i] = abi.encode(assetAttribute);
             } else if (variables[i] == VarType.OWNER) {
                 dynamicParams[i] = abi.encode(tokens[tokenId].owner);
             } else if (variables[i] == VarType.CONTRACTADDRESS) {
                 dynamicParams[i] = abi.encode(tokens[tokenId].contractAddress);
             } else if (variables[i] == VarType.RECEIVER) {
                 dynamicParams[i] = abi.encode(receiver);
+            } else if (variables[i] == VarType.UNIQUEDESCRIPTOR) {
+                dynamicParams[i] = abi.encode(assetAttribute);
             } else {
                 revert("Variable not supported");
             }
         }
         return dynamicParams;
     }
+
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
+    } 
 }
+

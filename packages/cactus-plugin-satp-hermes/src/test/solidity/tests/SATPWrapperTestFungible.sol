@@ -15,6 +15,9 @@ contract SATPWrapperTest is Test{
     
     SATPWrapperContract wrapperContract;
 
+    address public user = makeAddr("user");
+    address public user2 = makeAddr("user2");
+
     string[] lockInteractions;
     VarType[][] lockVariables;
     string[] unlockInteractions;
@@ -35,16 +38,14 @@ contract SATPWrapperTest is Test{
 
         contract1 = new SATPTokenContract(address(wrapperContract));
 
-        lockInteractions.push("transfer(address,address,uint256)");
+        lockInteractions.push("bridgeTransferFrom(address,address,uint256)");
     
         lockVariables.push([VarType.OWNER, VarType.BRIDGE, VarType.AMOUNT]);
         InteractionSignature memory lock = InteractionSignature(InteractionType.LOCK,lockInteractions,lockVariables, true);
         signatures.push(lock);
         
-        unlockInteractions.push("approve(address,uint256)");
-        unlockInteractions.push("transfer(address,address,uint256)");
+        unlockInteractions.push("lock(address,address,uint256)");
         
-        unlockVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
         unlockVariables.push([VarType.BRIDGE, VarType.OWNER, VarType.AMOUNT]);
         InteractionSignature memory unlock = InteractionSignature(InteractionType.UNLOCK,unlockInteractions,lockVariables, true);
         signatures.push(unlock);
@@ -83,7 +84,7 @@ contract SATPWrapperTest is Test{
     }
 
     function testWrap() public {
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(user), signatures);
 
         Token memory tokenReceived = wrapperContract.getToken(contract1.name());
 
@@ -94,9 +95,9 @@ contract SATPWrapperTest is Test{
 
     function testWrapTokenAlreadyWrapped() public {
 
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(user), signatures);
 
-        try wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures) returns (bool s) {
+        try wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(user), signatures) returns (bool s) {
             require(!s, "Expected an error");
         }
         catch Error(string memory) {
@@ -106,7 +107,7 @@ contract SATPWrapperTest is Test{
     }
 
     function testUnwrap() public {
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(user), signatures);
 
         wrapperContract.unwrap(contract1.name());
 
@@ -115,16 +116,24 @@ contract SATPWrapperTest is Test{
         assertNotEq(tokenReceived.contractAddress, address(contract1), "Tokens don't match");
     }
 
-    // function testUnwrapATokenNotWrapped() public {
-    //     vm.expectRevert();
-    //     wrapperContract.unwrap(contract1.name());
-    // }
+    //function testMint() public {
+        //wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures);
+        //wrapperContract.mint(contract1.name(), 10);
+        
+        //assertEq(contract1.balanceOf(address(this)), 10, "Token not minted");
+    //}
 
-    function testUnwrapATokenWithValueLocked() public {
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+    function testMintATokenNotWrapped() public {
+        try wrapperContract.mint(contract1.name(), 10) returns (bool s) {
+            require(!s, "Expected an error");
+        }
+        catch Error(string memory) {
+        }
+        catch (bytes memory /*lowLevelData*/) {
+        }
+    }
 
-        wrapperContract.mint(contract1.name(), 10);
-
+    function testUnwrapATokenNotWrapped() public {
         try wrapperContract.unwrap(contract1.name()) returns (bool s) {
             require(!s, "Expected an error");
         }
@@ -134,16 +143,12 @@ contract SATPWrapperTest is Test{
         }
     }
 
-    // function testMint() public {
-    //     wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+    function testUnwrapATokenWithValueLocked() public {
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(user), signatures);
 
-    //     wrapperContract.mint(contract1.name(), 10);
-        
-    //     assertEq(contract1.balanceOf(address(wrapperContract)), 10, "Token not minted");
-    // }
+        wrapperContract.mint(contract1.name(), 10);
 
-    function testMintATokenNotWrapped() public {
-        try wrapperContract.mint(contract1.name(), 10) returns (bool s) {
+        try wrapperContract.unwrap(contract1.name()) returns (bool s) {
             require(!s, "Expected an error");
         }
         catch Error(string memory) {

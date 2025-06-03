@@ -111,6 +111,9 @@
                       "amount": {
                         "type": "string"
                       },
+                      "uniqueDescriptor": {
+                        "type": "string"
+                      },
                       "networkId": {
                         "type": "object",
                         "description": "The network of the DLT being interacted with.",
@@ -185,6 +188,9 @@
                         "type": "string"
                       },
                       "amount": {
+                        "type": "string"
+                      },
+                      "uniqueDescriptor": {
                         "type": "string"
                       },
                       "networkId": {
@@ -4557,6 +4563,9 @@
           "amount": {
             "type": "string"
           },
+          "uniqueDescriptor": {
+            "type": "string"
+          },
           "networkId": {
             "type": "object",
             "description": "The network of the DLT being interacted with.",
@@ -4651,6 +4660,9 @@
               "amount": {
                 "type": "string"
               },
+              "uniqueDescriptor": {
+                "type": "string"
+              },
               "networkId": {
                 "type": "object",
                 "description": "The network of the DLT being interacted with.",
@@ -4725,6 +4737,9 @@
                 "type": "string"
               },
               "amount": {
+                "type": "string"
+              },
+              "uniqueDescriptor": {
                 "type": "string"
               },
               "networkId": {

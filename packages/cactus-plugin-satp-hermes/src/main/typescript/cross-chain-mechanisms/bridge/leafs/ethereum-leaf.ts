@@ -16,7 +16,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
-import { EvmAsset } from "../ontology/assets/evm-asset";
+import {
+  EvmAsset,
+  EvmFungibleAsset,
+  EvmNonFungibleAsset,
+} from "../ontology/assets/evm-asset";
 import {
   Logger,
   LoggerProvider,
@@ -52,7 +56,7 @@ import {
 } from "../../common/errors";
 import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
-import { Asset } from "../ontology/assets/asset";
+import { Asset, UniqueTokenID, Amount } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
@@ -144,10 +148,8 @@ export class EthereumLeaf
 
   private readonly gasConfig: GasTransactionConfig | undefined;
 
-  private wrapperFungibleDeployReceipt: Web3TransactionReceipt | undefined;
-
+  private wrapperDeployReceipt: Web3TransactionReceipt | undefined;
   private wrapperContractAddress: string | undefined;
-
   private wrapperContractName: string | undefined;
 
   /**
@@ -245,7 +247,7 @@ export class EthereumLeaf
       );
     } else {
       throw new InvalidWrapperContract(
-        `${EthereumLeaf.CLASS_NAME}#constructor, Contract Name or Contract Address missing`,
+        `${EthereumLeaf.CLASS_NAME}#constructor, Contract Name or Contract Address missing for respective contract`,
       );
     }
   }
@@ -275,16 +277,18 @@ export class EthereumLeaf
       case TokenType.NONSTANDARD_FUNGIBLE:
         if (!this.wrapperContractAddress) {
           throw new ApproveAddressError(
-            `${fnTag}, Wrapper Contract Address not available for approving address`,
+            `${fnTag}, Wrapper Contract Address for Fungible not available for approving address`,
           );
         }
         return this.wrapperContractAddress;
       case TokenType.ERC721:
       case TokenType.NONSTANDARD_NONFUNGIBLE:
-        //TODO implement
-        throw new ApproveAddressError(
-          `${fnTag}, Non-fungible wrapper contract not implemented`,
-        );
+        if (!this.wrapperContractAddress) {
+          throw new ApproveAddressError(
+            `${fnTag}, Wrapper Contract Address for Non Fungible not available for approving address`,
+          );
+        }
+        return this.wrapperContractAddress;
       default:
         throw new ApproveAddressError(
           `${fnTag}, Invalid asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
@@ -302,10 +306,7 @@ export class EthereumLeaf
    * @returns {Promise<void>} A promise that resolves when all contracts are deployed.
    */
   public async deployContracts(): Promise<void> {
-    await Promise.all([
-      this.deployFungibleWrapperContract(),
-      // this.deployNonFungibleWrapperContract(),
-    ]);
+    await Promise.all([this.deployWrapperContract()]);
   }
 
   /**
@@ -314,33 +315,13 @@ export class EthereumLeaf
    * @returns
    * @throws
    */
-  public getDeployNonFungibleWrapperContractReceipt(): unknown {
-    //TODO implement
-    throw new Error("Method not implemented.");
-  }
-
-  /**
-   * Deploys a non-fungible wrapper contract.
-   *
-   **/
-  public async deployNonFungibleWrapperContract(): Promise<void> {
-    //TODO implement
-    throw new Error("Method not implemented.");
-  }
-
-  /**
-   * Retrieves the deployment receipt of the fungible wrapper contract.
-   *
-   * @returns {Web3TransactionReceipt} The transaction receipt of the deployed fungible wrapper contract.
-   * @throws {ReceiptError} If the fungible wrapper contract has not been deployed.
-   */
-  public getDeployFungibleWrapperContractReceipt(): Web3TransactionReceipt {
-    if (!this.wrapperFungibleDeployReceipt) {
+  public getDeployWrapperContractReceipt(): unknown {
+    if (!this.wrapperDeployReceipt) {
       throw new ReceiptError(
-        `${EthereumLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt() Fungible Wrapper Contract Not deployed`,
+        `${EthereumLeaf.CLASS_NAME}#getDeployWrapperContractReceipt() Wrapper Contract Not deployed`,
       );
     }
-    return this.wrapperFungibleDeployReceipt;
+    return this.wrapperDeployReceipt;
   }
 
   /**
@@ -352,9 +333,7 @@ export class EthereumLeaf
    * @throws {TransactionReceiptError} If the deployment transaction receipt is not found.
    * @throws {ContractAddressError} If the contract address is not found in the deployment receipt.
    */
-  public async deployFungibleWrapperContract(
-    contractName?: string,
-  ): Promise<void> {
+  public async deployWrapperContract(contractName?: string): Promise<void> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}#deployWrapperContract`;
     this.log.debug(`${fnTag}, Deploying Wrapper Contract`);
 
@@ -362,8 +341,7 @@ export class EthereumLeaf
       throw new WrapperContractAlreadyCreatedError(fnTag);
     }
 
-    this.wrapperContractName =
-      contractName || `${this.id}-fungible-wrapper-contract`;
+    this.wrapperContractName = contractName || `${this.id}-wrapper-contract`;
 
     const deployOutWrapperContract = await this.connector.deployContract({
       contract: {
@@ -390,8 +368,7 @@ export class EthereumLeaf
       );
     }
 
-    this.wrapperFungibleDeployReceipt =
-      deployOutWrapperContract.transactionReceipt;
+    this.wrapperDeployReceipt = deployOutWrapperContract.transactionReceipt;
 
     this.wrapperContractAddress =
       deployOutWrapperContract.transactionReceipt.contractAddress;
@@ -410,18 +387,16 @@ export class EthereumLeaf
    */
   public getWrapperContract(type: "FUNGIBLE" | "NONFUNGIBLE"): string {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#getWrapperContract`;
-    this.log.debug(`${fnTag}, Getting Wrapper Contract Adress`);
+    this.log.debug(`${fnTag}, Getting Wrapper Contract Address`);
     switch (type) {
       case "FUNGIBLE":
+      case "NONFUNGIBLE":
         if (!this.wrapperContractAddress) {
           throw new WrapperContractError(
             `${fnTag}, Wrapper Contract not deployed`,
           );
         }
         return this.wrapperContractAddress;
-      case "NONFUNGIBLE":
-        //TODO implement
-        throw new Error("Method not implemented.");
       default:
         throw new Error("Invalid type");
     }
@@ -446,8 +421,19 @@ export class EthereumLeaf
       asset.referenceId,
     );
 
-    if (!this.wrapperContractName || !this.wrapperContractAddress) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
+    switch (asset.type) {
+      case TokenType.ERC20:
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_FUNGIBLE:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
+        if (!this.wrapperContractName || !this.wrapperContractAddress) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
+        break;
+      default:
+        throw new Error("Type not supported");
     }
 
     const response = (await this.connector.invokeContract({
@@ -530,17 +516,19 @@ export class EthereumLeaf
    * Locks an asset.
    *
    * @param {string} assetId - The ID of the asset to be locked.
-   * @param {number} amount - The amount of the asset to be locked.
+   * @param {number | string} assetAttribute - The amount of the asset to be locked.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async lockAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#lockAsset`;
-    this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Locking Asset: ${assetId} with attribute ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -557,12 +545,11 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "lock",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
-      this.log.debug(response);
       throw new TransactionError(fnTag);
     }
     return {
@@ -576,17 +563,19 @@ export class EthereumLeaf
    * Unlocks an asset.
    *
    * @param {string} assetId - The ID of the asset to be unlocked.
-   * @param {number} amount - The amount of the asset to be unlocked.
+   * @param {number | string} _assetAttribute - The amount of the asset to be unlocked.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async unlockAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#unlockAsset`;
-    this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Unlocking Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -603,7 +592,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "unlock",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -621,17 +610,19 @@ export class EthereumLeaf
    * Mints an asset.
    *
    * @param {string} assetId - The ID of the asset to be minted.
-   * @param {number} amount - The amount of the asset to be minted.
+   * @param {number | string} assetAttribute - The amount of the asset to be minted.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async mintAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#mintAsset`;
-    this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Minting Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -648,7 +639,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -666,17 +657,19 @@ export class EthereumLeaf
    * Burns an asset.
    *
    * @param {string} assetId - The ID of the asset to be burned.
-   * @param {number} amount - The amount of the asset to be burned.
+   * @param {number | string} _assetAttribute - The amount of the asset to be burned.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async burnAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#burnAsset`;
-    this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Burning Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -693,7 +686,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "burn",
-      params: [assetId, amount.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -712,7 +705,7 @@ export class EthereumLeaf
    *
    * @param {string} assetId - The ID of the asset to be assigned.
    * @param {string} to - The new owner of the asset.
-   * @param {number} amount - The amount of the asset to be assigned.
+   * @param {number | string} assetAttribute - The amount of the asset to be assigned.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
@@ -720,11 +713,11 @@ export class EthereumLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    amount: number,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#assignAsset`;
     this.log.debug(
-      `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
+      `${fnTag}, Assigning Asset: ${assetId} with attribute: ${assetAttribute} to: ${to}`,
     );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
@@ -742,7 +735,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "assign",
-      params: [assetId, to, amount],
+      params: [assetId, to, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -832,16 +825,36 @@ export class EthereumLeaf
 
     const token = response.callOutput as TokenResponse;
 
-    return {
-      contractName: token.contractName,
-      id: token.tokenId,
-      referenceId: token.referenceId,
-      contractAddress: token.contractAddress,
-      type: Number(token.tokenType),
-      owner: token.owner,
-      amount: token.amount,
-      network: this.networkIdentification,
-    } as EvmAsset;
+    switch (Number(token.tokenType)) {
+      case TokenType.ERC20:
+      case TokenType.NONSTANDARD_FUNGIBLE:
+        this.log.debug("Returning Fungible Asset");
+        return {
+          contractName: token.contractName,
+          id: token.tokenId,
+          referenceId: token.referenceId,
+          contractAddress: token.contractAddress,
+          type: Number(token.tokenType),
+          owner: token.owner,
+          amount: Number(token.tokenAttribute) as Amount,
+          network: this.networkIdentification,
+        } as EvmFungibleAsset;
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
+        this.log.debug("Returning Non Fungible Asset");
+        return {
+          contractName: token.contractName,
+          id: token.tokenId,
+          referenceId: token.referenceId,
+          contractAddress: token.contractAddress,
+          type: Number(token.tokenType),
+          owner: token.owner,
+          uniqueDescriptor: Number(token.tokenAttribute) as UniqueTokenID,
+          network: this.networkIdentification,
+        } as EvmNonFungibleAsset;
+      default:
+        throw new Error("Unexpected Token Type");
+    }
   }
 
   /**
@@ -908,7 +921,6 @@ export class EthereumLeaf
   public async getView(assetId: string): Promise<string> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#getView`;
     this.log.debug(`${fnTag}, Getting View for asset: ${assetId}`);
-
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
     }
@@ -987,7 +999,7 @@ export class EthereumLeaf
       case ClaimFormat.BUNGEE:
         if (claimFormat in this.claimFormats)
           return await this.getView(asset.id);
-        else throw new ProofError(`Claim format not supported: ${claimFormat}`);
+      //Could another ClaimFormat be the ZK? Can I insert ZK usage here?
       case ClaimFormat.DEFAULT:
         return "";
       default:

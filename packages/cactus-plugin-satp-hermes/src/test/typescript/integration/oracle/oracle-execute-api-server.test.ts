@@ -39,6 +39,9 @@ import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { keccak256 } from "web3-utils";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+//import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -70,16 +73,30 @@ beforeAll(async () => {
     const businessLogicContract = "OracleTestContract";
 
     try {
-      besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
+      besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+        {
+          logLevel,
+        },
+        [
+          {
+            assetType: SupportedBesuContractTypes.FUNGIBLE,
+            contractName: businessLogicContract,
+          },
+        ],
+      );
       log.info("Besu Ledger started successfully");
 
-      ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
+      ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+        {
+          logLevel,
+        },
+        [
+          {
+            assetType: SupportedEthereumContractTypes.FUNGIBLE,
+            contractName: businessLogicContract,
+          },
+        ],
+      );
 
       fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
@@ -184,7 +201,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     let response = await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -214,7 +231,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     let response = await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -268,7 +285,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     let response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -320,7 +337,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     const response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -329,7 +346,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       },
       destinationNetworkId: besuEnv.network,
       destinationContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestFungibleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         methodName: "setData",

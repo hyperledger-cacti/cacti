@@ -289,14 +289,17 @@ message Asset {
   string reference_id = 2;
   TokenType token_type = 3;
   string owner = 4;
+  //Fungible
   uint64 amount = 5;
-  string contract_name = 6;
+  //Non Fungible
+  uint64 uniqueDescriptor = 6;
+  string contract_name = 7;
   //besu
-  string contract_address = 7;
+  string contract_address = 8;
   //fabric
-  string msp_id = 8;
-  string channel_name = 9;
-  NetworkId network_id = 10;
+  string msp_id = 9;
+  string channel_name = 10;
+  NetworkId network_id = 11;
 }
 
 message NetworkId {
