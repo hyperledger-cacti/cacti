@@ -59,9 +59,9 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   private static readonly networkName = "CDBC_Network";
 
-  private static readonly DOCKER_IMAGE_VERSION = "918079c5a-2025-04-29";
+  private static readonly DOCKER_IMAGE_VERSION = "42f2d28b7-2025-05-28";
   private static readonly DOCKER_IMAGE_NAME =
-    "kubaya/cacti-satp-hermes-gateway";
+    "aaugusto11/cacti-satp-hermes-gateway";
 
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
