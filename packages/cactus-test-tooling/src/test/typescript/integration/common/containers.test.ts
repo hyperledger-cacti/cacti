@@ -105,22 +105,20 @@ describe(testCase, () => {
 
     {
       const badSocketPath = "/some-non-existent-path/to-make-it-trip-up/";
-      try {
-        await Containers.getDiagnostics({
+      await expect(
+        Containers.getDiagnostics({
           logLevel: "TRACE",
           // pass in an incorrect value for the port so that it fails for sure
           dockerodeOptions: {
             port: 9999,
             socketPath: badSocketPath,
           },
-        });
-        fail(Containers.getDiagnostics);
-      } catch (ex: unknown) {
-        expect(ex).toBeTruthy();
-        const connectEN = "connect ENOENT ";
-        const fullBadPath = connectEN.concat(badSocketPath);
-        expect(ex).toHaveProperty(["cause", "message"], fullBadPath);
-      }
+        }),
+      ).rejects.toMatchObject({
+        cause: expect.objectContaining({
+          message: expect.stringContaining(badSocketPath),
+        }),
+      });
     }
   });
 });

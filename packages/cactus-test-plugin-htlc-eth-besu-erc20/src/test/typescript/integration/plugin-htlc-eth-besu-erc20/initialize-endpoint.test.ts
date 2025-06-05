@@ -200,11 +200,11 @@ describe(testCase, () => {
       web3SigningCredential,
       gas: estimatedGas,
     };
-    try {
-      const res = await api.initializeV1(request);
-      expect(res.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
-    }
+
+    await expect(api.initializeV1(request)).rejects.toMatchObject({
+      response: expect.objectContaining({
+        status: 400,
+      }),
+    });
   });
 });
