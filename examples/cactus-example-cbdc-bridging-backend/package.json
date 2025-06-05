@@ -45,6 +45,28 @@
   "files": [
     "dist/*"
   ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "moduleNameMapper": {
+      "^(\\.?\\.?/.*)\\.js$": "$1"
+    },
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
+  },
   "scripts": {
     "build:dev:backend:postbuild": "",
     "forge": "forge build ./src/solidity/main/*.sol --out ./src/solidity/main/generated",
@@ -53,6 +75,7 @@
     "solidity": "hardhat compile",
     "start": "npx ts-node ./src/main/typescript/cbdc-bridging-app-cli.ts dotenv_config_path=./process.env",
     "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
+    "test:integration": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration --runInBand --forceExit",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -85,7 +108,7 @@
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@openzeppelin/contracts": "4.9.6",
     "@openzeppelin/contracts-upgradeable": "4.9.6",
-    "@quobix/vacuum": "^0.16.7",
+    "@quobix/vacuum": "0.16.7",
     "async-exit-hook": "2.0.1",
     "axios": "1.8.4",
     "body-parser": "1.20.3",
@@ -99,13 +122,13 @@
     "hardhat": "2.22.5",
     "knex": "2.4.0",
     "kubo-rpc-client": "3.0.1",
-    "node-ssh": "^13.2.1",
+    "node-ssh": "13.2.1",
     "nyc": "13.1.0",
     "openapi-types": "12.1.3",
-    "pg": "^8.15.6",
+    "pg": "8.15.6",
     "socket.io": "4.6.2",
     "sqlite3": "5.1.5",
-    "ts-results": "^3.3.0",
+    "ts-results": "3.3.0",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
     "web3": "1.6.1",
@@ -121,8 +144,9 @@
     "@types/express": "5.0.1",
     "@types/express-jwt": "6.0.2",
     "@types/fs-extra": "9.0.13",
+    "@types/jest": "29.5.14",
     "@types/node": "18.11.9",
-    "@types/pg": "^8",
+    "@types/pg": "8",
     "@types/swagger-ui-express": "4.1.6",
     "@types/uuid": "9.0.8",
     "@typescript-eslint/eslint-plugin": "7.1.0",
@@ -139,13 +163,15 @@
     "ethereum-abi-types-generator": "1.3.4",
     "hardhat": "2.22.19",
     "http-status-codes": "2.1.4",
+    "jest": "29.7.0",
     "jose": "4.15.5",
     "npm-run-all": "4.1.5",
     "prettier": "3.2.5",
     "remix-tests": "0.1.34",
     "swagger-cli": "4.0.4",
+    "ts-jest": "29.3.4",
     "ts-node": "10.9.1",
-    "typescript": "5.5.2"
+    "typescript": "5.8.3"
   },
   "engines": {
     "node": ">=18",
