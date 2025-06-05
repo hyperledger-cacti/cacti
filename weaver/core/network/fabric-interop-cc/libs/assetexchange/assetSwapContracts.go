@@ -200,7 +200,7 @@ func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId,
 	return claimAssetCommon(ctx, assetLockVal.LockInfo, assetLockVal.ExpiryTimeSecs, assetLockVal.Recipient, "", contractId, claimInfoBytesBase64)
 }
 
-// ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
+// Record claim of an asset on the ledger (this uses the contractId)
 func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoBytesBase64 string) error {
 
 	assetLockKey, assetLockVal, err := fetchLockStateUsingContractId(ctx, contractId)
