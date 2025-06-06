@@ -1,5 +1,6 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
@@ -41,12 +42,17 @@ import {
 import OracleTestContract from "../../../solidity/generated/oracle-contract.sol/OracleTestContract.json";
 import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
 import { keccak256 } from "web3-utils";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
+const monitorService = MonitorService.createOrGetMonitorService({});
 const logLevel: LogLevelDesc = "TRACE";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "SATP - Hermes",
-});
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "SATP - Hermes",
+  },
+  monitorService,
+);
 
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
@@ -120,6 +126,7 @@ beforeAll(async () => {
       contractName: businessLogicContract,
       logLevel,
       network: testNetwork,
+      monitorService: monitorService,
     });
     log.info("Besu Ledger started successfully");
 
@@ -134,6 +141,7 @@ beforeAll(async () => {
       contractName: businessLogicContract,
       logLevel,
       network: testNetwork,
+      monitorService: monitorService,
     });
     log.info("Ethereum Ledger started successfully");
 

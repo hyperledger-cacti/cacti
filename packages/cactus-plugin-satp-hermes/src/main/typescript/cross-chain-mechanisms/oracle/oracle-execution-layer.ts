@@ -1,16 +1,15 @@
 // this file contains a class that encapsulates the logic for managing the Oracle (read and write).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
 
-import {
-  LogLevelDesc,
-  Logger,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../core/satp-logger";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { ClaimFormatError, TransactionError } from "../common/errors";
 import { OracleAbstract } from "./oracle-abstract";
 import { IOracleEntryBase } from "./oracle-types";
 import { OracleResponse, OracleOperation } from "../../public-api";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 /**
  * Options for configuring the IOracleExecutionLayer.
@@ -23,6 +22,7 @@ export interface IOracleExecutionLayerOptions {
   oracleImpl: OracleAbstract;
   claimType?: ClaimFormat;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 /**
@@ -38,6 +38,7 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
   private readonly logLevel: LogLevelDesc;
   private readonly oracleImpl: OracleAbstract;
   private readonly claimType: ClaimFormat;
+  private readonly monitorService: MonitorService;
 
   /**
    * Constructs an instance of OracleExecutionLayer.
@@ -49,7 +50,11 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
   constructor(public readonly options: IOracleExecutionLayerOptions) {
     const label = OracleExecutionLayer.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.claimType = options.claimType || ClaimFormat.DEFAULT;
 

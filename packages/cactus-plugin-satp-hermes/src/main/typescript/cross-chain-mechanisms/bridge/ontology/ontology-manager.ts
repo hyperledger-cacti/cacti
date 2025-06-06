@@ -14,11 +14,10 @@ import { evmInteractionList } from "./assets/evm-asset";
 import { LedgerNotSupported, OntologyNotFoundError } from "./ontology-errors";
 import * as fs from "fs";
 import * as path from "path";
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../../core/satp-logger";
+import { MonitorService } from "../../../services/monitoring/monitor";
 
 /**
  * Options for configuring the OntologyManager.
@@ -50,10 +49,16 @@ export class OntologyManager {
    * @constructor
    * @param {IOntologyManagerOptions} options - The options for configuring the OntologyManager.
    */
-  constructor(options: IOntologyManagerOptions) {
+  constructor(
+    options: IOntologyManagerOptions,
+    monitorService: MonitorService,
+  ) {
     const label = OntologyManager.CLASS_NAME;
     this.logLevel = options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      monitorService,
+    );
     const ontologiesPath = options.ontologiesPath;
 
     if (ontologiesPath) {

@@ -1,4 +1,5 @@
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import "jest-extended";
 
 import path from "path";
@@ -15,16 +16,21 @@ import { FabricTestEnvironment } from "../../test-utils";
 import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/fabric-asset";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { FabricLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let ontologyManager: OntologyManager;
 
 let asset: FabricFungibleAsset;
 
 const logLevel: LogLevelDesc = "DEBUG";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "SATP - Hermes",
-});
+const monitorService = MonitorService.createOrGetMonitorService({});
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "SATP - Hermes",
+  },
+  monitorService,
+);
 
 let fabricLeaf: FabricLeaf;
 let fabricEnv: FabricTestEnvironment;
@@ -44,15 +50,19 @@ beforeAll(async () => {
 
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
-    ontologyManager = new OntologyManager({
-      logLevel,
-      ontologiesPath: ontologiesPath,
-    });
+    ontologyManager = new OntologyManager(
+      {
+        logLevel,
+        ontologiesPath: ontologiesPath,
+      },
+      monitorService,
+    );
 
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
       logLevel,
       claimFormat: ClaimFormat.DEFAULT,
+      monitorService: monitorService,
     });
     log.info("Fabric Ledger started successfully");
 
@@ -86,7 +96,9 @@ describe("Fabric Bridge Test", () => {
   jest.setTimeout(900000);
   it("Should Initialize the bridge", async () => {
     fabricLeaf = new FabricLeaf(
-      fabricEnv.createFabricLeafConfig(ontologyManager, "DEBUG"),
+      fabricEnv.createFabricLeafConfig("DEBUG"),
+      ontologyManager,
+      monitorService,
     );
     expect(fabricLeaf).toBeDefined();
   });

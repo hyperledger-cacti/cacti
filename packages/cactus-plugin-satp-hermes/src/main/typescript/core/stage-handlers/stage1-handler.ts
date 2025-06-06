@@ -15,7 +15,8 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../core/satp-logger";
 import {
   FailedToCreateMessageError,
   FailedToProcessError,
@@ -28,6 +29,7 @@ import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { saveMessageInSessionData, setError } from "../session-utils";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
@@ -36,13 +38,18 @@ export class Stage1SATPHandler implements SATPHandler {
   private clientService: Stage1ClientService;
   private bridgeManagerClient: BridgeManagerClientInterface;
   private logger: Logger;
+  private monitorService: MonitorService;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage1ServerService;
     this.clientService = ops.clientService as Stage1ClientService;
     this.bridgeManagerClient = ops.bridgeClient;
-    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      ops.loggerOptions,
+      this.monitorService,
+    );
     this.logger.trace(`Initialized ${Stage1SATPHandler.CLASS_NAME}`);
   }
 

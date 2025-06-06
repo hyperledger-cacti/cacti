@@ -1,10 +1,11 @@
 import {
-  type Logger,
   Checks,
   type LogLevelDesc,
-  LoggerProvider,
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
+
+import { SatpLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
+import type { Satp_Logger as Logger } from "../core/satp-logger";
 
 import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 
@@ -73,6 +74,7 @@ import { GetOracleStatusEndpointV1 } from "./oracle/oracle-get-status-endpoint";
 import safeStableStringify from "safe-stable-stringify";
 import { executeAudit } from "./admin/get-audit-handler-service";
 import { AuditEndpointV1 } from "./admin/audit-endpoint";
+import { MonitorService } from "../services/monitoring/monitor";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -85,6 +87,7 @@ export interface BLODispatcherOptions {
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
   claimFormat?: ClaimFormat;
+  monitorService: MonitorService;
 }
 
 // TODO: addGateways as an admin endpoint, simply calls orchestrator
@@ -101,6 +104,7 @@ export class BLODispatcher {
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
   private isShuttingDown = false;
+  private monitorService: MonitorService;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -108,10 +112,13 @@ export class BLODispatcher {
 
     this.level = this.options.logLevel || "INFO";
     this.label = this.className;
-    this.logger = LoggerProvider.getOrCreate({
-      level: this.level,
-      label: this.label,
-    });
+    this.logger = LoggerProvider.getOrCreate(
+      {
+        level: this.level,
+        label: this.label,
+      },
+      this.options.monitorService,
+    );
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.orchestrator = options.orchestrator;
@@ -119,6 +126,7 @@ export class BLODispatcher {
     const ourGateway = this.orchestrator.ourGateway;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
+    this.monitorService = options.monitorService;
 
     this.ccManager = options.ccManager;
 
@@ -132,6 +140,7 @@ export class BLODispatcher {
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
       claimFormat: options.claimFormat,
+      monitorService: this.monitorService,
     };
 
     this.manager = new SATPManager(SATPManagerOpts);

@@ -70,6 +70,7 @@ export class Stage0ClientService extends SATPService {
       signer: ops.signer,
       serviceType: Stage0ClientService.SERVICE_TYPE,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
     if (ops.bridgeManager == undefined) {
@@ -242,6 +243,7 @@ export class Stage0ClientService extends SATPService {
         sessionID: response.sessionId,
         server: false,
         client: true,
+        monitorService: this.monitorService,
       });
 
       copySessionDataAttributes(

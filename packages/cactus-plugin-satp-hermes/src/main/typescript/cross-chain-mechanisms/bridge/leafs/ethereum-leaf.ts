@@ -17,12 +17,9 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
 import { EvmAsset } from "../ontology/assets/evm-asset";
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-  Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../../core/satp-logger";
 import { v4 as uuidv4 } from "uuid";
 import {
   ClaimFormat,
@@ -57,6 +54,7 @@ import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
 import { getUint8Key } from "./leafs-utils";
+import { MonitorService } from "../../../services/monitoring/monitor";
 
 export interface IEthereumLeafNeworkOptions extends INetworkOptions {
   signingCredential: Web3SigningCredential;
@@ -150,6 +148,8 @@ export class EthereumLeaf
 
   private wrapperContractName: string | undefined;
 
+  private readonly monitorService: MonitorService;
+
   /**
    * Constructs a new instance of the `EthereumLeaf` class.
    *
@@ -159,11 +159,19 @@ export class EthereumLeaf
    * @throws {NoSigningCredentialError} If no signing credential is provided.
    * @throws {InvalidWrapperContract} If the wrapper contract name or address is missing.
    */
-  constructor(public readonly options: IEthereumLeafOptions) {
+  constructor(
+    public readonly options: IEthereumLeafOptions,
+    ontologyManager: OntologyManager,
+    monitorService: MonitorService,
+  ) {
     super();
     const label = EthereumLeaf.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.log.debug(
       `${EthereumLeaf.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
@@ -197,7 +205,7 @@ export class EthereumLeaf
       options.connectorOptions as IPluginLedgerConnectorEthereumOptions,
     );
 
-    this.ontologyManager = options.ontologyManager;
+    this.ontologyManager = ontologyManager;
 
     if (isWeb3SigningCredentialNone(options.signingCredential)) {
       throw new NoSigningCredentialError(

@@ -1,14 +1,15 @@
 import {
   Secp256k1Keys,
-  type Logger,
   Checks,
-  LoggerProvider,
   type ILoggerOptions,
   JsObjectSigner,
   type IJsObjectSignerOptions,
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
+
+import { type Satp_Logger as Logger } from "./core/satp-logger";
+import { SatpLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
 import { v4 as uuidv4 } from "uuid";
 
 import { ValidatorOptions } from "class-validator";
@@ -80,6 +81,7 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
 import { createMigrationSource } from "./database/knex-migration-source";
+import { MonitorService } from "./services/monitoring/monitor";
 
 export interface SATPGatewayConfig extends ICactusPluginOptions {
   gid?: GatewayIdentity;
@@ -136,6 +138,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
   private crashManager?: CrashManager;
+  private monitorService: MonitorService;
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
 
@@ -149,7 +152,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       level: level,
       label: this.className,
     };
-    this.logger = LoggerProvider.getOrCreate(logOptions);
+    this.monitorService = MonitorService.createOrGetMonitorService({
+      logLevel: this.config.logLevel,
+    });
+    void this.initializeMonitorService();
+    this.logger = LoggerProvider.getOrCreate(logOptions, this.monitorService);
     this.logger.info("Initializing Gateway Coordinator");
 
     if (this.config.localRepository) {
@@ -212,6 +219,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       counterPartyGateways: this.config.counterPartyGateways,
       signer: this.signer,
       enableCrashRecovery: this.config.enableCrashRecovery,
+      monitorService: this.monitorService,
     };
 
     if (this.config.gid) {
@@ -231,6 +239,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         ontologiesPath: this.config.ontologyPath,
       },
       logLevel: this.config.logLevel,
+      monitorService: this.monitorService,
     };
 
     this.SATPCCManager = new SATPCrossChainManager(SATPCCManagerOptions);
@@ -251,6 +260,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
       claimFormat: this.claimFormat,
+      monitorService: this.monitorService,
     };
 
     this.connectedDLTs = this.config.gid.connectedDLTs || [];
@@ -272,6 +282,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         localRepository: this.localRepository,
         remoteRepository: this.remoteRepository,
         signer: this.signer,
+        monitorService: this.monitorService,
       };
       this.crashManager = new CrashManager(crashOptions);
       this.logger.info("CrashManager has been initialized.");
@@ -673,12 +684,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       return;
     }
 
-    const satpManager = await this.BLODispatcher?.getManager();
-
-    const monitorService = satpManager?.getMonitorService() || undefined;
-    if (monitorService) {
+    if (this.monitorService) {
       this.logger.debug("Shutting down monitor service");
-      await monitorService.shutdown();
+      await this.monitorService.shutdown();
       this.logger.debug("Monitor service shut down");
     }
 
@@ -733,12 +741,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       return;
     }
 
-    const satpManager = await this.BLODispatcher?.getManager();
-
-    const monitorService = satpManager?.getMonitorService() || undefined;
-    if (monitorService) {
+    if (this.monitorService) {
       this.logger.debug("Shutting down monitor service");
-      await monitorService.shutdown();
+      await this.monitorService.shutdown();
       this.logger.debug("Monitor service shut down");
     }
 
@@ -854,5 +859,28 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         }
       });
     });
+  }
+  private async initializeMonitorService(): Promise<void> {
+    const fnTag = `${this.className}#initializeMonitorService()`;
+
+    if (!this.monitorService) {
+      this.logger.warn(
+        `${fnTag} Monitoring service is undefined. Skipping initialization.`,
+      );
+      return;
+    }
+
+    try {
+      await this.monitorService.init();
+      await this.monitorService.createMetric("satp.active_sessions");
+      await this.monitorService.createMetric("satp.transfer.count");
+      await this.monitorService.createMetric("satp.transfer.success");
+      await this.monitorService.createMetric("satp.transfer.failure");
+    } catch (error) {
+      // Log error but don't throw - allow service to continue without monitoring
+      this.logger.warn(
+        `${fnTag} Failed to initialize monitoring service: ${error}`,
+      );
+    }
   }
 }

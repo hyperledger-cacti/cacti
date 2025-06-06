@@ -31,7 +31,8 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -51,6 +52,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
@@ -70,13 +72,17 @@ let besuLeaf: BesuLeaf;
 let fabricLeaf: FabricLeaf;
 
 const sessionId = uuidv4();
+const monitorService = MonitorService.createOrGetMonitorService({});
 const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const logLevel: LogLevelDesc = "DEBUG";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "Rollback-stage-0",
-});
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "Rollback-stage-0",
+  },
+  monitorService,
+);
 
 // mock stage-0 rollback
 const createMockSession = (
@@ -88,6 +94,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()
@@ -162,16 +169,20 @@ beforeAll(async () => {
   {
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
-    ontologyManager = new OntologyManager({
-      logLevel,
-      ontologiesPath: ontologiesPath,
-    });
+    ontologyManager = new OntologyManager(
+      {
+        logLevel,
+        ontologiesPath: ontologiesPath,
+      },
+      monitorService,
+    );
 
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
       logLevel,
       claimFormat: ClaimFormat.DEFAULT,
+      monitorService: monitorService,
     });
     log.info("Fabric Ledger started successfully");
 
@@ -184,6 +195,7 @@ beforeAll(async () => {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
       logLevel,
+      monitorService: monitorService,
     });
     log.info("Besu Ledger started successfully");
 
@@ -191,11 +203,15 @@ beforeAll(async () => {
   }
 
   fabricLeaf = new FabricLeaf(
-    fabricEnv.createFabricLeafConfig(ontologyManager, "DEBUG"),
+    fabricEnv.createFabricLeafConfig("DEBUG"),
+    ontologyManager,
+    monitorService,
   );
 
   besuLeaf = new BesuLeaf(
-    besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
+    besuEnv.createBesuLeafConfig("DEBUG"),
+    ontologyManager,
+    monitorService,
   );
 });
 

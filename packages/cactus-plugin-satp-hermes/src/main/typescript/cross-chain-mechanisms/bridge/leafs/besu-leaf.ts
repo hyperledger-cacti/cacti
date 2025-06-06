@@ -14,11 +14,9 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
 import { EvmAsset } from "../ontology/assets/evm-asset";
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../../core/satp-logger";
 import {
   ClaimFormat,
   TokenType,
@@ -55,6 +53,7 @@ import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
 import { getUint8Key } from "./leafs-utils";
 import { isWeb3SigningCredentialNone } from "../../common/utils";
+import { MonitorService } from "../../../services/monitoring/monitor";
 
 export interface IBesuLeafNeworkOptions extends INetworkOptions {
   signingCredential: Web3SigningCredential;
@@ -166,11 +165,21 @@ export class BesuLeaf
    * @throws {NoSigningCredentialError} If no signing credential is provided in the options.
    * @throws {InvalidWrapperContract} If either the contract name or contract address is missing.
    */
-  constructor(public readonly options: IBesuLeafOptions) {
+  constructor(
+    public readonly options: IBesuLeafOptions,
+    ontologyManager: OntologyManager,
+    monitorService: MonitorService,
+  ) {
     super();
     const label = BesuLeaf.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.log = LoggerProvider.getOrCreate(
+      {
+        label,
+        level: this.logLevel,
+      },
+      monitorService,
+    );
 
     this.log.debug(
       `${BesuLeaf.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
@@ -207,7 +216,7 @@ export class BesuLeaf
       options.connectorOptions as IPluginLedgerConnectorBesuOptions,
     );
 
-    this.ontologyManager = options.ontologyManager;
+    this.ontologyManager = ontologyManager;
 
     if (isWeb3SigningCredentialNone(options.signingCredential)) {
       throw new NoSigningCredentialError(

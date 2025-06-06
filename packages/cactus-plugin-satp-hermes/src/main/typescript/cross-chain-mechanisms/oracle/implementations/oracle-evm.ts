@@ -2,11 +2,11 @@ import { OracleAbstract, type OracleAbstractOptions } from "../oracle-abstract";
 import safeStableStringify from "safe-stable-stringify";
 import {
   ISignerKeyPair,
-  type Logger,
-  LoggerProvider,
   type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import type { Satp_Logger as Logger } from "../../../core/satp-logger";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
 import {
@@ -44,6 +44,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SolidityEventLog } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { keccak256 } from "web3-utils";
 import { AbiEventFragment, DecodedParams } from "web3";
+import { MonitorService } from "../../../services/monitoring/monitor";
 
 export interface IEVMOracleEntry extends IOracleEntryBase {
   contractAddress: string;
@@ -53,7 +54,9 @@ export interface IEVMOracleEntry extends IOracleEntryBase {
 
 export interface IOracleEVMOptions
   extends OracleAbstractOptions,
-    IEthereumLeafNeworkOptions {}
+    IEthereumLeafNeworkOptions {
+  monitorService: MonitorService;
+}
 
 export class OracleEVM extends OracleAbstract {
   public static CLASS_NAME = "OracleEVM";
@@ -64,6 +67,7 @@ export class OracleEVM extends OracleAbstract {
   protected readonly claimFormats: ClaimFormat[];
   protected readonly keyPair: ISignerKeyPair;
   protected readonly gasConfig: GasTransactionConfig | undefined;
+  protected readonly monitorService: MonitorService;
 
   private readonly signingCredential:
     | Web3SigningCredentialPrivateKeyHex
@@ -78,7 +82,11 @@ export class OracleEVM extends OracleAbstract {
     super();
     const label = OracleEVM.CLASS_NAME;
     this.logLevel = options.logLevel || "INFO";
-    this.logger = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = options.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      options.monitorService,
+    );
 
     this.logger.debug(
       `${OracleEVM.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,

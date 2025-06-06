@@ -1,19 +1,19 @@
 // todo implement
 // tasks provide callback urls for notifications, this service calls those callbacks
 
-import {
-  type Logger,
-  LoggerProvider,
-  type LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { type LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import type { Satp_Logger as Logger } from "../../core/satp-logger";
 import {
   OracleTask,
   OracleTaskStatusEnum,
   OracleTaskTypeEnum,
 } from "../../public-api";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export interface OracleNotificationDispatcherOptions {
   logger: Logger;
+  monitorService: MonitorService;
 }
 
 export interface OracleNotification {
@@ -28,6 +28,7 @@ export interface OracleNotification {
 export class OracleNotificationDispatcher {
   public static readonly CLASS_NAME = "OracleNotificationDispatcher";
   private readonly log: Logger;
+  private readonly monitorService: MonitorService;
 
   constructor(
     options: OracleNotificationDispatcherOptions,
@@ -35,7 +36,10 @@ export class OracleNotificationDispatcher {
   ) {
     const label = OracleNotificationDispatcher.CLASS_NAME;
     level = level || "INFO";
-    this.log = options.logger ?? LoggerProvider.getOrCreate({ label, level });
+    this.monitorService = options.monitorService;
+    this.log =
+      options.logger ??
+      LoggerProvider.getOrCreate({ label, level }, this.monitorService);
     this.log.debug(
       `${label}#constructor: OracleNotificationDispatcher initialized.`,
     );

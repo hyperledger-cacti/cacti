@@ -13,6 +13,7 @@ import { Stage2SATPHandler } from "../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { CrashRecoveryHandler } from "../core/crash-management/crash-handler";
 import { BridgeManagerClientInterface } from "../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { MonitorService } from "../services/monitoring/monitor";
 
 /**
  * Represents a handler for various stages of the SATP (Secure Asset Transfer Protocol).
@@ -73,5 +74,6 @@ export interface SATPHandlerOptions {
   gatewayId: string;
   loggerOptions: ILoggerOptions;
   stage: string;
+  monitorService: MonitorService;
 }
 export { SATPService, SATPServiceType };

@@ -1,5 +1,5 @@
 import type { ConnectRouter } from "@connectrpc/connect";
-import type { Logger } from "@hyperledger/cactus-common";
+import type { Satp_Logger as Logger } from "../../core/satp-logger";
 import {
   CrashRecoveryService,
   type RecoverSuccessResponse,
