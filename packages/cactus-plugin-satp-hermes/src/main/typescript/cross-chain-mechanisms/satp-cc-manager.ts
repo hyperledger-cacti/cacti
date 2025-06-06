@@ -1,18 +1,18 @@
-import {
-  LoggerProvider,
-  type LogLevelDesc,
-  type Logger,
-} from "@hyperledger/cactus-common";
+import { type LogLevelDesc } from "@hyperledger/cactus-common";
+import type { SATPLogger as Logger } from "../core/satp-logger";
+import { SatpLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import { BridgeManager } from "./bridge/bridge-manager";
 import { BridgeManagerClientInterface } from "./bridge/interfaces/bridge-manager-client-interface";
 import { IOntologyManagerOptions } from "./bridge/ontology/ontology-manager";
 import { INetworkOptions } from "./bridge/bridge-types";
 import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import { OracleManager } from "./oracle/oracle-manager";
+import { MonitorService } from "../services/monitoring/monitor";
 export interface ISATPCrossChainManagerOptions {
   orquestrator: GatewayOrchestrator;
   logLevel?: LogLevelDesc;
   ontologyOptions?: IOntologyManagerOptions;
+  monitorService: MonitorService;
 }
 
 export interface ICrossChainMechanismsOptions {
@@ -60,6 +60,11 @@ export class SATPCrossChainManager {
   private readonly oracleManager: OracleManager;
 
   /**
+   * Instance of the GatewayOrchestrator to handle gateway-related operations.
+   */
+  private readonly monitorService: MonitorService;
+
+  /**
    * Constructs an instance of `ISATPCCManager`.
    *
    * @param options - The options for configuring the `ISATPCCManager`.
@@ -67,11 +72,16 @@ export class SATPCrossChainManager {
   constructor(private options: ISATPCrossChainManagerOptions) {
     const label = SATPCrossChainManager.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.bridgeManager = new BridgeManager({
       ontologyOptions: options.ontologyOptions,
       logLevel: this.logLevel,
+      monitorService: this.monitorService,
     });
 
     this.gatewayOrchestrator = options.orquestrator;
@@ -80,6 +90,7 @@ export class SATPCrossChainManager {
       logLevel: this.logLevel,
       bungee: undefined,
       initialTasks: [],
+      monitorService: this.monitorService,
     });
   }
 

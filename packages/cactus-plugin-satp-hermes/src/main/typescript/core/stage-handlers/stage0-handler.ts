@@ -1,4 +1,5 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { SATPSession } from "../satp-session";
 import { Stage0ServerService } from "../stage-services/server/stage0-server-service";
 import {
@@ -28,6 +29,7 @@ import {
 import { saveMessageInSessionData, setError } from "../session-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { getMessageTypeName } from "../satp-utils";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export class Stage0SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE0;
@@ -37,11 +39,16 @@ export class Stage0SATPHandler implements SATPHandler {
   private logger: Logger;
   private pubKeys: Map<string, string>;
   private gatewayId: string;
+  private monitorService: MonitorService;
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage0ServerService;
     this.clientService = ops.clientService as Stage0ClientService;
-    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      ops.loggerOptions,
+      this.monitorService,
+    );
     this.logger.trace(`Initialized ${Stage0SATPHandler.CLASS_NAME}`);
     this.pubKeys = ops.pubkeys;
     this.gatewayId = ops.gatewayId;

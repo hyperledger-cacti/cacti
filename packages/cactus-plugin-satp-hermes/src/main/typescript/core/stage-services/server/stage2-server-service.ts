@@ -48,6 +48,7 @@ export class Stage2ServerService extends SATPService {
       signer: ops.signer,
       serviceType: Stage2ServerService.SERVICE_TYPE,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
   }

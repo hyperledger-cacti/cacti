@@ -1,19 +1,19 @@
-import {
-  Logger,
-  LogLevelDesc,
-  ILoggerOptions,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc, ILoggerOptions } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { OracleAbstract } from "./oracle-abstract";
 import { IOracleListenerBase } from "./oracle-types";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export interface IOraclePollingManagerOptions {
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 export class OracleSchedulerManager {
   public static readonly CLASS_NAME = "OracleSchedulerManager";
   private readonly logger: Logger;
+  private readonly monitorService: MonitorService;
 
   private pollers: Map<string, NodeJS.Timeout>;
   private eventListeners: Map<string, { unsubscribe: () => void }>;
@@ -24,11 +24,15 @@ export class OracleSchedulerManager {
       throw new Error(`${fnTag}: OracleSchedulerManager options are required`);
     }
     const logLevel = (options.logLevel || "INFO") as LogLevelDesc;
+    this.monitorService = options.monitorService;
     const loggerOptions: ILoggerOptions = {
       level: logLevel,
       label: OracleSchedulerManager.CLASS_NAME,
     };
-    this.logger = LoggerProvider.getOrCreate(loggerOptions);
+    this.logger = LoggerProvider.getOrCreate(
+      loggerOptions,
+      this.monitorService,
+    );
     this.logger.info(`${fnTag}: Initializing OracleSchedulerManager`);
 
     this.pollers = new Map();

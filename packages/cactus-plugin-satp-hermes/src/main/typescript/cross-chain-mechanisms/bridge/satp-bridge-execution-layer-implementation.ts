@@ -1,10 +1,8 @@
 // this file contains a class that encapsulates the logic for managing the SATP bridge (lock, unlock, etc).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   Asset,
   FungibleAsset,
@@ -21,6 +19,7 @@ import {
 } from "./satp-bridge-execution-layer";
 import { BridgeLeafFungible } from "./bridge-leaf-fungible";
 import { BridgeLeaf } from "./bridge-leaf";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 /**
  * Options for configuring the ISATPBridgeExecutionLayerImpl.
@@ -33,6 +32,7 @@ export interface ISATPBridgeExecutionLayerImplOptions {
   leafBridge: BridgeLeaf;
   claimType?: ClaimFormat;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 /**
@@ -48,6 +48,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   private readonly logLevel: LogLevelDesc;
   private readonly bridgeEndPoint: BridgeLeaf;
   private readonly claimType: ClaimFormat;
+  private readonly monitorService: MonitorService;
 
   /**
    * Constructs an instance of SATPBridgeExecutionLayerImpl.
@@ -59,7 +60,11 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   constructor(public readonly options: ISATPBridgeExecutionLayerImplOptions) {
     const label = SATPBridgeExecutionLayerImpl.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.claimType = options.claimType || ClaimFormat.DEFAULT;
 

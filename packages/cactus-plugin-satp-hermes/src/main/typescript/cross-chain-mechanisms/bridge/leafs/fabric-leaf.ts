@@ -13,12 +13,9 @@ import fs from "fs-extra";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyFabric } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import {
-  Logger,
-  LogLevelDesc,
-  LoggerProvider,
-  Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { v4 as uuidv4 } from "uuid";
 import {
   ClaimFormat,
@@ -52,6 +49,7 @@ import { X509Identity } from "fabric-network";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
 import { getUint8Key } from "./leafs-utils";
+import { MonitorService } from "../../../services/monitoring/monitor";
 export interface IFabricLeafNeworkOptions extends INetworkOptions {
   signingCredential: FabricSigningCredential;
   connectorOptions: Partial<IPluginLedgerConnectorFabricOptions>;
@@ -174,6 +172,7 @@ export class FabricLeaf
   private signaturePolicy: string | undefined;
   private mspId: string | undefined;
   private brigeId: string | undefined;
+  private monitorService: MonitorService;
   /**
    * Constructs a new instance of the FabricLeaf class.
    *
@@ -183,11 +182,19 @@ export class FabricLeaf
    * @throws InvalidWrapperContract - If the necessary variables for deploying the wrapper contract are missing.
    *
    */
-  constructor(public readonly options: IFabricLeafOptions) {
+  constructor(
+    public readonly options: IFabricLeafOptions,
+    ontologyManager: OntologyManager,
+    monitorService: MonitorService,
+  ) {
     super();
     const label = FabricLeaf.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.log.debug(
       `${FabricLeaf.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
@@ -221,7 +228,7 @@ export class FabricLeaf
       options.connectorOptions as IPluginLedgerConnectorFabricOptions,
     );
 
-    this.ontologyManager = options.ontologyManager;
+    this.ontologyManager = ontologyManager;
 
     this.signingCredential = options.signingCredential;
 
