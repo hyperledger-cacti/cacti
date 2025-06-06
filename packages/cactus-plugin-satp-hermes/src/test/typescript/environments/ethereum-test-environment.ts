@@ -3,7 +3,7 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
+import SATPTokenContract from "../../solidity/generated/satp-erc20.sol/SATPTokenContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -99,10 +99,10 @@ export class EthereumTestEnvironment {
 
     await this.ledger.start(false, []);
 
-    const SATPContract1 = {
-      contractName: "SATPContract",
-      abi: SATPContract.abi,
-      bytecode: SATPContract.bytecode.object,
+    const SATPTokenContract1 = {
+      contractName: "SATPTokenContract",
+      abi: SATPTokenContract.abi,
+      bytecode: SATPTokenContract.bytecode.object,
     };
     const SATPWrapperContract1 = {
       contractName: "SATPWrapperContract",
@@ -131,7 +131,7 @@ export class EthereumTestEnvironment {
 
     this.keychainPlugin1.set(
       this.erc20TokenContract,
-      JSON.stringify(SATPContract1),
+      JSON.stringify(SATPTokenContract1),
     );
     this.keychainPlugin2.set(
       this.contractNameWrapper,
@@ -161,7 +161,7 @@ export class EthereumTestEnvironment {
   }
 
   public getTestContractAbi(): any {
-    return SATPContract.abi;
+    return SATPTokenContract.abi;
   }
 
   public getTestOwnerAccount(): string {
@@ -267,7 +267,7 @@ export class EthereumTestEnvironment {
 
   // Deploys smart contracts and sets up configurations for testing
   public async deployAndSetupContracts(claimFormat: ClaimFormat) {
-    const deployOutSATPContract = await this.connector.deployContract({
+    const deployOutSATPTokenContract = await this.connector.deployContract({
       contract: {
         keychainId: this.keychainPlugin1.getKeychainId(),
         contractName: this.erc20TokenContract,
@@ -282,16 +282,16 @@ export class EthereumTestEnvironment {
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
-    expect(deployOutSATPContract).toBeTruthy();
-    expect(deployOutSATPContract.transactionReceipt).toBeTruthy();
+    expect(deployOutSATPTokenContract).toBeTruthy();
+    expect(deployOutSATPTokenContract.transactionReceipt).toBeTruthy();
     expect(
-      deployOutSATPContract.transactionReceipt.contractAddress,
+      deployOutSATPTokenContract.transactionReceipt.contractAddress,
     ).toBeTruthy();
 
     this.assetContractAddress =
-      deployOutSATPContract.transactionReceipt.contractAddress ?? "";
+      deployOutSATPTokenContract.transactionReceipt.contractAddress ?? "";
 
-    this.log.info("SATPContract Deployed successfully");
+    this.log.info("SATPTokenContract Deployed successfully");
 
     this.ethereumConfig = {
       networkIdentification: this.network,
