@@ -116,20 +116,6 @@ beforeAll(async () => {
   const businessLogicContract = "OracleTestContract";
 
   {
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: businessLogicContract,
-      logLevel,
-      network: testNetwork,
-    });
-    log.info("Besu Ledger started successfully");
-
-    besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
-      ClaimFormat.BUNGEE,
-      "OracleTestContract",
-      OracleTestContract,
-    );
-  }
-  {
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: businessLogicContract,
       logLevel,
@@ -138,6 +124,20 @@ beforeAll(async () => {
     log.info("Ethereum Ledger started successfully");
 
     ethereumContractAddress = await ethereumEnv.deployAndSetupOracleContracts(
+      ClaimFormat.BUNGEE,
+      "OracleTestContract",
+      OracleTestContract,
+    );
+  }
+  {
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
+      contractName: businessLogicContract,
+      logLevel,
+      network: testNetwork,
+    });
+    log.info("Besu Ledger started successfully");
+
+    besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
       ClaimFormat.BUNGEE,
       "OracleTestContract",
       OracleTestContract,

@@ -5,13 +5,12 @@ pragma solidity >=0.7.0;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "./oracle-contract-interface.sol";
 
 /**
  * @title OracleTestContract
  * The OracleTestContract is a example costum contract .
  */
-contract OracleTestContract is AccessControl, OracleTestContractInterface {
+contract OracleTestContract is AccessControl {
 
     bytes32 public constant ORACLE_ROLE = keccak256("ORACLE_ROLE");
 
