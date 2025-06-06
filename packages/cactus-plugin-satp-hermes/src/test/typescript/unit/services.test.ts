@@ -86,6 +86,7 @@ import { BridgeManager } from "../../../main/typescript/cross-chain-mechanisms/b
 import { createMigrationSource } from "../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../main/typescript/database/knexfile-remote";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -99,6 +100,8 @@ const serviceClasses = [
   Stage3ServerService,
   Stage3ClientService,
 ];
+
+const monitorService = MonitorService.createOrGetMonitorService({});
 
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 
@@ -148,6 +151,7 @@ const sessionIDs: string[] = [];
 beforeAll(async () => {
   bridgeManager = new BridgeManager({
     logLevel: logLevel,
+    monitorService: monitorService,
   });
 
   jest.spyOn(bridgeManager, "getSATPExecutionLayer").mockImplementation(() => {
@@ -190,6 +194,7 @@ beforeAll(async () => {
     remoteRepository,
     signer,
     pubKey: Buffer.from(keyPairs.publicKey).toString("hex"),
+    monitorService: monitorService,
   });
 
   persistLogEntrySpy = jest.spyOn(dbLogger, "persistLogEntry");
@@ -198,6 +203,7 @@ beforeAll(async () => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   sessionIDs.push(mockSession.getSessionId());
@@ -1109,6 +1115,7 @@ function initializeServiceOptions(
       index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
     bridgeManager: bridgeManager,
     dbLogger: dbLogger,
+    monitorService: monitorService,
   }));
 }
 

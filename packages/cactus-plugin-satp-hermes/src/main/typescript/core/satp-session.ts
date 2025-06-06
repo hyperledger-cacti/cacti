@@ -1,12 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import {
-  Checks,
-  LogLevelDesc,
-  Logger,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
+
+import { SatpLoggerProvider as LoggerProvider } from "./satp-logger-provider";
+import { Satp_Logger as Logger } from "./satp-logger";
 
 import {
   Type,
@@ -58,6 +56,7 @@ import {
 } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { SessionType } from "./session-utils";
 import { create } from "@bufbuild/protobuf";
+import { MonitorService } from "../services/monitoring/monitor";
 
 // Define interface on protos
 export interface ISATPSessionOptions {
@@ -66,6 +65,7 @@ export interface ISATPSessionOptions {
   sessionID?: string;
   server: boolean;
   client: boolean;
+  monitorService: MonitorService;
 }
 
 export class SATPSession {
@@ -73,6 +73,7 @@ export class SATPSession {
   private clientSessionData: SessionData | undefined;
   private serverSessionData: SessionData | undefined;
   private readonly logger: Logger;
+  private monitorService: MonitorService;
 
   constructor(ops: ISATPSessionOptions) {
     const fnTag = `${SATPSession.CLASS_NAME}#constructor()`;
@@ -80,7 +81,11 @@ export class SATPSession {
 
     const level = ops.logLevel || "DEBUG";
     const label = this.className;
-    this.logger = LoggerProvider.getOrCreate({ level, label });
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      { level, label },
+      this.monitorService,
+    );
 
     if (!ops.server && !ops.client) {
       throw new Error(`${SATPSession.CLASS_NAME}#constructor(), at least one of server or client must be true
@@ -139,6 +144,8 @@ export class SATPSession {
     sessionData.satpMessages.stage2 = create(Stage2MessagesSchema, {});
     sessionData.satpMessages.stage3 = create(Stage3MessagesSchema, {});
     sessionData.state = State.ONGOING;
+
+    this.monitorService.incrementCounter("created_sessions");
   }
 
   public getServerSessionData(): SessionData {
@@ -163,7 +170,10 @@ export class SATPSession {
     return this.clientSessionData;
   }
 
-  public static recreateSession(sessionData: SessionData): SATPSession {
+  public static recreateSession(
+    sessionData: SessionData,
+    monitorService: MonitorService,
+  ): SATPSession {
     const isClient = sessionData.role === Type.CLIENT;
     const isServer = sessionData.role === Type.SERVER;
 
@@ -176,6 +186,7 @@ export class SATPSession {
       sessionID: sessionData.id,
       server: isServer,
       client: isClient,
+      monitorService: monitorService,
     });
 
     if (isServer) {

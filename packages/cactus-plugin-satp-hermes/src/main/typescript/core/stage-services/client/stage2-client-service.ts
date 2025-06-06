@@ -65,6 +65,7 @@ export class Stage2ClientService extends SATPService {
       serviceType: Stage2ClientService.SERVICE_TYPE,
       bridgeManager: ops.bridgeManager,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
 

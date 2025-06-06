@@ -1,10 +1,10 @@
 import {
-  type Logger,
-  LoggerProvider,
   Checks,
   type LogLevelDesc,
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
+import { type Satp_Logger as Logger } from "../../core/satp-logger";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import {
   Type,
   type SessionData,
@@ -36,6 +36,7 @@ import type { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/
 import type { SATPHandler } from "../../types/satp-protocol";
 import { CrashStatus } from "../../core/types";
 import { verifySignature } from "../../gateway-utils";
+import { MonitorService } from "../monitoring/monitor";
 
 export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
@@ -46,6 +47,7 @@ export interface ICrashRecoveryManagerOptions {
   orchestrator: GatewayOrchestrator;
   signer: JsObjectSigner;
   healthCheckInterval?: string | schedule.RecurrenceRule;
+  monitorService: MonitorService;
 }
 
 export class CrashManager {
@@ -65,6 +67,7 @@ export class CrashManager {
   private gatewaysPubKeys: Map<string, string> = new Map();
   private readonly ccManager: SATPCrossChainManager;
   private signer: JsObjectSigner;
+  private monitorService: MonitorService;
 
   constructor(public readonly options: ICrashRecoveryManagerOptions) {
     const fnTag = `${CrashManager.CLASS_NAME}#constructor()`;
@@ -72,7 +75,11 @@ export class CrashManager {
 
     const level = this.options.logLevel;
     const label = this.className;
-    this.log = LoggerProvider.getOrCreate({ level, label });
+    this.monitorService = options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { level, label },
+      this.monitorService,
+    );
     this.log.info(`Instantiated ${this.className} OK`);
     this.instanceId = options.instanceId;
     this.sessions = new Map<string, SATPSession>();
@@ -168,7 +175,10 @@ export class CrashManager {
 
       const sessionData: SessionData = JSON.parse(log.data);
 
-      const satpSession = SATPSession.recreateSession(sessionData);
+      const satpSession = SATPSession.recreateSession(
+        sessionData,
+        this.monitorService,
+      );
       this.sessions.set(sessionId, satpSession);
       this.log.info(
         `${fnTag} Successfully reconstructed session: ${sessionId}`,
@@ -547,7 +557,10 @@ export class CrashManager {
           sessionData.hashes = hashes;
           sessionData.processedTimestamps = processedTimestamps;
           sessionData.signatures = signatures;
-          const updatedSession = SATPSession.recreateSession(sessionData);
+          const updatedSession = SATPSession.recreateSession(
+            sessionData,
+            this.monitorService,
+          );
           this.sessions.set(sessionId, updatedSession);
           this.log.info(
             `${fnTag} Session data successfully reconstructed for session ID: ${sessionId}`,

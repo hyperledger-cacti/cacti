@@ -3,15 +3,13 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./database/repository/interfaces/repository";
-import {
-  JsObjectSigner,
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { JsObjectSigner, LogLevelDesc } from "@hyperledger/cactus-common";
+import { Satp_Logger as Logger } from "./core/satp-logger";
+import { SatpLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, getSatpLogKey, sign } from "./gateway-utils";
+import { MonitorService } from "./services/monitoring/monitor";
 
 interface SATPLogEntry {
   sessionID: string;
@@ -27,6 +25,7 @@ export interface ISATPLoggerConfig {
   signer: JsObjectSigner;
   pubKey: string;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService; // Replace with actual type if available
 }
 
 export class SATPLogger {
@@ -36,17 +35,22 @@ export class SATPLogger {
   private signer: JsObjectSigner;
   private pubKey: string;
   private readonly log: Logger;
+  private readonly monitorService: MonitorService;
 
   constructor(config: ISATPLoggerConfig) {
     this.localRepository = config.localRepository;
     this.remoteRepository = config.remoteRepository;
     this.signer = config.signer;
     this.pubKey = config.pubKey;
+    this.monitorService = config.monitorService;
 
-    this.log = LoggerProvider.getOrCreate({
-      label: "SATPLogger",
-      level: config.logLevel || "INFO",
-    });
+    this.log = LoggerProvider.getOrCreate(
+      {
+        label: "SATPLogger",
+        level: config.logLevel || "INFO",
+      },
+      this.monitorService,
+    );
 
     this.log.info("SATPLogger initialized.");
   }

@@ -8,7 +8,8 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../core/satp-logger";
 import {
   LockAssertionResponse,
   LockAssertionRequest,
@@ -24,18 +25,24 @@ import { getSessionId } from "./handler-utils";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { saveMessageInSessionData, setError } from "../session-utils";
+import { MonitorService } from "../../services/monitoring/monitor";
 export class Stage2SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE2;
   private sessions: Map<string, SATPSession>;
   private serverService: Stage2ServerService;
   private clientService: Stage2ClientService;
   private logger: Logger;
+  private monitorService: MonitorService;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage2ServerService;
     this.clientService = ops.clientService as Stage2ClientService;
-    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      ops.loggerOptions,
+      this.monitorService,
+    );
     this.logger.trace(`Initialized ${Stage2SATPHandler.CLASS_NAME}`);
   }
 

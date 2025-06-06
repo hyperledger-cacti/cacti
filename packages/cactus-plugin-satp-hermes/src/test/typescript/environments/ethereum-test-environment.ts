@@ -1,8 +1,6 @@
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../main/typescript/core/satp-logger-provider";
+import { Satp_Logger as Logger } from "../../../main/typescript/core/satp-logger";
 import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -30,13 +28,14 @@ import {
   IEthereumLeafNeworkOptions,
   IEthereumLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
-import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 export interface IEthereumTestEnvironment {
   contractName: string;
   logLevel: LogLevelDesc;
+  monitorService: MonitorService;
   network?: string;
 }
 // Test environment for Ethereum ledger operations
@@ -69,12 +68,15 @@ export class EthereumTestEnvironment {
 
   private dockerNetwork?: string;
 
+  private monitorService: MonitorService;
+
   private readonly log: Logger;
 
   // eslint-disable-next-line prettier/prettier
   private constructor(
     erc20TokenContract: string,
     logLevel: LogLevelDesc,
+    monitorService: MonitorService,
     network?: string,
   ) {
     if (network) {
@@ -86,7 +88,11 @@ export class EthereumTestEnvironment {
 
     const level = logLevel || "INFO";
     const label = "EthereumTestEnvironment";
-    this.log = LoggerProvider.getOrCreate({ level, label });
+    this.monitorService = monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { level, label },
+      this.monitorService,
+    );
   }
 
   // Initializes the Ethereum ledger, accounts, and connector for testing
@@ -203,6 +209,7 @@ export class EthereumTestEnvironment {
     const instance = new EthereumTestEnvironment(
       config.contractName,
       config.logLevel,
+      config.monitorService,
       config.network,
     );
     await instance.init(config.logLevel);
@@ -211,13 +218,11 @@ export class EthereumTestEnvironment {
 
   // this creates the same config as the bridge manager does
   public createEthereumLeafConfig(
-    ontologyManager: OntologyManager,
     logLevel?: LogLevelDesc,
   ): IEthereumLeafOptions {
     return {
       networkIdentification: this.ethereumConfig.networkIdentification,
       signingCredential: this.ethereumConfig.signingCredential,
-      ontologyManager: ontologyManager,
       wrapperContractName: this.ethereumConfig.wrapperContractName,
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
       gasConfig: this.ethereumConfig.gasConfig,
