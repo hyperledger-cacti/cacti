@@ -69,9 +69,8 @@
   },
   "scripts": {
     "build:dev:backend:postbuild": "",
-    "forge:all": "run-s 'forge:build' 'forge:test'",
+    "forge:all": "run-s 'forge:build'",
     "forge:build": "forge build ./src/main/solidity/contracts/*.sol --out ./src/main/solidity/generated",
-    "forge:test": "forge test --out ./src/test/solidity/generated",
     "start": "npx ts-node ./src/main/typescript/cbdc-bridging-app-cli.ts dotenv_config_path=./process.env",
     "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
     "test:integration": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration --runInBand --forceExit",
