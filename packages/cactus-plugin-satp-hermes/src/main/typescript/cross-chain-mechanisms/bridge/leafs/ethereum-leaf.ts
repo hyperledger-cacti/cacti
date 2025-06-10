@@ -51,7 +51,7 @@ import {
   WrapperContractError,
 } from "../../common/errors";
 import { ISignerKeyPair } from "@hyperledger/cactus-common";
-import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
+import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { Asset } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";

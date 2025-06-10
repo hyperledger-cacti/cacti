@@ -14,7 +14,7 @@ import Docker from "dockerode";
 import { Account } from "web3-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
+import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   EthContractInvocationType as BesuContractInvocationType,
@@ -129,7 +129,7 @@ export class BesuEnvironment {
     // Smart Contract Configuration
     this.keychainPlugin1.set(
       BesuEnvironment.SATP_CONTRACT_NAME,
-      JSON.stringify(SATPContract),
+      JSON.stringify(SATPTokenContract),
     );
 
     // Plugin Registry setup
@@ -162,34 +162,31 @@ export class BesuEnvironment {
 
   // Deploys smart contracts and sets up configurations for testing
   public async deployAndSetupContracts() {
-    const deployOutSATPContract = await this.connector?.deployContract({
+    const deployOutSATPTokenContract = await this.connector?.deployContract({
       keychainId: this.keychainPlugin1.getKeychainId(),
       contractName: BesuEnvironment.SATP_CONTRACT_NAME,
-      contractAbi: SATPContract.abi,
-      constructorArgs: [
-        this.firstHighNetWorthAccount,
-        BesuEnvironment.BESU_ASSET_ID,
-      ],
+      contractAbi: SATPTokenContract.abi,
+      constructorArgs: [this.firstHighNetWorthAccount],
       web3SigningCredential: {
         ethAccount: this.firstHighNetWorthAccount,
         secret: this.besuKeyPair?.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      bytecode: SATPContract.bytecode.object,
+      bytecode: SATPTokenContract.bytecode.object,
       gas: 999999999999999,
     });
     if (
-      !deployOutSATPContract ||
-      !deployOutSATPContract.transactionReceipt ||
-      !deployOutSATPContract.transactionReceipt.contractAddress
+      !deployOutSATPTokenContract ||
+      !deployOutSATPTokenContract.transactionReceipt ||
+      !deployOutSATPTokenContract.transactionReceipt.contractAddress
     ) {
-      throw new Error("Failed to deploy SATPContract");
+      throw new Error("Failed to deploy SATPTokenContract");
     }
 
     this.assetContractAddress =
-      deployOutSATPContract?.transactionReceipt.contractAddress ?? "";
+      deployOutSATPTokenContract?.transactionReceipt.contractAddress ?? "";
 
-    this.log.info("SATPContract Deployed successfully");
+    this.log.info("SATPTokenContract Deployed successfully");
   }
 
   public setApproveAddress(approveAddress: string) {
@@ -231,7 +228,7 @@ export class BesuEnvironment {
       contractName: BesuEnvironment.SATP_CONTRACT_NAME,
       keychainId: this.keychainPlugin1.getKeychainId(),
       invocationType: BesuContractInvocationType.Send,
-      methodName: "giveRole",
+      methodName: "grantBridgeRole",
       params: [wrapperAddress],
       signingCredential: {
         ethAccount: this.firstHighNetWorthAccount,

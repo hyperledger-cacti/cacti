@@ -4,19 +4,15 @@
     "type": "ETHEREUM",
     "ontology": {
         "lock": [{
-            "functionSignature": "transfer(address,address,uint256)",
+            "functionSignature": "transferFrom(address,address,uint256)",
             "variables": ["owner", "bridge", "amount"],
             "available": true
         }
         ],
-        "unlock": [{
-            "functionSignature": "approve(address,uint256)",
-            "variables": ["bridge", "amount"],
-            "available": true
-            },
+        "unlock": [
             {
-            "functionSignature": "transfer(address,address,uint256)",
-            "variables": ["bridge", "owner", "amount"],
+            "functionSignature": "transfer(address,uint256)",
+            "variables": ["owner", "amount"],
             "available": true
             }
         ],
@@ -33,13 +29,13 @@
             }
         ],
         "assign": [{
-                "functionSignature": "assign(address,address,uint256)",
-                "variables": ["bridge", "receiver", "amount"],
+                "functionSignature": "transfer(address,uint256)",
+                "variables": ["receiver", "amount"],
                 "available": true
             }
         ],
         "checkPermission": [{
-            "functionSignature": "hasPermission(address)",
+            "functionSignature": "hasBridgeRole(address)",
             "variables": ["bridge"],
             "available": true
             } 
