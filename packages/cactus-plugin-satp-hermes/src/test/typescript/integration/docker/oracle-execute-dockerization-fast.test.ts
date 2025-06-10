@@ -38,7 +38,7 @@ import {
   OracleRegisterRequestTaskModeEnum,
   OracleTaskStatusEnum,
 } from "../../../../main/typescript";
-import OracleTestContract from "../../../solidity/generated/oracle-contract.sol/OracleTestContract.json";
+import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
 import { keccak256 } from "web3-utils";
 
@@ -116,20 +116,6 @@ beforeAll(async () => {
   const businessLogicContract = "OracleTestContract";
 
   {
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: businessLogicContract,
-      logLevel,
-      network: testNetwork,
-    });
-    log.info("Besu Ledger started successfully");
-
-    besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
-      ClaimFormat.BUNGEE,
-      "OracleTestContract",
-      OracleTestContract,
-    );
-  }
-  {
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: businessLogicContract,
       logLevel,
@@ -138,6 +124,20 @@ beforeAll(async () => {
     log.info("Ethereum Ledger started successfully");
 
     ethereumContractAddress = await ethereumEnv.deployAndSetupOracleContracts(
+      ClaimFormat.BUNGEE,
+      "OracleTestContract",
+      OracleTestContract,
+    );
+  }
+  {
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
+      contractName: businessLogicContract,
+      logLevel,
+      network: testNetwork,
+    });
+    log.info("Besu Ledger started successfully");
+
+    besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
       ClaimFormat.BUNGEE,
       "OracleTestContract",
       OracleTestContract,
@@ -337,7 +337,7 @@ describe("Oracle event listener for EVM working", () => {
         [keccak256(payload1)],
       );
     } catch (error) {
-      log.info("Expected error occurred while reading data:", error);
+      log.info("Received expected error because payload1 does not exist");
       response2 = { success: false, callOutput: null };
     }
 
@@ -354,7 +354,7 @@ describe("Oracle event listener for EVM working", () => {
         [keccak256(payload2)],
       );
     } catch (error) {
-      log.info("Expected error occurred while reading data:", error);
+      log.info("Received expected error because payload1 does not exist");
       response3 = { success: false, callOutput: null };
     }
 
@@ -468,5 +468,9 @@ describe("Oracle event listener for EVM working", () => {
 
     expect(response3.success).toBeTruthy();
     expect(response3.callOutput).toBe(payload2);
+
+    log.info(
+      "Data successfully copied from Ethereum to Besu using event listener",
+    );
   });
 });

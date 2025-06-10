@@ -30,7 +30,7 @@ import {
 } from "../../../../main/typescript/core/constants";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { v4 as uuidv4 } from "uuid";
-import OracleTestContract from "../../../solidity/generated/oracle-contract.sol/OracleTestContract.json";
+import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "DEBUG";

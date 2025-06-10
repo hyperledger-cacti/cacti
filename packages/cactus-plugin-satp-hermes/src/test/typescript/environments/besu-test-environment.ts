@@ -13,7 +13,7 @@ import {
   Web3SigningCredential,
   Web3SigningCredentialType as Web3SigningCredentialTypeBesu,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import SATPContract from "../../solidity/generated/satp-erc20.sol/SATPContract.json";
+import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import Web3 from "web3";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -58,6 +58,7 @@ export class BesuTestEnvironment {
   public erc20TokenContract!: string;
   public assetContractAddress?: string;
   public besuConfig!: IBesuLeafNeworkOptions;
+  public gas: number = 999999999; // Default gas limit for transactions
 
   private dockerContainerIP?: string;
   private dockerNetwork: string = "besu";
@@ -137,7 +138,7 @@ export class BesuTestEnvironment {
     // Smart Contract Configuration
     this.keychainPlugin1.set(
       this.erc20TokenContract,
-      JSON.stringify(SATPContract),
+      JSON.stringify(SATPTokenContract),
     );
 
     // Plugin Registry setup
@@ -264,32 +265,29 @@ export class BesuTestEnvironment {
 
   // Deploys smart contracts and sets up configurations for testing
   public async deployAndSetupContracts(claimFormat: ClaimFormat) {
-    const deployOutSATPContract = await this.connector.deployContract({
+    const deployOutSATPTokenContract = await this.connector.deployContract({
       keychainId: this.keychainPlugin1.getKeychainId(),
       contractName: this.erc20TokenContract,
-      contractAbi: SATPContract.abi,
-      constructorArgs: [
-        this.firstHighNetWorthAccount,
-        BesuTestEnvironment.BESU_ASSET_ID,
-      ],
+      contractAbi: SATPTokenContract.abi,
+      constructorArgs: [this.firstHighNetWorthAccount],
       web3SigningCredential: {
         ethAccount: this.firstHighNetWorthAccount,
         secret: this.besuKeyPair.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      bytecode: SATPContract.bytecode.object,
-      gas: 999999999999999,
+      bytecode: SATPTokenContract.bytecode.object,
+      gas: this.gas,
     });
-    expect(deployOutSATPContract).toBeTruthy();
-    expect(deployOutSATPContract.transactionReceipt).toBeTruthy();
+    expect(deployOutSATPTokenContract).toBeTruthy();
+    expect(deployOutSATPTokenContract.transactionReceipt).toBeTruthy();
     expect(
-      deployOutSATPContract.transactionReceipt.contractAddress,
+      deployOutSATPTokenContract.transactionReceipt.contractAddress,
     ).toBeTruthy();
 
     this.assetContractAddress =
-      deployOutSATPContract.transactionReceipt.contractAddress ?? "";
+      deployOutSATPTokenContract.transactionReceipt.contractAddress ?? "";
 
-    this.log.info("SATPContract Deployed successfully");
+    this.log.info("SATPTokenContract Deployed successfully");
 
     this.besuConfig = {
       networkIdentification: this.network,
@@ -301,7 +299,7 @@ export class BesuTestEnvironment {
       leafId: "Testing-event-besu-leaf",
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: 999999999999999,
+      gas: this.gas,
     };
   }
 
@@ -322,7 +320,7 @@ export class BesuTestEnvironment {
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
       bytecode: contract.bytecode.object,
-      gas: 999999999999999,
+      gas: this.gas,
     });
     expect(blOracleContract).toBeTruthy();
     expect(blOracleContract.transactionReceipt).toBeTruthy();
@@ -343,7 +341,7 @@ export class BesuTestEnvironment {
       leafId: "Testing-event-besu-leaf",
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: 999999999999999,
+      gas: this.gas,
     };
 
     return blOracleContract.transactionReceipt.contractAddress!;
@@ -361,7 +359,7 @@ export class BesuTestEnvironment {
         secret: this.besuKeyPair.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: 999999999,
+      gas: this.besuConfig.gas,
     });
     expect(responseMint).toBeTruthy();
     expect(responseMint.success).toBeTruthy();
@@ -373,7 +371,7 @@ export class BesuTestEnvironment {
       contractName: this.erc20TokenContract,
       keychainId: this.keychainPlugin1.getKeychainId(),
       invocationType: BesuContractInvocationType.Send,
-      methodName: "giveRole",
+      methodName: "grantBridgeRole",
       params: [wrapperAddress],
       signingCredential: {
         ethAccount: this.firstHighNetWorthAccount,
@@ -403,7 +401,7 @@ export class BesuTestEnvironment {
         secret: this.besuKeyPair.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: 999999999,
+      gas: this.besuConfig.gas,
     });
     expect(responseApprove).toBeTruthy();
     expect(responseApprove.success).toBeTruthy();
@@ -419,7 +417,7 @@ export class BesuTestEnvironment {
   }
 
   public getTestContractAbi(): any {
-    return SATPContract.abi;
+    return SATPTokenContract.abi;
   }
 
   public getTestOwnerAccount(): string {
@@ -459,10 +457,10 @@ export class BesuTestEnvironment {
       contractAddress: contract_address,
       contractAbi: contract_abi,
       invocationType: BesuContractInvocationType.Call,
-      methodName: "checkBalance",
+      methodName: "balanceOf",
       params: [account],
       signingCredential: signingCredential,
-      gas: 999999999,
+      gas: this.besuConfig.gas,
     });
 
     expect(responseBalanceBridge).toBeTruthy();
@@ -508,7 +506,7 @@ export class BesuTestEnvironment {
         secret: this.bridgeEthAccount.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: 999999999999999,
+      gas: this.besuConfig.gas,
     });
   }
 
@@ -531,7 +529,7 @@ export class BesuTestEnvironment {
         secret: this.bridgeEthAccount.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: 999999999999999,
+      gas: this.besuConfig.gas,
     });
 
     expect(response).toBeTruthy();
@@ -559,7 +557,7 @@ export class BesuTestEnvironment {
         secret: this.bridgeEthAccount.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: 999999999999999,
+      gas: this.besuConfig.gas,
     });
 
     expect(response).toBeTruthy();
