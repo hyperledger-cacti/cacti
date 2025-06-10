@@ -39,7 +39,7 @@ import {
 } from "../../../../main/typescript/core/constants";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { v4 as uuidv4 } from "uuid";
-import OracleTestContract from "../../../solidity/generated/oracle-contract.sol/OracleTestContract.json";
+import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { keccak256 } from "web3-utils";
 import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
