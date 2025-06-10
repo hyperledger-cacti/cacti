@@ -133,10 +133,9 @@ jobs:
           yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-json 
           yarn workspace @hyperledger/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
 
-      - name: Generate ABI types
+      - name: Generate ABIs and run solidity tests
         run: |
           yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:all
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:abi
 
       - name: Run linting
         run: |
