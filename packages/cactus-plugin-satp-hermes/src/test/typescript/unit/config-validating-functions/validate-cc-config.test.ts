@@ -354,7 +354,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     ).toThrowError(/Invalid config\.bridgesConfig && config\.oracleConfig/);
   });
 
-  it("should throw when is an invalid FabricConfig", async () => {
+  it("should throw when is an invalid FabricConfig (the connTimeout should be a number)", async () => {
     const badFabricConfig = {
       networkIdentification: {
         id: "FabricLedgerTestNetwork",
@@ -403,7 +403,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
-      connTimeout: "60",
+      connTimeout: "60", //should be a number
       signaturePolicy: "config.signaturePolicy",
       mspId: "Org2MSP",
       wrapperContractName: "exampleWrapperContractName",
@@ -416,7 +416,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       },
       claimFormats: [2],
     };
-    const bridgeConfig = badFabricConfig;
+    const bridgeConfig = [badFabricConfig];
     expect(() =>
       validateCCConfig({
         configValue: {
@@ -426,7 +426,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
-  it("should throw when is an invalid FabricOptionsJSON", async () => {
+  it("should throw when is an invalid FabricOptionsJSON (the connectorOptions->peerBinary should be a string)", async () => {
     const badFabricConfig = {
       networkIdentification: {
         id: "FabricLedgerTestNetwork",
@@ -444,7 +444,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       },
       connectorOptions: {
         dockerBinary: "/usr/local/bin/docker",
-        peerBinary: 123,
+        peerBinary: 123, //should be a string
         goBinary: "/usr/local/go/bin/go",
         cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         sshConfig: {
@@ -488,7 +488,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       },
       claimFormats: [2],
     };
-    const bridgeConfig = badFabricConfig;
+    const bridgeConfig = [badFabricConfig];
     expect(() =>
       validateCCConfig({
         configValue: {
@@ -498,7 +498,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
-  it("should throw when is an invalid EthereumConfig", async () => {
+  it("should throw when is an invalid EthereumConfig (the wrapperContractName should be a string)", async () => {
     const badEthereumConfig = {
       networkIdentification: {
         id: "EthereumLedgerTestNetwork",
@@ -522,13 +522,13 @@ describe("Instantiate SATP Gateway Runner", () => {
       },
       claimFormats: [2],
       wrapperContractAddress: "0x8230f81920ed354445d201222470ad6f92459D3f",
-      wrapperContractName: 123,
+      wrapperContractName: 123, //should be a string
       gasConfig: {
         gas: "6721975",
         gasPrice: "20000000000",
       },
     };
-    const bridgeConfig = badEthereumConfig;
+    const bridgeConfig = [badEthereumConfig];
     expect(() =>
       validateCCConfig({
         configValue: {
@@ -538,7 +538,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
-  it("should throw when is an invalid EthereumOptionsJSON", async () => {
+  it("should throw when is an invalid EthereumOptionsJSON (the connectorOptions->rpcApiWsHost should be a string)", async () => {
     const badEthereumConfig = {
       networkIdentification: {
         id: "EthereumLedgerTestNetwork",
@@ -551,7 +551,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       },
       connectorOptions: {
         rpcApiHttpHost: "http://172.23.0.4:8545",
-        rpcApiWsHost: 8546,
+        rpcApiWsHost: 8546, //should be a string
       },
       leafId: "exampleLeafId",
       keyPair: {
@@ -568,7 +568,7 @@ describe("Instantiate SATP Gateway Runner", () => {
         gasPrice: "20000000000",
       },
     };
-    const bridgeConfig = badEthereumConfig;
+    const bridgeConfig = [badEthereumConfig];
     expect(() =>
       validateCCConfig({
         configValue: {
@@ -578,7 +578,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
-  it("should throw when is an invalid BesuConfig", async () => {
+  it("should throw when is an invalid BesuConfig (the wrapperContractName should be a string)", async () => {
     const badBesuConfig = {
       networkIdentification: {
         id: "BesuLedgerTestNetwork",
@@ -603,10 +603,10 @@ describe("Instantiate SATP Gateway Runner", () => {
       },
       claimFormats: [1],
       wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B",
-      wrapperContractName: "exampleWrapperContractName",
-      gas: "999999999999999",
+      wrapperContractName: true, //should be a string
+      gas: 999999999999999,
     };
-    const bridgeConfig = badBesuConfig;
+    const bridgeConfig = [badBesuConfig];
     expect(() =>
       validateCCConfig({
         configValue: {
@@ -616,7 +616,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
-  it("should throw when is an invalid BesuOptionsJSON", async () => {
+  it("should throw when is an invalid BesuOptionsJSON (the connectorOptions->rpcApiHttpHost should be a string)", async () => {
     const badBesuConfig = {
       networkIdentification: {
         id: "BesuLedgerTestNetwork",
@@ -629,7 +629,7 @@ describe("Instantiate SATP Gateway Runner", () => {
         type: "PRIVATE_KEY_HEX",
       },
       connectorOptions: {
-        rpcApiHttpHost: 8545,
+        rpcApiHttpHost: 8545, //should be a string
         rpcApiWsHost: "ws://172.20.0.6:8546",
       },
       leafId: "exampleLeafId",
@@ -644,7 +644,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       wrapperContractName: "exampleWrapperContractName",
       gas: 999999999999999,
     };
-    const bridgeConfig = badBesuConfig;
+    const bridgeConfig = [badBesuConfig];
     expect(() =>
       validateCCConfig({
         configValue: {

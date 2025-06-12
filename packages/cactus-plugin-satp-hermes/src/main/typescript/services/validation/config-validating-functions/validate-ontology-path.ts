@@ -19,14 +19,14 @@ export function validateOntologyPath(opts: {
     );
   }
 
-  // Now validate that the file exists and is a file
+  // Validate that the path exists and is a directory
   const path = opts.configValue;
   if (
     typeof path === "string" &&
-    (!fs.existsSync(path) || !fs.statSync(path).isFile())
+    (!fs.existsSync(path) || !fs.statSync(path).isDirectory())
   ) {
     throw new TypeError(
-      `Invalid config.ontologyPath: ${path}. File does not exist or is not a file.`,
+      `Invalid config.ontologyPath: ${path}. Directory does not exist or is not a folder.`,
     );
   }
   return opts.configValue;

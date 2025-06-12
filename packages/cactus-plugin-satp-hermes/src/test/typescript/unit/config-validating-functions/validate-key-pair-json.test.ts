@@ -6,9 +6,9 @@ describe("validateKeyPairJson", () => {
   it("should pass with a valid key pair", () => {
     const keyPairJSON = {
       privateKey:
-        "0x1c3a1e987fdabc9aeea47e457ad4db9732f7d7b6d2856d6e3f9b8d88ff6e227e",
+        "38c732b7b86d752c5c051a9c944a683da994eac1cc1544462518b90f89d8146d",
       publicKey:
-        "0x03a34e1d66b78e47fa1bba3445a6019acb5b9c87d0c6ad81c09e7d496682ae81fc",
+        "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171c",
     } as KeyPairJSON;
     const result = validateSatpKeyPairJSON({
       configValue: keyPairJSON,
@@ -16,17 +16,97 @@ describe("validateKeyPairJson", () => {
     expect(result).toEqual(keyPairJSON);
   });
 
-  it("should throw if is not a valid key pair", () => {
+  it("should throw if is a key pair with too short hex strings", () => {
     const invalidJson = {
-      privateKey: "0xabc123",
-      publicKey: "0xdef456",
+      privateKey: "abc123",
+      publicKey: "def456",
     } as KeyPairJSON;
     expect(() =>
       validateSatpKeyPairJSON({
         configValue: invalidJson,
       }),
     ).toThrowError(
-      `Invalid config.keyPair values: ${JSON.stringify(invalidJson)}. 'publicKey' and 'privateKey' must be valid hex strings (e.g. starting with 0x and containing only hex digits).`,
+      `Invalid config.keyPair: ${JSON.stringify(invalidJson)}. 'publicKey' must be 66-character hex, 'privateKey' must be 64-character hex.`,
+    );
+  });
+
+  it("should throw if is a key pair with too long hex strings", () => {
+    const invalidJson = {
+      privateKey:
+        "38c732b7b86d752c5c051a9c944a683da994eac1cc1544462518b90f89d8146ds3",
+      publicKey:
+        "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171cd3",
+    } as KeyPairJSON;
+    expect(() =>
+      validateSatpKeyPairJSON({
+        configValue: invalidJson,
+      }),
+    ).toThrowError(
+      `Invalid config.keyPair: ${JSON.stringify(invalidJson)}. 'publicKey' must be 66-character hex, 'privateKey' must be 64-character hex.`,
+    );
+  });
+
+  it("should throw if is a public key with too short hex strings", () => {
+    const invalidJson = {
+      privateKey:
+        "38c732b7b86d752c5c051a9c944a683da994eac1cc1544462518b90f89d8146d",
+      publicKey:
+        "036256069f81bcaae52a64965b8add791ee54cb2ad3d85de5250d78cf0fc171c",
+    } as KeyPairJSON;
+    expect(() =>
+      validateSatpKeyPairJSON({
+        configValue: invalidJson,
+      }),
+    ).toThrowError(
+      `Invalid config.keyPair: ${JSON.stringify(invalidJson)}. 'publicKey' must be 66-character hex, 'privateKey' must be 64-character hex.`,
+    );
+  });
+
+  it("should throw if is a private key with too short hex strings", () => {
+    const invalidJson = {
+      privateKey:
+        "38c732b7b86d752c5c051a944a683da994eac1cc1544462518b90f89d8146d",
+      publicKey:
+        "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171c",
+    } as KeyPairJSON;
+    expect(() =>
+      validateSatpKeyPairJSON({
+        configValue: invalidJson,
+      }),
+    ).toThrowError(
+      `Invalid config.keyPair: ${JSON.stringify(invalidJson)}. 'publicKey' must be 66-character hex, 'privateKey' must be 64-character hex.`,
+    );
+  });
+
+  it("should throw if is a public key with too long hex strings", () => {
+    const invalidJson = {
+      privateKey:
+        "38c732b7b86d752c5c051a9c944a683da994eac1cc1544462518b90f89d8146d",
+      publicKey:
+        "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171ce4",
+    } as KeyPairJSON;
+    expect(() =>
+      validateSatpKeyPairJSON({
+        configValue: invalidJson,
+      }),
+    ).toThrowError(
+      `Invalid config.keyPair: ${JSON.stringify(invalidJson)}. 'publicKey' must be 66-character hex, 'privateKey' must be 64-character hex.`,
+    );
+  });
+
+  it("should throw if is a private key with too long hex strings", () => {
+    const invalidJson = {
+      privateKey:
+        "38c732b7b86d752c5c051a9c944a683da994eac1cc1544462518b90f89d8146d",
+      publicKey:
+        "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171r3c",
+    } as KeyPairJSON;
+    expect(() =>
+      validateSatpKeyPairJSON({
+        configValue: invalidJson,
+      }),
+    ).toThrowError(
+      `Invalid config.keyPair: ${JSON.stringify(invalidJson)}. 'publicKey' must be 66-character hex, 'privateKey' must be 64-character hex.`,
     );
   });
 
@@ -43,7 +123,7 @@ describe("validateKeyPairJson", () => {
 
   it("should throw if privateKey is missing", () => {
     const invalidJson = {
-      publicKey: "0xdef456",
+      publicKey: "def456",
     };
     expect(() =>
       validateSatpKeyPairJSON({
@@ -56,7 +136,7 @@ describe("validateKeyPairJson", () => {
 
   it("should throw if publicKey is missing", () => {
     const invalidJson = {
-      privateKey: "0xabc123",
+      privateKey: "abc123",
     };
     expect(() =>
       validateSatpKeyPairJSON({
