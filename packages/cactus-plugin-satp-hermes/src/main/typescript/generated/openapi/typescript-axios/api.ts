@@ -105,6 +105,158 @@ export interface AssetProfile {
 /**
  * 
  * @export
+ * @interface ClientRequestV1Request
+ */
+export interface ClientRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'version': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'loggingProfile': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'accessControlProfile': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'assetControlProfile': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'applicationProfile': string;
+    /**
+     * 
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile}
+     * @memberof ClientRequestV1Request
+     */
+    'assetProfile': Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile;
+    /**
+     * 
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfile}
+     * @memberof ClientRequestV1Request
+     */
+    'payloadProfile': Phase1TransferInitiationRequestV1RequestPayloadProfile;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'sourceGatewayDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'recipientGatewayDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'recipientGatewayPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'originatorPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'beneficiaryPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'clientDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'serverDltSystem': string;
+    /**
+     * 
+     * @type {ClientRequestV1RequestClientGatewayConfiguration}
+     * @memberof ClientRequestV1Request
+     */
+    'clientGatewayConfiguration': ClientRequestV1RequestClientGatewayConfiguration;
+    /**
+     * 
+     * @type {ClientRequestV1RequestClientGatewayConfiguration}
+     * @memberof ClientRequestV1Request
+     */
+    'serverGatewayConfiguration': ClientRequestV1RequestClientGatewayConfiguration;
+    /**
+     * 
+     * @type {number}
+     * @memberof ClientRequestV1Request
+     */
+    'maxRetries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ClientRequestV1Request
+     */
+    'maxTimeout': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'sourceLedgerAssetID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1Request
+     */
+    'recipientLedgerAssetID': string;
+}
+/**
+ * 
+ * @export
+ * @interface ClientRequestV1RequestClientGatewayConfiguration
+ */
+export interface ClientRequestV1RequestClientGatewayConfiguration {
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientRequestV1RequestClientGatewayConfiguration
+     */
+    'apiHost': string;
+}
+/**
+ * 
+ * @export
  * @interface ClientV1Request
  */
 export interface ClientV1Request {
@@ -140,16 +292,16 @@ export interface ClientV1Request {
     'applicationProfile': string;
     /**
      * 
-     * @type {AssetProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile}
      * @memberof ClientV1Request
      */
-    'assetProfile': AssetProfile;
+    'assetProfile': Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile;
     /**
      * 
-     * @type {PayloadProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfile}
      * @memberof ClientV1Request
      */
-    'payloadProfile': PayloadProfile;
+    'payloadProfile': Phase1TransferInitiationRequestV1RequestPayloadProfile;
     /**
      * 
      * @type {string}
@@ -206,16 +358,16 @@ export interface ClientV1Request {
     'serverDltSystem': string;
     /**
      * 
-     * @type {ClientV1RequestClientGatewayConfiguration}
+     * @type {ClientRequestV1RequestClientGatewayConfiguration}
      * @memberof ClientV1Request
      */
-    'clientGatewayConfiguration': ClientV1RequestClientGatewayConfiguration;
+    'clientGatewayConfiguration': ClientRequestV1RequestClientGatewayConfiguration;
     /**
      * 
-     * @type {ClientV1RequestClientGatewayConfiguration}
+     * @type {ClientRequestV1RequestClientGatewayConfiguration}
      * @memberof ClientV1Request
      */
-    'serverGatewayConfiguration': ClientV1RequestClientGatewayConfiguration;
+    'serverGatewayConfiguration': ClientRequestV1RequestClientGatewayConfiguration;
     /**
      * 
      * @type {number}
@@ -240,19 +392,6 @@ export interface ClientV1Request {
      * @memberof ClientV1Request
      */
     'recipientLedgerAssetID': string;
-}
-/**
- * 
- * @export
- * @interface ClientV1RequestClientGatewayConfiguration
- */
-export interface ClientV1RequestClientGatewayConfiguration {
-    /**
-     * 
-     * @type {string}
-     * @memberof ClientV1RequestClientGatewayConfiguration
-     */
-    'apiHost': string;
 }
 /**
  * 
@@ -640,7 +779,7 @@ export interface LockEvidenceV1Request {
      * @type {object}
      * @memberof LockEvidenceV1Request
      */
-    'lockEvidenceFormat'?: object;
+    'lockEvidenceFormat'?: object | null;
     /**
      * 
      * @type {string}
@@ -747,16 +886,1049 @@ export interface LockEvidenceV1Response {
 export interface PayloadProfile {
     /**
      * 
-     * @type {AssetProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile}
      * @memberof PayloadProfile
      */
-    'assetProfile': AssetProfile;
+    'assetProfile': Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile;
     /**
      * 
      * @type {string}
      * @memberof PayloadProfile
      */
     'capabilities'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface Phase1TransferInitiationRequestV1Request
+ */
+export interface Phase1TransferInitiationRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'version'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'developerURN'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'credentialProfile'?: Phase1TransferInitiationRequestV1RequestCredentialProfileEnum;
+    /**
+     * 
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfile}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'payloadProfile': Phase1TransferInitiationRequestV1RequestPayloadProfile;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'applicationProfile': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'loggingProfile': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'accessControlProfile': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'sourceGatewayPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'sourceGatewayDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'recipientGatewayPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'recipientGatewayDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'escrowType'?: Phase1TransferInitiationRequestV1RequestEscrowTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'expiryTime'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'multipleClaimsAllowed'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'multipleCancelsAllowed'?: boolean;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'permissions'?: object;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'origin'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'destination'?: string;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'subsequentCalls'?: object;
+    /**
+     * 
+     * @type {Array<Phase1TransferInitiationRequestV1RequestHistoriesInner>}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'histories'?: Array<Phase1TransferInitiationRequestV1RequestHistoriesInner>;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'sequenceNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'sourceBasePath': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'recipientBasePath': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'maxRetries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'maxTimeout': number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'backupGatewaysAllowed': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'recipientLedgerAssetID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1Request
+     */
+    'sourceLedgerAssetID': string;
+}
+
+export const Phase1TransferInitiationRequestV1RequestCredentialProfileEnum = {
+    Saml: 'SAML',
+    Oauth: 'OAUTH',
+    X509: 'X509'
+} as const;
+
+export type Phase1TransferInitiationRequestV1RequestCredentialProfileEnum = typeof Phase1TransferInitiationRequestV1RequestCredentialProfileEnum[keyof typeof Phase1TransferInitiationRequestV1RequestCredentialProfileEnum];
+export const Phase1TransferInitiationRequestV1RequestEscrowTypeEnum = {
+    Faucet: 'FAUCET',
+    Timelock: 'TIMELOCK',
+    Hashlock: 'HASHLOCK',
+    Hashtimelock: 'HASHTIMELOCK',
+    Multiclaimpc: 'MULTICLAIMPC',
+    Destroy: 'DESTROY',
+    Burn: 'BURN'
+} as const;
+
+export type Phase1TransferInitiationRequestV1RequestEscrowTypeEnum = typeof Phase1TransferInitiationRequestV1RequestEscrowTypeEnum[keyof typeof Phase1TransferInitiationRequestV1RequestEscrowTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface Phase1TransferInitiationRequestV1RequestHistoriesInner
+ */
+export interface Phase1TransferInitiationRequestV1RequestHistoriesInner {
+    /**
+     * 
+     * @type {Array<object>}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'Transactions'?: Array<object>;
+    /**
+     * 
+     * @type {Array<object>}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'Actions'?: Array<object>;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'Origin'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'Destination'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'Balance'?: string;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'CurrentStatus'?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase1TransferInitiationRequestV1RequestHistoriesInner
+     */
+    'ApplicationSpecificParameters'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface Phase1TransferInitiationRequestV1RequestPayloadProfile
+ */
+export interface Phase1TransferInitiationRequestV1RequestPayloadProfile {
+    /**
+     * 
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfile
+     */
+    'assetProfile': Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfile
+     */
+    'capabilities'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+ */
+export interface Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'issuer'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'assetCode'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'assetCodeType'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'issuanceDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'expirationDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'verificationEndPoint'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'digitalSignature'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'prospectusLink'?: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'keyInformationLink'?: Array<any>;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'keyWord'?: Array<any>;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'transferRestriction'?: Array<any>;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile
+     */
+    'ledgerRequirements'?: Array<any>;
+}
+/**
+ * 
+ * @export
+ * @interface Phase1TransferInitiationResponseV1Request
+ */
+export interface Phase1TransferInitiationResponseV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'sequenceNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'odapPhase'?: Phase1TransferInitiationResponseV1RequestOdapPhaseEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'initialRequestMessageHash': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'destination'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'timeStamp': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'processedTimeStamp': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Phase1TransferInitiationResponseV1Request
+     */
+    'backupGatewaysAllowed': Array<string>;
+}
+
+export const Phase1TransferInitiationResponseV1RequestOdapPhaseEnum = {
+    TransferInitialization: 'TransferInitialization',
+    LockEvidenceVerification: 'LockEvidenceVerification',
+    CommitmentEstablishment: 'CommitmentEstablishment'
+} as const;
+
+export type Phase1TransferInitiationResponseV1RequestOdapPhaseEnum = typeof Phase1TransferInitiationResponseV1RequestOdapPhaseEnum[keyof typeof Phase1TransferInitiationResponseV1RequestOdapPhaseEnum];
+
+/**
+ * 
+ * @export
+ * @interface Phase2LockEvidenceRequestV1Request
+ */
+export interface Phase2LockEvidenceRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'lockEvidenceClaim': string;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'lockEvidenceFormat'?: object | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'lockEvidenceExpiration': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'hashCommenceAckRequest': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'clientTransferNumber'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'messageHash'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2LockEvidenceRequestV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase2LockEvidenceResponseV1Request
+ */
+export interface Phase2LockEvidenceResponseV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'hashLockEvidenceRequest': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'serverTransferNumber'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2LockEvidenceResponseV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase2TransferCommenceRequestV1Request
+ */
+export interface Phase2TransferCommenceRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'originatorPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'beneficiaryPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'senderDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'recipientDltSystem': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'hashAssetProfile': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'assetUnit'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'hashPrevMessage': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'clientTransferNumber'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2TransferCommenceRequestV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase2TransferCommenceResponseV1Request
+ */
+export interface Phase2TransferCommenceResponseV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'hashCommenceRequest': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'serverTransferNumber'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'messageHash'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase2TransferCommenceResponseV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase3CommitFinalRequestV1Request
+ */
+export interface Phase3CommitFinalRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'commitFinalClaim': string;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'commitFinalClaimFormat'?: object;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'hashCommitPrepareAck': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'clientTransferNumber'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitFinalRequestV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase3CommitFinalResponseV1Request
+ */
+export interface Phase3CommitFinalResponseV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'commitAcknowledgementClaim': string;
+    /**
+     * 
+     * @type {object}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'commitAcknowledgementClaimFormat'?: object;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'hashCommitFinal': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'serverTransferNumber'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitFinalResponseV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase3CommitPreparationRequestV1Request
+ */
+export interface Phase3CommitPreparationRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'hashLockEvidenceAck': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'clientTransferNumber'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitPreparationRequestV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase3CommitPreparationResponseV1Request
+ */
+export interface Phase3CommitPreparationResponseV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'hashCommitPrep': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'serverTransferNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3CommitPreparationResponseV1Request
+     */
+    'sequenceNumber': number;
+}
+/**
+ * 
+ * @export
+ * @interface Phase3TransferCompleteRequestV1Request
+ */
+export interface Phase3TransferCompleteRequestV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'messageType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'clientIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'serverIdentityPubkey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'hashCommitFinalAck': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'clientTransferNumber'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'hashTransferCommence': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Phase3TransferCompleteRequestV1Request
+     */
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -817,6 +1989,37 @@ export interface RecoverUpdateAckV1Message {
 /**
  * 
  * @export
+ * @interface RecoverUpdateAckV1MessageRequest
+ */
+export interface RecoverUpdateAckV1MessageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateAckV1MessageRequest
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RecoverUpdateAckV1MessageRequest
+     */
+    'success': boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RecoverUpdateAckV1MessageRequest
+     */
+    'changedEntriesHash': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateAckV1MessageRequest
+     */
+    'signature': string;
+}
+/**
+ * 
+ * @export
  * @interface RecoverUpdateV1Message
  */
 export interface RecoverUpdateV1Message {
@@ -828,16 +2031,84 @@ export interface RecoverUpdateV1Message {
     'sessionID': string;
     /**
      * 
-     * @type {Array<LocalLog>}
+     * @type {Array<RecoverUpdateV1MessageRequestRecoveredLogsInner>}
      * @memberof RecoverUpdateV1Message
      */
-    'recoveredLogs': Array<LocalLog>;
+    'recoveredLogs': Array<RecoverUpdateV1MessageRequestRecoveredLogsInner>;
     /**
      * 
      * @type {string}
      * @memberof RecoverUpdateV1Message
      */
     'signature': string;
+}
+/**
+ * 
+ * @export
+ * @interface RecoverUpdateV1MessageRequest
+ */
+export interface RecoverUpdateV1MessageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequest
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {Array<RecoverUpdateV1MessageRequestRecoveredLogsInner>}
+     * @memberof RecoverUpdateV1MessageRequest
+     */
+    'recoveredLogs': Array<RecoverUpdateV1MessageRequestRecoveredLogsInner>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequest
+     */
+    'signature': string;
+}
+/**
+ * 
+ * @export
+ * @interface RecoverUpdateV1MessageRequestRecoveredLogsInner
+ */
+export interface RecoverUpdateV1MessageRequestRecoveredLogsInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequestRecoveredLogsInner
+     */
+    'key'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequestRecoveredLogsInner
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequestRecoveredLogsInner
+     */
+    'data'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequestRecoveredLogsInner
+     */
+    'type': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequestRecoveredLogsInner
+     */
+    'operation': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverUpdateV1MessageRequestRecoveredLogsInner
+     */
+    'timestamp'?: string;
 }
 /**
  * 
@@ -891,6 +2162,86 @@ export interface RecoverV1Message {
      * 
      * @type {string}
      * @memberof RecoverV1Message
+     */
+    'signature': string;
+}
+/**
+ * 
+ * @export
+ * @interface RecoverV1MessageRequest
+ */
+export interface RecoverV1MessageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1MessageRequest
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1MessageRequest
+     */
+    'odapPhase': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RecoverV1MessageRequest
+     */
+    'sequenceNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1MessageRequest
+     */
+    'lastLogEntryTimestamp': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RecoverV1MessageRequest
+     */
+    'isBackup': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1MessageRequest
+     */
+    'newBasePath': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1MessageRequest
+     */
+    'newGatewayPubKey'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1MessageRequest
+     */
+    'signature': string;
+}
+/**
+ * 
+ * @export
+ * @interface RecoverV1SuccessRequest
+ */
+export interface RecoverV1SuccessRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1SuccessRequest
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RecoverV1SuccessRequest
+     */
+    'success': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1SuccessRequest
      */
     'signature': string;
 }
@@ -959,6 +2310,43 @@ export interface RollbackV1Message {
 /**
  * 
  * @export
+ * @interface RollbackV1MessageRequest
+ */
+export interface RollbackV1MessageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RollbackV1MessageRequest
+     */
+    'sessionID': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RollbackV1MessageRequest
+     */
+    'success': boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RollbackV1MessageRequest
+     */
+    'actionPerformed': Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RollbackV1MessageRequest
+     */
+    'proofs': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollbackV1MessageRequest
+     */
+    'signature': string;
+}
+/**
+ * 
+ * @export
  * @interface SatpMessage
  */
 export interface SatpMessage {
@@ -1006,10 +2394,10 @@ export interface SatpMessage {
     'CredentialBlock'?: Array<any>;
     /**
      * 
-     * @type {PayloadProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfile}
      * @memberof SatpMessage
      */
-    'CredentialsProfile'?: PayloadProfile;
+    'CredentialsProfile'?: Phase1TransferInitiationRequestV1RequestPayloadProfile;
     /**
      * 
      * @type {object}
@@ -1128,16 +2516,16 @@ export interface SessionData {
     'applicationProfile'?: string;
     /**
      * 
-     * @type {PayloadProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfile}
      * @memberof SessionData
      */
-    'payloadProfile'?: PayloadProfile;
+    'payloadProfile'?: Phase1TransferInitiationRequestV1RequestPayloadProfile;
     /**
      * 
-     * @type {AssetProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile}
      * @memberof SessionData
      */
-    'assetProfile'?: AssetProfile;
+    'assetProfile'?: Phase1TransferInitiationRequestV1RequestPayloadProfileAssetProfile;
     /**
      * 
      * @type {Array<string>}
@@ -1706,16 +3094,16 @@ export interface TransferInitializationV1Request {
     'developerURN'?: string;
     /**
      * 
-     * @type {CredentialProfile}
+     * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    'credentialProfile'?: CredentialProfile;
+    'credentialProfile'?: TransferInitializationV1RequestCredentialProfileEnum;
     /**
      * 
-     * @type {PayloadProfile}
+     * @type {Phase1TransferInitiationRequestV1RequestPayloadProfile}
      * @memberof TransferInitializationV1Request
      */
-    'payloadProfile': PayloadProfile;
+    'payloadProfile': Phase1TransferInitiationRequestV1RequestPayloadProfile;
     /**
      * 
      * @type {string}
@@ -1814,10 +3202,10 @@ export interface TransferInitializationV1Request {
     'subsequentCalls'?: object;
     /**
      * 
-     * @type {Array<History>}
+     * @type {Array<Phase1TransferInitiationRequestV1RequestHistoriesInner>}
      * @memberof TransferInitializationV1Request
      */
-    'histories'?: Array<History>;
+    'histories'?: Array<Phase1TransferInitiationRequestV1RequestHistoriesInner>;
     /**
      * 
      * @type {number}
@@ -1868,6 +3256,13 @@ export interface TransferInitializationV1Request {
     'sourceLedgerAssetID': string;
 }
 
+export const TransferInitializationV1RequestCredentialProfileEnum = {
+    Saml: 'SAML',
+    Oauth: 'OAUTH',
+    X509: 'X509'
+} as const;
+
+export type TransferInitializationV1RequestCredentialProfileEnum = typeof TransferInitializationV1RequestCredentialProfileEnum[keyof typeof TransferInitializationV1RequestCredentialProfileEnum];
 export const TransferInitializationV1RequestEscrowTypeEnum = {
     Faucet: 'FAUCET',
     Timelock: 'TIMELOCK',
@@ -1971,11 +3366,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @param {ClientV1Request} [clientV1Request] 
+         * @param {ClientRequestV1Request} [clientRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        clientRequestV1: async (clientV1Request?: ClientV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        clientRequestV1: async (clientRequestV1Request?: ClientRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/clientrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1995,7 +3390,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(clientV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(clientRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2004,11 +3399,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {TransferInitializationV1Request} [transferInitializationV1Request] 
+         * @param {Phase1TransferInitiationRequestV1Request} [phase1TransferInitiationRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase1TransferInitiationRequestV1: async (transferInitializationV1Request?: TransferInitializationV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase1TransferInitiationRequestV1: async (phase1TransferInitiationRequestV1Request?: Phase1TransferInitiationRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2028,7 +3423,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(transferInitializationV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase1TransferInitiationRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2037,11 +3432,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {TransferInitializationV1Response} [transferInitializationV1Response] 
+         * @param {Phase1TransferInitiationResponseV1Request} [phase1TransferInitiationResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase1TransferInitiationResponseV1: async (transferInitializationV1Response?: TransferInitializationV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase1TransferInitiationResponseV1: async (phase1TransferInitiationResponseV1Request?: Phase1TransferInitiationResponseV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2061,7 +3456,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(transferInitializationV1Response, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase1TransferInitiationResponseV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2070,11 +3465,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {LockEvidenceV1Request} [lockEvidenceV1Request] 
+         * @param {Phase2LockEvidenceRequestV1Request} [phase2LockEvidenceRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2LockEvidenceRequestV1: async (lockEvidenceV1Request?: LockEvidenceV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase2LockEvidenceRequestV1: async (phase2LockEvidenceRequestV1Request?: Phase2LockEvidenceRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidencerequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2094,7 +3489,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(lockEvidenceV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase2LockEvidenceRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2103,11 +3498,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {LockEvidenceV1Response} [lockEvidenceV1Response] 
+         * @param {Phase2LockEvidenceResponseV1Request} [phase2LockEvidenceResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2LockEvidenceResponseV1: async (lockEvidenceV1Response?: LockEvidenceV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase2LockEvidenceResponseV1: async (phase2LockEvidenceResponseV1Request?: Phase2LockEvidenceResponseV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2127,7 +3522,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(lockEvidenceV1Response, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase2LockEvidenceResponseV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2136,11 +3531,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {TransferCommenceV1Request} [transferCommenceV1Request] 
+         * @param {Phase2TransferCommenceRequestV1Request} [phase2TransferCommenceRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2TransferCommenceRequestV1: async (transferCommenceV1Request?: TransferCommenceV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase2TransferCommenceRequestV1: async (phase2TransferCommenceRequestV1Request?: Phase2TransferCommenceRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommencerequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2160,7 +3555,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(transferCommenceV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase2TransferCommenceRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2169,11 +3564,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {TransferCommenceV1Response} [transferCommenceV1Response] 
+         * @param {Phase2TransferCommenceResponseV1Request} [phase2TransferCommenceResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2TransferCommenceResponseV1: async (transferCommenceV1Response?: TransferCommenceV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase2TransferCommenceResponseV1: async (phase2TransferCommenceResponseV1Request?: Phase2TransferCommenceResponseV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2193,7 +3588,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(transferCommenceV1Response, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase2TransferCommenceResponseV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2202,11 +3597,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {CommitFinalV1Request} [commitFinalV1Request] 
+         * @param {Phase3CommitFinalRequestV1Request} [phase3CommitFinalRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitFinalRequestV1: async (commitFinalV1Request?: CommitFinalV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase3CommitFinalRequestV1: async (phase3CommitFinalRequestV1Request?: Phase3CommitFinalRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2226,7 +3621,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(commitFinalV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase3CommitFinalRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2235,11 +3630,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {CommitFinalV1Response} [commitFinalV1Response] 
+         * @param {Phase3CommitFinalResponseV1Request} [phase3CommitFinalResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitFinalResponseV1: async (commitFinalV1Response?: CommitFinalV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase3CommitFinalResponseV1: async (phase3CommitFinalResponseV1Request?: Phase3CommitFinalResponseV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2259,7 +3654,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(commitFinalV1Response, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase3CommitFinalResponseV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2268,11 +3663,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {CommitPreparationV1Request} [commitPreparationV1Request] 
+         * @param {Phase3CommitPreparationRequestV1Request} [phase3CommitPreparationRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitPreparationRequestV1: async (commitPreparationV1Request?: CommitPreparationV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase3CommitPreparationRequestV1: async (phase3CommitPreparationRequestV1Request?: Phase3CommitPreparationRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2292,7 +3687,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(commitPreparationV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase3CommitPreparationRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2301,11 +3696,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {CommitPreparationV1Response} [commitPreparationV1Response] 
+         * @param {Phase3CommitPreparationResponseV1Request} [phase3CommitPreparationResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitPreparationResponseV1: async (commitPreparationV1Response?: CommitPreparationV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase3CommitPreparationResponseV1: async (phase3CommitPreparationResponseV1Request?: Phase3CommitPreparationResponseV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2325,7 +3720,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(commitPreparationV1Response, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase3CommitPreparationResponseV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2334,11 +3729,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {TransferCompleteV1Request} [transferCompleteV1Request] 
+         * @param {Phase3TransferCompleteRequestV1Request} [phase3TransferCompleteRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3TransferCompleteRequestV1: async (transferCompleteV1Request?: TransferCompleteV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        phase3TransferCompleteRequestV1: async (phase3TransferCompleteRequestV1Request?: Phase3TransferCompleteRequestV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/transfercompleterequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2358,7 +3753,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(transferCompleteV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(phase3TransferCompleteRequestV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2367,11 +3762,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {RecoverUpdateAckV1Message} [recoverUpdateAckV1Message] 
+         * @param {RecoverUpdateAckV1MessageRequest} [recoverUpdateAckV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverUpdateAckV1Message: async (recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        recoverUpdateAckV1Message: async (recoverUpdateAckV1MessageRequest?: RecoverUpdateAckV1MessageRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdateackmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2391,7 +3786,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(recoverUpdateAckV1Message, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(recoverUpdateAckV1MessageRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2400,11 +3795,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {RecoverUpdateV1Message} [recoverUpdateV1Message] 
+         * @param {RecoverUpdateV1MessageRequest} [recoverUpdateV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverUpdateV1Message: async (recoverUpdateV1Message?: RecoverUpdateV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        recoverUpdateV1Message: async (recoverUpdateV1MessageRequest?: RecoverUpdateV1MessageRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdatemessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2424,7 +3819,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(recoverUpdateV1Message, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(recoverUpdateV1MessageRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2433,11 +3828,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {RecoverV1Message} [recoverV1Message] 
+         * @param {RecoverV1MessageRequest} [recoverV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverV1Message: async (recoverV1Message?: RecoverV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        recoverV1Message: async (recoverV1MessageRequest?: RecoverV1MessageRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/recovermessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2457,7 +3852,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(recoverV1Message, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(recoverV1MessageRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2466,11 +3861,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {RecoverSuccessV1Message} [recoverSuccessV1Message] 
+         * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverV1Success: async (recoverSuccessV1Message?: RecoverSuccessV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        recoverV1Success: async (recoverV1SuccessRequest?: RecoverV1SuccessRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoversuccessmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2490,7 +3885,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(recoverSuccessV1Message, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(recoverV1SuccessRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2499,11 +3894,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {RollbackAckV1Message} [rollbackAckV1Message] 
+         * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollbackAckV1Message: async (rollbackAckV1Message?: RollbackAckV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rollbackAckV1Message: async (recoverV1SuccessRequest?: RecoverV1SuccessRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackackmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2523,7 +3918,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(rollbackAckV1Message, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(recoverV1SuccessRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2532,11 +3927,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {RollbackV1Message} [rollbackV1Message] 
+         * @param {RollbackV1MessageRequest} [rollbackV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollbackV1Message: async (rollbackV1Message?: RollbackV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rollbackV1Message: async (rollbackV1MessageRequest?: RollbackV1MessageRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2556,7 +3951,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(rollbackV1Message, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(rollbackV1MessageRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2575,182 +3970,182 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {ClientV1Request} [clientV1Request] 
+         * @param {ClientRequestV1Request} [clientRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async clientRequestV1(clientV1Request?: ClientV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.clientRequestV1(clientV1Request, options);
+        async clientRequestV1(clientRequestV1Request?: ClientRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.clientRequestV1(clientRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {TransferInitializationV1Request} [transferInitializationV1Request] 
+         * @param {Phase1TransferInitiationRequestV1Request} [phase1TransferInitiationRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase1TransferInitiationRequestV1(transferInitializationV1Request, options);
+        async phase1TransferInitiationRequestV1(phase1TransferInitiationRequestV1Request?: Phase1TransferInitiationRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase1TransferInitiationRequestV1(phase1TransferInitiationRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {TransferInitializationV1Response} [transferInitializationV1Response] 
+         * @param {Phase1TransferInitiationResponseV1Request} [phase1TransferInitiationResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase1TransferInitiationResponseV1(transferInitializationV1Response, options);
+        async phase1TransferInitiationResponseV1(phase1TransferInitiationResponseV1Request?: Phase1TransferInitiationResponseV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase1TransferInitiationResponseV1(phase1TransferInitiationResponseV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {LockEvidenceV1Request} [lockEvidenceV1Request] 
+         * @param {Phase2LockEvidenceRequestV1Request} [phase2LockEvidenceRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2LockEvidenceRequestV1(lockEvidenceV1Request, options);
+        async phase2LockEvidenceRequestV1(phase2LockEvidenceRequestV1Request?: Phase2LockEvidenceRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2LockEvidenceRequestV1(phase2LockEvidenceRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {LockEvidenceV1Response} [lockEvidenceV1Response] 
+         * @param {Phase2LockEvidenceResponseV1Request} [phase2LockEvidenceResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2LockEvidenceResponseV1(lockEvidenceV1Response, options);
+        async phase2LockEvidenceResponseV1(phase2LockEvidenceResponseV1Request?: Phase2LockEvidenceResponseV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2LockEvidenceResponseV1(phase2LockEvidenceResponseV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {TransferCommenceV1Request} [transferCommenceV1Request] 
+         * @param {Phase2TransferCommenceRequestV1Request} [phase2TransferCommenceRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2TransferCommenceRequestV1(transferCommenceV1Request, options);
+        async phase2TransferCommenceRequestV1(phase2TransferCommenceRequestV1Request?: Phase2TransferCommenceRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2TransferCommenceRequestV1(phase2TransferCommenceRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {TransferCommenceV1Response} [transferCommenceV1Response] 
+         * @param {Phase2TransferCommenceResponseV1Request} [phase2TransferCommenceResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2TransferCommenceResponseV1(transferCommenceV1Response, options);
+        async phase2TransferCommenceResponseV1(phase2TransferCommenceResponseV1Request?: Phase2TransferCommenceResponseV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase2TransferCommenceResponseV1(phase2TransferCommenceResponseV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {CommitFinalV1Request} [commitFinalV1Request] 
+         * @param {Phase3CommitFinalRequestV1Request} [phase3CommitFinalRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitFinalRequestV1(commitFinalV1Request, options);
+        async phase3CommitFinalRequestV1(phase3CommitFinalRequestV1Request?: Phase3CommitFinalRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitFinalRequestV1(phase3CommitFinalRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {CommitFinalV1Response} [commitFinalV1Response] 
+         * @param {Phase3CommitFinalResponseV1Request} [phase3CommitFinalResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitFinalResponseV1(commitFinalV1Response, options);
+        async phase3CommitFinalResponseV1(phase3CommitFinalResponseV1Request?: Phase3CommitFinalResponseV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitFinalResponseV1(phase3CommitFinalResponseV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {CommitPreparationV1Request} [commitPreparationV1Request] 
+         * @param {Phase3CommitPreparationRequestV1Request} [phase3CommitPreparationRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitPreparationRequestV1(commitPreparationV1Request, options);
+        async phase3CommitPreparationRequestV1(phase3CommitPreparationRequestV1Request?: Phase3CommitPreparationRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitPreparationRequestV1(phase3CommitPreparationRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {CommitPreparationV1Response} [commitPreparationV1Response] 
+         * @param {Phase3CommitPreparationResponseV1Request} [phase3CommitPreparationResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitPreparationResponseV1(commitPreparationV1Response, options);
+        async phase3CommitPreparationResponseV1(phase3CommitPreparationResponseV1Request?: Phase3CommitPreparationResponseV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitPreparationResponseV1(phase3CommitPreparationResponseV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {TransferCompleteV1Request} [transferCompleteV1Request] 
+         * @param {Phase3TransferCompleteRequestV1Request} [phase3TransferCompleteRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3TransferCompleteRequestV1(transferCompleteV1Request, options);
+        async phase3TransferCompleteRequestV1(phase3TransferCompleteRequestV1Request?: Phase3TransferCompleteRequestV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.phase3TransferCompleteRequestV1(phase3TransferCompleteRequestV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {RecoverUpdateAckV1Message} [recoverUpdateAckV1Message] 
+         * @param {RecoverUpdateAckV1MessageRequest} [recoverUpdateAckV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverUpdateAckV1Message(recoverUpdateAckV1Message, options);
+        async recoverUpdateAckV1Message(recoverUpdateAckV1MessageRequest?: RecoverUpdateAckV1MessageRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverUpdateAckV1Message(recoverUpdateAckV1MessageRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {RecoverUpdateV1Message} [recoverUpdateV1Message] 
+         * @param {RecoverUpdateV1MessageRequest} [recoverUpdateV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverUpdateV1Message(recoverUpdateV1Message, options);
+        async recoverUpdateV1Message(recoverUpdateV1MessageRequest?: RecoverUpdateV1MessageRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverUpdateV1Message(recoverUpdateV1MessageRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {RecoverV1Message} [recoverV1Message] 
+         * @param {RecoverV1MessageRequest} [recoverV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverV1Message(recoverV1Message?: RecoverV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverV1Message(recoverV1Message, options);
+        async recoverV1Message(recoverV1MessageRequest?: RecoverV1MessageRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverV1Message(recoverV1MessageRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {RecoverSuccessV1Message} [recoverSuccessV1Message] 
+         * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverV1Success(recoverSuccessV1Message, options);
+        async recoverV1Success(recoverV1SuccessRequest?: RecoverV1SuccessRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.recoverV1Success(recoverV1SuccessRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {RollbackAckV1Message} [rollbackAckV1Message] 
+         * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackAckV1Message(rollbackAckV1Message, options);
+        async rollbackAckV1Message(recoverV1SuccessRequest?: RecoverV1SuccessRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackAckV1Message(recoverV1SuccessRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {RollbackV1Message} [rollbackV1Message] 
+         * @param {RollbackV1MessageRequest} [rollbackV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackV1Message(rollbackV1Message, options);
+        async rollbackV1Message(rollbackV1MessageRequest?: RollbackV1MessageRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackV1Message(rollbackV1MessageRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2765,165 +4160,165 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @param {ClientV1Request} [clientV1Request] 
+         * @param {ClientRequestV1Request} [clientRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        clientRequestV1(clientV1Request?: ClientV1Request, options?: any): AxiosPromise<any> {
-            return localVarFp.clientRequestV1(clientV1Request, options).then((request) => request(axios, basePath));
+        clientRequestV1(clientRequestV1Request?: ClientRequestV1Request, options?: any): AxiosPromise<any> {
+            return localVarFp.clientRequestV1(clientRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {TransferInitializationV1Request} [transferInitializationV1Request] 
+         * @param {Phase1TransferInitiationRequestV1Request} [phase1TransferInitiationRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.phase1TransferInitiationRequestV1(transferInitializationV1Request, options).then((request) => request(axios, basePath));
+        phase1TransferInitiationRequestV1(phase1TransferInitiationRequestV1Request?: Phase1TransferInitiationRequestV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase1TransferInitiationRequestV1(phase1TransferInitiationRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {TransferInitializationV1Response} [transferInitializationV1Response] 
+         * @param {Phase1TransferInitiationResponseV1Request} [phase1TransferInitiationResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: any): AxiosPromise<void> {
-            return localVarFp.phase1TransferInitiationResponseV1(transferInitializationV1Response, options).then((request) => request(axios, basePath));
+        phase1TransferInitiationResponseV1(phase1TransferInitiationResponseV1Request?: Phase1TransferInitiationResponseV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase1TransferInitiationResponseV1(phase1TransferInitiationResponseV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {LockEvidenceV1Request} [lockEvidenceV1Request] 
+         * @param {Phase2LockEvidenceRequestV1Request} [phase2LockEvidenceRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.phase2LockEvidenceRequestV1(lockEvidenceV1Request, options).then((request) => request(axios, basePath));
+        phase2LockEvidenceRequestV1(phase2LockEvidenceRequestV1Request?: Phase2LockEvidenceRequestV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase2LockEvidenceRequestV1(phase2LockEvidenceRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {LockEvidenceV1Response} [lockEvidenceV1Response] 
+         * @param {Phase2LockEvidenceResponseV1Request} [phase2LockEvidenceResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: any): AxiosPromise<void> {
-            return localVarFp.phase2LockEvidenceResponseV1(lockEvidenceV1Response, options).then((request) => request(axios, basePath));
+        phase2LockEvidenceResponseV1(phase2LockEvidenceResponseV1Request?: Phase2LockEvidenceResponseV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase2LockEvidenceResponseV1(phase2LockEvidenceResponseV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {TransferCommenceV1Request} [transferCommenceV1Request] 
+         * @param {Phase2TransferCommenceRequestV1Request} [phase2TransferCommenceRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.phase2TransferCommenceRequestV1(transferCommenceV1Request, options).then((request) => request(axios, basePath));
+        phase2TransferCommenceRequestV1(phase2TransferCommenceRequestV1Request?: Phase2TransferCommenceRequestV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase2TransferCommenceRequestV1(phase2TransferCommenceRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {TransferCommenceV1Response} [transferCommenceV1Response] 
+         * @param {Phase2TransferCommenceResponseV1Request} [phase2TransferCommenceResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: any): AxiosPromise<void> {
-            return localVarFp.phase2TransferCommenceResponseV1(transferCommenceV1Response, options).then((request) => request(axios, basePath));
+        phase2TransferCommenceResponseV1(phase2TransferCommenceResponseV1Request?: Phase2TransferCommenceResponseV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase2TransferCommenceResponseV1(phase2TransferCommenceResponseV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {CommitFinalV1Request} [commitFinalV1Request] 
+         * @param {Phase3CommitFinalRequestV1Request} [phase3CommitFinalRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.phase3CommitFinalRequestV1(commitFinalV1Request, options).then((request) => request(axios, basePath));
+        phase3CommitFinalRequestV1(phase3CommitFinalRequestV1Request?: Phase3CommitFinalRequestV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase3CommitFinalRequestV1(phase3CommitFinalRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {CommitFinalV1Response} [commitFinalV1Response] 
+         * @param {Phase3CommitFinalResponseV1Request} [phase3CommitFinalResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: any): AxiosPromise<void> {
-            return localVarFp.phase3CommitFinalResponseV1(commitFinalV1Response, options).then((request) => request(axios, basePath));
+        phase3CommitFinalResponseV1(phase3CommitFinalResponseV1Request?: Phase3CommitFinalResponseV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase3CommitFinalResponseV1(phase3CommitFinalResponseV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {CommitPreparationV1Request} [commitPreparationV1Request] 
+         * @param {Phase3CommitPreparationRequestV1Request} [phase3CommitPreparationRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.phase3CommitPreparationRequestV1(commitPreparationV1Request, options).then((request) => request(axios, basePath));
+        phase3CommitPreparationRequestV1(phase3CommitPreparationRequestV1Request?: Phase3CommitPreparationRequestV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase3CommitPreparationRequestV1(phase3CommitPreparationRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {CommitPreparationV1Response} [commitPreparationV1Response] 
+         * @param {Phase3CommitPreparationResponseV1Request} [phase3CommitPreparationResponseV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: any): AxiosPromise<void> {
-            return localVarFp.phase3CommitPreparationResponseV1(commitPreparationV1Response, options).then((request) => request(axios, basePath));
+        phase3CommitPreparationResponseV1(phase3CommitPreparationResponseV1Request?: Phase3CommitPreparationResponseV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase3CommitPreparationResponseV1(phase3CommitPreparationResponseV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {TransferCompleteV1Request} [transferCompleteV1Request] 
+         * @param {Phase3TransferCompleteRequestV1Request} [phase3TransferCompleteRequestV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.phase3TransferCompleteRequestV1(transferCompleteV1Request, options).then((request) => request(axios, basePath));
+        phase3TransferCompleteRequestV1(phase3TransferCompleteRequestV1Request?: Phase3TransferCompleteRequestV1Request, options?: any): AxiosPromise<void> {
+            return localVarFp.phase3TransferCompleteRequestV1(phase3TransferCompleteRequestV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {RecoverUpdateAckV1Message} [recoverUpdateAckV1Message] 
+         * @param {RecoverUpdateAckV1MessageRequest} [recoverUpdateAckV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: any): AxiosPromise<void> {
-            return localVarFp.recoverUpdateAckV1Message(recoverUpdateAckV1Message, options).then((request) => request(axios, basePath));
+        recoverUpdateAckV1Message(recoverUpdateAckV1MessageRequest?: RecoverUpdateAckV1MessageRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.recoverUpdateAckV1Message(recoverUpdateAckV1MessageRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {RecoverUpdateV1Message} [recoverUpdateV1Message] 
+         * @param {RecoverUpdateV1MessageRequest} [recoverUpdateV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: any): AxiosPromise<void> {
-            return localVarFp.recoverUpdateV1Message(recoverUpdateV1Message, options).then((request) => request(axios, basePath));
+        recoverUpdateV1Message(recoverUpdateV1MessageRequest?: RecoverUpdateV1MessageRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.recoverUpdateV1Message(recoverUpdateV1MessageRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {RecoverV1Message} [recoverV1Message] 
+         * @param {RecoverV1MessageRequest} [recoverV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverV1Message(recoverV1Message?: RecoverV1Message, options?: any): AxiosPromise<void> {
-            return localVarFp.recoverV1Message(recoverV1Message, options).then((request) => request(axios, basePath));
+        recoverV1Message(recoverV1MessageRequest?: RecoverV1MessageRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.recoverV1Message(recoverV1MessageRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {RecoverSuccessV1Message} [recoverSuccessV1Message] 
+         * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: any): AxiosPromise<void> {
-            return localVarFp.recoverV1Success(recoverSuccessV1Message, options).then((request) => request(axios, basePath));
+        recoverV1Success(recoverV1SuccessRequest?: RecoverV1SuccessRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.recoverV1Success(recoverV1SuccessRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {RollbackAckV1Message} [rollbackAckV1Message] 
+         * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: any): AxiosPromise<void> {
-            return localVarFp.rollbackAckV1Message(rollbackAckV1Message, options).then((request) => request(axios, basePath));
+        rollbackAckV1Message(recoverV1SuccessRequest?: RecoverV1SuccessRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.rollbackAckV1Message(recoverV1SuccessRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {RollbackV1Message} [rollbackV1Message] 
+         * @param {RollbackV1MessageRequest} [rollbackV1MessageRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: any): AxiosPromise<void> {
-            return localVarFp.rollbackV1Message(rollbackV1Message, options).then((request) => request(axios, basePath));
+        rollbackV1Message(rollbackV1MessageRequest?: RollbackV1MessageRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.rollbackV1Message(rollbackV1MessageRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2937,200 +4332,200 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
-     * @param {ClientV1Request} [clientV1Request] 
+     * @param {ClientRequestV1Request} [clientRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public clientRequestV1(clientV1Request?: ClientV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).clientRequestV1(clientV1Request, options).then((request) => request(this.axios, this.basePath));
+    public clientRequestV1(clientRequestV1Request?: ClientRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).clientRequestV1(clientRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {TransferInitializationV1Request} [transferInitializationV1Request] 
+     * @param {Phase1TransferInitiationRequestV1Request} [phase1TransferInitiationRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase1TransferInitiationRequestV1(transferInitializationV1Request, options).then((request) => request(this.axios, this.basePath));
+    public phase1TransferInitiationRequestV1(phase1TransferInitiationRequestV1Request?: Phase1TransferInitiationRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase1TransferInitiationRequestV1(phase1TransferInitiationRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {TransferInitializationV1Response} [transferInitializationV1Response] 
+     * @param {Phase1TransferInitiationResponseV1Request} [phase1TransferInitiationResponseV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase1TransferInitiationResponseV1(transferInitializationV1Response, options).then((request) => request(this.axios, this.basePath));
+    public phase1TransferInitiationResponseV1(phase1TransferInitiationResponseV1Request?: Phase1TransferInitiationResponseV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase1TransferInitiationResponseV1(phase1TransferInitiationResponseV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {LockEvidenceV1Request} [lockEvidenceV1Request] 
+     * @param {Phase2LockEvidenceRequestV1Request} [phase2LockEvidenceRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase2LockEvidenceRequestV1(lockEvidenceV1Request, options).then((request) => request(this.axios, this.basePath));
+    public phase2LockEvidenceRequestV1(phase2LockEvidenceRequestV1Request?: Phase2LockEvidenceRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase2LockEvidenceRequestV1(phase2LockEvidenceRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {LockEvidenceV1Response} [lockEvidenceV1Response] 
+     * @param {Phase2LockEvidenceResponseV1Request} [phase2LockEvidenceResponseV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase2LockEvidenceResponseV1(lockEvidenceV1Response, options).then((request) => request(this.axios, this.basePath));
+    public phase2LockEvidenceResponseV1(phase2LockEvidenceResponseV1Request?: Phase2LockEvidenceResponseV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase2LockEvidenceResponseV1(phase2LockEvidenceResponseV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {TransferCommenceV1Request} [transferCommenceV1Request] 
+     * @param {Phase2TransferCommenceRequestV1Request} [phase2TransferCommenceRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase2TransferCommenceRequestV1(transferCommenceV1Request, options).then((request) => request(this.axios, this.basePath));
+    public phase2TransferCommenceRequestV1(phase2TransferCommenceRequestV1Request?: Phase2TransferCommenceRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase2TransferCommenceRequestV1(phase2TransferCommenceRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {TransferCommenceV1Response} [transferCommenceV1Response] 
+     * @param {Phase2TransferCommenceResponseV1Request} [phase2TransferCommenceResponseV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase2TransferCommenceResponseV1(transferCommenceV1Response, options).then((request) => request(this.axios, this.basePath));
+    public phase2TransferCommenceResponseV1(phase2TransferCommenceResponseV1Request?: Phase2TransferCommenceResponseV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase2TransferCommenceResponseV1(phase2TransferCommenceResponseV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {CommitFinalV1Request} [commitFinalV1Request] 
+     * @param {Phase3CommitFinalRequestV1Request} [phase3CommitFinalRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase3CommitFinalRequestV1(commitFinalV1Request, options).then((request) => request(this.axios, this.basePath));
+    public phase3CommitFinalRequestV1(phase3CommitFinalRequestV1Request?: Phase3CommitFinalRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase3CommitFinalRequestV1(phase3CommitFinalRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {CommitFinalV1Response} [commitFinalV1Response] 
+     * @param {Phase3CommitFinalResponseV1Request} [phase3CommitFinalResponseV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase3CommitFinalResponseV1(commitFinalV1Response, options).then((request) => request(this.axios, this.basePath));
+    public phase3CommitFinalResponseV1(phase3CommitFinalResponseV1Request?: Phase3CommitFinalResponseV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase3CommitFinalResponseV1(phase3CommitFinalResponseV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {CommitPreparationV1Request} [commitPreparationV1Request] 
+     * @param {Phase3CommitPreparationRequestV1Request} [phase3CommitPreparationRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase3CommitPreparationRequestV1(commitPreparationV1Request, options).then((request) => request(this.axios, this.basePath));
+    public phase3CommitPreparationRequestV1(phase3CommitPreparationRequestV1Request?: Phase3CommitPreparationRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase3CommitPreparationRequestV1(phase3CommitPreparationRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {CommitPreparationV1Response} [commitPreparationV1Response] 
+     * @param {Phase3CommitPreparationResponseV1Request} [phase3CommitPreparationResponseV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase3CommitPreparationResponseV1(commitPreparationV1Response, options).then((request) => request(this.axios, this.basePath));
+    public phase3CommitPreparationResponseV1(phase3CommitPreparationResponseV1Request?: Phase3CommitPreparationResponseV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase3CommitPreparationResponseV1(phase3CommitPreparationResponseV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {TransferCompleteV1Request} [transferCompleteV1Request] 
+     * @param {Phase3TransferCompleteRequestV1Request} [phase3TransferCompleteRequestV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).phase3TransferCompleteRequestV1(transferCompleteV1Request, options).then((request) => request(this.axios, this.basePath));
+    public phase3TransferCompleteRequestV1(phase3TransferCompleteRequestV1Request?: Phase3TransferCompleteRequestV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).phase3TransferCompleteRequestV1(phase3TransferCompleteRequestV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {RecoverUpdateAckV1Message} [recoverUpdateAckV1Message] 
+     * @param {RecoverUpdateAckV1MessageRequest} [recoverUpdateAckV1MessageRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).recoverUpdateAckV1Message(recoverUpdateAckV1Message, options).then((request) => request(this.axios, this.basePath));
+    public recoverUpdateAckV1Message(recoverUpdateAckV1MessageRequest?: RecoverUpdateAckV1MessageRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).recoverUpdateAckV1Message(recoverUpdateAckV1MessageRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {RecoverUpdateV1Message} [recoverUpdateV1Message] 
+     * @param {RecoverUpdateV1MessageRequest} [recoverUpdateV1MessageRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).recoverUpdateV1Message(recoverUpdateV1Message, options).then((request) => request(this.axios, this.basePath));
+    public recoverUpdateV1Message(recoverUpdateV1MessageRequest?: RecoverUpdateV1MessageRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).recoverUpdateV1Message(recoverUpdateV1MessageRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {RecoverV1Message} [recoverV1Message] 
+     * @param {RecoverV1MessageRequest} [recoverV1MessageRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverV1Message(recoverV1Message?: RecoverV1Message, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).recoverV1Message(recoverV1Message, options).then((request) => request(this.axios, this.basePath));
+    public recoverV1Message(recoverV1MessageRequest?: RecoverV1MessageRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).recoverV1Message(recoverV1MessageRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {RecoverSuccessV1Message} [recoverSuccessV1Message] 
+     * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).recoverV1Success(recoverSuccessV1Message, options).then((request) => request(this.axios, this.basePath));
+    public recoverV1Success(recoverV1SuccessRequest?: RecoverV1SuccessRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).recoverV1Success(recoverV1SuccessRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {RollbackAckV1Message} [rollbackAckV1Message] 
+     * @param {RecoverV1SuccessRequest} [recoverV1SuccessRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).rollbackAckV1Message(rollbackAckV1Message, options).then((request) => request(this.axios, this.basePath));
+    public rollbackAckV1Message(recoverV1SuccessRequest?: RecoverV1SuccessRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).rollbackAckV1Message(recoverV1SuccessRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {RollbackV1Message} [rollbackV1Message] 
+     * @param {RollbackV1MessageRequest} [rollbackV1MessageRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).rollbackV1Message(rollbackV1Message, options).then((request) => request(this.axios, this.basePath));
+    public rollbackV1Message(rollbackV1MessageRequest?: RollbackV1MessageRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).rollbackV1Message(rollbackV1MessageRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
