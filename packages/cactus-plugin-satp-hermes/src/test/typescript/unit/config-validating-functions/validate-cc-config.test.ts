@@ -197,8 +197,8 @@ const besuConfig = {
   gas: 999999999999999,
 } as Partial<IBesuLeafNeworkOptions> & INetworkOptions;
 
-describe("Instantiate SATP Gateway Runner", () => {
-  it("Instantiate SATP Gateway Runner (oracleConfig)", async () => {
+describe("Validate CC Config", () => {
+  it("should pass with a valid cc config (oracleConfig)", async () => {
     const oracleConfig = [
       {
         networkIdentification: {
@@ -230,7 +230,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     expect(result.oracleConfig).toEqual(oracleConfig);
   });
 
-  it("Instantiate SATP Gateway Runner (FabricConfig)", async () => {
+  it("should pass with a valid cc config (FabricConfig)", async () => {
     const bridgeConfig = [fabricConfig];
     const result = validateCCConfig({
       configValue: {
@@ -242,7 +242,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     );
   });
 
-  it("Instantiate SATP Gateway Runner (EthereumConfig)", async () => {
+  it("should pass with a valid cc config  (EthereumConfig)", async () => {
     const bridgeConfig = [ethereumConfig];
     const result = validateCCConfig({
       configValue: {
@@ -254,7 +254,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     );
   });
 
-  it("Instantiate SATP Gateway Runner (BesuConfig)", async () => {
+  it("should pass with a valid cc config (BesuConfig)", async () => {
     const bridgeConfig = [besuConfig];
     const result = validateCCConfig({
       configValue: {
