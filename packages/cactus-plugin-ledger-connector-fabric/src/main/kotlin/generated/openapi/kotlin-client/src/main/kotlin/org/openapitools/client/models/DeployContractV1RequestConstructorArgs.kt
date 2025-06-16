@@ -22,14 +22,14 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param message 
+ * @param args 
  */
 
 
-data class DeployContractGoSourceV1501Response (
+data class DeployContractV1RequestConstructorArgs (
 
-    @Json(name = "message")
-    val message: kotlin.String? = null
+    @Json(name = "Args")
+    val args: kotlin.collections.List<kotlin.Any>? = null
 
 )
 

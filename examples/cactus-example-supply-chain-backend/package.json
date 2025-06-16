@@ -65,22 +65,26 @@
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/tar-fs": "2.0.4",
     "async-exit-hook": "2.0.1",
     "axios": "1.8.4",
     "dotenv": "16.0.0",
     "express": "5.1.0",
     "express-jwt": "8.4.1",
     "fabric-network": "2.2.20",
+    "fs-extra": "11.2.0",
     "jose": "4.15.5",
     "openapi-types": "12.1.3",
     "solc": "0.8.6",
+    "tar-fs": "3.0.10",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
     "web3-core": "1.6.1"
   },
   "devDependencies": {
     "@types/express": "5.0.1",
-    "@types/uuid": "10.0.0"
+    "@types/uuid": "10.0.0",
+    "fs-extra": "11.2.0"
   },
   "engines": {
     "node": ">=18",

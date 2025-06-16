@@ -302,7 +302,6 @@ export class SupplyChainApp {
 
     const connectionProfile =
       await this.ledgers.fabric.getConnectionProfileOrg1();
-    const sshConfig = await this.ledgers.fabric.getSshConfig();
 
     const registryA = new PluginRegistry({
       plugins: [
@@ -424,18 +423,14 @@ export class SupplyChainApp {
 
     const fabricConnector = new PluginLedgerConnectorFabric({
       instanceId: "PluginLedgerConnectorFabric_C",
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "peer",
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
       connectionProfile: connectionProfile,
-      sshConfig: sshConfig,
-      logLevel: "INFO",
       pluginRegistry: registryC,
       discoveryOptions,
       eventHandlerOptions: {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: this.ledgers.fabric.getNetworkName(),
     });
 
     registryC.add(fabricConnector);

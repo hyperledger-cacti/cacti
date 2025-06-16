@@ -186,9 +186,6 @@ async function createFabricConnector(signerIdentity: FabricIdentity) {
   fabricConnectorPlugin = new PluginLedgerConnectorFabric({
     instanceId: `fabricAssetTrade-${uuidv4()}`,
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-    sshConfig: {}, // Provide SSH config to deploy contracts through connector
-    cliContainerEnv: {},
-    peerBinary: "/fabric-samples/bin/peer",
     logLevel: config.logLevel,
     connectionProfile,
     discoveryOptions: {

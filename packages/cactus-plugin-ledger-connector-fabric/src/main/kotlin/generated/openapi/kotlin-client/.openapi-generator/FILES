@@ -31,11 +31,9 @@ src/main/kotlin/org/openapitools/client/models/ChainCodeProgrammingLanguage.kt
 src/main/kotlin/org/openapitools/client/models/ConnectionProfile.kt
 src/main/kotlin/org/openapitools/client/models/ConnectionProfileClient.kt
 src/main/kotlin/org/openapitools/client/models/DefaultEventHandlerStrategy.kt
-src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1501Response.kt
-src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1Request.kt
-src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1RequestConstructorArgs.kt
-src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1Response.kt
+src/main/kotlin/org/openapitools/client/models/DeployContractV1501Response.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractV1Request.kt
+src/main/kotlin/org/openapitools/client/models/DeployContractV1RequestConstructorArgs.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractV1Response.kt
 src/main/kotlin/org/openapitools/client/models/DeploymentTargetOrgFabric2x.kt
 src/main/kotlin/org/openapitools/client/models/DeploymentTargetOrganization.kt

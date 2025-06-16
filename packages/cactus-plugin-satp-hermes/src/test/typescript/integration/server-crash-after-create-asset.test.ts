@@ -20,6 +20,8 @@ import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   BesuTestLedger,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { ClientV1Request } from "../../../main/typescript/public-api";
@@ -147,7 +149,6 @@ beforeAll(async () => {
     const enrollAdminOut = await fabricLedger.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await fabricLedger.enrollUser(adminWallet);
-    const sshConfig = await fabricLedger.getSshConfig();
 
     const keychainInstanceId = uuidv4();
     const keychainId = uuidv4();
@@ -171,51 +172,9 @@ beforeAll(async () => {
       asLocalhost: true,
     };
 
-    // This is the directory structure of the Fabirc 2.x CLI container (fabric-tools image)
-    // const orgCfgDir = "/fabric-samples/test-network/organizations/";
-    const orgCfgDir =
-      "/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/";
-
-    // these below mirror how the fabric-samples sets up the configuration
-    const org1Env = {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org1MSP",
-
-      ORDERER_CA: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      CORE_PEER_TLS_ROOTCERT_FILE: `${orgCfgDir}peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt`,
-      CORE_PEER_MSPCONFIGPATH: `${orgCfgDir}peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp`,
-      CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
-      ORDERER_TLS_ROOTCERT_FILE: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
-
-    // these below mirror how the fabric-samples sets up the configuration
-    const org2Env = {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org2MSP",
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      ORDERER_CA: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
-      CORE_PEER_MSPCONFIGPATH: `${orgCfgDir}peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp`,
-      CORE_PEER_TLS_ROOTCERT_FILE: `${orgCfgDir}peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt`,
-      ORDERER_TLS_ROOTCERT_FILE: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
-
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: org1Env,
-      sshConfig,
       logLevel,
       connectionProfile,
       discoveryOptions,
@@ -223,6 +182,7 @@ beforeAll(async () => {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: fabricLedger.getNetworkName(),
     };
 
     fabricConnector = new PluginLedgerConnectorFabric(pluginOptions);
@@ -315,19 +275,55 @@ beforeAll(async () => {
       });
     }
 
+    const peer0Org1Certs = await fabricLedger.getPeerOrgCertsAndConfig(
+      "org1",
+      "peer0",
+    );
+    const peer0Org2Certs = await fabricLedger.getPeerOrgCertsAndConfig(
+      "org2",
+      "peer0",
+    );
+
+    const filePath = path.join(__dirname, "../../yaml/resources/core.yaml");
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
     const response = await apiClient.deployContractV1({
       channelId,
       ccVersion: "1.0.0",
       sourceFiles,
       ccName: fabricContractName,
-      targetOrganizations: [org1Env, org2Env],
-      caFile: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
+      targetOrganizations: [
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+        },
+      ],
+      caFile: peer0Org1Certs.ordererTlsRootCert,
       ccLabel: "basic-asset-transfer-2",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
+      coreYamlFile: coreFile,
     });
 
     const { packageIds, lifecycle, success } = response.data;

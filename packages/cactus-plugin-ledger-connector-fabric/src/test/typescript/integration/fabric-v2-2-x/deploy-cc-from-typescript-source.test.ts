@@ -43,9 +43,10 @@ import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript
 import { DiscoveryOptions } from "fabric-network";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import { PeerCerts } from "@hyperledger/cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1";
 
 const testCase = "deploys Fabric 2.x contract from typescript source";
-const logLevel: LogLevelDesc = "INFO";
+const logLevel: LogLevelDesc = "DEBUG";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -64,6 +65,8 @@ describe("Deploy CC from typescript source test", () => {
   const contractRelPath =
     "../../fixtures/go/basic-asset-transfer/chaincode-typescript";
   let server: Server;
+  let peer0Org1Certs: PeerCerts;
+  let peer0Org2Certs: PeerCerts;
   beforeAll(async () => {
     const pruning = pruneDockerAllIfGithubAction({ logLevel });
     await expect(pruning).resolves.not.toThrow();
@@ -81,7 +84,6 @@ describe("Deploy CC from typescript source test", () => {
     const enrollAdminOut = await ledger.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await ledger.enrollUser(adminWallet);
-    const sshConfig = await ledger.getSshConfig();
     const keychainInstanceId = uuidv4();
     const keychainEntryValue = JSON.stringify(userIdentity);
     const keychainPlugin = new PluginKeychainMemory({
@@ -99,14 +101,13 @@ describe("Deploy CC from typescript source test", () => {
       enabled: true,
       asLocalhost: true,
     };
+
+    peer0Org1Certs = await ledger.getPeerOrgCertsAndConfig("org1", "peer0");
+    peer0Org2Certs = await ledger.getPeerOrgCertsAndConfig("org2", "peer0");
+
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-      sshConfig,
       logLevel,
       connectionProfile,
       discoveryOptions,
@@ -114,6 +115,7 @@ describe("Deploy CC from typescript source test", () => {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: ledger.getNetworkName(),
     };
     const plugin = new PluginLedgerConnectorFabric(pluginOptions);
     const expressApp = express();
@@ -216,6 +218,17 @@ describe("Deploy CC from typescript source test", () => {
         filename,
       });
     }
+
+    const filePath = path.join(
+      __dirname,
+      "../../../resources/fixtures/addOrgX/core.yaml",
+    );
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
     const res = await apiClient.deployContractV1({
       channelId,
       ccVersion: "1.0.0",
@@ -223,17 +236,33 @@ describe("Deploy CC from typescript source test", () => {
       sourceFiles,
       ccName: contractName,
       targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+        },
       ],
-      caFile:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+      caFile: peer0Org1Certs.ordererTlsRootCert,
       ccLabel: "basic-asset-transfer-2",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
+      coreYamlFile: coreFile,
     });
 
     const { packageIds, lifecycle, success } = res.data;

@@ -20,7 +20,7 @@ var _ MappedNullable = &DeployContractV1Request{}
 // DeployContractV1Request struct for DeployContractV1Request
 type DeployContractV1Request struct {
 	CcLang ChainCodeProgrammingLanguage `json:"ccLang"`
-	// File-system path pointing at the CA file.
+	// CA certificate file that will be used to verify the TLS connection to the orderer.
 	CaFile string `json:"caFile"`
 	// Ordering service endpoint specified as <hostname or IP address>:<port>
 	Orderer string `json:"orderer"`
@@ -35,7 +35,7 @@ type DeployContractV1Request struct {
 	// The name of the Fabric channel where the contract will get instantiated.
 	ChannelId string `json:"channelId"`
 	TargetOrganizations []DeploymentTargetOrganization `json:"targetOrganizations"`
-	ConstructorArgs *DeployContractGoSourceV1RequestConstructorArgs `json:"constructorArgs,omitempty"`
+	ConstructorArgs *DeployContractV1RequestConstructorArgs `json:"constructorArgs,omitempty"`
 	CcSequence float32 `json:"ccSequence"`
 	CcVersion string `json:"ccVersion"`
 	CcName string `json:"ccName"`
@@ -43,13 +43,14 @@ type DeployContractV1Request struct {
 	CcLabel string `json:"ccLabel"`
 	// The your-smart-contract.go file where the functionality of your contract is implemented.
 	SourceFiles []FileBase64 `json:"sourceFiles"`
+	CoreYamlFile FileBase64 `json:"coreYamlFile"`
 }
 
 // NewDeployContractV1Request instantiates a new DeployContractV1Request object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeployContractV1Request(ccLang ChainCodeProgrammingLanguage, caFile string, orderer string, ordererTLSHostnameOverride string, channelId string, targetOrganizations []DeploymentTargetOrganization, ccSequence float32, ccVersion string, ccName string, ccLabel string, sourceFiles []FileBase64) *DeployContractV1Request {
+func NewDeployContractV1Request(ccLang ChainCodeProgrammingLanguage, caFile string, orderer string, ordererTLSHostnameOverride string, channelId string, targetOrganizations []DeploymentTargetOrganization, ccSequence float32, ccVersion string, ccName string, ccLabel string, sourceFiles []FileBase64, coreYamlFile FileBase64) *DeployContractV1Request {
 	this := DeployContractV1Request{}
 	this.CcLang = ccLang
 	this.CaFile = caFile
@@ -62,6 +63,7 @@ func NewDeployContractV1Request(ccLang ChainCodeProgrammingLanguage, caFile stri
 	this.CcName = ccName
 	this.CcLabel = ccLabel
 	this.SourceFiles = sourceFiles
+	this.CoreYamlFile = coreYamlFile
 	return &this
 }
 
@@ -314,9 +316,9 @@ func (o *DeployContractV1Request) SetTargetOrganizations(v []DeploymentTargetOrg
 }
 
 // GetConstructorArgs returns the ConstructorArgs field value if set, zero value otherwise.
-func (o *DeployContractV1Request) GetConstructorArgs() DeployContractGoSourceV1RequestConstructorArgs {
+func (o *DeployContractV1Request) GetConstructorArgs() DeployContractV1RequestConstructorArgs {
 	if o == nil || IsNil(o.ConstructorArgs) {
-		var ret DeployContractGoSourceV1RequestConstructorArgs
+		var ret DeployContractV1RequestConstructorArgs
 		return ret
 	}
 	return *o.ConstructorArgs
@@ -324,7 +326,7 @@ func (o *DeployContractV1Request) GetConstructorArgs() DeployContractGoSourceV1R
 
 // GetConstructorArgsOk returns a tuple with the ConstructorArgs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DeployContractV1Request) GetConstructorArgsOk() (*DeployContractGoSourceV1RequestConstructorArgs, bool) {
+func (o *DeployContractV1Request) GetConstructorArgsOk() (*DeployContractV1RequestConstructorArgs, bool) {
 	if o == nil || IsNil(o.ConstructorArgs) {
 		return nil, false
 	}
@@ -340,8 +342,8 @@ func (o *DeployContractV1Request) HasConstructorArgs() bool {
 	return false
 }
 
-// SetConstructorArgs gets a reference to the given DeployContractGoSourceV1RequestConstructorArgs and assigns it to the ConstructorArgs field.
-func (o *DeployContractV1Request) SetConstructorArgs(v DeployContractGoSourceV1RequestConstructorArgs) {
+// SetConstructorArgs gets a reference to the given DeployContractV1RequestConstructorArgs and assigns it to the ConstructorArgs field.
+func (o *DeployContractV1Request) SetConstructorArgs(v DeployContractV1RequestConstructorArgs) {
 	o.ConstructorArgs = &v
 }
 
@@ -465,6 +467,30 @@ func (o *DeployContractV1Request) SetSourceFiles(v []FileBase64) {
 	o.SourceFiles = v
 }
 
+// GetCoreYamlFile returns the CoreYamlFile field value
+func (o *DeployContractV1Request) GetCoreYamlFile() FileBase64 {
+	if o == nil {
+		var ret FileBase64
+		return ret
+	}
+
+	return o.CoreYamlFile
+}
+
+// GetCoreYamlFileOk returns a tuple with the CoreYamlFile field value
+// and a boolean to check if the value has been set.
+func (o *DeployContractV1Request) GetCoreYamlFileOk() (FileBase64, bool) {
+	if o == nil {
+		return FileBase64{}, false
+	}
+	return o.CoreYamlFile, true
+}
+
+// SetCoreYamlFile sets field value
+func (o *DeployContractV1Request) SetCoreYamlFile(v FileBase64) {
+	o.CoreYamlFile = v
+}
+
 func (o DeployContractV1Request) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -498,6 +524,7 @@ func (o DeployContractV1Request) ToMap() (map[string]interface{}, error) {
 	toSerialize["ccName"] = o.CcName
 	toSerialize["ccLabel"] = o.CcLabel
 	toSerialize["sourceFiles"] = o.SourceFiles
+	toSerialize["coreYamlFile"] = o.CoreYamlFile
 	return toSerialize, nil
 }
 

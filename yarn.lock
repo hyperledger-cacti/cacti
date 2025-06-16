@@ -8182,6 +8182,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
+    "@types/tar-fs": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
     axios: "npm:1.8.4"
@@ -8189,9 +8190,11 @@ __metadata:
     express: "npm:5.1.0"
     express-jwt: "npm:8.4.1"
     fabric-network: "npm:2.2.20"
+    fs-extra: "npm:11.2.0"
     jose: "npm:4.15.5"
     openapi-types: "npm:12.1.3"
     solc: "npm:0.8.6"
+    tar-fs: "npm:3.0.10"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
     web3-core: "npm:1.6.1"
@@ -8284,12 +8287,14 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
+    "@types/dockerode": "npm:3.2.7"
     "@types/express": "npm:5.0.1"
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
     axios: "npm:1.8.4"
     body-parser: "npm:1.20.3"
+    dockerode: "npm:3.3.0"
     express: "npm:5.1.0"
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
@@ -8763,6 +8768,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/bn.js": "npm:5.1.0"
     "@types/body-parser": "npm:1.19.4"
+    "@types/dockerode": "npm:3.2.7"
     "@types/elliptic": "npm:6.4.16"
     "@types/express": "npm:5.0.1"
     "@types/fs-extra": "npm:11.0.4"
@@ -8771,12 +8777,14 @@ __metadata:
     "@types/multer": "npm:1.4.7"
     "@types/node-vault": "npm:0.9.13"
     "@types/sanitize-html": "npm:2.9.5"
+    "@types/tar-fs": "npm:2.0.4"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
     axios: "npm:1.8.4"
     bl: "npm:6.1.0"
     bn.js: "npm:4.12.0"
     body-parser: "npm:1.20.3"
+    dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
     express: "npm:5.1.0"
     fabric-ca-client: "npm:2.5.0-snapshot.23"
@@ -8789,6 +8797,7 @@ __metadata:
     http-errors: "npm:2.0.0"
     http-status-codes: "npm:2.1.4"
     internal-ip: "npm:6.2.0"
+    joi: "npm:17.13.3"
     jsrsasign: "npm:11.0.0"
     long: "npm:5.2.3"
     multer: "npm:1.4.5-lts.1"
@@ -8804,6 +8813,7 @@ __metadata:
     secp256k1: "npm:5.0.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
+    tar-fs: "npm:3.0.10"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
@@ -9263,6 +9273,7 @@ __metadata:
     "@types/node-forge": "npm:1.3.0"
     "@types/ssh2": "npm:0.5.47"
     "@types/ssh2-streams": "npm:0.1.9"
+    "@types/tar-fs": "npm:2.0.4"
     "@types/tar-stream": "npm:2.2.1"
     "@types/temp": "npm:0.9.1"
     axios: "npm:1.8.4"
@@ -9286,6 +9297,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
+    tar-fs: "npm:3.0.10"
     tar-stream: "npm:2.2.0"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
@@ -16145,6 +16157,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/tar-fs@npm:2.0.4":
+  version: 2.0.4
+  resolution: "@types/tar-fs@npm:2.0.4"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/tar-stream": "npm:*"
+  checksum: 10/a5f8b3a494244c24ff6175aa512bf7e4429efd2b9577e2b96fdba8c5649aec8881eaf7e107082ab741eedf4da5928f7d3bf255ce05ea83e15268c18eac600f5e
+  languageName: node
+  linkType: hard
+
+"@types/tar-stream@npm:*":
+  version: 3.1.4
+  resolution: "@types/tar-stream@npm:3.1.4"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10/9d1e182315c2189e18293b5a884edb9803c70772d37914870fbdb0bd659970e0d8effe002b19415ee251c422e3f169013668f3acf41feb9371040d0f0867d7b7
+  languageName: node
+  linkType: hard
+
 "@types/tar-stream@npm:2.2.1":
   version: 2.2.1
   resolution: "@types/tar-stream@npm:2.2.1"
@@ -18639,6 +18670,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"b4a@npm:^1.6.4":
+  version: 1.6.7
+  resolution: "b4a@npm:1.6.7"
+  checksum: 10/1ac056e3bce378d4d3e570e57319360a9d3125ab6916a1921b95bea33d9ee646698ebc75467561fd6fcc80ff697612124c89bb9b95e80db94c6dc23fcb977705
+  languageName: node
+  linkType: hard
+
 "b64-lite@npm:^1.3.1, b64-lite@npm:^1.4.0":
   version: 1.4.0
   resolution: "b64-lite@npm:1.4.0"
@@ -18972,6 +19010,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bare-events@npm:^2.2.0, bare-events@npm:^2.5.4":
+  version: 2.5.4
+  resolution: "bare-events@npm:2.5.4"
+  checksum: 10/135ef380b13f554ca2c6905bdbcfac8edae08fce85b7f953fa01f09a9f5b0da6a25e414111659bc9a6118216f0dd1f732016acd11ce91517f2afb26ebeb4b721
+  languageName: node
+  linkType: hard
+
+"bare-fs@npm:^4.0.1":
+  version: 4.1.5
+  resolution: "bare-fs@npm:4.1.5"
+  dependencies:
+    bare-events: "npm:^2.5.4"
+    bare-path: "npm:^3.0.0"
+    bare-stream: "npm:^2.6.4"
+  peerDependencies:
+    bare-buffer: "*"
+  peerDependenciesMeta:
+    bare-buffer:
+      optional: true
+  checksum: 10/81334c45db9ac848f0ad73c2fbcf897f53a0f029554def38d2e1f9b617757c0eff9184dd7df8fd2bfc0dc2afe5b7c283439ee252933bcc4d1bbd8c305fac01b9
+  languageName: node
+  linkType: hard
+
 "bare-module-resolve@npm:^1.10.0":
   version: 1.10.2
   resolution: "bare-module-resolve@npm:1.10.2"
@@ -19006,6 +19067,23 @@ __metadata:
   version: 1.0.1
   resolution: "bare-semver@npm:1.0.1"
   checksum: 10/b601629841a767b1b8ed3b475ce9208ae2fc6508672fd326b1c9667fe50437bc96905e1c4639ead8389b5b971731eb508e34b64d42db0dcca44ab25bff69a990
+  languageName: node
+  linkType: hard
+
+"bare-stream@npm:^2.6.4":
+  version: 2.6.5
+  resolution: "bare-stream@npm:2.6.5"
+  dependencies:
+    streamx: "npm:^2.21.0"
+  peerDependencies:
+    bare-buffer: "*"
+    bare-events: "*"
+  peerDependenciesMeta:
+    bare-buffer:
+      optional: true
+    bare-events:
+      optional: true
+  checksum: 10/0f5ca2167fbbccc118157bce7c53a933e21726268e03d751461211550d72b2d01c296b767ccf96aae8ab28e106b126407c6fe0d29f915734b844ffe6057f0a08
   languageName: node
   linkType: hard
 
@@ -27321,7 +27399,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-fifo@npm:^1.0.0":
+"fast-fifo@npm:^1.0.0, fast-fifo@npm:^1.2.0, fast-fifo@npm:^1.3.2":
   version: 1.3.2
   resolution: "fast-fifo@npm:1.3.2"
   checksum: 10/6bfcba3e4df5af7be3332703b69a7898a8ed7020837ec4395bb341bd96cc3a6d86c3f6071dd98da289618cf2234c70d84b2a6f09a33dd6f988b1ff60d8e54275
@@ -46743,6 +46821,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"streamx@npm:^2.15.0, streamx@npm:^2.21.0":
+  version: 2.22.1
+  resolution: "streamx@npm:2.22.1"
+  dependencies:
+    bare-events: "npm:^2.2.0"
+    fast-fifo: "npm:^1.3.2"
+    text-decoder: "npm:^1.1.0"
+  dependenciesMeta:
+    bare-events:
+      optional: true
+  checksum: 10/6d8576e0e5f4a67776427e3d29a877e66295bf7e17019a5b5c77d7fa026c5e8df6cdbd0cec2774999075af985179d70f07b25db7557b9226e33148fe67edd487
+  languageName: node
+  linkType: hard
+
 "strict-uri-encode@npm:^1.0.0":
   version: 1.1.0
   resolution: "strict-uri-encode@npm:1.1.0"
@@ -47776,6 +47868,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tar-fs@npm:3.0.10":
+  version: 3.0.10
+  resolution: "tar-fs@npm:3.0.10"
+  dependencies:
+    bare-fs: "npm:^4.0.1"
+    bare-path: "npm:^3.0.0"
+    pump: "npm:^3.0.0"
+    tar-stream: "npm:^3.1.5"
+  dependenciesMeta:
+    bare-fs:
+      optional: true
+    bare-path:
+      optional: true
+  checksum: 10/0a18701d015ed3db2762db716d4836c0f253d2f8a6fe5e28ded05e1f4ca4f9f29729b7eca1a0d00a5a1629f26a8618c3cbb4a4816e73e570cf381728112117b9
+  languageName: node
+  linkType: hard
+
 "tar-fs@npm:^2.0.0, tar-fs@npm:^2.1.1":
   version: 2.1.2
   resolution: "tar-fs@npm:2.1.2"
@@ -47825,6 +47934,17 @@ __metadata:
     to-buffer: "npm:^1.1.1"
     xtend: "npm:^4.0.0"
   checksum: 10/ac9b850bd40e6d4b251abcf92613bafd9fc9e592c220c781ebcdbb0ba76da22a245d9ea3ea638ad7168910e7e1ae5079333866cd679d2f1ffadb99c403f99d7f
+  languageName: node
+  linkType: hard
+
+"tar-stream@npm:^3.1.5":
+  version: 3.1.7
+  resolution: "tar-stream@npm:3.1.7"
+  dependencies:
+    b4a: "npm:^1.6.4"
+    fast-fifo: "npm:^1.2.0"
+    streamx: "npm:^2.15.0"
+  checksum: 10/b21a82705a72792544697c410451a4846af1f744176feb0ff11a7c3dd0896961552e3def5e1c9a6bbee4f0ae298b8252a1f4c9381e9f991553b9e4847976f05c
   languageName: node
   linkType: hard
 
@@ -48068,6 +48188,15 @@ __metadata:
   version: 0.0.1
   resolution: "testrpc@npm:0.0.1"
   checksum: 10/e27778552df2d0b938b062fdf41d44557f0eb3de75903cb90b87909f55a82a6345dd13e40d1498e718272b4e5225872dca66da73646c35df1031486bb0ed0fda
+  languageName: node
+  linkType: hard
+
+"text-decoder@npm:^1.1.0":
+  version: 1.2.3
+  resolution: "text-decoder@npm:1.2.3"
+  dependencies:
+    b4a: "npm:^1.6.4"
+  checksum: 10/bcdec33c0f070aeac38e46e4cafdcd567a58473ed308bdf75260bfbd8f7dc76acbc0b13226afaec4a169d0cb44cec2ab89c57b6395ccf02e941eaebbe19e124a
   languageName: node
   linkType: hard
 

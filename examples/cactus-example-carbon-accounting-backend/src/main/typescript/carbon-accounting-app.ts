@@ -101,7 +101,6 @@ export class CarbonAccountingApp {
 
     const xdaiAccount = await this.ledgers.xdai.createEthTestAccount();
 
-    const sshConfig = await this.ledgers.fabric.getSshConfig();
     const connectionProfile =
       await this.ledgers.fabric.getConnectionProfileOrg1();
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
@@ -142,12 +141,7 @@ export class CarbonAccountingApp {
 
     const fabricPlugin = new PluginLedgerConnectorFabric({
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry: pluginRegistry,
-      cliContainerEnv: this.ledgers.org1Env,
-      sshConfig,
       connectionProfile,
       logLevel: this.options.logLevel || "INFO",
       discoveryOptions: {
@@ -158,6 +152,7 @@ export class CarbonAccountingApp {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: this.ledgers.fabric.getNetworkName(),
     });
 
     const xdaiPlugin = new PluginLedgerConnectorXdai({

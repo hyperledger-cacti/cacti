@@ -24,7 +24,6 @@ import TimelockContract from "../../json/generated/src/main/solidity/net-emissio
 import NetEmissionsTokenNetworkContract from "../../json/generated/src/main/solidity/net-emissions-token-network/NetEmissionsTokenNetwork.sol/NetEmissionsTokenNetwork.json";
 import {
   ChainCodeProgrammingLanguage,
-  DeploymentTargetOrgFabric2x,
   FileBase64,
   PluginLedgerConnectorFabric,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
@@ -70,43 +69,6 @@ export class CarbonAccountingAppDummyInfrastructure {
 
   public get orgCfgDir(): string {
     return CarbonAccountingAppDummyInfrastructure.FABRIC_2_AIO_CLI_CFG_DIR;
-  }
-
-  public get org1Env(): NodeJS.ProcessEnv & DeploymentTargetOrgFabric2x {
-    return {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org1MSP",
-
-      ORDERER_CA: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      CORE_PEER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt`,
-      CORE_PEER_MSPCONFIGPATH: `${this.orgCfgDir}peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp`,
-      CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
-      ORDERER_TLS_ROOTCERT_FILE: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
-  }
-
-  public get org2Env(): NodeJS.ProcessEnv & DeploymentTargetOrgFabric2x {
-    const orgCfgDir =
-      CarbonAccountingAppDummyInfrastructure.FABRIC_2_AIO_CLI_CFG_DIR;
-
-    return {
-      CORE_LOGGING_LEVEL: "debug",
-      FABRIC_LOGGING_SPEC: "debug",
-      CORE_PEER_LOCALMSPID: "Org2MSP",
-
-      FABRIC_CFG_PATH: "/etc/hyperledger/fabric",
-      CORE_PEER_TLS_ENABLED: "true",
-      ORDERER_CA: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-
-      CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
-      CORE_PEER_MSPCONFIGPATH: `${orgCfgDir}peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp`,
-      CORE_PEER_TLS_ROOTCERT_FILE: `${orgCfgDir}peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt`,
-      ORDERER_TLS_ROOTCERT_FILE: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
-    };
   }
 
   constructor(
@@ -333,12 +295,43 @@ export class CarbonAccountingAppDummyInfrastructure {
         });
       }
 
+      const peer0Org1Certs = await this.fabric.getPeerOrgCertsAndConfig(
+        "org1",
+        "peer0",
+      );
+      const peer0Org2Certs = await this.fabric.getPeerOrgCertsAndConfig(
+        "org2",
+        "peer0",
+      );
+
+      const filePath = path.join(__dirname, "../../yaml/resources/core.yaml");
+      const buffer = await fs.readFile(filePath);
+      const coreFile = {
+        body: buffer.toString("base64"),
+        filename: "core.yaml",
+      };
+
       const res = await fabricPlugin.deployContract({
         channelId,
         ccVersion,
         sourceFiles,
         ccName,
-        targetOrganizations: [this.org1Env, this.org2Env],
+        targetOrganizations: [
+          {
+            CORE_PEER_LOCALMSPID: "Org1MSP",
+            CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
+            CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+            CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+            ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+          },
+          {
+            CORE_PEER_LOCALMSPID: "Org2MSP",
+            CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
+            CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+            CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+            ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+          },
+        ],
         caFile: `${this.orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
         ccLabel,
         ccLang: ChainCodeProgrammingLanguage.Typescript,
@@ -346,6 +339,7 @@ export class CarbonAccountingAppDummyInfrastructure {
         orderer: "orderer.example.com:7050",
         ordererTLSHostnameOverride: "orderer.example.com",
         connTimeout: 60,
+        coreYamlFile: coreFile,
       });
 
       const { packageIds, success } = res;

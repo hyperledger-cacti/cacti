@@ -132,9 +132,6 @@ describe("Run transaction with identities", () => {
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
       pluginRegistry,
-      sshConfig: {},
-      cliContainerEnv: {},
-      peerBinary: "not-required",
       logLevel,
       connectionProfile,
       discoveryOptions,
