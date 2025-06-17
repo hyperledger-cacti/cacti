@@ -32,7 +32,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```golang
-import generated "github.com/hyperledger/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated"
+import generated "github.com/hyperledger-cacti/cacti/packages/cactus-plugin-satp-hermes/src/main/go/generated"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:
