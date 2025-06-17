@@ -125,7 +125,7 @@ jobs:
         run: yarn configure
 
       - name: Generate protobuf files
-        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes build-proto
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:proto
 
       - name: Generate OpenAPI SDKs
         run: |
