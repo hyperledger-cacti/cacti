@@ -23,32 +23,34 @@ export abstract class BridgeLeafNonFungible {
 
   public abstract wrapAsset(asset: Asset): Promise<TransactionResponse>;
 
-  public abstract unwrapAsset(assetId: string): Promise<TransactionResponse>;
-
-  public abstract lockAsset(
+  public abstract unwrapNonFungibleAsset(
     assetId: string,
-    uniqueDescriptor: string,
   ): Promise<TransactionResponse>;
 
-  public abstract unlockAsset(
+  public abstract lockNonFungibleAsset(
     assetId: string,
-    uniqueDescriptor: string,
+    nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract mintAsset(
+  public abstract unlockNonFungibleAsset(
     assetId: string,
-    uniqueDescriptor: string,
+    nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract burnAsset(
+  public abstract mintNonFungibleAsset(
     assetId: string,
-    uniqueDescriptor: string,
+    nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract assignAsset(
+  public abstract burnNonFungibleAsset(
+    assetId: string,
+    nftID: string,
+  ): Promise<TransactionResponse>;
+
+  public abstract assignNonFungibleAsset(
     assetId: string,
     to: string,
-    uniqueDescriptor: string,
+    nftID: string,
   ): Promise<TransactionResponse>;
 
   public abstract runTransaction(
