@@ -21,7 +21,6 @@ export abstract class BridgeLeafNonFungible {
    */
   public abstract getDeployNonFungibleWrapperContractReceipt(): unknown;
 
-  //TODO: Implement this NON-FUNGIBLE bridge
   public abstract wrapAsset(asset: Asset): Promise<TransactionResponse>;
 
   public abstract unwrapAsset(assetId: string): Promise<TransactionResponse>;

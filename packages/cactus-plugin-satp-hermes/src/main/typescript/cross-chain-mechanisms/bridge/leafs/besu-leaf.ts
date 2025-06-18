@@ -65,6 +65,8 @@ export interface IBesuLeafNeworkOptions extends INetworkOptions {
   wrapperContractName?: string;
   wrapperContractAddress?: string;
   gas?: number;
+  nftWrapperContractName: string;
+  nftWrapperContractAddress: string;
 }
 
 export interface IBesuLeafOptions
@@ -153,10 +155,13 @@ export class BesuLeaf
   private readonly gas: number;
 
   private wrapperFungibleDeployReceipt: Web3TransactionReceipt | undefined;
+  private wrapperNonFungibleDeployReceipt: Web3TransactionReceipt | undefined;
 
   private wrapperContractAddress: string | undefined;
+  private nonFungiblewrapperContractAddress: string | undefined;
 
   private wrapperContractName: string | undefined;
+  private nonFungibleWrapperContractName: string | undefined;
 
   /**
    * Constructs a new instance of the `BesuLeaf` class.
@@ -287,16 +292,18 @@ export class BesuLeaf
       case TokenType.NONSTANDARD_FUNGIBLE:
         if (!this.wrapperContractAddress) {
           throw new ApproveAddressError(
-            `${fnTag}, Wrapper Contract Address not available for approving address`,
+            `${fnTag}, Wrapper Contract Address for Fungible not available for approving address`,
           );
         }
         return this.wrapperContractAddress;
       case TokenType.ERC721:
       case TokenType.NONSTANDARD_NONFUNGIBLE:
-        //TODO implement
-        throw new ApproveAddressError(
-          `${fnTag}, Non-fungible wrapper contract not implemented`,
-        );
+        if (!this.wrapperContractAddress) {
+          throw new ApproveAddressError(
+            `${fnTag}, Wrapper Contract Address for Non Fungible not available for approving address`,
+          );
+        }
+        return this.wrapperContractAddress;
       default:
         throw new ApproveAddressError(
           `${fnTag}, Invalid asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
@@ -316,7 +323,7 @@ export class BesuLeaf
   public async deployContracts(): Promise<void> {
     await Promise.all([
       this.deployFungibleWrapperContract(),
-      // this.deployNonFungibleWrapperContract(),
+      this.deployNonFungibleWrapperContract(),
     ]);
   }
 
@@ -327,17 +334,65 @@ export class BesuLeaf
    * @throws
    */
   public getDeployNonFungibleWrapperContractReceipt(): unknown {
-    //TODO implement
-    throw new Error("Method not implemented.");
+    if (!this.wrapperNonFungibleDeployReceipt) {
+      throw new ReceiptError(
+        `${BesuLeaf.CLASS_NAME}#getDeployNonFungibleWrapperContractReceipt() Non Fungible Wrapper Contract Not deployed`,
+      );
+    }
+    return this.wrapperNonFungibleDeployReceipt;
   }
 
   /**
    * Deploys a non-fungible wrapper contract.
    *
    **/
-  public deployNonFungibleWrapperContract(): Promise<void> {
-    //TODO implement
-    throw new Error("Method not implemented.");
+  public async deployNonFungibleWrapperContract(
+    contractName?: string,
+  ): Promise<void> {
+    const fnTag = `${BesuLeaf.CLASS_NAME}#deployNonFungibleWrapperContract`;
+    this.log.debug(`${fnTag}, Deploying Non Fungible Wrapper Contract`);
+
+    if (this.wrapperContractAddress && this.wrapperContractName) {
+      this.log.debug(
+        `${fnTag}, Wrapper Contract already created, wrapperContractAddress: ${this.wrapperContractAddress}, wrapperContractName: ${this.wrapperContractName}`,
+      );
+      throw new WrapperContractAlreadyCreatedError(fnTag);
+    }
+
+    this.wrapperContractName =
+      contractName || `${this.id}-non-fungible-wrapper-contract`;
+
+    const deployOutWrapperContract =
+      await this.connector.deployContractNoKeychain({
+        contractName: this.wrapperContractName,
+        contractAbi: SATPWrapperContract.abi,
+        constructorArgs: [this.signingCredential.ethAccount],
+        web3SigningCredential: this.signingCredential,
+        bytecode: SATPWrapperContract.bytecode.object,
+        gas: this.gas,
+      });
+
+    if (!deployOutWrapperContract.transactionReceipt) {
+      throw new TransactionReceiptError(
+        `${fnTag}, Wrapper Contract deployment failed: ${safeStableStringify(deployOutWrapperContract)}`,
+      );
+    }
+
+    if (!deployOutWrapperContract.transactionReceipt.contractAddress) {
+      throw new ContractAddressError(
+        `${fnTag}, Wrapper Contract address not found in deploy receipt: ${safeStableStringify(deployOutWrapperContract.transactionReceipt)}`,
+      );
+    }
+
+    this.wrapperFungibleDeployReceipt =
+      deployOutWrapperContract.transactionReceipt;
+
+    this.wrapperContractAddress =
+      deployOutWrapperContract.transactionReceipt.contractAddress;
+
+    this.log.debug(
+      `${fnTag}, Wrapper Contract deployed receipt: ${safeStableStringify(deployOutWrapperContract.transactionReceipt)}`,
+    );
   }
   /**
    * Retrieves the deployment receipt of the fungible wrapper contract.
