@@ -1,4 +1,4 @@
-import type { Logger } from "@hyperledger/cactus-common";
+import type { SATPLogger as Logger } from "../../satp-logger";
 import type { SATPSession } from "../../satp-session";
 import type { RollbackStrategy } from "./rollback-strategy-factory";
 import {

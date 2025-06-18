@@ -16,7 +16,8 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
 import { getSessionId } from "./handler-utils";
 import {
@@ -32,6 +33,7 @@ import {
   setError,
   setErrorChecking,
 } from "../session-utils";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
@@ -39,12 +41,17 @@ export class Stage3SATPHandler implements SATPHandler {
   private clientService: Stage3ClientService;
   private serverService: Stage3ServerService;
   private logger: Logger;
+  private monitorService: MonitorService;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage3ServerService;
     this.clientService = ops.clientService as Stage3ClientService;
-    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      ops.loggerOptions,
+      this.monitorService,
+    );
     this.logger.trace(`Initialized ${Stage3SATPHandler.CLASS_NAME}`);
   }
 

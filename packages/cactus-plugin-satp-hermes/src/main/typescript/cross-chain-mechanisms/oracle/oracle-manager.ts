@@ -1,9 +1,9 @@
 import {
   type ILoggerOptions,
-  type Logger,
-  LoggerProvider,
   type LogLevelDesc,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import type { SATPLogger as Logger } from "../../core/satp-logger";
 // import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
 
 import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
@@ -44,17 +44,20 @@ import { OracleExecutionLayer } from "./oracle-execution-layer";
 import { updateOracleOperation } from "./oracle-utils";
 import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
   bungee: IPluginBungeeHermesOptions | undefined;
   initialTasks?: OracleTask[];
+  monitorService: MonitorService;
 }
 
 export class OracleManager {
   public static readonly CLASS_NAME = "OracleManager";
   private readonly logger: Logger;
   private readonly logLevel: LogLevelDesc = "INFO";
+  private readonly monitorService: MonitorService;
 
   // Group oracle by the network, a network can have various oracles (bridges)
   private readonly oracles: Map<string, Map<string, OracleAbstract>> =
@@ -72,11 +75,15 @@ export class OracleManager {
       throw new Error(`${fnTag}: OracleManager options are required`);
     }
     const logLevel = (options.logLevel || "INFO") as LogLevelDesc;
+    this.monitorService = options.monitorService;
     const loggerOptions: ILoggerOptions = {
       level: logLevel,
       label: OracleManager.CLASS_NAME,
     };
-    this.logger = LoggerProvider.getOrCreate(loggerOptions);
+    this.logger = LoggerProvider.getOrCreate(
+      loggerOptions,
+      this.monitorService,
+    );
     this.logger.info(`${fnTag}: Initializing OracleManager`);
 
     // this.notificationDispatcher = new OracleNotificationDispatcher({
@@ -85,6 +92,7 @@ export class OracleManager {
 
     this.schedulerManager = new OracleSchedulerManager({
       logLevel: this.logLevel,
+      monitorService: this.monitorService,
     });
   }
 
@@ -296,6 +304,7 @@ export class OracleManager {
       oracleImpl: this.getNetworkOracle(id, claimType),
       claimType,
       logLevel: this.logLevel,
+      monitorService: this.monitorService,
     });
   }
 

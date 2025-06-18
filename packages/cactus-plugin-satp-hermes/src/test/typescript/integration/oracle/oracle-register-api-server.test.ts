@@ -1,5 +1,6 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
@@ -43,12 +44,17 @@ import OracleTestContract from "../../../solidity/generated/OracleTestContract.s
 import { keccak256 } from "web3-utils";
 import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "SATP - Hermes",
-});
+const monitorService = MonitorService.createOrGetMonitorService({});
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "SATP - Hermes",
+  },
+  monitorService,
+);
 
 let oracleApi: OracleApi;
 let besuEnv: BesuTestEnvironment;
@@ -78,17 +84,20 @@ beforeAll(async () => {
       besuEnv = await BesuTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
         logLevel,
+        monitorService: monitorService,
       });
       log.info("Besu Ledger started successfully");
 
       ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
         logLevel,
+        monitorService: monitorService,
       });
 
       fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
         logLevel,
+        monitorService: monitorService,
       });
     } catch (err) {
       log.error("Error starting Besu Ledger: ", err);

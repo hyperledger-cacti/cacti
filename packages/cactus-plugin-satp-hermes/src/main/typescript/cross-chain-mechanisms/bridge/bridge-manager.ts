@@ -1,8 +1,6 @@
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { BridgeLeaf } from "./bridge-leaf";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BesuLeaf, IBesuLeafNeworkOptions } from "./leafs/besu-leaf";
@@ -35,6 +33,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { NetworkId } from "../../public-api";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 /**
  * Options for configuring the BridgeManager.
@@ -45,6 +44,7 @@ import { NetworkId } from "../../public-api";
 interface IBridgeManagerOptions {
   ontologyOptions?: IOntologyManagerOptions;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 /**
@@ -59,6 +59,7 @@ export class BridgeManager
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
   private readonly ontologyManager: OntologyManager;
+  private readonly monitorService: MonitorService;
 
   // Group leaf by the network, a network can have various leafs (bridges)
   private readonly leafs: Map<string, Map<string, BridgeLeaf>> = new Map();
@@ -71,11 +72,18 @@ export class BridgeManager
   constructor(public readonly options: IBridgeManagerOptions) {
     const label = BridgeManager.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
-    this.ontologyManager = new OntologyManager({
-      ...options.ontologyOptions,
-      logLevel: options.logLevel,
-    });
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
+    this.ontologyManager = new OntologyManager(
+      {
+        ...options.ontologyOptions,
+        logLevel: options.logLevel,
+      },
+      this.monitorService,
+    );
   }
 
   /**
@@ -117,19 +125,23 @@ export class BridgeManager
           );
           const besuNetworkOptions =
             leafNetworkOptions as unknown as IBesuLeafNeworkOptions;
-          leaf = new BesuLeaf({
-            ...besuNetworkOptions,
-            connectorOptions: {
-              ...besuNetworkOptions.connectorOptions,
-              instanceId: uuidv4(),
-              pluginRegistry: new PluginRegistry({
-                plugins: [],
-              }),
+          leaf = new BesuLeaf(
+            {
+              ...besuNetworkOptions,
+              connectorOptions: {
+                ...besuNetworkOptions.connectorOptions,
+                instanceId: uuidv4(),
+                pluginRegistry: new PluginRegistry({
+                  plugins: [],
+                }),
+                logLevel: this.logLevel,
+              },
               logLevel: this.logLevel,
             },
-            ontologyManager: this.ontologyManager,
-            logLevel: this.logLevel,
-          });
+            this.ontologyManager,
+            this.monitorService,
+          );
+          this.log.debug(`${fnTag}, Besu Leaf: ${leaf}`);
           break;
         case LedgerType.Ethereum:
           this.log.debug(`${fnTag}, Deploying Ethereum Leaf...`);
@@ -140,19 +152,22 @@ export class BridgeManager
           );
           const ethereumNetworkOptions =
             leafNetworkOptions as unknown as IEthereumLeafNeworkOptions;
-          leaf = new EthereumLeaf({
-            ...ethereumNetworkOptions,
-            connectorOptions: {
-              ...ethereumNetworkOptions.connectorOptions,
-              instanceId: uuidv4(),
-              pluginRegistry: new PluginRegistry({
-                plugins: [],
-              }),
+          leaf = new EthereumLeaf(
+            {
+              ...ethereumNetworkOptions,
+              connectorOptions: {
+                ...ethereumNetworkOptions.connectorOptions,
+                instanceId: uuidv4(),
+                pluginRegistry: new PluginRegistry({
+                  plugins: [],
+                }),
+                logLevel: this.logLevel,
+              },
               logLevel: this.logLevel,
             },
-            ontologyManager: this.ontologyManager,
-            logLevel: this.logLevel,
-          });
+            this.ontologyManager,
+            this.monitorService,
+          );
           break;
         case LedgerType.Fabric2:
           this.log.debug(`${fnTag}, Deploying Fabric Leaf...`);
@@ -200,11 +215,14 @@ export class BridgeManager
               keychainRef: keychainEntryKeyBridge,
             },
           } as unknown as IFabricLeafNeworkOptions;
-          leaf = new FabricLeaf({
-            ...fabricNetworkOptions,
-            ontologyManager: this.ontologyManager,
-            logLevel: this.logLevel,
-          });
+          leaf = new FabricLeaf(
+            {
+              ...fabricNetworkOptions,
+              logLevel: this.logLevel,
+            },
+            this.ontologyManager,
+            this.monitorService,
+          );
           break;
         default:
           throw new UnsupportedNetworkError(
@@ -303,6 +321,7 @@ export class BridgeManager
       leafBridge: this.getBridgeEndPoint(id, claimType),
       claimType,
       logLevel: this.logLevel,
+      monitorService: this.monitorService,
     });
   }
 

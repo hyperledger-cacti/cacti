@@ -2,11 +2,11 @@ import { OracleAbstract, type OracleAbstractOptions } from "../oracle-abstract";
 import safeStableStringify from "safe-stable-stringify";
 import {
   ISignerKeyPair,
-  type Logger,
-  LoggerProvider,
   type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import type { SATPLogger as Logger } from "../../../core/satp-logger";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
 
@@ -36,6 +36,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { isWeb3SigningCredentialNone } from "../../common/utils";
 import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
+import { MonitorService } from "../../../services/monitoring/monitor";
 
 export interface IBesuOracleEntry extends IOracleEntryBase {
   contractAddress: string;
@@ -45,7 +46,9 @@ export interface IBesuOracleEntry extends IOracleEntryBase {
 
 export interface IOracleBesuOptions
   extends OracleAbstractOptions,
-    IBesuLeafNeworkOptions {}
+    IBesuLeafNeworkOptions {
+  monitorService: MonitorService;
+}
 
 export class OracleBesu extends OracleAbstract {
   public static CLASS_NAME = "OracleBesu";
@@ -55,6 +58,7 @@ export class OracleBesu extends OracleAbstract {
   protected readonly bungee?: PluginBungeeHermes;
   protected readonly claimFormats: ClaimFormat[];
   protected readonly keyPair: ISignerKeyPair;
+  protected readonly monitorService: MonitorService;
 
   private readonly signingCredential:
     | Web3SigningCredentialPrivateKeyHex
@@ -68,7 +72,11 @@ export class OracleBesu extends OracleAbstract {
     super();
     const label = OracleBesu.CLASS_NAME;
     this.logLevel = options.logLevel || "INFO";
-    this.logger = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = options.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.logger.debug(
       `${OracleBesu.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,

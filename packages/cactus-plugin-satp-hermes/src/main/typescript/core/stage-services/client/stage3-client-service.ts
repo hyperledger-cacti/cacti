@@ -74,6 +74,7 @@ export class Stage3ClientService extends SATPService {
       serviceType: Stage3ClientService.SERVICE_TYPE,
       bridgeManager: ops.bridgeManager,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
 
@@ -732,6 +733,11 @@ export class Stage3ClientService extends SATPService {
       sessionData.burnAssertionClaim = create(BurnAssertionClaimSchema, {});
 
       const res = await bridge.burnAsset(token);
+
+      this.monitorService.incrementCounter(
+        "burned_asset_amount",
+        Number(token.amount),
+      );
 
       sessionData.burnAssertionClaim.receipt = res.receipt;
 

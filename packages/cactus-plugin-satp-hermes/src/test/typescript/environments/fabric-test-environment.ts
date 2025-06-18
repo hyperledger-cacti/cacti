@@ -1,8 +1,6 @@
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../main/typescript/core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../../main/typescript/core/satp-logger";
 import {
   AssetTokenTypeEnum,
   Configuration,
@@ -37,14 +35,15 @@ import { Asset, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { IFabricLeafOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-fabric.json";
-import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 // Test environment for Fabric ledger operations
 
 export interface IFabricTestEnvironment {
   contractName: string;
   logLevel: LogLevelDesc;
+  monitorService: MonitorService;
   claimFormat?: ClaimFormat;
   network?: string;
 }
@@ -80,6 +79,7 @@ export class FabricTestEnvironment {
   private dockerNetwork: string = "fabric";
 
   private readonly log: Logger;
+  private monitorService: MonitorService;
 
   private bridgeMSPID?: string;
   public bridgeIdentity?: X509Identity;
@@ -88,6 +88,7 @@ export class FabricTestEnvironment {
   private constructor(
     satpContractName: string,
     logLevel: LogLevelDesc,
+    monitorService: MonitorService,
     network?: string,
     claimFormat?: ClaimFormat,
   ) {
@@ -100,7 +101,11 @@ export class FabricTestEnvironment {
 
     const level = logLevel || "INFO";
     const label = "FabricTestEnvironment";
-    this.log = LoggerProvider.getOrCreate({ level, label });
+    this.monitorService = monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { level, label },
+      this.monitorService,
+    );
   }
 
   // Initializes the Fabric ledger, accounts, and connector for testing
@@ -258,10 +263,12 @@ export class FabricTestEnvironment {
   public static async setupTestEnvironment(
     config: IFabricTestEnvironment,
   ): Promise<FabricTestEnvironment> {
-    const { contractName, logLevel, claimFormat, network } = config;
+    const { contractName, logLevel, monitorService, claimFormat, network } =
+      config;
     const instance = new FabricTestEnvironment(
       contractName,
       logLevel,
+      monitorService,
       network,
       claimFormat,
     );
@@ -346,14 +353,10 @@ export class FabricTestEnvironment {
     } as INetworkOptions;
   }
   // this creates the same config as the bridge manager does
-  public createFabricLeafConfig(
-    ontologyManager: OntologyManager,
-    logLevel?: LogLevelDesc,
-  ): IFabricLeafOptions {
+  public createFabricLeafConfig(logLevel?: LogLevelDesc): IFabricLeafOptions {
     return {
       networkIdentification: this.network,
       signingCredential: this.bridgeFabricSigningCredential,
-      ontologyManager: ontologyManager,
       channelName: this.fabricChannelName,
       targetOrganizations: [
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,

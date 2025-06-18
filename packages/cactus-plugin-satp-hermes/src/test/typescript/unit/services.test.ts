@@ -75,7 +75,7 @@ import {
 import { Knex, knex } from "knex";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/database/repository/knex-remote-log-repository";
-import { SATPLogger } from "../../../main/typescript/logging";
+import { SATPPersistence } from "../../../main/typescript/satp-persistence";
 import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client
@@ -86,6 +86,7 @@ import { BridgeManager } from "../../../main/typescript/cross-chain-mechanisms/b
 import { createMigrationSource } from "../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../main/typescript/database/knexfile-remote";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -100,6 +101,8 @@ const serviceClasses = [
   Stage3ClientService,
 ];
 
+const monitorService = MonitorService.createOrGetMonitorService({});
+
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 
 const signer = new JsObjectSigner({
@@ -112,7 +115,7 @@ const connectedDLTs = [
 ];
 let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
-let dbLogger: SATPLogger;
+let dbLogger: SATPPersistence;
 let persistLogEntrySpy: jest.SpyInstance;
 let bridgeManager: BridgeManagerClientInterface;
 
@@ -148,6 +151,7 @@ const sessionIDs: string[] = [];
 beforeAll(async () => {
   bridgeManager = new BridgeManager({
     logLevel: logLevel,
+    monitorService: monitorService,
   });
 
   jest.spyOn(bridgeManager, "getSATPExecutionLayer").mockImplementation(() => {
@@ -185,11 +189,12 @@ beforeAll(async () => {
 
   localRepository = new LocalLogRepository(knexLocalInstance.default);
   remoteRepository = new RemoteLogRepository(knexRemoteInstance.default);
-  dbLogger = new SATPLogger({
+  dbLogger = new SATPPersistence({
     localRepository,
     remoteRepository,
     signer,
     pubKey: Buffer.from(keyPairs.publicKey).toString("hex"),
+    monitorService: monitorService,
   });
 
   persistLogEntrySpy = jest.spyOn(dbLogger, "persistLogEntry");
@@ -198,6 +203,7 @@ beforeAll(async () => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   sessionIDs.push(mockSession.getSessionId());
@@ -1109,6 +1115,7 @@ function initializeServiceOptions(
       index % 2 === 0 ? SATPServiceType.Server : SATPServiceType.Client,
     bridgeManager: bridgeManager,
     dbLogger: dbLogger,
+    monitorService: monitorService,
   }));
 }
 
