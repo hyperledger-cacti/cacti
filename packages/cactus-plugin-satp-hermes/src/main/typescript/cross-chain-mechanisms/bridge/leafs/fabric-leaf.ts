@@ -160,10 +160,13 @@ export class FabricLeaf
   );
 
   private wrapperFungibleDeployReceipt: DeployContractV1Response | undefined;
+  private wrapperNonFungibleDeployReceipt: DeployContractV1Response | undefined;
 
   private contractChannel: string | undefined;
+  private nonFungibleContractChannel: string | undefined;
 
   private wrapperContractName: string | undefined;
+  private wrapperNonFungibleContractName: string | undefined;
 
   private targetOrganizations: Array<DeploymentTargetOrganization> | undefined;
   private caFile: string | undefined;
@@ -348,9 +351,13 @@ export class FabricLeaf
    * @returns
    * @throws
    */
-  public getDeployNonFungibleWrapperContractReceipt(): unknown {
-    //TODO implement
-    throw new Error("Method not implemented.");
+  public getDeployNonFungibleWrapperContractReceipt(): DeployContractV1Response {
+    if (!this.wrapperNonFungibleDeployReceipt) {
+      throw new ReceiptError(
+        `${FabricLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt() Non Fungible Wrapper Contract Not deployed`,
+      );
+    }
+    return this.wrapperNonFungibleDeployReceipt;
   }
 
   /**
@@ -668,13 +675,38 @@ export class FabricLeaf
       asset.referenceId,
     );
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
+    let inUseContractChannel;
+    let inUseContractName;
+
+    switch (asset.type) {
+      case TokenType.ERC20:
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
+        inUseContractChannel = this.contractChannel;
+        inUseContractName = this.wrapperContractName;
+        break;
+      case TokenType.ERC721:
+        if (
+          !this.nonFungibleContractChannel ||
+          !this.wrapperNonFungibleContractName
+        ) {
+          throw new WrapperContractError(
+            `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+          );
+        }
+        inUseContractChannel = this.nonFungibleContractChannel;
+        inUseContractName = this.wrapperNonFungibleContractName;
+        break;
+      default:
+        throw new Error("Asset if unsupported type");
     }
 
     const response = await this.connector.transact({
       signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
+      channelName: inUseContractChannel,
       methodName: "wrap",
       params: [
         asset.type.toString(),
@@ -686,7 +718,7 @@ export class FabricLeaf
         asset.contractName,
         safeStableStringify(interactions),
       ],
-      contractName: this.wrapperContractName,
+      contractName: inUseContractName,
       invocationType: FabricContractInvocationType.Send,
     });
 
@@ -722,6 +754,40 @@ export class FabricLeaf
       methodName: "unwrap",
       params: [assetId],
       contractName: this.wrapperContractName,
+      invocationType: FabricContractInvocationType.Send,
+    });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
+    return {
+      transactionId: response.transactionId,
+      output: response.functionOutput,
+    };
+  }
+
+  public async unwrapNonFungibleAsset(
+    nftID: string,
+  ): Promise<TransactionResponse> {
+    const fnTag = `${FabricLeaf.CLASS_NAME}}#unwrapAsset`;
+    this.log.debug(`${fnTag}, Unwrapping NonFungible Asset: ${nftID}`);
+
+    if (
+      !this.nonFungibleContractChannel ||
+      !this.wrapperNonFungibleContractName
+    ) {
+      throw new WrapperContractError(
+        `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+      );
+    }
+
+    const response = await this.connector.transact({
+      signingCredential: this.signingCredential,
+      channelName: this.nonFungibleContractChannel,
+      methodName: "unwrap",
+      params: [nftID],
+      contractName: this.wrapperNonFungibleContractName,
       invocationType: FabricContractInvocationType.Send,
     });
 
@@ -774,6 +840,41 @@ export class FabricLeaf
     };
   }
 
+  public async lockNonFungibleAsset(
+    assetId: string,
+    nftID: string,
+  ): Promise<TransactionResponse> {
+    const fnTag = `${FabricLeaf.CLASS_NAME}}#lockAsset`;
+    this.log.debug(`${fnTag}, Locking Non Fungible Asset: ${nftID}`);
+
+    if (
+      !this.nonFungibleContractChannel ||
+      !this.wrapperNonFungibleContractName
+    ) {
+      throw new WrapperContractError(
+        `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+      );
+    }
+
+    const response = await this.connector.transact({
+      signingCredential: this.signingCredential,
+      channelName: this.nonFungibleContractChannel,
+      methodName: "lock",
+      params: [assetId, nftID],
+      contractName: this.wrapperNonFungibleContractName,
+      invocationType: FabricContractInvocationType.Send,
+    });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
+    return {
+      transactionId: response.transactionId,
+      output: response.functionOutput,
+    };
+  }
+
   /**
    * Unlocks an asset.
    *
@@ -800,6 +901,39 @@ export class FabricLeaf
       methodName: "unlock",
       params: [assetId, amount.toString()],
       contractName: this.wrapperContractName,
+      invocationType: FabricContractInvocationType.Send,
+    });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
+    return {
+      transactionId: response.transactionId,
+      output: response.functionOutput,
+    };
+  }
+
+  public async unlockNonFungibleAsset(
+    assetId: string,
+    nftID: string,
+  ): Promise<TransactionResponse> {
+    const fnTag = `${FabricLeaf.CLASS_NAME}}#unlockAsset`;
+    this.log.debug(`${fnTag}, Unlocking Non Fungible Asset: ${nftID}`);
+
+    if (
+      !this.nonFungibleContractChannel ||
+      !this.wrapperNonFungibleContractName
+    ) {
+      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
+    }
+
+    const response = await this.connector.transact({
+      signingCredential: this.signingCredential,
+      channelName: this.nonFungibleContractChannel,
+      methodName: "unlock",
+      params: [assetId, nftID],
+      contractName: this.wrapperNonFungibleContractName,
       invocationType: FabricContractInvocationType.Send,
     });
 
@@ -852,6 +986,41 @@ export class FabricLeaf
     };
   }
 
+  public async mintNonFungibleAsset(
+    assetId: string,
+    nftID: string,
+  ): Promise<TransactionResponse> {
+    const fnTag = `${FabricLeaf.CLASS_NAME}}#mintAsset`;
+    this.log.debug(`${fnTag}, Minting Non Fungible Asset from: ${nftID}`);
+
+    if (
+      !this.nonFungibleContractChannel ||
+      !this.wrapperNonFungibleContractName
+    ) {
+      throw new WrapperContractError(
+        `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+      );
+    }
+
+    const response = await this.connector.transact({
+      signingCredential: this.signingCredential,
+      channelName: this.nonFungibleContractChannel,
+      methodName: "mint",
+      params: [assetId, nftID],
+      contractName: this.wrapperNonFungibleContractName,
+      invocationType: FabricContractInvocationType.Send,
+    });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
+    return {
+      transactionId: response.transactionId,
+      output: response.functionOutput,
+    };
+  }
+
   /**
    * Burns an asset.
    *
@@ -878,6 +1047,41 @@ export class FabricLeaf
       methodName: "burn",
       params: [assetId, amount.toString()],
       contractName: this.wrapperContractName,
+      invocationType: FabricContractInvocationType.Send,
+    });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
+    return {
+      transactionId: response.transactionId,
+      output: response.functionOutput,
+    };
+  }
+
+  public async burnNonFungibleAsset(
+    assetId: string,
+    nftID: string,
+  ): Promise<TransactionResponse> {
+    const fnTag = `${FabricLeaf.CLASS_NAME}}#burnAsset`;
+    this.log.debug(`${fnTag}, Burning Non Fungible Asset: ${nftID}`);
+
+    if (
+      !this.nonFungibleContractChannel ||
+      !this.wrapperNonFungibleContractName
+    ) {
+      throw new WrapperContractError(
+        `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+      );
+    }
+
+    const response = await this.connector.transact({
+      signingCredential: this.signingCredential,
+      channelName: this.nonFungibleContractChannel,
+      methodName: "burn",
+      params: [assetId, nftID],
+      contractName: this.wrapperNonFungibleContractName,
       invocationType: FabricContractInvocationType.Send,
     });
 
@@ -933,6 +1137,45 @@ export class FabricLeaf
       output: response.functionOutput,
     };
   }
+
+  public async assignNonFungibleAsset(
+    assetId: string,
+    to: string,
+    nftID: string,
+  ): Promise<TransactionResponse> {
+    const fnTag = `${FabricLeaf.CLASS_NAME}}#assignAsset`;
+    this.log.debug(
+      `${fnTag}, Assigning Non Fungible Asset: ${nftID} to: ${to}`,
+    );
+
+    if (
+      !this.nonFungibleContractChannel ||
+      !this.wrapperNonFungibleContractName
+    ) {
+      throw new WrapperContractError(
+        `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+      );
+    }
+
+    const response = await this.connector.transact({
+      signingCredential: this.signingCredential,
+      channelName: this.nonFungibleContractChannel,
+      methodName: "assign",
+      params: [assetId, to, nftID],
+      contractName: this.wrapperNonFungibleContractName,
+      invocationType: FabricContractInvocationType.Send,
+    });
+
+    if (response == undefined || response.transactionId == "") {
+      throw new TransactionError(fnTag);
+    }
+
+    return {
+      transactionId: response.transactionId,
+      output: response.functionOutput,
+    };
+  }
+
   /**
    * Retrieves all asset IDs.
    *
@@ -940,20 +1183,49 @@ export class FabricLeaf
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
-  public async getAsset(assetId: string): Promise<FabricAsset> {
+  public async getAsset(
+    assetId: string,
+    assetType: string,
+  ): Promise<FabricAsset> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#getAsset`;
     this.log.debug(`${fnTag}, Getting Asset`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
+    let inUseContractChannel;
+    let inUseContractName;
+    switch (assetType) {
+      case "ERC20":
+      case "FUNGIBLE":
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
+        inUseContractChannel = this.contractChannel;
+        inUseContractName = this.wrapperContractName;
+        break;
+      case "ERC721":
+      case "NONFUNGIBLE":
+        if (
+          !this.nonFungibleContractChannel ||
+          !this.wrapperNonFungibleContractName
+        ) {
+          throw new WrapperContractError(
+            `${fnTag}, Non Fungible Wrapper Contract not deployed`,
+          );
+        }
+        inUseContractChannel = this.nonFungibleContractChannel;
+        inUseContractName = this.wrapperNonFungibleContractName;
+        break;
+      default:
+        throw new Error("Trying to get unsupported type " + assetType);
     }
 
     const response = await this.connector.transact({
       signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
+      channelName: inUseContractChannel,
       methodName: "GetAsset",
       params: [assetId],
-      contractName: this.wrapperContractName,
+      contractName: inUseContractName,
       invocationType: FabricContractInvocationType.Call,
     });
 

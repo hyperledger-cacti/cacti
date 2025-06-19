@@ -65,8 +65,8 @@ export interface IBesuLeafNeworkOptions extends INetworkOptions {
   wrapperContractName?: string;
   wrapperContractAddress?: string;
   gas?: number;
-  nftWrapperContractName: string;
-  nftWrapperContractAddress: string;
+  nftWrapperContractName?: string;
+  nftWrapperContractAddress?: string;
 }
 
 export interface IBesuLeafOptions
@@ -846,7 +846,7 @@ export class BesuLeaf
     nftID: string,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#mintAsset`;
-    this.log.debug(`${fnTag}, Minting Non Fungible Asset: ${nftID}`);
+    this.log.debug(`${fnTag}, Minting Non Fungible Asset from: ${nftID}`);
 
     if (
       !this.nonFungibleWrapperContractName ||

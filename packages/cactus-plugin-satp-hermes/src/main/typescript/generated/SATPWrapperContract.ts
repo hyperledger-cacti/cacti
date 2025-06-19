@@ -191,6 +191,15 @@ export interface TokensResponse {
   owner: string;
   amount: string;
 }
+export interface NonFungibleTokenResponse {
+  contractName: string;
+  contractAddress: string;
+  tokenType: string;
+  tokenId: string;
+  referenceId: string;
+  owner:string;
+  uniqueIdentifier: string;
+}
 export interface TokensInteractionsResponse {
   interactionType: string;
   available: boolean;

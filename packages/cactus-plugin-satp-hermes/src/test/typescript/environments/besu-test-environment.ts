@@ -56,6 +56,7 @@ export class BesuTestEnvironment {
   public bridgeEthAccount!: { address: string; privateKey: string };
   public assigneeEthAccount?: { address: string; privateKey: string };
   public erc20TokenContract!: string;
+  //public erc721TokenContract!: string;
   public assetContractAddress?: string;
   public besuConfig!: IBesuLeafNeworkOptions;
   public gas: number = 999999999; // Default gas limit for transactions
