@@ -7,11 +7,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./ITraceableContract.sol";
 
-import "./satp-contract-interface.sol";
-
 error noPermission(address adr);
 
-contract SATPContract is AccessControl, ERC721, ITraceableContract, SATPContractInterface {
+abstract contract SATPContract is AccessControl, ERC721, ITraceableContract {
     bytes32 public constant BRIDGE_ROLE = keccak256("BRIDGE_ROLE");
     bytes32 public constant OWNER_ROLE = keccak256("OWNER_ROLE");
 
@@ -24,11 +22,6 @@ contract SATPContract is AccessControl, ERC721, ITraceableContract, SATPContract
         id = _id;
     }
 
-    //In the following functions, where uint256 is called amount,
-    //it is to be considered the tokenID. This is just to respect 
-    //the naming established in SATPContractInterface. The second
-    //attribute of these functions, both for ERC20 and ERC721 is
-    //an uint256, so no deeper problems for now.
     function mint(address account, uint256 amount) external onlyRole(BRIDGE_ROLE) returns (bool success) {
         uint256 tokenId = amount;
         _safeMint(account, tokenId);
@@ -49,7 +42,11 @@ contract SATPContract is AccessControl, ERC721, ITraceableContract, SATPContract
         return true;
     }
 
-    function transfer(from, recipient, amount) {}
+    //function transfer(from, recipient, amount) {}
 
-    function hasPermission(account) {}
+    //function hasPermission(account) {}
+
+    function supportsInterface(interfaceId) {
+        return false
+    }
 }
