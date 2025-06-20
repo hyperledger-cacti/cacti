@@ -11,7 +11,7 @@ export abstract class BridgeLeafNonFungible {
    * Deploys the non-fungible wrapper contract.
    * This method should be implemented to handle the deployment logic.
    */
-  public abstract deployNonFungibleWrapperContract(): Promise<void>;
+  public abstract deployWrapperContract(): Promise<void>;
 
   /**
    * Retrieves the receipt of the deployed non-fungible wrapper contract.
@@ -19,35 +19,33 @@ export abstract class BridgeLeafNonFungible {
    *
    * @returns {unknown} The receipt of the deployed non-fungible wrapper contract.
    */
-  public abstract getDeployNonFungibleWrapperContractReceipt(): unknown;
+  public abstract getDeployWrapperContractReceipt(): unknown;
 
   public abstract wrapAsset(asset: Asset): Promise<TransactionResponse>;
 
-  public abstract unwrapNonFungibleAsset(
-    assetId: string,
-  ): Promise<TransactionResponse>;
+  public abstract unwrapAsset(assetId: string): Promise<TransactionResponse>;
 
-  public abstract lockNonFungibleAsset(
+  public abstract lockAsset(
     assetId: string,
     nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract unlockNonFungibleAsset(
+  public abstract unlockAsset(
     assetId: string,
     nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract mintNonFungibleAsset(
+  public abstract mintAsset(
     assetId: string,
     nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract burnNonFungibleAsset(
+  public abstract burnAsset(
     assetId: string,
     nftID: string,
   ): Promise<TransactionResponse>;
 
-  public abstract assignNonFungibleAsset(
+  public abstract assignAsset(
     assetId: string,
     to: string,
     nftID: string,

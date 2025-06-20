@@ -12,13 +12,13 @@ export abstract class BridgeLeafFungible {
    * Deploys the fungible wrapper contract.
    * @returns A promise that resolves when the contract is deployed.
    */
-  public abstract deployFungibleWrapperContract(): Promise<void>;
+  public abstract deployWrapperContract(): Promise<void>;
 
   /**
    * Retrieves the receipt for the deployment of the fungible wrapper contract.
    * @returns The receipt of the deployment.
    */
-  public abstract getDeployFungibleWrapperContractReceipt(): unknown;
+  public abstract getDeployWrapperContractReceipt(): unknown;
 
   /**
    * Wraps an asset into the fungible wrapper.

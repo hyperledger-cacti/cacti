@@ -154,14 +154,11 @@ export class BesuLeaf
 
   private readonly gas: number;
 
-  private wrapperFungibleDeployReceipt: Web3TransactionReceipt | undefined;
-  private wrapperNonFungibleDeployReceipt: Web3TransactionReceipt | undefined;
+  private wrapperDeployReceipt: Web3TransactionReceipt | undefined;
 
   private wrapperContractAddress: string | undefined;
-  private nonFungibleWrapperContractAddress: string | undefined;
 
   private wrapperContractName: string | undefined;
-  private nonFungibleWrapperContractName: string | undefined;
 
   /**
    * Constructs a new instance of the `BesuLeaf` class.
@@ -290,20 +287,14 @@ export class BesuLeaf
     switch (assetType) {
       case TokenType.ERC20:
       case TokenType.NONSTANDARD_FUNGIBLE:
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
         if (!this.wrapperContractAddress) {
           throw new ApproveAddressError(
-            `${fnTag}, Wrapper Contract Address for Fungible not available for approving address`,
+            `${fnTag}, Wrapper Contract Address not available for approving address`,
           );
         }
         return this.wrapperContractAddress;
-      case TokenType.ERC721:
-      case TokenType.NONSTANDARD_NONFUNGIBLE:
-        if (!this.nonFungibleWrapperContractAddress) {
-          throw new ApproveAddressError(
-            `${fnTag}, Wrapper Contract Address for Non Fungible not available for approving address`,
-          );
-        }
-        return this.nonFungibleWrapperContractAddress;
       default:
         throw new ApproveAddressError(
           `${fnTag}, Invalid asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
@@ -321,81 +312,7 @@ export class BesuLeaf
    * @returns {Promise<void>} A promise that resolves when all contracts are deployed.
    */
   public async deployContracts(): Promise<void> {
-    await Promise.all([
-      this.deployFungibleWrapperContract(),
-      this.deployNonFungibleWrapperContract(),
-    ]);
-  }
-
-  /**
-   * Retrieves the deployment receipt of the non-fungible wrapper contract.
-   *
-   * @returns
-   * @throws
-   */
-  public getDeployNonFungibleWrapperContractReceipt(): unknown {
-    if (!this.wrapperNonFungibleDeployReceipt) {
-      throw new ReceiptError(
-        `${BesuLeaf.CLASS_NAME}#getDeployNonFungibleWrapperContractReceipt() Non Fungible Wrapper Contract Not deployed`,
-      );
-    }
-    return this.wrapperNonFungibleDeployReceipt;
-  }
-
-  /**
-   * Deploys a non-fungible wrapper contract. HAS A TODO
-   *
-   **/
-  public async deployNonFungibleWrapperContract(
-    contractName?: string,
-  ): Promise<void> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}#deployNonFungibleWrapperContract`;
-    this.log.debug(`${fnTag}, Deploying Non Fungible Wrapper Contract`);
-
-    if (
-      this.nonFungibleWrapperContractAddress &&
-      this.nonFungibleWrapperContractName
-    ) {
-      this.log.debug(
-        `${fnTag}, Wrapper Contract already created, wrapperContractAddress: ${this.nonFungibleWrapperContractAddress}, wrapperContractName: ${this.nonFungibleWrapperContractName}`,
-      );
-      throw new WrapperContractAlreadyCreatedError(fnTag);
-    }
-
-    this.nonFungibleWrapperContractName =
-      contractName || `${this.id}-non-fungible-wrapper-contract`;
-
-    const deployOutWrapperContract =
-      await this.connector.deployContractNoKeychain({
-        contractName: this.nonFungibleWrapperContractName,
-        contractAbi: SATPWrapperContract.abi, //TODO: CHANGE TO THE ABI OF NEW CONTRACT WHEN CREATED
-        constructorArgs: [this.signingCredential.ethAccount],
-        web3SigningCredential: this.signingCredential,
-        bytecode: SATPWrapperContract.bytecode.object, //TODO: SAME AS PREVIOUS
-        gas: this.gas,
-      });
-
-    if (!deployOutWrapperContract.transactionReceipt) {
-      throw new TransactionReceiptError(
-        `${fnTag}, Wrapper Contract deployment failed: ${safeStableStringify(deployOutWrapperContract)}`,
-      );
-    }
-
-    if (!deployOutWrapperContract.transactionReceipt.contractAddress) {
-      throw new ContractAddressError(
-        `${fnTag}, Wrapper Contract address not found in deploy receipt: ${safeStableStringify(deployOutWrapperContract.transactionReceipt)}`,
-      );
-    }
-
-    this.wrapperNonFungibleDeployReceipt =
-      deployOutWrapperContract.transactionReceipt;
-
-    this.nonFungibleWrapperContractAddress =
-      deployOutWrapperContract.transactionReceipt.contractAddress;
-
-    this.log.debug(
-      `${fnTag}, Non Fungible Wrapper Contract deployed receipt: ${safeStableStringify(deployOutWrapperContract.transactionReceipt)}`,
-    );
+    await Promise.all([this.deployWrapperContract()]);
   }
 
   /**
@@ -404,13 +321,13 @@ export class BesuLeaf
    * @returns {Web3TransactionReceipt} The transaction receipt of the deployed fungible wrapper contract.
    * @throws {ReceiptError} If the fungible wrapper contract has not been deployed.
    */
-  public getDeployFungibleWrapperContractReceipt(): Web3TransactionReceipt {
-    if (!this.wrapperFungibleDeployReceipt) {
+  public getDeployWrapperContractReceipt(): Web3TransactionReceipt {
+    if (!this.wrapperDeployReceipt) {
       throw new ReceiptError(
-        `${BesuLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt() Fungible Wrapper Contract Not deployed`,
+        `${BesuLeaf.CLASS_NAME}#getDeployWrapperContractReceipt() Wrapper Contract Not deployed`,
       );
     }
-    return this.wrapperFungibleDeployReceipt;
+    return this.wrapperDeployReceipt;
   }
 
   /**
@@ -422,10 +339,8 @@ export class BesuLeaf
    * @throws {TransactionReceiptError} If the deployment transaction receipt is not found.
    * @throws {ContractAddressError} If the contract address is not found in the deployment receipt.
    */
-  public async deployFungibleWrapperContract(
-    contractName?: string,
-  ): Promise<void> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}#deployFungibleWrapperContract`;
+  public async deployWrapperContract(contractName?: string): Promise<void> {
+    const fnTag = `${BesuLeaf.CLASS_NAME}#deployWrapperContract`;
     this.log.debug(`${fnTag}, Deploying Wrapper Contract`);
 
     if (this.wrapperContractAddress && this.wrapperContractName) {
@@ -435,8 +350,7 @@ export class BesuLeaf
       throw new WrapperContractAlreadyCreatedError(fnTag);
     }
 
-    this.wrapperContractName =
-      contractName || `${this.id}-fungible-wrapper-contract`;
+    this.wrapperContractName = contractName || `${this.id}-wrapper-contract`;
 
     const deployOutWrapperContract =
       await this.connector.deployContractNoKeychain({
@@ -460,8 +374,7 @@ export class BesuLeaf
       );
     }
 
-    this.wrapperFungibleDeployReceipt =
-      deployOutWrapperContract.transactionReceipt;
+    this.wrapperDeployReceipt = deployOutWrapperContract.transactionReceipt;
 
     this.wrapperContractAddress =
       deployOutWrapperContract.transactionReceipt.contractAddress;
@@ -480,29 +393,23 @@ export class BesuLeaf
    */
   public getWrapperContract(type: "FUNGIBLE" | "NONFUNGIBLE"): string {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#getWrapperContract`;
-    this.log.debug(`${fnTag}, Getting Wrapper Contract Adress`);
+    this.log.debug(`${fnTag}, Getting Wrapper Contract Address`);
     switch (type) {
       case "FUNGIBLE":
+      case "NONFUNGIBLE":
         if (!this.wrapperContractAddress) {
           throw new WrapperContractError(
             `${fnTag}, Wrapper Contract not deployed`,
           );
         }
         return this.wrapperContractAddress;
-      case "NONFUNGIBLE":
-        if (!this.nonFungibleWrapperContractAddress) {
-          throw new WrapperContractError(
-            `${fnTag}, Wrapper Contract not deployed`,
-          );
-        }
-        return this.nonFungibleWrapperContractAddress;
       default:
         throw new Error("Invalid type");
     }
   }
 
   /**
-   * Wraps an asset. HAS A TODO
+   * Wraps an asset.
    *
    * @param {EvmAsset} asset - The asset to be wrapped.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
@@ -519,39 +426,25 @@ export class BesuLeaf
       LedgerType.Besu2X,
       asset.referenceId,
     );
-    let inUseWrapperContractAddress;
-    let inUseWrapperContractName;
-    //TODO: This should also change the necessary params in the invokeContract call: Do this call inside the switch?
     switch (asset.type) {
       case TokenType.ERC20:
+      case TokenType.NONSTANDARD_FUNGIBLE:
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
         if (!this.wrapperContractName || !this.wrapperContractAddress) {
           throw new WrapperContractError(
-            `${fnTag}, Wrapper Contract for fungible assets not deployed`,
+            `${fnTag}, Wrapper Contract not deployed`,
           );
         }
-        inUseWrapperContractAddress = this.wrapperContractAddress;
-        inUseWrapperContractName = this.wrapperContractName;
-        break;
-      case TokenType.ERC721:
-        if (
-          !this.nonFungibleWrapperContractName ||
-          !this.nonFungibleWrapperContractAddress
-        ) {
-          throw new WrapperContractError(
-            `${fnTag}, Wrapper Contract for non fungible assets not deployed`,
-          );
-        }
-        inUseWrapperContractAddress = this.nonFungibleWrapperContractAddress;
-        inUseWrapperContractName = this.nonFungibleWrapperContractName;
         break;
       default:
         throw new Error("Unsupported asset type wrapping");
     }
 
     const response = (await this.connector.invokeContract({
-      contractName: inUseWrapperContractName,
+      contractName: this.wrapperContractName,
       contractAbi: SATPWrapperContract.abi,
-      contractAddress: inUseWrapperContractAddress,
+      contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "wrap",
       params: [
@@ -614,56 +507,23 @@ export class BesuLeaf
     };
   }
 
-  /**HAS A TODO */
-  public async unwrapNonFungibleAsset(
-    nftID: string,
-  ): Promise<TransactionResponse> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#unwrapAsset`;
-    this.log.debug(`${fnTag}, Unwrapping Non Fungible Asset: ${nftID}`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: CHANGE TO RESPECTIVE ABI AND CORRECT INVOKE CALL WHEN CREATED
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractName,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.wrapperContractAddress,
-      invocationType: EthContractInvocationType.Send,
-      methodName: "unwrap",
-      params: [nftID],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-    return {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt:
-        safeStableStringify(response.out.transactionReceipt) ?? "",
-    };
-  }
-
   /**
    * Locks an asset.
    *
    * @param {string} assetId - The ID of the asset to be locked.
-   * @param {number} amount - The amount of the asset to be locked.
+   * @param {number} assetAttribute - The amount of the asset to be locked.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async lockAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#lockAsset`;
-    this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Locking Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -675,43 +535,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "lock",
-      params: [assetId, amount.toString()],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt:
-        safeStableStringify(response.out.transactionReceipt) ?? "",
-    };
-  }
-
-  /**HAS A TODO */
-  public async lockNonFungibleAsset(
-    nftID: string,
-  ): Promise<TransactionResponse> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#lockAsset`;
-    this.log.debug(`${fnTag}, Locking Non Fungible Asset: ${nftID}`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: CHANGE THE ABI AND CONTRACT CALL WHEN POSSIBLE
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractAddress,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Send,
-      methodName: "lock",
-      params: [nftID],
+      params: [assetId, assetAttribute.toString()],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -730,17 +554,19 @@ export class BesuLeaf
    * Unlocks an asset.
    *
    * @param {string} assetId - The ID of the asset to be unlocked.
-   * @param {number} amount - The amount of the asset to be unlocked.
+   * @param {number} assetAttribute - The amount of the asset to be unlocked.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async unlockAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#unlockAsset`;
-    this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Unlocking Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -752,42 +578,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "unlock",
-      params: [assetId, amount.toString()],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-    return {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt:
-        safeStableStringify(response.out.transactionReceipt) ?? "",
-    };
-  }
-
-  /**HAS A TODO */
-  public async unlockNonFungibleAsset(
-    nftID: string,
-  ): Promise<TransactionResponse> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#unlockAsset`;
-    this.log.debug(`${fnTag}, Unlocking Non Fungible Asset: ${nftID}`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: CHANGE CONTRACT CALL
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractAddress,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Send,
-      methodName: "unlock",
-      params: [nftID],
+      params: [assetId, assetAttribute.toString()],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -805,17 +596,19 @@ export class BesuLeaf
    * Mints an asset.
    *
    * @param {string} assetId - The ID of the asset to be minted.
-   * @param {number} amount - The amount of the asset to be minted.
+   * @param {number} assetAttribute - The amount of the asset to be minted.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async mintAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#mintAsset`;
-    this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Minting Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -827,42 +620,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
-      params: [assetId, amount.toString()],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-    return {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt:
-        safeStableStringify(response.out.transactionReceipt) ?? "",
-    };
-  }
-
-  /**HAS A TODO */
-  public async mintNonFungibleAsset(
-    nftID: string,
-  ): Promise<TransactionResponse> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#mintAsset`;
-    this.log.debug(`${fnTag}, Minting Non Fungible Asset from: ${nftID}`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: ADAPT FOLLOWING CALL
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractName,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Send,
-      methodName: "mint",
-      params: [nftID],
+      params: [assetId, assetAttribute.toString()],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -880,17 +638,19 @@ export class BesuLeaf
    * Burns an asset.
    *
    * @param {string} assetId - The ID of the asset to be burned.
-   * @param {number} amount - The amount of the asset to be burned.
+   * @param {number} assetAttribute - The amount of the asset to be burned.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async burnAsset(
     assetId: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#burnAsset`;
-    this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
+    this.log.debug(
+      `${fnTag}, Burning Asset: ${assetId} with attribute: ${assetAttribute}`,
+    );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
@@ -902,42 +662,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "burn",
-      params: [assetId, amount.toString()],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-    return {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt:
-        safeStableStringify(response.out.transactionReceipt) ?? "",
-    };
-  }
-
-  /**HAS A TODO */
-  public async burnNonFungibleAsset(
-    nftID: string,
-  ): Promise<TransactionResponse> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#burnAsset`;
-    this.log.debug(`${fnTag}, Burning Asset: ${nftID}`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: ADAPT
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractName,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Send,
-      methodName: "burn",
-      params: [nftID],
+      params: [assetId, assetAttribute.toString()],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -964,11 +689,11 @@ export class BesuLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    amount: number,
+    assetAttribute: number | string,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#assignAsset`;
     this.log.debug(
-      `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
+      `${fnTag}, Assigning Asset: ${assetId} with attribute: ${assetAttribute} to: ${to}`,
     );
 
     if (!this.wrapperContractName || !this.wrapperContractAddress) {
@@ -981,43 +706,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "assign",
-      params: [assetId, to, amount],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-    return {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt:
-        safeStableStringify(response.out.transactionReceipt) ?? "",
-    };
-  }
-
-  /**HAS A TODO */
-  public async assignNonFungibleAsset(
-    to: string,
-    nftID: string,
-  ): Promise<TransactionResponse> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#assignAsset`;
-    this.log.debug(`${fnTag}, Assigning Asset: ${nftID} to: ${to}`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: ADAPT
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractName,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Send,
-      methodName: "assign",
-      params: [to, nftID],
+      params: [assetId, to, assetAttribute],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -1032,7 +721,7 @@ export class BesuLeaf
   }
 
   /**
-   * Retrieves all asset IDs. HAS A TODO
+   * Retrieves all asset IDs.
    *
    * @returns {Promise<string[]>} A promise that resolves to an array of asset IDs.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
@@ -1046,7 +735,7 @@ export class BesuLeaf
       throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
     }
 
-    const responseFungible = (await this.connector.invokeContract({
+    const response = (await this.connector.invokeContract({
       contractName: this.wrapperContractName,
       contractAbi: SATPWrapperContract.abi,
       contractAddress: this.wrapperContractAddress,
@@ -1057,33 +746,10 @@ export class BesuLeaf
       gas: this.gas,
     })) as BesuResponse;
 
-    if (!responseFungible.success) {
+    if (!response.success) {
       throw new TransactionError(fnTag);
     }
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
-
-    //TODO: ADAPT CALL PARAMETERS
-    const responseNonFungible = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractName,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Call,
-      methodName: "getAllAssetIDs",
-      params: [],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-
-    const fungibleAssets = responseFungible.callOutput as string[];
-    const nonFungibleAssets = responseNonFungible.callOutput as string[];
-
-    return fungibleAssets.concat(nonFungibleAssets);
+    return response.callOutput as string[];
   }
 
   /**
@@ -1119,57 +785,34 @@ export class BesuLeaf
 
     const token = response.callOutput as TokenResponse;
 
-    return {
-      contractName: token.contractName,
-      id: token.tokenId,
-      referenceId: token.referenceId,
-      contractAddress: token.contractAddress,
-      type: Number(token.tokenType),
-      owner: token.owner,
-      amount: token.amount,
-      network: this.networkIdentification,
-    } as EvmAsset;
-  }
-
-  /**HAS A TODO */
-  public async getNonFungibleAsset(nftID: string): Promise<EvmAsset> {
-    const fnTag = `${BesuLeaf.CLASS_NAME}}#getAsset`;
-    this.log.debug(`${fnTag}, Getting Asset`);
-
-    if (
-      !this.nonFungibleWrapperContractName ||
-      !this.nonFungibleWrapperContractAddress
-    ) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
+    switch (Number(token.tokenType)) {
+      case TokenType.ERC20:
+      case TokenType.NONSTANDARD_FUNGIBLE:
+        return {
+          contractName: token.contractName,
+          id: token.tokenId,
+          referenceId: token.referenceId,
+          contractAddress: token.contractAddress,
+          type: Number(token.tokenType),
+          owner: token.owner,
+          amount: token.assetAttribute,
+          network: this.networkIdentification,
+        } as EvmAsset;
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
+        return {
+          contractName: token.contractName,
+          id: token.tokenId,
+          referenceId: token.referenceId,
+          contractAddress: token.contractAddress,
+          type: Number(token.tokenType),
+          owner: token.owner,
+          uniqueDescriptor: token.assetAttribute,
+          network: this.networkIdentification,
+        } as EvmAsset;
+      default:
+        throw new Error("Unexpected Token Type");
     }
-
-    const response = (await this.connector.invokeContract({
-      contractName: this.nonFungibleWrapperContractName,
-      contractAbi: SATPWrapperContract.abi,
-      contractAddress: this.nonFungibleWrapperContractAddress,
-      invocationType: EthContractInvocationType.Call,
-      methodName: "getToken",
-      params: [nftID],
-      signingCredential: this.signingCredential,
-      gas: this.gas,
-    })) as BesuResponse;
-
-    if (!response.success) {
-      throw new TransactionError(fnTag);
-    }
-
-    const token = response.callOutput as TokenResponse;
-
-    return {
-      contractName: token.contractName,
-      id: token.tokenId,
-      referenceId: token.referenceId,
-      contractAddress: token.contractAddress,
-      type: Number(token.tokenType),
-      owner: token.owner,
-      amount: token.amount,
-      network: this.networkIdentification,
-    } as EvmAsset;
   }
 
   /**

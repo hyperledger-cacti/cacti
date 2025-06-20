@@ -88,9 +88,7 @@ describe("Ethereum Leaf Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await ethereumLeaf.deployContracts();
-    expect(
-      ethereumLeaf.getDeployFungibleWrapperContractReceipt(),
-    ).toBeDefined();
+    expect(ethereumLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
 
   it("Should return the wrapper contract address", async () => {
