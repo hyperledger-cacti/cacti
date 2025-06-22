@@ -139,6 +139,8 @@ export class SATPSession {
     sessionData.satpMessages.stage2 = create(Stage2MessagesSchema, {});
     sessionData.satpMessages.stage3 = create(Stage3MessagesSchema, {});
     sessionData.state = State.ONGOING;
+    sessionData.maxRetries = "3";
+    sessionData.maxTimeout = "15000";
   }
 
   public getServerSessionData(): SessionData {
