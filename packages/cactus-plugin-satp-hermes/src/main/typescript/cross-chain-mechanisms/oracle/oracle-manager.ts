@@ -44,6 +44,7 @@ import { OracleExecutionLayer } from "./oracle-execution-layer";
 import { updateOracleOperation } from "./oracle-utils";
 import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
+// import { GatewayLogger } from "../../logging"; TODO: Uncomment
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
@@ -55,6 +56,8 @@ export class OracleManager {
   public static readonly CLASS_NAME = "OracleManager";
   private readonly logger: Logger;
   private readonly logLevel: LogLevelDesc = "INFO";
+
+  // private readonly dbLogger: GatewayLogger; TODO: Uncomment
 
   // Group oracle by the network, a network can have various oracles (bridges)
   private readonly oracles: Map<string, Map<string, OracleAbstract>> =
@@ -78,6 +81,8 @@ export class OracleManager {
     };
     this.logger = LoggerProvider.getOrCreate(loggerOptions);
     this.logger.info(`${fnTag}: Initializing OracleManager`);
+
+    // TODO: setup this.dbLogger similar to what is done in the SATPManager
 
     // this.notificationDispatcher = new OracleNotificationDispatcher({
     //   logger: this.logger,
@@ -546,8 +551,10 @@ export class OracleManager {
       const entry = oracle.convertOperationToEntry(operation);
 
       if (operation.type === OracleOperationTypeEnum.Read) {
+        // TODO: Create logs for this operation
         response = await oracle.readEntry(entry as IOracleEntryBase);
       } else {
+        // TODO: Create logs for this operation
         response = await oracle.updateEntry(entry as IOracleEntryBase);
       }
 

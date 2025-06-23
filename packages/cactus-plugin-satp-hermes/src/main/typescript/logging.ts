@@ -21,7 +21,7 @@ interface SATPLogEntry {
   sequenceNumber: number;
 }
 
-export interface ISATPLoggerConfig {
+export interface IGatewayLoggerConfig {
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
   signer: JsObjectSigner;
@@ -29,7 +29,9 @@ export interface ISATPLoggerConfig {
   logLevel?: LogLevelDesc;
 }
 
-export class SATPLogger {
+export class GatewayLogger {
+  public static readonly CLASS_NAME = "GatewayLogger";
+
   private defaultRepository: boolean = true;
   public localRepository: ILocalLogRepository;
   public remoteRepository: IRemoteLogRepository | undefined;
@@ -37,22 +39,22 @@ export class SATPLogger {
   private pubKey: string;
   private readonly log: Logger;
 
-  constructor(config: ISATPLoggerConfig) {
+  constructor(config: IGatewayLoggerConfig) {
     this.localRepository = config.localRepository;
     this.remoteRepository = config.remoteRepository;
     this.signer = config.signer;
     this.pubKey = config.pubKey;
 
     this.log = LoggerProvider.getOrCreate({
-      label: "SATPLogger",
+      label: "GatewayLogger",
       level: config.logLevel || "INFO",
     });
 
-    this.log.info("SATPLogger initialized.");
+    this.log.info("GatewayLogger initialized.");
   }
 
   public async storeProof(logEntry: SATPLogEntry): Promise<void> {
-    const fnTag = `SATPLogger#storeProof()`;
+    const fnTag = `GatewayLogger#storeProof()`;
     this.log.info(
       `${fnTag} - Storing proof log entry for sessionID: ${logEntry.sessionID}`,
     );
@@ -86,7 +88,7 @@ export class SATPLogger {
   }
 
   public async persistLogEntry(logEntry: SATPLogEntry): Promise<void> {
-    const fnTag = `SATPLogger#persistLogEntry()`;
+    const fnTag = `GatewayLogger#persistLogEntry()`;
     this.log.info(
       `${fnTag} - Persisting log entry for sessionID: ${logEntry.sessionID}`,
     );
@@ -115,7 +117,7 @@ export class SATPLogger {
   }
 
   private getHash(logEntry: LocalLog): string {
-    const fnTag = `SATPLogger#getHash()`;
+    const fnTag = `GatewayLogger#getHash()`;
     this.log.debug(
       `${fnTag} - generating hash for log entry with sessionID: ${logEntry.sessionId}`,
     );
@@ -134,7 +136,7 @@ export class SATPLogger {
   }
 
   private async storeInDatabase(localLog: LocalLog): Promise<void> {
-    const fnTag = `SATPLogger#storeInDatabase()`;
+    const fnTag = `GatewayLogger#storeInDatabase()`;
     this.log.info(`${fnTag} - Storing log entry with key: ${localLog.key}`);
 
     if (this.defaultRepository && !this.localRepository.getCreated()) {
@@ -148,7 +150,7 @@ export class SATPLogger {
   }
 
   private async storeRemoteLog(key: string, hash: string): Promise<void> {
-    const fnTag = `SATPLogger#storeRemoteLog()`;
+    const fnTag = `GatewayLogger#storeRemoteLog()`;
     if (!!this.remoteRepository) {
       this.log.info(
         `${fnTag} - Storing remote log with key: ${key} and hash: ${hash}`,

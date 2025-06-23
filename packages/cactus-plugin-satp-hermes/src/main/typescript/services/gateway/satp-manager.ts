@@ -92,7 +92,7 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../database/repository/interfaces/repository";
-import { ISATPLoggerConfig, SATPLogger } from "../../logging";
+import { IGatewayLoggerConfig, GatewayLogger } from "../../logging";
 import { MonitorService } from "../monitoring/monitor";
 
 export interface ISATPManagerOptions {
@@ -130,7 +130,7 @@ export class SATPManager {
   private gatewaysPubKeys: Map<string, string> = new Map();
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
-  private readonly dbLogger: SATPLogger;
+  private readonly dbLogger: GatewayLogger;
   private readonly monitorService: MonitorService;
 
   private readonly claimFormat: ClaimFormat;
@@ -162,7 +162,7 @@ export class SATPManager {
       Stage3SATPHandler as unknown as SATPHandlerInstance,
     ];
 
-    const satpLoggerConfig: ISATPLoggerConfig = {
+    const GatewayLoggerConfig: IGatewayLoggerConfig = {
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
       signer: this.signer,
@@ -170,7 +170,7 @@ export class SATPManager {
       logLevel: level,
     };
 
-    this.dbLogger = new SATPLogger(satpLoggerConfig);
+    this.dbLogger = new GatewayLogger(GatewayLoggerConfig);
     this.logger.debug(`${fnTag} dbLogger initialized: ${!!this.dbLogger}`);
     this.monitorService = MonitorService.createOrGetMonitorService({
       logLevel: options.logLevel,
