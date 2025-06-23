@@ -83,6 +83,17 @@ export interface LocalLog {
   data: string;
   sequenceNumber: number;
 }
+
+export interface OracleLocalLog {
+  oracleTaskId: string;
+  operationId: string;
+  type: string;
+  key: string;
+  status: string;
+  data: string;
+  timestamp: number;
+}
+
 export interface RemoteLog {
   key: string;
   hash: string;

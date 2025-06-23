@@ -1,4 +1,4 @@
-import type { LocalLog, RemoteLog } from "../../../core/types";
+import type { LocalLog, OracleLocalLog, RemoteLog } from "../../../core/types";
 
 export interface IRepository<T, K> {
   readById(id: K): Promise<T>;
@@ -14,6 +14,7 @@ export interface ILocalLogRepository extends IRepository<LocalLog, string> {
   readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]>;
   readLastestLog(sessionID: string): Promise<LocalLog>;
   create(log: LocalLog): Promise<LocalLog>;
+  create(log: OracleLocalLog): Promise<LocalLog>;
   deleteBySessionId(log: string): any;
   fetchLogsFromSequence(
     sessionId: string,

@@ -141,7 +141,7 @@ export class SATPManager {
 
     const level = this.options.logLevel || "DEBUG";
     const label = this.className;
-    this.logger = LoggerProvider.getOrCreate({ level, label });
+    rthis.logge = LoggerProvider.getOrCreate({ level, label });
     this.ourGateway = options.ourGateway;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.status = HealthCheckResponseStatusEnum.Available;
