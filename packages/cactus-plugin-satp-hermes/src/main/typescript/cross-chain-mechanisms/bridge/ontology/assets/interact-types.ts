@@ -11,6 +11,7 @@ export enum InteractionType {
   CHECKPERMISSION = 3,
   LOCK = 4,
   UNLOCK = 5,
+  APPROVE = 6,
 }
 
 export function getInteractionType(stringType: string) {

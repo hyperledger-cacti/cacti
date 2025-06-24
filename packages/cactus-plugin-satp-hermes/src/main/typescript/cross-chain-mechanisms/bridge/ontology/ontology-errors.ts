@@ -23,8 +23,68 @@ export class OntologyNotFoundError extends OntologyInternalError {
   }
 }
 
+export class IncompleteOntologyError extends OntologyInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super(
+      "Provided ontology does not define all necessary interactions",
+      cause ?? null,
+      500,
+      traceID,
+      trace,
+    );
+  }
+}
+
+export class UnknownOntologyVariableError extends OntologyInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super(
+      "Ontology contains unknown function variable",
+      cause ?? null,
+      500,
+      traceID,
+      trace,
+    );
+  }
+}
+
+export class UnknownOntologyInteractionError extends OntologyInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super(
+      "Ontology contains unknown interaction",
+      cause ?? null,
+      500,
+      traceID,
+      trace,
+    );
+  }
+}
+
+export class InvalidSignatureError extends OntologyInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super("Invalid signature", cause ?? null, 500, traceID, trace);
+  }
+}
+
+export class HashNotMatchingError extends OntologyInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super(
+      "Provided hash does not match with computed hash",
+      cause ?? null,
+      500,
+      traceID,
+      trace,
+    );
+  }
+}
+
 export class LedgerNotSupported extends OntologyInternalError {
   constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
     super("Ledger not supported", cause ?? null, 500, traceID, trace);
+  }
+}
+
+export class BadFormatJson extends OntologyInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super("Json format not expected", cause ?? null, 500, traceID, trace);
   }
 }
