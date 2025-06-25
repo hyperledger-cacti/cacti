@@ -127,12 +127,11 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
       };
     } else {
       throw new Error("wrapAsset not implemented for current asset type");
-      //throw new Error("Non-fungible wrapAsset not implemented");
     }
   }
 
   /**
-   * Unwraps a fungibleor non fungible asset.
+   * Unwraps a fungible or non fungible asset.
    *
    * @param asset - The asset to be unwrapped.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset unwrapping.
@@ -181,7 +180,6 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
-      //throw new Error("Non-fungible unWrapAsset not implemented");
     } else {
       throw new Error("unwrapAsset not implemented for current asset type");
     }
@@ -247,7 +245,6 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         proof,
       };
     } else {
-      //throw new Error("Non-fungible lockAsset not implemented");
       throw new Error("lockAsset not implemented for current asset type");
     }
   }
@@ -312,7 +309,6 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         proof,
       };
     } else {
-      //throw new Error("Non-fungible unlockAsset not implemented");
       throw new Error("unlockAsset not implemented for current asset type");
     }
   }
@@ -377,7 +373,6 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         proof,
       };
     } else {
-      //throw new Error("Non-fungible mintAsset not implemented");
       throw new Error("mintAsset not implemented for current asset type");
     }
   }
@@ -442,7 +437,6 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         proof,
       };
     } else {
-      //throw new Error("Non-fungible burnAsset not implemented");
       throw new Error("burnAsset not implemented for current asset type");
     }
   }
@@ -510,7 +504,6 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         proof,
       };
     } else {
-      //throw new Error("Non-fungible assignAsset not implemented");
       throw new Error("assignAsset not implemented for current asset type");
     }
   }

@@ -8,15 +8,15 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 /**
  * @dev Enum for the supported token types.
  */
-enum TokenType { UNSPECIFIED, ERC20, ERC721, ERC1155, OTHER } //TODO: FIX THIS ENUM TO BE THE SAME OF THE BRIDGE
+enum TokenType { UNSPECIFIED, ERC20, ERC721, ERC1155, OTHER, NONSTANDARD_FUNGIBLE, NONSTANDARD_NONFUNGIBLE } //TODO: FIX THIS ENUM TO BE THE SAME OF THE BRIDGE
 /**
  * @dev Enum for the supported interaction types.
  */
-enum InteractionType { MINT, BURN, ASSIGN, CHECKPERMITION, LOCK, UNLOCK }
+enum InteractionType { MINT, BURN, ASSIGN, CHECKPERMITION, LOCK, UNLOCK, APPROVE }
 /**
  * @dev Enum representing the supported variable types used for contract-to-contract calls.
  */
-enum VarType {CONTRACTADDRESS, TOKENTYPE, TOKENID, OWNER, AMOUNT, BRIDGE, RECEIVER}
+enum VarType {CONTRACTADDRESS, TOKENTYPE, TOKENID, OWNER, AMOUNT, BRIDGE, RECEIVER, UNIQUEDESCRIPTOR}
  
 
 /**
@@ -36,7 +36,8 @@ struct Token {
     string referenceId;
     address owner;
     uint amount; //amount that is approved by the contract owner
-    //uint locked_amount; //amount that is approved by the contract owner 
+    //uint locked_amount; //amount that is approved by the contract owner
+    string uniqueDescriptor;
 }
 
 /**
@@ -65,6 +66,8 @@ error TokenLocked(string tokenId);
 error TokenNotUnlocked(string tokenId);
 
 error InsuficientAmountLocked(string tokenId, uint256 amount);
+
+error TokenTypeNotSupported(string tokenId);
 
 
 /**
@@ -104,6 +107,12 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     event Burn(string indexed tokenId, uint256 amount);
     event Assign(string indexed tokenId, address receiver_account, uint256 amount);
 
+    event Lock(string indexed tokenId, string assetDescriptor);
+    event Unlock(string indexed tokenId, string assetDescriptor);
+    event Mint(string indexed tokenId, string assetDescriptor);
+    event Burn(string indexed tokenId, string assetDescriptor);
+    event Assign(string indexed tokenId, address receiver_account, string assetDescriptor);
+
 
     /**
      * Constructor for the SATPWrapperContract.
@@ -136,7 +145,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
             require(interact(tokenId, InteractionType.CHECKPERMITION), "Contract does not have permission to interact with the token");
         }
 
-        tokens[tokenId] = Token(contractName, contractAddress, tokenType, tokenId, referenceId, owner, 0);
+        tokens[tokenId] = Token(contractName, contractAddress, tokenType, tokenId, referenceId, owner, 0, "");
     
         ids.push(tokenId);
         
@@ -160,9 +169,18 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         if(tokens[tokenId].contractAddress == address(0)) {
             revert TokenNotAvailable(tokenId);
         }
-        if(tokens[tokenId].amount > 0) {
-            revert TokenLocked(tokenId);
+
+        if(tokens[tokenId].tokenType == TokenType.NONSTANDARD_FUNGIBLE) {
+            if(tokens[tokenId].amount > 0) {
+                revert TokenLocked(tokenId);
+            }
         }
+        else if(tokens[tokenId].tokenType == TokenType.NONSTANDARD_NONFUNGIBLE) {
+            if(tokens[tokenId].uniqueDescriptor == "") {
+                revert TokenLocked(tokenId);
+            }
+        }
+        
         deleteFromArray(tokens[tokenId].tokenId);
         delete tokens[tokenId];
 
@@ -191,17 +209,28 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
         revert TokenNotLocked(tokenId);
     } 
+    function lock(string memory tokenId, string uniqueDescriptor) external onlyOwner returns (bool success) {
+        if(tokens[tokenId].contractAddress == address(0)){
+            revert TokenNotAvailable(tokenId);
+        }
+
+        bool lockSuccess = interact(tokenId, InteractionType.LOCK, uniqueDescriptor);
+
+        if(lockSuccess) {
+            // The locked amount is added to the amount of the token struct
+            tokens[tokenId].uniqueDescriptor = uniqueDescriptor;
+            emit Lock(tokenId, uniqueDescriptor);
+            return true;
+        }
+        revert TokenNotLocked(tokenId);
+    } 
 
     /**
      * Unlocks a given amount of tokens with the given token ID. This method calls the unlock function of the token contract.
      * @param tokenId The unique identifier of the token.
      * @param amount The amount of tokens to be unlocked.
      */
-    function unlock(string memory tokenId, uint256 amount) external onlyOwner returns (bool success) { //ammount
-        if(tokens[tokenId].contractAddress == address(0)){
-            revert TokenNotAvailable(tokenId);
-        }
-
+    function unlock(string memory tokenId, uint256 amount) external onlyOwner returns (bool success) {
         if(tokens[tokenId].amount < amount) {
             revert InsuficientAmountLocked(tokenId, amount);
         }
@@ -217,6 +246,19 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
         revert TokenNotUnlocked(tokenId);
     } 
+    function unlock(string memory tokenId, string uniqueDescriptor) external onlyOwner returns (bool success) {
+        if(tokens[tokenId].uniqueDescriptor != uniqueDescriptor) {
+            revert TokenNotLocked(tokenId);
+        }
+
+        require(interact(tokenId, InteractionType.UNLOCK, uniqueDescriptor), "unlock nft failed");
+
+        // The unlocked amount is subtracted from the amount of the token struct
+        emit Unlock(tokenId, uniqueDescriptor);
+        return true;
+        
+        revert TokenNotUnlocked(tokenId);
+    }
 
     /**
      * Mints a given amount of tokens with the given token ID. This method calls the mint function of the token contract.
@@ -232,6 +274,17 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
 
         tokens[tokenId].amount = amount;
         emit Mint(tokenId, amount);
+        return true;
+    }
+    function mint(string memory tokenId, string uniqueDescriptor) external onlyOwner returns (bool success) {
+        if(tokens[tokenId].contractAddress == address(0)){
+            revert TokenNotAvailable(tokenId);
+        }
+
+        require(interact(tokenId, InteractionType.MINT, uniqueDescriptor), "mint nft call failed");
+
+        tokens[tokenId].uniqueDescriptor = uniqueDescriptor;
+        emit Mint(tokenId, uniqueDescriptor);
         return true;
     }
 
@@ -250,6 +303,16 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         emit Burn(tokenId, amount);
         return true;
     }
+    function burn(string memory tokenId, string uniqueDescriptor) external onlyOwner returns (bool success) {
+        require(tokens[tokenId].uniqueDescriptor == uniqueDescriptor, "burn nft - asset is not locked");
+
+        require(interact(tokenId, InteractionType.BURN, uniqueDescriptor), "burn nft call failed");
+
+        tokens[tokenId].uniqueDescriptor = "";
+
+        emit Burn(tokenId, uniqueDescriptor);
+        return true;
+    }
 
     /**
      * Assigns a given amount of tokens with the given token ID to a receiver account. This method calls the assign function of the token contract.
@@ -265,6 +328,16 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         tokens[tokenId].amount -= amount;
         
         emit Assign(tokenId, receiver_account, amount);
+        return true;
+    }
+    function assign(string memory tokenId, address receiver_account, string uniqueDescriptor) external onlyOwner returns (bool success) {
+        require(tokens[tokenId].uniqueDescriptor == uniqueDescriptor, "assign nft - asset is not locked");
+
+        require(interact(tokenId, InteractionType.ASSIGN, uniqueDescriptor, receiver_account), "assign nft call failed");
+
+        tokens[tokenId].uniqueDescriptor = "";
+        
+        emit Assign(tokenId, receiver_account, uniqueDescriptor);
         return true;
     }   
 
@@ -328,6 +401,9 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     function interact(string memory tokenId, InteractionType interactionType, uint256 amount) internal returns (bool success) {
         return interact(tokenId, interactionType, amount, address(0));
     }
+    function interact(string memory tokenId, InteractionType interactionType, string uniqueDescriptor) internal returns (bool success) {
+        return interact(tokenId, interactionType, uniqueDescriptor, address(0));
+    }
 
     /**
      * Interacts with the token contract using the given token ID, interaction type, amount, and receiver account.
@@ -347,6 +423,23 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
             bytes4 functionSelector = bytes4(keccak256(abi.encodePacked(tokensInteractions[tokenId][interactionType].functionsSignature[i])));
 
             bytes memory encodedParams = encodeDynamicParams(functionSelector, encodeParams(tokensInteractions[tokenId][interactionType].variables[i], tokenId, receiver, amount));
+
+            (bool callSuccess, ) = tokens[tokenId].contractAddress.call(encodedParams);
+            if (!callSuccess) {
+                return false;
+            }
+        } 
+        return true;
+    }
+    function interact(string memory tokenId, InteractionType interactionType, string uniqueDescriptor, address receiver) internal returns (bool) {
+        if (!tokensInteractions[tokenId][interactionType].available) {
+            return false;
+        }
+
+        for (uint i = 0; i < tokensInteractions[tokenId][interactionType].functionsSignature.length; i++) {
+            bytes4 functionSelector = bytes4(keccak256(abi.encodePacked(tokensInteractions[tokenId][interactionType].functionsSignature[i])));
+
+            bytes memory encodedParams = encodeDynamicParams(functionSelector, encodeParams(tokensInteractions[tokenId][interactionType].variables[i], tokenId, receiver, uniqueDescriptor));
 
             (bool callSuccess, ) = tokens[tokenId].contractAddress.call(encodedParams);
             if (!callSuccess) {
@@ -386,6 +479,27 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
                 dynamicParams[i] = abi.encode(tokenId);
             } else if (variables[i] == VarType.AMOUNT) {
                 dynamicParams[i] = abi.encode(amount);
+            } else if (variables[i] == VarType.OWNER) {
+                dynamicParams[i] = abi.encode(tokens[tokenId].owner);
+            } else if (variables[i] == VarType.CONTRACTADDRESS) {
+                dynamicParams[i] = abi.encode(tokens[tokenId].contractAddress);
+            } else if (variables[i] == VarType.RECEIVER) {
+                dynamicParams[i] = abi.encode(receiver);
+            } else {
+                revert("Variable not supported");
+            }
+        }
+        return dynamicParams;
+    }
+    function encodeParams(VarType[] memory variables, string memory tokenId, address receiver, string uniqueDescriptor)  internal view returns (bytes[] memory){
+        bytes[] memory dynamicParams = new bytes[](variables.length);
+        for (uint i = 0; i < variables.length; i++) {
+            if (variables[i] == VarType.BRIDGE) {
+                dynamicParams[i] = abi.encode(address(this));
+            } else if (variables[i] == VarType.TOKENID) {
+                dynamicParams[i] = abi.encode(tokenId);
+            } else if (variables[i] == VarType.UNIQUEDESCRIPTOR) {
+                dynamicParams[i] = abi.encode(uniqueDescriptor);
             } else if (variables[i] == VarType.OWNER) {
                 dynamicParams[i] = abi.encode(tokens[tokenId].owner);
             } else if (variables[i] == VarType.CONTRACTADDRESS) {

@@ -543,7 +543,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "lock",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -591,7 +591,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "unlock",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -638,7 +638,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -685,7 +685,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "burn",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
@@ -734,7 +734,7 @@ export class EthereumLeaf
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "assign",
-      params: [assetId, to, assetAttribute.toString()],
+      params: [assetId, to, assetAttribute],
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;

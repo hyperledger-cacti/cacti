@@ -84,7 +84,7 @@ describe("Besu Leaf Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await besuLeaf.deployContracts();
-    expect(besuLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
+    expect(besuLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
 
   it("Should return the wrapper contract address", async () => {
