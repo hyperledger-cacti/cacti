@@ -6,9 +6,11 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import {
+  Amount,
   Asset,
   FungibleAsset,
   NonFungibleAsset,
+  UniqueTokenID,
   instanceOfFungibleAsset,
   instanceOfNonFungibleAsset,
 } from "./ontology/assets/asset";
@@ -201,7 +203,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.lockAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -225,7 +227,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafNonFungible;
       const response = await nonFungibleBridgeEndPoint.lockAsset(
         asset.id,
-        String((asset as NonFungibleAsset).uniqueDescriptor),
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
       );
 
       if (response.transactionId == undefined) {
@@ -265,7 +267,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.unlockAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -289,7 +291,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafNonFungible;
       const response = await nonFungibleBridgeEndPoint.unlockAsset(
         asset.id,
-        String((asset as NonFungibleAsset).uniqueDescriptor),
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
       );
 
       if (response.transactionId == undefined) {
@@ -329,7 +331,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.mintAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -353,7 +355,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafNonFungible;
       const response = await nonFungibleBridgeEndPoint.mintAsset(
         asset.id,
-        String((asset as NonFungibleAsset).uniqueDescriptor),
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
       );
 
       if (response.transactionId == undefined) {
@@ -393,7 +395,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.burnAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -417,7 +419,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafNonFungible;
       const response = await nonFungibleBridgeEndPoint.burnAsset(
         asset.id,
-        String((asset as NonFungibleAsset).uniqueDescriptor),
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
       );
 
       if (response.transactionId == undefined) {
@@ -459,7 +461,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
       const response = await fungibleBridgeEndPoint.assignAsset(
         asset.id,
         asset.owner,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -484,7 +486,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
       const response = await nonFungibleBridgeEndPoint.assignAsset(
         asset.id,
         asset.owner,
-        String((asset as NonFungibleAsset).uniqueDescriptor),
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
       );
 
       if (response.transactionId == undefined) {

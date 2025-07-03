@@ -52,7 +52,7 @@ import {
 } from "../../common/errors";
 import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
-import { Asset } from "../ontology/assets/asset";
+import { Asset, UniqueTokenID, Amount } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
@@ -521,7 +521,7 @@ export class EthereumLeaf
    */
   public async lockAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#lockAsset`;
     this.log.debug(
@@ -569,7 +569,7 @@ export class EthereumLeaf
    */
   public async unlockAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#unlockAsset`;
     this.log.debug(
@@ -616,7 +616,7 @@ export class EthereumLeaf
    */
   public async mintAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#mintAsset`;
     this.log.debug(
@@ -663,7 +663,7 @@ export class EthereumLeaf
    */
   public async burnAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#burnAsset`;
     this.log.debug(
@@ -712,7 +712,7 @@ export class EthereumLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#assignAsset`;
     this.log.debug(

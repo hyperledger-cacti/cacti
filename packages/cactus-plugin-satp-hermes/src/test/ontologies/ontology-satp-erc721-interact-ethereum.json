@@ -1,0 +1,48 @@
+{
+    "name": "SATP-ERC721",
+    "id": "SATP-ERC721-ETHEREUM",
+    "type": "ETHEREUM",
+    "contract": "",
+    "ontology": {
+        "lock": [{
+            "functionSignature": "transferFrom(address,address,uint256)",
+            "variables": ["owner", "bridge", "tokenId"],
+            "available": true
+        }
+        ],
+        "unlock": [
+            {
+            "functionSignature": "transfer(address,uint256)",
+            "variables": ["owner", "amount"],
+            "available": true
+            }
+        ],
+        "mint": [{
+            "functionSignature": "mint(address,uint256)",
+            "variables": ["bridge", "amount"],
+            "available": true
+            }
+        ],
+        "burn": [{
+            "functionSignature": "burn(address,uint256)",
+            "variables": ["bridge", "amount"],
+            "available": true
+            }
+        ],
+        "assign": [{
+                "functionSignature": "transfer(address,uint256)",
+                "variables": ["receiver", "amount"],
+                "available": true
+            }
+        ],
+        "checkPermission": [{
+            "functionSignature": "hasBridgeRole(address)",
+            "variables": ["bridge"],
+            "available": true
+            } 
+        ]
+    },
+    "bytecode": "",
+    "singature": "",
+    "hash": ""
+}

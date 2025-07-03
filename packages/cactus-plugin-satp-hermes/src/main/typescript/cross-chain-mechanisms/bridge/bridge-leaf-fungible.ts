@@ -1,4 +1,4 @@
-import { Asset } from "./ontology/assets/asset";
+import { Amount, Asset } from "./ontology/assets/asset";
 import { TransactionResponse } from "./bridge-types";
 
 /**
@@ -42,7 +42,7 @@ export abstract class BridgeLeafFungible {
    */
   public abstract lockAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse>;
 
   /**
@@ -53,7 +53,7 @@ export abstract class BridgeLeafFungible {
    */
   public abstract unlockAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse>;
 
   /**
@@ -64,7 +64,7 @@ export abstract class BridgeLeafFungible {
    */
   public abstract mintAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse>;
 
   /**
@@ -75,7 +75,7 @@ export abstract class BridgeLeafFungible {
    */
   public abstract burnAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse>;
 
   /**
@@ -88,7 +88,7 @@ export abstract class BridgeLeafFungible {
   public abstract assignAsset(
     assetId: string,
     to: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse>;
 
   /**

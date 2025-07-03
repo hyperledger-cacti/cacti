@@ -89,7 +89,7 @@ export class BesuTestEnvironment {
       envVars: ["BESU_NETWORK=dev"],
       containerImageVersion: "2024-06-09-cc2f9c5",
       containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
-      networkName: this.dockerNetwork,
+      //networkName: this.dockerNetwork,
     });
 
     const docker = new Docker();
@@ -225,8 +225,8 @@ export class BesuTestEnvironment {
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
       gas: this.besuConfig.gas,
       connectorOptions: {
-        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
-        rpcApiWsHost: await this.ledger.getRpcApiWsHost(false),
+        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(),
+        rpcApiWsHost: await this.ledger.getRpcApiWsHost(),
       },
       claimFormats: this.besuConfig.claimFormats,
     } as INetworkOptions;

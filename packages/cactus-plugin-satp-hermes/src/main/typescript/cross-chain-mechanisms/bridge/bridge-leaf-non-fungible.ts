@@ -1,4 +1,4 @@
-import { Asset } from "./ontology/assets/asset";
+import { Asset, UniqueTokenID } from "./ontology/assets/asset";
 import { TransactionResponse } from "./bridge-types";
 
 /**
@@ -27,28 +27,28 @@ export abstract class BridgeLeafNonFungible {
 
   public abstract lockAsset(
     assetId: string,
-    nftID: string,
+    nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   public abstract unlockAsset(
     assetId: string,
-    nftID: string,
+    nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   public abstract mintAsset(
     assetId: string,
-    nftID: string,
+    nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   public abstract burnAsset(
     assetId: string,
-    nftID: string,
+    nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   public abstract assignAsset(
     assetId: string,
     to: string,
-    nftID: string,
+    nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   public abstract runTransaction(
