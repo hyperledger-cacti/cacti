@@ -18,6 +18,7 @@ export enum VarType {
   AMOUNT = 4,
   BRIDGE = 5,
   RECEIVER = 6,
+  UNIQUEDESCRIPTOR = 7,
 }
 
 export function getVarTypes(stringType: string) {

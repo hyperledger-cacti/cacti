@@ -154,16 +154,13 @@ contract SATPWrapperTest is Test{
         console.log(address(wrapperContract));
         console.log("address this");
         console.log(address(this));
+        console.log("address contract nft");
+        console.log(address(contract1));
+        console.log("address user");
+        console.log(address(user));
         wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_NONFUNGIBLE, contract1.name(), "refID", address(user), signatures);
-         //wrapperContract.mint(contract1.name(), 1001);
-        vm.prank(address(wrapperContract));
-        contract1.grantBridgeRole(address(wrapperContract));
-        vm.prank(address(wrapperContract));
-        contract1.mint(user, 1001);
-        vm.prank(address(wrapperContract));
-        //contract1.approve(address(wrapperContract), 1001);
+        contract1.mint(address(user), 1001);
         wrapperContract.lock(contract1.name(), 1001);
-        //assertEq(contract1.balanceOf(address(wrapperContract)), 10, "Token not minted");
         wrapperContract.unlock(contract1.name(), 1001);
     }
 

@@ -176,7 +176,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
             }
         }
         else if(tt == TokenType.NONSTANDARD_NONFUNGIBLE || tt == TokenType.ERC721) {
-            if(tokens[tokenId].tokenAttribute == 0) {
+            if(tokens[tokenId].tokenAttribute != 0) {
                 revert TokenLocked(tokenId);
             }
         }
@@ -198,11 +198,13 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
      */
     function lock(string memory tokenId, uint256 assetAttribute) external onlyOwner returns (bool success) {
         if(tokens[tokenId].contractAddress == address(0)){
+            console.log("\n\nToken not available\n\n");
             revert TokenNotAvailable(tokenId);
         }
 
         bool lockSuccess = interact(tokenId, InteractionType.LOCK, assetAttribute);
         if(lockSuccess) {
+            console.log("\n\nTransfer occurred correctly from the tokenContract side\n\n");
             TokenType tt = tokens[tokenId].tokenType;
             if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
                 //The locked amount is added to the amount of the token struct

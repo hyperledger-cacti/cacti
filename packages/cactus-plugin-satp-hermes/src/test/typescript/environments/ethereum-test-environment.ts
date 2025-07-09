@@ -4,7 +4,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
-import SATPNFTokenContract from "../../solidity/generated/SATPNFToken.sol/SATPNFTokenContract.json";
+import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -32,8 +32,8 @@ import {
   IEthereumLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
-import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
-//import ExampleOntology from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";
+//import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
+import ExampleOntology from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 
 export interface IEthereumTestEnvironment {
@@ -449,8 +449,33 @@ export class EthereumTestEnvironment {
     });
     expect(responseMint).toBeTruthy();
     expect(responseMint.success).toBeTruthy();
+    this.log.debug("\n\n\n\nMINT RESPONSE\n\n\n\n");
     this.log.debug(responseMint);
-    this.log.info(`Minted nft ${uniqueDescriptor} to firstHighNetWorthAccount`);
+    //this.log.info(`Minted nft ${uniqueDescriptor} to firstHighNetWorthAccount`);
+  }
+
+  public async approveNonFungible(
+    uniqueDescriptor: string,
+    wrapperAddress: string,
+  ): Promise<void> {
+    const responseApprove = await this.connector.invokeContract({
+      contract: {
+        contractName: this.erc721TokenContract,
+        keychainId: this.keychainPlugin3.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "approve",
+      params: [wrapperAddress, uniqueDescriptor],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(responseApprove).toBeTruthy();
+    expect(responseApprove.success).toBeTruthy();
+    this.log.debug(responseApprove);
+    this.log.info(`Approved ${uniqueDescriptor} to wrapper`);
   }
 
   public async giveRoleToBridge(wrapperAddress: string): Promise<void> {

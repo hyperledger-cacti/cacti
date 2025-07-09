@@ -12,8 +12,8 @@
         ],
         "unlock": [
             {
-            "functionSignature": "unlock(address,uint256)",
-            "variables": ["owner", "uniqueDescriptor"],
+            "functionSignature": "unlock(address,address,uint256)",
+            "variables": ["bridge", "owner", "uniqueDescriptor"],
             "available": true
             }
         ],
@@ -24,8 +24,8 @@
             }
         ],
         "burn": [{
-            "functionSignature": "burn(address,uint256)",
-            "variables": ["bridge", "uniqueDescriptor"],
+            "functionSignature": "burn(uint256)",
+            "variables": ["uniqueDescriptor"],
             "available": true
             }
         ],

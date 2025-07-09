@@ -44,10 +44,8 @@ contract SATPWrapperTest is Test{
         InteractionSignature memory lock = InteractionSignature(InteractionType.LOCK,lockInteractions,lockVariables, true);
         signatures.push(lock);
         
-        unlockInteractions.push("approve(address,uint256)");
-        unlockInteractions.push("transfer(address,address,uint256)");
+        unlockInteractions.push("lock(address,address,uint256)");
         
-        unlockVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
         unlockVariables.push([VarType.BRIDGE, VarType.OWNER, VarType.AMOUNT, VarType.UNIQUEDESCRIPTOR]);
         InteractionSignature memory unlock = InteractionSignature(InteractionType.UNLOCK,unlockInteractions,lockVariables, true);
         signatures.push(unlock);

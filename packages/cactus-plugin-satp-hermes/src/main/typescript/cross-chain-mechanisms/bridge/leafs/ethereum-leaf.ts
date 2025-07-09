@@ -422,6 +422,9 @@ export class EthereumLeaf
       LedgerType.Ethereum,
       asset.referenceId,
     );
+    this.log.debug(
+      `\n\n\n\n${fnTag}, Interactions: ${safeStableStringify(interactions)}\n\n\n`,
+    );
 
     switch (asset.type) {
       case TokenType.ERC20:
@@ -437,6 +440,10 @@ export class EthereumLeaf
       default:
         throw new Error("Type not supported");
     }
+
+    this.log.debug(
+      "\n\nToken Wrapped Contract Address: " + asset.contractAddress,
+    );
 
     const response = (await this.connector.invokeContract({
       contract: {

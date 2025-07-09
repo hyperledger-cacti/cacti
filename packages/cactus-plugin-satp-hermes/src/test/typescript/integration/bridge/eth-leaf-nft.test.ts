@@ -147,6 +147,30 @@ describe("Ethereum Leaf Test", () => {
   });
 
   it("Should Lock a token", async () => {
+    //const t = await ethereumLeaf.getAsset(asset.id);
+    //console.log("\n\ntoken:" + (t as EvmNonFungibleAsset) + "\n");
+    //console.log("WhaleAddress: " + WHALE_ACCOUNT_ADDRESS);
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestNFTContractName(),
+      ethereumEnv.getTestNFTContractAddress(),
+      ethereumEnv.getTestNFTContractAbi(),
+      ethereumLeaf.getWrapperContract("NONFUNGIBLE"),
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("NFT not in wrapper account");
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestNFTContractName(),
+      ethereumEnv.getTestNFTContractAddress(),
+      ethereumEnv.getTestNFTContractAbi(),
+      ethereumEnv.getTestOwnerAccount(),
+      "1",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("NFT in owner account");
+
     const response = await ethereumLeaf.lockAsset(
       asset.id,
       asset.uniqueDescriptor,
@@ -197,6 +221,8 @@ describe("Ethereum Leaf Test", () => {
   });
 
   it("Should Unlock a token", async () => {
+    console.log("\n\nON UNLOCK\n\n");
+    (await ethereumLeaf.getAsset(asset.id)) as EvmNonFungibleAsset;
     const response = await ethereumLeaf.unlockAsset(
       asset.id,
       1001 as UniqueTokenID,
@@ -213,15 +239,15 @@ describe("Ethereum Leaf Test", () => {
     expect(response2.type).toBe(asset.type);
     expect(response2.owner.toLowerCase()).toBe(asset.owner);
     expect(response2.contractAddress.toLowerCase()).toBe(
-      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestNFTContractAddress(),
     );
-    expect(response2.contractName).toBe(ethereumEnv.getTestContractName());
+    expect(response2.contractName).toBe(ethereumEnv.getTestNFTContractName());
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      1001 as UniqueTokenID,
+      0 as UniqueTokenID,
     );
     log.info("Unlocked NFT successfully");
 
-    /*await ethereumEnv.checkBalance(
+    await ethereumEnv.checkBalance(
       ethereumEnv.getTestNFTContractName(),
       ethereumEnv.getTestNFTContractAddress(),
       ethereumEnv.getTestNFTContractAbi(),
@@ -232,26 +258,26 @@ describe("Ethereum Leaf Test", () => {
     log.info("Amount was transfer correctly to the Wrapper account");
 
     await ethereumEnv.checkBalance(
-      ethereumEnv.getTestContractName(),
-      ethereumEnv.getTestContractAddress(),
-      ethereumEnv.getTestContractAbi(),
+      ethereumEnv.getTestNFTContractName(),
+      ethereumEnv.getTestNFTContractAddress(),
+      ethereumEnv.getTestNFTContractAbi(),
       ethereumEnv.getTestOwnerAccount(),
       "1",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
-    log.info("Amount was transfer correctly from the Owner account");
-    log.info("Amount was transfer correctly from the Wrapper account");*/
+    log.info("Amount was transfer correctly from the Wrapper account");
+    log.info("Amount was transfer correctly back to Owner account");
   });
 
-  /*it("Should Burn a token", async () => {
-    const wrapperContractAddress =
-      await ethereumLeaf.getWrapperContract("NONFUNGIBLE");
+  it("Should Burn a token", async () => {
+    //const wrapperContractAddress =
+    //await ethereumLeaf.getWrapperContract("NONFUNGIBLE");
 
-    await ethereumEnv.approveAsset(wrapperContractAddress, "1001");
+    //await ethereumEnv.approveAsset(wrapperContractAddress, "1001");
 
     const response = await ethereumLeaf.lockAsset(
       asset.id,
-      1001 as UniqueTokenID,
+      asset.uniqueDescriptor,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -275,10 +301,12 @@ describe("Ethereum Leaf Test", () => {
     expect(response3.type).toBe(asset.type);
     expect(response3.owner.toLowerCase()).toBe(asset.owner);
     expect(response3.contractAddress.toLowerCase()).toBe(
-      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestNFTContractAddress(),
     );
-    expect(response3.contractName).toBe(ethereumEnv.defaultAsset.contractName);
-    expect(response3.uniqueDescriptor).toBe(""); //Need to check what happens after the burn
+    expect(response3.contractName).toBe(
+      ethereumEnv.nonFungibleDefaultAsset.contractName,
+    );
+    expect(response3.uniqueDescriptor).toBe(0 as UniqueTokenID); //Need to check what happens after the burn
 
     await ethereumEnv.checkBalance(
       ethereumEnv.getTestContractName(),
@@ -297,18 +325,18 @@ describe("Ethereum Leaf Test", () => {
       "0",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
-    log.info("Amount was burned correctly to the Wrapper account");
-  });*/
+    log.info("NFT was burned correctly to the Wrapper account");
+  });
 
   it("Should Mint a token", async () => {
     const response = await ethereumLeaf.mintAsset(
       asset.id,
-      1001 as UniqueTokenID,
+      1002 as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
-    log.info("Minted token 1001 successfully");
+    log.info("Minted token 1002 successfully");
 
     const response2 = (await ethereumLeaf.getAsset(
       asset.id,
@@ -321,22 +349,23 @@ describe("Ethereum Leaf Test", () => {
       ethereumEnv.getTestNFTContractAddress().toLowerCase(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      1001 as UniqueTokenID,
+      1002 as UniqueTokenID,
     );
-    log.info("Minted token 1001 successfully");
+    log.info("Minted token 1002 successfully");
 
-    /*await ethereumEnv.checkBalance(
-      ethereumEnv.getTestContractName(),
-      ethereumEnv.getTestContractAddress(),
-      ethereumEnv.getTestContractAbi(),
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestNFTContractName(),
+      ethereumEnv.getTestNFTContractAddress(),
+      ethereumEnv.getTestNFTContractAbi(),
       ethereumLeaf.getWrapperContract("NONFUNGIBLE"),
-      "100",
+      "1",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
-    log.info("Amount was minted correctly to the Wrapper account");*/
+    log.info("NFT was minted correctly to the Wrapper account");
+    await ethereumLeaf.burnAsset(asset.id, 1002 as UniqueTokenID);
   });
 
-  /*it("Should Assign a token", async () => {
+  it("Should Assign a token", async () => {
     const response = await ethereumLeaf.assignAsset(
       asset.id,
       ethereumEnv.getTestOwnerAccount(),
@@ -391,5 +420,5 @@ describe("Ethereum Leaf Test", () => {
     expect(response2).toBeDefined();
     expect(response2.length).toBe(0);
     log.info("Unwrapped 100 tokens successfully");
-  });*/
+  });
 });

@@ -15,6 +15,7 @@ import { FabricTestEnvironment } from "../../test-utils";
 import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/fabric-asset";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { FabricLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let ontologyManager: OntologyManager;
 
@@ -114,7 +115,7 @@ describe("Fabric Bridge Test", () => {
       contractName: fabricEnv.satpContractName,
       channelName: fabricEnv.fabricChannelName,
       mspId: fabricEnv.userIdentity.mspId,
-      amount: "100",
+      amount: 100 as Amount,
       network: {
         id: FabricTestEnvironment.FABRIC_NETWORK_ID,
         ledgerType: LedgerType.Fabric2,

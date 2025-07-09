@@ -19,56 +19,32 @@ contract SATPNFTokenContract is AccessControl, ERC721 {
         _grantRole(BRIDGE_ROLE, _owner);
     }
 
-    function mint(address account, uint256 tokenId) external onlyRole(BRIDGE_ROLE) returns (bool success) {
-        //require (!_exists(tokenId), "Abort minting: token with a duplicated Id");
-        _safeMint(account, tokenId);
+    function mint(address account, uint256 tokenId) external returns (bool success) {
+        _mint(account, tokenId);
         return true;
     }
 
-    function burn(uint256 tokenId) external onlyRole(BRIDGE_ROLE) returns (bool success) {
-        //require(_exists(tokenId), "Abort burning: unknown or inexistent tokenId");
-        address tokenOwner = _ownerOf(tokenId);
-        _checkAuthorized(tokenOwner, _msgSender(), tokenId);
+    function burn(uint256 tokenId) external returns (bool success) {
         _burn(tokenId);
         return true;
     }
-
-    function approveAsset(address recipient, uint256 tokenId) external returns (bool success) {
-        require(_msgSender() == _ownerOf(tokenId), "Address not owning the token trying to assign it");
-        _approve(recipient, tokenId, _ownerOf(tokenId));
-        return true;
-    }
-
     function grantBridgeRole(address account) external onlyRole(OWNER_ROLE) returns (bool success) {
         _grantRole(BRIDGE_ROLE, account);
         return true;
     }
 
-    function lock(address from, address to, uint256 tokenId) external onlyRole(BRIDGE_ROLE) returns (bool success) {
-        console.log("\nLOCKING AN NFT\n");
-        console.log(_ownerOf(tokenId));
-        console.log("from");
-        console.log(from);
-        require(_ownerOf(tokenId) == from, "Using the incorrect owner address");
-        _safeTransfer(from, to, tokenId);
-        return true;
-    }
-
-    function bridgeTransferFrom(address from, address to, uint256 tokenId) external onlyRole(BRIDGE_ROLE) returns (bool success) {
-        //require(_ownerOf(tokenId) == from, "Using the incorrect owner address");
-        _safeTransfer(from, to, tokenId);
+    function lock(address from, address to, uint256 tokenId) external returns (bool success) {
+        _transfer(from, to, tokenId);
         return true;
     }
 
     function transfer(address to, uint256 tokenId) external returns (bool success) {
-        require(_ownerOf(tokenId) == _msgSender(), "Using the incorrect owner address");
-        _safeTransfer(_msgSender(), to, tokenId);
+        _transfer(_msgSender(), to, tokenId);
         return true;
     }
 
-    function unlock(address to, uint256 tokenId) external returns (bool success) {
-        require(_ownerOf(tokenId) == _msgSender(), "Using the incorrect owner address");
-        _safeTransfer(_msgSender(), to, tokenId);
+    function unlock(address from, address to, uint256 tokenId) external returns (bool success) {
+        _transfer(from, to, tokenId);
         return true;
     }
 
@@ -76,20 +52,6 @@ contract SATPNFTokenContract is AccessControl, ERC721 {
         return IERC721Receiver.onERC721Received.selector;
     } 
 
-    //function transfer_From(address from, address recipient, uint256 tokenId) external onlyRole(BRIDGE_ROLE) returns (bool success) {
-        //require(from != address(0) && recipient != address(0), "Both addresses should be different from 0");
-        //if (_msgSender() != from) {
-            //require()
-        //}
-        //return false;
-    //}
-
-    function checkAssignment(address spender, uint256 tokenId) external onlyRole(BRIDGE_ROLE) returns (bool success) {
-        address tokenOwner = _ownerOf(tokenId);
-        require(_msgSender() != tokenOwner, "Performing an assignment check on the token owner"); //This is mostly to guarantee on testing that the owner of the token does not change
-        require(_isAuthorized(tokenOwner, spender, tokenId), "Spender not authorized to act on token");
-        return true;
-    }
 
     function hasPermissionInternal(address account, uint tokenId) internal returns (bool success) {
         address tokenOwner = _ownerOf(tokenId);

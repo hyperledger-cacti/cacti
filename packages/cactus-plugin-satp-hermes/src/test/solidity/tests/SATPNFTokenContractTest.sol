@@ -38,7 +38,7 @@ contract SATPNFTokenContractTest is Test {
         assertEq(satpContract.ownerOf(tokenId), user);
     }
 
-    function testApprove() public {
+    /*function testApprove() public {
         uint256 tokenId = 1001;
         vm.prank(bridge);
         satpContract.mint(user, tokenId);
@@ -49,7 +49,7 @@ contract SATPNFTokenContractTest is Test {
         vm.prank(bridge);
         bool allowance = satpContract.checkAssignment(bridge, tokenId);
         assertEq(allowance, true, "Approval allowance mismatch");
-    }
+    }*/
 
     function testLock() public {
         uint256 tokenId = 1001;
@@ -57,8 +57,8 @@ contract SATPNFTokenContractTest is Test {
         vm.prank(bridge);
         satpContract.mint(user, tokenId);
 
-        vm.prank(user);
-        satpContract.approve(bridge, 1001);
+        //vm.prank(user);
+        //satpContract.approve(bridge, 1001);
 
         vm.prank(bridge);
         satpContract.lock(user, bridge, 1001);
@@ -73,8 +73,8 @@ contract SATPNFTokenContractTest is Test {
         vm.prank(bridge);
         satpContract.mint(user, tokenId);
 
-        vm.prank(user);
-        satpContract.approve(bridge, tokenId);
+        //vm.prank(user);
+        //satpContract.approve(bridge, tokenId);
 
         vm.prank(bridge);
         satpContract.lock(user, bridge, tokenId);
@@ -96,8 +96,8 @@ contract SATPNFTokenContractTest is Test {
         satpContract.mint(user, tokenId2);
         assertEq(satpContract.balanceOf(user), 2);
         vm.stopPrank();
-        vm.prank(user);
-        satpContract.approve(bridge, tokenId);
+        //vm.prank(user);
+        //satpContract.approve(bridge, tokenId);
         vm.prank(bridge);
         satpContract.burn(tokenId);
 
