@@ -795,7 +795,7 @@ export class BesuLeaf
           contractAddress: token.contractAddress,
           type: Number(token.tokenType),
           owner: token.owner,
-          amount: token.assetAttribute,
+          amount: token.tokenAttribute,
           network: this.networkIdentification,
         } as EvmAsset;
       case TokenType.ERC721:
@@ -807,7 +807,7 @@ export class BesuLeaf
           contractAddress: token.contractAddress,
           type: Number(token.tokenType),
           owner: token.owner,
-          uniqueDescriptor: token.assetAttribute,
+          uniqueDescriptor: token.tokenAttribute,
           network: this.networkIdentification,
         } as EvmAsset;
       default:

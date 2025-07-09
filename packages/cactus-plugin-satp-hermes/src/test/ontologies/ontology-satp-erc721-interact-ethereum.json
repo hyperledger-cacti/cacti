@@ -5,27 +5,27 @@
     "contract": "",
     "ontology": {
         "lock": [{
-            "functionSignature": "transferFrom(address,address,uint256)",
-            "variables": ["owner", "bridge", "tokenId"],
+            "functionSignature": "lock(address,address,uint256)",
+            "variables": ["owner", "bridge", "uniqueDescriptor"],
             "available": true
         }
         ],
         "unlock": [
             {
-            "functionSignature": "transfer(address,uint256)",
-            "variables": ["owner", "amount"],
+            "functionSignature": "unlock(address,uint256)",
+            "variables": ["owner", "uniqueDescriptor"],
             "available": true
             }
         ],
         "mint": [{
             "functionSignature": "mint(address,uint256)",
-            "variables": ["bridge", "amount"],
+            "variables": ["bridge", "uniqueDescriptor"],
             "available": true
             }
         ],
         "burn": [{
             "functionSignature": "burn(address,uint256)",
-            "variables": ["bridge", "amount"],
+            "variables": ["bridge", "uniqueDescriptor"],
             "available": true
             }
         ],
@@ -43,6 +43,6 @@
         ]
     },
     "bytecode": "",
-    "singature": "",
+    "signature": "",
     "hash": ""
 }

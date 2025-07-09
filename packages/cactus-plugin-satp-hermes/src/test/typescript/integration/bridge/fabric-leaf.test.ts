@@ -92,7 +92,7 @@ describe("Fabric Bridge Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await fabricLeaf.deployContracts();
-    expect(fabricLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
+    expect(fabricLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
   it("Should return the wrapper contract name", async () => {
     const wrapperContractName = fabricLeaf.getWrapperContract("FUNGIBLE");
@@ -136,7 +136,6 @@ describe("Fabric Bridge Test", () => {
 
     const response3 = (await fabricLeaf.getAsset(
       asset.id,
-      "FUNGIBLE",
     )) as FabricFungibleAsset;
 
     log.info(`GetAsset response: ${JSON.stringify(response3)}`);
@@ -161,7 +160,6 @@ describe("Fabric Bridge Test", () => {
 
     const response2 = (await fabricLeaf.getAsset(
       asset.id,
-      "FUNGIBLE",
     )) as FabricFungibleAsset;
 
     expect(response2).not.toBeUndefined();
@@ -205,7 +203,6 @@ describe("Fabric Bridge Test", () => {
 
     const response = (await fabricLeaf.getAsset(
       asset.id,
-      "FUNGIBLE",
     )) as FabricFungibleAsset;
 
     expect(response).not.toBeUndefined();
@@ -258,7 +255,6 @@ describe("Fabric Bridge Test", () => {
 
     const response = (await fabricLeaf.getAsset(
       asset.id,
-      "FUNGIBLE",
     )) as FabricFungibleAsset;
     expect(response).not.toBeUndefined();
     expect(response.id).toBe(asset.id);
@@ -299,7 +295,6 @@ describe("Fabric Bridge Test", () => {
 
     const response = (await fabricLeaf.getAsset(
       asset.id,
-      "FUNGIBLE",
     )) as FabricFungibleAsset;
     expect(response).not.toBeUndefined();
     expect(response.id).toBe(asset.id);
@@ -335,7 +330,6 @@ describe("Fabric Bridge Test", () => {
 
     const response = (await fabricLeaf.getAsset(
       asset.id,
-      "FUNGIBLE",
     )) as FabricFungibleAsset;
     expect(response).not.toBeUndefined();
     expect(response.id).toBe(asset.id);

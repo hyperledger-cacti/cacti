@@ -16,7 +16,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
-import { EvmAsset } from "../ontology/assets/evm-asset";
+import {
+  EvmAsset,
+  EvmFungibleAsset,
+  EvmNonFungibleAsset,
+} from "../ontology/assets/evm-asset";
 import {
   Logger,
   LoggerProvider,
@@ -461,6 +465,7 @@ export class EthereumLeaf
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
+    this.log.debug(response);
 
     return {
       transactionId: response.out.transactionReceipt.transactionHash ?? "",
@@ -548,7 +553,9 @@ export class EthereumLeaf
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
     if (!response.success) {
+      this.log.debug("\n\nEEERRROOORRR:");
       this.log.debug(response);
+      this.log.debug(response.callOutput);
       throw new TransactionError(fnTag);
     }
     return {
@@ -595,6 +602,7 @@ export class EthereumLeaf
       web3SigningCredential: this.signingCredential,
       gasConfig: this.gasConfig,
     })) as EthereumResponse;
+    this.log.debug(response);
     if (!response.success) {
       throw new TransactionError(fnTag);
     }
@@ -823,10 +831,13 @@ export class EthereumLeaf
     }
 
     const token = response.callOutput as TokenResponse;
+    console.log("\n\n\nASSET");
+    console.log(token);
 
     switch (Number(token.tokenType)) {
       case TokenType.ERC20:
       case TokenType.NONSTANDARD_FUNGIBLE:
+        this.log.debug("\nRETURNING FUNGIBLE ASSET");
         return {
           contractName: token.contractName,
           id: token.tokenId,
@@ -834,11 +845,12 @@ export class EthereumLeaf
           contractAddress: token.contractAddress,
           type: Number(token.tokenType),
           owner: token.owner,
-          amount: token.assetAttribute,
+          amount: Number(token.tokenAttribute) as Amount,
           network: this.networkIdentification,
-        } as EvmAsset;
+        } as EvmFungibleAsset;
       case TokenType.ERC721:
       case TokenType.NONSTANDARD_NONFUNGIBLE:
+        this.log.debug("\nRETURNING NONFUNGIBLE ASSET");
         return {
           contractName: token.contractName,
           id: token.tokenId,
@@ -846,9 +858,9 @@ export class EthereumLeaf
           contractAddress: token.contractAddress,
           type: Number(token.tokenType),
           owner: token.owner,
-          uniqueDescriptor: token.assetAttribute,
+          uniqueDescriptor: Number(token.tokenAttribute) as UniqueTokenID,
           network: this.networkIdentification,
-        } as EvmAsset;
+        } as EvmNonFungibleAsset;
       default:
         throw new Error("Unexpected Token Type");
     }

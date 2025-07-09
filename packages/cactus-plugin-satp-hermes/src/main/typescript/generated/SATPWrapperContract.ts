@@ -180,7 +180,7 @@ export interface TokenResponse {
   tokenId: string;
   referenceId: string;
   owner: string;
-  assetAttribute: string;
+  tokenAttribute: string;
 }
 export interface TokensResponse {
   contractName: string;
@@ -189,7 +189,7 @@ export interface TokensResponse {
   tokenId: string;
   referenceId: string;
   owner: string;
-  assetAttribute: string;
+  tokenAttribute: string;
 }
 export interface TokensInteractionsResponse {
   interactionType: string;

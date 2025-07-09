@@ -33,6 +33,7 @@ import {
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
+//import ExampleOntology from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 
 export interface IEthereumTestEnvironment {
@@ -44,6 +45,7 @@ export interface IEthereumTestEnvironment {
 // Test environment for Ethereum ledger operations
 export class EthereumTestEnvironment {
   public static readonly ETH_ASSET_ID: string = "EthereumExampleAsset";
+  public static readonly ETH_NFT_ASSET_ID: string = "EthereumExampleNFT";
   public static readonly ETHREFERENCE_ID: string = ExampleOntology.id;
   public static readonly ETH_NETWORK_ID: string = "EthereumLedgerTestNetwork";
   public readonly network: NetworkId = {
@@ -328,10 +330,9 @@ export class EthereumTestEnvironment {
 
     this.assetContractAddress =
       deployOutSATPTokenContract.transactionReceipt.contractAddress ?? "";
-
-    this.log.info("SATPTokenContract Deployed successfully");
-    this.log.info(this.keychainPlugin3.getKeychainId());
-    this.log.info(this.erc721TokenContract);
+    if (this.assetContractAddress != "") {
+      this.log.info("SATPTokenContract Deployed successfully");
+    }
 
     const deployOutSATPNFTokenContract = await this.connector.deployContract({
       contract: {
@@ -353,8 +354,9 @@ export class EthereumTestEnvironment {
 
     this.nftContractAddress =
       deployOutSATPNFTokenContract.transactionReceipt.contractAddress ?? "";
-
-    this.log.info("SATPNFTokenContract Deployed successfully");
+    if (this.nftContractAddress != "") {
+      this.log.info("SATPNFTokenContract Deployed successfully");
+    }
 
     this.ethereumConfig = {
       networkIdentification: this.network,
@@ -447,7 +449,8 @@ export class EthereumTestEnvironment {
     });
     expect(responseMint).toBeTruthy();
     expect(responseMint.success).toBeTruthy();
-    this.log.info("Minted nft to firstHighNetWorthAccount");
+    this.log.debug(responseMint);
+    this.log.info(`Minted nft ${uniqueDescriptor} to firstHighNetWorthAccount`);
   }
 
   public async giveRoleToBridge(wrapperAddress: string): Promise<void> {
@@ -536,7 +539,8 @@ export class EthereumTestEnvironment {
     });
     expect(responseApprove).toBeTruthy();
     expect(responseApprove.success).toBeTruthy();
-    this.log.info(`Approved token ${uniqueDescriptor} SATPWrapperContract`);
+    this.log.debug(responseApprove);
+    this.log.info(`Approved token ${uniqueDescriptor} to SATPWrapperContract`);
   }
 
   public async checkBalance(
@@ -580,7 +584,7 @@ export class EthereumTestEnvironment {
   }
   public get nonFungibleDefaultAsset(): Asset {
     return {
-      id: EthereumTestEnvironment.ETH_ASSET_ID,
+      id: EthereumTestEnvironment.ETH_NFT_ASSET_ID,
       referenceId: EthereumTestEnvironment.ETHREFERENCE_ID,
       owner: WHALE_ACCOUNT_ADDRESS,
       contractName: this.erc721TokenContract,

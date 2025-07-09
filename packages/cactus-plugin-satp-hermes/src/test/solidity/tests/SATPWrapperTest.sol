@@ -5,11 +5,13 @@ pragma solidity 0.8.20;
 
 import "../../../main/solidity/contracts/SATPWrapperContract.sol";
 import { SATPTokenContract } from "../contracts/SATPTokenContract.sol";
+import { SATPNFTokenContract } from "../contracts/SATPNFTokenContract.sol";
 import "forge-std/Test.sol";
 
 contract SATPWrapperTest is Test{
 
     SATPTokenContract contract1;
+    SATPNFTokenContract contract2;
 
     InteractionSignature[] signatures;
     
@@ -34,10 +36,11 @@ contract SATPWrapperTest is Test{
         wrapperContract = new SATPWrapperContract(address(this));
 
         contract1 = new SATPTokenContract(address(wrapperContract));
+        contract2 = new SATPNFTokenContract(address(wrapperContract));
 
-        lockInteractions.push("transfer(address,address,uint256)");
+        lockInteractions.push("bridgeTransferFrom(address,address,uint256)");
     
-        lockVariables.push([VarType.OWNER, VarType.BRIDGE, VarType.AMOUNT]);
+        lockVariables.push([VarType.OWNER, VarType.BRIDGE, VarType.AMOUNT, VarType.UNIQUEDESCRIPTOR]);
         InteractionSignature memory lock = InteractionSignature(InteractionType.LOCK,lockInteractions,lockVariables, true);
         signatures.push(lock);
         
@@ -45,28 +48,28 @@ contract SATPWrapperTest is Test{
         unlockInteractions.push("transfer(address,address,uint256)");
         
         unlockVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
-        unlockVariables.push([VarType.BRIDGE, VarType.OWNER, VarType.AMOUNT]);
+        unlockVariables.push([VarType.BRIDGE, VarType.OWNER, VarType.AMOUNT, VarType.UNIQUEDESCRIPTOR]);
         InteractionSignature memory unlock = InteractionSignature(InteractionType.UNLOCK,unlockInteractions,lockVariables, true);
         signatures.push(unlock);
 
         
         mintInteractions.push("mint(address,uint256)");
         
-        mintVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
+        mintVariables.push([VarType.BRIDGE, VarType.AMOUNT, VarType.UNIQUEDESCRIPTOR]);
         InteractionSignature memory mint = InteractionSignature(InteractionType.MINT,mintInteractions,lockVariables, true);
         signatures.push(mint);
 
         
         burnInteractions.push("burn(address,uint256)");
         
-        burnVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
+        burnVariables.push([VarType.BRIDGE, VarType.AMOUNT, VarType.UNIQUEDESCRIPTOR]);
         InteractionSignature memory burn = InteractionSignature(InteractionType.BURN,burnInteractions,lockVariables, true);
         signatures.push(burn);
 
         
         assignInteractions.push("assign(address,address,uint256)");
         
-        assignVariables.push([VarType.BRIDGE, VarType.RECEIVER, VarType.AMOUNT]);
+        assignVariables.push([VarType.BRIDGE, VarType.RECEIVER, VarType.AMOUNT, VarType.UNIQUEDESCRIPTOR]);
         InteractionSignature memory assign = InteractionSignature(InteractionType.ASSIGN,assignInteractions,lockVariables, true);
         signatures.push(assign);
 
@@ -83,7 +86,7 @@ contract SATPWrapperTest is Test{
     }
 
     function testWrap() public {
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures);
 
         Token memory tokenReceived = wrapperContract.getToken(contract1.name());
 
@@ -94,9 +97,9 @@ contract SATPWrapperTest is Test{
 
     function testWrapTokenAlreadyWrapped() public {
 
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures);
 
-        try wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures) returns (bool s) {
+        try wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures) returns (bool s) {
             require(!s, "Expected an error");
         }
         catch Error(string memory) {
@@ -106,7 +109,7 @@ contract SATPWrapperTest is Test{
     }
 
     function testUnwrap() public {
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures);
 
         wrapperContract.unwrap(contract1.name());
 
@@ -121,7 +124,7 @@ contract SATPWrapperTest is Test{
     // }
 
     function testUnwrapATokenWithValueLocked() public {
-        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures);
 
         wrapperContract.mint(contract1.name(), 10);
 
@@ -134,13 +137,21 @@ contract SATPWrapperTest is Test{
         }
     }
 
-    // function testMint() public {
-    //     wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
+    //function testMint() public {
+         //wrapperContract.wrap(contract1.name(), address(contract1), TokenType.OTHER, contract1.name(), "refID", address(this), signatures);
 
-    //     wrapperContract.mint(contract1.name(), 10);
+         //wrapperContract.mint(contract1.name(), 10);
         
-    //     assertEq(contract1.balanceOf(address(wrapperContract)), 10, "Token not minted");
-    // }
+        //assertEq(contract1.balanceOf(address(wrapperContract)), 10, "Token not minted");
+    //}
+
+    function testLock() public {
+         wrapperContract.wrap(contract2.name(), address(contract2), TokenType.NONSTANDARD_NONFUNGIBLE, contract2.name(), "refID", address(this), signatures);
+         wrapperContract.mint(contract2.name(), 1001);
+         wrapperContract.lock(contract2.name(), 1001);
+        
+        //assertEq(contract1.balanceOf(address(wrapperContract)), 10, "Token not minted");
+    }
 
     function testMintATokenNotWrapped() public {
         try wrapperContract.mint(contract1.name(), 10) returns (bool s) {

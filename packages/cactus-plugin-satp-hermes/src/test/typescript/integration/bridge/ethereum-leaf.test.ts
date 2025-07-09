@@ -12,6 +12,7 @@ import path from "path";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { EthereumTestEnvironment } from "../../test-utils";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let ontologyManager: OntologyManager;
 
@@ -38,6 +39,7 @@ beforeAll(async () => {
     });
   {
     const erc20TokenContract = "SATPContract";
+    const erc721TokenContract = "SATPNFTokenContract";
 
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
@@ -48,6 +50,7 @@ beforeAll(async () => {
 
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
+      contractName2: erc721TokenContract,
       logLevel,
     });
     log.info("Ethereum Ledger started successfully");
@@ -108,7 +111,7 @@ describe("Ethereum Leaf Test", () => {
       owner: WHALE_ACCOUNT_ADDRESS,
       contractName: ethereumEnv.defaultAsset.contractName,
       contractAddress: ethereumEnv.defaultAsset.contractAddress!,
-      amount: "100",
+      amount: 100 as Amount,
       network: {
         id: EthereumTestEnvironment.ETH_NETWORK_ID,
         ledgerType: LedgerType.Ethereum,
@@ -140,7 +143,7 @@ describe("Ethereum Leaf Test", () => {
   });
 
   it("Should Lock a token", async () => {
-    const response = await ethereumLeaf.lockAsset(asset.id, 100);
+    const response = await ethereumLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -181,7 +184,7 @@ describe("Ethereum Leaf Test", () => {
   });
 
   it("Should Unlock a token", async () => {
-    const response = await ethereumLeaf.unlockAsset(asset.id, 100);
+    const response = await ethereumLeaf.unlockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -228,13 +231,13 @@ describe("Ethereum Leaf Test", () => {
 
     await ethereumEnv.approveAmount(wrapperContractAddress, "100");
 
-    const response = await ethereumLeaf.lockAsset(asset.id, 100);
+    const response = await ethereumLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
     log.info("Locked 100 tokens successfully");
 
-    const response2 = await ethereumLeaf.burnAsset(asset.id, 100);
+    const response2 = await ethereumLeaf.burnAsset(asset.id, 100 as Amount);
     expect(response2).toBeDefined();
     expect(response2.transactionId).toBeDefined();
     expect(response2.transactionReceipt).toBeDefined();
@@ -274,7 +277,7 @@ describe("Ethereum Leaf Test", () => {
   });
 
   it("Should Mint a token", async () => {
-    const response = await ethereumLeaf.mintAsset(asset.id, 100);
+    const response = await ethereumLeaf.mintAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -308,7 +311,7 @@ describe("Ethereum Leaf Test", () => {
     const response = await ethereumLeaf.assignAsset(
       asset.id,
       ethereumEnv.getTestOwnerAccount(),
-      100,
+      100 as Amount,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();

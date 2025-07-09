@@ -5,6 +5,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ITraceableContract.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+import { console } from "forge-std/console.sol";
+
 /**
  * @dev Enum for the supported token types.
  */
@@ -201,7 +205,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         if(lockSuccess) {
             TokenType tt = tokens[tokenId].tokenType;
             if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
-                // The locked amount is added to the amount of the token struct
+                //The locked amount is added to the amount of the token struct
                 tokens[tokenId].tokenAttribute += assetAttribute;
                 emit Lock(tokenId, assetAttribute);
                 return true;
@@ -251,7 +255,9 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         if(tokens[tokenId].contractAddress == address(0)){
             revert TokenNotAvailable(tokenId);
         }
-        
+        console.log("Minting asset with tokenId:, attribute:");
+        console.log("\n\nhahahahhahahahahahahahahahahahahahahhaha\n\n");
+        console.log(tokenId);
         require(interact(tokenId, InteractionType.MINT, assetAttribute) , "mint asset call failed");
 
         tokens[tokenId].tokenAttribute = assetAttribute;
@@ -353,6 +359,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         for(uint i = 0; i < interactions.length; i++) {
             tokensInteractions[tokenId][interactions[i].interactionType] = interactions[i];
         }
+        return true;
     }
 
     /**
@@ -385,12 +392,14 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
      */
     function interact(string memory tokenId, InteractionType interactionType, uint256 assetAttribute, address receiver) internal returns (bool) {
         if (!tokensInteractions[tokenId][interactionType].available) {
+            console.log("\n\nInteractions not available for token\n");
             return false;
         }
-
+        console.log(receiver);
+        console.log("\ncontinue\n");
         for (uint i = 0; i < tokensInteractions[tokenId][interactionType].functionsSignature.length; i++) {
+            console.log(tokensInteractions[tokenId][interactionType].functionsSignature[i]);
             bytes4 functionSelector = bytes4(keccak256(abi.encodePacked(tokensInteractions[tokenId][interactionType].functionsSignature[i])));
-
             bytes memory encodedParams = encodeDynamicParams(functionSelector, encodeParams(tokensInteractions[tokenId][interactionType].variables[i], tokenId, receiver, assetAttribute));
 
             (bool callSuccess, ) = tokens[tokenId].contractAddress.call(encodedParams);
@@ -426,18 +435,32 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         bytes[] memory dynamicParams = new bytes[](variables.length);
         for (uint i = 0; i < variables.length; i++) {
             if (variables[i] == VarType.BRIDGE) {
+                console.log(i);
+                console.log("Bridge address");
                 dynamicParams[i] = abi.encode(address(this));
             } else if (variables[i] == VarType.TOKENID) {
+                console.log(i);
+                console.log("tokenId");
                 dynamicParams[i] = abi.encode(tokenId);
             } else if (variables[i] == VarType.AMOUNT) {
+                console.log(i);
+                console.log("amount");
                 dynamicParams[i] = abi.encode(assetAttribute);
             } else if (variables[i] == VarType.OWNER) {
+                console.log(i);
+                console.log("owner address");
                 dynamicParams[i] = abi.encode(tokens[tokenId].owner);
             } else if (variables[i] == VarType.CONTRACTADDRESS) {
+                console.log(i);
+                console.log("contract address");
                 dynamicParams[i] = abi.encode(tokens[tokenId].contractAddress);
             } else if (variables[i] == VarType.RECEIVER) {
+                console.log(i);
+                console.log("receiver address");
                 dynamicParams[i] = abi.encode(receiver);
             } else if (variables[i] == VarType.UNIQUEDESCRIPTOR) {
+                console.log(i);
+                console.log("unique descriptor");
                 dynamicParams[i] = abi.encode(assetAttribute);
             } else {
                 revert("Variable not supported");
@@ -445,4 +468,9 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         }
         return dynamicParams;
     }
+
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
+    } 
 }
+

@@ -11,6 +11,7 @@ import { BesuTestEnvironment } from "../../test-utils";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let ontologyManager: OntologyManager;
 
@@ -106,7 +107,7 @@ describe("Besu Leaf Test", () => {
       owner: besuEnv.defaultAsset.owner,
       contractName: besuEnv.defaultAsset.contractName,
       contractAddress: besuEnv.defaultAsset.contractAddress!,
-      amount: "100",
+      amount: Number("100") as Amount,
       network: {
         id: BesuTestEnvironment.BESU_NETWORK_ID,
         ledgerType: LedgerType.Besu2X,
