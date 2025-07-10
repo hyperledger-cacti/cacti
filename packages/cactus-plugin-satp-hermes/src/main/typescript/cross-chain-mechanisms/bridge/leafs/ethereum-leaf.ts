@@ -838,7 +838,7 @@ export class EthereumLeaf
     }
 
     const token = response.callOutput as TokenResponse;
-    console.log("\n\n\nASSET");
+    this.log.info(`${fnTag}, Retrieved Asset:`);
     console.log(token);
 
     switch (Number(token.tokenType)) {

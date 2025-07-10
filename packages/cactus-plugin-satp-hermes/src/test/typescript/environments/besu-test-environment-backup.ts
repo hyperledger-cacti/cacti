@@ -14,19 +14,13 @@ import {
   Web3SigningCredentialType as Web3SigningCredentialTypeBesu,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
-import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
 import Web3 from "web3";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { expect } from "@jest/globals";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import {
-  Asset,
-  AssetTokenTypeEnum,
-  NetworkId,
-  TokenType,
-} from "../../../main/typescript";
+import { Asset, AssetTokenTypeEnum, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import {
   IBesuLeafNeworkOptions,
@@ -52,10 +46,8 @@ export class BesuTestEnvironment {
   public ledger!: BesuTestLedger;
   public connector!: PluginLedgerConnectorBesu;
   public connectorOptions!: IPluginLedgerConnectorBesuOptions;
-
   public keychainPlugin1!: PluginKeychainMemory;
   public keychainPlugin2!: PluginKeychainMemory;
-
   public besuKeyPair!: { privateKey: string };
   public keychainEntryKey!: string;
   public keychainEntryValue!: string;
@@ -63,15 +55,9 @@ export class BesuTestEnvironment {
   public firstHighNetWorthAccount!: string;
   public bridgeEthAccount!: { address: string; privateKey: string };
   public assigneeEthAccount?: { address: string; privateKey: string };
-
-  //public erc20TokenContract!: string;
+  public erc20TokenContract!: string;
   //public erc721TokenContract!: string;
-  public tokenContract!: string;
-  public tokenContractCode!: any;
   public assetContractAddress?: string;
-
-  public deployedTokenType!: TokenType;
-
   public besuConfig!: IBesuLeafNeworkOptions;
   public gas: number = 999999999; // Default gas limit for transactions
 
@@ -81,7 +67,7 @@ export class BesuTestEnvironment {
   private readonly log: Logger;
 
   private constructor(
-    tokenContract: string,
+    erc20TokenContract: string,
     logLevel: LogLevelDesc,
     network?: string,
   ) {
@@ -89,7 +75,7 @@ export class BesuTestEnvironment {
       this.dockerNetwork = network;
     }
 
-    this.tokenContract = tokenContract;
+    this.erc20TokenContract = erc20TokenContract;
 
     const level = logLevel || "INFO";
     const label = "BesuTestEnvironment";
@@ -97,10 +83,7 @@ export class BesuTestEnvironment {
   }
 
   // Initializes the Besu ledger, accounts, and connector for testing
-  public async init(
-    logLevel: LogLevelDesc,
-    tokenType: TokenType,
-  ): Promise<void> {
+  public async init(logLevel: LogLevelDesc): Promise<void> {
     this.ledger = new BesuTestLedger({
       emitContainerLogs: true,
       envVars: ["BESU_NETWORK=dev"],
@@ -153,29 +136,12 @@ export class BesuTestEnvironment {
       logLevel,
     });
 
-    switch (tokenType) {
-      case TokenType.Erc20:
-      case TokenType.NonstandardFungible:
-        // Smart Contract Configuration
-        this.keychainPlugin1.set(
-          this.tokenContract,
-          JSON.stringify(SATPTokenContract),
-        );
-        this.tokenContractCode = SATPTokenContract;
-        break;
-      case TokenType.Erc721:
-      case TokenType.NonstandardNonfungible:
-        // Smart Contract Configuration
-        this.keychainPlugin1.set(
-          this.tokenContract,
-          JSON.stringify(SATPNFTokenContract),
-        );
-        this.tokenContractCode = SATPNFTokenContract;
-        break;
-      default:
-        throw new Error(`Unsupported token type: ${tokenType}`);
-    }
-    this.deployedTokenType = tokenType;
+    // Smart Contract Configuration
+    this.keychainPlugin1.set(
+      this.erc20TokenContract,
+      JSON.stringify(SATPTokenContract),
+    );
+
     // Plugin Registry setup
     const pluginRegistry = new PluginRegistry({
       plugins: [this.keychainPlugin1, this.keychainPlugin2],
@@ -224,15 +190,13 @@ export class BesuTestEnvironment {
 
   public static async setupTestEnvironment(
     config: IBesuTestEnvironment,
-    tokenType: TokenType,
   ): Promise<BesuTestEnvironment> {
     const instance = new BesuTestEnvironment(
       config.contractName,
       config.logLevel,
       config.network,
     );
-
-    await instance.init(config.logLevel, tokenType);
+    await instance.init(config.logLevel);
     return instance;
   }
 
@@ -304,15 +268,15 @@ export class BesuTestEnvironment {
   public async deployAndSetupContracts(claimFormat: ClaimFormat) {
     const deployOutSATPTokenContract = await this.connector.deployContract({
       keychainId: this.keychainPlugin1.getKeychainId(),
-      contractName: this.tokenContract,
-      contractAbi: this.tokenContractCode.abi,
+      contractName: this.erc20TokenContract,
+      contractAbi: SATPTokenContract.abi,
       constructorArgs: [this.firstHighNetWorthAccount],
       web3SigningCredential: {
         ethAccount: this.firstHighNetWorthAccount,
         secret: this.besuKeyPair.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      bytecode: this.tokenContractCode.bytecode.object,
+      bytecode: SATPTokenContract.bytecode.object,
       gas: this.gas,
     });
     expect(deployOutSATPTokenContract).toBeTruthy();
@@ -384,13 +348,13 @@ export class BesuTestEnvironment {
     return blOracleContract.transactionReceipt.contractAddress!;
   }
 
-  public async mintTokens(assetAttribute: string): Promise<void> {
+  public async mintTokens(amount: string): Promise<void> {
     const responseMint = await this.connector.invokeContract({
-      contractName: this.tokenContract,
+      contractName: this.erc20TokenContract,
       keychainId: this.keychainPlugin1.getKeychainId(),
       invocationType: BesuContractInvocationType.Send,
       methodName: "mint",
-      params: [this.firstHighNetWorthAccount, assetAttribute],
+      params: [this.firstHighNetWorthAccount, amount],
       signingCredential: {
         ethAccount: this.firstHighNetWorthAccount,
         secret: this.besuKeyPair.privateKey,
@@ -400,15 +364,12 @@ export class BesuTestEnvironment {
     });
     expect(responseMint).toBeTruthy();
     expect(responseMint.success).toBeTruthy();
-    //this.log.info("Minted 100 tokens to firstHighNetWorthAccount");
-    this.log.info(
-      `Minted ${assetAttribute} ${this.deployedTokenType} to firstHighNetWorthAccount`,
-    );
+    this.log.info("Minted 100 tokens to firstHighNetWorthAccount");
   }
 
   public async giveRoleToBridge(wrapperAddress: string): Promise<void> {
     const giveRoleRes = await this.connector.invokeContract({
-      contractName: this.tokenContract,
+      contractName: this.erc20TokenContract,
       keychainId: this.keychainPlugin1.getKeychainId(),
       invocationType: BesuContractInvocationType.Send,
       methodName: "grantBridgeRole",
@@ -431,7 +392,7 @@ export class BesuTestEnvironment {
     amount: string,
   ): Promise<void> {
     const responseApprove = await this.connector.invokeContract({
-      contractName: this.tokenContract,
+      contractName: this.erc20TokenContract,
       keychainId: this.keychainPlugin1.getKeychainId(),
       invocationType: BesuContractInvocationType.Send,
       methodName: "approve",
@@ -448,32 +409,8 @@ export class BesuTestEnvironment {
     this.log.info("Approved 100 tokens to SATPWrapperContract");
   }
 
-  public async approveToken(
-    wrapperAddress: string,
-    assetAttribute: string,
-  ): Promise<void> {
-    const responseApprove = await this.connector.invokeContract({
-      contractName: this.tokenContract,
-      keychainId: this.keychainPlugin1.getKeychainId(),
-      invocationType: BesuContractInvocationType.Send,
-      methodName: "approve",
-      params: [wrapperAddress, assetAttribute],
-      signingCredential: {
-        ethAccount: this.firstHighNetWorthAccount,
-        secret: this.besuKeyPair.privateKey,
-        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
-      },
-      gas: this.besuConfig.gas,
-    });
-    expect(responseApprove).toBeTruthy();
-    expect(responseApprove.success).toBeTruthy();
-    this.log.info(
-      `Approved ${assetAttribute} ${this.deployedTokenType} to SATPWrapperContract`,
-    );
-  }
-
   public getTestContractName(): string {
-    return this.tokenContract;
+    return this.erc20TokenContract;
   }
 
   public getTestContractAddress(): string {
@@ -481,7 +418,7 @@ export class BesuTestEnvironment {
   }
 
   public getTestContractAbi(): any {
-    return this.tokenContractCode.abi;
+    return SATPTokenContract.abi;
   }
 
   public getTestOwnerAccount(): string {
@@ -537,10 +474,10 @@ export class BesuTestEnvironment {
       id: BesuTestEnvironment.BESU_ASSET_ID,
       referenceId: BesuTestEnvironment.BESU_REFERENCE_ID,
       owner: this.firstHighNetWorthAccount,
-      contractName: this.tokenContract,
+      contractName: this.erc20TokenContract,
       contractAddress: this.assetContractAddress,
       networkId: this.network,
-      tokenType: this.deployedTokenType,
+      tokenType: AssetTokenTypeEnum.NonstandardFungible,
     };
   }
 

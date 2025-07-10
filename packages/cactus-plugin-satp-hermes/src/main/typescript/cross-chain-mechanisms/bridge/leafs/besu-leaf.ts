@@ -13,7 +13,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
-import { EvmAsset } from "../ontology/assets/evm-asset";
+import {
+  EvmAsset,
+  EvmFungibleAsset,
+  EvmNonFungibleAsset,
+} from "../ontology/assets/evm-asset";
 import {
   Logger,
   LoggerProvider,
@@ -49,7 +53,7 @@ import {
 import { ISignerKeyPair, Secp256k1Keys } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { OntologyManager } from "../ontology/ontology-manager";
-import { Asset } from "../ontology/assets/asset";
+import { Asset, UniqueTokenID, Amount } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
@@ -518,7 +522,7 @@ export class BesuLeaf
    */
   public async lockAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#lockAsset`;
     this.log.debug(
@@ -535,7 +539,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "lock",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -561,7 +565,7 @@ export class BesuLeaf
    */
   public async unlockAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#unlockAsset`;
     this.log.debug(
@@ -578,7 +582,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "unlock",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -603,7 +607,7 @@ export class BesuLeaf
    */
   public async mintAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#mintAsset`;
     this.log.debug(
@@ -620,7 +624,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -645,7 +649,7 @@ export class BesuLeaf
    */
   public async burnAsset(
     assetId: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#burnAsset`;
     this.log.debug(
@@ -662,7 +666,7 @@ export class BesuLeaf
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
       methodName: "burn",
-      params: [assetId, assetAttribute.toString()],
+      params: [assetId, assetAttribute],
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
@@ -689,7 +693,7 @@ export class BesuLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    assetAttribute: number | string,
+    assetAttribute: Amount | UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#assignAsset`;
     this.log.debug(
@@ -784,6 +788,8 @@ export class BesuLeaf
     }
 
     const token = response.callOutput as TokenResponse;
+    this.log.info(`${fnTag}, Retrieved Asset:`);
+    console.log(token);
 
     switch (Number(token.tokenType)) {
       case TokenType.ERC20:
@@ -795,9 +801,9 @@ export class BesuLeaf
           contractAddress: token.contractAddress,
           type: Number(token.tokenType),
           owner: token.owner,
-          amount: token.tokenAttribute,
+          amount: Number(token.tokenAttribute) as Amount,
           network: this.networkIdentification,
-        } as EvmAsset;
+        } as EvmFungibleAsset;
       case TokenType.ERC721:
       case TokenType.NONSTANDARD_NONFUNGIBLE:
         return {
@@ -807,9 +813,9 @@ export class BesuLeaf
           contractAddress: token.contractAddress,
           type: Number(token.tokenType),
           owner: token.owner,
-          uniqueDescriptor: token.tokenAttribute,
+          uniqueDescriptor: Number(token.tokenAttribute) as UniqueTokenID,
           network: this.networkIdentification,
-        } as EvmAsset;
+        } as EvmNonFungibleAsset;
       default:
         throw new Error("Unexpected Token Type");
     }
