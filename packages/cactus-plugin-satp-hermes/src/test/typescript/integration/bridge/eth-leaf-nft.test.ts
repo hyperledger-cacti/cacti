@@ -362,7 +362,6 @@ describe("Ethereum Leaf Test", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("NFT was minted correctly to the Wrapper account");
-    await ethereumLeaf.burnAsset(asset.id, 1002 as UniqueTokenID);
   });
 
   it("Should Assign a token", async () => {

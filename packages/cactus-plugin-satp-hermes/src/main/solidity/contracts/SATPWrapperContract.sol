@@ -299,7 +299,6 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     function assign(string memory tokenId, address receiver_account, uint256 assetAttribute) external onlyOwner returns (bool success) {
         TokenType tt = tokens[tokenId].tokenType;
         if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
-            return false;
             require(tokens[tokenId].tokenAttribute >= assetAttribute, "Assigning more assets than those locked");
             require(interact(tokenId, InteractionType.ASSIGN, assetAttribute, receiver_account), "assign asset call failed");
 
