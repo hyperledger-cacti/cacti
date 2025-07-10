@@ -510,7 +510,7 @@ jobs:
 
   # Run after all tests and summarize results
   run-all-tests:
-    needs: [run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
+    needs: [run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc]
     runs-on: ubuntu-22.04
     env:
       NODEJS_VERSION: v18.18.2
