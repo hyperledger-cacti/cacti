@@ -80,7 +80,7 @@ contract SATPNFTokenContractTest is Test {
         satpContract.lock(user, bridge, tokenId);
 
         vm.prank(bridge);
-        satpContract.unlock(user, tokenId);
+        satpContract.unlock(bridge, user, tokenId);
 
         assertEq(satpContract.balanceOf(user), 1);
         assertEq(satpContract.balanceOf(bridge), 0);

@@ -55,6 +55,7 @@ export function evmInteractionList(
       available: true,
     };
     interactions.push(interactionRequest);
+    console.log("\n\ninteractionRequest: ", interactionRequest);
   }
 
   return interactions;

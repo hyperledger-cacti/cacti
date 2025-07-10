@@ -30,8 +30,8 @@
             }
         ],
         "assign": [{
-                "functionSignature": "transfer(address,uint256)",
-                "variables": ["receiver", "amount"],
+                "functionSignature": "assign(address,uint256)",
+                "variables": ["receiver", "uniqueDescriptor"],
                 "available": true
             }
         ],

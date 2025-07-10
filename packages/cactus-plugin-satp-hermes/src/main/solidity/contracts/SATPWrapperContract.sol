@@ -257,8 +257,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         if(tokens[tokenId].contractAddress == address(0)){
             revert TokenNotAvailable(tokenId);
         }
-        console.log("Minting asset with tokenId:, attribute:");
-        console.log("\n\nhahahahhahahahahahahahahahahahahahahhaha\n\n");
+        console.log("Minting asset from wrapper contract with tokenId:");
         console.log(tokenId);
         require(interact(tokenId, InteractionType.MINT, assetAttribute) , "mint asset call failed");
 
@@ -300,6 +299,7 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
     function assign(string memory tokenId, address receiver_account, uint256 assetAttribute) external onlyOwner returns (bool success) {
         TokenType tt = tokens[tokenId].tokenType;
         if (tt == TokenType.ERC20 || tt == TokenType.NONSTANDARD_FUNGIBLE) {
+            return false;
             require(tokens[tokenId].tokenAttribute >= assetAttribute, "Assigning more assets than those locked");
             require(interact(tokenId, InteractionType.ASSIGN, assetAttribute, receiver_account), "assign asset call failed");
 
@@ -311,7 +311,6 @@ contract SATPWrapperContract is Ownable, ITraceableContract{
         else if (tt == TokenType.ERC721 || tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
             require(tokens[tokenId].tokenAttribute == assetAttribute, "Assign nft - asset is not locked");
             require(interact(tokenId, InteractionType.ASSIGN, assetAttribute, receiver_account), "assign nft call failed");
-
             tokens[tokenId].tokenAttribute = 0;
             
             emit Assign(tokenId, receiver_account, assetAttribute);

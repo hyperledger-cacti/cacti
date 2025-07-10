@@ -38,8 +38,9 @@ contract SATPNFTokenContract is AccessControl, ERC721 {
         return true;
     }
 
-    function transfer(address to, uint256 tokenId) external returns (bool success) {
-        _transfer(_msgSender(), to, tokenId);
+    function assign(address to, uint256 tokenId) external returns (bool success) {
+        _transfer(ownerOf(tokenId), to, tokenId);
+        //_mint(to, tokenId);
         return true;
     }
 

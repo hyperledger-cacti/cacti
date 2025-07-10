@@ -369,12 +369,11 @@ describe("Ethereum Leaf Test", () => {
     const response = await ethereumLeaf.assignAsset(
       asset.id,
       ethereumEnv.getTestOwnerAccount(),
-      1001 as UniqueTokenID,
+      1002 as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
-    //log.info("Assigned 100 tokens successfully");
 
     const response2 = (await ethereumLeaf.getAsset(
       asset.id,
@@ -384,10 +383,10 @@ describe("Ethereum Leaf Test", () => {
     expect(response2.type).toBe(asset.type);
     expect(response2.owner.toLowerCase()).toBe(asset.owner);
     expect(response2.contractAddress.toLowerCase()).toBe(
-      ethereumEnv.getTestContractAddress(),
+      ethereumEnv.getTestNFTContractAddress(),
     );
-    expect(response2.uniqueDescriptor).toBe("0");
-    log.info("Assigned 100 tokens successfully");
+    expect(response2.uniqueDescriptor).toBe(0 as UniqueTokenID);
+    log.info("Assigned token successfully to user");
 
     await ethereumEnv.checkBalance(
       ethereumEnv.getTestContractName(),
@@ -397,17 +396,7 @@ describe("Ethereum Leaf Test", () => {
       "0",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
-    log.info("Amount was assigned correctly to the Wrapper account");
-
-    await ethereumEnv.checkBalance(
-      ethereumEnv.getTestContractName(),
-      ethereumEnv.getTestContractAddress(),
-      ethereumEnv.getTestContractAbi(),
-      ethereumEnv.getTestOwnerAccount(),
-      "100",
-      ethereumEnv.getTestOwnerSigningCredential(),
-    );
-    log.info("Amount was assigned correctly to the Assignee account");
+    log.info("Asset was removed from the Wrapper account");
   });
 
   it("Should Unwrap a token", async () => {
