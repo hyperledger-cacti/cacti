@@ -345,7 +345,7 @@ export class Stage0ServerService extends SATPService {
         messageSignature,
       );
 
-      saveHash(sessionData, MessageType.NEW_SESSION_REQUEST, fnTag);
+      saveHash(sessionData, MessageType.NEW_SESSION_REQUEST, getHash(request));
 
       saveTimestamp(
         sessionData,
@@ -504,7 +504,11 @@ export class Stage0ServerService extends SATPService {
         messageSignature,
       );
 
-      saveHash(sessionData, MessageType.PRE_SATP_TRANSFER_REQUEST, fnTag);
+      saveHash(
+        sessionData,
+        MessageType.PRE_SATP_TRANSFER_REQUEST,
+        getHash(request),
+      );
 
       saveTimestamp(
         sessionData,

@@ -429,7 +429,11 @@ export class Stage1ClientService extends SATPService {
 
     sessionData.receiverAsset!.tokenId = response.recipientTokenId;
 
-    saveHash(sessionData, MessageType.PRE_SATP_TRANSFER_RESPONSE, fnTag);
+    saveHash(
+      sessionData,
+      MessageType.PRE_SATP_TRANSFER_RESPONSE,
+      getHash(response),
+    );
 
     saveTimestamp(
       sessionData,
