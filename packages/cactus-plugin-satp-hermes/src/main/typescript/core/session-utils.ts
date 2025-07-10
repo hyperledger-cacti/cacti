@@ -511,8 +511,16 @@ export function getPreviousMessageType(
   }
 
   switch (type) {
+    case MessageType.NEW_SESSION_REQUEST:
+      return MessageType.UNSPECIFIED;
+    case MessageType.NEW_SESSION_RESPONSE:
+      return MessageType.NEW_SESSION_REQUEST;
+    case MessageType.PRE_SATP_TRANSFER_REQUEST:
+      return MessageType.NEW_SESSION_RESPONSE;
+    case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+      return MessageType.PRE_SATP_TRANSFER_REQUEST;
     case MessageType.INIT_PROPOSAL:
-      MessageType.UNSPECIFIED;
+      MessageType.PRE_SATP_TRANSFER_RESPONSE;
     case MessageType.INIT_RECEIPT:
       return MessageType.INIT_PROPOSAL;
     case MessageType.INIT_REJECT:
