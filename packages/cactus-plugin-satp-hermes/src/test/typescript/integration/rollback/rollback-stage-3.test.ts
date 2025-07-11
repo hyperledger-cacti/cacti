@@ -54,6 +54,8 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { TokenType as TokenTypeRaw } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let besuEnv: BesuTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
@@ -198,10 +200,13 @@ beforeAll(async () => {
   {
     const erc20TokenContract = "SATPContract";
 
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        contractName: erc20TokenContract,
+        logLevel,
+      },
+      TokenTypeRaw.NONSTANDARD_FUNGIBLE,
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
@@ -260,9 +265,9 @@ describe.skip("Rollback Test stage 3", () => {
       id: besuEnv.defaultAsset.id,
       referenceId: besuEnv.defaultAsset.referenceId,
       type: TokenType.NONSTANDARD_FUNGIBLE,
-      amount: "100",
+      amount: 100 as Amount,
       owner: besuEnv.firstHighNetWorthAccount,
-      contractName: besuEnv.erc20TokenContract,
+      contractName: besuEnv.tokenContract,
       contractAddress: besuEnv.assetContractAddress!,
       network: besuEnv.network,
     };
@@ -271,7 +276,10 @@ describe.skip("Rollback Test stage 3", () => {
     expect(besuReceipt).toBeDefined();
     log.info(`Besu Asset Wrapped: ${besuReceipt}`);
 
-    const besuReceipt1 = await besuLeaf.lockAsset(besuEnv.defaultAsset.id, 100);
+    const besuReceipt1 = await besuLeaf.lockAsset(
+      besuEnv.defaultAsset.id,
+      100 as Amount,
+    );
     expect(besuReceipt1).toBeDefined();
     log.info(`Besu Asset locked: ${besuReceipt1}`);
 
@@ -280,7 +288,7 @@ describe.skip("Rollback Test stage 3", () => {
       id: fabricEnv.defaultAsset.id,
       referenceId: fabricEnv.defaultAsset.referenceId,
       type: TokenType.NONSTANDARD_FUNGIBLE,
-      amount: "100",
+      amount: 100 as Amount,
       owner: fabricEnv.clientId,
       mspId: "Org1MSP",
       channelName: fabricEnv.fabricChannelName,

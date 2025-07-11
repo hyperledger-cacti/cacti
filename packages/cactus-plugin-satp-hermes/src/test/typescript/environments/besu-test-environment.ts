@@ -21,21 +21,18 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { expect } from "@jest/globals";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import {
-  Asset,
-  AssetTokenTypeEnum,
-  NetworkId,
-  TokenType,
-} from "../../../main/typescript";
+import { Asset, AssetTokenTypeEnum, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import {
   IBesuLeafNeworkOptions,
   IBesuLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
-import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-besu.json";
+//import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-besu.json";
+import ExampleOntology from "../../ontologies/ontology-satp-erc721-interact-besu.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
+import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 export interface IBesuTestEnvironment {
   contractName: string;
   logLevel: LogLevelDesc;
@@ -106,7 +103,7 @@ export class BesuTestEnvironment {
       envVars: ["BESU_NETWORK=dev"],
       containerImageVersion: "2024-06-09-cc2f9c5",
       containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
-      //networkName: this.dockerNetwork,
+      networkName: this.dockerNetwork,
     });
 
     const docker = new Docker();
@@ -154,8 +151,8 @@ export class BesuTestEnvironment {
     });
 
     switch (tokenType) {
-      case TokenType.Erc20:
-      case TokenType.NonstandardFungible:
+      case TokenType.ERC20:
+      case TokenType.NONSTANDARD_FUNGIBLE:
         // Smart Contract Configuration
         this.keychainPlugin1.set(
           this.tokenContract,
@@ -163,8 +160,8 @@ export class BesuTestEnvironment {
         );
         this.tokenContractCode = SATPTokenContract;
         break;
-      case TokenType.Erc721:
-      case TokenType.NonstandardNonfungible:
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
         // Smart Contract Configuration
         this.keychainPlugin1.set(
           this.tokenContract,
@@ -533,15 +530,32 @@ export class BesuTestEnvironment {
   }
   // Gets the default asset configuration for testing
   public get defaultAsset(): Asset {
-    return {
-      id: BesuTestEnvironment.BESU_ASSET_ID,
-      referenceId: BesuTestEnvironment.BESU_REFERENCE_ID,
-      owner: this.firstHighNetWorthAccount,
-      contractName: this.tokenContract,
-      contractAddress: this.assetContractAddress,
-      networkId: this.network,
-      tokenType: this.deployedTokenType,
-    };
+    switch (this.deployedTokenType) {
+      case TokenType.ERC20:
+      case TokenType.NONSTANDARD_FUNGIBLE:
+        return {
+          id: BesuTestEnvironment.BESU_ASSET_ID,
+          referenceId: BesuTestEnvironment.BESU_REFERENCE_ID,
+          owner: this.firstHighNetWorthAccount,
+          contractName: this.tokenContract,
+          contractAddress: this.assetContractAddress,
+          networkId: this.network,
+          tokenType: AssetTokenTypeEnum.NonstandardFungible,
+        };
+      case TokenType.ERC721:
+      case TokenType.NONSTANDARD_NONFUNGIBLE:
+        return {
+          id: BesuTestEnvironment.BESU_ASSET_ID,
+          referenceId: BesuTestEnvironment.BESU_REFERENCE_ID,
+          owner: this.firstHighNetWorthAccount,
+          contractName: this.tokenContract,
+          contractAddress: this.assetContractAddress,
+          networkId: this.network,
+          tokenType: AssetTokenTypeEnum.NonstandardNonfungible,
+        };
+      default:
+        throw new Error(`Unsupported token type: ${this.deployedTokenType}`);
+    }
   }
 
   // Returns the assignee account address used for testing transactions
