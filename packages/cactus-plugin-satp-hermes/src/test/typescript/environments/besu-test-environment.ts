@@ -28,8 +28,8 @@ import {
   IBesuLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
-//import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-besu.json";
-import ExampleOntology from "../../ontologies/ontology-satp-erc721-interact-besu.json";
+import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-besu.json";
+import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-besu.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
 import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
@@ -40,7 +40,10 @@ export interface IBesuTestEnvironment {
 }
 export class BesuTestEnvironment {
   public static readonly BESU_ASSET_ID: string = "BesuExampleAsset";
-  public static readonly BESU_REFERENCE_ID: string = ExampleOntology.id;
+  public static readonly BESU_REFERENCE_ID_ERC20: string =
+    ExampleOntologyERC20.id;
+  public static readonly BESU_REFERENCE_ID_ERC721: string =
+    ExampleOntologyERC721.id;
   public static readonly BESU_NETWORK_ID: string = "BesuLedgerTestNetwork";
   public readonly network: NetworkId = {
     id: BesuTestEnvironment.BESU_NETWORK_ID,
@@ -535,7 +538,7 @@ export class BesuTestEnvironment {
       case TokenType.NONSTANDARD_FUNGIBLE:
         return {
           id: BesuTestEnvironment.BESU_ASSET_ID,
-          referenceId: BesuTestEnvironment.BESU_REFERENCE_ID,
+          referenceId: BesuTestEnvironment.BESU_REFERENCE_ID_ERC20,
           owner: this.firstHighNetWorthAccount,
           contractName: this.tokenContract,
           contractAddress: this.assetContractAddress,
@@ -546,7 +549,7 @@ export class BesuTestEnvironment {
       case TokenType.NONSTANDARD_NONFUNGIBLE:
         return {
           id: BesuTestEnvironment.BESU_ASSET_ID,
-          referenceId: BesuTestEnvironment.BESU_REFERENCE_ID,
+          referenceId: BesuTestEnvironment.BESU_REFERENCE_ID_ERC721,
           owner: this.firstHighNetWorthAccount,
           contractName: this.tokenContract,
           contractAddress: this.assetContractAddress,
