@@ -667,6 +667,9 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
 
   public async persistCrossChainLogCsv(name?: string): Promise<string> {
     const startTime = new Date();
+    if (name && !/^[a-zA-Z0-9_-]+$/.test(name)) {
+      throw new RuntimeError("Invalid name parameter. Only alphanumeric characters, underscores, and hyphens are allowed.");
+    }
     const columns =
       this.crossChainLog.getCrossChainLogAttributes() as (keyof CrossChainEvent)[];
     const logName = name
@@ -708,6 +711,9 @@ export class CcModelHephaestus implements ICactusPlugin, IPluginWebService {
 
   public async persistCrossChainLogJson(name?: string): Promise<string> {
     const startTime = new Date();
+    if (name && !/^[a-zA-Z0-9_-]+$/.test(name)) {
+      throw new RuntimeError("Invalid name parameter. Only alphanumeric characters, underscores, and hyphens are allowed.");
+    }
     const logName = name
       ? `${name}.json`
       : `hephaestus_log_${startTime.getTime()}.json`;
