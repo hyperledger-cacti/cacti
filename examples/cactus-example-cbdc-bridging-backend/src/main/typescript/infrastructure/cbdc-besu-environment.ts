@@ -298,7 +298,7 @@ export class BesuEnvironment {
         contractName: BesuEnvironment.SATP_CONTRACT_NAME,
         keychainId: this.keychainPlugin1.getKeychainId(),
         invocationType: EthContractInvocationType.Call,
-        methodName: "checkBalance",
+        methodName: "balanceOf",
         params: [userEthAddress],
         signingCredential: {
           ethAccount: userEthAddress,
