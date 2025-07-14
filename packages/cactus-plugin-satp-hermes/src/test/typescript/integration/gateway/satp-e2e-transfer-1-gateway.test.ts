@@ -37,6 +37,7 @@ import path from "path";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { TokenType as TokenTypeRaw } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -104,10 +105,13 @@ beforeAll(async () => {
 
   {
     const erc20TokenContract = "SATPContract";
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        contractName: erc20TokenContract,
+        logLevel,
+      },
+      TokenTypeRaw.NONSTANDARD_FUNGIBLE,
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
@@ -116,6 +120,7 @@ beforeAll(async () => {
     const erc20TokenContract = "SATPContract";
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
+      contractName2: "fillerContract", //TODO: remove when correcting ethEnvironment to not receive a second contract name
       logLevel,
     });
     log.info("Ethereum Ledger started successfully");

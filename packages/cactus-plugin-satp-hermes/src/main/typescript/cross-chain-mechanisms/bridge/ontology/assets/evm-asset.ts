@@ -1,4 +1,4 @@
-import { Asset, FungibleAsset } from "./asset";
+import { Asset, FungibleAsset, NonFungibleAsset } from "./asset";
 import { InteractionsRequest as EvmInteractionSignature } from "../../../../generated/SATPWrapperContract";
 import { getInteractionType, InteractionData } from "./interact-types";
 
@@ -8,6 +8,8 @@ export interface EvmAsset extends Asset {
 
 export interface EvmFungibleAsset extends EvmAsset, FungibleAsset {}
 
+export interface EvmNonFungibleAsset extends EvmAsset, NonFungibleAsset {}
+
 export enum VarType {
   CONTRACTADDRESS = 0,
   TOKENTYPE = 1,
@@ -16,6 +18,7 @@ export enum VarType {
   AMOUNT = 4,
   BRIDGE = 5,
   RECEIVER = 6,
+  UNIQUEDESCRIPTOR = 7,
 }
 
 export function getVarTypes(stringType: string) {
@@ -52,6 +55,7 @@ export function evmInteractionList(
       available: true,
     };
     interactions.push(interactionRequest);
+    console.log("\n\ninteractionRequest: ", interactionRequest);
   }
 
   return interactions;

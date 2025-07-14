@@ -41,6 +41,7 @@ import {
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
 import { keccak256 } from "web3-utils";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -118,6 +119,7 @@ beforeAll(async () => {
   {
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: businessLogicContract,
+      contractName2: "fillerContract", // TODO: This should be removed, and ethEnvironment should not require a second contract - either get an erc20 or an erc721 contract
       logLevel,
       network: testNetwork,
     });
@@ -130,11 +132,14 @@ beforeAll(async () => {
     );
   }
   {
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: businessLogicContract,
-      logLevel,
-      network: testNetwork,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        contractName: businessLogicContract,
+        logLevel,
+        network: testNetwork,
+      },
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
     log.info("Besu Ledger started successfully");
 
     besuContractAddress = await besuEnv.deployAndSetupOracleContracts(

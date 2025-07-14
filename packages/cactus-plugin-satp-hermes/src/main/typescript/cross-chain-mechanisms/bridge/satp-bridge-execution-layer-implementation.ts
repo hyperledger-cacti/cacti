@@ -6,9 +6,13 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import {
+  Amount,
   Asset,
   FungibleAsset,
+  NonFungibleAsset,
+  UniqueTokenID,
   instanceOfFungibleAsset,
+  instanceOfNonFungibleAsset,
 } from "./ontology/assets/asset";
 import {
   ClaimFormatError,
@@ -20,6 +24,7 @@ import {
   TransactionReceipt,
 } from "./satp-bridge-execution-layer";
 import { BridgeLeafFungible } from "./bridge-leaf-fungible";
+import { BridgeLeafNonFungible } from "./bridge-leaf-non-fungible";
 import { BridgeLeaf } from "./bridge-leaf";
 
 /**
@@ -70,7 +75,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   }
 
   /**
-   * Wraps a fungible asset.
+   * Wraps a fungible or non fungible asset.
    *
    * @param asset - The asset to be wrapped.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset wrapping.
@@ -101,13 +106,34 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.wrapAsset(asset);
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible wrapAsset not implemented");
+      throw new Error("wrapAsset not implemented for current asset type");
     }
   }
 
   /**
-   * Unwraps a fungible asset.
+   * Unwraps a fungible or non fungible asset.
    *
    * @param asset - The asset to be unwrapped.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset unwrapping.
@@ -138,13 +164,31 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.unwrapAsset(asset.id);
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+      this.log.info(`${fnTag}, proof of the NFT wrapping: ${receipt}`);
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible unWrapAsset not implemented");
+      throw new Error("unwrapAsset not implemented for current asset type");
     }
   }
 
   /**
-   * Locks a fungible asset.
+   * Locks a fungible or non fungible asset.
    *
    * @param asset - The asset to be locked.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset locking.
@@ -159,7 +203,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.lockAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -178,13 +222,37 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.lockAsset(
+        asset.id,
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
+      );
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible lockAsset not implemented");
+      throw new Error("lockAsset not implemented for current asset type");
     }
   }
 
   /**
-   * Unlocks a fungible asset.
+   * Unlocks a fungible or non fungible asset.
    *
    * @param asset - The asset to be unlocked.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset unlocking.
@@ -199,7 +267,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.unlockAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -218,13 +286,37 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.unlockAsset(
+        asset.id,
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
+      );
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible unlockAsset not implemented");
+      throw new Error("unlockAsset not implemented for current asset type");
     }
   }
 
   /**
-   * Mints a fungible asset.
+   * Mints a fungible or non fungible asset.
    *
    * @param asset - The asset to be minted.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset minting.
@@ -239,7 +331,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.mintAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -258,13 +350,37 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.mintAsset(
+        asset.id,
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
+      );
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible mintAsset not implemented");
+      throw new Error("mintAsset not implemented for current asset type");
     }
   }
 
   /**
-   * Burns a fungible asset.
+   * Burns a fungible or non fungible asset.
    *
    * @param asset - The asset to be burned.
    * @returns A promise that resolves to a transaction receipt containing the receipt and proof of the asset burning.
@@ -279,7 +395,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         .bridgeEndPoint as unknown as BridgeLeafFungible;
       const response = await fungibleBridgeEndPoint.burnAsset(
         asset.id,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -298,13 +414,37 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.burnAsset(
+        asset.id,
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
+      );
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible burnAsset not implemented");
+      throw new Error("burnAsset not implemented for current asset type");
     }
   }
 
   /**
-   * Assigns a fungible asset to a recipient.
+   * Assigns a fungible or non fungible asset to a recipient.
    *
    * @param asset - The asset to be assigned.
    * @param recipient - The recipient of the asset.
@@ -321,7 +461,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
       const response = await fungibleBridgeEndPoint.assignAsset(
         asset.id,
         asset.owner,
-        Number((asset as FungibleAsset).amount),
+        (asset as FungibleAsset).amount as Amount,
       );
 
       if (response.transactionId == undefined) {
@@ -340,8 +480,33 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         receipt,
         proof,
       };
+    } else if (instanceOfNonFungibleAsset(asset)) {
+      const nonFungibleBridgeEndPoint = this
+        .bridgeEndPoint as unknown as BridgeLeafNonFungible;
+      const response = await nonFungibleBridgeEndPoint.assignAsset(
+        asset.id,
+        asset.owner,
+        (asset as NonFungibleAsset).uniqueDescriptor as UniqueTokenID,
+      );
+
+      if (response.transactionId == undefined) {
+        throw new TransactionIdUndefinedError(fnTag);
+      }
+
+      const receipt = await nonFungibleBridgeEndPoint.getReceipt(
+        response.transactionId,
+      );
+
+      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
+
+      return {
+        receipt,
+        proof,
+      };
     } else {
-      throw new Error("Non-fungible assignAsset not implemented");
+      throw new Error("assignAsset not implemented for current asset type");
     }
   }
 

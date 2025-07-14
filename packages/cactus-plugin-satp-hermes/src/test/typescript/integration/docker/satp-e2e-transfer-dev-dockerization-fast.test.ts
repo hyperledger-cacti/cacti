@@ -41,6 +41,7 @@ import {
   TransactionApi,
 } from "../../../../main/typescript";
 import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../../constants";
+import { TokenType as TokenTypeRaw } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -150,11 +151,14 @@ beforeAll(async () => {
   await setupDBTable(db_remote_config2);
 
   {
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-      network: testNetwork,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        contractName: erc20TokenContract,
+        logLevel,
+        network: testNetwork,
+      },
+      TokenTypeRaw.NONSTANDARD_FUNGIBLE,
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
@@ -162,6 +166,7 @@ beforeAll(async () => {
   {
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
+      contractName2: "fillerContract", //TODO: remove when correcting ethEnvironment to not receive a second contract name
       logLevel,
       network: testNetwork,
     });

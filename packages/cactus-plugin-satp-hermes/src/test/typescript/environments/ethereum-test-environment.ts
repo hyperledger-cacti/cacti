@@ -4,6 +4,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
+import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -31,17 +32,20 @@ import {
   IEthereumLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
-import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
+//import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
+import ExampleOntology from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 
 export interface IEthereumTestEnvironment {
   contractName: string;
+  contractName2: string;
   logLevel: LogLevelDesc;
   network?: string;
 }
 // Test environment for Ethereum ledger operations
 export class EthereumTestEnvironment {
   public static readonly ETH_ASSET_ID: string = "EthereumExampleAsset";
+  public static readonly ETH_NFT_ASSET_ID: string = "EthereumExampleNFT";
   public static readonly ETHREFERENCE_ID: string = ExampleOntology.id;
   public static readonly ETH_NETWORK_ID: string = "EthereumLedgerTestNetwork";
   public readonly network: NetworkId = {
@@ -54,13 +58,20 @@ export class EthereumTestEnvironment {
   public bungeeOptions!: IPluginBungeeHermesOptions;
   public keychainPlugin1!: PluginKeychainMemory;
   public keychainPlugin2!: PluginKeychainMemory;
+  public keychainPlugin3!: PluginKeychainMemory;
+
   public keychainEntryKey!: string;
   public keychainEntryValue!: string;
   public bridgeEthAccount!: string;
+
   public erc20TokenContract!: string;
+  public erc721TokenContract!: string;
   public contractNameWrapper!: string;
+
   public assetContractAddress!: string;
+  public nftContractAddress!: string;
   public wrapperContractAddress!: string;
+
   public ethereumConfig!: IEthereumLeafNeworkOptions;
   public gasConfig: GasTransactionConfig | undefined = {
     gas: "6721975",
@@ -74,6 +85,7 @@ export class EthereumTestEnvironment {
   // eslint-disable-next-line prettier/prettier
   private constructor(
     erc20TokenContract: string,
+    erc721TokenContract: string,
     logLevel: LogLevelDesc,
     network?: string,
   ) {
@@ -83,6 +95,7 @@ export class EthereumTestEnvironment {
 
     this.contractNameWrapper = "SATPWrapperContract";
     this.erc20TokenContract = erc20TokenContract;
+    this.erc721TokenContract = erc721TokenContract;
 
     const level = logLevel || "INFO";
     const label = "EthereumTestEnvironment";
@@ -103,6 +116,11 @@ export class EthereumTestEnvironment {
       contractName: "SATPTokenContract",
       abi: SATPTokenContract.abi,
       bytecode: SATPTokenContract.bytecode.object,
+    };
+    const SATPTokenContract2 = {
+      contractName: "SATPNFTokenContract",
+      abi: SATPNFTokenContract.abi,
+      bytecode: SATPNFTokenContract.bytecode.object,
     };
     const SATPWrapperContract1 = {
       contractName: "SATPWrapperContract",
@@ -129,6 +147,13 @@ export class EthereumTestEnvironment {
       logLevel,
     });
 
+    this.keychainPlugin3 = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      backend: new Map([[this.keychainEntryKey, this.keychainEntryValue]]),
+      logLevel,
+    });
+
     this.keychainPlugin1.set(
       this.erc20TokenContract,
       JSON.stringify(SATPTokenContract1),
@@ -137,9 +162,17 @@ export class EthereumTestEnvironment {
       this.contractNameWrapper,
       JSON.stringify(SATPWrapperContract1),
     );
+    this.keychainPlugin3.set(
+      this.erc721TokenContract,
+      JSON.stringify(SATPTokenContract2),
+    );
 
     const pluginRegistry = new PluginRegistry({
-      plugins: [this.keychainPlugin1, this.keychainPlugin2],
+      plugins: [
+        this.keychainPlugin1,
+        this.keychainPlugin2,
+        this.keychainPlugin3,
+      ],
     });
 
     this.connectorOptions = {
@@ -155,13 +188,22 @@ export class EthereumTestEnvironment {
   public getTestContractAddress(): string {
     return this.assetContractAddress ?? "";
   }
+  public getTestNFTContractAddress(): string {
+    return this.nftContractAddress ?? "";
+  }
 
   public getTestContractName(): string {
     return this.erc20TokenContract;
   }
+  public getTestNFTContractName(): string {
+    return this.erc721TokenContract;
+  }
 
   public getTestContractAbi(): any {
     return SATPTokenContract.abi;
+  }
+  public getTestNFTContractAbi(): any {
+    return SATPNFTokenContract.abi;
   }
 
   public getTestOwnerAccount(): string {
@@ -202,6 +244,7 @@ export class EthereumTestEnvironment {
   ): Promise<EthereumTestEnvironment> {
     const instance = new EthereumTestEnvironment(
       config.contractName,
+      config.contractName2,
       config.logLevel,
       config.network,
     );
@@ -287,8 +330,33 @@ export class EthereumTestEnvironment {
 
     this.assetContractAddress =
       deployOutSATPTokenContract.transactionReceipt.contractAddress ?? "";
+    if (this.assetContractAddress != "") {
+      this.log.info("SATPTokenContract Deployed successfully");
+    }
 
-    this.log.info("SATPTokenContract Deployed successfully");
+    const deployOutSATPNFTokenContract = await this.connector.deployContract({
+      contract: {
+        keychainId: this.keychainPlugin3.getKeychainId(),
+        contractName: this.erc721TokenContract,
+      },
+      constructorArgs: [WHALE_ACCOUNT_ADDRESS],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(deployOutSATPNFTokenContract).toBeTruthy();
+    expect(deployOutSATPNFTokenContract.transactionReceipt).toBeTruthy();
+    expect(
+      deployOutSATPNFTokenContract.transactionReceipt.contractAddress,
+    ).toBeTruthy();
+
+    this.nftContractAddress =
+      deployOutSATPNFTokenContract.transactionReceipt.contractAddress ?? "";
+    if (this.nftContractAddress != "") {
+      this.log.info("SATPNFTokenContract Deployed successfully");
+    }
 
     this.ethereumConfig = {
       networkIdentification: this.network,
@@ -364,6 +432,51 @@ export class EthereumTestEnvironment {
     expect(responseMint.success).toBeTruthy();
     this.log.info("Minted 100 tokens to firstHighNetWorthAccount");
   }
+  public async mintNonFungible(uniqueDescriptor: string): Promise<void> {
+    const responseMint = await this.connector.invokeContract({
+      contract: {
+        contractName: this.erc721TokenContract,
+        keychainId: this.keychainPlugin3.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "mint",
+      params: [WHALE_ACCOUNT_ADDRESS, uniqueDescriptor],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(responseMint).toBeTruthy();
+    expect(responseMint.success).toBeTruthy();
+    this.log.debug("\n\n\n\nMINT RESPONSE\n\n\n\n");
+    this.log.debug(responseMint);
+    //this.log.info(`Minted nft ${uniqueDescriptor} to firstHighNetWorthAccount`);
+  }
+
+  public async approveNonFungible(
+    uniqueDescriptor: string,
+    wrapperAddress: string,
+  ): Promise<void> {
+    const responseApprove = await this.connector.invokeContract({
+      contract: {
+        contractName: this.erc721TokenContract,
+        keychainId: this.keychainPlugin3.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "approve",
+      params: [wrapperAddress, uniqueDescriptor],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(responseApprove).toBeTruthy();
+    expect(responseApprove.success).toBeTruthy();
+    this.log.debug(responseApprove);
+    this.log.info(`Approved ${uniqueDescriptor} to wrapper`);
+  }
 
   public async giveRoleToBridge(wrapperAddress: string): Promise<void> {
     const giveRoleRes = await this.connector.invokeContract({
@@ -383,7 +496,30 @@ export class EthereumTestEnvironment {
 
     expect(giveRoleRes).toBeTruthy();
     expect(giveRoleRes.success).toBeTruthy();
-    this.log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
+    this.log.info(
+      "BRIDGE_ROLE given over erc20 to SATPWrapperContract successfully",
+    );
+
+    const giveRoleRes2 = await this.connector.invokeContract({
+      contract: {
+        contractName: this.erc721TokenContract,
+        keychainId: this.keychainPlugin3.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "grantBridgeRole",
+      params: [wrapperAddress],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+
+    expect(giveRoleRes2).toBeTruthy();
+    expect(giveRoleRes2.success).toBeTruthy();
+    this.log.info(
+      "BRIDGE_ROLE given over erc721 to SATPWrapperContract successfully",
+    );
   }
 
   public async approveAmount(
@@ -407,6 +543,29 @@ export class EthereumTestEnvironment {
     expect(responseApprove).toBeTruthy();
     expect(responseApprove.success).toBeTruthy();
     this.log.info("Approved 100 tokens to SATPWrapperContract");
+  }
+  public async approveAsset(
+    wrapperAddress: string,
+    uniqueDescriptor: string,
+  ): Promise<void> {
+    const responseApprove = await this.connector.invokeContract({
+      contract: {
+        contractName: this.erc721TokenContract,
+        keychainId: this.keychainPlugin3.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "approve",
+      params: [wrapperAddress, uniqueDescriptor],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(responseApprove).toBeTruthy();
+    expect(responseApprove.success).toBeTruthy();
+    this.log.debug(responseApprove);
+    this.log.info(`Approved token ${uniqueDescriptor} to SATPWrapperContract`);
   }
 
   public async checkBalance(
@@ -446,6 +605,17 @@ export class EthereumTestEnvironment {
       contractAddress: this.assetContractAddress,
       networkId: this.network,
       tokenType: AssetTokenTypeEnum.NonstandardFungible,
+    };
+  }
+  public get nonFungibleDefaultAsset(): Asset {
+    return {
+      id: EthereumTestEnvironment.ETH_NFT_ASSET_ID,
+      referenceId: EthereumTestEnvironment.ETHREFERENCE_ID,
+      owner: WHALE_ACCOUNT_ADDRESS,
+      contractName: this.erc721TokenContract,
+      contractAddress: this.nftContractAddress,
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.NonstandardNonfungible,
     };
   }
 

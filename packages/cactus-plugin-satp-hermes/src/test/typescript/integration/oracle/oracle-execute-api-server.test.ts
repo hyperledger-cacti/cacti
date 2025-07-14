@@ -39,6 +39,7 @@ import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { keccak256 } from "web3-utils";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { TokenType as TokenTypeRaw } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -70,14 +71,18 @@ beforeAll(async () => {
     const businessLogicContract = "OracleTestContract";
 
     try {
-      besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
+      besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+        {
+          contractName: businessLogicContract,
+          logLevel,
+        },
+        TokenTypeRaw.NONSTANDARD_FUNGIBLE,
+      );
       log.info("Besu Ledger started successfully");
 
       ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
+        contractName2: "fillerContract", //TODO: remove when correcting ethEnvironment to not receive a second contract name
         logLevel,
       });
 

@@ -11,6 +11,7 @@ import { BesuTestEnvironment } from "../../test-utils";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let ontologyManager: OntologyManager;
 
@@ -45,10 +46,13 @@ beforeAll(async () => {
       ontologiesPath: ontologiesPath,
     });
 
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        contractName: erc20TokenContract,
+        logLevel,
+      },
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
@@ -84,7 +88,7 @@ describe("Besu Leaf Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await besuLeaf.deployContracts();
-    expect(besuLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
+    expect(besuLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
 
   it("Should return the wrapper contract address", async () => {
@@ -106,7 +110,7 @@ describe("Besu Leaf Test", () => {
       owner: besuEnv.defaultAsset.owner,
       contractName: besuEnv.defaultAsset.contractName,
       contractAddress: besuEnv.defaultAsset.contractAddress!,
-      amount: "100",
+      amount: 100 as Amount,
       network: {
         id: BesuTestEnvironment.BESU_NETWORK_ID,
         ledgerType: LedgerType.Besu2X,
@@ -134,7 +138,7 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Lock a token", async () => {
-    const response = await besuLeaf.lockAsset(asset.id, 100);
+    const response = await besuLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -171,7 +175,7 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Unlock a token", async () => {
-    const response = await besuLeaf.unlockAsset(asset.id, 100);
+    const response = await besuLeaf.unlockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -213,13 +217,13 @@ describe("Besu Leaf Test", () => {
 
     await besuEnv.approveAmount(wrapperContractAddress, "100");
 
-    const response = await besuLeaf.lockAsset(asset.id, 100);
+    const response = await besuLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
     log.info("Locked 100 tokens successfully");
 
-    const response2 = await besuLeaf.burnAsset(asset.id, 100);
+    const response2 = await besuLeaf.burnAsset(asset.id, 100 as Amount);
     expect(response2).toBeDefined();
     expect(response2.transactionId).toBeDefined();
     expect(response2.transactionReceipt).toBeDefined();
@@ -256,7 +260,7 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Mint a token", async () => {
-    const response = await besuLeaf.mintAsset(asset.id, 100);
+    const response = await besuLeaf.mintAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -283,7 +287,11 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Assign a token", async () => {
-    const response = await besuLeaf.assignAsset(asset.id, asset.owner, 100);
+    const response = await besuLeaf.assignAsset(
+      asset.id,
+      asset.owner,
+      100 as Amount,
+    );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
