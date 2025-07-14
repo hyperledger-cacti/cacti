@@ -53,8 +53,11 @@ import path from "path";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let mockSession: SATPSession;
+const monitorService = MonitorService.createOrGetMonitorService({});
+monitorService.init();
 
 const createMockSession = (maxTimeout: string, maxRetries: string) => {
   const sessionId = uuidv4();
@@ -62,6 +65,7 @@ const createMockSession = (maxTimeout: string, maxRetries: string) => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()
@@ -143,6 +147,7 @@ beforeAll(async () => {
     localGateway: gatewayIdentity,
     counterPartyGateways: [],
     signer: signer,
+    monitorService: monitorService,
   };
   const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
   const ontologiesPath = path.join(__dirname, "../../../ontologies");
@@ -152,6 +157,7 @@ beforeAll(async () => {
     ontologyOptions: {
       ontologiesPath: ontologiesPath,
     },
+    monitorService: monitorService,
   };
 
   const bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
@@ -164,6 +170,7 @@ beforeAll(async () => {
     localRepository: localRepository,
     remoteRepository: remoteRepository,
     signer: signer,
+    monitorService: monitorService,
   };
   crashManager = new CrashManager(crashOptions);
 });

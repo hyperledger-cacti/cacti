@@ -6,9 +6,13 @@ import { LedgerType } from "@hyperledger/cactus-core-api";
 import { OntologyNotFoundError } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-errors";
 import * as fs from "fs";
 import * as path from "path";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 jest.mock("fs");
 jest.mock("path");
+
+const monitorService = MonitorService.createOrGetMonitorService({});
+monitorService.init();
 
 describe("OntologyManager", () => {
   const mockOntologiesPath = "./ontologies";
@@ -142,7 +146,7 @@ describe("OntologyManager", () => {
     const options: IOntologyManagerOptions = {
       ontologiesPath: mockOntologiesPath,
     };
-    const ontologyManager = new OntologyManager(options);
+    const ontologyManager = new OntologyManager(options, monitorService);
 
     expect(fs.readdirSync).toHaveBeenCalledWith(mockOntologiesPath);
     expect(fs.readFileSync).toHaveBeenCalledWith(
@@ -165,7 +169,7 @@ describe("OntologyManager", () => {
     const options: IOntologyManagerOptions = {
       ontologiesPath: mockOntologiesPath,
     };
-    const ontologyManager = new OntologyManager(options);
+    const ontologyManager = new OntologyManager(options, monitorService);
 
     expect(() =>
       ontologyManager.getOntology(LedgerType.Besu2X, "nonexistentToken"),
@@ -176,7 +180,7 @@ describe("OntologyManager", () => {
     const options: IOntologyManagerOptions = {
       ontologiesPath: mockOntologiesPath,
     };
-    const ontologyManager = new OntologyManager(options);
+    const ontologyManager = new OntologyManager(options, monitorService);
 
     expect(() =>
       ontologyManager.getOntologyInteractions(LedgerType.Sawtooth1X, "token1"),
@@ -187,7 +191,7 @@ describe("OntologyManager", () => {
     const options: IOntologyManagerOptions = {
       ontologiesPath: mockOntologiesPath,
     };
-    const ontologyManager = new OntologyManager(options);
+    const ontologyManager = new OntologyManager(options, monitorService);
 
     const interactions = ontologyManager.getOntologyInteractions(
       LedgerType.Fabric2,

@@ -1,6 +1,7 @@
 import { Asset, FungibleAsset } from "./asset";
 import { InteractionsRequest as EvmInteractionSignature } from "../../../../generated/SATPWrapperContract";
 import { getInteractionType, InteractionData } from "./interact-types";
+import { context, SpanStatusCode, trace } from "@opentelemetry/api";
 
 export interface EvmAsset extends Asset {
   contractAddress: string;
@@ -25,34 +26,48 @@ export function getVarTypes(stringType: string) {
 export function evmInteractionList(
   jsonString: string,
 ): EvmInteractionSignature[] {
-  const ontologyJSON = JSON.parse(jsonString);
+  const fnTag = "evm-asset#evmInteractionList";
+  const tracer = trace.getTracer("satp-hermes-tracer");
+  const span = tracer.startSpan(fnTag);
+  const ctx = trace.setSpan(context.active(), span);
+  return context.with(ctx, () => {
+    try {
+      const ontologyJSON = JSON.parse(jsonString);
 
-  const interactions: EvmInteractionSignature[] = [];
+      const interactions: EvmInteractionSignature[] = [];
 
-  for (const interaction in ontologyJSON["ontology"]) {
-    const functions: string[] = [];
-    const variables: string | number[][] = [];
+      for (const interaction in ontologyJSON["ontology"]) {
+        const functions: string[] = [];
+        const variables: string | number[][] = [];
 
-    for (const signature of ontologyJSON["ontology"][
-      interaction
-    ] as InteractionData[]) {
-      functions.push(signature.functionSignature);
-      const vars: string | number[] = [];
+        for (const signature of ontologyJSON["ontology"][
+          interaction
+        ] as InteractionData[]) {
+          functions.push(signature.functionSignature);
+          const vars: string | number[] = [];
 
-      for (const variable of signature.variables) {
-        vars.push(getVarTypes(variable));
+          for (const variable of signature.variables) {
+            vars.push(getVarTypes(variable));
+          }
+          variables.push(vars);
+        }
+
+        const interactionRequest: EvmInteractionSignature = {
+          interactionType: getInteractionType(interaction),
+          functionsSignature: functions,
+          variables: variables,
+          available: true,
+        };
+        interactions.push(interactionRequest);
       }
-      variables.push(vars);
+
+      return interactions;
+    } catch (error) {
+      span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+      span.recordException(error);
+      throw error;
+    } finally {
+      span.end();
     }
-
-    const interactionRequest: EvmInteractionSignature = {
-      interactionType: getInteractionType(interaction),
-      functionsSignature: functions,
-      variables: variables,
-      available: true,
-    };
-    interactions.push(interactionRequest);
-  }
-
-  return interactions;
+  });
 }
