@@ -1,10 +1,8 @@
 // this file contains a class that encapsulates the logic for managing the SATP bridge (lock, unlock, etc).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   Asset,
   FungibleAsset,
@@ -21,6 +19,8 @@ import {
 } from "./satp-bridge-execution-layer";
 import { BridgeLeafFungible } from "./bridge-leaf-fungible";
 import { BridgeLeaf } from "./bridge-leaf";
+import { MonitorService } from "../../services/monitoring/monitor";
+import { context, trace, SpanStatusCode } from "@opentelemetry/api";
 
 /**
  * Options for configuring the ISATPBridgeExecutionLayerImpl.
@@ -33,6 +33,7 @@ export interface ISATPBridgeExecutionLayerImplOptions {
   leafBridge: BridgeLeaf;
   claimType?: ClaimFormat;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 /**
@@ -48,6 +49,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   private readonly logLevel: LogLevelDesc;
   private readonly bridgeEndPoint: BridgeLeaf;
   private readonly claimType: ClaimFormat;
+  private readonly monitorService: MonitorService;
 
   /**
    * Constructs an instance of SATPBridgeExecutionLayerImpl.
@@ -59,7 +61,11 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   constructor(public readonly options: ISATPBridgeExecutionLayerImplOptions) {
     const label = SATPBridgeExecutionLayerImpl.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.claimType = options.claimType || ClaimFormat.DEFAULT;
 
@@ -79,31 +85,49 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async wrapAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#wrapAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.wrapAsset(asset);
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.wrapAsset(asset);
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible wrapAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(error),
+        });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible wrapAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -116,31 +140,49 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async unwrapAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#unwrapAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.unwrapAsset(asset.id);
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.unwrapAsset(asset.id);
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible unWrapAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(error),
+        });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible unWrapAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -153,34 +195,49 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async lockAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#lockAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.lockAsset(
+            asset.id,
+            Number((asset as FungibleAsset).amount),
+          );
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.lockAsset(
-        asset.id,
-        Number((asset as FungibleAsset).amount),
-      );
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible lockAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible lockAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -193,34 +250,49 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async unlockAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#unlockAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.unlockAsset(
+            asset.id,
+            Number((asset as FungibleAsset).amount),
+          );
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.unlockAsset(
-        asset.id,
-        Number((asset as FungibleAsset).amount),
-      );
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible unlockAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible unlockAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -233,34 +305,49 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async mintAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#mintAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.mintAsset(
+            asset.id,
+            Number((asset as FungibleAsset).amount),
+          );
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.mintAsset(
-        asset.id,
-        Number((asset as FungibleAsset).amount),
-      );
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible mintAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible mintAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -273,34 +360,49 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async burnAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#burnAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.burnAsset(
+            asset.id,
+            Number((asset as FungibleAsset).amount),
+          );
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.burnAsset(
-        asset.id,
-        Number((asset as FungibleAsset).amount),
-      );
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible burnAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible burnAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -314,35 +416,50 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    */
   public async assignAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#assignAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        if (instanceOfFungibleAsset(asset)) {
+          const fungibleBridgeEndPoint = this
+            .bridgeEndPoint as unknown as BridgeLeafFungible;
+          const response = await fungibleBridgeEndPoint.assignAsset(
+            asset.id,
+            asset.owner,
+            Number((asset as FungibleAsset).amount),
+          );
 
-    if (instanceOfFungibleAsset(asset)) {
-      const fungibleBridgeEndPoint = this
-        .bridgeEndPoint as unknown as BridgeLeafFungible;
-      const response = await fungibleBridgeEndPoint.assignAsset(
-        asset.id,
-        asset.owner,
-        Number((asset as FungibleAsset).amount),
-      );
+          if (response.transactionId == undefined) {
+            throw new TransactionIdUndefinedError(fnTag);
+          }
 
-      if (response.transactionId == undefined) {
-        throw new TransactionIdUndefinedError(fnTag);
+          const receipt = await fungibleBridgeEndPoint.getReceipt(
+            response.transactionId,
+          );
+
+          this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const proof = await this.bridgeEndPoint.getProof(
+            asset,
+            this.claimType,
+          );
+
+          return {
+            receipt,
+            proof,
+          };
+        } else {
+          throw new Error("Non-fungible assignAsset not implemented");
+        }
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-
-      const receipt = await fungibleBridgeEndPoint.getReceipt(
-        response.transactionId,
-      );
-
-      this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
-
-      const proof = await this.bridgeEndPoint.getProof(asset, this.claimType);
-
-      return {
-        receipt,
-        proof,
-      };
-    } else {
-      throw new Error("Non-fungible assignAsset not implemented");
-    }
+    });
   }
 
   /**
@@ -359,8 +476,22 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     invocationType: unknown,
   ): Promise<boolean | undefined> {
-    //todo: implement this
-    throw new Error("Not implemented");
+    const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#verifyAssetExistence()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        //todo: implement this
+        throw new Error("Not implemented");
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -377,7 +508,21 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     invocationType: unknown,
   ): Promise<boolean | undefined> {
-    //todo: implement this
-    throw new Error("Not implemented");
+    const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#verifyLockAsset()`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        //todo: implement this
+        throw new Error("Not implemented");
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
   }
 }

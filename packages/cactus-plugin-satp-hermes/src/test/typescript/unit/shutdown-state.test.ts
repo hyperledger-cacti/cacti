@@ -3,7 +3,8 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../main/typescript/core/satp-logger-provider";
 import {
   SATPGateway,
   SATPGatewayConfig,
@@ -27,12 +28,18 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
-const logger = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "satp-gateway-orchestrator-init-test",
-});
+const monitorService = MonitorService.createOrGetMonitorService({});
+monitorService.init();
+const logger = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "satp-gateway-orchestrator-init-test",
+  },
+  monitorService,
+);
 const factoryOptions: IPluginFactoryOptions = {
   pluginImportType: PluginImportType.Local,
 };
@@ -55,6 +62,7 @@ beforeAll(async () => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   sessionIDs.push(mockSession.getSessionId());

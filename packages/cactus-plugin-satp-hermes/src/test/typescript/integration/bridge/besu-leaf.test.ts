@@ -1,4 +1,5 @@
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
@@ -11,16 +12,23 @@ import { BesuTestEnvironment } from "../../test-utils";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let ontologyManager: OntologyManager;
 
 let asset: EvmFungibleAsset;
 
+const monitorService = MonitorService.createOrGetMonitorService({});
+monitorService.init();
+
 const logLevel: LogLevelDesc = "DEBUG";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "SATP - Hermes",
-});
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "SATP - Hermes",
+  },
+  monitorService,
+);
 
 let besuLeaf: BesuLeaf;
 let besuEnv: BesuTestEnvironment;
@@ -40,14 +48,18 @@ beforeAll(async () => {
 
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
-    ontologyManager = new OntologyManager({
-      logLevel,
-      ontologiesPath: ontologiesPath,
-    });
+    ontologyManager = new OntologyManager(
+      {
+        logLevel,
+        ontologiesPath: ontologiesPath,
+      },
+      monitorService,
+    );
 
     besuEnv = await BesuTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
       logLevel,
+      monitorService,
     });
     log.info("Besu Ledger started successfully");
 
@@ -74,7 +86,9 @@ describe("Besu Leaf Test", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     besuLeaf = new BesuLeaf(
-      besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
+      besuEnv.createBesuLeafConfig("DEBUG"),
+      ontologyManager,
+      monitorService,
     );
     expect(besuLeaf.getNetworkIdentification()).toStrictEqual({
       id: BesuTestEnvironment.BESU_NETWORK_ID,

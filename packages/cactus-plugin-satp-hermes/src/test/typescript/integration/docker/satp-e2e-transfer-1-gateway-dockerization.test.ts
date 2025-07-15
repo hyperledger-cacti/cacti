@@ -1,5 +1,6 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
@@ -37,12 +38,18 @@ import {
   TransactionApi,
 } from "../../../../main/typescript";
 import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
+const monitorService = MonitorService.createOrGetMonitorService({});
+monitorService.init();
 const logLevel: LogLevelDesc = "TRACE";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "SATP - Hermes",
-});
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "SATP - Hermes",
+  },
+  monitorService,
+);
 
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
@@ -121,6 +128,7 @@ beforeAll(async () => {
       logLevel,
       network: testNetwork,
       claimFormat: ClaimFormat.DEFAULT,
+      monitorService: monitorService,
     });
     log.info("Fabric Ledger started successfully");
 
@@ -132,6 +140,7 @@ beforeAll(async () => {
       contractName: erc20TokenContract,
       logLevel,
       network: testNetwork,
+      monitorService: monitorService,
     });
     log.info("Besu Ledger started successfully");
 
@@ -142,6 +151,7 @@ beforeAll(async () => {
       contractName: erc20TokenContract,
       logLevel,
       network: testNetwork,
+      monitorService: monitorService,
     });
     log.info("Ethereum Ledger started successfully");
 

@@ -26,7 +26,7 @@ import { NetworkId } from "../../public-api";
  */
 export interface IBridgeLeafOptions {
   networkIdentification: NetworkId;
-  ontologyManager: OntologyManager;
+  //ontologyManager: OntologyManager;
   leafId?: string;
   keyPair?: ISignerKeyPair;
   logLevel?: LogLevelDesc;
