@@ -1,0 +1,129 @@
+<div class="container">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Role Manager</ion-card-title>
+      <ion-card-subtitle>
+        Manage manufacturer and customer roles for the supply chain
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <!-- Wallet connection status -->
+      <div class="wallet-status">
+        <h3>Wallet Status</h3>
+        <div *ngIf="!walletAddress" class="not-connected">
+          <p>
+            Not connected to a wallet. Please connect your wallet from the menu.
+          </p>
+        </div>
+        <div *ngIf="walletAddress" class="connected">
+          <p>
+            Connected to wallet:
+            <strong>{{ getShortenedAddress(walletAddress) }}</strong>
+            <ion-badge *ngIf="isAdmin" color="danger">Admin</ion-badge>
+          </p>
+        </div>
+      </div>
+
+      <!-- Role management section (only visible for admin) -->
+      <div *ngIf="isAdmin && walletAddress" class="role-management">
+        <h3>Assign Roles</h3>
+        <p>Use the form below to assign roles to wallet addresses</p>
+
+        <form [formGroup]="roleForm" (ngSubmit)="addRole()">
+          <ion-item class="form-row">
+            <ion-label position="floating">Wallet Address</ion-label>
+            <ion-input
+              formControlName="address"
+              placeholder="0x..."
+              required
+            ></ion-input>
+          </ion-item>
+          <div
+            *ngIf="
+              roleForm.get('address')?.hasError('required') &&
+              roleForm.get('address')?.touched
+            "
+            class="error-text"
+          >
+            Address is required
+          </div>
+          <div
+            *ngIf="
+              roleForm.get('address')?.hasError('pattern') &&
+              roleForm.get('address')?.touched
+            "
+            class="error-text"
+          >
+            Must be a valid Ethereum address
+          </div>
+
+          <ion-item class="form-row">
+            <ion-label position="floating">Role</ion-label>
+            <ion-select formControlName="role">
+              <ion-select-option value="manufacturer"
+                >Manufacturer</ion-select-option
+              >
+              <ion-select-option value="customer">Customer</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <div class="form-row">
+            <ion-button
+              expand="block"
+              color="primary"
+              type="submit"
+              [disabled]="roleForm.invalid || loading"
+            >
+              <span *ngIf="!loading">Assign Role</span>
+              <span *ngIf="loading">Processing...</span>
+            </ion-button>
+          </div>
+        </form>
+
+        <!-- Status messages -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+      </div>
+
+      <!-- Current role assignments -->
+      <div class="role-listings">
+        <h3>Current Role Assignments</h3>
+
+        <div class="role-section">
+          <h4>Manufacturers</h4>
+          <div *ngIf="manufacturers.length === 0">
+            No manufacturers assigned yet
+          </div>
+          <ion-list *ngIf="manufacturers.length > 0">
+            <ion-item *ngFor="let address of manufacturers">
+              {{ address }}
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <div class="role-section">
+          <h4>Customers</h4>
+          <div *ngIf="customers.length === 0">No customers assigned yet</div>
+          <ion-list *ngIf="customers.length > 0">
+            <ion-item *ngFor="let address of customers">
+              {{ address }}
+            </ion-item>
+          </ion-list>
+        </div>
+      </div>
+
+      <!-- Non-admin message -->
+      <div *ngIf="!isAdmin && walletAddress" class="not-admin">
+        <p class="warning">
+          You are not an admin. You can view role assignments but cannot modify
+          them.
+        </p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</div>

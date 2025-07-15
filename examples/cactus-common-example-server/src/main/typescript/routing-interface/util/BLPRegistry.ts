@@ -6,7 +6,7 @@
  */
 
 import { DBAccess } from "./DBAccess";
-import { ConfigUtil } from "../util/ConfigUtil";
+import { ConfigUtil } from "./ConfigUtil";
 
 const fs = require("fs");
 const path = require("path");

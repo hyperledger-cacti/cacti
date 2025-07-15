@@ -20,6 +20,7 @@ import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 
 import { AuthConfig } from "../../common/auth-config";
+import { WalletService } from "../../common/services/wallet.service";
 
 @Component({
   selector: "app-shipment-detail",
@@ -34,12 +35,14 @@ export class ShipmentDetailPage implements OnInit {
   public shipment: Shipment;
   public bookshelves: Bookshelf[];
   public bookshelfIds: string[];
+  private signedHeaders: { [key: string]: string } | null = null;
 
   constructor(
     private readonly baseClient: ApiClient,
     @Inject(XDAI_BESU_DEMO_LEDGER_ID) private readonly xdaiBesuLedgerId: string,
     public readonly modalController: ModalController,
     public readonly formBuilder: UntypedFormBuilder,
+    private readonly walletService: WalletService,
   ) {
     this.log = LoggerProvider.getOrCreate({ label: "ShipmentDetailPage" });
   }
@@ -55,15 +58,7 @@ export class ShipmentDetailPage implements OnInit {
   async ngOnInit(): Promise<void> {
     this.log.debug("component initialized.", this.shipment);
 
-    this._supplyChainApi = await this.baseClient.ofLedger(
-      this.xdaiBesuLedgerId,
-      SupplyChainApi,
-      {
-        baseOptions: {
-          headers: { Authorization: `Bearer ${AuthConfig.authToken}` },
-        },
-      },
-    );
+    await this.initializeApiClient();
 
     if (!this.shipment) {
       this.shipment = {
@@ -79,13 +74,61 @@ export class ShipmentDetailPage implements OnInit {
     await this.loadData();
   }
 
+  private async initializeApiClient(): Promise<void> {
+    // Get wallet headers
+    const headers = this.walletService.getWalletHeaders();
+    if (!headers) {
+      this.log.warn("Wallet not connected");
+      return;
+    }
+
+    // Sign the message
+    const signResult = await this.walletService.signMessage(
+      headers["x-message"],
+    );
+    if (!signResult) {
+      this.log.warn("Failed to sign message");
+      return;
+    }
+
+    // Add signature to headers and store them
+    headers["x-signature"] = signResult.signature;
+    this.signedHeaders = headers;
+
+    this._supplyChainApi = await this.baseClient.ofLedger(
+      this.xdaiBesuLedgerId,
+      SupplyChainApi,
+      {
+        baseOptions: {
+          headers: {
+            ...headers,
+            Authorization: `Bearer ${AuthConfig.authToken}`,
+          },
+        },
+      },
+    );
+  }
+
   private async loadData(): Promise<void> {
-    const { data } = await this.supplyChainApi.listBookshelfV1();
-    const { data: bookshelves } = data;
-    this.bookshelves = bookshelves;
-    this.log.debug(`Fetched BambooHarvest data: %o`, bookshelves);
-    this.bookshelfIds = this.bookshelves.map((bh) => bh.id);
-    this.log.debug(`BambooHarvest IDs: %o`, this.bookshelfIds);
+    if (!this._supplyChainApi) {
+      this.log.warn("API client not initialized");
+      return;
+    }
+
+    try {
+      const response = await this.supplyChainApi.listBookshelfV1({
+        headers: this.signedHeaders || undefined,
+      });
+
+      const { data } = response;
+      const { data: bookshelves } = data;
+      this.bookshelves = bookshelves || [];
+      this.log.debug(`Fetched Bookshelf data: %o`, bookshelves);
+      this.bookshelfIds = this.bookshelves.map((bh) => bh.id);
+      this.log.debug(`Bookshelf IDs: %o`, this.bookshelfIds);
+    } catch (error) {
+      this.log.error("Failed to load bookshelf data:", error);
+    }
   }
 
   onClickFormSubmit(value: Shipment): void {

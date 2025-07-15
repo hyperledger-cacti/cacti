@@ -18,7 +18,7 @@ import {
 
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
-
+import { WalletService } from "../../common/services/wallet.service";
 import { AuthConfig } from "../../common/auth-config";
 
 @Component({
@@ -34,12 +34,15 @@ export class BookshelfDetailPage implements OnInit {
   public bookshelf: Bookshelf;
   public bambooHarvests: BambooHarvest[];
   public bambooHarvestIds: string[];
+  public isWalletConnected = false;
+  public isLoading = false;
 
   constructor(
     private readonly baseClient: ApiClient,
     @Inject(XDAI_BESU_DEMO_LEDGER_ID) private readonly xdaiBesuLedgerId: string,
     public readonly modalController: ModalController,
     public readonly formBuilder: UntypedFormBuilder,
+    private readonly walletService: WalletService,
   ) {
     this.log = LoggerProvider.getOrCreate({ label: "BookshelfDetailPage" });
   }
@@ -55,39 +58,119 @@ export class BookshelfDetailPage implements OnInit {
   async ngOnInit(): Promise<void> {
     this.log.debug("component initialized.", this.bookshelf);
 
-    this._supplyChainApi = await this.baseClient.ofLedger(
-      this.xdaiBesuLedgerId,
-      SupplyChainApi,
-      {
-        baseOptions: {
-          headers: { Authorization: `Bearer ${AuthConfig.authToken}` },
-        },
-      },
-    );
-
-    if (!this.bookshelf) {
-      this.bookshelf = {
-        id: uuidv4(),
-        shelfCount: 5,
-        bambooHarvestId: "",
-      };
+    // Check if wallet is already connected
+    this.isWalletConnected = this.walletService.isWalletConnected();
+    if (this.isWalletConnected) {
+      await this.initializeApiAndLoadData();
     }
-    this.form = this.formBuilder.group({
-      id: [this.bookshelf.id, Validators.required],
-      shelfCount: [this.bookshelf.shelfCount, Validators.required],
-      bambooHarvestId: [this.bookshelf.bambooHarvestId, Validators.required],
-    });
+  }
 
-    await this.loadData();
+  async connectWallet(): Promise<void> {
+    this.isLoading = true;
+    try {
+      const connected = await this.walletService.connectWallet();
+      if (connected) {
+        this.isWalletConnected = true;
+        await this.initializeApiAndLoadData();
+      }
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private async initializeApiAndLoadData(): Promise<void> {
+    try {
+      // Get wallet headers
+      const headers = this.walletService.getWalletHeaders();
+      if (!headers) {
+        this.log.warn("Wallet not connected");
+        return;
+      }
+
+      // Sign the message
+      const signResult = await this.walletService.signMessage(
+        headers["x-message"],
+      );
+      if (!signResult) {
+        this.log.warn("Failed to sign message");
+        return;
+      }
+
+      // Add signature to headers
+      headers["x-signature"] = signResult.signature;
+
+      this._supplyChainApi = await this.baseClient.ofLedger(
+        this.xdaiBesuLedgerId,
+        SupplyChainApi,
+        {
+          baseOptions: {
+            headers: {
+              Authorization: `Bearer ${AuthConfig.authToken}`,
+              ...headers,
+            },
+          },
+        },
+      );
+
+      if (!this.bookshelf) {
+        this.bookshelf = {
+          id: uuidv4(),
+          shelfCount: 5,
+          bambooHarvestId: "",
+        };
+      }
+      this.form = this.formBuilder.group({
+        id: [this.bookshelf.id, Validators.required],
+        shelfCount: [this.bookshelf.shelfCount, Validators.required],
+        bambooHarvestId: [this.bookshelf.bambooHarvestId, Validators.required],
+      });
+
+      await this.loadData();
+    } catch (error) {
+      this.log.error("Failed to initialize API and load data:", error);
+    }
   }
 
   private async loadData(): Promise<void> {
-    const { data } = await this.supplyChainApi.listBambooHarvestV1();
-    const { data: bambooHarvests } = data;
-    this.bambooHarvests = bambooHarvests;
-    this.log.debug(`Fetched BambooHarvest data: %o`, bambooHarvests);
-    this.bambooHarvestIds = this.bambooHarvests.map((bh) => bh.id);
-    this.log.debug(`BambooHarvest IDs: %o`, this.bambooHarvestIds);
+    try {
+      // Get wallet headers
+      const walletHeaders = this.walletService.getWalletHeaders();
+      if (!walletHeaders) {
+        this.log.warn("Wallet not connected");
+        return;
+      }
+
+      // Sign the message
+      const signResult = await this.walletService.signMessage(
+        walletHeaders["x-message"],
+      );
+      if (!signResult) {
+        this.log.warn("Failed to sign message");
+        return;
+      }
+
+      // Add signature to headers
+      walletHeaders["x-signature"] = signResult.signature;
+
+      // Make sure all required headers are present
+      const headers = {
+        "x-wallet-address": walletHeaders["x-wallet-address"],
+        "x-signature": walletHeaders["x-signature"],
+        "x-message": walletHeaders["x-message"],
+      };
+
+      const { data } = await this.supplyChainApi.listBambooHarvestV1({
+        headers: headers,
+      });
+
+      const { data: bambooHarvests } = data;
+      this.bambooHarvests = bambooHarvests;
+      this.log.debug(`Fetched BambooHarvest data: %o`, bambooHarvests);
+      this.bambooHarvestIds = this.bambooHarvests.map((bh) => bh.id);
+      this.log.debug(`BambooHarvest IDs: %o`, this.bambooHarvestIds);
+    } catch (error) {
+      this.log.error("Failed to load bamboo harvest data:", error);
+    }
   }
 
   onClickFormSubmit(value: Bookshelf): void {

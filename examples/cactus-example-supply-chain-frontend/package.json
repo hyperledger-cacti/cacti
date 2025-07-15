@@ -8,19 +8,19 @@
     "Blockchain Integration",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
-    "email": "cacti@lists.lfdecentralizedtrust.org",
-    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    "email": "cacti@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -44,13 +44,16 @@
     "ng": "ng",
     "prepublishOnly": "ng build",
     "serve": "ng serve",
-    "serve:proxy": "ng serve -- --port 8000 --proxy-config proxy.conf.json",
+    "serve:proxy": "ng serve --port 8000 --proxy-config proxy.conf.json",
     "start": "ng serve"
   },
   "dependencies": {
+    "@angular/animations": "17.3.0",
+    "@angular/cdk": "17.3.0",
     "@angular/common": "17.3.11",
     "@angular/core": "17.3.11",
     "@angular/forms": "17.3.11",
+    "@angular/material": "17.3.0",
     "@angular/platform-browser": "17.3.11",
     "@angular/platform-browser-dynamic": "17.3.11",
     "@angular/router": "17.3.11",
@@ -66,6 +69,8 @@
     "@ionic-native/splash-screen": "patch:@ionic-native/splash-screen@npm%3A5.36.0#~/.yarn/patches/@ionic-native-splash-screen-npm-5.36.0-531cbbe0f8.patch",
     "@ionic-native/status-bar": "patch:@ionic-native/status-bar@npm%3A5.36.0#~/.yarn/patches/@ionic-native-status-bar-npm-5.36.0-1ca86cbaad.patch",
     "@ionic/angular": "8.2.5",
+    "@ionic/core": "^8.4.3",
+    "ionicons": "^7.4.0",
     "net-browserify": "0.2.4",
     "run-time-error": "1.4.0",
     "rxjs": "7.8.1",
@@ -84,10 +89,16 @@
     "@ionic/angular-toolkit": "10.0.0",
     "@types/uuid": "10.0.0",
     "browserify-fs": "1.0.0",
+    "browserify-zlib": "0.2.0",
+    "constants-browserify": "1.0.0",
+    "crypto-browserify": "3.12.0",
     "https-browserify": "1.0.0",
     "net-browserify": "0.2.4",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
+    "querystring-es3": "0.2.1",
+    "stream-browserify": "3.0.0",
+    "stream-http": "3.2.0",
     "tls-browserify": "0.2.2"
   },
   "engines": {

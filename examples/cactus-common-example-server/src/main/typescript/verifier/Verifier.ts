@@ -16,6 +16,7 @@ import { LedgerOperation } from "../business-logic-plugin/LedgerOperation";
 import { LedgerPluginInfo } from "./validator-registry";
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
+import { ROLE_ORG_MAPPING, ValidRole } from "./validator-authentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 import { Socket, io } from "socket.io-client-fixed-types";
@@ -489,4 +490,60 @@ export class Verifier implements IVerifier {
   // connect(): void;
   // disconnect(): void;
   // getVerifierInfo(): VerifierInfo[];
+
+  // Add a method to get role information from a token
+  public getRoleFromToken(token: string): Promise<any> {
+    return VerifierAuthentication.verifyRoleToken(token);
+  }
+
+  // Add a method to generate role tokens
+  public generateRoleTokens(): { manufacturer: string; customer: string } {
+    return VerifierAuthentication.generateRoleTokens();
+  }
+
+  // Add a method to get organization info based on role
+  public getOrgInfoForRole(role: ValidRole): {
+    orgMspId: string;
+    keychainRef: string;
+  } {
+    return (
+      ROLE_ORG_MAPPING[role] || {
+        orgMspId: "DefaultMSP",
+        keychainRef: "default",
+      }
+    );
+  }
+
+  // Modify sendSyncRequest to accept a token parameter
+  public sendSyncRequestWithToken(
+    token: string,
+    contract: object,
+    method: object,
+    args: object,
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // First verify the token and get role information
+      this.getRoleFromToken(token)
+        .then((userData) => {
+          // Use the organization info from the token
+          const orgInfo = this.getOrgInfoForRole(userData.role);
+
+          // Add organization info to the request
+          const argsWithOrg = {
+            ...args,
+            orgMspId: orgInfo.orgMspId,
+            keychainRef: orgInfo.keychainRef,
+          };
+
+          // Call the original method with the enhanced args
+          return this.sendSyncRequest(contract, method, argsWithOrg);
+        })
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  }
 }

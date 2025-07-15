@@ -6,16 +6,71 @@
           <ion-list-header>Hyperledger Cacti</ion-list-header>
           <ion-note>Example: Supply Chain App</ion-note>
 
-          <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
-            <ion-item (click)="selectedIndex = i" routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" [class.selected]="selectedIndex == i">
-              <ion-icon slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
+          <!-- Add wallet connection button -->
+          <ion-item>
+            <ion-button
+              expand="block"
+              *ngIf="!walletAddress"
+              (click)="connectWallet()"
+            >
+              <ion-icon name="wallet-outline" slot="start"></ion-icon>
+              Connect Wallet
+            </ion-button>
+            <ion-button
+              expand="block"
+              *ngIf="walletAddress"
+              (click)="disconnectWallet()"
+            >
+              <ion-icon name="wallet-outline" slot="start"></ion-icon>
+              {{ getShortenedAddress(walletAddress) }}
+              <ion-badge *ngIf="isAdmin" color="danger">Admin</ion-badge>
+            </ion-button>
+          </ion-item>
+
+          <!-- Add MetaMask test button -->
+          <ion-item>
+            <ion-button
+              expand="block"
+              (click)="testMetaMaskSigning()"
+              color="secondary"
+            >
+              <ion-icon name="bug-outline" slot="start"></ion-icon>
+              Test MetaMask Signing
+            </ion-button>
+          </ion-item>
+
+          <ion-menu-toggle
+            auto-hide="false"
+            *ngFor="let p of appPages; let i = index"
+          >
+            <ion-item
+              (click)="selectedIndex = i"
+              routerDirection="root"
+              [routerLink]="[p.url]"
+              lines="none"
+              detail="false"
+              [class.selected]="selectedIndex == i"
+            >
+              <ion-icon
+                slot="start"
+                [ios]="p.icon + '-outline'"
+                [md]="p.icon + '-sharp'"
+              ></ion-icon>
               <ion-label>{{ p.title }}</ion-label>
             </ion-item>
           </ion-menu-toggle>
         </ion-list>
-
       </ion-content>
     </ion-menu>
-    <ion-router-outlet id="main-content"></ion-router-outlet>
+    <ion-router-outlet id="main-content">
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
+          <ion-title>Supply Chain</ion-title>
+        </ion-toolbar>
+      </ion-header>
+    </ion-router-outlet>
   </ion-split-pane>
 </ion-app>
