@@ -28,11 +28,15 @@ import {
 } from "../../../../main/typescript/core/constants";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { AdminApi, OracleApi } from "../../../../main/typescript";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "satp-gateway-orchestrator-init-test",
+});
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
 });
 const factoryOptions: IPluginFactoryOptions = {
   pluginImportType: PluginImportType.Local,
@@ -55,6 +59,7 @@ describe("SATPGateway initialization", () => {
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
 
@@ -100,6 +105,7 @@ describe("SATPGateway initialization", () => {
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         address: "https://localhost",
       },
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
 
@@ -143,6 +149,7 @@ describe("SATPGateway initialization", () => {
         proofID: "mockProofID10",
         address: "https://localhost",
       },
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -175,6 +182,7 @@ describe("SATPGateway initialization", () => {
         gatewayClientPort: 3015,
         address: "https://localhost",
       },
+      monitorService: monitorService,
     };
 
     const gateway = await factory.create(options);
@@ -219,6 +227,7 @@ describe("SATPGateway startup", () => {
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
 
@@ -260,6 +269,7 @@ describe("SATPGateway startup", () => {
         gatewayClientPort: 3001,
         address: "https://localhost",
       },
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
 
@@ -302,6 +312,7 @@ describe("SATPGateway startup", () => {
         gatewayClientPort: 13011,
         address: "http://localhost",
       },
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -353,6 +364,7 @@ describe("SATPGateway startup", () => {
         gatewayClientPort: 13011,
         address: "http://localhost",
       },
+      monitorService: monitorService,
     };
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);

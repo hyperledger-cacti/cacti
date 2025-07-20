@@ -8,11 +8,11 @@ import {
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
   ISignerKeyPair,
-  type Logger,
-  LoggerProvider,
   type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import type { SATPLogger as Logger } from "../../../core/satp-logger";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyFabric } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
 import { OracleAbstract, type OracleAbstractOptions } from "../oracle-abstract";
@@ -33,6 +33,8 @@ import {
   ChannelNameError,
 } from "../../common/errors";
 import { v4 as uuidv4 } from "uuid";
+import { MonitorService } from "../../../services/monitoring/monitor";
+import { context, SpanStatusCode, trace } from "@opentelemetry/api";
 
 interface ContractEvent {
   chaincodeId: string;
@@ -60,6 +62,7 @@ export interface IOracleFabricOptions extends OracleAbstractOptions {
   leafId?: string;
   keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
+  monitorService: MonitorService;
 }
 
 export class OracleFabric extends OracleAbstract {
@@ -72,6 +75,7 @@ export class OracleFabric extends OracleAbstract {
   protected readonly connector: PluginLedgerConnectorFabric;
   protected readonly bungee?: PluginBungeeHermes;
   protected readonly claimFormats: ClaimFormat[];
+  protected readonly monitorService: MonitorService;
 
   private readonly signingCredential: FabricSigningCredential;
   private readonly channelName: string;
@@ -80,7 +84,11 @@ export class OracleFabric extends OracleAbstract {
     super();
     const label = OracleFabric.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.log.debug(
       `${OracleFabric.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
@@ -150,8 +158,22 @@ export class OracleFabric extends OracleAbstract {
   }
 
   public deployContracts(): Promise<void> {
-    // TODO: Implement contract deployment logic
-    return Promise.resolve();
+    const fnTag = `${OracleFabric.CLASS_NAME}#deployContracts`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        // TODO: Implement contract deployment logic
+        return Promise.resolve();
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -159,52 +181,78 @@ export class OracleFabric extends OracleAbstract {
    */
   public async updateEntry(args: IFabricOracleEntry): Promise<OracleResponse> {
     const fnTag = `${OracleFabric.CLASS_NAME}#updateEntry`;
-    this.log.debug(`${fnTag}: Updating entry}`);
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}: Updating entry}`);
 
-    const response = await this.connector.transact({
-      ...args,
-      channelName: this.channelName,
-      signingCredential: this.signingCredential,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          ...args,
+          channelName: this.channelName,
+          signingCredential: this.signingCredential,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (!response || !response.transactionId) {
+          throw new Error(`${fnTag}: Transaction failed`);
+        }
+
+        const transactionResponse: OracleResponse = {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+
+        transactionResponse.proof = undefined;
+
+        return transactionResponse;
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
     });
-
-    if (!response || !response.transactionId) {
-      throw new Error(`${fnTag}: Transaction failed`);
-    }
-
-    const transactionResponse: OracleResponse = {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
-
-    transactionResponse.proof = undefined;
-
-    return transactionResponse;
   }
 
   public async readEntry(args: IFabricOracleEntry): Promise<OracleResponse> {
     const fnTag = `${OracleFabric.CLASS_NAME}#readEntry`;
-    this.log.debug(
-      `${fnTag}: Reading entry with args: ${safeStableStringify(args)}`,
-    );
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}: Reading entry with args: ${safeStableStringify(args)}`,
+        );
 
-    const response = await this.connector.transact({
-      ...args,
-      signingCredential: this.signingCredential,
-      invocationType: FabricContractInvocationType.Call,
+        const response = await this.connector.transact({
+          ...args,
+          signingCredential: this.signingCredential,
+          invocationType: FabricContractInvocationType.Call,
+        });
+
+        if (!response) {
+          throw new Error(`${fnTag}: Read transaction failed`);
+        }
+
+        const proof = undefined;
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+          proof,
+        };
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
     });
-
-    if (!response) {
-      throw new Error(`${fnTag}: Read transaction failed`);
-    }
-
-    const proof = undefined;
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-      proof,
-    };
   }
 
   public async subscribeContractEvent(
@@ -213,53 +261,83 @@ export class OracleFabric extends OracleAbstract {
     filter: string[],
   ): Promise<{ unsubscribe: () => void }> {
     const fnTag = `${OracleFabric.CLASS_NAME}#subscribeContractEvent`;
-    this.log.debug(
-      `${fnTag}: Subscribing to event with args: ${safeStableStringify(args)}`,
-    );
-
-    const { removeListener } = await this.connector.createFabricListener(
-      {
-        channelName: this.channelName,
-        contractName: args.contractName,
-        signingCredential: this.signingCredential,
-      },
-      async (event: ContractEvent) => {
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, async () => {
+      try {
         this.log.debug(
-          `${fnTag}: Received event log: ${safeStableStringify(event)}`,
+          `${fnTag}: Subscribing to event with args: ${safeStableStringify(args)}`,
         );
 
-        if (event) {
-          if (event.eventName === args.eventSignature && event.payload) {
-            const payload = event.payload.toString("utf-8");
-            const payloadJson = JSON.parse(payload);
-
-            const output_params = this.extractNamedParams(payloadJson, filter);
-
-            callback(output_params);
-          } else {
+        const { removeListener } = await this.connector.createFabricListener(
+          {
+            channelName: this.channelName,
+            contractName: args.contractName,
+            signingCredential: this.signingCredential,
+          },
+          async (event: ContractEvent) => {
             this.log.debug(
-              `${fnTag}: Event name ${event.eventName} does not match expected ${args.eventSignature}. Will not process.`,
+              `${fnTag}: Received event log: ${safeStableStringify(event)}`,
             );
-            return;
-          }
-        }
-      },
-    );
 
-    return {
-      unsubscribe: () => removeListener(),
-    };
+            if (event) {
+              if (event.eventName === args.eventSignature && event.payload) {
+                const payload = event.payload.toString("utf-8");
+                const payloadJson = JSON.parse(payload);
+
+                const output_params = this.extractNamedParams(
+                  payloadJson,
+                  filter,
+                );
+
+                callback(output_params);
+              } else {
+                this.log.debug(
+                  `${fnTag}: Event name ${event.eventName} does not match expected ${args.eventSignature}. Will not process.`,
+                );
+                return;
+              }
+            }
+          },
+        );
+
+        return {
+          unsubscribe: () => removeListener(),
+        };
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public convertOperationToEntry(
     operation: OracleOperation,
   ): IFabricOracleEntry {
-    return {
-      contractName: operation.contract.contractName!,
-      methodName: operation.contract.methodName!,
-      params: operation.contract.params!,
-      channelName: this.channelName,
-    };
+    const fnTag = `${OracleFabric.CLASS_NAME}#convertOperationToEntry`;
+    const tracer = trace.getTracer("satp-hermes-tracer");
+    const span = tracer.startSpan(fnTag);
+    const ctx = trace.setSpan(context.active(), span);
+    return context.with(ctx, () => {
+      try {
+        return {
+          contractName: operation.contract.contractName!,
+          methodName: operation.contract.methodName!,
+          params: operation.contract.params!,
+          channelName: this.channelName,
+        };
+      } catch (error) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private isFullPluginOptions = (

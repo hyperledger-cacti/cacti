@@ -1,4 +1,5 @@
 import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { context, SpanStatusCode, trace } from "@opentelemetry/api";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -16,47 +17,61 @@ export function verifySignature(
   obj: any,
   pubKey: string,
 ): boolean {
-  const copy = JSON.parse(safeStableStringify(obj)!);
+  const fnTag = `gatewayUtils#verifySignature()`;
+  const tracer = trace.getTracer("satp-hermes-tracer");
+  const span = tracer.startSpan(fnTag);
+  const ctx = trace.setSpan(context.active(), span);
+  return context.with(ctx, () => {
+    try {
+      const copy = JSON.parse(safeStableStringify(obj)!);
 
-  if (copy.clientSignature) {
-    const sourceSignature = new Uint8Array(
-      Buffer.from(copy.clientSignature, "hex"),
-    );
+      if (copy.clientSignature) {
+        const sourceSignature = new Uint8Array(
+          Buffer.from(copy.clientSignature, "hex"),
+        );
 
-    const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+        const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
 
-    copy.clientSignature = "";
-    if (
-      !objectSigner.verify(
-        safeStableStringify(copy),
-        sourceSignature,
-        sourcePubkey,
-      )
-    ) {
-      return false;
+        copy.clientSignature = "";
+        if (
+          !objectSigner.verify(
+            safeStableStringify(copy),
+            sourceSignature,
+            sourcePubkey,
+          )
+        ) {
+          return false;
+        }
+        return true;
+      } else if (copy.serverSignature) {
+        const sourceSignature = new Uint8Array(
+          Buffer.from(copy.serverSignature, "hex"),
+        );
+
+        const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+
+        copy.serverSignature = "";
+        if (
+          !objectSigner.verify(
+            safeStableStringify(copy),
+            sourceSignature,
+            sourcePubkey,
+          )
+        ) {
+          return false;
+        }
+        return true;
+      } else {
+        throw new Error("No signature found in the object");
+      }
+    } catch (error) {
+      span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+      span.recordException(error);
+      throw error;
+    } finally {
+      span.end();
     }
-    return true;
-  } else if (copy.serverSignature) {
-    const sourceSignature = new Uint8Array(
-      Buffer.from(copy.serverSignature, "hex"),
-    );
-
-    const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
-
-    copy.serverSignature = "";
-    if (
-      !objectSigner.verify(
-        safeStableStringify(copy),
-        sourceSignature,
-        sourcePubkey,
-      )
-    ) {
-      return false;
-    }
-    return true;
-  } else {
-    throw new Error("No signature found in the object");
-  }
+  });
 }
 
 export function getSatpLogKey(

@@ -51,6 +51,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
@@ -70,6 +71,10 @@ let besuLeaf: BesuLeaf;
 let fabricLeaf: FabricLeaf;
 
 const sessionId = uuidv4();
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
+monitorService.init();
 const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 const logLevel: LogLevelDesc = "DEBUG";
@@ -88,6 +93,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.hasClientSessionData()
@@ -162,10 +168,13 @@ beforeAll(async () => {
   {
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
-    ontologyManager = new OntologyManager({
-      logLevel,
-      ontologiesPath: ontologiesPath,
-    });
+    ontologyManager = new OntologyManager(
+      {
+        logLevel,
+        ontologiesPath: ontologiesPath,
+      },
+      monitorService,
+    );
 
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
@@ -191,11 +200,15 @@ beforeAll(async () => {
   }
 
   fabricLeaf = new FabricLeaf(
-    fabricEnv.createFabricLeafConfig(ontologyManager, "DEBUG"),
+    fabricEnv.createFabricLeafConfig("DEBUG"),
+    ontologyManager,
+    monitorService,
   );
 
   besuLeaf = new BesuLeaf(
-    besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
+    besuEnv.createBesuLeafConfig("DEBUG"),
+    ontologyManager,
+    monitorService,
   );
 });
 
@@ -226,6 +239,8 @@ afterAll(async () => {
 
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
+
+  monitorService.shutdown();
 
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
