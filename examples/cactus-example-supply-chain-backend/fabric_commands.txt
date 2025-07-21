@@ -1,0 +1,26 @@
+# Commands for Hyperledger Fabric query
+# 1. Query all public products
+peer chaincode query -C mychannel -n manufacturerdata -c '{"Args":["GetAllProducts"]}'
+# 2. Query enhanced products with private data (Org2/manufacturer only)
+peer chaincode query -C mychannel -n manufacturerdata -c '{"Args":["GetAllEnhancedProducts"]}'
+# 3. Query private data for a specific product (replace PRODUCT-ID with actual ID)
+peer chaincode query -C mychannel -n manufacturerdata -c '{"Args":["GetPrivateProductData", "manufacturerPrivateData", "PRODUCT-ID"]}'
+# 4. Set up environment for Fabric CLI (Org2/manufacturer)
+export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+export CORE_PEER_ADDRESS=peer0.org2.example.com:7051
+export CORE_PEER_LOCALMSPID="Org2MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+# 5. Create curl command to query the API endpoint (customer view)
+curl -X GET "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-manufacturer-data" \
+     -H "Content-Type: application/json" \
+     -H "x-wallet-address: 0x1234567890abcdef1234567890abcdef12345678" \
+     -H "x-signature: 0xCustomerSignature" \
+     -H "x-message: Authentication message" \
+     -H "Accept: application/json"
+# 6. Create curl command to query the API endpoint (manufacturer view)
+curl -X GET "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-manufacturer-data" \
+     -H "Content-Type: application/json" \
+     -H "x-wallet-address: 0x9876543210abcdef1234567890abcdef12345678" \
+     -H "x-signature: 0xManufacturerSignature" \
+     -H "x-message: Authentication message" \
+     -H "Accept: application/json"

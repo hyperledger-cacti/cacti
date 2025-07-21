@@ -1,0 +1,580 @@
+/* Force light theme for the component */
+:host {
+  display: block;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+.transaction-receipt {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #3f51b5;
+  }
+
+  /* Ensure no surprise decorative text shows up */
+  &::before,
+  &::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* Fix for mat-card elements to ensure light theme */
+  ::ng-deep mat-card {
+    background-color: #ffffff !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  ::ng-deep mat-card-title,
+  ::ng-deep mat-card-subtitle,
+  ::ng-deep mat-card-content {
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+
+    p {
+      margin-top: 16px;
+      color: #616161;
+    }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    background-color: #ffebee;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+
+    p {
+      margin: 0;
+      color: #d32f2f;
+    }
+  }
+
+  .receipt-details {
+    .transaction-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      h3 {
+        margin: 0;
+      }
+
+      .etherscan-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #3f51b5;
+        font-size: 14px;
+
+        mat-icon {
+          font-size: 16px;
+          height: 16px;
+          width: 16px;
+          margin-right: 4px;
+        }
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    mat-card {
+      margin-bottom: 24px;
+    }
+
+    .receipt-field {
+      display: flex;
+      margin-bottom: 16px;
+      align-items: center;
+
+      .field-label {
+        width: 140px;
+        font-weight: 500;
+        color: #616161;
+      }
+
+      .field-value {
+        flex: 1;
+        word-break: break-word;
+      }
+
+      .field-value-with-copy {
+        flex: 1;
+        display: flex;
+        align-items: center;
+
+        .field-value {
+          margin-right: 8px;
+          flex: 1;
+        }
+
+        .hash-value {
+          font-family: "Roboto Mono", monospace;
+          font-size: 14px;
+          background-color: #f5f5f5;
+          padding: 4px 8px;
+          border-radius: 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        button {
+          margin-left: 8px;
+
+          mat-icon {
+            font-size: 18px;
+            color: #757575;
+          }
+
+          &:hover {
+            mat-icon {
+              color: #3f51b5;
+            }
+          }
+        }
+      }
+
+      .address-link {
+        color: #3f51b5;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 16px;
+        background-color: rgba(0, 0, 0, 0.08);
+
+        &.success {
+          background-color: rgba(76, 175, 80, 0.1);
+          color: #43a047;
+        }
+
+        mat-icon {
+          margin-right: 4px;
+          font-size: 16px;
+          height: 16px;
+          width: 16px;
+        }
+      }
+    }
+  }
+
+  .no-transaction {
+    text-align: center;
+    padding: 32px;
+    color: #616161;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+}
+
+.field-container {
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.field-value {
+  font-size: 1rem;
+  word-break: break-all;
+  &.hash-value {
+    font-family: monospace;
+  }
+}
+
+.field-value-with-copy {
+  display: flex;
+  align-items: center;
+  word-break: break-all;
+  .field-value {
+    flex-grow: 1;
+    margin-right: 0.5rem;
+  }
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  mat-icon {
+    margin-right: 5px;
+  }
+}
+
+// Progress bar and stepper styles - make sure we force proper display
+.progress-bar-container {
+  margin-bottom: 2rem;
+  background-color: #ffffff !important;
+
+  mat-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff !important;
+  }
+}
+
+.stepper-container {
+  margin: 1rem 0;
+  background-color: #ffffff !important;
+
+  ::ng-deep {
+    .mat-horizontal-stepper {
+      background-color: #ffffff !important;
+    }
+
+    // Customize stepper appearance
+    .mat-horizontal-stepper-header-container {
+      margin-bottom: 1rem;
+    }
+
+    .mat-step-header {
+      height: auto !important;
+      padding: 16px 24px !important;
+
+      &.mat-step-header-selected {
+        background-color: rgba(0, 128, 0, 0.04);
+      }
+
+      &.cdk-keyboard-focused {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+
+    .mat-step-icon {
+      &.mat-step-icon-selected {
+        background-color: #2e7d32; // Darker green
+      }
+
+      &.mat-step-icon-completed {
+        background-color: #4caf50; // Green
+      }
+    }
+
+    // Don't show the horizontal lines if you don't want them
+    .mat-stepper-horizontal-line {
+      border-top-width: 2px;
+      border-top-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .mat-step-label {
+      font-weight: 500;
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      max-width: none !important;
+      display: block !important;
+      text-align: center !important;
+      color: rgba(0, 0, 0, 0.87) !important;
+
+      &.mat-step-label-selected {
+        color: #2e7d32;
+      }
+    }
+
+    /* Fix step text label that shows as single letters */
+    .mat-step-text-label {
+      display: block !important;
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      color: rgba(0, 0, 0, 0.87) !important;
+    }
+  }
+}
+
+.step-content {
+  display: block !important;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  width: 100% !important;
+  text-align: center !important;
+  min-height: 70px !important;
+  background-color: transparent !important;
+
+  p {
+    margin: 8px 0 0 0 !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    width: 100% !important;
+    display: block !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+
+  .step-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+    display: inline-block !important;
+    margin-bottom: 8px !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+}
+
+// Status summary
+.status-summary {
+  padding: 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 1.25rem;
+    height: 1.25rem;
+    width: 1.25rem;
+  }
+}
+
+// Make the receipt responsive
+@media (max-width: 768px) {
+  .transaction-receipt {
+    padding: 8px;
+  }
+
+  .field-container {
+    margin-bottom: 0.75rem;
+  }
+
+  .field-label {
+    margin-bottom: 0.125rem;
+  }
+
+  .field-value {
+    font-size: 0.875rem;
+  }
+}
+
+::ng-deep {
+  // Ensure stepper labels are fully visible
+  .mat-step-label {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: initial !important;
+    max-width: none !important;
+  }
+
+  // Ensure step icons have enough space
+  .mat-step-icon {
+    margin-right: 8px;
+  }
+
+  // Improve responsive layout for small screens
+  @media (max-width: 599px) {
+    .mat-horizontal-stepper-header-container {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .mat-horizontal-stepper-header {
+        padding: 12px 0;
+        width: 100%;
+      }
+
+      .mat-stepper-horizontal-line {
+        display: none;
+      }
+    }
+  }
+
+  // Override Angular Material theming for step icons
+  .mat-step-icon,
+  .mat-step-icon-state-edit,
+  .mat-step-icon-state-done,
+  .mat-step-icon-state-number,
+  .mat-step-icon-selected,
+  .mat-step-icon-completed {
+    background-color: #000000 !important;
+  }
+
+  .step-icon-container,
+  .step-icon-container.completed {
+    background-color: #000000 !important;
+  }
+
+  /* Make sure the other theming doesn't override our styles */
+  .step-icon-container mat-icon,
+  .mat-step-icon mat-icon {
+    color: #ffffff !important;
+  }
+}
+
+// Fix copy button displays
+.copy-button {
+  min-width: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: transparent !important;
+
+  .mat-icon {
+    margin-right: 0 !important;
+    color: rgba(0, 0, 0, 0.54) !important;
+  }
+}
+
+// Fix status badges that show "co nfo"
+.status-badge,
+.copy-info {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+  font-size: 12px !important;
+
+  mat-icon {
+    margin-right: 4px !important;
+    color: #333333 !important;
+  }
+
+  span {
+    display: inline !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    color: #333333 !important;
+  }
+}
+
+// Add improved CSS for the step icons with black background
+.step-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #000000 !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin: 0 auto;
+
+  &.completed {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  mat-icon {
+    color: inherit;
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+}
+
+// Custom stepper overrides
+.custom-stepper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 30px 0;
+  position: relative;
+  padding: 0 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  // Connect the steps with a line
+  &:before {
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: 50px;
+    right: 50px;
+    height: 2px;
+    background-color: #e0e0e0;
+    z-index: 0;
+
+    @media (max-width: 768px) {
+      top: 0;
+      bottom: 0;
+      left: 24px;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+  }
+}
+
+.custom-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  background-color: transparent;
+  padding: 0 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 24px;
+    padding-left: 50px;
+    align-items: flex-start;
+  }
+
+  .step-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+    background-color: transparent;
+
+    @media (max-width: 768px) {
+      margin-right: 16px;
+      margin-bottom: 0;
+    }
+
+    .step-label {
+      margin-top: 8px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+      width: 100%;
+      max-width: 120px;
+
+      @media (max-width: 768px) {
+        margin-top: 0;
+        text-align: left;
+      }
+    }
+  }
+}

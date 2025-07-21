@@ -5,20 +5,24 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { IonicModule } from "@ionic/angular";
 
 import { BambooHarvestPageRoutingModule } from "./bamboo-harvest-routing.module";
-
 import { BambooHarvestListPage } from "./bamboo-harvest-list/bamboo-harvest-list.page";
-import { PageHeadingComponentModule } from "../common/page-heading/page-heading-component.module";
 import { BambooHarvestDetailPage } from "./bamboo-harvest-detail/bamboo-harvest-detail.page";
+import { BambooHarvestViewModalComponent } from "./bamboo-harvest-view-modal/bamboo-harvest-view-modal.component";
+import { PageHeadingComponentModule } from "../common/components/page-heading-component.module";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     IonicModule,
     BambooHarvestPageRoutingModule,
+    ReactiveFormsModule,
     PageHeadingComponentModule,
   ],
-  declarations: [BambooHarvestDetailPage, BambooHarvestListPage],
+  declarations: [
+    BambooHarvestListPage,
+    BambooHarvestDetailPage,
+    BambooHarvestViewModalComponent,
+  ],
 })
 export class BambooHarvestPageModule {}

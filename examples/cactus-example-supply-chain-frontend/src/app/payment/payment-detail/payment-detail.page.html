@@ -1,0 +1,175 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title
+      >{{ payment?.status === 'PENDING' ? 'Create Bookshelf Payment' :
+      'Bookshelf Payment Details' }}</ion-title
+    >
+    <ion-buttons slot="end">
+      <ion-button (click)="onClickBtnCancel()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-padding">
+    <div *ngIf="!form" class="loading-container">
+      <ion-spinner name="circles"></ion-spinner>
+      <p>Loading payment details...</p>
+    </div>
+
+    <form
+      *ngIf="form"
+      [formGroup]="form"
+      (ngSubmit)="onClickFormSubmit(form.value)"
+    >
+      <ion-item>
+        <ion-label position="floating">Payment ID</ion-label>
+        <ion-input type="text" formControlName="id" readonly></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Amount (ETH)</ion-label>
+        <ion-input
+          type="number"
+          formControlName="amount"
+          min="0.001"
+          step="0.001"
+        ></ion-input>
+      </ion-item>
+      <div
+        *ngIf="form.get('amount')?.invalid && form.get('amount')?.touched"
+        class="error-message"
+      >
+        <span *ngIf="form.get('amount')?.errors?.['required']"
+          >Amount is required</span
+        >
+        <span *ngIf="form.get('amount')?.errors?.['min']"
+          >Minimum amount is 0.001 ETH</span
+        >
+      </div>
+
+      <ion-item>
+        <ion-label position="floating">Payee Address</ion-label>
+        <ion-input type="text" formControlName="payee"></ion-input>
+      </ion-item>
+      <div
+        *ngIf="form.get('payee')?.invalid && form.get('payee')?.touched"
+        class="error-message"
+      >
+        <span *ngIf="form.get('payee')?.errors?.['required']"
+          >Payee address is required</span
+        >
+        <span *ngIf="form.get('payee')?.errors?.['pattern']"
+          >Invalid Ethereum address format</span
+        >
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Bookshelf ID</ion-label>
+        <ion-select
+          formControlName="productId"
+          placeholder="Select a Bookshelf ID"
+        >
+          <ion-select-option
+            *ngFor="let bookshelf of availableBookshelves"
+            [value]="bookshelf.id"
+          >
+            {{ bookshelf.id }} - {{ bookshelf['status'] || 'AVAILABLE' }} - {{
+            bookshelf.shelfCount }} shelves
+          </ion-select-option>
+          <ion-select-option
+            *ngIf="availableBookshelves.length === 0"
+            [value]=""
+            disabled
+          >
+            No available bookshelves found
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div
+        *ngIf="form.get('productId')?.invalid && form.get('productId')?.touched"
+        class="error-message"
+      >
+        <span *ngIf="form.get('productId')?.errors?.['required']"
+          >Bookshelf ID is required</span
+        >
+      </div>
+
+      <ion-item *ngIf="payment?.status === 'PENDING' && payment?.id">
+        <ion-label position="floating"> Transaction Reference </ion-label>
+        <ion-input
+          type="text"
+          formControlName="transactionReference"
+        ></ion-input>
+      </ion-item>
+      <div
+        *ngIf="form.get('transactionReference')?.invalid && form.get('transactionReference')?.touched"
+        class="error-message"
+      >
+        <span *ngIf="form.get('transactionReference')?.errors?.['required']"
+          >Transaction Reference is required</span
+        >
+      </div>
+
+      <div class="ion-padding-top">
+        <ion-button expand="block" type="submit" [disabled]="isLoading">
+          <ion-spinner name="circles" *ngIf="isLoading"></ion-spinner>
+          <span *ngIf="!isLoading">
+            {{ payment?.status === 'PENDING' && !payment?.id ? 'Create Payment'
+            : payment?.status === 'PENDING' && payment?.id ? 'Process Payment' :
+            'View Payment' }}
+          </span>
+        </ion-button>
+      </div>
+
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+    </form>
+
+    <!-- Transaction Receipt Component -->
+    <div
+      *ngIf="payment?.status === PaymentStatus.Paid && payment?.transactionReference"
+    >
+      <h4 class="receipt-header">Transaction Receipt</h4>
+      <app-transaction-receipt
+        [txHash]="payment.transactionReference"
+        [productId]="payment.productId"
+        [productType]="payment.productType"
+      >
+      </app-transaction-receipt>
+    </div>
+  </div>
+</ion-content>
+
+<style>
+  .error-message {
+    color: var(--ion-color-danger);
+    font-size: 14px;
+    margin: 5px 0 0 16px;
+  }
+
+  .success-message {
+    color: var(--ion-color-success);
+    font-size: 14px;
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  .receipt-header {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+</style>
