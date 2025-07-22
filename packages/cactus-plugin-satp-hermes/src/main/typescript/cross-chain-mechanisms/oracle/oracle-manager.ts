@@ -46,15 +46,11 @@ import { updateOracleOperation } from "./oracle-utils";
 import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
 import {
-  GatewayLogger,
-  IGatewayLoggerConfig,
-  IOracleOperationLogEntry,
-} from "../../oracle-logging"; //TODO: Uncomment
-import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../database/repository/interfaces/repository";
-//import { IOracleOperationLogEntry } from "./oracle-log-types";
+import { GatewayLogger, IGatewayLoggerConfig } from "../../logging";
+import { IOracleOperationLogEntry } from "./oracle-log-types";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;

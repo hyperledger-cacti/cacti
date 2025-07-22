@@ -1,4 +1,4 @@
-import type { LocalLog, OracleLocalLog, RemoteLog } from "../../../core/types";
+import type { SATPLocalLog, SATPRemoteLog, Log } from "../../../core/types";
 
 export interface IRepository<T, K> {
   readById(id: K): Promise<T>;
@@ -7,28 +7,28 @@ export interface IRepository<T, K> {
   reset(): any;
 }
 
-export interface ILocalLogRepository extends IRepository<LocalLog, string> {
+export interface ILocalLogRepository extends IRepository<SATPLocalLog, string> {
   database: any;
-  readById(id: string): Promise<LocalLog>;
-  readLogsNotProofs(): Promise<LocalLog[]>;
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]>;
-  readLastestLog(sessionID: string): Promise<LocalLog>;
-  create(log: LocalLog): Promise<LocalLog>;
-  create(log: OracleLocalLog): Promise<LocalLog>;
+  readById(id: string): Promise<SATPLocalLog>;
+  readLogsNotProofs(): Promise<SATPLocalLog[]>;
+  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<SATPLocalLog[]>;
+  readLastestLog(sessionID: string): Promise<SATPLocalLog>;
+  create(log: Log): Promise<Log>;
   deleteBySessionId(log: string): any;
   fetchLogsFromSequence(
     sessionId: string,
     sequenceNumber: number,
-  ): Promise<LocalLog[]>;
+  ): Promise<SATPLocalLog[]>;
   destroy(): any;
   reset(): any;
   getCreated(): boolean;
 }
 
-export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
+export interface IRemoteLogRepository
+  extends IRepository<SATPRemoteLog, string> {
   database: any;
-  readById(id: string): Promise<RemoteLog>;
-  create(log: RemoteLog): any;
+  readById(id: string): Promise<SATPRemoteLog>;
+  create(log: SATPRemoteLog): any;
   destroy(): any;
   reset(): any;
 }

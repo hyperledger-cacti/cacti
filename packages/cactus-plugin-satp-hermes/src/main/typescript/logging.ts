@@ -1,4 +1,4 @@
-import { LocalLog, RemoteLog } from "./core/types";
+import { Log, OracleLocalLog, SATPLocalLog, SATPRemoteLog } from "./core/types";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
@@ -11,17 +11,14 @@ import {
 } from "@hyperledger/cactus-common";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import { bufArray2HexStr, getSatpLogKey, sign } from "./gateway-utils";
+import {
+  bufArray2HexStr,
+  getOracleLogKey,
+  getSatpLogKey,
+  sign,
+} from "./gateway-utils";
 
-interface SATPLogEntry {
-  sessionID: string;
-  type: string;
-  operation: string;
-  data: string;
-  sequenceNumber: number;
-}
-
-export interface ISATPLoggerConfig {
+export interface IGatewayLoggerConfig {
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
   signer: JsObjectSigner;
@@ -29,7 +26,7 @@ export interface ISATPLoggerConfig {
   logLevel?: LogLevelDesc;
 }
 
-export class SATPLogger {
+export class GatewayLogger {
   private defaultRepository: boolean = true;
   public localRepository: ILocalLogRepository;
   public remoteRepository: IRemoteLogRepository | undefined;
@@ -37,104 +34,185 @@ export class SATPLogger {
   private pubKey: string;
   private readonly log: Logger;
 
-  constructor(config: ISATPLoggerConfig) {
+  constructor(config: IGatewayLoggerConfig) {
     this.localRepository = config.localRepository;
     this.remoteRepository = config.remoteRepository;
     this.signer = config.signer;
     this.pubKey = config.pubKey;
 
     this.log = LoggerProvider.getOrCreate({
-      label: "SATPLogger",
+      label: "GatewayLogger",
       level: config.logLevel || "INFO",
     });
 
-    this.log.info("SATPLogger initialized.");
+    this.log.info("GatewayLogger initialized.");
   }
 
-  public async storeProof(logEntry: SATPLogEntry): Promise<void> {
-    const fnTag = `SATPLogger#storeProof()`;
-    this.log.info(
-      `${fnTag} - Storing proof log entry for sessionID: ${logEntry.sessionID}`,
-    );
+  public async storeProof(
+    logEntry: SATPLocalLog | OracleLocalLog,
+  ): Promise<void> {
+    const fnTag = `GatewayLogger#storeProof()`;
 
-    if (logEntry.data == undefined) {
-      this.log.warn(`${fnTag} - No data provided in log entry.`);
-      return;
+    let localLog: SATPLocalLog | OracleLocalLog;
+    let hash: string;
+
+    if ("sessionID" in logEntry) {
+      this.log.info(
+        `${fnTag} - Storing proof log entry for sessionID: ${logEntry.sessionID}`,
+      );
+
+      if (logEntry.data == undefined) {
+        this.log.warn(`${fnTag} - No data provided in log entry.`);
+        return;
+      }
+
+      const key = getSatpLogKey(
+        logEntry.sessionID,
+        logEntry.type,
+        logEntry.operation,
+      );
+      localLog = {
+        sessionID: logEntry.sessionID,
+        type: logEntry.type,
+        key: key,
+        timestamp: Date.now().toString(),
+        operation: logEntry.operation,
+        data: logEntry.data,
+        sequenceNumber: logEntry.sequenceNumber,
+      };
+
+      hash = this.getSATPLocalLogHash(localLog);
+    } else {
+      this.log.info(
+        `${fnTag} - Storing proof log entry for taskID: ${logEntry.taskID}`,
+      );
+
+      if (logEntry.data == undefined) {
+        this.log.warn(`${fnTag} - No data provided in log entry.`);
+        return;
+      }
+
+      const key = getOracleLogKey(
+        logEntry.taskID,
+        logEntry.oracleOperationId,
+        logEntry.timestamp,
+      );
+      localLog = {
+        taskID: logEntry.taskID,
+        type: logEntry.type,
+        key: key,
+        timestamp: Date.now().toString(),
+        operation: logEntry.operation,
+        oracleOperationId: logEntry.oracleOperationId,
+        data: logEntry.data,
+      };
+      hash = this.getOracleLocalLogHash(localLog);
     }
 
-    const key = getSatpLogKey(
-      logEntry.sessionID,
-      logEntry.type,
-      logEntry.operation,
-    );
-    const localLog: LocalLog = {
-      sessionId: logEntry.sessionID,
-      type: logEntry.type,
-      key: key,
-      timestamp: Date.now().toString(),
-      operation: logEntry.operation,
-      data: logEntry.data,
-      sequenceNumber: logEntry.sequenceNumber,
-    };
-
     await this.storeInDatabase(localLog);
-
-    const hash = SHA256(localLog.data).toString();
 
     this.log.debug(`${fnTag} - generated hash: ${hash}`);
     await this.storeRemoteLog(localLog.key, hash);
   }
 
-  public async persistLogEntry(logEntry: SATPLogEntry): Promise<void> {
-    const fnTag = `SATPLogger#persistLogEntry()`;
-    this.log.info(
-      `${fnTag} - Persisting log entry for sessionID: ${logEntry.sessionID}`,
-    );
+  public async persistLogEntry(
+    logEntry: SATPLocalLog | OracleLocalLog,
+  ): Promise<void> {
+    const fnTag = `GatewayLogger#persistLogEntry()`;
 
-    const key = getSatpLogKey(
-      logEntry.sessionID,
-      logEntry.type,
-      logEntry.operation,
-    );
-    const localLog: LocalLog = {
-      sessionId: logEntry.sessionID,
-      type: logEntry.type,
-      key: key,
-      timestamp: Date.now().toString(),
-      operation: logEntry.operation,
-      data: logEntry.data,
-      sequenceNumber: logEntry.sequenceNumber,
-    };
+    let localLog: SATPLocalLog | OracleLocalLog;
+    let hash: string;
+
+    if ("sessionID" in logEntry) {
+      this.log.info(
+        `${fnTag} - Persisting log entry for sessionID: ${logEntry.sessionID}`,
+      );
+
+      const key = getSatpLogKey(
+        logEntry.sessionID,
+        logEntry.type,
+        logEntry.operation,
+      );
+      localLog = {
+        sessionID: logEntry.sessionID,
+        type: logEntry.type,
+        key: key,
+        timestamp: Date.now().toString(),
+        operation: logEntry.operation,
+        data: logEntry.data,
+        sequenceNumber: logEntry.sequenceNumber,
+      };
+
+      hash = this.getSATPLocalLogHash(localLog);
+    } else {
+      this.log.info(
+        `${fnTag} - Persisting log entry for taskID: ${logEntry.taskID}`,
+      );
+
+      const key = getOracleLogKey(
+        logEntry.taskID,
+        logEntry.oracleOperationId,
+        logEntry.timestamp,
+      );
+      localLog = {
+        taskID: logEntry.taskID,
+        key: key,
+        type: logEntry.type,
+        timestamp: Date.now().toString(),
+        operation: logEntry.operation,
+        oracleOperationId: logEntry.oracleOperationId,
+        data: logEntry.data,
+      };
+
+      hash = this.getOracleLocalLogHash(localLog);
+    }
 
     await this.storeInDatabase(localLog);
-
-    const hash = this.getHash(localLog);
 
     this.log.debug(`${fnTag} - generated hash: ${hash}`);
     await this.storeRemoteLog(localLog.key, hash);
   }
 
-  private getHash(logEntry: LocalLog): string {
-    const fnTag = `SATPLogger#getHash()`;
+  private getSATPLocalLogHash(logEntry: SATPLocalLog): string {
+    const fnTag = `GatewayLogger#getSATPLocalLogHash()`;
     this.log.debug(
-      `${fnTag} - generating hash for log entry with sessionID: ${logEntry.sessionId}`,
+      `${fnTag} - generating hash for log entry with sessionID: ${logEntry.sessionID}`,
     );
 
     return SHA256(
       safeStableStringify(logEntry, [
-        "sessionID",
-        "type",
         "key",
+        "type",
         "operation",
         "timestamp",
         "data",
+        "sessionID",
         "sequenceNumber",
       ]),
     ).toString();
   }
 
-  private async storeInDatabase(localLog: LocalLog): Promise<void> {
-    const fnTag = `SATPLogger#storeInDatabase()`;
+  private getOracleLocalLogHash(logEntry: OracleLocalLog): string {
+    const fnTag = `GatewayLogger#getOracleLocalLogHash()`;
+    this.log.debug(
+      `${fnTag} - generating hash for log entry with taskID: ${logEntry.taskID}`,
+    );
+
+    return SHA256(
+      safeStableStringify(logEntry, [
+        "key",
+        "type",
+        "operation",
+        "timestamp",
+        "data",
+        "taskID",
+        "oracleOperationId",
+      ]),
+    ).toString();
+  }
+
+  private async storeInDatabase(localLog: Log): Promise<void> {
+    const fnTag = `GatewayLogger#storeInDatabase()`;
     this.log.info(`${fnTag} - Storing log entry with key: ${localLog.key}`);
 
     if (this.defaultRepository && !this.localRepository.getCreated()) {
@@ -148,13 +226,13 @@ export class SATPLogger {
   }
 
   private async storeRemoteLog(key: string, hash: string): Promise<void> {
-    const fnTag = `SATPLogger#storeRemoteLog()`;
+    const fnTag = `GatewayLogger#storeRemoteLog()`;
     if (!!this.remoteRepository) {
       this.log.info(
         `${fnTag} - Storing remote log with key: ${key} and hash: ${hash}`,
       );
 
-      const remoteLog: RemoteLog = {
+      const remoteLog: SATPRemoteLog = {
         key: key,
         hash: hash,
         signature: "",

@@ -67,6 +67,14 @@ export function getSatpLogKey(
   return `${sessionID}-${type}-${operation}`;
 }
 
+export function getOracleLogKey(
+  taskID: string,
+  operationID: string,
+  timestamp: string,
+): string {
+  return `${taskID}-${operationID}-${timestamp}`;
+}
+
 export function getHash(object: unknown) {
   return SHA256(safeStableStringify(object) ?? "").toString();
 }

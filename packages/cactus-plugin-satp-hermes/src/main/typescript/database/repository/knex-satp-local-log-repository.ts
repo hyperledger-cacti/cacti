@@ -1,4 +1,4 @@
-import type { LocalLog } from "../../core/types";
+import type { SATPLocalLog } from "../../core/types";
 import type { ILocalLogRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
 import { knexLocalInstance } from "../knexfile";
@@ -33,25 +33,25 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
     return this.database("logs");
   }
 
-  readById(logKey: string): Promise<LocalLog> {
+  readById(logKey: string): Promise<SATPLocalLog> {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
-  readLastestLog(sessionID: string): Promise<LocalLog> {
+  readLastestLog(sessionID: string): Promise<SATPLocalLog> {
     return this.getLogsTable()
       .orderBy("timestamp", "desc")
       .where({ sessionID: sessionID })
       .first();
   }
 
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]> {
+  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .where("timestamp", ">", timestamp)
       .whereNot("type", "like", "%proof%");
   }
 
   // TODO fix any type
-  create(log: LocalLog): any {
+  create(log: SATPLocalLog): any {
     return this.getLogsTable().insert(log);
   }
 
@@ -60,7 +60,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
     return this.database().where({ sessionID: sessionID }).del();
   }
 
-  readLogsNotProofs(): Promise<LocalLog[]> {
+  readLogsNotProofs(): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .select(
         this.database.raw(
@@ -74,7 +74,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   fetchLogsFromSequence(
     sessionId: string,
     sequenceNumber: number,
-  ): Promise<LocalLog[]> {
+  ): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .where("sessionId", sessionId)
       .andWhere("sequenceNumber", ">", sequenceNumber);

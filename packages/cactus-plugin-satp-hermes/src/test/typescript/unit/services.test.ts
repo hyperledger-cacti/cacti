@@ -73,9 +73,9 @@ import {
   IRemoteLogRepository,
 } from "../../../main/typescript/database/repository/interfaces/repository";
 import { Knex, knex } from "knex";
-import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-local-log-repository";
+import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-satp-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/database/repository/knex-remote-log-repository";
-import { SATPLogger } from "../../../main/typescript/logging";
+import { GatewayLogger } from "../../../main/typescript/logging";
 import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client
@@ -112,7 +112,7 @@ const connectedDLTs = [
 ];
 let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
-let dbLogger: SATPLogger;
+let dbLogger: GatewayLogger;
 let persistLogEntrySpy: jest.SpyInstance;
 let bridgeManager: BridgeManagerClientInterface;
 
@@ -185,7 +185,7 @@ beforeAll(async () => {
 
   localRepository = new LocalLogRepository(knexLocalInstance.default);
   remoteRepository = new RemoteLogRepository(knexRemoteInstance.default);
-  dbLogger = new SATPLogger({
+  dbLogger = new GatewayLogger({
     localRepository,
     remoteRepository,
     signer,
