@@ -30,7 +30,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   }
 
   getLogsTable(): Knex.QueryBuilder {
-    return this.database("logs");
+    return this.database("satp_logs");
   }
 
   readById(logKey: string): Promise<SATPLocalLog> {

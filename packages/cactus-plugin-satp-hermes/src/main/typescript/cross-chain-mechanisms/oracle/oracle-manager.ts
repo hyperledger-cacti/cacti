@@ -42,7 +42,7 @@ import {
   OracleTaskTypeEnum,
 } from "../../public-api";
 import { OracleExecutionLayer } from "./oracle-execution-layer";
-import { updateOracleOperation } from "./oracle-utils";
+import { updateOracleOperation, getOracleLogKey } from "./oracle-utils";
 import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
 import {
@@ -50,7 +50,7 @@ import {
   IRemoteLogRepository,
 } from "../../database/repository/interfaces/repository";
 import { GatewayLogger, IGatewayLoggerConfig } from "../../logging";
-import { IOracleOperationLogEntry } from "./oracle-log-types";
+import { OracleLocalLog } from "../../core/types";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
@@ -60,6 +60,13 @@ export interface IOracleManagerOptions {
   remoteRepository?: IRemoteLogRepository;
   signer: JsObjectSigner;
   pubKey: string;
+}
+
+export enum logOperation {
+  INIT = "init",
+  EXEC = "exec",
+  DONE = "done",
+  FAIL = "fail"
 }
 
 export class OracleManager {
@@ -576,13 +583,14 @@ export class OracleManager {
 
     let response: OracleResponse;
 
-    const logEntryInit: IOracleOperationLogEntry = {
-      oracleTaskId: task.taskID,
-      operationId: operation.id,
+    const logEntryInit: OracleLocalLog = {
+      key: getOracleLogKey(task.taskID, operation.id, Date.now().toString()),
       type: `oracle-${operation.type.toLowerCase()}`,
-      status: "init",
+      operation: logOperation.INIT,
+      timestamp: Date.now().toString(),
       data: safeStableStringify(operation),
-      timestamp: Date.now(),
+      taskID: task.taskID,
+      oracleOperationId: operation.id,
     };
     await this.dbLogger.persistLogEntry(logEntryInit);
 
@@ -591,13 +599,15 @@ export class OracleManager {
 
       const entry = oracle.convertOperationToEntry(operation);
 
-      const logEntryExec: IOracleOperationLogEntry = {
-        oracleTaskId: task.taskID,
-        operationId: operation.id,
+      const logEntryExec: OracleLocalLog = {
+        key: getOracleLogKey(task.taskID, operation.id, Date.now().toString()),
         type: `oracle-${operation.type.toLowerCase()}`,
-        status: "exec",
+        operation: logOperation.EXEC,
+        timestamp: Date.now().toString(),
         data: safeStableStringify(operation),
-        timestamp: Date.now(),
+        taskID: task.taskID,
+        oracleOperationId: operation.id,
+        
       };
       await this.dbLogger.persistLogEntry(logEntryExec);
 
@@ -614,13 +624,14 @@ export class OracleManager {
       );
       task.operations.push(operation);
 
-      const logEntryDone: IOracleOperationLogEntry = {
-        oracleTaskId: task.taskID,
-        operationId: operation.id,
+      const logEntryDone: OracleLocalLog = {
+        key: getOracleLogKey(task.taskID, operation.id, Date.now().toString()),
         type: `oracle-${operation.type.toLowerCase()}`,
-        status: "done",
-        data: safeStableStringify(response),
-        timestamp: Date.now(),
+        operation: logOperation.DONE,
+        timestamp: Date.now().toString(),
+        data: safeStableStringify(operation),
+        taskID: task.taskID,
+        oracleOperationId: operation.id,
       };
       await this.dbLogger.persistLogEntry(logEntryDone);
     } catch (error) {
@@ -638,13 +649,14 @@ export class OracleManager {
       );
       task.operations.push(operation);
 
-      const logEntryFail: IOracleOperationLogEntry = {
-        oracleTaskId: task.taskID,
-        operationId: operation.id,
+      const logEntryFail: OracleLocalLog = {
+        key: getOracleLogKey(task.taskID, operation.id, Date.now().toString()),
         type: `oracle-${operation.type.toLowerCase()}`,
-        status: "fail",
-        data: safeStableStringify(response),
-        timestamp: Date.now(),
+        operation: logOperation.FAIL,
+        timestamp: Date.now().toString(),
+        data: safeStableStringify(operation),
+        taskID: task.taskID,
+        oracleOperationId: operation.id,
       };
       await this.dbLogger.persistLogEntry(logEntryFail);
 
