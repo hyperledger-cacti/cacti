@@ -7,12 +7,7 @@ import createHttpError from "http-errors";
 import { RuntimeError } from "run-time-error-cjs";
 import "multer";
 import temp from "temp";
-import {
-  NodeSSH,
-  Config as SshConfig,
-  SSHExecCommandOptions,
-  SSHExecCommandResponse,
-} from "node-ssh";
+import { Config as SshConfig } from "node-ssh";
 import type {
   Server as SocketIoServer,
   Socket as SocketIoSocket,
@@ -86,8 +81,6 @@ import {
   ConnectionProfile,
   GatewayDiscoveryOptions,
   GatewayEventHandlerOptions,
-  DeployContractGoSourceV1Request,
-  DeployContractGoSourceV1Response,
   DeployContractV1Request,
   DeployContractV1Response,
   FabricContractInvocationType,
@@ -113,11 +106,6 @@ import {
   GetDiscoveryResultsRequestV1,
   GetDiscoveryResultsResponseV1,
 } from "./generated/openapi/typescript-axios/index";
-
-import {
-  DeployContractGoSourceEndpointV1,
-  IDeployContractGoSourceEndpointV1Options,
-} from "./deploy-contract-go-source/deploy-contract-go-source-endpoint-v1";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { IQueryInstalledResponse } from "./peer/i-query-installed-response";
@@ -165,9 +153,10 @@ import {
   FabricLong,
   fabricLongToNumber,
 } from "./common/utils";
-import { findAndReplaceFabricLoggingSpec } from "./common/find-and-replace-fabric-logging-spec";
-import { deployContractGoSourceImplFabricV256 } from "./deploy-contract-go-source/deploy-contract-go-source-impl-fabric-v2-5-6";
+import { findAndReplaceFabricLoggingSpecArray } from "./common/find-and-replace-fabric-logging-spec";
 import { Observable, ReplaySubject } from "rxjs";
+import { CompilerTools } from "./compiler-tools/compiler-tools";
+import tar from "tar-fs";
 
 const { loadFromConfig } = require("fabric-network/lib/impl/ccp/networkconfig");
 assertFabricFunctionIsAvailable(loadFromConfig, "loadFromConfig");
@@ -178,19 +167,6 @@ export interface IRunTxReqWithTxId {
   timestamp: Date;
 }
 
-/**
- * Constant value holding the default $GOPATH in the Fabric CLI container as
- * observed on fabric deployments that are produced by the official examples
- * found in the https://github.com/hyperledger/fabric-samples repository.
- */
-export const K_DEFAULT_CLI_CONTAINER_GO_PATH = "/opt/gopath/";
-
-/**
- * The command that will be used to issue docker commands while controlling
- * the Fabric CLI container and the peers.
- */
-export const K_DEFAULT_DOCKER_BINARY = "docker";
-
 export type SignPayloadCallback = (
   payload: Buffer,
   txData: unknown,
@@ -199,14 +175,7 @@ export type SignPayloadCallback = (
 export interface IPluginLedgerConnectorFabricOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
-  dockerBinary?: string;
-  peerBinary: string;
-  goBinary?: string;
-  cliContainerGoPath?: string;
-  cliContainerEnv: NodeJS.ProcessEnv;
   pluginRegistry: PluginRegistry;
-  sshConfig?: SshConfig;
-  sshConfigB64?: string;
   readonly sshDebugOn?: boolean;
   connectionProfile?: ConnectionProfile;
   connectionProfileB64?: string;
@@ -217,6 +186,11 @@ export interface IPluginLedgerConnectorFabricOptions
   vaultConfig?: IVaultConfig;
   webSocketConfig?: IWebSocketConfig;
   signCallback?: SignPayloadCallback;
+  /**
+   * Docker network name used by the Fabric Connector CLI container to communicate with the ledger.
+   * This is especially relevant when testing with the fabricAIO image.
+   */
+  dockerNetworkName?: string;
 }
 
 export class PluginLedgerConnectorFabric
@@ -233,19 +207,15 @@ export class PluginLedgerConnectorFabric
   public static readonly CLASS_NAME = "PluginLedgerConnectorFabric";
   private readonly instanceId: string;
   private readonly log: Logger;
-  private readonly dockerBinary: string;
-  private readonly peerBinary: string;
-  private readonly goBinary: string;
-  private readonly cliContainerGoPath: string;
-  private readonly sshConfig: SshConfig;
   private readonly connectionProfile: ConnectionProfile;
   public prometheusExporter: PrometheusExporter;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private readonly secureIdentity: SecureIdentityProviders;
   private readonly certStore: CertDatastore;
-  private readonly sshDebugOn: boolean;
   private runningWatchBlocksMonitors = new Set<WatchBlocksV1Endpoint>();
   private txSubject: ReplaySubject<IRunTxReqWithTxId> = new ReplaySubject();
+
+  private dockerNetworkName: string = "bridge";
 
   public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
@@ -260,7 +230,6 @@ export class PluginLedgerConnectorFabric
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
-    Checks.truthy(opts.peerBinary, `${fnTag} options.peerBinary`);
     Checks.truthy(opts.pluginRegistry, `${fnTag} options.pluginRegistry`);
     this.prometheusExporter =
       opts.prometheusExporter ||
@@ -269,18 +238,7 @@ export class PluginLedgerConnectorFabric
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
-    this.dockerBinary = opts.dockerBinary || K_DEFAULT_DOCKER_BINARY;
-    Checks.truthy(this.dockerBinary != null, `${fnTag}:dockerBinary`);
 
-    this.cliContainerGoPath =
-      opts.cliContainerGoPath || K_DEFAULT_CLI_CONTAINER_GO_PATH;
-    Checks.nonBlankString(
-      this.cliContainerGoPath,
-      `${fnTag}:cliContainerGoPath`,
-    );
-
-    this.goBinary = opts.goBinary || "go";
-    this.peerBinary = opts.peerBinary;
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
@@ -311,28 +269,9 @@ export class PluginLedgerConnectorFabric
         "Cannot instantiate Fabric connector without connection profile.",
       );
     }
-
-    this.sshDebugOn = opts.sshDebugOn === true;
-    if (this.opts.sshConfig) {
-      this.sshConfig = this.opts.sshConfig;
-
-      if (this.sshDebugOn) {
-        this.sshConfig = this.enableSshDebugLogs(this.sshConfig);
-      }
-    } else if (this.opts.sshConfigB64) {
-      const sshConfigBuffer = Buffer.from(this.opts.sshConfigB64, "base64");
-      const sshConfigString = sshConfigBuffer.toString("utf-8");
-      this.sshConfig = JSON.parse(sshConfigString);
-
-      if (this.sshDebugOn) {
-        this.sshConfig = this.enableSshDebugLogs(this.sshConfig);
-      }
-    } else {
-      // TODO: Temporarily commenting this code so that we do not have breaking changes, will be fixed by issue #3764
-      // throw new Error("Cannot instantiate Fabric connector without SSH config");
-      this.sshConfig = {};
+    if (opts.dockerNetworkName) {
+      this.dockerNetworkName = opts.dockerNetworkName;
     }
-
     this.signCallback = opts.signCallback;
   }
 
@@ -390,24 +329,6 @@ export class PluginLedgerConnectorFabric
     };
   }
 
-  private async sshExec(
-    cmd: string,
-    label: string,
-    ssh: NodeSSH,
-    sshCmdOptions: SSHExecCommandOptions,
-  ): Promise<SSHExecCommandResponse> {
-    this.log.debug(`${label} CMD: ${cmd}`);
-    const cmdRes = await ssh.execCommand(cmd, sshCmdOptions);
-    this.log.debug(`${label} CMD Response .code: %o`, cmdRes.code);
-    this.log.debug(`${label} CMD Response .signal: %o`, cmdRes.signal);
-    this.log.debug(`${label} CMD Response .stderr: %s`, cmdRes.stderr);
-    this.log.debug(`${label} CMD Response .stdout: %s`, cmdRes.stdout);
-    if (cmdRes.code !== null && cmdRes.code !== 0) {
-      throw new RuntimeError(`Expected ${label} cmdRes.code as null or 0`);
-    }
-    return cmdRes;
-  }
-
   /**
    * @param req The object containing all the necessary metadata and parameters
    * in order to have the contract deployed.
@@ -418,10 +339,16 @@ export class PluginLedgerConnectorFabric
     const fnTag = `${this.className}#deployContract()`;
     const { log } = this;
 
-    const ssh = new NodeSSH();
-    this.log.debug(`${fnTag} Establishing SSH connection to peer...`);
-    await ssh.connect(this.sshConfig);
-    this.log.debug(`${fnTag} Established SSH connection to peer OK.`);
+    const ccCompiler = new CompilerTools({
+      logLevel: this.opts.logLevel,
+      emitContainerLogs: true,
+      dockerNetworkName: this.dockerNetworkName,
+    });
+    this.log.debug(`${fnTag} Starting CC Compiler container...`);
+    await ccCompiler.start();
+    this.log.debug(`${fnTag} CC Compiler container started OK.`);
+
+    this.log.debug(`${fnTag} SSH connection to the peer OK.`);
 
     if (req.collectionsConfigFile) {
       log.debug(`Has private data collection definition`);
@@ -463,50 +390,131 @@ export class PluginLedgerConnectorFabric
         initRequiredCliArg = ` --init-required `;
       }
 
+      if (targetOrganizations.length === 0) {
+        throw new Error(
+          `${fnTag}: No target organizations provided for chaincode deployment.`,
+        );
+      }
+
       temp.track();
+      const certsPath = "hyperledger-cacti-certs";
+      const tmpDirCertsPath = temp.mkdirSync(certsPath);
+      this.log.debug(
+        `${fnTag}: Creating temporary directory for certificates: ${tmpDirCertsPath}`,
+      );
+
+      fs.writeFileSync(path.join(tmpDirCertsPath, "ca.crt"), caFile);
+      const targetPeersCmd: string[] = [];
+      const targetOrganizationsWithPaths: {
+        CORE_PEER_LOCALMSPID: string;
+        CORE_PEER_ADDRESS: string;
+        CORE_PEER_MSPCONFIGPATH: string;
+        CORE_PEER_TLS_ROOTCERT_FILE: string;
+        ORDERER_TLS_ROOTCERT_FILE: string;
+      }[] = [];
+      for (const targetOrg of targetOrganizations) {
+        const {
+          CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG,
+          CORE_PEER_TLS_ROOTCERT,
+          ORDERER_TLS_ROOTCERT,
+        } = targetOrg;
+        fs.mkdirSync(path.join(tmpDirCertsPath, CORE_PEER_LOCALMSPID), {
+          recursive: true,
+        });
+        fs.mkdirSync(
+          path.join(tmpDirCertsPath, CORE_PEER_LOCALMSPID, CORE_PEER_ADDRESS),
+          {
+            recursive: true,
+          },
+        );
+
+        for (const msConfigFile of CORE_PEER_MSPCONFIG) {
+          const { filename, filepath, body } = msConfigFile;
+          const relativePath = filepath || "./";
+          const subDirPath = path.join(
+            tmpDirCertsPath,
+            CORE_PEER_LOCALMSPID,
+            CORE_PEER_ADDRESS,
+            "/msp",
+            relativePath,
+          );
+          fs.mkdirSync(subDirPath, { recursive: true });
+          const localFilePath = path.join(subDirPath, filename);
+          fs.writeFileSync(localFilePath, body, "base64");
+        }
+
+        const corePeerTLSRootCertPath = path.join(
+          tmpDirCertsPath,
+          CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS,
+          `${CORE_PEER_ADDRESS}.crt`,
+        );
+
+        fs.writeFileSync(corePeerTLSRootCertPath, CORE_PEER_TLS_ROOTCERT);
+        fs.writeFileSync(
+          path.join(tmpDirCertsPath, CORE_PEER_LOCALMSPID, "orderer.crt"),
+          ORDERER_TLS_ROOTCERT,
+        );
+        targetPeersCmd.push("--peerAddresses");
+        targetPeersCmd.push(CORE_PEER_ADDRESS);
+        targetPeersCmd.push("--tlsRootCertFiles");
+        targetPeersCmd.push(
+          path.join(
+            "./../",
+            CORE_PEER_LOCALMSPID,
+            CORE_PEER_ADDRESS,
+            `${CORE_PEER_ADDRESS}.crt`,
+          ),
+        );
+        targetOrganizationsWithPaths.push({
+          CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIGPATH: path.join(
+            "./",
+            CORE_PEER_LOCALMSPID,
+            CORE_PEER_ADDRESS,
+            "/msp",
+          ),
+          CORE_PEER_TLS_ROOTCERT_FILE: path.join(
+            "./",
+            CORE_PEER_LOCALMSPID,
+            CORE_PEER_ADDRESS,
+            `${CORE_PEER_ADDRESS}.crt`,
+          ),
+          ORDERER_TLS_ROOTCERT_FILE: path.join(
+            "./",
+            CORE_PEER_LOCALMSPID,
+            "orderer.crt",
+          ),
+        });
+      }
+
+      const certsTarStream = tar.pack(tmpDirCertsPath);
+      await ccCompiler.getContainer().putArchive(certsTarStream, {
+        path: "./",
+      });
+
+      log.debug(`${fnTag}: Copying core.yaml file to CLI container...`);
+      const tmpDirCoreFile = `hyperledger-cacti-core-yaml`;
+      const tmpDirCorePath = temp.mkdirSync(tmpDirCoreFile);
+      const { body } = req.coreYamlFile;
+      fs.writeFileSync(path.join(tmpDirCorePath, "core.yaml"), body, "base64");
+
+      const pack = tar.pack(tmpDirCorePath);
+
+      await ccCompiler.getContainer().putArchive(pack, {
+        path: "./",
+      });
       const tmpDirPrefix = `hyperledger-cacti-${this.className}`;
       const tmpDirPath = temp.mkdirSync(tmpDirPrefix);
 
-      const remoteDirPath = path.join(this.cliContainerGoPath, "src/", ccLabel);
-      log.debug(`Remote dir path on CLI container: ${remoteDirPath}`);
-
       let collectionsConfigFileCliArg = " ";
       if (collectionsConfigFile) {
-        const remoteFilePath = path.join(remoteDirPath, collectionsConfigFile);
-        this.log.debug(`Collections config: ${remoteFilePath}`);
-        collectionsConfigFileCliArg = `--collections-config ${remoteFilePath} `;
+        this.log.debug(`Collections config: ${collectionsConfigFile}`);
+        collectionsConfigFileCliArg = `--collections-config ${collectionsConfigFile} `;
       }
-
-      const sshCmdOptions: SSHExecCommandOptions = {
-        execOptions: {
-          pty: true, // FIXME do we need this? probably not... same for env
-          env: {
-            // just in case go modules would be otherwise disabled
-            GO111MODULE: "on",
-            FABRIC_LOGGING_SPEC: "DEBUG",
-          },
-        },
-        cwd: remoteDirPath,
-      };
-
-      const dockerExecEnv = Object.entries(this.opts.cliContainerEnv)
-        .map(([key, value]) => `--env ${key}=${value}`)
-        .join(" ");
-
-      const { dockerBinary } = this;
-      const dockerBuildCmd =
-        `${dockerBinary} exec ` +
-        dockerExecEnv +
-        ` --env GO111MODULE=on` +
-        ` --workdir=${remoteDirPath}` +
-        ` cli `;
-
-      // Need to make sure that the logging is turned off otherwise it
-      // mangles the JSON syntax and makes the output invalid...
-      const dockerBuildCmdInfoLog = findAndReplaceFabricLoggingSpec(
-        dockerBuildCmd,
-        "ERROR",
-      );
 
       for (const sourceFile of sourceFiles) {
         const { filename, filepath, body } = sourceFile;
@@ -517,47 +525,44 @@ export class PluginLedgerConnectorFabric
         fs.writeFileSync(localFilePath, body, "base64");
       }
 
-      log.debug(`SCP from/to %o => %o`, tmpDirPath, remoteDirPath);
-      await ssh.putDirectory(tmpDirPath, remoteDirPath, { concurrency: 1 });
-      log.debug(`SCP OK %o`, remoteDirPath);
+      const tarStream = tar.pack(tmpDirPath);
+      await ccCompiler.getContainer().putArchive(tarStream, {
+        path: "./chaincode",
+      });
 
       if (ccLang === ChainCodeProgrammingLanguage.Golang) {
-        {
-          const label = "docker copy go code to cli container";
-          const cliRemoteDirPath = path.join(remoteDirPath, "../");
-          const cmd = `${dockerBinary} cp ${remoteDirPath} cli:${cliRemoteDirPath}`;
-          await this.sshExec(cmd, label, ssh, sshCmdOptions);
-        }
-
-        {
-          const label = "go mod vendor";
-          const cmd = `${dockerBuildCmd} go mod vendor`;
-          await this.sshExec(cmd, label, ssh, sshCmdOptions);
-        }
+        this.log.debug(`${fnTag}: Compiling GO Chaincode...`);
+        await ccCompiler.executeCommand({
+          command: ["go", "mod", "vendor"],
+          label: "Compiling GO Chain Code",
+          env: ["GO111MODULE=on"],
+        });
+        this.log.debug(`${fnTag}: GO Chaincode compiled OK.`);
       } else if (ccLang === ChainCodeProgrammingLanguage.Typescript) {
-        {
-          const cmd = `npm install`;
-          const label = "ChainCode: Typescript install dependencies";
-          await this.sshExec(cmd, label, ssh, sshCmdOptions);
-        }
-        {
-          const cmd = `npm run build`;
-          const label = "ChainCode: Typescript build";
-          await this.sshExec(cmd, label, ssh, sshCmdOptions);
-        }
-        {
-          const label = "docker copy compiled TS code to cli container";
-          const cliRemoteDirPath = path.join(remoteDirPath, "../");
-          const cmd = `${dockerBinary} cp ${remoteDirPath} cli:${cliRemoteDirPath}`;
-          await this.sshExec(cmd, label, ssh, sshCmdOptions);
-        }
+        this.log.debug(`${fnTag}: Compiling Typescript Chaincode...`);
+
+        this.log.debug(`${fnTag}:ChainCode: Typescript install dependencies`);
+        await ccCompiler.executeCommand({
+          command: ["npm", "install"],
+          label: "NPM Install Chain Code",
+        });
+
+        this.log.debug(`${fnTag}:ChainCode: Typescript build`);
+        await ccCompiler.executeCommand({
+          command: ["npm", "run", "build"],
+          label: "NPM Build Chain Code",
+        });
+
+        this.log.debug(`${fnTag}: Typescript Chaincode compiled OK.`);
       } else if (ccLang === ChainCodeProgrammingLanguage.Javascript) {
-        {
-          const label = "docker copy JS code to cli container";
-          const cliRemoteDirPath = path.join(remoteDirPath, "../");
-          const cmd = `${dockerBinary} cp ${remoteDirPath} cli:${cliRemoteDirPath}`;
-          await this.sshExec(cmd, label, ssh, sshCmdOptions);
-        }
+        this.log.debug(`${fnTag}: Compiling Javascript Chaincode...`);
+        this.log.debug(
+          `${fnTag}:ChainCode: Javascript does not need compilation`,
+        );
+      }
+      //TODO: Implement JAVA cc support
+      else {
+        throw new Error(`${fnTag}: Unsupported chain code language: ${ccLang}`);
       }
 
       const lifecycle: ChainCodeLifeCycleCommandResponses = {
@@ -572,42 +577,80 @@ export class PluginLedgerConnectorFabric
       // https://github.com/hyperledger/fabric-samples/blob/14dc7e13160ef1b7332bafb01f8ffa865116f9e7/test-network/scripts/deployCC.sh
       {
         const runtimeLang = sourceLangToRuntimeLang(ccLang);
-        const cmd =
-          `${dockerBuildCmd} peer lifecycle chaincode package ${ccName}.tar.gz ` +
-          ` --path ${remoteDirPath} ` +
-          ` --label ${ccLabel} ` +
-          ` --lang ${runtimeLang}`;
 
-        const cmdLabel = `packaging chain code`;
-        const res = await this.sshExec(cmd, cmdLabel, ssh, sshCmdOptions);
+        const execCmd = [
+          "peer",
+          "lifecycle",
+          "chaincode",
+          "package",
+          `${ccName}.tar.gz`,
+          "--path",
+          "./",
+          "--label",
+          ccLabel,
+          "--lang",
+          runtimeLang,
+        ];
+
+        const res = await ccCompiler.executeCommand({
+          command: execCmd,
+          label: "Peer Package ChainCode",
+          env: ["FABRIC_CFG_PATH=./.."], // Ensure the peer command can find the core.yaml
+        });
         lifecycle.packaging = res;
       }
 
       // https://github.com/hyperledger/fabric-samples/blob/release-1.4/fabcar/startFabric.sh
-      for (const org of targetOrganizations) {
-        const dockerExecEnv = Object.entries(org)
-          .map(([key, val]) => `--env ${key}=${val}`)
-          .join(" ");
+      for (const org of targetOrganizationsWithPaths) {
+        const dockerExecEnv = Object.entries(org).map(
+          ([key, val]) => `${key}=${val}`,
+        );
 
-        const dockerBuildCmd =
-          `${dockerBinary} exec ` +
-          dockerExecEnv +
-          ` --env GO111MODULE=on` +
-          ` --workdir=${remoteDirPath}` +
-          ` cli `;
+        const cmd = [
+          "peer",
+          "lifecycle",
+          "chaincode",
+          "install",
+          `${ccName}.tar.gz`,
+          connTimeoutCliArg,
+        ];
 
-        const cmd =
-          `${dockerBuildCmd} peer lifecycle chaincode install ${ccName}.tar.gz ` +
-          ` ${connTimeoutCliArg} `;
         const label = `Install ChainCode in ${org.CORE_PEER_LOCALMSPID}`;
-        const res = await this.sshExec(cmd, label, ssh, sshCmdOptions);
+        const res = await ccCompiler.executeCommand({
+          command: cmd,
+          label,
+          env: [
+            "FABRIC_CFG_PATH=./..",
+            "GO111MODULE=on",
+            ...dockerExecEnv,
+            "CORE_PEER_TLS_ENABLED=true", //TODO check if this is needs to be configurable
+          ], // Ensure the peer command can find the core.yaml
+        });
         lifecycle.installList.push(res);
 
         let packageId: string;
         {
-          const cmd = `${dockerBuildCmdInfoLog} peer lifecycle chaincode queryinstalled --output json`;
+          const cmd = [
+            "peer",
+            "lifecycle",
+            "chaincode",
+            "queryinstalled",
+            "--output",
+            "json",
+          ];
+
           const label = `query installed contracts CMD`;
-          const res = await this.sshExec(cmd, label, ssh, sshCmdOptions);
+          const res = await ccCompiler.executeCommand({
+            command: cmd,
+            label: label,
+            env: [
+              "FABRIC_CFG_PATH=./..",
+              // Need to make sure that the logging is turned off otherwise it
+              // mangles the JSON syntax and makes the output invalid...
+              ...findAndReplaceFabricLoggingSpecArray(dockerExecEnv, "ERROR"),
+              "CORE_PEER_TLS_ENABLED=true",
+            ], // Ensure the peer command can find the core.yaml
+          });
           lifecycle.queryInstalledList.push(res);
 
           Checks.truthy(res.stdout.includes(ccLabel));
@@ -626,60 +669,116 @@ export class PluginLedgerConnectorFabric
           packageIds.push(packageId);
         }
         {
-          const cmd =
-            ` ${dockerBuildCmd} peer lifecycle chaincode approveformyorg ` +
-            `--orderer ${orderer} ` +
-            `--ordererTLSHostnameOverride ${ordererTLSHostnameOverride} ` +
-            `--tls ` +
-            `--cafile ${caFile} ` +
-            `--channelID ${channelId} ` +
-            `--name ${ccName} ` +
-            `--version ${ccVersion} ` +
-            `--package-id ${packageId} ` +
-            `--sequence ${ccSequence} ` +
-            ` ${signaturePolicyCliArg} ` +
-            ` ${collectionsConfigFileCliArg} ` +
-            ` ${initRequiredCliArg} ` +
-            ` ${connTimeoutCliArg} `;
+          const cmd = [
+            "peer",
+            "lifecycle",
+            "chaincode",
+            "approveformyorg",
+            "--orderer",
+            orderer,
+            "--ordererTLSHostnameOverride",
+            ordererTLSHostnameOverride,
+            "--tls",
+            "--cafile",
+            "./ca.crt", // This is the CA cert we copied to the CLI container earlier
+            "--channelID",
+            channelId,
+            "--name",
+            ccName,
+            "--version",
+            ccVersion,
+            "--package-id",
+            packageId,
+            "--sequence",
+            ccSequence.toString(),
+            signaturePolicyCliArg.trim(),
+            ...collectionsConfigFileCliArg.split(" "),
+            initRequiredCliArg.trim(),
+            connTimeoutCliArg.trim(),
+          ];
 
           const cmdLabel = `Install ChainCode in ${org.CORE_PEER_LOCALMSPID}`;
 
-          const res = await this.sshExec(cmd, cmdLabel, ssh, sshCmdOptions);
+          const res = await ccCompiler.executeCommand({
+            command: cmd,
+            label: cmdLabel,
+            env: [
+              "FABRIC_CFG_PATH=./..",
+              ...dockerExecEnv,
+              "CORE_PEER_TLS_ENABLED=true",
+            ], // Ensure the peer command can find the core.yaml
+          });
           lifecycle.approveForMyOrgList.push(res);
         }
       }
 
       let success = true;
-      const commitCmd =
-        `${dockerBuildCmd} peer lifecycle chaincode commit ` +
-        // ` --ctor '${ctorArgsJson}' ` +
-        ` --name ${ccName} ` +
-        ` --version ${ccVersion} ` +
-        ` --channelID ${channelId} ` +
-        ` --orderer ${orderer} ` +
-        ` --ordererTLSHostnameOverride ${ordererTLSHostnameOverride} ` +
-        ` --tls ` +
-        ` --cafile ${caFile} ` +
-        ` --peerAddresses ${targetOrganizations[0].CORE_PEER_ADDRESS} ` +
-        ` --tlsRootCertFiles ${targetOrganizations[0].CORE_PEER_TLS_ROOTCERT_FILE}` +
-        ` --peerAddresses ${targetOrganizations[1].CORE_PEER_ADDRESS} ` +
-        ` --tlsRootCertFiles ${targetOrganizations[1].CORE_PEER_TLS_ROOTCERT_FILE}` +
-        ` --sequence=${ccSequence} ` +
-        ` ${initRequiredCliArg} ` +
-        ` ${connTimeoutCliArg} ` +
-        ` ${collectionsConfigFileCliArg} ` +
-        ` ${signaturePolicyCliArg} `;
+      const dockerExecEnv = Object.entries(targetOrganizationsWithPaths[0]).map(
+        //TODO: check a better way to do this, to use the targetOrg things
+        ([key, val]) => `${key}=${val}`,
+      );
+
+      const commitCmd = [
+        "peer",
+        "lifecycle",
+        "chaincode",
+        "commit",
+        "--name",
+        ccName,
+        "--version",
+        ccVersion,
+        "--channelID",
+        channelId,
+        "--orderer",
+        orderer,
+        "--ordererTLSHostnameOverride",
+        ordererTLSHostnameOverride,
+        "--tls",
+        "--cafile",
+        "./ca.crt", // This is the CA cert we copied to the CLI container earlier
+        ...targetPeersCmd,
+        `--sequence=${ccSequence}`,
+        initRequiredCliArg.trim(),
+        connTimeoutCliArg.trim(),
+        ...collectionsConfigFileCliArg.split(" "),
+        signaturePolicyCliArg.trim(),
+      ];
 
       {
-        const res = await this.sshExec(commitCmd, "Commit", ssh, sshCmdOptions);
+        const res = await ccCompiler.executeCommand({
+          command: commitCmd,
+          env: [
+            "FABRIC_CFG_PATH=./..",
+            ...dockerExecEnv,
+            "CORE_PEER_TLS_ENABLED=true",
+          ], // Ensure the peer command can find the core.yaml
+          label: "Commit",
+        });
         lifecycle.commit = res;
         success = success && isSshExecOk(res);
       }
 
       {
-        const cmd = `${dockerBuildCmdInfoLog} peer lifecycle chaincode querycommitted --channelID=${channelId} --output json`;
+        const cmd = [
+          "peer",
+          "lifecycle",
+          "chaincode",
+          "querycommitted",
+          "--channelID",
+          channelId,
+          "--output",
+          "json",
+        ];
         const label = `query committed contracts`;
-        const res = await this.sshExec(cmd, label, ssh, sshCmdOptions);
+        const res = await ccCompiler.executeCommand({
+          command: cmd,
+          env: [
+            "FABRIC_CFG_PATH=./..",
+            ...findAndReplaceFabricLoggingSpecArray(dockerExecEnv, "ERROR"),
+            "CORE_PEER_TLS_ENABLED=true",
+          ], // Ensure the peer command can find the core.yaml
+          label: label,
+        });
         lifecycle.queryCommitted = res;
 
         Checks.truthy(res.stdout.includes(ccName), "stdout has contract name");
@@ -702,29 +801,11 @@ export class PluginLedgerConnectorFabric
       return res;
     } finally {
       try {
-        ssh.dispose();
       } finally {
+        await ccCompiler.stop();
         temp.cleanup();
       }
     }
-  }
-
-  /**
-   * @param req The object containing all the necessary metadata and parameters
-   * in order to have the contract deployed.
-   */
-  public async deployContractGoSourceV1(
-    req: DeployContractGoSourceV1Request,
-  ): Promise<DeployContractGoSourceV1Response> {
-    const { log } = this;
-    const ctx = {
-      log,
-      opts: this.opts,
-      dockerBinary: this.dockerBinary,
-      sshConfig: this.sshConfig,
-      className: this.className,
-    };
-    return deployContractGoSourceImplFabricV256(ctx, req);
   }
 
   /**
@@ -853,15 +934,6 @@ export class PluginLedgerConnectorFabric
     log.info(`Installing web services for plugin ${this.getPackageName()}...`);
 
     const endpoints: IWebServiceEndpoint[] = [];
-
-    {
-      const opts: IDeployContractGoSourceEndpointV1Options = {
-        connector: this,
-        logLevel: this.opts.logLevel,
-      };
-      const endpoint = new DeployContractGoSourceEndpointV1(opts);
-      endpoints.push(endpoint);
-    }
 
     {
       const opts: IDeployContractEndpointV1Options = {

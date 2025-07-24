@@ -154,8 +154,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       organization: "org2",
     });
 
-    const sshConfig = await this.fabric.getSshConfig();
-
     const keychainEntryKey1 = "userA";
     const keychainEntryValue1 = JSON.stringify(userIdentity1);
 
@@ -181,12 +179,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     this.log.info(`Creating Fabric Connector...`);
     return new PluginLedgerConnectorFabric({
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: this.org1Env,
-      sshConfig,
       connectionProfile: connectionProfileOrg1,
       logLevel: this.options.logLevel || "INFO",
       discoveryOptions: {
@@ -197,6 +190,7 @@ export class CbdcBridgingAppDummyInfrastructure {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: this.fabric.getNetworkName(),
     });
   }
 
@@ -375,30 +369,59 @@ export class CbdcBridgingAppDummyInfrastructure {
       });
     }
 
+    const peer0Org1Certs = await this.fabric.getPeerOrgCertsAndConfig(
+      "org1",
+      "peer0",
+    );
+    const peer0Org2Certs = await this.fabric.getPeerOrgCertsAndConfig(
+      "org2",
+      "peer0",
+    );
+
+    const filePath = path.join(__dirname, "../../yaml/resources/core.yaml");
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
     let retries = 0;
     while (retries <= 5) {
       await fabricApiClient
-        .deployContractV1(
-          {
-            channelId,
-            ccVersion: "1.0.0",
-            sourceFiles,
-            ccName: contractName,
-            targetOrganizations: [this.org1Env, this.org2Env],
-            caFile:
-              FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
-            ccLabel: "asset-reference-contract",
-            ccLang: ChainCodeProgrammingLanguage.Typescript,
-            ccSequence: 1,
-            orderer: "orderer.example.com:7050",
-            ordererTLSHostnameOverride: "orderer.example.com",
-            connTimeout: 120,
-          },
-          {
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-          },
-        )
+        .deployContractV1({
+          channelId,
+          ccVersion: "1.0.0",
+          sourceFiles,
+          ccName: contractName,
+          targetOrganizations: [
+            {
+              CORE_PEER_LOCALMSPID:
+                FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+              CORE_PEER_ADDRESS:
+                FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+              CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+              CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+              ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+            },
+            {
+              CORE_PEER_LOCALMSPID:
+                FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+              CORE_PEER_ADDRESS:
+                FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+              CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+              CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+              ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+            },
+          ],
+          caFile: peer0Org1Certs.ordererTlsRootCert,
+          ccLabel: "basic-asset-transfer-2",
+          ccLang: ChainCodeProgrammingLanguage.Typescript,
+          ccSequence: 1,
+          orderer: "orderer.example.com:7050",
+          ordererTLSHostnameOverride: "orderer.example.com",
+          connTimeout: 60,
+          coreYamlFile: coreFile,
+        })
         .then(async (res: { data: { packageIds: any; lifecycle: any } }) => {
           retries = 6;
 
@@ -503,6 +526,22 @@ export class CbdcBridgingAppDummyInfrastructure {
       });
     }
 
+    const peer0Org1Certs = await this.fabric.getPeerOrgCertsAndConfig(
+      "org1",
+      "peer0",
+    );
+    const peer0Org2Certs = await this.fabric.getPeerOrgCertsAndConfig(
+      "org2",
+      "peer0",
+    );
+
+    const filePath = path.join(__dirname, "../../yaml/resources/core.yaml");
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
     let retries = 0;
     while (retries <= 5) {
       await fabricApiClient
@@ -512,7 +551,26 @@ export class CbdcBridgingAppDummyInfrastructure {
             ccVersion: "1.0.0",
             sourceFiles,
             ccName: contractName,
-            targetOrganizations: [this.org1Env, this.org2Env],
+            targetOrganizations: [
+              {
+                CORE_PEER_LOCALMSPID:
+                  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+                CORE_PEER_ADDRESS:
+                  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+                CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+                CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+                ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+              },
+              {
+                CORE_PEER_LOCALMSPID:
+                  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+                CORE_PEER_ADDRESS:
+                  FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+                CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+                CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+                ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+              },
+            ],
             caFile:
               FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
             ccLabel: "cbdc",
@@ -521,6 +579,7 @@ export class CbdcBridgingAppDummyInfrastructure {
             orderer: "orderer.example.com:7050",
             ordererTLSHostnameOverride: "orderer.example.com",
             connTimeout: 120,
+            coreYamlFile: coreFile,
           },
           {
             maxContentLength: Infinity,

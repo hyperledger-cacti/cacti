@@ -116,9 +116,6 @@ describe("PluginLedgerConnectorFabric", () => {
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
       pluginRegistry,
-      sshConfig: {},
-      cliContainerEnv: {},
-      peerBinary: "not-required",
       logLevel,
       connectionProfile,
       discoveryOptions,

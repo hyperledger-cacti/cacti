@@ -44,7 +44,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**deployContractGoSourceV1**](docs/DefaultApi.md#deploycontractgosourcev1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source | Deploys a chaincode contract in the form of a go sources.
 *DefaultApi* | [**deployContractV1**](docs/DefaultApi.md#deploycontractv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract | Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
 *DefaultApi* | [**getBlockV1**](docs/DefaultApi.md#getblockv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
 *DefaultApi* | [**getChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
@@ -68,11 +67,9 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.ConnectionProfile](docs/ConnectionProfile.md)
  - [org.openapitools.client.models.ConnectionProfileClient](docs/ConnectionProfileClient.md)
  - [org.openapitools.client.models.DefaultEventHandlerStrategy](docs/DefaultEventHandlerStrategy.md)
- - [org.openapitools.client.models.DeployContractGoSourceV1501Response](docs/DeployContractGoSourceV1501Response.md)
- - [org.openapitools.client.models.DeployContractGoSourceV1Request](docs/DeployContractGoSourceV1Request.md)
- - [org.openapitools.client.models.DeployContractGoSourceV1RequestConstructorArgs](docs/DeployContractGoSourceV1RequestConstructorArgs.md)
- - [org.openapitools.client.models.DeployContractGoSourceV1Response](docs/DeployContractGoSourceV1Response.md)
+ - [org.openapitools.client.models.DeployContractV1501Response](docs/DeployContractV1501Response.md)
  - [org.openapitools.client.models.DeployContractV1Request](docs/DeployContractV1Request.md)
+ - [org.openapitools.client.models.DeployContractV1RequestConstructorArgs](docs/DeployContractV1RequestConstructorArgs.md)
  - [org.openapitools.client.models.DeployContractV1Response](docs/DeployContractV1Response.md)
  - [org.openapitools.client.models.DeploymentTargetOrgFabric2x](docs/DeploymentTargetOrgFabric2x.md)
  - [org.openapitools.client.models.DeploymentTargetOrganization](docs/DeploymentTargetOrganization.md)

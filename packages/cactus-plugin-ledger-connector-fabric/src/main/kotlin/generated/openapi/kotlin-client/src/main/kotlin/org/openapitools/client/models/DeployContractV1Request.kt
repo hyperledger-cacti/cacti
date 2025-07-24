@@ -16,7 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.ChainCodeProgrammingLanguage
-import org.openapitools.client.models.DeployContractGoSourceV1RequestConstructorArgs
+import org.openapitools.client.models.DeployContractV1RequestConstructorArgs
 import org.openapitools.client.models.DeploymentTargetOrganization
 import org.openapitools.client.models.FileBase64
 
@@ -27,7 +27,7 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param ccLang 
- * @param caFile File-system path pointing at the CA file.
+ * @param caFile CA certificate file that will be used to verify the TLS connection to the orderer.
  * @param orderer Ordering service endpoint specified as <hostname or IP address>:<port>
  * @param ordererTLSHostnameOverride The hostname override to use when validating the TLS connection to the orderer
  * @param channelId The name of the Fabric channel where the contract will get instantiated.
@@ -37,6 +37,7 @@ import com.squareup.moshi.JsonClass
  * @param ccName 
  * @param ccLabel Human readable label to uniquely identify the contract. Recommended to include in this at least the contract name and the exact version in order to make it easily distinguishable from other deployments of the same contract.
  * @param sourceFiles The your-smart-contract.go file where the functionality of your contract is implemented.
+ * @param coreYamlFile 
  * @param connTimeout Timeout for client to connect (default 3s)
  * @param signaturePolicy Passed in to the peer via the --signature-policy argument on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies
  * @param collectionsConfigFile Name of the collections config file as present in the sourceFiles array of the request.
@@ -49,7 +50,7 @@ data class DeployContractV1Request (
     @Json(name = "ccLang")
     val ccLang: ChainCodeProgrammingLanguage,
 
-    /* File-system path pointing at the CA file. */
+    /* CA certificate file that will be used to verify the TLS connection to the orderer. */
     @Json(name = "caFile")
     val caFile: kotlin.String,
 
@@ -85,6 +86,9 @@ data class DeployContractV1Request (
     @Json(name = "sourceFiles")
     val sourceFiles: kotlin.collections.List<FileBase64>,
 
+    @Json(name = "coreYamlFile")
+    val coreYamlFile: FileBase64,
+
     /* Timeout for client to connect (default 3s) */
     @Json(name = "connTimeout")
     val connTimeout: kotlin.Int? = null,
@@ -98,7 +102,7 @@ data class DeployContractV1Request (
     val collectionsConfigFile: kotlin.String? = null,
 
     @Json(name = "constructorArgs")
-    val constructorArgs: DeployContractGoSourceV1RequestConstructorArgs? = null
+    val constructorArgs: DeployContractV1RequestConstructorArgs? = null
 
 )
 

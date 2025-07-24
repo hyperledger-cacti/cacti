@@ -22,121 +22,6 @@ import (
 // DefaultApiService DefaultApi service
 type DefaultApiService service
 
-type ApiDeployContractGoSourceV1Request struct {
-	ctx context.Context
-	ApiService *DefaultApiService
-	deployContractGoSourceV1Request *DeployContractGoSourceV1Request
-}
-
-func (r ApiDeployContractGoSourceV1Request) DeployContractGoSourceV1Request(deployContractGoSourceV1Request DeployContractGoSourceV1Request) ApiDeployContractGoSourceV1Request {
-	r.deployContractGoSourceV1Request = &deployContractGoSourceV1Request
-	return r
-}
-
-func (r ApiDeployContractGoSourceV1Request) Execute() (*DeployContractGoSourceV1Response, *http.Response, error) {
-	return r.ApiService.DeployContractGoSourceV1Execute(r)
-}
-
-/*
-DeployContractGoSourceV1 Deploys a chaincode contract in the form of a go sources.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiDeployContractGoSourceV1Request
-*/
-func (a *DefaultApiService) DeployContractGoSourceV1(ctx context.Context) ApiDeployContractGoSourceV1Request {
-	return ApiDeployContractGoSourceV1Request{
-		ApiService: a,
-		ctx: ctx,
-	}
-}
-
-// Execute executes the request
-//  @return DeployContractGoSourceV1Response
-func (a *DefaultApiService) DeployContractGoSourceV1Execute(r ApiDeployContractGoSourceV1Request) (*DeployContractGoSourceV1Response, *http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *DeployContractGoSourceV1Response
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.DeployContractGoSourceV1")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "text/plain"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.deployContractGoSourceV1Request
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 501 {
-			var v DeployContractGoSourceV1501Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
 type ApiDeployContractV1Request struct {
 	ctx context.Context
 	ApiService *DefaultApiService
@@ -228,7 +113,7 @@ func (a *DefaultApiService) DeployContractV1Execute(r ApiDeployContractV1Request
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 501 {
-			var v DeployContractGoSourceV1501Response
+			var v DeployContractV1501Response
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

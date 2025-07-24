@@ -19,9 +19,7 @@ import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
-import org.openapitools.client.models.DeployContractGoSourceV1501Response
-import org.openapitools.client.models.DeployContractGoSourceV1Request
-import org.openapitools.client.models.DeployContractGoSourceV1Response
+import org.openapitools.client.models.DeployContractV1501Response
 import org.openapitools.client.models.DeployContractV1Request
 import org.openapitools.client.models.DeployContractV1Response
 import org.openapitools.client.models.ErrorExceptionResponseV1
@@ -58,78 +56,6 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         val defaultBasePath: String by lazy {
             System.getProperties().getProperty(ApiClient.baseUrlKey, "http://localhost")
         }
-    }
-
-    /**
-     * Deploys a chaincode contract in the form of a go sources.
-     * 
-     * @param deployContractGoSourceV1Request  (optional)
-     * @return DeployContractGoSourceV1Response
-     * @throws IllegalStateException If the request is not correctly configured
-     * @throws IOException Rethrows the OkHttp execute method exception
-     * @throws UnsupportedOperationException If the API returns an informational or redirection response
-     * @throws ClientException If the API returns a client error response
-     * @throws ServerException If the API returns a server error response
-     */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deployContractGoSourceV1(deployContractGoSourceV1Request: DeployContractGoSourceV1Request? = null) : DeployContractGoSourceV1Response {
-        val localVarResponse = deployContractGoSourceV1WithHttpInfo(deployContractGoSourceV1Request = deployContractGoSourceV1Request)
-
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as DeployContractGoSourceV1Response
-            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
-            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
-            ResponseType.ClientError -> {
-                val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
-            }
-            ResponseType.ServerError -> {
-                val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
-            }
-        }
-    }
-
-    /**
-     * Deploys a chaincode contract in the form of a go sources.
-     * 
-     * @param deployContractGoSourceV1Request  (optional)
-     * @return ApiResponse<DeployContractGoSourceV1Response?>
-     * @throws IllegalStateException If the request is not correctly configured
-     * @throws IOException Rethrows the OkHttp execute method exception
-     */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(IllegalStateException::class, IOException::class)
-    fun deployContractGoSourceV1WithHttpInfo(deployContractGoSourceV1Request: DeployContractGoSourceV1Request?) : ApiResponse<DeployContractGoSourceV1Response?> {
-        val localVariableConfig = deployContractGoSourceV1RequestConfig(deployContractGoSourceV1Request = deployContractGoSourceV1Request)
-
-        return request<DeployContractGoSourceV1Request, DeployContractGoSourceV1Response>(
-            localVariableConfig
-        )
-    }
-
-    /**
-     * To obtain the request config of the operation deployContractGoSourceV1
-     *
-     * @param deployContractGoSourceV1Request  (optional)
-     * @return RequestConfig
-     */
-    fun deployContractGoSourceV1RequestConfig(deployContractGoSourceV1Request: DeployContractGoSourceV1Request?) : RequestConfig<DeployContractGoSourceV1Request> {
-        val localVariableBody = deployContractGoSourceV1Request
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Content-Type"] = "application/json"
-        localVariableHeaders["Accept"] = "application/json"
-
-        return RequestConfig(
-            method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-            body = localVariableBody
-        )
     }
 
     /**

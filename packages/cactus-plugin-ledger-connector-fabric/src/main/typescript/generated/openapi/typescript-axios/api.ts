@@ -298,132 +298,15 @@ export type DefaultEventHandlerStrategy = typeof DefaultEventHandlerStrategy[key
 /**
  * 
  * @export
- * @interface DeployContractGoSourceV1501Response
+ * @interface DeployContractV1501Response
  */
-export interface DeployContractGoSourceV1501Response {
+export interface DeployContractV1501Response {
     /**
      * 
      * @type {string}
-     * @memberof DeployContractGoSourceV1501Response
+     * @memberof DeployContractV1501Response
      */
     'message'?: string;
-}
-/**
- * 
- * @export
- * @interface DeployContractGoSourceV1Request
- */
-export interface DeployContractGoSourceV1Request {
-    /**
-     * 
-     * @type {string}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'policyDslSource': string;
-    /**
-     * The TLS root cert files that will be passed to the chaincode instantiation command.
-     * @type {string}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'tlsRootCertFiles': string;
-    /**
-     * The name of the Fabric channel where the contract will get instantiated.
-     * @type {string}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'channelId': string;
-    /**
-     * 
-     * @type {Array<DeploymentTargetOrganization>}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'targetOrganizations': Array<DeploymentTargetOrganization>;
-    /**
-     * An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the official Fabric samples repository and therefore it is assumed to be correct usage.
-     * @type {Array<string>}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'targetPeerAddresses': Array<string>;
-    /**
-     * 
-     * @type {DeployContractGoSourceV1RequestConstructorArgs}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'constructorArgs'?: DeployContractGoSourceV1RequestConstructorArgs;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'chainCodeVersion': string;
-    /**
-     * 
-     * @type {FileBase64}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'goSource': FileBase64;
-    /**
-     * 
-     * @type {FileBase64}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'goMod'?: FileBase64;
-    /**
-     * The go module name that will be used for the go compilation process.
-     * @type {string}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'moduleName'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'pinnedDeps'?: Array<string>;
-    /**
-     * Indicates to the go chaincode compiler of Cactus if it should do an actual go compilation with the contact source or if it should just execute the go mod tidy command.
-     * @type {boolean}
-     * @memberof DeployContractGoSourceV1Request
-     */
-    'modTidyOnly'?: boolean | null;
-}
-/**
- * 
- * @export
- * @interface DeployContractGoSourceV1RequestConstructorArgs
- */
-export interface DeployContractGoSourceV1RequestConstructorArgs {
-    /**
-     * 
-     * @type {Array<any>}
-     * @memberof DeployContractGoSourceV1RequestConstructorArgs
-     */
-    'Args'?: Array<any>;
-}
-/**
- * 
- * @export
- * @interface DeployContractGoSourceV1Response
- */
-export interface DeployContractGoSourceV1Response {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DeployContractGoSourceV1Response
-     */
-    'success': boolean;
-    /**
-     * 
-     * @type {Array<SSHExecCommandResponse>}
-     * @memberof DeployContractGoSourceV1Response
-     */
-    'installationCommandResponses': Array<SSHExecCommandResponse>;
-    /**
-     * 
-     * @type {SSHExecCommandResponse}
-     * @memberof DeployContractGoSourceV1Response
-     */
-    'instantiationCommandResponse': SSHExecCommandResponse;
 }
 /**
  * 
@@ -438,7 +321,7 @@ export interface DeployContractV1Request {
      */
     'ccLang': ChainCodeProgrammingLanguage;
     /**
-     * File-system path pointing at the CA file.
+     * CA certificate file that will be used to verify the TLS connection to the orderer.
      * @type {string}
      * @memberof DeployContractV1Request
      */
@@ -487,10 +370,10 @@ export interface DeployContractV1Request {
     'targetOrganizations': Array<DeploymentTargetOrganization>;
     /**
      * 
-     * @type {DeployContractGoSourceV1RequestConstructorArgs}
+     * @type {DeployContractV1RequestConstructorArgs}
      * @memberof DeployContractV1Request
      */
-    'constructorArgs'?: DeployContractGoSourceV1RequestConstructorArgs;
+    'constructorArgs'?: DeployContractV1RequestConstructorArgs;
     /**
      * 
      * @type {number}
@@ -521,9 +404,28 @@ export interface DeployContractV1Request {
      * @memberof DeployContractV1Request
      */
     'sourceFiles': Array<FileBase64>;
+    /**
+     * 
+     * @type {FileBase64}
+     * @memberof DeployContractV1Request
+     */
+    'coreYamlFile': FileBase64;
 }
 
 
+/**
+ * 
+ * @export
+ * @interface DeployContractV1RequestConstructorArgs
+ */
+export interface DeployContractV1RequestConstructorArgs {
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof DeployContractV1RequestConstructorArgs
+     */
+    'Args'?: Array<any>;
+}
 /**
  * 
  * @export
@@ -612,22 +514,22 @@ export interface DeploymentTargetOrganization {
     'CORE_PEER_ADDRESS': string;
     /**
      * Mapped to environment variables of the Fabric CLI container.
-     * @type {string}
+     * @type {Array<FileBase64>}
      * @memberof DeploymentTargetOrganization
      */
-    'CORE_PEER_MSPCONFIGPATH': string;
+    'CORE_PEER_MSPCONFIG': Array<FileBase64>;
     /**
      * Mapped to environment variables of the Fabric CLI container.
      * @type {string}
      * @memberof DeploymentTargetOrganization
      */
-    'CORE_PEER_TLS_ROOTCERT_FILE': string;
+    'CORE_PEER_TLS_ROOTCERT': string;
     /**
      * Mapped to environment variables of the Fabric CLI container.
      * @type {string}
      * @memberof DeploymentTargetOrganization
      */
-    'ORDERER_TLS_ROOTCERT_FILE': string;
+    'ORDERER_TLS_ROOTCERT': string;
 }
 /**
  * 
@@ -1992,40 +1894,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary Deploys a chaincode contract in the form of a go sources.
-         * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deployContractGoSourceV1: async (deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(deployContractGoSourceV1Request, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
          * @param {DeployContractV1Request} [deployContractV1Request] 
          * @param {*} [options] Override http request option.
@@ -2310,17 +2178,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Deploys a chaincode contract in the form of a go sources.
-         * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractGoSourceV1Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractGoSourceV1(deployContractGoSourceV1Request, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
          * @param {DeployContractV1Request} [deployContractV1Request] 
          * @param {*} [options] Override http request option.
@@ -2418,16 +2275,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary Deploys a chaincode contract in the form of a go sources.
-         * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): AxiosPromise<DeployContractGoSourceV1Response> {
-            return localVarFp.deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
          * @param {DeployContractV1Request} [deployContractV1Request] 
          * @param {*} [options] Override http request option.
@@ -2515,18 +2362,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
-    /**
-     * 
-     * @summary Deploys a chaincode contract in the form of a go sources.
-     * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.

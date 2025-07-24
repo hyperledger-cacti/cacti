@@ -22,6 +22,9 @@ export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_TLS_KEY_FILE_ORG_1 =
 export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_ADDRESS_ORG_1 =
   "peer0.org1.example.com:7051";
 
+export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_NAME_ORG_1 =
+  "peer0.org1.example.com";
+
 export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_MSPCONFIGPATH_ORG_1 =
   "/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp";
 
@@ -79,6 +82,9 @@ export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_TLS_KEY_FILE_ORG_2 =
 
 export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_ADDRESS_ORG_2 =
   "peer0.org2.example.com:9051";
+
+export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_NAME_ORG_2 =
+  "peer0.org2.example.com";
 
 export const FABRIC_25_LTS_FABRIC_SAMPLES__CORE_PEER_MSPCONFIGPATH_ORG_2 =
   "/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp";

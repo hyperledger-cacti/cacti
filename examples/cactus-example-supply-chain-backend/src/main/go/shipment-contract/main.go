@@ -1,4 +1,4 @@
-export const SHIPMENT_CONTRACT_GO_SOURCE = `package main
+package main
 
 import (
 	"encoding/json"
@@ -98,16 +98,4 @@ func (t *ShipmentChaincode) GetListShipment(ctx contractapi.TransactionContextIn
 	}
 
 	return shipments, nil
-}`;
-
-const exportSourceToFs = async () => {
-  const path = await import("path");
-  const fs = await import("fs");
-  const fileName = "./shipment.go";
-  const scriptPath = path.join(__dirname, fileName);
-  fs.writeFileSync(scriptPath, SHIPMENT_CONTRACT_GO_SOURCE);
-};
-
-if (require.main === module) {
-  exportSourceToFs();
 }

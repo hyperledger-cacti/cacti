@@ -45,6 +45,8 @@ import {
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { GatewayOptions } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { CreateListenerRequest } from "../../../../main/typescript/common/utils";
+import { PeerCerts } from "@hyperledger/cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1";
+
 // For development on local fabric network
 // 1. leaveLedgerRunning = true, useRunningLedger = false to run ledger and leave it running after test finishes.
 // 2. leaveLedgerRunning = true, useRunningLedger = true to use that ledger in future runs.
@@ -65,6 +67,9 @@ describe("PluginLedgerConnectorFabric", () => {
   let server: http.Server;
   let gatewayOptions: GatewayOptions;
   let plugin: PluginLedgerConnectorFabric;
+
+  let peer0Org1Certs: PeerCerts;
+  let peer0Org2Certs: PeerCerts;
 
   beforeAll(async () => {
     const pruning = pruneDockerAllIfGithubAction({ logLevel });
@@ -95,7 +100,6 @@ describe("PluginLedgerConnectorFabric", () => {
       organization: "org1",
       wallet: adminWallet,
     });
-    const sshConfig = await ledger.getSshConfig();
 
     const keychainInstanceId = uuidv4();
     keychainId = uuidv4();
@@ -129,14 +133,12 @@ describe("PluginLedgerConnectorFabric", () => {
       asLocalhost: true,
     };
 
+    peer0Org1Certs = await ledger.getPeerOrgCertsAndConfig("org1", "peer0");
+    peer0Org2Certs = await ledger.getPeerOrgCertsAndConfig("org2", "peer0");
+
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-      sshConfig,
       logLevel,
       connectionProfile,
       discoveryOptions,
@@ -144,6 +146,7 @@ describe("PluginLedgerConnectorFabric", () => {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: ledger.getNetworkName(),
     };
 
     plugin = new PluginLedgerConnectorFabric(pluginOptions);
@@ -250,23 +253,49 @@ describe("PluginLedgerConnectorFabric", () => {
       });
     }
 
+    const filePath = path.join(
+      __dirname,
+      "../../../resources/fixtures/addOrgX/core.yaml",
+    );
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
     const res = await apiClient.deployContractV1({
       channelId,
       ccVersion: "1.0.0",
       sourceFiles,
       ccName: deployedContractName,
       targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+        },
       ],
-      caFile:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+      caFile: peer0Org1Certs.ordererTlsRootCert,
       ccLabel: "basic-asset-transfer-2",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
+      coreYamlFile: coreFile,
     });
 
     expect(res.status).toBe(200);
