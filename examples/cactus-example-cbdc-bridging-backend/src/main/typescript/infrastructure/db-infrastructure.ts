@@ -5,7 +5,6 @@ import { EventEmitter } from "events";
 import { createMigrationSource } from "./knex/knex-migration-source";
 
 export interface PGDatabaseConfig {
-  port: number;
   toUseInDocker?: boolean;
   network?: string;
   postgresUser?: string;
@@ -17,7 +16,6 @@ export async function createPGDatabase(
   config: PGDatabaseConfig,
 ): Promise<{ config: Knex.Config; container: Container }> {
   const {
-    port,
     network,
     postgresUser = "postgres",
     postgresPassword = "password",
@@ -47,11 +45,8 @@ export async function createPGDatabase(
   }
 
   const hostConfig: Docker.HostConfig = {
-    PublishAllPorts: true,
+    PublishAllPorts: false,
     Binds: [],
-    PortBindings: {
-      "5432/tcp": [{ HostPort: `${port}` }],
-    },
     NetworkMode: network,
   };
 
@@ -130,35 +125,16 @@ export async function createPGDatabase(
     .getContainer((await container).id)
     .inspect();
 
-  if (network) {
-    return {
-      config: {
-        client: "pg",
-        connection: {
-          host: containerData.NetworkSettings.Networks[network || "bridge"]
-            .IPAddress,
-          user: postgresUser,
-          password: postgresPassword,
-          database: postgresDB,
-          port: 5432,
-          ssl: false,
-        },
-        migrations: {
-          migrationSource: await createMigrationSource(),
-        },
-      } as Knex.Config,
-      container: await container,
-    };
-  }
   return {
     config: {
       client: "pg",
       connection: {
-        host: "localhost",
+        host: containerData.NetworkSettings.Networks[network || "bridge"]
+          .IPAddress,
         user: postgresUser,
         password: postgresPassword,
         database: postgresDB,
-        port: port,
+        port: 5432,
         ssl: false,
       },
       migrations: {
