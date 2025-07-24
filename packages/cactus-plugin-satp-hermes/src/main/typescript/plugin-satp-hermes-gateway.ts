@@ -42,7 +42,7 @@ import type {
   IRemoteLogRepository,
 } from "./database/repository/interfaces/repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "./database/repository/knex-remote-log-repository";
-import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-local-log-repository";
+import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-satp-local-log-repository";
 import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
 import { type JsonObject } from "swagger-ui-express";
 import type {

@@ -10,7 +10,7 @@ import { CrashStatus } from "../../../../main/typescript/core/types";
 import type { ICrashRecoveryManagerOptions } from "../../../../main/typescript/services/gateway/crash-manager";
 import { type Knex, knex } from "knex";
 import type {
-  LocalLog,
+  SATPLocalLog,
   GatewayIdentity,
   Address,
 } from "../../../../main/typescript/core/types";
@@ -42,7 +42,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-local-log-repository";
+import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-satp-local-log-repository";
 import { KnexRemoteLogRepository } from "../../../../main/typescript/database/repository/knex-remote-log-repository";
 import type {
   ILocalLogRepository,
@@ -196,8 +196,8 @@ describe.skip("CrashManager Tests", () => {
 
     // load sample log in database
     const key = getSatpLogKey(sessionId, "type", "operation");
-    const mockLogEntry: LocalLog = {
-      sessionId: sessionId,
+    const mockLogEntry: SATPLocalLog = {
+      sessionID: sessionId,
       type: "type",
       key: key,
       operation: "operation",
@@ -242,8 +242,8 @@ describe.skip("CrashManager Tests", () => {
 
     const pastTime = new Date(Date.now() - 10000).toISOString();
 
-    const mockLogEntry: LocalLog = {
-      sessionId: sessionId,
+    const mockLogEntry: SATPLocalLog = {
+      sessionID: sessionId,
       type: "type_o",
       key: key,
       operation: "done",
@@ -270,8 +270,8 @@ describe.skip("CrashManager Tests", () => {
       ? mockSession.getClientSessionData()
       : mockSession.getServerSessionData();
 
-    const mockLogEntry: LocalLog = {
-      sessionId: testData.id,
+    const mockLogEntry: SATPLocalLog = {
+      sessionID: testData.id,
       type: "type",
       key: getSatpLogKey(testData.id, "type", "done"),
       operation: "done",
@@ -352,8 +352,8 @@ describe.skip("CrashManager Tests", () => {
 
     const key = getSatpLogKey(sessionId, "type", "init");
 
-    const mockLogEntry: LocalLog = {
-      sessionId: sessionId,
+    const mockLogEntry: SATPLocalLog = {
+      sessionID: sessionId,
       type: "type",
       key: key,
       operation: "init", // operation!=done
@@ -391,8 +391,8 @@ describe.skip("CrashManager Tests", () => {
 
     const key = getSatpLogKey(sessionId, "type3", "init");
 
-    const mockLogEntry: LocalLog = {
-      sessionId: sessionId,
+    const mockLogEntry: SATPLocalLog = {
+      sessionID: sessionId,
       type: "type3",
       key: key,
       operation: "init", // operation!=done

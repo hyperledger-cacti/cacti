@@ -8,7 +8,7 @@ import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/ser
 import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import type { SATPLogger } from "../../logging";
+import type { GatewayLogger } from "../../logging";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
@@ -26,7 +26,7 @@ export type ISATPServiceOptions = {
   signer: JsObjectSigner;
   serviceType: SATPServiceType;
   bridgeManager?: BridgeManagerClientInterface;
-  dbLogger: SATPLogger;
+  dbLogger: GatewayLogger;
   claimFormat?: ClaimFormat;
 };
 
@@ -60,7 +60,7 @@ export abstract class SATPService {
   readonly serviceType: SATPServiceType;
   private readonly signer: JsObjectSigner;
   readonly serviceName: string;
-  public dbLogger: SATPLogger;
+  public dbLogger: GatewayLogger;
 
   constructor(ops: ISATPServiceOptions) {
     this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);

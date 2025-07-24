@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 import { Err, Ok, Result } from "ts-results";
 
-import * as create_logs_table from "./migrations/20220331132128_create_logs_table";
+import * as create_logs_table from "./migrations/20220331132128_create_satp_logs_table";
 import * as create_remote_logs_table from "./migrations/20240130234303_create_remote_logs_table";
 
 export interface IKnexMigration {

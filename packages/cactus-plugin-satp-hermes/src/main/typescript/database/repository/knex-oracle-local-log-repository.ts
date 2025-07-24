@@ -1,18 +1,16 @@
-import type { IRemoteLogRepository } from "./interfaces/repository";
-import type { SATPRemoteLog } from "../../core/types";
+import type { OracleLocalLog } from "../../core/types";
+import type { ILocalLogRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
-import { knexRemoteInstance } from "../../database/knexfile-remote";
+import { knexLocalInstance } from "../knexfile";
 import { createMigrationSource } from "../knex-migration-source";
 
-export class KnexRemoteLogRepository implements IRemoteLogRepository {
+export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;
+  private created = false;
 
-  // for now we will ignore the config because it needs to be static
-  // so that both gateways can have access to the same database
-  // simulating a remote log storage
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
-    const configFile = knexRemoteInstance[envName];
+    const configFile = knexLocalInstance[envName];
 
     config = config || configFile;
 
@@ -27,16 +25,16 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
     this.database = knex(config);
   }
 
-  getLogsTable(): Knex.QueryBuilder {
-    return this.database("remote-logs");
+  public getCreated(): boolean {
+    return this.created;
   }
 
-  readById(logKey: string): Promise<SATPRemoteLog> {
-    return this.getLogsTable().where({ key: logKey }).first();
+  getLogsTable(): Knex.QueryBuilder {
+    return this.database("oracle_logs");
   }
 
   // TODO fix any type
-  create(log: SATPRemoteLog): any {
+  create(log: OracleLocalLog): any {
     return this.getLogsTable().insert(log);
   }
 
