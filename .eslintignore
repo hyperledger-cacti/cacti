@@ -11,6 +11,8 @@ weaver/common/protos-js/**/*_pb.js
 **/src/main/typescript/generated/proto/**
 **/src/main/typescript/generated/wasm-pack/**
 
+packages/cactus-plugin-satp-hermes/src/main/typescript/generated/*
+
 examples/cactus-common-example-server/src/main/typescript/business-logic-plugin/BusinessLogicBase.ts
 examples/cactus-common-example-server/src/main/typescript/business-logic-plugin/LedgerOperation.ts
 examples/cactus-common-example-server/src/main/typescript/business-logic-plugin/app.ts

@@ -42,10 +42,11 @@ httpModule
     if (exitCode === 0) {
       console.log("%s Healthcheck OK: ", url, statusCode, statusMessage);
     } else {
-      console.error("%s Healthcheck FAIL: ", url, statusCode, statusMessage);
+      console.error("%s Healthcheck FAIL_1: ", url, statusCode, statusMessage);
     }
     process.exit(exitCode);
   })
   .on("error", (ex) => {
-    console.error("%s Healthcheck FAIL: ", url, ex);
+    console.error("%s Healthcheck FAIL_2: ", url, ex);
+    process.exit(1);
   });

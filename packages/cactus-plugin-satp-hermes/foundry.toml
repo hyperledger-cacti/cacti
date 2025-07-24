@@ -1,0 +1,18 @@
+# Foundry Configuration File
+# Default definitions: https://github.com/gakonst/foundry/blob/b7917fa8491aedda4dd6db53fbb206ea233cd531/config/src/lib.rs#L782
+
+[profile.default]
+solc_version = "0.8.20"
+evm-version = "paris"
+# The source directory
+src = "./src/test/solidity/contracts"
+extra_src = ["src/main/solidity/"]
+# The test directory
+test = "src/test/solidity/tests"
+auto_detect_solc = false
+optimizer_runs = 1_000
+libs = ["node_modules", "lib"]
+remappings = [
+    "ds-test/=./node_modules/ds-test/src/",
+    "forge-std/=./node_modules/forge-std/src/",
+]
