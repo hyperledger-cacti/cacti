@@ -198,7 +198,6 @@ export class CbdcBridgingAppDummyInfrastructure {
   public async createDBs() {
     ({ config: this.db_local_config1, container: this.db_local1 } =
       await createPGDatabase({
-        port: 5432,
         network: CbdcBridgingAppDummyInfrastructure.networkName,
         postgresUser: "user123123",
         postgresPassword: "password",
@@ -206,7 +205,6 @@ export class CbdcBridgingAppDummyInfrastructure {
 
     ({ config: this.db_remote_config1, container: this.db_remote1 } =
       await createPGDatabase({
-        port: 5450,
         network: CbdcBridgingAppDummyInfrastructure.networkName,
         postgresUser: "user123123",
         postgresPassword: "password",
@@ -214,7 +212,6 @@ export class CbdcBridgingAppDummyInfrastructure {
 
     ({ config: this.db_local_config2, container: this.db_local2 } =
       await createPGDatabase({
-        port: 5433,
         network: CbdcBridgingAppDummyInfrastructure.networkName,
         postgresUser: "user123123",
         postgresPassword: "password",
@@ -222,7 +219,6 @@ export class CbdcBridgingAppDummyInfrastructure {
 
     ({ config: this.db_remote_config2, container: this.db_remote2 } =
       await createPGDatabase({
-        port: 5451,
         network: CbdcBridgingAppDummyInfrastructure.networkName,
         postgresUser: "user123123",
         postgresPassword: "password",
