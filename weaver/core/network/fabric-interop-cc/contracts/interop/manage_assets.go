@@ -144,7 +144,7 @@ func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionCo
 	return nil
 }
 
-// ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
+// Record claim of an asset on the ledger (this uses the contractId)
 func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
