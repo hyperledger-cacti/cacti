@@ -32,11 +32,15 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
+});
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
 });
 
 let oracleApi: OracleApi;
@@ -80,6 +84,7 @@ beforeAll(async () => {
       oracleConfig: [],
     },
     pluginRegistry: new PluginRegistry({ plugins: [] }),
+    monitorService: monitorService,
   };
   gateway = await factory.create(options);
   expect(gateway).toBeInstanceOf(SATPGateway);

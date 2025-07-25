@@ -1,7 +1,7 @@
 import {
+  LogLevelDesc,
   Logger,
   LoggerProvider,
-  LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import {
   AssetTokenTypeEnum,
@@ -37,7 +37,6 @@ import { Asset, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { IFabricLeafOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-fabric.json";
-import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
 // Test environment for Fabric ledger operations
@@ -346,14 +345,10 @@ export class FabricTestEnvironment {
     } as INetworkOptions;
   }
   // this creates the same config as the bridge manager does
-  public createFabricLeafConfig(
-    ontologyManager: OntologyManager,
-    logLevel?: LogLevelDesc,
-  ): IFabricLeafOptions {
+  public createFabricLeafConfig(logLevel?: LogLevelDesc): IFabricLeafOptions {
     return {
       networkIdentification: this.network,
       signingCredential: this.bridgeFabricSigningCredential,
-      ontologyManager: ontologyManager,
       channelName: this.fabricChannelName,
       targetOrganizations: [
         FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,

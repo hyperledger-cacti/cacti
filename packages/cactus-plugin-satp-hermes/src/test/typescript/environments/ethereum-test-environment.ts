@@ -1,7 +1,7 @@
 import {
+  LogLevelDesc,
   Logger,
   LoggerProvider,
-  LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
@@ -30,7 +30,6 @@ import {
   IEthereumLeafNeworkOptions,
   IEthereumLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
-import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 
@@ -211,13 +210,11 @@ export class EthereumTestEnvironment {
 
   // this creates the same config as the bridge manager does
   public createEthereumLeafConfig(
-    ontologyManager: OntologyManager,
     logLevel?: LogLevelDesc,
   ): IEthereumLeafOptions {
     return {
       networkIdentification: this.ethereumConfig.networkIdentification,
       signingCredential: this.ethereumConfig.signingCredential,
-      ontologyManager: ontologyManager,
       wrapperContractName: this.ethereumConfig.wrapperContractName,
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
       gasConfig: this.ethereumConfig.gasConfig,

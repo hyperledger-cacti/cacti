@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from "@opentelemetry/api";
 import { Asset, FungibleAsset } from "./asset";
 import {
   getInteractionType,
@@ -38,32 +39,46 @@ export interface FabricInteractionSignature {
 export function fabricInteractionList(
   jsonString: string,
 ): FabricInteractionSignature[] {
-  const ontologyJSON = JSON.parse(jsonString);
+  const fnTag = "fabric-asset#fabricInteractionList";
+  const tracer = trace.getTracer("satp-hermes-tracer");
+  const span = tracer.startSpan(fnTag);
+  const ctx = trace.setSpan(context.active(), span);
+  return context.with(ctx, () => {
+    try {
+      const ontologyJSON = JSON.parse(jsonString);
 
-  const interactions: FabricInteractionSignature[] = [];
+      const interactions: FabricInteractionSignature[] = [];
 
-  for (const interaction in ontologyJSON["ontology"]) {
-    const functions: string[] = [];
-    const variables: string | number[][] = [];
+      for (const interaction in ontologyJSON["ontology"]) {
+        const functions: string[] = [];
+        const variables: string | number[][] = [];
 
-    for (const signature of ontologyJSON["ontology"][
-      interaction
-    ] as InteractionData[]) {
-      functions.push(signature.functionSignature);
-      const vars: string | number[] = [];
+        for (const signature of ontologyJSON["ontology"][
+          interaction
+        ] as InteractionData[]) {
+          functions.push(signature.functionSignature);
+          const vars: string | number[] = [];
 
-      for (const variable of signature.variables) {
-        vars.push(getVarTypes(variable));
+          for (const variable of signature.variables) {
+            vars.push(getVarTypes(variable));
+          }
+          variables.push(vars);
+        }
+
+        const interactionRequest: FabricInteractionSignature = {
+          type: getInteractionType(interaction),
+          functionsSignature: functions,
+          variables: variables,
+        };
+        interactions.push(interactionRequest);
       }
-      variables.push(vars);
+      return interactions;
+    } catch (error) {
+      span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+      span.recordException(error);
+      throw error;
+    } finally {
+      span.end();
     }
-
-    const interactionRequest: FabricInteractionSignature = {
-      type: getInteractionType(interaction),
-      functionsSignature: functions,
-      variables: variables,
-    };
-    interactions.push(interactionRequest);
-  }
-  return interactions;
+  });
 }
