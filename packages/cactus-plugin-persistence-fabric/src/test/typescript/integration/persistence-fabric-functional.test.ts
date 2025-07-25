@@ -417,4 +417,53 @@ describe("Fabric persistence plugin tests", () => {
     },
     testTimeout,
   );
+
+  test(
+    "Discovery network pushes current ledger structure to the database",
+    async () => {
+      await persistence.discoverNetwork();
+
+      const allInsertCalls = (
+        dbClientInstance.insertDiscoveryResults as jest.Mock
+      ).mock.calls;
+      expect(allInsertCalls.length).toBe(1);
+      const discoveryInsertArg = allInsertCalls[0][0];
+
+      // Assert required fields provided
+      expect(Object.keys(discoveryInsertArg.msps).length).toBeGreaterThan(0);
+      expect(Object.keys(discoveryInsertArg.orderers).length).toBeGreaterThan(
+        0,
+      );
+      expect(Object.keys(discoveryInsertArg.peersByMSP).length).toBeGreaterThan(
+        0,
+      );
+      expect(discoveryInsertArg.timestamp).toBeTruthy();
+    },
+    testTimeout,
+  );
+
+  test(
+    "Network discovery is called when starting block monitoring",
+    async () => {
+      try {
+        await new Promise<any>((resolve, reject) => {
+          (
+            dbClientInstance.getMissingBlocksInRange as jest.Mock
+          ).mockReturnValue([]);
+
+          (
+            dbClientInstance.insertDiscoveryResults as jest.Mock
+          ).mockImplementation((discoveryResults) => resolve(discoveryResults));
+
+          persistence.startMonitor((err) => {
+            reject(err);
+          });
+          log.debug("Persistence plugin block monitoring started.");
+        });
+      } finally {
+        persistence.stopMonitor();
+      }
+    },
+    testTimeout,
+  );
 });

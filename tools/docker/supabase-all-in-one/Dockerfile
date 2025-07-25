@@ -56,6 +56,8 @@ COPY ./src/healthcheck.sh /bin/healthcheck
 RUN chmod +x /bin/healthcheck
 HEALTHCHECK --interval=5s --timeout=5s --start-period=45s --retries=90 CMD /bin/healthcheck
 
+# Studio
+EXPOSE 3000
 # Supabase
 EXPOSE 8000
 # Postgres
