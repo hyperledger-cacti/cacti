@@ -95,9 +95,6 @@ export async function setupApiServer(
   const connector = new PluginLedgerConnectorFabric({
     instanceId: uuidV4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-    sshConfig: {},
-    cliContainerEnv: {},
-    peerBinary: "/fabric-samples/bin/peer",
     logLevel: sutLogLevel,
     connectionProfile,
     discoveryOptions,

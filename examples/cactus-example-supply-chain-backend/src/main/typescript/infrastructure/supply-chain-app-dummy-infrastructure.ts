@@ -32,12 +32,13 @@ import {
 import {
   PluginLedgerConnectorFabric,
   DefaultEventHandlerStrategy,
+  ChainCodeProgrammingLanguage,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import fs from "fs-extra";
+import path from "path";
 
 import BambooHarvestRepositoryJSON from "../../json/generated/BambooHarvestRepository.json";
 import BookshelfRepositoryJSON from "../../json/generated/BookshelfRepository.json";
-import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
-import { SHIPMENT_GOLANG_CONTRACT_PINNED_DEPENDENCIES } from "./shipment-golang-contract-pinned-dependencies";
 
 export interface ISupplyChainAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -295,7 +296,6 @@ export class SupplyChainAppDummyInfrastructure {
 
   public async deployFabricContract(): Promise<IFabricContractDeployment> {
     const connectionProfile = await this.fabric.getConnectionProfileOrg1();
-    const sshConfig = await this.fabric.getSshConfig();
     const discoveryOptions: DiscoveryOptions = {
       enabled: true,
       asLocalhost: true,
@@ -305,41 +305,88 @@ export class SupplyChainAppDummyInfrastructure {
     pluginRegistry.add(this.keychain);
     const connector = new PluginLedgerConnectorFabric({
       instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
-      dockerBinary: "/usr/local/bin/docker",
       pluginRegistry,
-      peerBinary: "peer",
-      sshConfig: sshConfig,
       logLevel: this.options.logLevel || "INFO",
       connectionProfile: connectionProfile,
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
       discoveryOptions: discoveryOptions,
       eventHandlerOptions: {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
       },
+      dockerNetworkName: this.fabric.getNetworkName(),
     });
 
-    const res = await connector.deployContractGoSourceV1({
-      tlsRootCertFiles:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_TLS_ROOTCERT_FILE,
-      targetPeerAddresses: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
-      ],
-      policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",
+    const filePath = path.join(__dirname, "../../yaml/resources/core.yaml");
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
+    const peer0Org1Certs = await this.fabric.getPeerOrgCertsAndConfig(
+      "org1",
+      "peer0",
+    );
+    const peer0Org2Certs = await this.fabric.getPeerOrgCertsAndConfig(
+      "org2",
+      "peer0",
+    );
+
+    const contractDir = path.join(__dirname, "../../go/shipment-contract");
+    const smartContractGoPath = path.join(contractDir, "main.go");
+    const smartContractGoBuffer = await fs.readFile(smartContractGoPath);
+    const smartContractGo = {
+      body: smartContractGoBuffer.toString("base64"),
+      filename: "main.go",
+    };
+    const goModPath = path.join(contractDir, "./go.mod");
+    const goModBuf = await fs.readFile(goModPath);
+    const goMod = {
+      body: goModBuf.toString("base64"),
+      filename: "go.mod",
+    };
+
+    const goSumPath = path.join(contractDir, "./go.sum");
+    const goSumBuf = await fs.readFile(goSumPath);
+    const goSum = {
+      body: goSumBuf.toString("base64"),
+      filename: "go.sum",
+    };
+
+    const res = await connector.deployContract({
       channelId: "mychannel",
-      chainCodeVersion: "1.0.0",
-      constructorArgs: { Args: [] },
-      goSource: {
-        body: Buffer.from(SHIPMENT_CONTRACT_GO_SOURCE).toString("base64"),
-        filename: "shipment.go",
-      },
-      moduleName: "shipment",
+      ccVersion: "1.0.0",
+      ccName: "shipment",
+      sourceFiles: [smartContractGo, goMod, goSum],
       targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+        },
       ],
-      pinnedDeps: SHIPMENT_GOLANG_CONTRACT_PINNED_DEPENDENCIES,
+      caFile: peer0Org1Certs.ordererTlsRootCert,
+      ccLabel: "shipment",
+      ccLang: ChainCodeProgrammingLanguage.Golang,
+      ccSequence: 1,
+      orderer: "orderer.example.com:7050",
+      ordererTLSHostnameOverride: "orderer.example.com",
+      connTimeout: 60,
+      coreYamlFile: coreFile,
     });
+
     this.log.debug("Supply chain app Fabric contract deployment result:", res);
 
     const shipmentRepository = {

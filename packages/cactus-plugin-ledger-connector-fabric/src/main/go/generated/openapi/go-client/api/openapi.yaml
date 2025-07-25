@@ -92,33 +92,6 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source:
-    post:
-      operationId: deployContractGoSourceV1
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeployContractGoSourceV1Request'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeployContractGoSourceV1Response'
-          description: OK
-        "501":
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/deployContractGoSourceV1_501_response'
-          description: Not implemented
-      summary: Deploys a chaincode contract in the form of a go sources.
-      x-hyperledger-cacti:
-        http:
-          verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source
   /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract:
     post:
       operationId: deployContractV1
@@ -139,7 +112,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/deployContractGoSourceV1_501_response'
+                $ref: '#/components/schemas/deployContractV1_501_response'
           description: Not implemented
       summary: "Deploys a chaincode contract from a set of source files. Note: This\
         \ endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers\
@@ -967,10 +940,17 @@ components:
     DeploymentTargetOrganization:
       example:
         CORE_PEER_LOCALMSPID: Org1MSP
-        CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-        ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+        CORE_PEER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+          KEY----- '
+        ORDERER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY----- '
+        CORE_PEER_MSPCONFIG:
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
         CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-        CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
       properties:
         CORE_PEER_LOCALMSPID:
           description: Mapped to environment variables of the Fabric CLI container.
@@ -986,33 +966,34 @@ components:
           minLength: 1
           nullable: false
           type: string
-        CORE_PEER_MSPCONFIGPATH:
+        CORE_PEER_MSPCONFIG:
           description: Mapped to environment variables of the Fabric CLI container.
-          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          maxLength: 1024
+          items:
+            $ref: '#/components/schemas/FileBase64'
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: array
+        CORE_PEER_TLS_ROOTCERT:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY----- '
+          maxLength: 65535
           minLength: 1
           nullable: false
           type: string
-        CORE_PEER_TLS_ROOTCERT_FILE:
+        ORDERER_TLS_ROOTCERT:
           description: Mapped to environment variables of the Fabric CLI container.
-          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-          maxLength: 1024
-          minLength: 1
-          nullable: false
-          type: string
-        ORDERER_TLS_ROOTCERT_FILE:
-          description: Mapped to environment variables of the Fabric CLI container.
-          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-          maxLength: 1024
+          example: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY----- '
+          maxLength: 65535
           minLength: 1
           nullable: false
           type: string
       required:
       - CORE_PEER_ADDRESS
       - CORE_PEER_LOCALMSPID
-      - CORE_PEER_MSPCONFIGPATH
-      - CORE_PEER_TLS_ROOTCERT_FILE
-      - ORDERER_TLS_ROOTCERT_FILE
+      - CORE_PEER_MSPCONFIG
+      - CORE_PEER_TLS_ROOTCERT
+      - ORDERER_TLS_ROOTCERT
       type: object
     DeploymentTargetOrgFabric2x:
       properties:
@@ -1064,177 +1045,6 @@ components:
       - CORE_PEER_TLS_ROOTCERT_FILE
       - ORDERER_TLS_ROOTCERT_FILE
       type: object
-    DeployContractGoSourceV1Request:
-      additionalProperties: false
-      example:
-        chainCodeVersion: 1.0.0
-        pinnedDeps:
-        - github.com/hyperledger/fabric@v1.4.8
-        - github.com/hyperledger/fabric@v1.4.8
-        - github.com/hyperledger/fabric@v1.4.8
-        - github.com/hyperledger/fabric@v1.4.8
-        - github.com/hyperledger/fabric@v1.4.8
-        goSource:
-          filename: my-cool-file-full-of-wonders-and-fun-stuff.go
-          filepath: ./my/sub-folder/structure/
-          body: body
-        targetPeerAddresses:
-        - peer0.org1.example.com:7051
-        goMod:
-          filename: my-cool-file-full-of-wonders-and-fun-stuff.go
-          filepath: ./my/sub-folder/structure/
-          body: body
-        constructorArgs: "{} - An empty object literal can be sufficient if your contract\
-          \ does not have parameters."
-        targetOrganizations:
-        - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-        - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-        - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-        - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-        - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-        tlsRootCertFiles: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-        moduleName: hello-world-contract
-        policyDslSource: "AND('Org1MSP.member','Org2MSP.member')"
-        channelId: mychannel
-        modTidyOnly: true
-      properties:
-        policyDslSource:
-          example: "AND('Org1MSP.member','Org2MSP.member')"
-          maxLength: 65535
-          minLength: 1
-          nullable: false
-          type: string
-        tlsRootCertFiles:
-          description: The TLS root cert files that will be passed to the chaincode
-            instantiation command.
-          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-          maxLength: 65535
-          minLength: 1
-          nullable: false
-          type: string
-        channelId:
-          description: The name of the Fabric channel where the contract will get
-            instantiated.
-          example: mychannel
-          maxLength: 2048
-          minLength: 1
-          nullable: false
-          type: string
-        targetOrganizations:
-          items:
-            $ref: '#/components/schemas/DeploymentTargetOrganization'
-          maxItems: 1024
-          minItems: 1
-          nullable: false
-          type: array
-        targetPeerAddresses:
-          description: An array of peer addresses where the contract will be instantiated.
-            Note that at present only the first item from this array will be used
-            which is the behavior taken from the official Fabric samples repository
-            and therefore it is assumed to be correct usage.
-          example:
-          - peer0.org1.example.com:7051
-          items:
-            maxLength: 4096
-            minLength: 1
-            type: string
-          maxItems: 2048
-          minItems: 1
-          type: array
-        constructorArgs:
-          $ref: '#/components/schemas/DeployContractGoSourceV1Request_constructorArgs'
-        chainCodeVersion:
-          example: 1.0.0
-          maxLength: 128
-          minLength: 1
-          nullable: false
-          type: string
-        goSource:
-          $ref: '#/components/schemas/FileBase64'
-        goMod:
-          $ref: '#/components/schemas/FileBase64'
-        moduleName:
-          description: The go module name that will be used for the go compilation
-            process.
-          example: hello-world-contract
-          maxLength: 255
-          minLength: 1
-          nullable: false
-          type: string
-        pinnedDeps:
-          items:
-            example: github.com/hyperledger/fabric@v1.4.8
-            nullable: false
-            type: string
-          maxItems: 1024
-          minItems: 0
-          type: array
-        modTidyOnly:
-          description: Indicates to the go chaincode compiler of Cactus if it should
-            do an actual go compilation with the contact source or if it should just
-            execute the go mod tidy command.
-          nullable: true
-          type: boolean
-      required:
-      - chainCodeVersion
-      - channelId
-      - goSource
-      - policyDslSource
-      - targetOrganizations
-      - targetPeerAddresses
-      - tlsRootCertFiles
-      type: object
-    DeployContractGoSourceV1Response:
-      example:
-        success: true
-        instantiationCommandResponse:
-          code: 0
-          stdout: stdout
-          stderr: stderr
-          signal: signal
-        installationCommandResponses:
-        - code: 0
-          stdout: stdout
-          stderr: stderr
-          signal: signal
-        - code: 0
-          stdout: stdout
-          stderr: stderr
-          signal: signal
-      properties:
-        success:
-          type: boolean
-        installationCommandResponses:
-          items:
-            $ref: '#/components/schemas/SSHExecCommandResponse'
-          type: array
-        instantiationCommandResponse:
-          $ref: '#/components/schemas/SSHExecCommandResponse'
-      required:
-      - installationCommandResponses
-      - instantiationCommandResponse
-      - success
-      type: object
     DeployContractV1Request:
       additionalProperties: false
       example:
@@ -1244,9 +1054,13 @@ components:
           \ does not have parameters."
         ccLang: null
         ccSequence: 1
+        coreYamlFile:
+          filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
         ccName: my-hello-world-contract
         connTimeout: 0
-        caFile: "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+        caFile: '-----BEGIN CERTIFICATE----- .... -----END CERTIFICATE-----'
         signaturePolicy: "AND('Org1MSP.member','Org2MSP.member')"
         sourceFiles:
         - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
@@ -1268,39 +1082,80 @@ components:
         orderer: orderer.example.com:7050
         targetOrganizations:
         - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          ORDERER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          CORE_PEER_MSPCONFIG:
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
           CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
         - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          ORDERER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          CORE_PEER_MSPCONFIG:
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
           CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
         - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          ORDERER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          CORE_PEER_MSPCONFIG:
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
           CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
         - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          ORDERER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          CORE_PEER_MSPCONFIG:
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
           CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
         - CORE_PEER_LOCALMSPID: Org1MSP
-          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          ORDERER_TLS_ROOTCERT: '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE
+            KEY----- '
+          CORE_PEER_MSPCONFIG:
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
+          - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+            filepath: ./my/sub-folder/structure/
+            body: body
           CORE_PEER_ADDRESS: peer0.org1.example.com:7051
-          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
         collectionsConfigFile: collectionsConfigFile
         channelId: mychannel
       properties:
         ccLang:
           $ref: '#/components/schemas/ChainCodeProgrammingLanguage'
         caFile:
-          description: File-system path pointing at the CA file.
-          example: "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
-          maxLength: 4096
+          description: CA certificate file that will be used to verify the TLS connection
+            to the orderer.
+          example: '-----BEGIN CERTIFICATE----- .... -----END CERTIFICATE-----'
+          maxLength: 65535
           minLength: 1
           type: string
         orderer:
@@ -1351,7 +1206,7 @@ components:
           nullable: false
           type: array
         constructorArgs:
-          $ref: '#/components/schemas/DeployContractGoSourceV1Request_constructorArgs'
+          $ref: '#/components/schemas/DeployContractV1Request_constructorArgs'
         ccSequence:
           example: 1
           nullable: false
@@ -1387,6 +1242,8 @@ components:
           minItems: 1
           nullable: false
           type: array
+        coreYamlFile:
+          $ref: '#/components/schemas/FileBase64'
       required:
       - caFile
       - ccLabel
@@ -1395,6 +1252,7 @@ components:
       - ccSequence
       - ccVersion
       - channelId
+      - coreYamlFile
       - orderer
       - ordererTLSHostnameOverride
       - sourceFiles
@@ -2151,7 +2009,7 @@ components:
       - $ref: '#/components/schemas/WatchBlocksFilteredResponseV1'
       - $ref: '#/components/schemas/WatchBlocksPrivateResponseV1'
       - $ref: '#/components/schemas/WatchBlocksCactusErrorResponseV1'
-    deployContractGoSourceV1_501_response:
+    deployContractV1_501_response:
       properties:
         message:
           maxLength: 2048
@@ -2191,7 +2049,7 @@ components:
           nullable: false
           type: string
       type: object
-    DeployContractGoSourceV1Request_constructorArgs:
+    DeployContractV1Request_constructorArgs:
       example: "{} - An empty object literal can be sufficient if your contract does\
         \ not have parameters."
       nullable: false

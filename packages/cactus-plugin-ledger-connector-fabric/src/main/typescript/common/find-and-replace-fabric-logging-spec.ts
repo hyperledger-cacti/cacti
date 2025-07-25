@@ -23,3 +23,25 @@ export function findAndReplaceFabricLoggingSpec(
       " FABRIC_LOGGING_SPEC= ".concat(newLogLevel),
     );
 }
+
+export function findAndReplaceFabricLoggingSpecArray(
+  input: string[],
+  newLogLevel: string,
+): string[] {
+  Checks.truthy(
+    input && Array.isArray(input),
+    `findAndReplaceFabricLoggingSpecArray() arg1 must be array`,
+  );
+  Checks.nonBlankString(
+    newLogLevel,
+    `findAndReplaceFabricLoggingSpecArray() arg2`,
+  );
+  return input.map((line) =>
+    line
+      .replace(PATTERN_FABRIC_CORE_LOGGING_LEVEL, " ")
+      .replace(
+        PATTERN_FABRIC_LOGGING_SPEC,
+        "FABRIC_LOGGING_SPEC=".concat(newLogLevel),
+      ),
+  );
+}

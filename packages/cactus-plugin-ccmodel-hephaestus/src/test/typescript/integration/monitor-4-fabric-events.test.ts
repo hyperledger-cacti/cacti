@@ -93,7 +93,6 @@ beforeAll(async () => {
     const enrollAdminOut = await fabricLedger.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await fabricLedger.enrollUser(adminWallet);
-    const sshConfig = await fabricLedger.getSshConfig();
     log.info("admin enrolled");
 
     const keychainInstanceId = uuidv4();
@@ -120,12 +119,7 @@ beforeAll(async () => {
 
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-      sshConfig,
       logLevel,
       connectionProfile,
       discoveryOptions,
@@ -133,6 +127,7 @@ beforeAll(async () => {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: fabricLedger.getNetworkName(),
     };
     fabricConnector = new PluginLedgerConnectorFabric(pluginOptions);
 
@@ -227,23 +222,55 @@ beforeAll(async () => {
       });
     }
 
+    const peer0Org1Certs = await fabricLedger.getPeerOrgCertsAndConfig(
+      "org1",
+      "peer0",
+    );
+    const peer0Org2Certs = await fabricLedger.getPeerOrgCertsAndConfig(
+      "org2",
+      "peer0",
+    );
+
+    const filePath = path.join(__dirname, "../../yaml/resources/core.yaml");
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
     const res = await apiClient.deployContractV1({
       channelId,
       ccVersion: "1.0.0",
       sourceFiles,
       ccName: contractName,
       targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+        },
       ],
-      caFile:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+      caFile: peer0Org1Certs.ordererTlsRootCert,
       ccLabel: "basic-asset-transfer-2",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
+      coreYamlFile: coreFile,
     });
 
     const { packageIds, lifecycle, success } = res.data;

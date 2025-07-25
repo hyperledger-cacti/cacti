@@ -117,8 +117,6 @@ describe(testCase, () => {
 
     const connectionProfile = await ledger.getConnectionProfileOrg1();
 
-    const sshConfig = await ledger.getSshConfig();
-
     const keychainInstanceId = uuidv4();
     const keychainId = uuidv4();
     const keychainEntryKey = "user2";
@@ -144,9 +142,6 @@ describe(testCase, () => {
     const pluginOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
       pluginRegistry,
-      sshConfig,
-      cliContainerEnv: {},
-      peerBinary: "/fabric-samples/bin/peer",
       logLevel,
       connectionProfile,
       discoveryOptions,
@@ -253,17 +248,11 @@ describe(testCase, () => {
     {
       const connectionProfileString = JSON.stringify(connectionProfile);
       const connectionProfileB64Buffer = Buffer.from(connectionProfileString);
-      const sshConfigString = JSON.stringify(sshConfig);
       const connectionProfileB64 =
         connectionProfileB64Buffer.toString("base64");
-      const sshConfigB64Buffer = Buffer.from(sshConfigString);
-      const sshConfigB64 = sshConfigB64Buffer.toString("base64");
       const pluginOptionsSerialized: IPluginLedgerConnectorFabricOptions = {
         instanceId: uuidv4(),
         pluginRegistry,
-        sshConfigB64,
-        cliContainerEnv: {},
-        peerBinary: "/fabric-samples/bin/peer",
         logLevel,
         connectionProfileB64,
         discoveryOptions,

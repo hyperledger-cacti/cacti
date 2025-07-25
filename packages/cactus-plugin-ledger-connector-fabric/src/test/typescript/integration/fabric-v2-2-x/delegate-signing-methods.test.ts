@@ -153,9 +153,6 @@ describe("Delegated signing tests", () => {
     fabricConnectorPlugin = new PluginLedgerConnectorFabric({
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-      sshConfig: await ledger.getSshConfig(),
-      cliContainerEnv: {},
-      peerBinary: "/fabric-samples/bin/peer",
       logLevel: sutLogLevel,
       connectionProfile,
       discoveryOptions: {

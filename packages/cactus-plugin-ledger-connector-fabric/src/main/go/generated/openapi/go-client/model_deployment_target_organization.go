@@ -24,24 +24,24 @@ type DeploymentTargetOrganization struct {
 	// Mapped to environment variables of the Fabric CLI container.
 	CORE_PEER_ADDRESS string `json:"CORE_PEER_ADDRESS"`
 	// Mapped to environment variables of the Fabric CLI container.
-	CORE_PEER_MSPCONFIGPATH string `json:"CORE_PEER_MSPCONFIGPATH"`
+	CORE_PEER_MSPCONFIG []FileBase64 `json:"CORE_PEER_MSPCONFIG"`
 	// Mapped to environment variables of the Fabric CLI container.
-	CORE_PEER_TLS_ROOTCERT_FILE string `json:"CORE_PEER_TLS_ROOTCERT_FILE"`
+	CORE_PEER_TLS_ROOTCERT string `json:"CORE_PEER_TLS_ROOTCERT"`
 	// Mapped to environment variables of the Fabric CLI container.
-	ORDERER_TLS_ROOTCERT_FILE string `json:"ORDERER_TLS_ROOTCERT_FILE"`
+	ORDERER_TLS_ROOTCERT string `json:"ORDERER_TLS_ROOTCERT"`
 }
 
 // NewDeploymentTargetOrganization instantiates a new DeploymentTargetOrganization object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeploymentTargetOrganization(cOREPEERLOCALMSPID string, cOREPEERADDRESS string, cOREPEERMSPCONFIGPATH string, cOREPEERTLSROOTCERTFILE string, oRDERERTLSROOTCERTFILE string) *DeploymentTargetOrganization {
+func NewDeploymentTargetOrganization(cOREPEERLOCALMSPID string, cOREPEERADDRESS string, cOREPEERMSPCONFIG []FileBase64, cOREPEERTLSROOTCERT string, oRDERERTLSROOTCERT string) *DeploymentTargetOrganization {
 	this := DeploymentTargetOrganization{}
 	this.CORE_PEER_LOCALMSPID = cOREPEERLOCALMSPID
 	this.CORE_PEER_ADDRESS = cOREPEERADDRESS
-	this.CORE_PEER_MSPCONFIGPATH = cOREPEERMSPCONFIGPATH
-	this.CORE_PEER_TLS_ROOTCERT_FILE = cOREPEERTLSROOTCERTFILE
-	this.ORDERER_TLS_ROOTCERT_FILE = oRDERERTLSROOTCERTFILE
+	this.CORE_PEER_MSPCONFIG = cOREPEERMSPCONFIG
+	this.CORE_PEER_TLS_ROOTCERT = cOREPEERTLSROOTCERT
+	this.ORDERER_TLS_ROOTCERT = oRDERERTLSROOTCERT
 	return &this
 }
 
@@ -101,76 +101,76 @@ func (o *DeploymentTargetOrganization) SetCORE_PEER_ADDRESS(v string) {
 	o.CORE_PEER_ADDRESS = v
 }
 
-// GetCORE_PEER_MSPCONFIGPATH returns the CORE_PEER_MSPCONFIGPATH field value
-func (o *DeploymentTargetOrganization) GetCORE_PEER_MSPCONFIGPATH() string {
+// GetCORE_PEER_MSPCONFIG returns the CORE_PEER_MSPCONFIG field value
+func (o *DeploymentTargetOrganization) GetCORE_PEER_MSPCONFIG() []FileBase64 {
+	if o == nil {
+		var ret []FileBase64
+		return ret
+	}
+
+	return o.CORE_PEER_MSPCONFIG
+}
+
+// GetCORE_PEER_MSPCONFIGOk returns a tuple with the CORE_PEER_MSPCONFIG field value
+// and a boolean to check if the value has been set.
+func (o *DeploymentTargetOrganization) GetCORE_PEER_MSPCONFIGOk() ([]FileBase64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.CORE_PEER_MSPCONFIG, true
+}
+
+// SetCORE_PEER_MSPCONFIG sets field value
+func (o *DeploymentTargetOrganization) SetCORE_PEER_MSPCONFIG(v []FileBase64) {
+	o.CORE_PEER_MSPCONFIG = v
+}
+
+// GetCORE_PEER_TLS_ROOTCERT returns the CORE_PEER_TLS_ROOTCERT field value
+func (o *DeploymentTargetOrganization) GetCORE_PEER_TLS_ROOTCERT() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.CORE_PEER_MSPCONFIGPATH
+	return o.CORE_PEER_TLS_ROOTCERT
 }
 
-// GetCORE_PEER_MSPCONFIGPATHOk returns a tuple with the CORE_PEER_MSPCONFIGPATH field value
+// GetCORE_PEER_TLS_ROOTCERTOk returns a tuple with the CORE_PEER_TLS_ROOTCERT field value
 // and a boolean to check if the value has been set.
-func (o *DeploymentTargetOrganization) GetCORE_PEER_MSPCONFIGPATHOk() (*string, bool) {
+func (o *DeploymentTargetOrganization) GetCORE_PEER_TLS_ROOTCERTOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.CORE_PEER_MSPCONFIGPATH, true
+	return &o.CORE_PEER_TLS_ROOTCERT, true
 }
 
-// SetCORE_PEER_MSPCONFIGPATH sets field value
-func (o *DeploymentTargetOrganization) SetCORE_PEER_MSPCONFIGPATH(v string) {
-	o.CORE_PEER_MSPCONFIGPATH = v
+// SetCORE_PEER_TLS_ROOTCERT sets field value
+func (o *DeploymentTargetOrganization) SetCORE_PEER_TLS_ROOTCERT(v string) {
+	o.CORE_PEER_TLS_ROOTCERT = v
 }
 
-// GetCORE_PEER_TLS_ROOTCERT_FILE returns the CORE_PEER_TLS_ROOTCERT_FILE field value
-func (o *DeploymentTargetOrganization) GetCORE_PEER_TLS_ROOTCERT_FILE() string {
+// GetORDERER_TLS_ROOTCERT returns the ORDERER_TLS_ROOTCERT field value
+func (o *DeploymentTargetOrganization) GetORDERER_TLS_ROOTCERT() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.CORE_PEER_TLS_ROOTCERT_FILE
+	return o.ORDERER_TLS_ROOTCERT
 }
 
-// GetCORE_PEER_TLS_ROOTCERT_FILEOk returns a tuple with the CORE_PEER_TLS_ROOTCERT_FILE field value
+// GetORDERER_TLS_ROOTCERTOk returns a tuple with the ORDERER_TLS_ROOTCERT field value
 // and a boolean to check if the value has been set.
-func (o *DeploymentTargetOrganization) GetCORE_PEER_TLS_ROOTCERT_FILEOk() (*string, bool) {
+func (o *DeploymentTargetOrganization) GetORDERER_TLS_ROOTCERTOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.CORE_PEER_TLS_ROOTCERT_FILE, true
+	return &o.ORDERER_TLS_ROOTCERT, true
 }
 
-// SetCORE_PEER_TLS_ROOTCERT_FILE sets field value
-func (o *DeploymentTargetOrganization) SetCORE_PEER_TLS_ROOTCERT_FILE(v string) {
-	o.CORE_PEER_TLS_ROOTCERT_FILE = v
-}
-
-// GetORDERER_TLS_ROOTCERT_FILE returns the ORDERER_TLS_ROOTCERT_FILE field value
-func (o *DeploymentTargetOrganization) GetORDERER_TLS_ROOTCERT_FILE() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.ORDERER_TLS_ROOTCERT_FILE
-}
-
-// GetORDERER_TLS_ROOTCERT_FILEOk returns a tuple with the ORDERER_TLS_ROOTCERT_FILE field value
-// and a boolean to check if the value has been set.
-func (o *DeploymentTargetOrganization) GetORDERER_TLS_ROOTCERT_FILEOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.ORDERER_TLS_ROOTCERT_FILE, true
-}
-
-// SetORDERER_TLS_ROOTCERT_FILE sets field value
-func (o *DeploymentTargetOrganization) SetORDERER_TLS_ROOTCERT_FILE(v string) {
-	o.ORDERER_TLS_ROOTCERT_FILE = v
+// SetORDERER_TLS_ROOTCERT sets field value
+func (o *DeploymentTargetOrganization) SetORDERER_TLS_ROOTCERT(v string) {
+	o.ORDERER_TLS_ROOTCERT = v
 }
 
 func (o DeploymentTargetOrganization) MarshalJSON() ([]byte, error) {
@@ -185,9 +185,9 @@ func (o DeploymentTargetOrganization) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["CORE_PEER_LOCALMSPID"] = o.CORE_PEER_LOCALMSPID
 	toSerialize["CORE_PEER_ADDRESS"] = o.CORE_PEER_ADDRESS
-	toSerialize["CORE_PEER_MSPCONFIGPATH"] = o.CORE_PEER_MSPCONFIGPATH
-	toSerialize["CORE_PEER_TLS_ROOTCERT_FILE"] = o.CORE_PEER_TLS_ROOTCERT_FILE
-	toSerialize["ORDERER_TLS_ROOTCERT_FILE"] = o.ORDERER_TLS_ROOTCERT_FILE
+	toSerialize["CORE_PEER_MSPCONFIG"] = o.CORE_PEER_MSPCONFIG
+	toSerialize["CORE_PEER_TLS_ROOTCERT"] = o.CORE_PEER_TLS_ROOTCERT
+	toSerialize["ORDERER_TLS_ROOTCERT"] = o.ORDERER_TLS_ROOTCERT
 	return toSerialize, nil
 }
 

@@ -15,6 +15,7 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.FileBase64
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -24,9 +25,9 @@ import com.squareup.moshi.JsonClass
  *
  * @param CORE_PEER_LOCALMSPID Mapped to environment variables of the Fabric CLI container.
  * @param CORE_PEER_ADDRESS Mapped to environment variables of the Fabric CLI container.
- * @param CORE_PEER_MSPCONFIGPATH Mapped to environment variables of the Fabric CLI container.
- * @param CORE_PEER_TLS_ROOTCERT_FILE Mapped to environment variables of the Fabric CLI container.
- * @param ORDERER_TLS_ROOTCERT_FILE Mapped to environment variables of the Fabric CLI container.
+ * @param CORE_PEER_MSPCONFIG Mapped to environment variables of the Fabric CLI container.
+ * @param CORE_PEER_TLS_ROOTCERT Mapped to environment variables of the Fabric CLI container.
+ * @param ORDERER_TLS_ROOTCERT Mapped to environment variables of the Fabric CLI container.
  */
 
 
@@ -41,16 +42,16 @@ data class DeploymentTargetOrganization (
     val CORE_PEER_ADDRESS: kotlin.String,
 
     /* Mapped to environment variables of the Fabric CLI container. */
-    @Json(name = "CORE_PEER_MSPCONFIGPATH")
-    val CORE_PEER_MSPCONFIGPATH: kotlin.String,
+    @Json(name = "CORE_PEER_MSPCONFIG")
+    val CORE_PEER_MSPCONFIG: kotlin.collections.List<FileBase64>,
 
     /* Mapped to environment variables of the Fabric CLI container. */
-    @Json(name = "CORE_PEER_TLS_ROOTCERT_FILE")
-    val CORE_PEER_TLS_ROOTCERT_FILE: kotlin.String,
+    @Json(name = "CORE_PEER_TLS_ROOTCERT")
+    val CORE_PEER_TLS_ROOTCERT: kotlin.String,
 
     /* Mapped to environment variables of the Fabric CLI container. */
-    @Json(name = "ORDERER_TLS_ROOTCERT_FILE")
-    val ORDERER_TLS_ROOTCERT_FILE: kotlin.String
+    @Json(name = "ORDERER_TLS_ROOTCERT")
+    val ORDERER_TLS_ROOTCERT: kotlin.String
 
 )
 

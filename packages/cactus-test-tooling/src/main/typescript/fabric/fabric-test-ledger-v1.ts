@@ -35,7 +35,13 @@ import fs from "fs";
 import yaml from "js-yaml";
 import { envMapToDocker } from "../common/env-map-to-docker";
 import { RuntimeError } from "run-time-error-cjs";
+import tar from "tar-fs";
 
+export interface FileBase64 {
+  body: string;
+  filename: string;
+  filepath?: string;
+}
 export interface organizationDefinitionFabricV2 {
   path: string;
   orgName: string;
@@ -79,6 +85,14 @@ export interface LedgerStartOptions {
   omitPull?: boolean;
   setContainer?: boolean;
   containerID?: string;
+}
+
+export interface PeerCerts {
+  peerTlsCert: string;
+  peerTlsKey: string;
+  mspConfig: FileBase64[];
+  peerTlsRootCert: string;
+  ordererTlsRootCert: string;
 }
 
 export const DEFAULT_FABRIC_2_AIO_IMAGE_NAME =
@@ -639,6 +653,147 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const e = ex instanceof Error ? ex : safeStringifyException(ex);
       throw new RuntimeError(`getConnectionProfileOrgX() crashed.`, e);
     }
+  }
+
+  /**
+   * Retrieves important file contents for a given peer/org:
+   * - Peer TLS certificate
+   * - Peer TLS key
+   * - MSP config (config.yaml)
+   * - Peer TLS root certificate (ca.crt)
+   * - Orderer TLS root certificate (orderer ca.crt)
+   *
+   * @param orgName The organization name (e.g., "org1")
+   * @param peerName The peer name (e.g., "peer0")
+   * @returns An object with the file contents as strings
+   */
+  public async getPeerOrgCertsAndConfig(
+    orgName: string,
+    peerName: string = "peer0",
+  ): Promise<PeerCerts> {
+    const fnTag = `${this.className}#getPeerOrgCertsAndConfig()`;
+    try {
+      const container = this.getContainer();
+
+      // Paths inside the container
+      const basePath = `/fabric-samples/test-network/organizations/peerOrganizations/${orgName}.example.com/peers/${peerName}.${orgName}.example.com`;
+      const adminPath = `/fabric-samples/test-network/organizations/peerOrganizations/${orgName}.example.com/users/Admin@${orgName}.example.com`;
+      const mspPath = `${adminPath}/msp`;
+      const tlsPath = `${basePath}/tls`;
+
+      // Peer TLS cert and key
+      const peerTlsCertPath = `${tlsPath}/server.crt`;
+      const peerTlsKeyPath = `${tlsPath}/server.key`;
+
+      // Peer TLS root cert (ca.crt)
+      const peerTlsRootCertPath = `${tlsPath}/ca.crt`;
+
+      // Orderer TLS root cert
+      const ordererTlsRootCertPath =
+        "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
+
+      // Pull files from container
+      // Retrieve the entire MSP folder as a tar archive
+      const mspFolderTar = await container.getArchive({ path: mspPath });
+
+      // Retrieve individual files as before
+      const [peerTlsCert, peerTlsKey, peerTlsRootCert, ordererTlsRootCert] =
+        await Promise.all([
+          Containers.pullFile(container, peerTlsCertPath),
+          Containers.pullFile(container, peerTlsKeyPath),
+          Containers.pullFile(container, peerTlsRootCertPath),
+          Containers.pullFile(container, ordererTlsRootCertPath),
+        ]);
+
+      this.log.debug(
+        `${fnTag}: Retrieved files for org "${orgName}" and peer "${peerName}"`,
+      );
+
+      this.log.debug(`${fnTag}: Peer TLS Cert: ${peerTlsCert}`);
+      this.log.debug(`${fnTag}: Peer TLS Key: ${peerTlsKey}`);
+      this.log.debug(`${fnTag}: Peer TLS Root Cert: ${peerTlsRootCert}`);
+      this.log.debug(`${fnTag}: Orderer TLS Root Cert: ${ordererTlsRootCert}`);
+
+      return {
+        peerTlsCert,
+        peerTlsKey,
+        mspConfig: await this.tarBufferToFileBase64Array(mspFolderTar),
+        peerTlsRootCert,
+        ordererTlsRootCert,
+      };
+    } catch (ex) {
+      this.log.error(`${fnTag}:getPeerOrgCertsAndConfig() failed:`, ex);
+      throw new RuntimeError(`${fnTag}:getPeerOrgCertsAndConfig() failed`, ex);
+    }
+  }
+
+  private async collectFiles(
+    dir: string,
+    relativePath = "",
+  ): Promise<FileBase64[]> {
+    const fnTag = `${this.className}#collectFiles()`;
+    this.log.debug(
+      `${fnTag} ENTER - dir=%s, relativePath=%s`,
+      dir,
+      relativePath,
+    );
+    const files: FileBase64[] = [];
+    const entries = await fs.promises.readdir(dir, {
+      withFileTypes: true,
+    });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      const relPath = path.join(relativePath, entry.name);
+
+      if (entry.isDirectory()) {
+        files.push(...(await this.collectFiles(fullPath, relPath)));
+      } else if (entry.isFile()) {
+        const fileBuffer = await fs.promises.readFile(fullPath);
+        const parts = relPath.split(path.sep);
+        const filename = parts.pop()!;
+        const filepath = parts.length ? parts.join("/") : undefined;
+
+        files.push({
+          filename,
+          body: fileBuffer.toString("base64"),
+          filepath,
+        });
+      }
+    }
+    return files;
+  }
+
+  private async tarBufferToFileBase64Array(
+    tarBuffer: NodeJS.ReadableStream,
+  ): Promise<FileBase64[]> {
+    const fnTag = `${this.className}#tarBufferToFileBase64Array()`;
+    temp.track();
+
+    const tempDirPath = temp.mkdirSync("tar-extract");
+
+    await new Promise<void>((resolve, reject) => {
+      tarBuffer
+        .pipe(tar.extract(tempDirPath))
+        .on("finish", resolve)
+        .on("error", reject);
+    });
+
+    // Find the first folder inside tempDirPath and collect files from there
+    const entries = await fs.promises.readdir(tempDirPath, {
+      withFileTypes: true,
+    });
+    const firstDir = entries.find((entry) => entry.isDirectory());
+    let files: FileBase64[] = [];
+    if (firstDir) {
+      const innerDirPath = path.join(tempDirPath, firstDir.name);
+      files = await this.collectFiles(innerDirPath);
+    } else {
+      files = await this.collectFiles(tempDirPath);
+    }
+
+    temp.cleanupSync();
+    this.log.debug(`${fnTag} EXIT - files.length=%d`, files.length);
+    return files;
   }
 
   public async populateFile(

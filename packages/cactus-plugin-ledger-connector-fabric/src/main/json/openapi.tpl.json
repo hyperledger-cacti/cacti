@@ -606,9 +606,9 @@
         "required": [
           "CORE_PEER_LOCALMSPID",
           "CORE_PEER_ADDRESS",
-          "CORE_PEER_MSPCONFIGPATH",
-          "CORE_PEER_TLS_ROOTCERT_FILE",
-          "ORDERER_TLS_ROOTCERT_FILE"
+          "CORE_PEER_MSPCONFIG",
+          "CORE_PEER_TLS_ROOTCERT",
+          "ORDERER_TLS_ROOTCERT"
         ],
         "properties": {
           "CORE_PEER_LOCALMSPID": {
@@ -627,28 +627,30 @@
             "maxLength": 1024,
             "description": "Mapped to environment variables of the Fabric CLI container."
           },
-          "CORE_PEER_MSPCONFIGPATH": {
-            "type": "string",
-            "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+          "CORE_PEER_MSPCONFIG": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileBase64"
+            },
             "nullable": false,
             "minLength": 1,
-            "maxLength": 1024,
+            "maxLength": 65535,
             "description": "Mapped to environment variables of the Fabric CLI container."
           },
-          "CORE_PEER_TLS_ROOTCERT_FILE": {
+          "CORE_PEER_TLS_ROOTCERT": {
             "type": "string",
-            "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+            "example": "-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY----- ",
             "nullable": false,
             "minLength": 1,
-            "maxLength": 1024,
+            "maxLength": 65535,
             "description": "Mapped to environment variables of the Fabric CLI container."
           },
-          "ORDERER_TLS_ROOTCERT_FILE": {
+          "ORDERER_TLS_ROOTCERT": {
             "type": "string",
-            "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+             "example": "-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY----- ",
             "nullable": false,
             "minLength": 1,
-            "maxLength": 1024,
+            "maxLength": 65535,
             "description": "Mapped to environment variables of the Fabric CLI container."
           }
         }
@@ -712,140 +714,6 @@
           }
         }
       },
-      "DeployContractGoSourceV1Request": {
-        "type": "object",
-        "required": [
-          "goSource",
-          "targetOrganizations",
-          "chainCodeVersion",
-          "channelId",
-          "policyDslSource",
-          "targetPeerAddresses",
-          "tlsRootCertFiles"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "policyDslSource": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 65535,
-            "nullable": false,
-            "example": "AND('Org1MSP.member','Org2MSP.member')"
-          },
-          "tlsRootCertFiles": {
-            "type": "string",
-            "description": "The TLS root cert files that will be passed to the chaincode instantiation command.",
-            "minLength": 1,
-            "maxLength": 65535,
-            "nullable": false,
-            "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
-          },
-          "channelId": {
-            "type": "string",
-            "description": "The name of the Fabric channel where the contract will get instantiated.",
-            "example": "mychannel",
-            "minLength": 1,
-            "maxLength": 2048,
-            "nullable": false
-          },
-          "targetOrganizations": {
-            "type": "array",
-            "minItems": 1,
-            "nullable": false,
-            "maxItems": 1024,
-            "items": {
-              "$ref": "#/components/schemas/DeploymentTargetOrganization"
-            }
-          },
-          "targetPeerAddresses": {
-            "type": "array",
-            "description": "An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the official Fabric samples repository and therefore it is assumed to be correct usage.",
-            "example": ["peer0.org1.example.com:7051"],
-            "minItems": 1,
-            "maxItems": 2048,
-            "items": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 4096
-            }
-          },
-          "constructorArgs": {
-            "type": "object",
-            "example": "{} - An empty object literal can be sufficient if your contract does not have parameters.",
-            "nullable": false,
-            "properties": {
-              "Args": {
-                "type": "array",
-                "minLength": 0,
-                "maxLength": 2048,
-                "items": {}
-              }
-            }
-          },
-          "chainCodeVersion": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128,
-            "example": "1.0.0",
-            "nullable": false
-          },
-          "goSource": {
-            "description": "The your-smart-contract.go file where the functionality of your contract is implemented.",
-            "$ref": "#/components/schemas/FileBase64",
-            "nullable": false
-          },
-          "goMod": {
-            "description": "The go.mod file that declares the dependencies of the chaincode go contract that is being deployed as part of this request.",
-            "$ref": "#/components/schemas/FileBase64",
-            "nullable": false
-          },
-          "moduleName": {
-            "description": "The go module name that will be used for the go compilation process.",
-            "example": "hello-world-contract",
-            "type": "string",
-            "nullable": false,
-            "minLength": 1,
-            "maxLength": 255
-          },
-          "pinnedDeps": {
-            "type": "array",
-            "minItems": 0,
-            "maxItems": 1024,
-            "items": {
-              "type": "string",
-              "nullable": false,
-              "example": "github.com/hyperledger/fabric@v1.4.8"
-            }
-          },
-          "modTidyOnly": {
-            "description": "Indicates to the go chaincode compiler of Cactus if it should do an actual go compilation with the contact source or if it should just execute the go mod tidy command.",
-            "type": "boolean",
-            "nullable": true
-          }
-        }
-      },
-      "DeployContractGoSourceV1Response": {
-        "type": "object",
-        "required": [
-          "success",
-          "installationCommandResponses",
-          "instantiationCommandResponse"
-        ],
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "installationCommandResponses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SSHExecCommandResponse"
-            }
-          },
-          "instantiationCommandResponse": {
-            "$ref": "#/components/schemas/SSHExecCommandResponse"
-          }
-        }
-      },
       "DeployContractV1Request": {
         "type": "object",
         "required": [
@@ -859,7 +727,8 @@
           "channelId",
           "ccLang",
           "orderer",
-          "ordererTLSHostnameOverride"
+          "ordererTLSHostnameOverride",
+          "coreYamlFile"
         ],
         "additionalProperties": false,
         "properties": {
@@ -868,10 +737,10 @@
           },
           "caFile": {
             "type": "string",
-            "description": "File-system path pointing at the CA file.",
-            "example": "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+            "description": "CA certificate file that will be used to verify the TLS connection to the orderer.",
+            "example": "-----BEGIN CERTIFICATE----- .... -----END CERTIFICATE-----",
             "minLength": 1,
-            "maxLength": 4096
+            "maxLength": 65535
           },
           "orderer": {
             "type": "string",
@@ -973,6 +842,11 @@
             "minItems": 1,
             "maxItems": 65535,
             "nullable": false
+          },
+          "coreYamlFile": {
+            "type": "object",
+            "$ref": "#/components/schemas/FileBase64",
+            "description": "The core.yaml file that contains the configuration of the peer node where the contract will be instantiated."
           }
         }
       },
@@ -1936,58 +1810,6 @@
           },
           "404": {
             "description": ""
-          }
-        }
-      }
-    },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source": {
-      "post": {
-        "operationId": "deployContractGoSourceV1",
-        "summary": "Deploys a chaincode contract in the form of a go sources.",
-        "x-hyperledger-cacti": {
-          "http": {
-            "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
-          }
-        },
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeployContractGoSourceV1Request"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeployContractGoSourceV1Response"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Not implemented",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "nullable": false,
-                      "minLength": 1,
-                      "maxLength": 2048
-                    }
-                  }
-                }
-              }
-            }
           }
         }
       }
