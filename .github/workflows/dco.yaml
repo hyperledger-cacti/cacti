@@ -1,0 +1,37 @@
+name: DCO
+
+on: [pull_request]
+
+jobs:
+  dco_check:
+    runs-on: ubuntu-22.04
+    name: DCO
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full commit history to handle large PRs
+
+      - name: DCO Check
+        uses: KineticCafe/actions-dco@v1
+        with:
+          exempt-authors: |
+            33758641+jonathan-m-hamilton@users.noreply.github.com
+            chanmickyyun@gmail.com
+            dhinakaran2705@gmail.com
+            dhinakaran@linuxservervd.sl.cloud9.ibm.com
+            dvinayag@uwaterloo.ca
+            francissamuelmendoza7@gmail.com
+            jonathan.m.hamilton@accenture.com
+            knaraya3@in.ibm.com
+            n.krishnasuri@gmail.com
+            peter.somogyvari@accenture.com
+            petermetz@users.noreply.github.com
+            sandeep.nishad1@ibm.com
+            sandeepn.official@gmail.com
+            sannish1@in.ibm.com
+            sanven.hbti@gmail.com
+            sikharpatranabis@gmail.com
+            tkyonezu@gmail.com
+            tracy.a.kuhrt@accenture.com
+            vramakr2@in.ibm.com
