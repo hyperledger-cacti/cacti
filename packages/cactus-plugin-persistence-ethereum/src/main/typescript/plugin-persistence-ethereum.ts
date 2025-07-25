@@ -23,6 +23,8 @@ import ERC20 from "../json/contract-abi/ERC20.json";
 import TokenClientERC20 from "./token-client/token-client-erc20";
 import ERC721 from "../json/contract-abi/ERC721.json";
 import TokenClientERC721 from "./token-client/token-client-erc721";
+import ERC1155 from "../json/contract-abi/ERC1155.json";
+import TokenClientERC1155 from "./token-client/token-client-erc1155";
 import OAS from "../json/openapi.json";
 import { getRuntimeErrorCause, normalizeAddress } from "./utils";
 import { StatusEndpointV1 } from "./web-services/status-endpoint-v1";
@@ -74,6 +76,7 @@ export class PluginPersistenceEthereum
   private endpoints: IWebServiceEndpoint[] | undefined;
   private ethersInterfaceERC721 = new EthersInterface(ERC721.abi);
   private ethersInterfaceERC20 = new EthersInterface(ERC20.abi);
+  private ethersInterfaceERC1155 = new EthersInterface(ERC1155);
   private pushBlockMutex = new Mutex();
   private syncBlocksMutex = new Mutex();
   private syncTokenBalancesMutex = new Mutex();
@@ -152,6 +155,8 @@ export class PluginPersistenceEthereum
         return this.ethersInterfaceERC20;
       case TokenTypeV1.ERC721:
         return this.ethersInterfaceERC721;
+      case TokenTypeV1.ERC1155:
+        return this.ethersInterfaceERC1155;
       default:
         const unknownTokenType: never = tokenType;
         throw new Error(
@@ -398,6 +403,12 @@ export class PluginPersistenceEthereum
             recipient: normalizeAddress(t.args["to"]),
             value: t.args["tokenId"].toString(),
           };
+        case TokenTypeV1.ERC1155:
+          return {
+            sender: normalizeAddress(t.args["from"]),
+            recipient: normalizeAddress(t.args["to"]),
+            value: t.args["tokenId"].toString(),
+          };
         default:
           const unknownTokenType: never = tokenType;
           throw new Error(
@@ -461,6 +472,7 @@ export class PluginPersistenceEthereum
         this.log.debug("Update token balances from block", oldestBlockRestored);
         await this.dbClient.syncTokenBalanceERC20();
         await this.dbClient.syncTokenBalanceERC721(oldestBlockRestored);
+        await this.dbClient.syncTokenBalanceERC1155(oldestBlockRestored);
       } else {
         this.log.warn(
           "Ledger not in sync (some blocks are missing), token balance not updated!",
@@ -803,6 +815,35 @@ export class PluginPersistenceEthereum
       this.watchBlocksSubscription = undefined;
       this.log.info("stopMonitor(): Done.");
     }
+  }
+
+  /**
+   * Add new ERC1155 token to be monitored by this plugin.
+   * @param address ERC1155 contract address.
+   */
+  public async addTokenERC1155(address: string): Promise<void> {
+    const checkedAddress = normalizeAddress(address);
+    this.log.info(
+      "Add ERC1155 token to monitor changes on it. Address:",
+      checkedAddress,
+    );
+
+    const tokenClient = new TokenClientERC1155(this.apiClient, checkedAddress);
+
+    try {
+      await this.dbClient.insertTokenMetadataERC1155({
+        address: checkedAddress,
+        name: await tokenClient.name(),
+        symbol: await tokenClient.symbol(),
+      });
+    } catch (err: unknown) {
+      throw new RuntimeError(
+        `Could not store ERC1155 token metadata information`,
+        getRuntimeErrorCause(err),
+      );
+    }
+
+    await this.refreshMonitoredTokens();
   }
 
   /**

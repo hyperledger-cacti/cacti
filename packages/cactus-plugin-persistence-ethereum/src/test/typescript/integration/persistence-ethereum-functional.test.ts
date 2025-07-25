@@ -17,6 +17,8 @@ const erc20TokenSymbol = "T20";
 const erc20TokenSupply = 1000;
 const erc721TokenName = "TestErc721Token";
 const erc721TokenSymbol = "T721";
+const erc1155TokenName = "TestERC1155Token";
+const erc1155TokenSymbol = "T1155";
 
 // Geth environment
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
@@ -66,6 +68,7 @@ const DatabaseClientMock = DatabaseClient as unknown as jest.Mock;
 import { PluginPersistenceEthereum } from "../../../main/typescript";
 import TestERC20ContractJson from "../../solidity/TestERC20.json";
 import TestERC721ContractJson from "../../solidity/TestERC721.json";
+import TestERC1155ContractJson from "../../solidity/TestERC1155.json";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -84,6 +87,7 @@ describe("Ethereum persistence plugin tests", () => {
   let defaultAccountAddress: string;
   let erc20ContractCreationReceipt: Required<TransactionReceipt>;
   let erc721ContractCreationReceipt: Required<TransactionReceipt>;
+  let erc1155ContractCreationReceipt: Required<TransactionReceipt>;
 
   const expressAppConnector = express();
   expressAppConnector.use(bodyParser.json({ limit: "250mb" }));
@@ -150,6 +154,32 @@ describe("Ethereum persistence plugin tests", () => {
       log.error("mintErc721Token ERROR", error);
       throw error;
     }
+  }
+
+  async function mintErc1155Token(
+    targetAddress: string,
+    tokenId: number,
+    amount: number,
+    data: string,
+  ) {
+    log.info(
+      `Mint ERC1155 token ID ${tokenId} for address ${targetAddress} of amount ${amount} by ${defaultAccountAddress}`,
+    );
+    const tokenContract = new web3.eth.Contract(
+      TestERC1155ContractJson.abi,
+      erc1155ContractCreationReceipt.contractAddress,
+    );
+    const mintResponse = await (tokenContract.methods as any)
+      .mint(targetAddress, tokenId, amount, data)
+      .send({
+        from: defaultAccountAddress,
+        gas: 8000000,
+      });
+    log.debug("mintErc1155Token mintResponse:", mintResponse);
+    expect(mintResponse).toBeTruthy();
+    expect(Number(mintResponse.status)).toEqual(1);
+
+    return mintResponse;
   }
 
   /**
@@ -221,6 +251,14 @@ describe("Ethereum persistence plugin tests", () => {
         address: erc721ContractCreationReceipt.contractAddress,
         name: erc721TokenName,
         symbol: erc721TokenSymbol,
+        created_at: "2022-1-1T12:00:01Z",
+      },
+    ]);
+    (dbClientInstance.getTokenMetadataERC1155 as jest.Mock).mockReturnValue([
+      {
+        address: erc1155ContractCreationReceipt.contractAddress,
+        name: erc1155TokenName,
+        symbol: erc1155TokenSymbol,
         created_at: "2022-1-1T12:00:01Z",
       },
     ]);
@@ -396,6 +434,18 @@ describe("Ethereum persistence plugin tests", () => {
         "ERC721 deployed contract address:",
         erc721ContractCreationReceipt.contractAddress,
       );
+
+      const erc1155ByteCode = TestERC1155ContractJson.bytecode.object;
+      log.debug("starting deploying the erc1155");
+      log.info("starting deploying the erc1155");
+      erc1155ContractCreationReceipt = await deploySmartContract(
+        TestERC1155ContractJson.abi,
+        erc1155ByteCode,
+      );
+      log.info(
+        "ERC1155 deployed contract address:",
+        erc1155ContractCreationReceipt.contractAddress,
+      );
     });
 
     test("onPluginInit creates DB schema and fetches the monitored tokens", async () => {
@@ -485,6 +535,24 @@ describe("Ethereum persistence plugin tests", () => {
       expect(token.symbol).toEqual(erc721TokenSymbol);
     });
 
+    test("Adding ERC1155 tokens to GUI test", async () => {
+      await persistence.addTokenERC1155(
+        erc1155ContractCreationReceipt.contractAddress,
+      );
+      const insertCalls =
+        dbClientInstance.insertTokenMetadataERC1155.mock.calls;
+      expect(insertCalls.length).toBe(1);
+      const insertCallArgs = insertCalls[0];
+      const token = insertCallArgs[0];
+      expect(token).toBeTruthy();
+      expect(token.address.toLowerCase()).toEqual(
+        erc1155ContractCreationReceipt.contractAddress.toLowerCase(),
+      );
+      expect(checkAddressCheckSum(token.address)).toBeTrue();
+      expect(token.name).toEqual(erc1155TokenName);
+      expect(token.symbol).toEqual(erc1155TokenSymbol);
+    });
+
     test("Refresh tokens updates internal state", async () => {
       const tokens = await persistence.refreshMonitoredTokens();
 
@@ -533,6 +601,16 @@ describe("Ethereum persistence plugin tests", () => {
         erc721ContractCreationReceipt.contractAddress,
       );
 
+      const erc1155ByteCode = TestERC1155ContractJson.bytecode.object;
+      erc1155ContractCreationReceipt = await deploySmartContract(
+        TestERC1155ContractJson.abi,
+        erc1155ByteCode,
+      );
+      log.info(
+        "ERC1155 deployed contract address:",
+        erc1155ContractCreationReceipt.contractAddress,
+      );
+
       mockTokenMetadataResponse();
     });
 
@@ -555,6 +633,22 @@ describe("Ethereum persistence plugin tests", () => {
         expect([1, 2, 3]).toInclude(token.token_id);
         expect(token.account_address).toBeTruthy();
         expect(token.uri).toBeTruthy();
+      });
+    });
+
+    test("Synchronization of ERC1155 finds all issued tokens", async () => {
+      expect(erc1155ContractCreationReceipt.contractAddress).toBeTruthy();
+      await persistence.refreshMonitoredTokens();
+      await mintErc1155Token(constTestAcc.address, 1, 1, "");
+      await mintErc1155Token(constTestAcc.address, 2, 1, "");
+      await mintErc1155Token(constTestAcc.address, 3, 1, "");
+      log.debug("Minting test ERC1155 tokens done.");
+      const upsertCalls = dbClientInstance.upsertTokenERC1155.mock.calls;
+      expect(upsertCalls.length).toBe(3);
+      upsertCalls.forEach((callArgs: any[]) => {
+        const token = callArgs[0];
+        expect([1, 2, 3]).toContain(token.token_id);
+        expect(token.account_address).toBeTruthy();
       });
     });
   });
