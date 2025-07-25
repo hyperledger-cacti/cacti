@@ -298,13 +298,21 @@ export default class PostgresDatabaseClient {
 
     this.log.debug("Insert ERC721 token if not present yet:", token);
     const insertResponse = await this.client.query(
-      `INSERT INTO ethereum.token_erc721("account_address", "token_address", "uri", "token_id")
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO ethereum.token_erc721("account_address", "token_address", "uri", "token_id", "nft_name", "nft_description", "nft_image")
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        ON CONFLICT ON CONSTRAINT token_erc721_contract_tokens_unique
        DO
         UPDATE SET account_address = EXCLUDED.account_address;
         `,
-      [token.account_address, token.token_address, token.uri, token.token_id],
+      [
+        token.account_address,
+        token.token_address,
+        token.uri,
+        token.token_id,
+        token.nft_name,
+        token.nft_description,
+        token.nft_image,
+      ],
     );
     this.log.debug(
       `Inserted ${insertResponse.rowCount} rows into table token_erc721`,

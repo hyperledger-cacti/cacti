@@ -158,6 +158,9 @@ CREATE TABLE IF NOT EXISTS ethereum.token_erc721
     token_address text COLLATE pg_catalog."default" NOT NULL,
     uri text COLLATE pg_catalog."default" NOT NULL,
     token_id numeric NOT NULL,
+    nft_name text COLLATE pg_catalog."default" NOT NULL,
+    nft_description text COLLATE pg_catalog."default" NOT NULL,
+    nft_image text COLLATE pg_catalog."default" NOT NULL,
     last_owner_change timestamp without time zone NOT NULL DEFAULT now(),
     CONSTRAINT token_erc721_pkey1 PRIMARY KEY (id),
     CONSTRAINT token_erc721_contract_tokens_unique UNIQUE (token_address, token_id),
@@ -437,6 +440,9 @@ BEGIN
         token_transfer.token_address,
         '',
         token_transfer.token_id,
+        '',
+        '',
+        '',
         token_transfer.created_at
         );
     ELSE
