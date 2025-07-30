@@ -303,6 +303,12 @@ export interface Asset {
     'amount'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof Asset
+     */
+    'uniqueDescriptor'?: string;
+    /**
+     * 
      * @type {TransactRequestSourceAssetNetworkId}
      * @memberof Asset
      */
@@ -3772,6 +3778,12 @@ export interface TransactRequestSourceAsset {
      * @memberof TransactRequestSourceAsset
      */
     'amount'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactRequestSourceAsset
+     */
+    'uniqueDescriptor'?: string;
     /**
      * 
      * @type {TransactRequestSourceAssetNetworkId}

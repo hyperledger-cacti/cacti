@@ -180,7 +180,7 @@ export interface TokenResponse {
   tokenId: string;
   referenceId: string;
   owner: string;
-  amount: string;
+  tokenAttribute: string;
 }
 export interface TokensResponse {
   contractName: string;
@@ -189,7 +189,7 @@ export interface TokensResponse {
   tokenId: string;
   referenceId: string;
   owner: string;
-  amount: string;
+  tokenAttribute: string;
 }
 export interface TokensInteractionsResponse {
   interactionType: string;
@@ -204,11 +204,11 @@ export interface InteractionsRequest {
 export interface AssignEventEmittedResponse {
   tokenId: string;
   receiver_account: string;
-  amount: string;
+  assetAttribute: string;
 }
 export interface BurnEventEmittedResponse {
   tokenId: string;
-  amount: string;
+  assetAttribute: string;
 }
 export interface ChangedEventEmittedResponse {
   id: string;
@@ -216,11 +216,11 @@ export interface ChangedEventEmittedResponse {
 }
 export interface LockEventEmittedResponse {
   tokenId: string;
-  amount: string;
+  assetAttribute: string;
 }
 export interface MintEventEmittedResponse {
   tokenId: string;
-  amount: string;
+  assetAttribute: string;
 }
 export interface OwnershipTransferredEventEmittedResponse {
   previousOwner: string;
@@ -228,7 +228,7 @@ export interface OwnershipTransferredEventEmittedResponse {
 }
 export interface UnlockEventEmittedResponse {
   tokenId: string;
-  amount: string;
+  assetAttribute: string;
 }
 export interface UnwrapEventEmittedResponse {
   tokenId: string;
@@ -261,7 +261,7 @@ export interface SATPWrapperContract {
   assign(
     tokenId: string,
     receiver_account: string,
-    amount: string
+    assetAttribute: string
   ): MethodReturnContext;
   /**
    * Payable: false
@@ -278,7 +278,7 @@ export interface SATPWrapperContract {
    * @param tokenId Type: string, Indexed: false
    * @param amount Type: uint256, Indexed: false
    */
-  burn(tokenId: string, amount: string): MethodReturnContext;
+  burn(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -302,7 +302,7 @@ export interface SATPWrapperContract {
    * @param tokenId Type: string, Indexed: false
    * @param amount Type: uint256, Indexed: false
    */
-  lock(tokenId: string, amount: string): MethodReturnContext;
+  lock(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -311,7 +311,7 @@ export interface SATPWrapperContract {
    * @param tokenId Type: string, Indexed: false
    * @param amount Type: uint256, Indexed: false
    */
-  mint(tokenId: string, amount: string): MethodReturnContext;
+  mint(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -362,7 +362,7 @@ export interface SATPWrapperContract {
    * @param tokenId Type: string, Indexed: false
    * @param amount Type: uint256, Indexed: false
    */
-  unlock(tokenId: string, amount: string): MethodReturnContext;
+  unlock(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false

@@ -93,6 +93,8 @@ paths:
                       type: string
                     amount:
                       type: string
+                    uniqueDescriptor:
+                      type: string
                     networkId:
                       type: object
                       description: The network of the DLT being interacted with.
@@ -149,6 +151,8 @@ paths:
                     channelName:
                       type: string
                     amount:
+                      type: string
+                    uniqueDescriptor:
                       type: string
                     networkId:
                       type: object
@@ -3418,6 +3422,8 @@ components:
           type: string
         amount:
           type: string
+        uniqueDescriptor:
+          type: string
         networkId:
           type: object
           description: The network of the DLT being interacted with.
@@ -3490,6 +3496,8 @@ components:
               type: string
             amount:
               type: string
+            uniqueDescriptor:
+              type: string
             networkId:
               type: object
               description: The network of the DLT being interacted with.
@@ -3546,6 +3554,8 @@ components:
             channelName:
               type: string
             amount:
+              type: string
+            uniqueDescriptor:
               type: string
             networkId:
               type: object
