@@ -22,7 +22,7 @@ export interface ISATPGatewayRunnerConstructorOptions {
   oapiPort?: number;
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
-  configFilePath?: string;
+  configPath?: string;
   logsPath?: string;
   ontologiesPath?: string;
   databasePath?: string;
@@ -65,7 +65,7 @@ export class SATPGatewayRunner implements ITestLedger {
   public readonly oapiPort: number;
   public readonly emitContainerLogs: boolean;
   public readonly logsPath?: string;
-  public readonly configFilePath?: string;
+  public readonly configPath?: string;
   public readonly ontologiesPath?: string;
   private readonly networkName?: string;
   private readonly url?: string;
@@ -95,7 +95,7 @@ export class SATPGatewayRunner implements ITestLedger {
     this.networkName = options.networkName;
     this.url = options.url;
 
-    this.configFilePath = options.configFilePath;
+    this.configPath = options.configPath;
     this.logsPath = options.logsPath;
     this.ontologiesPath = options.ontologiesPath;
 
@@ -193,10 +193,8 @@ export class SATPGatewayRunner implements ITestLedger {
 
     const containerPath = "/opt/cacti/satp-hermes";
 
-    if (this.configFilePath) {
-      hostConfig.Binds!.push(
-        `${this.configFilePath}:${containerPath}/config/config.json:ro`,
-      );
+    if (this.configPath) {
+      hostConfig.Binds!.push(`${this.configPath}:${containerPath}/config:ro`);
     }
 
     if (this.logsPath) {
@@ -235,7 +233,11 @@ export class SATPGatewayRunner implements ITestLedger {
         [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: {}, // CLIENT_PORT
         [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort}/tcp`]: {}, // OAPI_PORT
       },
-      HostConfig: { ...hostConfig, NetworkMode: this.networkName },
+      HostConfig: {
+        ...hostConfig,
+        NetworkMode: this.networkName,
+        Privileged: true,
+      },
     };
 
     if (this.networkName) {
