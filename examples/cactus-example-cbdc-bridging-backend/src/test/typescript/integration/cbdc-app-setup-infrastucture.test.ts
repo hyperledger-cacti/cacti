@@ -11,7 +11,7 @@ const TIMEOUT: number = 1000000;
 
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
-  label: "BUNGEE - Hermes",
+  label: "CBDC Bridging Backend",
 });
 beforeAll(async () => {
   await pruneDockerAllIfGithubAction({ logLevel })

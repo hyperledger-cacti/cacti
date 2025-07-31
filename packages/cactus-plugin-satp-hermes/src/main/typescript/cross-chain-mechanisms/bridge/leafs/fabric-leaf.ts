@@ -57,17 +57,17 @@ export interface IFabricLeafNeworkOptions extends INetworkOptions {
   channelName: string;
   targetOrganizations?: Array<DeploymentTargetOrganization>;
   userIdentity?: X509Identity;
-  caFile?: string;
-  ccSequence?: number;
-  orderer?: string;
-  ordererTLSHostnameOverride?: string;
-  connTimeout?: number;
-  signaturePolicy?: string;
   mspId?: string;
   wrapperContractName?: string;
   leafId?: string;
   keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
+  caFile?: string;
+  orderer?: string;
+  ordererTLSHostnameOverride?: string;
+  coreYamlFile?: FileBase64;
+  connTimeout?: number;
+  signaturePolicy?: string;
 }
 
 export interface IFabricLeafOptions
@@ -92,11 +92,7 @@ export interface IFabricLeafOptions
  *   networkIdentification: { id: "fabric-network", ledgerType: LedgerType.Fabric2 },
  *   keyPair: myKeyPair,
  *   instanceId: uuidv4(),
- *     peerBinary: "/fabric-samples/bin/peer",
- *     goBinary: "/usr/local/go/bin/go",
  *     pluginRegistry,
- *     cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
- *     sshConfig: sshConfig,
  *     logLevel,
  *     connectionProfile: connectionProfile,
  *     discoveryOptions: discoveryOptions,
@@ -107,9 +103,8 @@ export interface IFabricLeafOptions
  *   signingCredential: mySigningCredential,
  *   ontologyManager: myOntologyManager,
  *   channelName: "mychannel",
- *   targetOrganizations: [{ mspId: "Org1MSP", peerEndpoint: "peer0.org1.example.com:7051" }],
- *   caFile: "/path/to/ca.pem",
- *   ccSequence: 1,
+ *   targetOrganizations: [{CORE_PEER_LOCALMSPID..., CORE_PEER_ADDRESS...}],
+ *   caFile: --------BEGIN Certificat-------- ...,
  *   orderer: "orderer.example.com:7050",
  *   ordererTLSHostnameOverride: "orderer.example.com",
  * });
@@ -166,13 +161,13 @@ export class FabricLeaf
 
   private targetOrganizations: Array<DeploymentTargetOrganization> | undefined;
   private caFile: string | undefined;
-  private ccSequence: number | undefined;
   private orderer: string | undefined;
   private ordererTLSHostnameOverride: string | undefined;
   private connTimeout: number | undefined;
   private signaturePolicy: string | undefined;
   private mspId: string | undefined;
   private bridgeId: string | undefined;
+  private coreYamlFile: FileBase64 | undefined;
   private readonly monitorService: MonitorService;
   /**
    * Constructs a new instance of the FabricLeaf class.
@@ -219,15 +214,16 @@ export class FabricLeaf
       ? options.claimFormats.concat(ClaimFormat.DEFAULT)
       : [ClaimFormat.DEFAULT];
 
-    if (!this.isFullPluginOptions(options.connectorOptions)) {
+    if (!options.connectorOptions.pluginRegistry) {
       throw new ConnectorOptionsError(
-        "Invalid options provided to the FabricLeaf constructor. Please provide a valid IPluginLedgerConnectorFabricOptions object.",
+        "Invalid options provided to the FabricLeaf constructor. Plugin Registry is required.",
       );
     }
 
-    this.connector = new PluginLedgerConnectorFabric(
-      options.connectorOptions as IPluginLedgerConnectorFabricOptions,
-    );
+    this.connector = new PluginLedgerConnectorFabric({
+      ...options.connectorOptions,
+      dockerNetworkName: options.connectorOptions.dockerNetworkName ?? "host",
+    } as IPluginLedgerConnectorFabricOptions);
 
     this.ontologyManager = ontologyManager;
 
@@ -276,17 +272,36 @@ export class FabricLeaf
           //this variables are necessary to deploy the wrapper contract
           options.targetOrganizations &&
           options.caFile &&
-          options.ccSequence &&
           options.orderer &&
           options.ordererTLSHostnameOverride &&
-          options.mspId
+          options.mspId &&
+          options.coreYamlFile &&
+          options.caFile
         ) {
           this.log.debug(
             `${FabricLeaf.CLASS_NAME}#constructor, No wrapper contract provided, creation required`,
           );
+
+          for (const targetOrganization of options.targetOrganizations) {
+            if (
+              !(
+                targetOrganization.CORE_PEER_LOCALMSPID &&
+                targetOrganization.CORE_PEER_ADDRESS &&
+                targetOrganization.CORE_PEER_MSPCONFIG &&
+                targetOrganization.CORE_PEER_TLS_ROOTCERT &&
+                targetOrganization.ORDERER_TLS_ROOTCERT
+              )
+            ) {
+              throw new WrapperContractError(
+                `${FabricLeaf.CLASS_NAME}#constructor, Missing target organization variables for contract creation: ${safeStableStringify(
+                  targetOrganization,
+                )}`,
+              );
+            }
+          }
           this.targetOrganizations = options.targetOrganizations;
           this.caFile = options.caFile;
-          this.ccSequence = options.ccSequence;
+          this.coreYamlFile = options.coreYamlFile;
           this.orderer = options.orderer;
           this.ordererTLSHostnameOverride = options.ordererTLSHostnameOverride;
           this.mspId = options.mspId;
@@ -489,7 +504,7 @@ export class FabricLeaf
           !(
             this.targetOrganizations &&
             this.caFile &&
-            this.ccSequence &&
+            this.coreYamlFile &&
             this.orderer &&
             this.ordererTLSHostnameOverride
           )
@@ -627,11 +642,12 @@ export class FabricLeaf
           caFile: this.caFile,
           ccLabel: "fungible-wrapper-contract",
           ccLang: ChainCodeProgrammingLanguage.Typescript,
-          ccSequence: this.ccSequence,
+          ccSequence: 1,
           orderer: this.orderer,
           ordererTLSHostnameOverride: this.ordererTLSHostnameOverride,
           connTimeout: this.connTimeout,
           signaturePolicy: this.signaturePolicy,
+          coreYamlFile: this.coreYamlFile,
         });
 
         if (!deployOutWrapperContract.success) {
@@ -1510,14 +1526,4 @@ export class FabricLeaf
       }
     });
   }
-
-  private isFullPluginOptions = (
-    obj: Partial<IPluginLedgerConnectorFabricOptions>,
-  ): obj is IPluginLedgerConnectorFabricOptions => {
-    return (
-      obj.peerBinary !== undefined &&
-      obj.cliContainerEnv !== undefined &&
-      obj.pluginRegistry !== undefined
-    );
-  };
 }

@@ -42,6 +42,8 @@ export async function launchGateway(): Promise<void> {
   const config = await fs.readJson(path.join(workDir, "/config/config.json"));
   logger.debug("Configuration read OK");
 
+  logger.debug(`Config: ${JSON.stringify(config, null, 2)}`);
+
   // validating gateway-config.json
 
   logger.debug("Validating SATP Gateway instanceId...");
@@ -105,9 +107,12 @@ export async function launchGateway(): Promise<void> {
   logger.debug("SATP KeyPair is valid.");
 
   logger.debug("Validating Cross Chain Config...");
-  const ccConfig = validateCCConfig({
-    configValue: config.ccConfig,
-  });
+  const ccConfig = await validateCCConfig(
+    {
+      configValue: config.ccConfig,
+    },
+    logger,
+  );
   logger.debug("Cross Chain Config is valid.");
 
   logger.debug("Validating Local Repository Config...");

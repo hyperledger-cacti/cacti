@@ -98,14 +98,12 @@ beforeAll(async () => {
     });
 
   ({ config: db_local_config, container: db_local } = await createPGDatabase({
-    port: 5432,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
 
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
-    port: 5450,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
@@ -203,7 +201,7 @@ beforeAll(async () => {
     containerImageName: DOCKER_IMAGE_NAME,
     logLevel,
     emitContainerLogs: true,
-    configFilePath: files.configFilePath,
+    configPath: files.configPath,
     logsPath: files.logsPath,
     ontologiesPath: files.ontologiesPath,
     networkName: testNetwork,
