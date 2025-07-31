@@ -55,6 +55,7 @@ const TIMEOUT = 900000; // 15 minutes
 
 afterAll(async () => {
   await gateway.shutdown();
+  await ethereumEnv.tearDown();
   await besuEnv.tearDown();
   await fabricEnv.tearDown();
 

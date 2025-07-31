@@ -1,2 +1,2 @@
-export const DOCKER_IMAGE_NAME = "aaugusto11/cacti-satp-hermes-gateway";
-export const DOCKER_IMAGE_VERSION = "42f2d28b7-2025-05-28";
+export const DOCKER_IMAGE_NAME = "kubaya/cacti-satp-hermes-gateway";
+export const DOCKER_IMAGE_VERSION = "6fdbbc9e5-2025-07-31";
