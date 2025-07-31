@@ -2,6 +2,7 @@ import {
   DeploymentTargetOrganization,
   FabricContractInvocationType,
   type FabricSigningCredential,
+  FileBase64,
   type IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
@@ -62,6 +63,7 @@ export interface IOracleFabricOptions extends OracleAbstractOptions {
   leafId?: string;
   keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
+  coreYamlFile?: FileBase64;
 }
 
 export class OracleFabric extends OracleAbstract {
@@ -111,9 +113,9 @@ export class OracleFabric extends OracleAbstract {
       ? options.claimFormats.concat(ClaimFormat.DEFAULT)
       : [ClaimFormat.DEFAULT];
 
-    if (!this.isFullPluginOptions(options.connectorOptions)) {
+    if (!options.connectorOptions.pluginRegistry) {
       throw new ConnectorOptionsError(
-        "Invalid options provided to the OracleFabric constructor. Please provide a valid IPluginLedgerConnectorFabricOptions object.",
+        "Invalid options provided to the FabricLeaf constructor. Plugin Registry is required.",
       );
     }
 
@@ -328,14 +330,4 @@ export class OracleFabric extends OracleAbstract {
       }
     });
   }
-
-  private isFullPluginOptions = (
-    obj: Partial<IPluginLedgerConnectorFabricOptions>,
-  ): obj is IPluginLedgerConnectorFabricOptions => {
-    return (
-      obj.peerBinary !== undefined &&
-      obj.cliContainerEnv !== undefined &&
-      obj.pluginRegistry !== undefined
-    );
-  };
 }

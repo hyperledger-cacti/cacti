@@ -15,41 +15,42 @@ export function getUserFromPseudonim(user: string): string {
   }
 }
 
-export function setupGatewayDockerFiles(
-  config: Partial<SATPGatewayConfig>,
-  gatewayHostId: string = "gatewayId",
-): {
-  configFilePath: string;
+export function getTestConfigFilesDirectory(basePath: string): string {
+  const testFilesDirectoryConfig = `${__dirname}/../../../../cache/${basePath}/config`;
+  if (!fs.existsSync(testFilesDirectoryConfig)) {
+    fs.mkdirSync(testFilesDirectoryConfig, { recursive: true });
+  }
+  return testFilesDirectoryConfig;
+}
+
+export function setupGatewayDockerFiles(config: Partial<SATPGatewayConfig>): {
+  configPath: string;
   logsPath: string;
   ontologiesPath: string;
 } {
-  const context =
-    gatewayHostId ||
-    new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
-
-  const directory = `${__dirname}/../../../cache/`;
+  const directory = `${__dirname}/../../../../cache/`;
   const configDir = path.join(
     directory,
-    `gateway-info-${gatewayHostId}/config`,
+    `gateway-info-${config.gid?.id}/config`,
   );
 
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
   }
-  const configFilePath = path.join(configDir, `gateway-config-${context}.json`);
+  const configFilePath = path.join(configDir, "config.json");
   fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2));
   if (!fs.existsSync(configFilePath)) {
     throw new Error(`Config file was not created at path: ${configFilePath}`);
   }
 
-  const logDir = path.join(directory, `gateway-info-${gatewayHostId}/logs`);
+  const logDir = path.join(directory, `gateway-info-${config.gid?.id}/logs`);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
   const ontologiesDir = path.join(
     directory,
-    `gateway-info-${gatewayHostId}/ontologies`,
+    `gateway-info-${config.gid?.id}/ontologies`,
   );
   if (!fs.existsSync(ontologiesDir)) {
     fs.mkdirSync(ontologiesDir, { recursive: true });
@@ -65,7 +66,7 @@ export function setupGatewayDockerFiles(
   }
 
   return {
-    configFilePath,
+    configPath: configDir,
     logsPath: logDir,
     ontologiesPath: ontologiesDir,
   };
