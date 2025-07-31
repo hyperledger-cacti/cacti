@@ -19,6 +19,7 @@ import {
   EthereumTestEnvironment,
   createPGDatabase,
   setupDBTable,
+  getTestConfigFilesDirectory,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -125,7 +126,6 @@ beforeAll(async () => {
     });
 
   ({ config: db_local_config1, container: db_local1 } = await createPGDatabase({
-    port: 5432,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
@@ -133,14 +133,12 @@ beforeAll(async () => {
 
   ({ config: db_remote_config1, container: db_remote1 } =
     await createPGDatabase({
-      port: 5450,
       network: testNetwork,
       postgresUser: "user123123",
       postgresPassword: "password",
     }));
 
   ({ config: db_local_config2, container: db_local2 } = await createPGDatabase({
-    port: 5433,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
@@ -148,7 +146,6 @@ beforeAll(async () => {
 
   ({ config: db_remote_config2, container: db_remote2 } =
     await createPGDatabase({
-      port: 5451,
       network: testNetwork,
       postgresUser: "user123123",
       postgresPassword: "password",
@@ -163,7 +160,7 @@ beforeAll(async () => {
       contractName: satpContractName,
       logLevel,
       network: testNetwork,
-      claimFormat: ClaimFormat.BUNGEE,
+      claimFormat: ClaimFormat.DEFAULT,
     });
     log.info("Fabric Ledger started successfully");
 
@@ -262,7 +259,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
+      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity2.id}`),
+    );
 
     const files1 = setupGatewayDockerFiles({
       gatewayIdentity: gatewayIdentity1,
@@ -272,7 +271,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       ccConfig: { bridgeConfig: [besuConfigJSON] },
       localRepository: db_local_config1,
       remoteRepository: db_remote_config1,
-      gatewayId: "gateway-1",
       gatewayKeyPair: {
         privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
@@ -287,7 +285,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       ccConfig: { bridgeConfig: [fabricConfigJSON] },
       localRepository: db_local_config2,
       remoteRepository: db_remote_config2,
-      gatewayId: "gateway-2",
       gatewayKeyPair: {
         privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
@@ -303,7 +300,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files1.configFilePath,
+      configPath: files1.configPath,
       logsPath: files1.logsPath,
       ontologiesPath: files1.ontologiesPath,
       networkName: testNetwork,
@@ -319,7 +316,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files2.configFilePath,
+      configPath: files2.configPath,
       logsPath: files2.logsPath,
       ontologiesPath: files2.ontologiesPath,
       networkName: testNetwork,
@@ -499,7 +496,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     } as GatewayIdentity;
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
+      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity1.id}`),
+    );
 
     // besuConfig Json object setup:
     const besuConfigJSON = await besuEnv.createBesuDockerConfig();
@@ -544,7 +543,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files1.configFilePath,
+      configPath: files1.configPath,
       logsPath: files1.logsPath,
       ontologiesPath: files1.ontologiesPath,
       networkName: testNetwork,
@@ -560,7 +559,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files2.configFilePath,
+      configPath: files2.configPath,
       logsPath: files2.logsPath,
       ontologiesPath: files2.ontologiesPath,
       networkName: testNetwork,
@@ -806,7 +805,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files1.configFilePath,
+      configPath: files1.configPath,
       logsPath: files1.logsPath,
       ontologiesPath: files1.ontologiesPath,
       networkName: testNetwork,
@@ -822,7 +821,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files2.configFilePath,
+      configPath: files2.configPath,
       logsPath: files2.logsPath,
       ontologiesPath: files2.ontologiesPath,
       networkName: testNetwork,

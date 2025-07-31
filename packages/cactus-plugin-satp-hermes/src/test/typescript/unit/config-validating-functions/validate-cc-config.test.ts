@@ -1,13 +1,15 @@
 import "jest-extended";
 import { validateCCConfig } from "../../../../main/typescript/services/validation/config-validating-functions/validate-cc-config";
 import { INetworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
-import { IFabricLeafNeworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import { IBesuLeafNeworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { IEthereumLeafNeworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
 } from "@hyperledger/cactus-test-tooling";
+import { FabricConfigJSON } from "../../../../main/typescript/services/validation/config-validating-functions/bridges-config-validating-functions/validate-fabric-config";
+import path from "path";
+import { Logger } from "@hyperledger/cactus-common";
 
 const connectionProfile = {
   name: "test-network-org1",
@@ -94,18 +96,6 @@ const fabricConfig = {
     type: "X.509", // Credential type; typically X.509 for Fabric
   },
   connectorOptions: {
-    dockerBinary: "/usr/local/bin/docker",
-    peerBinary: "/fabric-samples/bin/peer",
-    goBinary: "/usr/local/go/bin/go",
-    cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-    sshConfig: {
-      // SSH access details (if interacting over SSH)
-      host: "172.20.0.6",
-      privateKey:
-        "-----BEGIN OPENSSH PRIVATE KEY-----\n...\n-----END OPENSSH PRIVATE KEY-----\n",
-      username: "root",
-      port: 22,
-    },
     connectionProfile: connectionProfile,
     discoveryOptions: {
       enabled: true,
@@ -118,10 +108,47 @@ const fabricConfig = {
   },
   channelName: "mychannel",
   targetOrganizations: [
-    FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-    FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+    {
+      CORE_PEER_LOCALMSPID:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+      CORE_PEER_ADDRESS:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+      CORE_PEER_MSPCONFIG_PATH: path.join(
+        __dirname,
+        "../../../yaml/resources/test-config-folder",
+      ),
+      CORE_PEER_TLS_ROOTCERT_PATH: path.join(
+        __dirname,
+        "../../../yaml/resources/test-config-folder/test-config",
+      ),
+      ORDERER_TLS_ROOTCERT_PATH: path.join(
+        __dirname,
+        "../../../yaml/resources/test-config-folder/test-config",
+      ),
+    },
+    {
+      CORE_PEER_LOCALMSPID:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+      CORE_PEER_ADDRESS:
+        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+      CORE_PEER_MSPCONFIG_PATH: path.join(
+        __dirname,
+        "../../../yaml/resources/test-config-folder",
+      ),
+      CORE_PEER_TLS_ROOTCERT_PATH: path.join(
+        __dirname,
+        "../../../yaml/resources/test-config-folder/test-config",
+      ),
+      ORDERER_TLS_ROOTCERT_PATH: path.join(
+        __dirname,
+        "../../../yaml/resources/test-config-folder/test-config",
+      ),
+    },
   ],
-  caFile: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.ORDERER_TLS_ROOTCERT_FILE,
+  caFilePath: path.join(
+    __dirname,
+    "../../../yaml/resources/test-config-folder/test-config",
+  ),
   ccSequence: 1,
   orderer: "orderer.example.com:7050",
   ordererTLSHostnameOverride: "orderer.example.com",
@@ -137,7 +164,8 @@ const fabricConfig = {
       "0x1c3a1e987fdabc9aeea47e457ad4db9732f7d7b6d2856d6e3f9b8d88ff6e227e",
   },
   claimFormats: [2],
-} as Partial<IFabricLeafNeworkOptions> & INetworkOptions;
+  coreYamlFilePath: path.join(__dirname, "../../../yaml/resources/core.yaml"),
+} as Partial<FabricConfigJSON> & INetworkOptions;
 
 const ethereumConfig = {
   networkIdentification: {
@@ -197,6 +225,11 @@ const besuConfig = {
   gas: 999999999999999,
 } as Partial<IBesuLeafNeworkOptions> & INetworkOptions;
 
+const logger: Logger = new Logger({
+  label: "ValidateCCConfigTest",
+  level: "DEBUG",
+});
+
 describe("Validate CC Config", () => {
   it("should pass with a valid cc config (oracleConfig)", async () => {
     const oracleConfig = [
@@ -222,21 +255,27 @@ describe("Validate CC Config", () => {
         claimFormats: [2],
       },
     ];
-    const result = validateCCConfig({
-      configValue: {
-        oracleConfig,
+    const result = await validateCCConfig(
+      {
+        configValue: {
+          oracleConfig,
+        },
       },
-    });
+      logger,
+    );
     expect(result.oracleConfig).toEqual(oracleConfig);
   });
 
   it("should pass with a valid cc config (FabricConfig)", async () => {
     const bridgeConfig = [fabricConfig];
-    const result = validateCCConfig({
-      configValue: {
-        bridgeConfig,
+    const result = await validateCCConfig(
+      {
+        configValue: {
+          bridgeConfig,
+        },
       },
-    });
+      logger,
+    );
     expect(result.bridgeConfig![0].networkIdentification.ledgerType).toEqual(
       "FABRIC_2",
     );
@@ -244,11 +283,14 @@ describe("Validate CC Config", () => {
 
   it("should pass with a valid cc config  (EthereumConfig)", async () => {
     const bridgeConfig = [ethereumConfig];
-    const result = validateCCConfig({
-      configValue: {
-        bridgeConfig,
+    const result = await validateCCConfig(
+      {
+        configValue: {
+          bridgeConfig,
+        },
       },
-    });
+      logger,
+    );
     expect(result.bridgeConfig![0].networkIdentification.ledgerType).toEqual(
       "ETHEREUM",
     );
@@ -256,66 +298,81 @@ describe("Validate CC Config", () => {
 
   it("should pass with a valid cc config (BesuConfig)", async () => {
     const bridgeConfig = [besuConfig];
-    const result = validateCCConfig({
-      configValue: {
-        bridgeConfig,
+    const result = await validateCCConfig(
+      {
+        configValue: {
+          bridgeConfig,
+        },
       },
-    });
+      logger,
+    );
     expect(result.bridgeConfig![0].networkIdentification.ledgerType).toEqual(
       "BESU_2X",
     );
   });
 
   it("should throw when instantiate SATP Gateway Runner without bridgesConfig nor oracleConfig", async () => {
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          notConfig: [
-            {
-              networkIdentification: {
-                id: "EthereumLedgerTestNetwork",
-                ledgerType: "ETHEREUM",
-              },
-              signingCredential: {
-                ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
-                secret:
-                  "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
-                type: "GETH_KEYCHAIN_PASSWORD",
-              },
-              gasConfig: {
-                gas: "6721975",
-                gasPrice: "20000000000",
-              },
-              connectorOptions: {
-                rpcApiHttpHost: "http://127.0.0.1:7545",
-                rpcApiWsHost: "ws://127.0.0.1:7545",
-              },
-              claimFormats: [2],
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              notConfig: [
+                {
+                  networkIdentification: {
+                    id: "EthereumLedgerTestNetwork",
+                    ledgerType: "ETHEREUM",
+                  },
+                  signingCredential: {
+                    ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
+                    secret:
+                      "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
+                    type: "GETH_KEYCHAIN_PASSWORD",
+                  },
+                  gasConfig: {
+                    gas: "6721975",
+                    gasPrice: "20000000000",
+                  },
+                  connectorOptions: {
+                    rpcApiHttpHost: "http://127.0.0.1:7545",
+                    rpcApiWsHost: "ws://127.0.0.1:7545",
+                  },
+                  claimFormats: [2],
+                },
+              ],
             },
-          ],
-        },
-      }),
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
   it("should throw when instantiate SATP Gateway Runner with a null oracleConfig", async () => {
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          oracleConfig: null,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              oracleConfig: null,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
   it("should throw when bridgeConfig is not a array", async () => {
     const bridgeConfig = ethereumConfig;
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -344,13 +401,17 @@ describe("Validate CC Config", () => {
         claimFormats: [2],
       },
     ];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          oracleConfig,
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              oracleConfig,
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig && config\.oracleConfig/);
   });
 
@@ -417,12 +478,16 @@ describe("Validate CC Config", () => {
       claimFormats: [2],
     };
     const bridgeConfig = [badFabricConfig];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -489,12 +554,16 @@ describe("Validate CC Config", () => {
       claimFormats: [2],
     };
     const bridgeConfig = [badFabricConfig];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -529,12 +598,16 @@ describe("Validate CC Config", () => {
       },
     };
     const bridgeConfig = [badEthereumConfig];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -569,12 +642,16 @@ describe("Validate CC Config", () => {
       },
     };
     const bridgeConfig = [badEthereumConfig];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -607,12 +684,16 @@ describe("Validate CC Config", () => {
       gas: 999999999999999,
     };
     const bridgeConfig = [badBesuConfig];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -645,12 +726,16 @@ describe("Validate CC Config", () => {
       gas: 999999999999999,
     };
     const bridgeConfig = [badBesuConfig];
-    expect(() =>
-      validateCCConfig({
-        configValue: {
-          bridgeConfig,
-        },
-      }),
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
+          },
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 });

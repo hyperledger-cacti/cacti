@@ -43,7 +43,7 @@ import {
   DEFAULT_PORT_GATEWAY_SERVER,
   DEFAULT_PORT_GATEWAY_OAPI,
 } from "@hyperledger/cactus-plugin-satp-hermes";
-import { setupGatewayDockerFiles } from "./utils";
+import { getTestConfigFilesDirectory, setupGatewayDockerFiles } from "./utils";
 import {
   ISATPGatewayRunnerConstructorOptions,
   SATPGatewayRunner,
@@ -59,9 +59,9 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   private static readonly networkName = "CDBC_Network";
 
-  private static readonly DOCKER_IMAGE_VERSION = "42f2d28b7-2025-05-28";
+  private static readonly DOCKER_IMAGE_VERSION = "5f190f37f-2025-08-19";
   private static readonly DOCKER_IMAGE_NAME =
-    "aaugusto11/cacti-satp-hermes-gateway";
+    "kubaya/cacti-satp-hermes-gateway";
 
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
@@ -236,7 +236,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     const besuGatewayKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
     const fabricGatewayIdentity = {
-      id: "mockID-1",
+      id: "FabricGateway",
       name: "CustomGateway",
       version: [
         {
@@ -260,7 +260,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     } as GatewayIdentity;
 
     const besuGatewayIdentity = {
-      id: "mockID-2",
+      id: "BesuGateway",
       name: "CustomGateway",
       version: [
         {
@@ -283,8 +283,9 @@ export class CbdcBridgingAppDummyInfrastructure {
       pubKey: Buffer.from(besuGatewayKeyPair.publicKey).toString("hex"),
     } as GatewayIdentity;
 
-    const fabricConfig =
-      await this.fabricEnvironment.createFabricDockerConfig();
+    const fabricConfig = await this.fabricEnvironment.createFabricDockerConfig(
+      getTestConfigFilesDirectory(`gateway-info-${fabricGatewayIdentity.id}`),
+    );
 
     const besuConfig = await this.besuEnvironment.createBesuDockerConfig();
 
@@ -346,14 +347,9 @@ export class CbdcBridgingAppDummyInfrastructure {
       ontologyPath: "/opt/cacti/satp-hermes/ontologies",
     };
 
-    const besuGatewayDockerFiles = setupGatewayDockerFiles(
-      besuGatewayOptions,
-      "besu-gateway",
-    );
-    const fabricGatewayDockerFiles = setupGatewayDockerFiles(
-      fabricGatewayOptions,
-      "fabric-gateway",
-    );
+    const besuGatewayDockerFiles = setupGatewayDockerFiles(besuGatewayOptions);
+    const fabricGatewayDockerFiles =
+      setupGatewayDockerFiles(fabricGatewayOptions);
 
     const besuGatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion:
@@ -364,7 +360,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel: this.logLevel,
       emitContainerLogs: true,
-      configFilePath: besuGatewayDockerFiles.configFilePath,
+      configPath: besuGatewayDockerFiles.configPath,
       logsPath: besuGatewayDockerFiles.logsPath,
       ontologiesPath: besuGatewayDockerFiles.ontologiesPath,
       networkName: CbdcBridgingAppDummyInfrastructure.networkName,
@@ -380,7 +376,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
       logLevel: this.logLevel,
       emitContainerLogs: true,
-      configFilePath: fabricGatewayDockerFiles.configFilePath,
+      configPath: fabricGatewayDockerFiles.configPath,
       logsPath: fabricGatewayDockerFiles.logsPath,
       ontologiesPath: fabricGatewayDockerFiles.ontologiesPath,
       networkName: CbdcBridgingAppDummyInfrastructure.networkName,

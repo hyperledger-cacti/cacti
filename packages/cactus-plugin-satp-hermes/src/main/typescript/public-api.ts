@@ -13,3 +13,8 @@ export {
   DEFAULT_PORT_GATEWAY_OAPI,
 } from "./core/constants";
 export { GatewayIdentity } from "./core/types";
+
+export {
+  TargetOrganization,
+  FabricConfigJSON,
+} from "./services/validation/config-validating-functions/bridges-config-validating-functions/validate-fabric-config";

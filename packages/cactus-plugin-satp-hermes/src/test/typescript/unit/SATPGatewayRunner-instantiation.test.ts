@@ -56,7 +56,7 @@ describe("Instantiate SATP Gateway Runner", () => {
     oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
     logLevel,
     emitContainerLogs: true,
-    configFilePath: files.configFilePath,
+    configPath: files.configPath,
     logsPath: files.logsPath,
     ontologiesPath: files.ontologiesPath,
   };

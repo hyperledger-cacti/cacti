@@ -118,7 +118,6 @@ beforeAll(async () => {
     });
 
   ({ config: db_local_config1, container: db_local1 } = await createPGDatabase({
-    port: 5432,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
@@ -126,14 +125,12 @@ beforeAll(async () => {
 
   ({ config: db_remote_config1, container: db_remote1 } =
     await createPGDatabase({
-      port: 5450,
       network: testNetwork,
       postgresUser: "user123123",
       postgresPassword: "password",
     }));
 
   ({ config: db_local_config2, container: db_local2 } = await createPGDatabase({
-    port: 5433,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
@@ -141,7 +138,6 @@ beforeAll(async () => {
 
   ({ config: db_remote_config2, container: db_remote2 } =
     await createPGDatabase({
-      port: 5451,
       network: testNetwork,
       postgresUser: "user123123",
       postgresPassword: "password",
@@ -228,7 +224,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files.configFilePath,
+      configPath: files.configPath,
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
@@ -448,7 +444,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files1.configFilePath,
+      configPath: files1.configPath,
       logsPath: files1.logsPath,
       ontologiesPath: files1.ontologiesPath,
       networkName: testNetwork,
@@ -464,7 +460,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files2.configFilePath,
+      configPath: files2.configPath,
       logsPath: files2.logsPath,
       ontologiesPath: files2.ontologiesPath,
       networkName: testNetwork,
@@ -707,7 +703,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files1.configFilePath,
+      configPath: files1.configPath,
       logsPath: files1.logsPath,
       ontologiesPath: files1.ontologiesPath,
       networkName: testNetwork,
@@ -723,7 +719,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files2.configFilePath,
+      configPath: files2.configPath,
       logsPath: files2.logsPath,
       ontologiesPath: files2.ontologiesPath,
       networkName: testNetwork,

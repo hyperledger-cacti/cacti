@@ -553,8 +553,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         await Promise.all([
           this.createDBRepository(),
           this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!),
-          this.startupGOLServer(),
         ]);
+
+        // start everything before starting the GOL server
+        await this.startupGOLServer();
         span.setStatus({ code: SpanStatusCode.OK });
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

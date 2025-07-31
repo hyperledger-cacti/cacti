@@ -25,6 +25,16 @@ export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
 
+const testFilesDirectory = `${__dirname}/../../../cache/`;
+
+export function getTestConfigFilesDirectory(basePath: string): string {
+  const testFilesDirectoryConfig = `${__dirname}/../../../cache/${basePath}/config`;
+  if (!fs.existsSync(testFilesDirectoryConfig)) {
+    fs.mkdirSync(testFilesDirectoryConfig, { recursive: true });
+  }
+  return testFilesDirectoryConfig;
+}
+
 const composeFilePath = path.resolve(
   __dirname,
   "../../../../../packages/cactus-plugin-satp-hermes/docker-compose-satp.yml",
@@ -133,7 +143,7 @@ export interface GatewayDockerConfig {
 }
 
 export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
-  configFilePath: string;
+  configPath: string;
   logsPath: string;
   ontologiesPath: string;
 } {
@@ -145,8 +155,6 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     ccConfig,
     localRepository,
     remoteRepository,
-    gatewayId = "gatewayId",
-    fileContext,
     gatewayKeyPair,
   } = config;
 
@@ -173,28 +181,30 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     ontologyPath: "/opt/cacti/satp-hermes/ontologies",
   };
 
-  const context =
-    fileContext ||
-    new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
-
-  const directory = `${__dirname}/../../../cache/`;
-  const configDir = path.join(directory, `gateway-info-${gatewayId}/config`);
+  const directory = testFilesDirectory;
+  const configDir = path.join(
+    directory,
+    `gateway-info-${gatewayIdentity.id}/config`,
+  );
 
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
   }
-  const configFilePath = path.join(configDir, `gateway-config-${context}.json`);
+  const configFilePath = path.join(configDir, "config.json");
   fs.writeFileSync(configFilePath, JSON.stringify(jsonObject, null, 2));
   expect(fs.existsSync(configFilePath)).toBe(true);
 
-  const logDir = path.join(directory, `gateway-info-${gatewayId}/logs`);
+  const logDir = path.join(
+    directory,
+    `gateway-info-${gatewayIdentity.id}/logs`,
+  );
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
   const ontologiesDir = path.join(
     directory,
-    `gateway-info-${gatewayId}/ontologies`,
+    `gateway-info-${gatewayIdentity.id}/ontologies`,
   );
   if (!fs.existsSync(ontologiesDir)) {
     fs.mkdirSync(ontologiesDir, { recursive: true });
@@ -210,7 +220,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
   }
 
   return {
-    configFilePath,
+    configPath: configDir,
     logsPath: logDir,
     ontologiesPath: ontologiesDir,
   };
@@ -232,7 +242,6 @@ export function getTransactRequest(
 }
 
 export interface PGDatabaseConfig {
-  port: number;
   toUseInDocker?: boolean;
   network?: string;
   postgresUser?: string;
@@ -244,7 +253,6 @@ export async function createPGDatabase(
   config: PGDatabaseConfig,
 ): Promise<{ config: Knex.Config; container: Container }> {
   const {
-    port,
     network,
     postgresUser = "postgres",
     postgresPassword = "password",
@@ -276,9 +284,6 @@ export async function createPGDatabase(
   const hostConfig: Docker.HostConfig = {
     PublishAllPorts: true,
     Binds: [],
-    PortBindings: {
-      "5432/tcp": [{ HostPort: `${port}` }],
-    },
     NetworkMode: network,
   };
 
@@ -359,35 +364,16 @@ export async function createPGDatabase(
 
   const migrationSource = await createMigrationSource();
 
-  if (network) {
-    return {
-      config: {
-        client: "pg",
-        connection: {
-          host: containerData.NetworkSettings.Networks[network || "bridge"]
-            .IPAddress,
-          user: postgresUser,
-          password: postgresPassword,
-          database: postgresDB,
-          port: 5432,
-          ssl: false,
-        },
-        migrations: {
-          migrationSource: migrationSource,
-        },
-      } as Knex.Config,
-      container: await container,
-    };
-  }
   return {
     config: {
       client: "pg",
       connection: {
-        host: "localhost",
+        host: containerData.NetworkSettings.Networks[network || "bridge"]
+          .IPAddress,
         user: postgresUser,
         password: postgresPassword,
         database: postgresDB,
-        port: port,
+        port: 5432,
         ssl: false,
       },
       migrations: {
