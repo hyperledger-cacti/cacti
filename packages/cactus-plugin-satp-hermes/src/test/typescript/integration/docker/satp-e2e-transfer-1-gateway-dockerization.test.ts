@@ -18,6 +18,7 @@ import {
   EthereumTestEnvironment,
   createPGDatabase,
   setupDBTable,
+  getTestConfigFilesDirectory,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -60,7 +61,7 @@ const testNetwork = "test-network";
 
 const gatewayAddress = "gateway.satp-hermes";
 
-const TIMEOUT = 900000; // 15 minutes
+const TIMEOUT = 9000000; // 15 minutes
 afterEach(async () => {
   if (gatewayRunner) {
     await gatewayRunner.stop();
@@ -99,14 +100,12 @@ beforeAll(async () => {
     });
 
   ({ config: db_local_config, container: db_local } = await createPGDatabase({
-    port: 5432,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
 
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
-    port: 5450,
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
@@ -187,7 +186,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
+      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity.id}`),
+    );
 
     // gateway configuration setup:
     const files = setupGatewayDockerFiles({
@@ -206,7 +207,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       containerImageName: DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files.configFilePath,
+      configPath: files.configPath,
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
@@ -342,7 +343,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
+      getTestConfigFilesDirectory(gatewayIdentity.id),
+    );
 
     // gateway configuration setup:
     const files = setupGatewayDockerFiles({
@@ -361,7 +364,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       containerImageName: DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files.configFilePath,
+      configPath: files.configPath,
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
@@ -519,7 +522,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       containerImageName: DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
-      configFilePath: files.configFilePath,
+      configPath: files.configPath,
       logsPath: files.logsPath,
       ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
