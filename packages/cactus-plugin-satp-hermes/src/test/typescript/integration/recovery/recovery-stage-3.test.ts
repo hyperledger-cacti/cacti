@@ -49,11 +49,17 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
 let knexInstanceRemote: Knex;
 let knexInstanceTargetRemote: Knex;
+
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
+monitorService.init();
 
 let gateway1: SATPGateway;
 let gateway2: SATPGateway;
@@ -78,6 +84,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: !isClient,
     client: isClient,
+    monitorService: monitorService,
   });
 
   const baseTime = new Date();
@@ -286,6 +293,7 @@ beforeAll(async () => {
     enableCrashRecovery: true,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [] }),
+    monitorService: monitorService,
   };
 
   knexInstanceRemote = knex({
@@ -314,6 +322,7 @@ beforeAll(async () => {
     enableCrashRecovery: true,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [] }),
+    monitorService: monitorService,
   };
 
   gateway1 = (await factory.create(options1)) as SATPGateway;

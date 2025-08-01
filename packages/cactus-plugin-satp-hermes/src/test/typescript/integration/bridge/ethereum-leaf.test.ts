@@ -1,4 +1,4 @@
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   pruneDockerAllIfGithubAction,
   Containers,
@@ -12,10 +12,16 @@ import path from "path";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { EthereumTestEnvironment } from "../../test-utils";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let ontologyManager: OntologyManager;
 
 let asset: EvmFungibleAsset;
+
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
+monitorService.init();
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -41,10 +47,13 @@ beforeAll(async () => {
 
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
-    ontologyManager = new OntologyManager({
-      logLevel,
-      ontologiesPath: ontologiesPath,
-    });
+    ontologyManager = new OntologyManager(
+      {
+        logLevel,
+        ontologiesPath: ontologiesPath,
+      },
+      monitorService,
+    );
 
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
       contractName: erc20TokenContract,
@@ -66,6 +75,8 @@ afterAll(async () => {
     fail("Error shutting down Ethereum Leaf connector");
   });
 
+  await monitorService.shutdown();
+
   log.info("Ethereum Leaf connector shutdown successfully");
 
   await pruneDockerAllIfGithubAction({ logLevel })
@@ -82,7 +93,9 @@ describe("Ethereum Leaf Test", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     ethereumLeaf = new EthereumLeaf(
-      ethereumEnv.createEthereumLeafConfig(ontologyManager, "DEBUG"),
+      ethereumEnv.createEthereumLeafConfig("DEBUG"),
+      ontologyManager,
+      monitorService,
     );
     expect(ethereumLeaf).toBeDefined();
   });
