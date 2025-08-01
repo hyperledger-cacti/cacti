@@ -16,7 +16,8 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
 import { getSessionId } from "./handler-utils";
 import {
@@ -32,6 +33,8 @@ import {
   setError,
   setErrorChecking,
 } from "../session-utils";
+import { MonitorService } from "../../services/monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
@@ -39,12 +42,17 @@ export class Stage3SATPHandler implements SATPHandler {
   private clientService: Stage3ClientService;
   private serverService: Stage3ServerService;
   private logger: Logger;
+  private readonly monitorService: MonitorService;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
     this.serverService = ops.serverService as Stage3ServerService;
     this.clientService = ops.clientService as Stage3ClientService;
-    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      ops.loggerOptions,
+      this.monitorService,
+    );
     this.logger.trace(`Initialized ${Stage3SATPHandler.CLASS_NAME}`);
   }
 
@@ -70,50 +78,64 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<CommitPreparationResponse> {
     const stepTag = `CommitPreparationImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Commit Preparation...`);
-      this.Log.debug(`${fnTag}, Request: ${req}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Commit Preparation...`);
+          this.Log.debug(`${fnTag}, Request: ${req}`);
 
-      session = this.sessions.get(getSessionId(req));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(req));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.serverService.checkCommitPreparationRequest(req, session);
+
+          saveMessageInSessionData(session.getServerSessionData(), req);
+
+          await this.serverService.mintAsset(session);
+
+          const message = await this.serverService.commitReadyResponse(
+            req,
+            session,
+          );
+
+          this.Log.debug(`${fnTag}, Returning response: ${message}`);
+
+          if (!message) {
+            throw new FailedToCreateMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_READY),
+            );
+          }
+
+          saveMessageInSessionData(session.getServerSessionData(), message);
+
+          return message;
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_READY),
+              error,
+            )}`,
+          );
+          setError(session, MessageType.COMMIT_READY, error);
+          return await this.serverService.commitReadyErrorResponse(
+            error,
+            session,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.serverService.checkCommitPreparationRequest(req, session);
-
-      saveMessageInSessionData(session.getServerSessionData(), req);
-
-      await this.serverService.mintAsset(session);
-
-      const message = await this.serverService.commitReadyResponse(
-        req,
-        session,
-      );
-
-      this.Log.debug(`${fnTag}, Returning response: ${message}`);
-
-      if (!message) {
-        throw new FailedToCreateMessageError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_READY),
-        );
-      }
-
-      saveMessageInSessionData(session.getServerSessionData(), message);
-
-      return message;
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_READY),
-          error,
-        )}`,
-      );
-      setError(session, MessageType.COMMIT_READY, error);
-      return await this.serverService.commitReadyErrorResponse(error, session);
-    }
+    });
   }
 
   async CommitFinalAssertionImplementation(
@@ -122,54 +144,68 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<CommitFinalAssertionResponse> {
     const stepTag = `CommitFinalAssertionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Commit Final Assertion...`);
-      this.Log.debug(`${fnTag}, Request: ${req}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Commit Final Assertion...`);
+          this.Log.debug(`${fnTag}, Request: ${req}`);
 
-      session = this.sessions.get(getSessionId(req));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(req));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.serverService.checkCommitFinalAssertionRequest(
+            req,
+            session,
+          );
+
+          saveMessageInSessionData(session.getServerSessionData(), req);
+
+          await this.serverService.assignAsset(session);
+
+          const message =
+            await this.serverService.commitFinalAcknowledgementReceiptResponse(
+              req,
+              session,
+            );
+
+          this.Log.debug(`${fnTag}, Returning response: ${message}`);
+
+          if (!message) {
+            throw new FailedToCreateMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+            );
+          }
+
+          saveMessageInSessionData(session.getServerSessionData(), message);
+
+          return message;
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+              error,
+            )}`,
+          );
+          setError(session, MessageType.ACK_COMMIT_FINAL, error);
+          return await this.serverService.commitFinalAcknowledgementReceiptErrorResponse(
+            error,
+            session,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.serverService.checkCommitFinalAssertionRequest(req, session);
-
-      saveMessageInSessionData(session.getServerSessionData(), req);
-
-      await this.serverService.assignAsset(session);
-
-      const message =
-        await this.serverService.commitFinalAcknowledgementReceiptResponse(
-          req,
-          session,
-        );
-
-      this.Log.debug(`${fnTag}, Returning response: ${message}`);
-
-      if (!message) {
-        throw new FailedToCreateMessageError(
-          fnTag,
-          getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-        );
-      }
-
-      saveMessageInSessionData(session.getServerSessionData(), message);
-
-      return message;
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-          error,
-        )}`,
-      );
-      setError(session, MessageType.ACK_COMMIT_FINAL, error);
-      return await this.serverService.commitFinalAcknowledgementReceiptErrorResponse(
-        error,
-        session,
-      );
-    }
+    });
   }
 
   async TransferCompleteImplementation(
@@ -178,64 +214,91 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<TransferCompleteResponse> {
     const stepTag = `CommitFinalAssertionImplementation()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Transfer Complete...`);
-      this.Log.debug(`${fnTag}, Request: ${req}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Transfer Complete...`);
+          this.Log.debug(`${fnTag}, Request: ${req}`);
 
-      session = this.sessions.get(getSessionId(req));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(req));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.serverService.checkTransferCompleteRequest(req, session);
+
+          saveMessageInSessionData(session.getServerSessionData(), req);
+
+          const message = await this.serverService.transferCompleteResponse(
+            req,
+            session,
+          );
+
+          if (!message) {
+            throw new FailedToCreateMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
+            );
+          }
+
+          saveMessageInSessionData(session.getServerSessionData(), message);
+
+          return message;
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
+              error,
+            )}`,
+          );
+          setError(
+            session,
+            MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+            error,
+          );
+          return await this.serverService.transferCompleteErrorResponse(
+            error,
+            session,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.serverService.checkTransferCompleteRequest(req, session);
-
-      saveMessageInSessionData(session.getServerSessionData(), req);
-
-      const message = await this.serverService.transferCompleteResponse(
-        req,
-        session,
-      );
-
-      if (!message) {
-        throw new FailedToCreateMessageError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
-        );
-      }
-
-      saveMessageInSessionData(session.getServerSessionData(), message);
-
-      return message;
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
-          error,
-        )}`,
-      );
-      setError(session, MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE, error);
-      return await this.serverService.transferCompleteErrorResponse(
-        error,
-        session,
-      );
-    }
+    });
   }
 
   setupRouter(router: ConnectRouter): void {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    router.service(SatpStage3Service, {
-      async commitPreparation(req) {
-        return await that.CommitPreparationImplementation(req);
-      },
-      async commitFinalAssertion(req) {
-        return await that.CommitFinalAssertionImplementation(req);
-      },
-      async transferComplete(req) {
-        return await that.TransferCompleteImplementation(req);
-      },
+    const fnTag = `${this.getHandlerIdentifier()}#setupRouter()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this;
+        router.service(SatpStage3Service, {
+          async commitPreparation(req) {
+            return await that.CommitPreparationImplementation(req);
+          },
+          async commitFinalAssertion(req) {
+            return await that.CommitFinalAssertionImplementation(req);
+          },
+          async transferComplete(req) {
+            return await that.TransferCompleteImplementation(req);
+          },
+        });
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
   }
 
@@ -246,50 +309,64 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<CommitPreparationRequest> {
     const stepTag = `CommitPreparationRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Commit Preparation Request...`);
-      this.Log.debug(`${fnTag}, Response: ${response}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Commit Preparation Request...`);
+          this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      session = this.sessions.get(getSessionId(response));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(response));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.clientService.checkLockAssertionResponse(
+            response,
+            session,
+          );
+
+          saveMessageInSessionData(session.getClientSessionData(), response);
+
+          const request = await this.clientService.commitPreparation(
+            response,
+            session,
+          );
+
+          if (!request) {
+            throw new FailedToCreateMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_PREPARE),
+            );
+          }
+
+          saveMessageInSessionData(session.getClientSessionData(), request);
+
+          return request;
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_PREPARE),
+              error,
+            )}`,
+          );
+          setError(session, MessageType.COMMIT_PREPARE, error);
+          throw new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.COMMIT_PREPARE),
+            error,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.clientService.checkLockAssertionResponse(response, session);
-
-      saveMessageInSessionData(session.getClientSessionData(), response);
-
-      const request = await this.clientService.commitPreparation(
-        response,
-        session,
-      );
-
-      if (!request) {
-        throw new FailedToCreateMessageError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_PREPARE),
-        );
-      }
-
-      saveMessageInSessionData(session.getClientSessionData(), request);
-
-      return request;
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_PREPARE),
-          error,
-        )}`,
-      );
-      setError(session, MessageType.COMMIT_PREPARE, error);
-      throw new FailedToProcessError(
-        fnTag,
-        getMessageTypeName(MessageType.COMMIT_PREPARE),
-        error,
-      );
-    }
+    });
   }
 
   async CommitFinalAssertionRequest(
@@ -297,55 +374,66 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<CommitFinalAssertionRequest> {
     const stepTag = `CommitFinalAssertionRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Commit Final Assertion Request...`);
-      this.Log.debug(`${fnTag}, Response: ${response}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Commit Final Assertion Request...`);
+          this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      session = this.sessions.get(getSessionId(response));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(response));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.clientService.checkCommitPreparationResponse(
+            response,
+            session,
+          );
+
+          saveMessageInSessionData(session.getClientSessionData(), response);
+
+          await this.clientService.burnAsset(session);
+
+          const request = await this.clientService.commitFinalAssertion(
+            response,
+            session,
+          );
+
+          if (!request) {
+            throw new FailedToCreateMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_FINAL),
+            );
+          }
+
+          saveMessageInSessionData(session.getClientSessionData(), request);
+
+          return request;
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              getMessageTypeName(MessageType.COMMIT_FINAL),
+              error,
+            )}`,
+          );
+          setError(session, MessageType.COMMIT_FINAL, error);
+          throw new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.COMMIT_FINAL),
+            error,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.clientService.checkCommitPreparationResponse(
-        response,
-        session,
-      );
-
-      saveMessageInSessionData(session.getClientSessionData(), response);
-
-      await this.clientService.burnAsset(session);
-
-      const request = await this.clientService.commitFinalAssertion(
-        response,
-        session,
-      );
-
-      if (!request) {
-        throw new FailedToCreateMessageError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_FINAL),
-        );
-      }
-
-      saveMessageInSessionData(session.getClientSessionData(), request);
-
-      return request;
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          getMessageTypeName(MessageType.COMMIT_FINAL),
-          error,
-        )}`,
-      );
-      setError(session, MessageType.COMMIT_FINAL, error);
-      throw new FailedToProcessError(
-        fnTag,
-        getMessageTypeName(MessageType.COMMIT_FINAL),
-        error,
-      );
-    }
+    });
   }
 
   async TransferCompleteRequest(
@@ -353,53 +441,64 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<TransferCompleteRequest> {
     const stepTag = `TransferCompleteRequest()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Transfer Complete Request...`);
-      this.Log.debug(`${fnTag}, Response: ${response}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Transfer Complete Request...`);
+          this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      session = this.sessions.get(getSessionId(response));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(response));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.clientService.checkCommitFinalAssertionResponse(
+            response,
+            session,
+          );
+
+          saveMessageInSessionData(session.getClientSessionData(), response);
+
+          const request = await this.clientService.transferComplete(
+            response,
+            session,
+          );
+
+          if (!request) {
+            throw new FailedToCreateMessageError(
+              fnTag,
+              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+            );
+          }
+
+          saveMessageInSessionData(session.getClientSessionData(), request);
+
+          return request;
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+              error,
+            )}`,
+          );
+          setError(session, MessageType.ACK_COMMIT_FINAL, error);
+          throw new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+            error,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.clientService.checkCommitFinalAssertionResponse(
-        response,
-        session,
-      );
-
-      saveMessageInSessionData(session.getClientSessionData(), response);
-
-      const request = await this.clientService.transferComplete(
-        response,
-        session,
-      );
-
-      if (!request) {
-        throw new FailedToCreateMessageError(
-          fnTag,
-          getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-        );
-      }
-
-      saveMessageInSessionData(session.getClientSessionData(), request);
-
-      return request;
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-          error,
-        )}`,
-      );
-      setError(session, MessageType.ACK_COMMIT_FINAL, error);
-      throw new FailedToProcessError(
-        fnTag,
-        getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-        error,
-      );
-    }
+    });
   }
 
   async CheckTransferCompleteResponse(
@@ -407,39 +506,55 @@ export class Stage3SATPHandler implements SATPHandler {
   ): Promise<void> {
     const stepTag = `CheckTransferCompleteResponse()`;
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
-    let session: SATPSession | undefined;
-    try {
-      this.Log.debug(`${fnTag}, Check Transfer Complete Response...`);
-      this.Log.debug(`${fnTag}, Response: ${response}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        let session: SATPSession | undefined;
+        try {
+          this.Log.debug(`${fnTag}, Check Transfer Complete Response...`);
+          this.Log.debug(`${fnTag}, Response: ${response}`);
 
-      session = this.sessions.get(getSessionId(response));
-      if (!session) {
-        throw new SessionNotFoundError(fnTag);
+          session = this.sessions.get(getSessionId(response));
+          if (!session) {
+            throw new SessionNotFoundError(fnTag);
+          }
+
+          await this.clientService.checkTransferCompleteResponse(
+            response,
+            session,
+          );
+
+          saveMessageInSessionData(session.getClientSessionData(), response);
+        } catch (error) {
+          this.Log.error(
+            `${fnTag}, Error: ${new FailedToProcessError(
+              fnTag,
+              "Checking " +
+                getMessageTypeName(
+                  MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+                ),
+              error,
+            )}`,
+          );
+          setErrorChecking(
+            session,
+            MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+            error,
+          );
+          throw new FailedToProcessError(
+            fnTag,
+            "Checking " +
+              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
+            error,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      await this.clientService.checkTransferCompleteResponse(response, session);
-
-      saveMessageInSessionData(session.getClientSessionData(), response);
-    } catch (error) {
-      this.Log.error(
-        `${fnTag}, Error: ${new FailedToProcessError(
-          fnTag,
-          "Checking " +
-            getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
-          error,
-        )}`,
-      );
-      setErrorChecking(
-        session,
-        MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-        error,
-      );
-      throw new FailedToProcessError(
-        fnTag,
-        "Checking " +
-          getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
-        error,
-      );
-    }
+    });
   }
 }
