@@ -62,6 +62,7 @@ import { create } from "@bufbuild/protobuf";
 import { type BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { NetworkId } from "../../../public-api";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 export class Stage0ServerService extends SATPService {
   public static readonly SATP_STAGE = "0";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -81,6 +82,7 @@ export class Stage0ServerService extends SATPService {
       signer: ops.signer,
       serviceType: Stage0ServerService.SERVICE_TYPE,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
     if (ops.bridgeManager == undefined) {
@@ -100,78 +102,94 @@ export class Stage0ServerService extends SATPService {
   ): Promise<SATPSession> {
     const stepTag = `checkNewSessionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        if (request == undefined) {
+          throw new Error(`${fnTag}, Request is undefined`);
+        }
 
-    if (request == undefined) {
-      throw new Error(`${fnTag}, Request is undefined`);
-    }
+        if (request.clientSignature == "") {
+          throw new SignatureMissingError(fnTag);
+        }
 
-    if (request.clientSignature == "") {
-      throw new SignatureMissingError(fnTag);
-    }
+        if (request.sessionId == "") {
+          throw new SessionIdError(fnTag);
+        }
 
-    if (request.sessionId == "") {
-      throw new SessionIdError(fnTag);
-    }
+        if (request.messageType != MessageType.NEW_SESSION_REQUEST) {
+          throw new MessageTypeError(
+            fnTag,
+            request.messageType.toString(),
+            MessageType.NEW_SESSION_REQUEST.toString(),
+          );
+        }
 
-    if (request.messageType != MessageType.NEW_SESSION_REQUEST) {
-      throw new MessageTypeError(
-        fnTag,
-        request.messageType.toString(),
-        MessageType.NEW_SESSION_REQUEST.toString(),
-      );
-    }
+        if (!verifySignature(this.Signer, request, clientPubKey)) {
+          throw new SignatureVerificationError(fnTag);
+        }
 
-    if (!verifySignature(this.Signer, request, clientPubKey)) {
-      throw new SignatureVerificationError(fnTag);
-    }
+        if (session == undefined) {
+          this.Log.debug(`${fnTag}, Session is undefined needs to be created`);
+          session = new SATPSession({
+            contextID: request.contextId,
+            sessionID: request.sessionId,
+            server: true,
+            client: false,
+            monitorService: this.monitorService,
+          });
+        } else if (!session.hasServerSessionData()) {
+          this.Log.debug(`${fnTag}, Session does not have server session data`);
+          session.createSessionData(
+            SessionType.SERVER,
+            request.sessionId,
+            request.contextId,
+          );
+        } else {
+          this.Log.debug(`${fnTag}, Session is already has a server session`);
+          session = new SATPSession({
+            contextID: request.contextId,
+            server: true,
+            client: false,
+            monitorService: this.monitorService,
+          });
+          this.Log.debug(
+            `${fnTag}, Session created with new sessionID ${session.getSessionId()}`,
+          );
+        }
 
-    if (session == undefined) {
-      this.Log.debug(`${fnTag}, Session is undefined needs to be created`);
-      session = new SATPSession({
-        contextID: request.contextId,
-        sessionID: request.sessionId,
-        server: true,
-        client: false,
-      });
-    } else if (!session.hasServerSessionData()) {
-      this.Log.debug(`${fnTag}, Session does not have server session data`);
-      session.createSessionData(
-        SessionType.SERVER,
-        request.sessionId,
-        request.contextId,
-      );
-    } else {
-      this.Log.debug(`${fnTag}, Session is already has a server session`);
-      session = new SATPSession({
-        contextID: request.contextId,
-        server: true,
-        client: false,
-      });
-      this.Log.debug(
-        `${fnTag}, Session created with new sessionID ${session.getSessionId()}`,
-      );
-    }
+        const newSessionData = session.getServerSessionData();
 
-    const newSessionData = session.getServerSessionData();
+        newSessionData.clientGatewayPubkey = clientPubKey;
 
-    newSessionData.clientGatewayPubkey = clientPubKey;
+        saveSignature(
+          newSessionData,
+          MessageType.NEW_SESSION_REQUEST,
+          request.clientSignature,
+        );
 
-    saveSignature(
-      newSessionData,
-      MessageType.NEW_SESSION_REQUEST,
-      request.clientSignature,
-    );
+        saveHash(
+          newSessionData,
+          MessageType.NEW_SESSION_REQUEST,
+          getHash(request),
+        );
 
-    saveHash(newSessionData, MessageType.NEW_SESSION_REQUEST, getHash(request));
+        saveTimestamp(
+          newSessionData,
+          MessageType.NEW_SESSION_REQUEST,
+          TimestampType.RECEIVED,
+        );
 
-    saveTimestamp(
-      newSessionData,
-      MessageType.NEW_SESSION_REQUEST,
-      TimestampType.RECEIVED,
-    );
-
-    this.Log.info(`${fnTag}, NewSessionRequest passed all checks.`);
-    return session;
+        this.Log.info(`${fnTag}, NewSessionRequest passed all checks.`);
+        return session;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async checkPreSATPTransferRequest(
@@ -180,109 +198,123 @@ export class Stage0ServerService extends SATPService {
   ): Promise<void> {
     const stepTag = `checkPreSATPTransferRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, () => {
+      try {
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (!session.hasServerSessionData()) {
+          throw new Error(`${fnTag}, Session Data is missing`);
+        }
 
-    if (!session.hasServerSessionData()) {
-      throw new Error(`${fnTag}, Session Data is missing`);
-    }
+        const sessionData = session.getServerSessionData();
 
-    const sessionData = session.getServerSessionData();
+        if (request.sessionId != sessionData.id) {
+          throw new Error(`${fnTag}, Session ID does not match`);
+        }
 
-    if (request.sessionId != sessionData.id) {
-      throw new Error(`${fnTag}, Session ID does not match`);
-    }
+        if (request.senderGatewayNetworkId == "") {
+          throw new Error(`${fnTag}, Sender Gateway Network ID does not match`);
+        }
 
-    if (request.senderGatewayNetworkId == "") {
-      throw new Error(`${fnTag}, Sender Gateway Network ID does not match`);
-    }
+        sessionData.senderGatewayNetworkId = request.senderGatewayNetworkId;
 
-    sessionData.senderGatewayNetworkId = request.senderGatewayNetworkId;
+        if (request.senderAsset == undefined) {
+          throw new Error(`${fnTag}, Sender Asset is missing`);
+        }
 
-    if (request.senderAsset == undefined) {
-      throw new Error(`${fnTag}, Sender Asset is missing`);
-    }
+        if (request.receiverAsset == undefined) {
+          throw new Error(`${fnTag}, Receiver Asset is missing`);
+        }
 
-    if (request.receiverAsset == undefined) {
-      throw new Error(`${fnTag}, Receiver Asset is missing`);
-    }
+        if (request.messageType != MessageType.PRE_SATP_TRANSFER_REQUEST) {
+          throw new MessageTypeError(
+            fnTag,
+            request.messageType.toString(),
+            MessageType.PRE_SATP_TRANSFER_REQUEST.toString(),
+          );
+        }
 
-    if (request.messageType != MessageType.PRE_SATP_TRANSFER_REQUEST) {
-      throw new MessageTypeError(
-        fnTag,
-        request.messageType.toString(),
-        MessageType.PRE_SATP_TRANSFER_REQUEST.toString(),
-      );
-    }
+        if (
+          request.hashPreviousMessage !=
+          getMessageHash(sessionData, MessageType.NEW_SESSION_RESPONSE)
+        ) {
+          throw new Error(`${fnTag}, Hash of previous message does not match`);
+        }
 
-    if (
-      request.hashPreviousMessage !=
-      getMessageHash(sessionData, MessageType.NEW_SESSION_RESPONSE)
-    ) {
-      throw new Error(`${fnTag}, Hash of previous message does not match`);
-    }
+        if (request.clientSignature == "") {
+          throw new Error(`${fnTag}, Client Signature is missing`);
+        }
 
-    if (request.clientSignature == "") {
-      throw new Error(`${fnTag}, Client Signature is missing`);
-    }
+        if (
+          !verifySignature(
+            this.Signer,
+            request,
+            sessionData.clientGatewayPubkey,
+          )
+        ) {
+          throw new Error(`${fnTag}, Client Signature is invalid`);
+        }
 
-    if (
-      !verifySignature(this.Signer, request, sessionData.clientGatewayPubkey)
-    ) {
-      throw new Error(`${fnTag}, Client Signature is invalid`);
-    }
+        if (request.senderAsset == undefined) {
+          throw new Error(`${fnTag}, Sender Asset is missing`);
+        }
 
-    if (request.senderAsset == undefined) {
-      throw new Error(`${fnTag}, Sender Asset is missing`);
-    }
+        sessionData.senderAsset = request.senderAsset;
 
-    sessionData.senderAsset = request.senderAsset;
+        if (request.receiverAsset == undefined) {
+          throw new Error(`${fnTag}, Receiver Asset is missing`);
+        }
 
-    if (request.receiverAsset == undefined) {
-      throw new Error(`${fnTag}, Receiver Asset is missing`);
-    }
+        if (request.wrapAssertionClaim == undefined) {
+          throw new Error(`${fnTag}, Wrap Assertion Claim is missing`);
+        }
 
-    if (request.wrapAssertionClaim == undefined) {
-      throw new Error(`${fnTag}, Wrap Assertion Claim is missing`);
-    }
+        if (request.clientTransferNumber != "") {
+          this.Log.info(
+            `${fnTag}, Optional variable loaded: clientTransferNumber...`,
+          );
+          sessionData.clientTransferNumber = request.clientTransferNumber;
+        }
 
-    if (request.clientTransferNumber != "") {
-      this.Log.info(
-        `${fnTag}, Optional variable loaded: clientTransferNumber...`,
-      );
-      sessionData.clientTransferNumber = request.clientTransferNumber;
-    }
+        saveSignature(
+          sessionData,
+          MessageType.PRE_SATP_TRANSFER_REQUEST,
+          request.clientSignature,
+        );
 
-    saveSignature(
-      sessionData,
-      MessageType.PRE_SATP_TRANSFER_REQUEST,
-      request.clientSignature,
-    );
+        saveHash(
+          sessionData,
+          MessageType.PRE_SATP_TRANSFER_REQUEST,
+          getHash(request),
+        );
 
-    saveHash(
-      sessionData,
-      MessageType.PRE_SATP_TRANSFER_REQUEST,
-      getHash(request),
-    );
+        saveTimestamp(
+          sessionData,
+          MessageType.PRE_SATP_TRANSFER_REQUEST,
+          TimestampType.RECEIVED,
+        );
 
-    saveTimestamp(
-      sessionData,
-      MessageType.PRE_SATP_TRANSFER_REQUEST,
-      TimestampType.RECEIVED,
-    );
+        //TODO maybe do a hard copy, reason: after the hash because this changes the req object
+        sessionData.receiverAsset = request.receiverAsset;
 
-    //TODO maybe do a hard copy, reason: after the hash because this changes the req object
-    sessionData.receiverAsset = request.receiverAsset;
+        sessionData.receiverAsset.tokenId = createAssetId(
+          request.contextId,
+          request.receiverAsset.tokenType,
+          sessionData.recipientGatewayNetworkId,
+        );
 
-    sessionData.receiverAsset.tokenId = createAssetId(
-      request.contextId,
-      request.receiverAsset.tokenType,
-      sessionData.recipientGatewayNetworkId,
-    );
-
-    this.Log.info(`${fnTag}, PreSATPTransferRequest passed all checks.`);
+        this.Log.info(`${fnTag}, PreSATPTransferRequest passed all checks.`);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async newSessionResponse(
@@ -291,137 +323,176 @@ export class Stage0ServerService extends SATPService {
   ): Promise<NewSessionResponse> {
     const stepTag = `newSessionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    const messageType = MessageType[MessageType.NEW_SESSION_RESPONSE];
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        const messageType = MessageType[MessageType.NEW_SESSION_RESPONSE];
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    if (!session.hasServerSessionData()) {
-      throw new SessionDataNotAvailableError("server", fnTag);
-    }
-    const sessionData = session.getServerSessionData();
+        if (!session.hasServerSessionData()) {
+          throw new SessionDataNotAvailableError("server", fnTag);
+        }
+        const sessionData = session.getServerSessionData();
 
-    await this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: messageType,
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
-    });
-    try {
-      this.Log.info(`exec-${messageType}`);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      const newSessionResponse = create(NewSessionResponseSchema, {
-        sessionId: sessionData.id,
-        contextId: sessionData.transferContextId,
-        messageType: MessageType.NEW_SESSION_RESPONSE,
-        hashPreviousMessage: getMessageHash(
-          sessionData,
-          MessageType.NEW_SESSION_REQUEST,
-        ),
-      });
+        await this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: messageType,
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`exec-${messageType}`);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          const newSessionResponse = create(NewSessionResponseSchema, {
+            sessionId: sessionData.id,
+            contextId: sessionData.transferContextId,
+            messageType: MessageType.NEW_SESSION_RESPONSE,
+            hashPreviousMessage: getMessageHash(
+              sessionData,
+              MessageType.NEW_SESSION_REQUEST,
+            ),
+          });
 
-      if (sessionData.id != request.sessionId) {
-        newSessionResponse.status = STATUS.STATUS_REJECTED;
-      } else {
-        newSessionResponse.status = STATUS.STATUS_ACCEPTED;
+          if (sessionData.id != request.sessionId) {
+            newSessionResponse.status = STATUS.STATUS_REJECTED;
+          } else {
+            newSessionResponse.status = STATUS.STATUS_ACCEPTED;
+          }
+
+          const messageSignature = bufArray2HexStr(
+            sign(this.Signer, safeStableStringify(newSessionResponse)),
+          );
+
+          newSessionResponse.serverSignature = messageSignature;
+
+          saveSignature(
+            sessionData,
+            MessageType.NEW_SESSION_REQUEST,
+            messageSignature,
+          );
+
+          saveHash(
+            sessionData,
+            MessageType.NEW_SESSION_REQUEST,
+            getHash(request),
+          );
+
+          saveTimestamp(
+            sessionData,
+            MessageType.NEW_SESSION_REQUEST,
+            TimestampType.PROCESSED,
+          );
+
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "done",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+
+          this.Log.info(`${fnTag}, sending NewSessionRequest...`);
+
+          return newSessionResponse;
+        } catch (error) {
+          this.Log.error(`fail-${messageType}`, error);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      const messageSignature = bufArray2HexStr(
-        sign(this.Signer, safeStableStringify(newSessionResponse)),
-      );
-
-      newSessionResponse.serverSignature = messageSignature;
-
-      saveSignature(
-        sessionData,
-        MessageType.NEW_SESSION_REQUEST,
-        messageSignature,
-      );
-
-      saveHash(sessionData, MessageType.NEW_SESSION_REQUEST, getHash(request));
-
-      saveTimestamp(
-        sessionData,
-        MessageType.NEW_SESSION_REQUEST,
-        TimestampType.PROCESSED,
-      );
-
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "done",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-
-      this.Log.info(`${fnTag}, sending NewSessionRequest...`);
-
-      return newSessionResponse;
-    } catch (error) {
-      this.Log.error(`fail-${messageType}`, error);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw error;
-    }
+    });
   }
 
   public async newSessionErrorResponse(
     error: SATPInternalError,
   ): Promise<NewSessionResponse> {
-    let newSessionResponse = create(NewSessionResponseSchema, {
-      messageType: MessageType.NEW_SESSION_RESPONSE,
+    const fnTag = `${this.getServiceIdentifier()}#newSessionErrorResponse()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        let newSessionResponse = create(NewSessionResponseSchema, {
+          messageType: MessageType.NEW_SESSION_RESPONSE,
+        });
+
+        newSessionResponse = this.setError(
+          newSessionResponse,
+          error,
+        ) as NewSessionResponse;
+
+        const messageSignature = bufArray2HexStr(
+          sign(this.Signer, safeStableStringify(newSessionResponse)),
+        );
+
+        newSessionResponse.serverSignature = messageSignature;
+
+        return newSessionResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    newSessionResponse = this.setError(
-      newSessionResponse,
-      error,
-    ) as NewSessionResponse;
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(newSessionResponse)),
-    );
-
-    newSessionResponse.serverSignature = messageSignature;
-
-    return newSessionResponse;
   }
 
   public async preSATPTransferErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
   ): Promise<PreSATPTransferResponse> {
-    let preSATPTransferResponse = create(PreSATPTransferResponseSchema, {
-      messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+    const fnTag = `${this.getServiceIdentifier()}#preSATPTransferErrorResponse()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        let preSATPTransferResponse = create(PreSATPTransferResponseSchema, {
+          messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+        });
+
+        preSATPTransferResponse = this.setError(
+          preSATPTransferResponse,
+          error,
+        ) as PreSATPTransferResponse;
+
+        if (!(error instanceof SessionNotFoundError) && session != undefined) {
+          preSATPTransferResponse.sessionId = session.getServerSessionData().id;
+        }
+
+        const messageSignature = bufArray2HexStr(
+          sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
+        );
+
+        preSATPTransferResponse.serverSignature = messageSignature;
+
+        return preSATPTransferResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    preSATPTransferResponse = this.setError(
-      preSATPTransferResponse,
-      error,
-    ) as PreSATPTransferResponse;
-
-    if (!(error instanceof SessionNotFoundError) && session != undefined) {
-      preSATPTransferResponse.sessionId = session.getServerSessionData().id;
-    }
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
-    );
-
-    preSATPTransferResponse.serverSignature = messageSignature;
-
-    return preSATPTransferResponse;
   }
 
   public async preSATPTransferResponse(
@@ -430,222 +501,262 @@ export class Stage0ServerService extends SATPService {
   ): Promise<PreSATPTransferResponse> {
     const stepTag = `preSATPTransferResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    const messageType = MessageType[MessageType.PRE_TRANSFER_COMMENCE_RESPONSE];
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        const messageType =
+          MessageType[MessageType.PRE_TRANSFER_COMMENCE_RESPONSE];
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    if (!session.hasServerSessionData()) {
-      throw new SessionDataNotAvailableError("server", fnTag);
-    }
+        if (!session.hasServerSessionData()) {
+          throw new SessionDataNotAvailableError("server", fnTag);
+        }
 
-    const sessionData = session.getServerSessionData();
+        const sessionData = session.getServerSessionData();
 
-    await this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: messageType,
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        await this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: messageType,
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
+        try {
+          this.Log.info(`exec-${messageType}`);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+
+          if (request.receiverAsset == undefined) {
+            throw new AssetMissing(fnTag);
+          }
+
+          const bridge = this.bridgeManager.getBridgeEndPoint(
+            {
+              id: sessionData.receiverAsset?.networkId?.id,
+              ledgerType: sessionData.receiverAsset?.networkId?.type,
+            } as NetworkId,
+            this.claimFormat,
+          );
+
+          if (!sessionData.receiverAsset?.tokenType) {
+            throw new LedgerAssetError(`${fnTag}, tokenType is missing`);
+          }
+
+          sessionData.recipientGatewayNetworkId = bridge.getApproveAddress(
+            sessionData.receiverAsset?.tokenType,
+          );
+
+          const preSATPTransferResponse = create(
+            PreSATPTransferResponseSchema,
+            {
+              sessionId: sessionData.id,
+              contextId: sessionData.transferContextId,
+              recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
+              hashPreviousMessage: getMessageHash(
+                sessionData,
+                MessageType.PRE_SATP_TRANSFER_REQUEST,
+              ),
+              wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
+              recipientTokenId: sessionData.receiverAsset!.tokenId,
+              messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
+            },
+          );
+
+          const messageSignature = bufArray2HexStr(
+            sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
+          );
+
+          preSATPTransferResponse.serverSignature = messageSignature;
+
+          saveSignature(
+            sessionData,
+            MessageType.PRE_SATP_TRANSFER_REQUEST,
+            messageSignature,
+          );
+
+          saveHash(
+            sessionData,
+            MessageType.PRE_SATP_TRANSFER_REQUEST,
+            getHash(request),
+          );
+
+          saveTimestamp(
+            sessionData,
+            MessageType.PRE_SATP_TRANSFER_REQUEST,
+            TimestampType.PROCESSED,
+          );
+
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "done",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+
+          this.Log.info(`${fnTag},  sending PreSATPTransferResponse...`);
+
+          return preSATPTransferResponse;
+        } catch (error) {
+          this.Log.error(`fail-${messageType}`, error);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    try {
-      this.Log.info(`exec-${messageType}`);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-
-      if (request.receiverAsset == undefined) {
-        throw new AssetMissing(fnTag);
-      }
-
-      const bridge = this.bridgeManager.getBridgeEndPoint(
-        {
-          id: sessionData.receiverAsset?.networkId?.id,
-          ledgerType: sessionData.receiverAsset?.networkId?.type,
-        } as NetworkId,
-        this.claimFormat,
-      );
-
-      if (!sessionData.receiverAsset?.tokenType) {
-        throw new LedgerAssetError(`${fnTag}, tokenType is missing`);
-      }
-
-      sessionData.recipientGatewayNetworkId = bridge.getApproveAddress(
-        sessionData.receiverAsset?.tokenType,
-      );
-
-      const preSATPTransferResponse = create(PreSATPTransferResponseSchema, {
-        sessionId: sessionData.id,
-        contextId: sessionData.transferContextId,
-        recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
-        hashPreviousMessage: getMessageHash(
-          sessionData,
-          MessageType.PRE_SATP_TRANSFER_REQUEST,
-        ),
-        wrapAssertionClaim: sessionData.receiverWrapAssertionClaim,
-        recipientTokenId: sessionData.receiverAsset!.tokenId,
-        messageType: MessageType.PRE_SATP_TRANSFER_RESPONSE,
-      });
-
-      const messageSignature = bufArray2HexStr(
-        sign(this.Signer, safeStableStringify(preSATPTransferResponse)),
-      );
-
-      preSATPTransferResponse.serverSignature = messageSignature;
-
-      saveSignature(
-        sessionData,
-        MessageType.PRE_SATP_TRANSFER_REQUEST,
-        messageSignature,
-      );
-
-      saveHash(
-        sessionData,
-        MessageType.PRE_SATP_TRANSFER_REQUEST,
-        getHash(request),
-      );
-
-      saveTimestamp(
-        sessionData,
-        MessageType.PRE_SATP_TRANSFER_REQUEST,
-        TimestampType.PROCESSED,
-      );
-
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "done",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-
-      this.Log.info(`${fnTag},  sending PreSATPTransferResponse...`);
-
-      return preSATPTransferResponse;
-    } catch (error) {
-      this.Log.error(`fail-${messageType}`, error);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw error;
-    }
   }
 
   public async wrapToken(session: SATPSession): Promise<void> {
     const stepTag = `wrapToken()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    const sessionData = session.getServerSessionData();
-    this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: "wrap-token-server",
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        const sessionData = session.getServerSessionData();
+        this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: "wrap-token-server",
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`exec-${stepTag}`);
+          this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: "wrap-token-server",
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, Wrapping Asset...`);
+
+          if (sessionData.receiverAsset == undefined) {
+            throw new LedgerAssetError(fnTag);
+          }
+
+          const networkId = {
+            id: sessionData.receiverAsset.networkId?.id,
+            ledgerType: sessionData.receiverAsset.networkId?.type as LedgerType,
+          } as NetworkId;
+
+          const token: FungibleAsset = protoToAsset(
+            sessionData.receiverAsset,
+            networkId,
+          ) as FungibleAsset;
+
+          if (token.id == undefined) {
+            throw new TokenIdMissingError(fnTag);
+          }
+
+          if (token.amount == undefined) {
+            throw new AmountMissingError(fnTag);
+          }
+
+          this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
+
+          this.Log.debug(
+            `${fnTag}, Wrap Asset ID: ${token.id} amount: ${(token as FungibleAsset).amount.toString()}`,
+          );
+
+          const bridge = this.bridgeManager.getSATPExecutionLayer(
+            networkId,
+            this.claimFormat,
+          );
+
+          sessionData.receiverWrapAssertionClaim = create(
+            WrapAssertionClaimSchema,
+            {},
+          );
+
+          const res = await bridge.wrapAsset(token);
+
+          sessionData.receiverWrapAssertionClaim.receipt = res.receipt;
+
+          this.Log.debug(
+            `${fnTag}, Wrap Operation Receipt: ${sessionData.receiverWrapAssertionClaim.receipt}`,
+          );
+
+          sessionData.receiverWrapAssertionClaim.proof = res.proof;
+
+          sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
+            sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
+          );
+
+          this.dbLogger.storeProof({
+            sessionID: sessionData.id,
+            type: "wrap-token-server",
+            operation: "done",
+            data: safeStableStringify(
+              sessionData.receiverWrapAssertionClaim.proof,
+            ),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, done-${fnTag}`);
+        } catch (error) {
+          this.Log.debug(`Crash in ${fnTag}`, error);
+
+          this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: "wrap-token-server",
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw new FailedToProcessError(fnTag, "WrapAsset", error);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-    try {
-      this.Log.info(`exec-${stepTag}`);
-      this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: "wrap-token-server",
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, Wrapping Asset...`);
-
-      if (sessionData.receiverAsset == undefined) {
-        throw new LedgerAssetError(fnTag);
-      }
-
-      const networkId = {
-        id: sessionData.receiverAsset.networkId?.id,
-        ledgerType: sessionData.receiverAsset.networkId?.type as LedgerType,
-      } as NetworkId;
-
-      const token: FungibleAsset = protoToAsset(
-        sessionData.receiverAsset,
-        networkId,
-      ) as FungibleAsset;
-
-      if (token.id == undefined) {
-        throw new TokenIdMissingError(fnTag);
-      }
-
-      if (token.amount == undefined) {
-        throw new AmountMissingError(fnTag);
-      }
-
-      this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
-
-      this.Log.debug(
-        `${fnTag}, Wrap Asset ID: ${token.id} amount: ${(token as FungibleAsset).amount.toString()}`,
-      );
-
-      const bridge = this.bridgeManager.getSATPExecutionLayer(
-        networkId,
-        this.claimFormat,
-      );
-
-      sessionData.receiverWrapAssertionClaim = create(
-        WrapAssertionClaimSchema,
-        {},
-      );
-
-      const res = await bridge.wrapAsset(token);
-
-      sessionData.receiverWrapAssertionClaim.receipt = res.receipt;
-
-      this.Log.debug(
-        `${fnTag}, Wrap Operation Receipt: ${sessionData.receiverWrapAssertionClaim.receipt}`,
-      );
-
-      sessionData.receiverWrapAssertionClaim.proof = res.proof;
-
-      sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
-        sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
-      );
-
-      this.dbLogger.storeProof({
-        sessionID: sessionData.id,
-        type: "wrap-token-server",
-        operation: "done",
-        data: safeStableStringify(sessionData.receiverWrapAssertionClaim.proof),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, done-${fnTag}`);
-    } catch (error) {
-      this.Log.debug(`Crash in ${fnTag}`, error);
-
-      this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: "wrap-token-server",
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw new FailedToProcessError(fnTag, "WrapAsset", error);
-    }
   }
   private setError(
     message: NewSessionResponse | PreSATPTransferResponse,
     error: SATPInternalError,
   ): NewSessionResponse | PreSATPTransferResponse {
-    message.error = true;
-    message.errorCode = error.getSATPErrorType();
-    return message;
+    const fnTag = `${this.getServiceIdentifier()}#setError()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        message.error = true;
+        message.errorCode = error.getSATPErrorType();
+        return message;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 }

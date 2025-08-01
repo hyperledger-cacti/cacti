@@ -14,6 +14,7 @@ import type { SATPGatewayConfig } from "../../../../main/typescript/plugin-satp-
 import { createClient } from "../../test-utils";
 import { HealthCheckResponseStatusEnum } from "../../../../main/typescript";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -24,6 +25,9 @@ const factoryOptions: IPluginFactoryOptions = {
   pluginImportType: PluginImportType.Local,
 };
 const factory = new PluginFactorySATPGateway(factoryOptions);
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -55,6 +59,7 @@ const options: SATPGatewayConfig = {
     address: "http://localhost",
   },
   pluginRegistry: new PluginRegistry({ plugins: [] }),
+  monitorService: monitorService,
 };
 
 describe("GetStatus Endpoint and Functionality testing", () => {

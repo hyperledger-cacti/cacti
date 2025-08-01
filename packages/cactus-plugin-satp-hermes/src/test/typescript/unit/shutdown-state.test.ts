@@ -27,8 +27,12 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
 const logger = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "satp-gateway-orchestrator-init-test",
@@ -55,6 +59,7 @@ beforeAll(async () => {
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   sessionIDs.push(mockSession.getSessionId());
@@ -98,6 +103,7 @@ describe("Shutdown Verify State Tests", () => {
       },
       ontologyPath: ontologiesPath,
       logLevel: logLevel,
+      monitorService: monitorService,
     };
 
     const gateway = await factory.create(options);
@@ -149,6 +155,7 @@ describe("Shutdown Verify State Tests", () => {
       },
       ontologyPath: ontologiesPath,
       logLevel: logLevel,
+      monitorService: monitorService,
     };
 
     const gateway = await factory.create(options);
@@ -171,7 +178,6 @@ describe("Shutdown Verify State Tests", () => {
 
     // Start shutdown (which waits for sessions to conclude)
     const shutdownPromise = gateway.shutdown();
-
     // Check initial session state (should be false)
     const initialSessionState = await satpManager.getSATPSessionState();
     expect(initialSessionState).toBe(false);
@@ -216,6 +222,7 @@ describe("Shutdown Verify State Tests", () => {
       },
       ontologyPath: ontologiesPath,
       logLevel: logLevel,
+      monitorService: monitorService,
     };
 
     const gateway = await factory.create(options);

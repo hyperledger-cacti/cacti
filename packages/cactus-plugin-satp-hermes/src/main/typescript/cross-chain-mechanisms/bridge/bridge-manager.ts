@@ -1,8 +1,6 @@
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { BridgeLeaf } from "./bridge-leaf";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BesuLeaf, IBesuLeafNeworkOptions } from "./leafs/besu-leaf";
@@ -35,6 +33,8 @@ import { v4 as uuidv4 } from "uuid";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { NetworkId } from "../../public-api";
+import { MonitorService } from "../../services/monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 /**
  * Options for configuring the BridgeManager.
@@ -45,6 +45,7 @@ import { NetworkId } from "../../public-api";
 interface IBridgeManagerOptions {
   ontologyOptions?: IOntologyManagerOptions;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 /**
@@ -58,7 +59,8 @@ export class BridgeManager
   public static readonly CLASS_NAME = "BridgeManager";
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
-  private readonly ontologyManager: OntologyManager;
+  private ontologyManager?: OntologyManager;
+  private readonly monitorService: MonitorService;
 
   // Group leaf by the network, a network can have various leafs (bridges)
   private readonly leafs: Map<string, Map<string, BridgeLeaf>> = new Map();
@@ -69,12 +71,38 @@ export class BridgeManager
    * @param options - The configuration options for the BridgeManager.
    */
   constructor(public readonly options: IBridgeManagerOptions) {
+    const fnTag = `${BridgeManager.CLASS_NAME}#constructor()`;
     const label = BridgeManager.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
-    this.ontologyManager = new OntologyManager({
-      ...options.ontologyOptions,
-      logLevel: options.logLevel,
+    this.monitorService = this.options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+
+    context.with(ctx, () => {
+      try {
+        this.ontologyManager = new OntologyManager(
+          {
+            ...options.ontologyOptions,
+            logLevel: options.logLevel,
+          },
+          this.monitorService,
+        );
+        if (!this.ontologyManager) {
+          throw new Error(`${fnTag}, Ontology Manager is not defined`);
+        }
+      } catch (error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(error),
+        });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
+      }
     });
   }
 
@@ -89,149 +117,184 @@ export class BridgeManager
    */
   public async deployLeaf(leafNetworkOptions: INetworkOptions): Promise<void> {
     const fnTag = `${BridgeManager.CLASS_NAME}#deployLeaf()`;
-    this.log.debug(`${fnTag}, Deploying Leaf...`);
-    this.log.debug(
-      `${fnTag}, Leaf Network Options: ${JSON.stringify(leafNetworkOptions)}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
-    if (
-      this.leafs.has(
-        safeStableStringify(leafNetworkOptions.networkIdentification),
-      )
-    ) {
-      throw new DeployLeafError(
-        `${fnTag}, Leaf already deployed: ${safeStableStringify(leafNetworkOptions.networkIdentification)}`,
-      );
-    }
-
-    try {
-      let leaf: BridgeLeaf;
-      switch (leafNetworkOptions.networkIdentification.ledgerType) {
-        case LedgerType.Besu1X:
-        case LedgerType.Besu2X:
-          this.log.debug(`${fnTag}, Deploying Besu Leaf...`);
-          this.log.debug(
-            `${fnTag}, Besu Leaf Network Options: ${JSON.stringify(
-              leafNetworkOptions,
-            )}`,
-          );
-          const besuNetworkOptions =
-            leafNetworkOptions as unknown as IBesuLeafNeworkOptions;
-          leaf = new BesuLeaf({
-            ...besuNetworkOptions,
-            connectorOptions: {
-              ...besuNetworkOptions.connectorOptions,
-              instanceId: uuidv4(),
-              pluginRegistry: new PluginRegistry({
-                plugins: [],
-              }),
-              logLevel: this.logLevel,
-            },
-            ontologyManager: this.ontologyManager,
-            logLevel: this.logLevel,
-          });
-          break;
-        case LedgerType.Ethereum:
-          this.log.debug(`${fnTag}, Deploying Ethereum Leaf...`);
-          this.log.debug(
-            `${fnTag}, Ethereum Leaf Network Options: ${JSON.stringify(
-              leafNetworkOptions,
-            )}`,
-          );
-          const ethereumNetworkOptions =
-            leafNetworkOptions as unknown as IEthereumLeafNeworkOptions;
-          leaf = new EthereumLeaf({
-            ...ethereumNetworkOptions,
-            connectorOptions: {
-              ...ethereumNetworkOptions.connectorOptions,
-              instanceId: uuidv4(),
-              pluginRegistry: new PluginRegistry({
-                plugins: [],
-              }),
-              logLevel: this.logLevel,
-            },
-            ontologyManager: this.ontologyManager,
-            logLevel: this.logLevel,
-          });
-          break;
-        case LedgerType.Fabric2:
-          this.log.debug(`${fnTag}, Deploying Fabric Leaf...`);
-          this.log.debug(
-            `${fnTag}, Fabric Leaf Network Options: ${JSON.stringify(
-              leafNetworkOptions,
-            )}`,
-          );
-          if (
-            !(leafNetworkOptions as Partial<IFabricLeafNeworkOptions>)
-              .userIdentity
-          ) {
-            throw new DeployLeafError(
-              `${fnTag}, User Identity is required for Fabric network`,
-            );
-          }
-          const keychainEntryKeyBridge = "bridgeKey";
-          const fabricKeychain = new PluginKeychainMemory({
-            instanceId: uuidv4(),
-            keychainId: uuidv4(),
-            logLevel: this.logLevel,
-            backend: new Map([
-              [
-                keychainEntryKeyBridge,
-                JSON.stringify(
-                  (leafNetworkOptions as Partial<IFabricLeafNeworkOptions>)
-                    .userIdentity,
-                ),
-              ],
-            ]),
-          });
-          const fabricNetworkOptions = {
-            ...leafNetworkOptions,
-            connectorOptions: {
-              ...(leafNetworkOptions as Partial<IFabricLeafNeworkOptions>)
-                .connectorOptions,
-              instanceId: uuidv4(),
-              pluginRegistry: new PluginRegistry({
-                plugins: [fabricKeychain],
-              }),
-              logLevel: this.logLevel,
-            },
-            signingCredential: {
-              keychainId: fabricKeychain.getKeychainId(),
-              keychainRef: keychainEntryKeyBridge,
-            },
-          } as unknown as IFabricLeafNeworkOptions;
-          leaf = new FabricLeaf({
-            ...fabricNetworkOptions,
-            ontologyManager: this.ontologyManager,
-            logLevel: this.logLevel,
-          });
-          break;
-        default:
-          throw new UnsupportedNetworkError(
-            `${fnTag}, ${leafNetworkOptions.networkIdentification.ledgerType} is not supported`,
-          );
-      }
+    await context.with(ctx, async () => {
       try {
-        await leaf.deployContracts();
-      } catch (error) {
-        this.log.error(`${fnTag}, Error deploying leaf: ${error}`);
-        if (error instanceof WrapperContractAlreadyCreatedError) {
-          this.log.debug("Contracts already deployed");
-        } else {
-          throw error;
+        this.log.debug(`${fnTag}, Deploying Leaf...`);
+        this.log.debug(
+          `${fnTag}, Leaf Network Options: ${JSON.stringify(leafNetworkOptions)}`,
+        );
+
+        if (
+          this.leafs.has(
+            safeStableStringify(leafNetworkOptions.networkIdentification),
+          )
+        ) {
+          throw new DeployLeafError(
+            `${fnTag}, Leaf already deployed: ${safeStableStringify(leafNetworkOptions.networkIdentification)}`,
+          );
         }
+
+        try {
+          let leaf: BridgeLeaf;
+          switch (leafNetworkOptions.networkIdentification.ledgerType) {
+            case LedgerType.Besu1X:
+            case LedgerType.Besu2X:
+              this.log.debug(`${fnTag}, Deploying Besu Leaf...`);
+              this.log.debug(
+                `${fnTag}, Besu Leaf Network Options: ${JSON.stringify(
+                  leafNetworkOptions,
+                )}`,
+              );
+              const besuNetworkOptions =
+                leafNetworkOptions as unknown as IBesuLeafNeworkOptions;
+              if (!this.ontologyManager) {
+                throw new Error(`${fnTag}, Ontology Manager is not defined`);
+              }
+              leaf = new BesuLeaf(
+                {
+                  ...besuNetworkOptions,
+                  connectorOptions: {
+                    ...besuNetworkOptions.connectorOptions,
+                    instanceId: uuidv4(),
+                    pluginRegistry: new PluginRegistry({
+                      plugins: [],
+                    }),
+                    logLevel: this.logLevel,
+                  },
+                  logLevel: this.logLevel,
+                },
+                this.ontologyManager,
+                this.monitorService,
+              );
+              this.log.debug(`${fnTag}, Besu Leaf: ${leaf}`);
+              break;
+            case LedgerType.Ethereum:
+              this.log.debug(`${fnTag}, Deploying Ethereum Leaf...`);
+              this.log.debug(
+                `${fnTag}, Ethereum Leaf Network Options: ${JSON.stringify(
+                  leafNetworkOptions,
+                )}`,
+              );
+              const ethereumNetworkOptions =
+                leafNetworkOptions as unknown as IEthereumLeafNeworkOptions;
+              if (!this.ontologyManager) {
+                throw new Error(`${fnTag}, Ontology Manager is not defined`);
+              }
+              leaf = new EthereumLeaf(
+                {
+                  ...ethereumNetworkOptions,
+                  connectorOptions: {
+                    ...ethereumNetworkOptions.connectorOptions,
+                    instanceId: uuidv4(),
+                    pluginRegistry: new PluginRegistry({
+                      plugins: [],
+                    }),
+                    logLevel: this.logLevel,
+                  },
+                  logLevel: this.logLevel,
+                },
+                this.ontologyManager,
+                this.monitorService,
+              );
+              break;
+            case LedgerType.Fabric2:
+              this.log.debug(`${fnTag}, Deploying Fabric Leaf...`);
+              this.log.debug(
+                `${fnTag}, Fabric Leaf Network Options: ${JSON.stringify(
+                  leafNetworkOptions,
+                )}`,
+              );
+              if (
+                !(leafNetworkOptions as Partial<IFabricLeafNeworkOptions>)
+                  .userIdentity
+              ) {
+                throw new DeployLeafError(
+                  `${fnTag}, User Identity is required for Fabric network`,
+                );
+              }
+              const keychainEntryKeyBridge = "bridgeKey";
+              const fabricKeychain = new PluginKeychainMemory({
+                instanceId: uuidv4(),
+                keychainId: uuidv4(),
+                logLevel: this.logLevel,
+                backend: new Map([
+                  [
+                    keychainEntryKeyBridge,
+                    JSON.stringify(
+                      (leafNetworkOptions as Partial<IFabricLeafNeworkOptions>)
+                        .userIdentity,
+                    ),
+                  ],
+                ]),
+              });
+              const fabricNetworkOptions = {
+                ...leafNetworkOptions,
+                connectorOptions: {
+                  ...(leafNetworkOptions as Partial<IFabricLeafNeworkOptions>)
+                    .connectorOptions,
+                  instanceId: uuidv4(),
+                  pluginRegistry: new PluginRegistry({
+                    plugins: [fabricKeychain],
+                  }),
+                  logLevel: this.logLevel,
+                },
+                signingCredential: {
+                  keychainId: fabricKeychain.getKeychainId(),
+                  keychainRef: keychainEntryKeyBridge,
+                },
+              } as unknown as IFabricLeafNeworkOptions;
+              if (!this.ontologyManager) {
+                throw new Error(`${fnTag}, Ontology Manager is not defined`);
+              }
+              leaf = new FabricLeaf(
+                {
+                  ...fabricNetworkOptions,
+                  logLevel: this.logLevel,
+                },
+                this.ontologyManager,
+                this.monitorService,
+              );
+              break;
+            default:
+              throw new UnsupportedNetworkError(
+                `${fnTag}, ${leafNetworkOptions.networkIdentification.ledgerType} is not supported`,
+              );
+          }
+          try {
+            await leaf.deployContracts();
+          } catch (error) {
+            this.log.error(`${fnTag}, Error deploying leaf: ${error}`);
+            if (error instanceof WrapperContractAlreadyCreatedError) {
+              this.log.debug("Contracts already deployed");
+            } else {
+              throw error;
+            }
+          }
+          const networkKey = safeStableStringify(
+            leafNetworkOptions.networkIdentification,
+          );
+          if (!this.leafs.has(networkKey)) {
+            this.leafs.set(networkKey, new Map());
+          }
+          this.leafs.get(networkKey)?.set(leaf.getId(), leaf);
+        } catch (error) {
+          this.log.error(`${fnTag}, Error deploying leaf: ${error}`);
+          throw new DeployLeafError(error);
+        }
+        span.setStatus({ code: SpanStatusCode.OK });
+      } catch (error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(error),
+        });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-      const networkKey = safeStableStringify(
-        leafNetworkOptions.networkIdentification,
-      );
-      if (!this.leafs.has(networkKey)) {
-        this.leafs.set(networkKey, new Map());
-      }
-      this.leafs.get(networkKey)?.set(leaf.getId(), leaf);
-    } catch (error) {
-      this.log.error(`${fnTag}, Error deploying leaf: ${error}`);
-      throw new DeployLeafError(error);
-    }
+    });
   }
 
   /**
@@ -246,28 +309,39 @@ export class BridgeManager
     claimFormat: ClaimFormat = ClaimFormat.DEFAULT,
   ): BridgeLeaf {
     const fnTag = `${BridgeManager.CLASS_NAME}#getBridgeEndPoint()`;
-    this.log.debug(`${fnTag}, Getting Leaf...`);
-    this.log.debug(
-      `${fnTag}, Getting Leaf for Network ID: ${safeStableStringify(id)}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Leaf...`);
+        this.log.debug(
+          `${fnTag}, Getting Leaf for Network ID: ${safeStableStringify(id)}`,
+        );
 
-    const leafs = this.leafs.get(safeStableStringify(id));
+        const leafs = this.leafs.get(safeStableStringify(id));
 
-    if (!leafs) {
-      throw new LeafError(
-        `${fnTag}, Bridge endpoint not available for network: ${safeStableStringify(id)}`,
-      );
-    }
+        if (!leafs) {
+          throw new LeafError(
+            `${fnTag}, Bridge endpoint not available for network: ${safeStableStringify(id)}`,
+          );
+        }
 
-    for (const leaf of leafs.values()) {
-      if (leaf.getSupportedClaimFormats().includes(claimFormat)) {
-        return leaf;
+        for (const leaf of leafs.values()) {
+          if (leaf.getSupportedClaimFormats().includes(claimFormat)) {
+            return leaf;
+          }
+        }
+
+        throw new LeafError(
+          `${fnTag}, Bridge endpoint not available: ${id}, with Claim Format: ${claimFormat}`,
+        );
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-    }
-
-    throw new LeafError(
-      `${fnTag}, Bridge endpoint not available: ${id}, with Claim Format: ${claimFormat}`,
-    );
+    });
   }
 
   /**
@@ -277,12 +351,23 @@ export class BridgeManager
    */
   public getAvailableEndPoints(): NetworkId[] {
     const fnTag = `${BridgeManager.CLASS_NAME}#getAvailableEndPoints()`;
-    this.log.debug(`${fnTag}, Getting Leafs...`);
-    const networkIds: NetworkId[] = [];
-    for (const key of this.leafs.keys()) {
-      networkIds.push(JSON.parse(key) as NetworkId);
-    }
-    return networkIds;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Leafs...`);
+        const networkIds: NetworkId[] = [];
+        for (const key of this.leafs.keys()) {
+          networkIds.push(JSON.parse(key) as NetworkId);
+        }
+        return networkIds;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -297,12 +382,24 @@ export class BridgeManager
     claimType: ClaimFormat = ClaimFormat.DEFAULT,
   ): SATPBridgeExecutionLayer {
     const fnTag = `${BridgeManager.CLASS_NAME}#getSATPExecutionLayer()`;
-    this.log.debug(`${fnTag}, Getting SATP Execution Layer...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.log.debug(`${fnTag}, Getting SATP Execution Layer...`);
 
-    return new SATPBridgeExecutionLayerImpl({
-      leafBridge: this.getBridgeEndPoint(id, claimType),
-      claimType,
-      logLevel: this.logLevel,
+        return new SATPBridgeExecutionLayerImpl({
+          leafBridge: this.getBridgeEndPoint(id, claimType),
+          claimType,
+          logLevel: this.logLevel,
+          monitorService: this.monitorService,
+        });
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
   }
 
@@ -321,10 +418,21 @@ export class BridgeManager
     assetType: TokenType,
   ): string {
     const fnTag = `${BridgeManager.CLASS_NAME}#getApproveAddress()`;
-    this.log.debug(`${fnTag}, Getting Approve Address...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Approve Address...`);
 
-    return this.getBridgeEndPoint(networkIdentification).getApproveAddress(
-      assetType,
-    );
+        return this.getBridgeEndPoint(networkIdentification).getApproveAddress(
+          assetType,
+        );
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 }

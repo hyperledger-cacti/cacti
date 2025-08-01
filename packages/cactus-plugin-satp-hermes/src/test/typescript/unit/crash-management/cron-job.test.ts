@@ -48,6 +48,7 @@ import { knexLocalInstance } from "../../../../main/typescript/database/knexfile
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository } from "../../../../main/typescript/database/repository/knex-remote-log-repository";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 let crashManager: CrashManager;
 let localRepository: ILocalLogRepository;
@@ -55,6 +56,10 @@ let remoteRepository: IRemoteLogRepository;
 let knexInstanceClient: Knex;
 let knexInstanceRemote: Knex;
 const sessionId = uuidv4();
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
+monitorService.init();
 const createMockSession = (
   maxTimeout: string,
   maxRetries: string,
@@ -63,6 +68,7 @@ const createMockSession = (
     contextID: "MOCK_CONTEXT_ID",
     server: true,
     client: true,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.getServerSessionData();
@@ -144,6 +150,7 @@ beforeAll(async () => {
     localGateway: gatewayIdentity,
     counterPartyGateways: [],
     signer: signer,
+    monitorService: monitorService,
   };
   const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
   const ontologiesPath = path.join(__dirname, "../../../ontologies");
@@ -153,6 +160,7 @@ beforeAll(async () => {
     ontologyOptions: {
       ontologiesPath: ontologiesPath,
     },
+    monitorService: monitorService,
   };
   const bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 
@@ -164,6 +172,7 @@ beforeAll(async () => {
     localRepository: localRepository,
     remoteRepository: remoteRepository,
     signer: signer,
+    monitorService: monitorService,
   };
 
   crashManager = new CrashManager(crashOptions);
@@ -179,6 +188,7 @@ afterAll(async () => {
     await knexInstanceClient.destroy();
     await knexInstanceRemote.destroy();
   }
+  monitorService.shutdown();
 });
 
 describe.skip("CrashManager Tests", () => {
