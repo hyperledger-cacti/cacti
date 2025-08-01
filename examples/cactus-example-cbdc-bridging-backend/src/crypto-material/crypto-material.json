@@ -30,10 +30,12 @@
   },
   "keychains": {
     "keychain1": {
-      "id": "df05d3c2-ddd5-4074-aae3-526564217459"
+      "id": "df05d3c2-ddd5-4074-aae3-526564217459",
+      "ref": "bridge1"
     },
     "keychain2": {
-      "id": "d741fb4a-c95c-4205-8afa-758a9423234f"
+      "id": "d741fb4a-c95c-4205-8afa-758a9423234f",
+      "ref": "bridge2"
     }
   }
 }

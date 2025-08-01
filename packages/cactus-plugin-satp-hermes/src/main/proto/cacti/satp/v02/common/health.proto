@@ -1,0 +1,12 @@
+syntax = "proto3";
+package cacti.satp.v02.common;
+
+message CheckHealthRequest {}
+
+message CheckHealthResponse {
+}
+
+service HealthService {
+    rpc CheckHealth(CheckHealthRequest) returns (CheckHealthResponse);
+}
+
