@@ -283,3 +283,9 @@ export class InvalidParameterError extends BridgeInternalError {
     );
   }
 }
+
+export class UninitializedMonitorServiceError extends BridgeInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super("Uninitialized MonitorService", cause ?? null, 500, traceID, trace);
+  }
+}

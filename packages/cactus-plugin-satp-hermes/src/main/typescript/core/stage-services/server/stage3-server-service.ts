@@ -60,6 +60,7 @@ import { LedgerType } from "@hyperledger/cactus-core-api";
 import { protoToAsset } from "../service-utils";
 import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { NetworkId } from "../../../public-api";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 export class Stage3ServerService extends SATPService {
   public static readonly SATP_STAGE = "3";
@@ -79,6 +80,7 @@ export class Stage3ServerService extends SATPService {
       serviceType: Stage3ServerService.SERVICE_TYPE,
       bridgeManager: ops.bridgeManager,
       dbLogger: ops.dbLogger,
+      monitorService: ops.monitorService,
     };
     super(commonOptions);
     if (ops.bridgeManager == undefined) {
@@ -96,136 +98,164 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void | CommitPreparationResponse> {
     const stepTag = `commitReady()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    const messageType = MessageType[MessageType.COMMIT_READY];
-    this.Log.debug(`${fnTag}, commitReady...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        const messageType = MessageType[MessageType.COMMIT_READY];
+        this.Log.debug(`${fnTag}, commitReady...`);
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
+        session.verify(fnTag, SessionType.SERVER);
 
-    const sessionData = session.getServerSessionData();
-    await this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: messageType,
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        const sessionData = session.getServerSessionData();
+        await this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: messageType,
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`exec-${messageType}`);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          const commonBody = create(CommonSatpSchema, {
+            version: sessionData.version,
+            messageType: MessageType.COMMIT_READY,
+            sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+            hashPreviousMessage: getMessageHash(
+              sessionData,
+              MessageType.COMMIT_PREPARE,
+            ),
+            sessionId: request.common!.sessionId,
+            clientGatewayPubkey: sessionData.clientGatewayPubkey,
+            serverGatewayPubkey: sessionData.serverGatewayPubkey,
+            resourceUrl: sessionData.resourceUrl,
+          });
+
+          sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+
+          const commitReadyMessage = create(CommitPreparationResponseSchema, {
+            common: commonBody,
+          });
+
+          if (sessionData.mintAssertionClaim == undefined) {
+            throw new MintAssertionClaimError(fnTag);
+          }
+
+          commitReadyMessage.mintAssertionClaim =
+            sessionData.mintAssertionClaim;
+          commitReadyMessage.mintAssertionClaimFormat =
+            sessionData.mintAssertionClaimFormat;
+
+          if (sessionData.transferContextId != undefined) {
+            commitReadyMessage.common!.transferContextId =
+              sessionData.transferContextId;
+          }
+
+          if (sessionData.serverTransferNumber != undefined) {
+            commitReadyMessage.serverTransferNumber =
+              sessionData.serverTransferNumber;
+          }
+
+          const messageSignature = bufArray2HexStr(
+            sign(this.Signer, safeStableStringify(commitReadyMessage)),
+          );
+
+          commitReadyMessage.serverSignature = messageSignature;
+
+          saveSignature(
+            sessionData,
+            MessageType.COMMIT_READY,
+            messageSignature,
+          );
+
+          saveHash(
+            sessionData,
+            MessageType.COMMIT_READY,
+            getHash(commitReadyMessage),
+          );
+
+          saveTimestamp(
+            sessionData,
+            MessageType.LOCK_ASSERT,
+            TimestampType.PROCESSED,
+          );
+
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "done",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, sending commitReadyMessage...`);
+
+          return commitReadyMessage;
+        } catch (error) {
+          this.Log.error(`fail-${messageType}`, error);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-    try {
-      this.Log.info(`exec-${messageType}`);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      const commonBody = create(CommonSatpSchema, {
-        version: sessionData.version,
-        messageType: MessageType.COMMIT_READY,
-        sequenceNumber: request.common!.sequenceNumber + BigInt(1),
-        hashPreviousMessage: getMessageHash(
-          sessionData,
-          MessageType.COMMIT_PREPARE,
-        ),
-        sessionId: request.common!.sessionId,
-        clientGatewayPubkey: sessionData.clientGatewayPubkey,
-        serverGatewayPubkey: sessionData.serverGatewayPubkey,
-        resourceUrl: sessionData.resourceUrl,
-      });
-
-      sessionData.lastSequenceNumber = commonBody.sequenceNumber;
-
-      const commitReadyMessage = create(CommitPreparationResponseSchema, {
-        common: commonBody,
-      });
-
-      if (sessionData.mintAssertionClaim == undefined) {
-        throw new MintAssertionClaimError(fnTag);
-      }
-
-      commitReadyMessage.mintAssertionClaim = sessionData.mintAssertionClaim;
-      commitReadyMessage.mintAssertionClaimFormat =
-        sessionData.mintAssertionClaimFormat;
-
-      if (sessionData.transferContextId != undefined) {
-        commitReadyMessage.common!.transferContextId =
-          sessionData.transferContextId;
-      }
-
-      if (sessionData.serverTransferNumber != undefined) {
-        commitReadyMessage.serverTransferNumber =
-          sessionData.serverTransferNumber;
-      }
-
-      const messageSignature = bufArray2HexStr(
-        sign(this.Signer, safeStableStringify(commitReadyMessage)),
-      );
-
-      commitReadyMessage.serverSignature = messageSignature;
-
-      saveSignature(sessionData, MessageType.COMMIT_READY, messageSignature);
-
-      saveHash(
-        sessionData,
-        MessageType.COMMIT_READY,
-        getHash(commitReadyMessage),
-      );
-
-      saveTimestamp(
-        sessionData,
-        MessageType.LOCK_ASSERT,
-        TimestampType.PROCESSED,
-      );
-
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "done",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, sending commitReadyMessage...`);
-
-      return commitReadyMessage;
-    } catch (error) {
-      this.Log.error(`fail-${messageType}`, error);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw error;
-    }
   }
 
   async commitReadyErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
   ): Promise<CommitPreparationResponse> {
-    const errorResponse = create(CommitPreparationResponseSchema, {});
-    const commonBody = create(CommonSatpSchema, {
-      messageType: MessageType.COMMIT_READY,
-      error: true,
-      errorCode: error.getSATPErrorType(),
+    const fnTag = `${this.getServiceIdentifier()}#commitReadyErrorResponse()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        const errorResponse = create(CommitPreparationResponseSchema, {});
+        const commonBody = create(CommonSatpSchema, {
+          messageType: MessageType.COMMIT_READY,
+          error: true,
+          errorCode: error.getSATPErrorType(),
+        });
+
+        if (!(error instanceof SessionNotFoundError) && session != undefined) {
+          commonBody.sessionId = session.getServerSessionData().id;
+        }
+        errorResponse.common = commonBody;
+
+        const messageSignature = bufArray2HexStr(
+          sign(this.Signer, safeStableStringify(errorResponse)),
+        );
+
+        errorResponse.serverSignature = messageSignature;
+
+        return errorResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (!(error instanceof SessionNotFoundError) && session != undefined) {
-      commonBody.sessionId = session.getServerSessionData().id;
-    }
-    errorResponse.common = commonBody;
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(errorResponse)),
-    );
-
-    errorResponse.serverSignature = messageSignature;
-
-    return errorResponse;
   }
 
   async commitFinalAcknowledgementReceiptResponse(
@@ -234,155 +264,182 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void | CommitFinalAssertionResponse> {
     const stepTag = `commitFinalAcknowledgementReceiptResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    const messageType = MessageType[MessageType.ACK_COMMIT_FINAL];
-    this.Log.debug(`${fnTag}, commitFinalAcknowledgementReceiptResponse...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        const messageType = MessageType[MessageType.ACK_COMMIT_FINAL];
+        this.Log.debug(
+          `${fnTag}, commitFinalAcknowledgementReceiptResponse...`,
+        );
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
+        session.verify(fnTag, SessionType.SERVER);
 
-    const sessionData = session.getServerSessionData();
+        const sessionData = session.getServerSessionData();
 
-    await this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: messageType,
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        await this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: messageType,
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`exec-${messageType}`);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          const commonBody = create(CommonSatpSchema, {
+            version: sessionData.version,
+            messageType: MessageType.ACK_COMMIT_FINAL,
+            sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+            hashPreviousMessage: getMessageHash(
+              sessionData,
+              MessageType.COMMIT_FINAL,
+            ),
+            sessionId: request.common!.sessionId,
+            clientGatewayPubkey: sessionData.clientGatewayPubkey,
+            serverGatewayPubkey: sessionData.serverGatewayPubkey,
+            resourceUrl: sessionData.resourceUrl,
+          });
+
+          sessionData.lastSequenceNumber =
+            request.common!.sequenceNumber + BigInt(1);
+
+          const commitFinalAcknowledgementReceiptResponseMessage = create(
+            CommitFinalAssertionResponseSchema,
+            {
+              common: commonBody,
+            },
+          );
+
+          if (sessionData.assignmentAssertionClaim == undefined) {
+            throw new AssignmentAssertionClaimError(fnTag);
+          }
+
+          commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaim =
+            sessionData.assignmentAssertionClaim;
+
+          if (sessionData.assignmentAssertionClaimFormat != undefined) {
+            commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaimFormat =
+              sessionData.assignmentAssertionClaimFormat;
+          }
+
+          if (sessionData.transferContextId != undefined) {
+            commitFinalAcknowledgementReceiptResponseMessage.common!.transferContextId =
+              sessionData.transferContextId;
+          }
+
+          if (sessionData.serverTransferNumber != undefined) {
+            commitFinalAcknowledgementReceiptResponseMessage.serverTransferNumber =
+              sessionData.serverTransferNumber;
+          }
+
+          const messageSignature = bufArray2HexStr(
+            sign(
+              this.Signer,
+              safeStableStringify(
+                commitFinalAcknowledgementReceiptResponseMessage,
+              ),
+            ),
+          );
+
+          commitFinalAcknowledgementReceiptResponseMessage.serverSignature =
+            messageSignature;
+
+          saveSignature(
+            sessionData,
+            MessageType.ACK_COMMIT_FINAL,
+            messageSignature,
+          );
+
+          saveHash(
+            sessionData,
+            MessageType.ACK_COMMIT_FINAL,
+            getHash(commitFinalAcknowledgementReceiptResponseMessage),
+          );
+
+          saveTimestamp(
+            sessionData,
+            MessageType.ACK_COMMIT_FINAL,
+            TimestampType.PROCESSED,
+          );
+
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "done",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(
+            `${fnTag}, sending commitFinalAcknowledgementReceiptResponseMessage...`,
+          );
+
+          return commitFinalAcknowledgementReceiptResponseMessage;
+        } catch (error) {
+          this.Log.error(`fail-${messageType}`, error);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-    try {
-      this.Log.info(`exec-${messageType}`);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      const commonBody = create(CommonSatpSchema, {
-        version: sessionData.version,
-        messageType: MessageType.ACK_COMMIT_FINAL,
-        sequenceNumber: request.common!.sequenceNumber + BigInt(1),
-        hashPreviousMessage: getMessageHash(
-          sessionData,
-          MessageType.COMMIT_FINAL,
-        ),
-        sessionId: request.common!.sessionId,
-        clientGatewayPubkey: sessionData.clientGatewayPubkey,
-        serverGatewayPubkey: sessionData.serverGatewayPubkey,
-        resourceUrl: sessionData.resourceUrl,
-      });
-
-      sessionData.lastSequenceNumber =
-        request.common!.sequenceNumber + BigInt(1);
-
-      const commitFinalAcknowledgementReceiptResponseMessage = create(
-        CommitFinalAssertionResponseSchema,
-        {
-          common: commonBody,
-        },
-      );
-
-      if (sessionData.assignmentAssertionClaim == undefined) {
-        throw new AssignmentAssertionClaimError(fnTag);
-      }
-
-      commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaim =
-        sessionData.assignmentAssertionClaim;
-
-      if (sessionData.assignmentAssertionClaimFormat != undefined) {
-        commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaimFormat =
-          sessionData.assignmentAssertionClaimFormat;
-      }
-
-      if (sessionData.transferContextId != undefined) {
-        commitFinalAcknowledgementReceiptResponseMessage.common!.transferContextId =
-          sessionData.transferContextId;
-      }
-
-      if (sessionData.serverTransferNumber != undefined) {
-        commitFinalAcknowledgementReceiptResponseMessage.serverTransferNumber =
-          sessionData.serverTransferNumber;
-      }
-
-      const messageSignature = bufArray2HexStr(
-        sign(
-          this.Signer,
-          safeStableStringify(commitFinalAcknowledgementReceiptResponseMessage),
-        ),
-      );
-
-      commitFinalAcknowledgementReceiptResponseMessage.serverSignature =
-        messageSignature;
-
-      saveSignature(
-        sessionData,
-        MessageType.ACK_COMMIT_FINAL,
-        messageSignature,
-      );
-
-      saveHash(
-        sessionData,
-        MessageType.ACK_COMMIT_FINAL,
-        getHash(commitFinalAcknowledgementReceiptResponseMessage),
-      );
-
-      saveTimestamp(
-        sessionData,
-        MessageType.ACK_COMMIT_FINAL,
-        TimestampType.PROCESSED,
-      );
-
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "done",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(
-        `${fnTag}, sending commitFinalAcknowledgementReceiptResponseMessage...`,
-      );
-
-      return commitFinalAcknowledgementReceiptResponseMessage;
-    } catch (error) {
-      this.Log.error(`fail-${messageType}`, error);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw error;
-    }
   }
 
   async commitFinalAcknowledgementReceiptErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
   ): Promise<CommitFinalAssertionResponse> {
-    const errorResponse = create(CommitFinalAssertionResponseSchema, {});
-    const commonBody = create(CommonSatpSchema, {
-      messageType: MessageType.ACK_COMMIT_FINAL,
-      error: true,
-      errorCode: error.getSATPErrorType(),
+    const fnTag = `${this.getServiceIdentifier()}#commitFinalAcknowledgementReceiptErrorResponse()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        const errorResponse = create(CommitFinalAssertionResponseSchema, {});
+        const commonBody = create(CommonSatpSchema, {
+          messageType: MessageType.ACK_COMMIT_FINAL,
+          error: true,
+          errorCode: error.getSATPErrorType(),
+        });
+
+        if (!(error instanceof SessionNotFoundError) && session != undefined) {
+          commonBody.sessionId = session.getServerSessionData().id;
+        }
+        errorResponse.common = commonBody;
+
+        const messageSignature = bufArray2HexStr(
+          sign(this.Signer, safeStableStringify(errorResponse)),
+        );
+
+        errorResponse.serverSignature = messageSignature;
+
+        return errorResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (!(error instanceof SessionNotFoundError) && session != undefined) {
-      commonBody.sessionId = session.getServerSessionData().id;
-    }
-    errorResponse.common = commonBody;
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(errorResponse)),
-    );
-
-    errorResponse.serverSignature = messageSignature;
-
-    return errorResponse;
   }
 
   async checkCommitPreparationRequest(
@@ -391,46 +448,57 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void> {
     const stepTag = `checkCommitPreparationRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, checkCommitPreparationRequest...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, () => {
+      try {
+        this.Log.debug(`${fnTag}, checkCommitPreparationRequest...`);
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
+        session.verify(fnTag, SessionType.SERVER);
 
-    const sessionData = session.getServerSessionData();
+        const sessionData = session.getServerSessionData();
 
-    if (request.common == undefined) {
-      commonBodyVerifier(
-        fnTag,
-        request.common,
-        sessionData,
-        MessageType.COMMIT_PREPARE,
-      );
-    }
+        if (request.common == undefined) {
+          commonBodyVerifier(
+            fnTag,
+            request.common,
+            sessionData,
+            MessageType.COMMIT_PREPARE,
+          );
+        }
 
-    signatureVerifier(fnTag, this.Signer, request, sessionData);
+        signatureVerifier(fnTag, this.Signer, request, sessionData);
 
-    if (
-      sessionData.clientTransferNumber != "" &&
-      request.clientTransferNumber != sessionData.clientTransferNumber
-    ) {
-      // This does not throw an error because the clientTransferNumber is only meaningful to the client.
-      this.Log.info(
-        `${fnTag}, LockAssertionRequest clientTransferNumber does not match the one that was sent`,
-      );
-    }
+        if (
+          sessionData.clientTransferNumber != "" &&
+          request.clientTransferNumber != sessionData.clientTransferNumber
+        ) {
+          // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+          this.Log.info(
+            `${fnTag}, LockAssertionRequest clientTransferNumber does not match the one that was sent`,
+          );
+        }
 
-    saveHash(sessionData, MessageType.COMMIT_PREPARE, getHash(request));
+        saveHash(sessionData, MessageType.COMMIT_PREPARE, getHash(request));
 
-    saveTimestamp(
-      sessionData,
-      MessageType.COMMIT_PREPARE,
-      TimestampType.RECEIVED,
-    );
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_PREPARE,
+          TimestampType.RECEIVED,
+        );
 
-    this.Log.info(`${fnTag}, CommitPreparationRequest passed all checks.`);
+        this.Log.info(`${fnTag}, CommitPreparationRequest passed all checks.`);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   async checkCommitFinalAssertionRequest(
@@ -439,60 +507,74 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void> {
     const stepTag = `checkCommitFinalAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, checkCommitFinalAssertionRequest...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, () => {
+      try {
+        this.Log.debug(`${fnTag}, checkCommitFinalAssertionRequest...`);
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
+        session.verify(fnTag, SessionType.SERVER);
 
-    const sessionData = session.getServerSessionData();
+        const sessionData = session.getServerSessionData();
 
-    if (request.common == undefined) {
-      commonBodyVerifier(
-        fnTag,
-        request.common,
-        sessionData,
-        MessageType.COMMIT_FINAL,
-      );
-    }
+        if (request.common == undefined) {
+          commonBodyVerifier(
+            fnTag,
+            request.common,
+            sessionData,
+            MessageType.COMMIT_FINAL,
+          );
+        }
 
-    signatureVerifier(fnTag, this.Signer, request, sessionData);
+        signatureVerifier(fnTag, this.Signer, request, sessionData);
 
-    //todo check burn
-    if (request.burnAssertionClaim == undefined) {
-      throw new BurnAssertionClaimError(fnTag);
-    }
+        //todo check burn
+        if (request.burnAssertionClaim == undefined) {
+          throw new BurnAssertionClaimError(fnTag);
+        }
 
-    sessionData.burnAssertionClaim = request.burnAssertionClaim;
+        sessionData.burnAssertionClaim = request.burnAssertionClaim;
 
-    if (request.burnAssertionClaimFormat != undefined) {
-      this.Log.info(
-        `${fnTag}, optional variable loaded: burnAssertionClaimFormat`,
-      );
-      sessionData.burnAssertionClaimFormat = request.burnAssertionClaimFormat;
-    }
+        if (request.burnAssertionClaimFormat != undefined) {
+          this.Log.info(
+            `${fnTag}, optional variable loaded: burnAssertionClaimFormat`,
+          );
+          sessionData.burnAssertionClaimFormat =
+            request.burnAssertionClaimFormat;
+        }
 
-    if (
-      sessionData.clientTransferNumber != undefined &&
-      request.clientTransferNumber != sessionData.clientTransferNumber
-    ) {
-      // This does not throw an error because the clientTransferNumber is only meaningful to the client.
-      this.Log.info(
-        `${fnTag}, CommitFinalAssertionRequest clientTransferNumber does not match the one that was sent`,
-      );
-    }
+        if (
+          sessionData.clientTransferNumber != undefined &&
+          request.clientTransferNumber != sessionData.clientTransferNumber
+        ) {
+          // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+          this.Log.info(
+            `${fnTag}, CommitFinalAssertionRequest clientTransferNumber does not match the one that was sent`,
+          );
+        }
 
-    saveHash(sessionData, MessageType.COMMIT_FINAL, getHash(request));
+        saveHash(sessionData, MessageType.COMMIT_FINAL, getHash(request));
 
-    saveTimestamp(
-      sessionData,
-      MessageType.COMMIT_FINAL,
-      TimestampType.RECEIVED,
-    );
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_FINAL,
+          TimestampType.RECEIVED,
+        );
 
-    this.Log.info(`${fnTag}, CommitFinalAssertionRequest passed all checks.`);
+        this.Log.info(
+          `${fnTag}, CommitFinalAssertionRequest passed all checks.`,
+        );
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   async checkTransferCompleteRequest(
@@ -501,53 +583,66 @@ export class Stage3ServerService extends SATPService {
   ): Promise<void> {
     const stepTag = `checkTransferCompleteRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    this.Log.debug(`${fnTag}, checkTransferCompleteRequest...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, () => {
+      try {
+        this.Log.debug(`${fnTag}, checkTransferCompleteRequest...`);
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
+        session.verify(fnTag, SessionType.SERVER);
 
-    const sessionData = session.getServerSessionData();
+        const sessionData = session.getServerSessionData();
 
-    if (request.common == undefined) {
-      commonBodyVerifier(
-        fnTag,
-        request.common,
-        sessionData,
-        MessageType.COMMIT_TRANSFER_COMPLETE,
-      );
-    }
+        if (request.common == undefined) {
+          commonBodyVerifier(
+            fnTag,
+            request.common,
+            sessionData,
+            MessageType.COMMIT_TRANSFER_COMPLETE,
+          );
+        }
 
-    signatureVerifier(fnTag, this.Signer, request, sessionData);
+        signatureVerifier(fnTag, this.Signer, request, sessionData);
 
-    if (
-      sessionData.clientTransferNumber != undefined &&
-      request.clientTransferNumber != sessionData.clientTransferNumber
-    ) {
-      // This does not throw an error because the clientTransferNumber is only meaningful to the client.
-      this.Log.info(
-        `${fnTag}, TransferCompleteRequest clientTransferNumber does not match the one that was sent`,
-      );
-    }
-    this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
+        if (
+          sessionData.clientTransferNumber != undefined &&
+          request.clientTransferNumber != sessionData.clientTransferNumber
+        ) {
+          // This does not throw an error because the clientTransferNumber is only meaningful to the client.
+          this.Log.info(
+            `${fnTag}, TransferCompleteRequest clientTransferNumber does not match the one that was sent`,
+          );
+        }
+        this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
 
-    sessionData.state = State.COMPLETED;
+        sessionData.state = State.COMPLETED;
 
-    saveHash(
-      sessionData,
-      MessageType.COMMIT_TRANSFER_COMPLETE,
-      getHash(request),
-    );
+        this.monitorService.incrementCounter("successful_transactions");
 
-    saveTimestamp(
-      sessionData,
-      MessageType.COMMIT_TRANSFER_COMPLETE,
-      TimestampType.RECEIVED,
-    );
+        saveHash(
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE,
+          getHash(request),
+        );
 
-    this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE,
+          TimestampType.RECEIVED,
+        );
+
+        this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   async transferCompleteResponse(
@@ -556,344 +651,394 @@ export class Stage3ServerService extends SATPService {
   ): Promise<TransferCompleteResponse> {
     const stepTag = `createTransferCompleteResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    const messageType =
-      MessageType[MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE];
-    this.Log.debug(`${fnTag}, createTransferCompleteResponse...`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        const messageType =
+          MessageType[MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE];
+        this.Log.debug(`${fnTag}, createTransferCompleteResponse...`);
 
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER, false, true);
+        session.verify(fnTag, SessionType.SERVER, false, true);
 
-    const sessionData = session.getServerSessionData();
+        const sessionData = session.getServerSessionData();
 
-    await this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: messageType,
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        await this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: messageType,
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`exec-${messageType}`);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          const commonBody = create(CommonSatpSchema, {
+            version: sessionData.version,
+            messageType: MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+            sequenceNumber: request.common!.sequenceNumber + BigInt(1),
+            hashPreviousMessage: getMessageHash(
+              sessionData,
+              MessageType.COMMIT_TRANSFER_COMPLETE,
+            ),
+            sessionId: request.common!.sessionId,
+            clientGatewayPubkey: sessionData.clientGatewayPubkey,
+            serverGatewayPubkey: sessionData.serverGatewayPubkey,
+            resourceUrl: sessionData.resourceUrl,
+          });
+
+          sessionData.lastSequenceNumber =
+            request.common!.sequenceNumber + BigInt(1);
+
+          const transferCompleteResponseMessage = create(
+            TransferCompleteResponseSchema,
+            {
+              common: commonBody,
+            },
+          );
+
+          if (sessionData.transferContextId != undefined) {
+            transferCompleteResponseMessage.common!.transferContextId =
+              sessionData.transferContextId;
+          }
+
+          if (sessionData.serverTransferNumber != undefined) {
+            transferCompleteResponseMessage.serverTransferNumber =
+              sessionData.serverTransferNumber;
+          }
+
+          const messageSignature = bufArray2HexStr(
+            sign(
+              this.Signer,
+              safeStableStringify(transferCompleteResponseMessage),
+            ),
+          );
+
+          transferCompleteResponseMessage.serverSignature = messageSignature;
+
+          saveSignature(
+            sessionData,
+            MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+            messageSignature,
+          );
+
+          saveHash(
+            sessionData,
+            MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+            getHash(transferCompleteResponseMessage),
+          );
+
+          saveTimestamp(
+            sessionData,
+            MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+            TimestampType.PROCESSED,
+          );
+
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "done",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, sending transferCompleteResponseMessage...`);
+
+          return transferCompleteResponseMessage;
+        } catch (error) {
+          this.Log.error(`fail-${messageType}`, error);
+          await this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: messageType,
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-    try {
-      this.Log.info(`exec-${messageType}`);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      const commonBody = create(CommonSatpSchema, {
-        version: sessionData.version,
-        messageType: MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-        sequenceNumber: request.common!.sequenceNumber + BigInt(1),
-        hashPreviousMessage: getMessageHash(
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE,
-        ),
-        sessionId: request.common!.sessionId,
-        clientGatewayPubkey: sessionData.clientGatewayPubkey,
-        serverGatewayPubkey: sessionData.serverGatewayPubkey,
-        resourceUrl: sessionData.resourceUrl,
-      });
-
-      sessionData.lastSequenceNumber =
-        request.common!.sequenceNumber + BigInt(1);
-
-      const transferCompleteResponseMessage = create(
-        TransferCompleteResponseSchema,
-        {
-          common: commonBody,
-        },
-      );
-
-      if (sessionData.transferContextId != undefined) {
-        transferCompleteResponseMessage.common!.transferContextId =
-          sessionData.transferContextId;
-      }
-
-      if (sessionData.serverTransferNumber != undefined) {
-        transferCompleteResponseMessage.serverTransferNumber =
-          sessionData.serverTransferNumber;
-      }
-
-      const messageSignature = bufArray2HexStr(
-        sign(this.Signer, safeStableStringify(transferCompleteResponseMessage)),
-      );
-
-      transferCompleteResponseMessage.serverSignature = messageSignature;
-
-      saveSignature(
-        sessionData,
-        MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-        messageSignature,
-      );
-
-      saveHash(
-        sessionData,
-        MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-        getHash(transferCompleteResponseMessage),
-      );
-
-      saveTimestamp(
-        sessionData,
-        MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-        TimestampType.PROCESSED,
-      );
-
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "done",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, sending transferCompleteResponseMessage...`);
-
-      return transferCompleteResponseMessage;
-    } catch (error) {
-      this.Log.error(`fail-${messageType}`, error);
-      await this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: messageType,
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw error;
-    }
   }
 
   async transferCompleteErrorResponse(
     error: SATPInternalError,
     session?: SATPSession,
   ): Promise<TransferCompleteResponse> {
-    const errorResponse = create(TransferCompleteResponseSchema, {});
-    const commonBody = create(CommonSatpSchema, {
-      messageType: MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-      error: true,
-      errorCode: error.getSATPErrorType(),
+    const fnTag = `${this.getServiceIdentifier()}#transferCompleteErrorResponse()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        const errorResponse = create(TransferCompleteResponseSchema, {});
+        const commonBody = create(CommonSatpSchema, {
+          messageType: MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+          error: true,
+          errorCode: error.getSATPErrorType(),
+        });
+
+        if (!(error instanceof SessionNotFoundError) && session != undefined) {
+          commonBody.sessionId = session.getServerSessionData().id;
+        }
+        errorResponse.common = commonBody;
+
+        const messageSignature = bufArray2HexStr(
+          sign(this.Signer, safeStableStringify(errorResponse)),
+        );
+
+        errorResponse.serverSignature = messageSignature;
+
+        return errorResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (!(error instanceof SessionNotFoundError) && session != undefined) {
-      commonBody.sessionId = session.getServerSessionData().id;
-    }
-    errorResponse.common = commonBody;
-
-    const messageSignature = bufArray2HexStr(
-      sign(this.Signer, safeStableStringify(errorResponse)),
-    );
-
-    errorResponse.serverSignature = messageSignature;
-
-    return errorResponse;
   }
 
   async mintAsset(session: SATPSession): Promise<void> {
     const stepTag = `mintAsset()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
+        session.verify(fnTag, SessionType.SERVER);
 
-    const sessionData = session.getServerSessionData();
-    this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: "mint-asset",
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        const sessionData = session.getServerSessionData();
+        this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: "mint-asset",
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`exec-${stepTag}`);
+          this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: "mint-asset",
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, Minting Asset...`);
+
+          if (sessionData.receiverAsset == undefined) {
+            throw new LedgerAssetError(fnTag);
+          }
+
+          const networkId = {
+            id: sessionData.receiverAsset.networkId?.id,
+            ledgerType: sessionData.receiverAsset.networkId?.type as LedgerType,
+          } as NetworkId;
+
+          const token: FungibleAsset = protoToAsset(
+            sessionData.receiverAsset,
+            networkId,
+          ) as FungibleAsset;
+
+          if (token.id == undefined) {
+            throw new TokenIdMissingError(fnTag);
+          }
+
+          if (token.amount == undefined) {
+            throw new AmountMissingError(fnTag);
+          }
+
+          this.logger.debug(
+            `${fnTag}, Mint Asset ID: ${token.id} amount: ${token.amount.toString()}`,
+          );
+
+          const bridge = this.bridgeManager.getSATPExecutionLayer(
+            networkId,
+            this.claimFormat,
+          );
+
+          sessionData.mintAssertionClaim = create(MintAssertionClaimSchema, {});
+
+          const res = await bridge.mintAsset(token);
+
+          sessionData.mintAssertionClaim.receipt = res.receipt;
+
+          this.Log.debug(
+            `${fnTag}, Mint Operation Receipt: ${sessionData.mintAssertionClaim.receipt}`,
+          );
+
+          sessionData.mintAssertionClaim.proof = res.proof;
+          sessionData.mintAssertionClaimFormat = create(
+            MintAssertionClaimFormatSchema,
+            {
+              format: this.claimFormat,
+            },
+          );
+
+          sessionData.mintAssertionClaim.signature = bufArray2HexStr(
+            sign(this.Signer, sessionData.mintAssertionClaim.receipt),
+          );
+          this.dbLogger.storeProof({
+            sessionID: sessionData.id,
+            type: "mint-asset",
+            operation: "done",
+            data: safeStableStringify(sessionData.mintAssertionClaim.proof),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, done-${fnTag}`);
+        } catch (error) {
+          this.logger.debug(`Crash in ${fnTag}`, error);
+          this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: "mint-asset",
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw new FailedToProcessError(fnTag, "MintAsset", error);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-    try {
-      this.Log.info(`exec-${stepTag}`);
-      this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: "mint-asset",
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, Minting Asset...`);
-
-      if (sessionData.receiverAsset == undefined) {
-        throw new LedgerAssetError(fnTag);
-      }
-
-      const networkId = {
-        id: sessionData.receiverAsset.networkId?.id,
-        ledgerType: sessionData.receiverAsset.networkId?.type as LedgerType,
-      } as NetworkId;
-
-      const token: FungibleAsset = protoToAsset(
-        sessionData.receiverAsset,
-        networkId,
-      ) as FungibleAsset;
-
-      if (token.id == undefined) {
-        throw new TokenIdMissingError(fnTag);
-      }
-
-      if (token.amount == undefined) {
-        throw new AmountMissingError(fnTag);
-      }
-
-      this.logger.debug(
-        `${fnTag}, Mint Asset ID: ${token.id} amount: ${token.amount.toString()}`,
-      );
-
-      const bridge = this.bridgeManager.getSATPExecutionLayer(
-        networkId,
-        this.claimFormat,
-      );
-
-      sessionData.mintAssertionClaim = create(MintAssertionClaimSchema, {});
-
-      const res = await bridge.mintAsset(token);
-
-      sessionData.mintAssertionClaim.receipt = res.receipt;
-
-      this.Log.debug(
-        `${fnTag}, Mint Operation Receipt: ${sessionData.mintAssertionClaim.receipt}`,
-      );
-
-      sessionData.mintAssertionClaim.proof = res.proof;
-      sessionData.mintAssertionClaimFormat = create(
-        MintAssertionClaimFormatSchema,
-        {
-          format: this.claimFormat,
-        },
-      );
-
-      sessionData.mintAssertionClaim.signature = bufArray2HexStr(
-        sign(this.Signer, sessionData.mintAssertionClaim.receipt),
-      );
-      this.dbLogger.storeProof({
-        sessionID: sessionData.id,
-        type: "mint-asset",
-        operation: "done",
-        data: safeStableStringify(sessionData.mintAssertionClaim.proof),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, done-${fnTag}`);
-    } catch (error) {
-      this.logger.debug(`Crash in ${fnTag}`, error);
-      this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: "mint-asset",
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw new FailedToProcessError(fnTag, "MintAsset", error);
-    }
   }
 
   async assignAsset(session: SATPSession): Promise<void> {
     const stepTag = `assignAsset()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    if (session == undefined) {
-      throw new SessionError(fnTag);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        if (session == undefined) {
+          throw new SessionError(fnTag);
+        }
 
-    session.verify(fnTag, SessionType.SERVER);
-    const sessionData = session.getServerSessionData();
-    this.dbLogger.persistLogEntry({
-      sessionID: sessionData.id,
-      type: "assign-asset",
-      operation: "init",
-      data: safeStableStringify(sessionData),
-      sequenceNumber: Number(sessionData.lastSequenceNumber),
+        session.verify(fnTag, SessionType.SERVER);
+        const sessionData = session.getServerSessionData();
+        this.dbLogger.persistLogEntry({
+          sessionID: sessionData.id,
+          type: "assign-asset",
+          operation: "init",
+          data: safeStableStringify(sessionData),
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+        try {
+          this.Log.info(`${fnTag}, Assigning Asset...`);
+          this.Log.info(`exec-${stepTag}`);
+          this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: "assign-asset",
+            operation: "exec",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+
+          if (sessionData.receiverAsset == undefined) {
+            throw new LedgerAssetError(fnTag);
+          }
+
+          const networkId = {
+            id: sessionData.receiverAsset.networkId?.id,
+            ledgerType: sessionData.receiverAsset.networkId?.type as LedgerType,
+          } as NetworkId;
+
+          const token: FungibleAsset = protoToAsset(
+            sessionData.receiverAsset,
+            networkId,
+          ) as FungibleAsset;
+
+          if (token.owner == undefined) {
+            throw new MissingRecipientError(fnTag);
+          }
+
+          if (token.id == undefined) {
+            throw new TokenIdMissingError(fnTag);
+          }
+
+          if (token.amount == undefined) {
+            throw new AmountMissingError(fnTag);
+          }
+
+          this.logger.debug(
+            `${fnTag}, Assign Asset ID: ${token.id} amount: ${token.amount} recipient: ${token.owner}`,
+          );
+
+          const bridge = this.bridgeManager.getSATPExecutionLayer(
+            networkId,
+            this.claimFormat,
+          );
+
+          sessionData.assignmentAssertionClaim = create(
+            AssignmentAssertionClaimSchema,
+            {},
+          );
+
+          const res = await bridge.assignAsset(token);
+
+          sessionData.assignmentAssertionClaim.receipt = res.receipt;
+
+          this.Log.debug(
+            `${fnTag}, Assign Operation Receipt: ${sessionData.assignmentAssertionClaim.receipt}`,
+          );
+
+          sessionData.assignmentAssertionClaim.proof = res.proof;
+          sessionData.assignmentAssertionClaimFormat = create(
+            AssignmentAssertionClaimFormatSchema,
+            {
+              format: this.claimFormat,
+            },
+          );
+          sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
+            sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
+          );
+          this.dbLogger.storeProof({
+            sessionID: sessionData.id,
+            type: "assign-asset",
+            operation: "done",
+            data: safeStableStringify(
+              sessionData.assignmentAssertionClaim.proof,
+            ),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          this.Log.info(`${fnTag}, done-${fnTag}`);
+        } catch (error) {
+          this.logger.debug(`Crash in ${fnTag}`, error);
+          this.dbLogger.persistLogEntry({
+            sessionID: sessionData.id,
+            type: "assign-asset",
+            operation: "fail",
+            data: safeStableStringify(sessionData),
+            sequenceNumber: Number(sessionData.lastSequenceNumber),
+          });
+          throw new FailedToProcessError(fnTag, "AssignAsset", error);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-    try {
-      this.Log.info(`${fnTag}, Assigning Asset...`);
-      this.Log.info(`exec-${stepTag}`);
-      this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: "assign-asset",
-        operation: "exec",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-
-      if (sessionData.receiverAsset == undefined) {
-        throw new LedgerAssetError(fnTag);
-      }
-
-      const networkId = {
-        id: sessionData.receiverAsset.networkId?.id,
-        ledgerType: sessionData.receiverAsset.networkId?.type as LedgerType,
-      } as NetworkId;
-
-      const token: FungibleAsset = protoToAsset(
-        sessionData.receiverAsset,
-        networkId,
-      ) as FungibleAsset;
-
-      if (token.owner == undefined) {
-        throw new MissingRecipientError(fnTag);
-      }
-
-      if (token.id == undefined) {
-        throw new TokenIdMissingError(fnTag);
-      }
-
-      if (token.amount == undefined) {
-        throw new AmountMissingError(fnTag);
-      }
-
-      this.logger.debug(
-        `${fnTag}, Assign Asset ID: ${token.id} amount: ${token.amount} recipient: ${token.owner}`,
-      );
-
-      const bridge = this.bridgeManager.getSATPExecutionLayer(
-        networkId,
-        this.claimFormat,
-      );
-
-      sessionData.assignmentAssertionClaim = create(
-        AssignmentAssertionClaimSchema,
-        {},
-      );
-
-      const res = await bridge.assignAsset(token);
-
-      sessionData.assignmentAssertionClaim.receipt = res.receipt;
-
-      this.Log.debug(
-        `${fnTag}, Assign Operation Receipt: ${sessionData.assignmentAssertionClaim.receipt}`,
-      );
-
-      sessionData.assignmentAssertionClaim.proof = res.proof;
-      sessionData.assignmentAssertionClaimFormat = create(
-        AssignmentAssertionClaimFormatSchema,
-        {
-          format: this.claimFormat,
-        },
-      );
-      sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
-        sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
-      );
-      this.dbLogger.storeProof({
-        sessionID: sessionData.id,
-        type: "assign-asset",
-        operation: "done",
-        data: safeStableStringify(sessionData.assignmentAssertionClaim.proof),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      this.Log.info(`${fnTag}, done-${fnTag}`);
-    } catch (error) {
-      this.logger.debug(`Crash in ${fnTag}`, error);
-      this.dbLogger.persistLogEntry({
-        sessionID: sessionData.id,
-        type: "assign-asset",
-        operation: "fail",
-        data: safeStableStringify(sessionData),
-        sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
-      throw new FailedToProcessError(fnTag, "AssignAsset", error);
-    }
   }
 }

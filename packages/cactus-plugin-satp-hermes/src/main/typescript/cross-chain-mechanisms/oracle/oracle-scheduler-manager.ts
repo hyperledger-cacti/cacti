@@ -1,19 +1,20 @@
-import {
-  Logger,
-  LogLevelDesc,
-  ILoggerOptions,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc, ILoggerOptions } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 import { OracleAbstract } from "./oracle-abstract";
 import { IOracleListenerBase } from "./oracle-types";
+import { MonitorService } from "../../services/monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 export interface IOraclePollingManagerOptions {
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 export class OracleSchedulerManager {
   public static readonly CLASS_NAME = "OracleSchedulerManager";
   private readonly logger: Logger;
+  private readonly monitorService: MonitorService;
 
   private pollers: Map<string, NodeJS.Timeout>;
   private eventListeners: Map<string, { unsubscribe: () => void }>;
@@ -24,11 +25,15 @@ export class OracleSchedulerManager {
       throw new Error(`${fnTag}: OracleSchedulerManager options are required`);
     }
     const logLevel = (options.logLevel || "INFO") as LogLevelDesc;
+    this.monitorService = options.monitorService;
     const loggerOptions: ILoggerOptions = {
       level: logLevel,
       label: OracleSchedulerManager.CLASS_NAME,
     };
-    this.logger = LoggerProvider.getOrCreate(loggerOptions);
+    this.logger = LoggerProvider.getOrCreate(
+      loggerOptions,
+      this.monitorService,
+    );
     this.logger.info(`${fnTag}: Initializing OracleSchedulerManager`);
 
     this.pollers = new Map();
@@ -43,15 +48,26 @@ export class OracleSchedulerManager {
    */
   addPoller(id: string, callback: () => void, intervalMs: number): void {
     const fnTag = `${OracleSchedulerManager.CLASS_NAME}#addPoller`;
-    this.logger.debug(
-      `${fnTag}: Create poller for task ${id} with interval ${intervalMs} ms`,
-    );
-    if (this.pollers.has(id)) {
-      throw new Error(`Poller with id "${id}" already exists.`);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    context.with(ctx, () => {
+      try {
+        this.logger.debug(
+          `${fnTag}: Create poller for task ${id} with interval ${intervalMs} ms`,
+        );
+        if (this.pollers.has(id)) {
+          throw new Error(`Poller with id "${id}" already exists.`);
+        }
 
-    const interval = setInterval(callback, intervalMs);
-    this.pollers.set(id, interval);
+        const interval = setInterval(callback, intervalMs);
+        this.pollers.set(id, interval);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -59,13 +75,25 @@ export class OracleSchedulerManager {
    * @param id - The unique identifier of the listener to remove.
    */
   removePoller(id: string): void {
-    const interval = this.pollers.get(id);
-    if (!interval) {
-      throw new Error(`Poller with id "${id}" does not exist.`);
-    }
+    const fnTag = `${OracleSchedulerManager.CLASS_NAME}#removePoller`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    context.with(ctx, () => {
+      try {
+        const interval = this.pollers.get(id);
+        if (!interval) {
+          throw new Error(`Poller with id "${id}" does not exist.`);
+        }
 
-    clearInterval(interval);
-    this.pollers.delete(id);
+        clearInterval(interval);
+        this.pollers.delete(id);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -97,19 +125,30 @@ export class OracleSchedulerManager {
     filter?: string[],
   ): Promise<void> {
     const fnTag = `${OracleSchedulerManager.CLASS_NAME}#addEventListener`;
-    this.logger.debug(
-      `${fnTag}: Adding event listener for oracle with args: ${JSON.stringify(args)}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        this.logger.debug(
+          `${fnTag}: Adding event listener for oracle with args: ${JSON.stringify(args)}`,
+        );
 
-    const subscriber = await oracle.subscribeContractEvent(
-      args,
-      (params: string[]) => {
-        callback(params);
-      },
-      filter,
-    );
+        const subscriber = await oracle.subscribeContractEvent(
+          args,
+          (params: string[]) => {
+            callback(params);
+          },
+          filter,
+        );
 
-    this.eventListeners.set(taskId, subscriber);
+        this.eventListeners.set(taskId, subscriber);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -118,41 +157,66 @@ export class OracleSchedulerManager {
    */
   async removeEventListener(taskId: string): Promise<void> {
     const fnTag = `${OracleSchedulerManager.CLASS_NAME}#removeEventListener`;
-    this.logger.debug(
-      `${fnTag}: Removing event listener with taskId: ${taskId}`,
-    );
-    const subscriber = this.eventListeners.get(taskId);
-    if (!subscriber) {
-      this.logger.warn(
-        `${fnTag}: No event listener found with taskId: ${taskId}`,
-      );
-      return;
-    }
-    subscriber.unsubscribe();
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, () => {
+      try {
+        this.logger.debug(
+          `${fnTag}: Removing event listener with taskId: ${taskId}`,
+        );
+        const subscriber = this.eventListeners.get(taskId);
+        if (!subscriber) {
+          this.logger.warn(
+            `${fnTag}: No event listener found with taskId: ${taskId}`,
+          );
+          return;
+        }
+        subscriber.unsubscribe();
 
-    this.eventListeners.delete(taskId);
-    this.logger.debug(
-      `${fnTag}: Event listener with taskId: ${taskId} removed successfully`,
-    );
+        this.eventListeners.delete(taskId);
+        this.logger.debug(
+          `${fnTag}: Event listener with taskId: ${taskId} removed successfully`,
+        );
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
    * Clears all pollers and listeners.
    */
   async clearAll(): Promise<void> {
-    this.logger.info(
-      `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners(): Clearing ${this.pollers.size} pollers`,
-    );
-    this.pollers.forEach((interval) => clearInterval(interval));
-    this.pollers.clear();
+    const fnTag = `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, () => {
+      try {
+        this.logger.info(
+          `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners(): Clearing ${this.pollers.size} pollers`,
+        );
+        this.pollers.forEach((interval) => clearInterval(interval));
+        this.pollers.clear();
 
-    this.logger.info(
-      `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners(): Clearing ${this.eventListeners.size} event listeners`,
-    );
-    this.eventListeners.forEach(async (subscriber) => subscriber.unsubscribe());
-    this.eventListeners.clear();
-    this.logger.info(
-      `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners(): All listeners cleared`,
-    );
+        this.logger.info(
+          `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners(): Clearing ${this.eventListeners.size} event listeners`,
+        );
+        this.eventListeners.forEach(async (subscriber) =>
+          subscriber.unsubscribe(),
+        );
+        this.eventListeners.clear();
+        this.logger.info(
+          `${OracleSchedulerManager.CLASS_NAME}#clearAllListeners(): All listeners cleared`,
+        );
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 }

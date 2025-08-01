@@ -13,12 +13,9 @@ import fs from "fs-extra";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyFabric } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import {
-  Logger,
-  LogLevelDesc,
-  LoggerProvider,
-  Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { v4 as uuidv4 } from "uuid";
 import {
   ClaimFormat,
@@ -52,6 +49,8 @@ import { X509Identity } from "fabric-network";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
 import { getUint8Key } from "./leafs-utils";
+import { MonitorService } from "../../../services/monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 export interface IFabricLeafNeworkOptions extends INetworkOptions {
   signingCredential: FabricSigningCredential;
   connectorOptions: Partial<IPluginLedgerConnectorFabricOptions>;
@@ -173,7 +172,8 @@ export class FabricLeaf
   private connTimeout: number | undefined;
   private signaturePolicy: string | undefined;
   private mspId: string | undefined;
-  private brigeId: string | undefined;
+  private bridgeId: string | undefined;
+  private readonly monitorService: MonitorService;
   /**
    * Constructs a new instance of the FabricLeaf class.
    *
@@ -183,12 +183,20 @@ export class FabricLeaf
    * @throws InvalidWrapperContract - If the necessary variables for deploying the wrapper contract are missing.
    *
    */
-  constructor(public readonly options: IFabricLeafOptions) {
+  constructor(
+    public readonly options: IFabricLeafOptions,
+    ontologyManager: OntologyManager,
+    monitorService: MonitorService,
+  ) {
+    const fnTag = `${FabricLeaf.CLASS_NAME}#constructor()`;
     super();
     const label = FabricLeaf.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ label, level: this.logLevel });
-
+    this.monitorService = monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
     this.log.debug(
       `${FabricLeaf.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
     );
@@ -221,67 +229,83 @@ export class FabricLeaf
       options.connectorOptions as IPluginLedgerConnectorFabricOptions,
     );
 
-    this.ontologyManager = options.ontologyManager;
+    this.ontologyManager = ontologyManager;
 
     this.signingCredential = options.signingCredential;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
-    for (const claim of this.claimFormats) {
-      switch (claim) {
-        case ClaimFormat.BUNGEE:
-          {
-            this.bungee = new PluginBungeeHermes({
-              instanceId: uuidv4(),
-              pluginRegistry: (
-                options.connectorOptions as IPluginLedgerConnectorFabricOptions
-              ).pluginRegistry,
-              keyPair: getUint8Key(this.keyPair),
-              logLevel: this.logLevel,
-            });
-            this.bungee.addStrategy(
-              this.options.networkIdentification.id,
-              new StrategyFabric(this.logLevel),
-            );
+    context.with(ctx, () => {
+      try {
+        for (const claim of this.claimFormats) {
+          switch (claim) {
+            case ClaimFormat.BUNGEE:
+              {
+                this.bungee = new PluginBungeeHermes({
+                  instanceId: uuidv4(),
+                  pluginRegistry: (
+                    options.connectorOptions as IPluginLedgerConnectorFabricOptions
+                  ).pluginRegistry,
+                  keyPair: getUint8Key(this.keyPair),
+                  logLevel: this.logLevel,
+                });
+                this.bungee.addStrategy(
+                  this.options.networkIdentification.id,
+                  new StrategyFabric(this.logLevel),
+                );
+              }
+              break;
+            case ClaimFormat.DEFAULT:
+              break;
+            default:
+              throw new ClaimFormatError(
+                `Claim format not supported: ${claim}`,
+              );
           }
-          break;
-        case ClaimFormat.DEFAULT:
-          break;
-        default:
-          throw new ClaimFormatError(`Claim format not supported: ${claim}`);
+        }
+
+        if (!options.channelName) {
+          throw new ChannelNameError(
+            `${FabricLeaf.CLASS_NAME}#constructor, Channel Name not provided`,
+          );
+        }
+        this.contractChannel = options.channelName;
+
+        if (options.wrapperContractName) {
+          this.wrapperContractName = options.wrapperContractName;
+        } else if (
+          //this variables are necessary to deploy the wrapper contract
+          options.targetOrganizations &&
+          options.caFile &&
+          options.ccSequence &&
+          options.orderer &&
+          options.ordererTLSHostnameOverride &&
+          options.mspId
+        ) {
+          this.log.debug(
+            `${FabricLeaf.CLASS_NAME}#constructor, No wrapper contract provided, creation required`,
+          );
+          this.targetOrganizations = options.targetOrganizations;
+          this.caFile = options.caFile;
+          this.ccSequence = options.ccSequence;
+          this.orderer = options.orderer;
+          this.ordererTLSHostnameOverride = options.ordererTLSHostnameOverride;
+          this.mspId = options.mspId;
+        } else {
+          throw new InvalidWrapperContract(
+            `${FabricLeaf.CLASS_NAME}#constructor, Missing variables necessary to deploy the Wrapper Contract, given: ${safeStableStringify(options)}`,
+          );
+        }
+      } catch (error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(error),
+        });
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end();
       }
-    }
-
-    if (!options.channelName) {
-      throw new ChannelNameError(
-        `${FabricLeaf.CLASS_NAME}#constructor, Channel Name not provided`,
-      );
-    }
-    this.contractChannel = options.channelName;
-
-    if (options.wrapperContractName) {
-      this.wrapperContractName = options.wrapperContractName;
-    } else if (
-      //this variables are necessary to deploy the wrapper contract
-      options.targetOrganizations &&
-      options.caFile &&
-      options.ccSequence &&
-      options.orderer &&
-      options.ordererTLSHostnameOverride &&
-      options.mspId
-    ) {
-      this.log.debug(
-        `${FabricLeaf.CLASS_NAME}#constructor, No wrapper contract provided, creation required`,
-      );
-      this.targetOrganizations = options.targetOrganizations;
-      this.caFile = options.caFile;
-      this.ccSequence = options.ccSequence;
-      this.orderer = options.orderer;
-      this.ordererTLSHostnameOverride = options.ordererTLSHostnameOverride;
-      this.mspId = options.mspId;
-    } else {
-      throw new InvalidWrapperContract(
-        `${FabricLeaf.CLASS_NAME}#constructor, Missing variables necessary to deploy the Wrapper Contract, given: ${safeStableStringify(options)}`,
-      );
-    }
+    });
   }
 
   /**
@@ -301,29 +325,40 @@ export class FabricLeaf
    */
   public getApproveAddress(assetType: TokenType): string {
     const fnTag = `${FabricLeaf.CLASS_NAME}#getApproveAddress`;
-    this.log.debug(
-      `${fnTag}, Getting Approve Address for asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
-    );
-    switch (assetType) {
-      case TokenType.ERC20:
-      case TokenType.NONSTANDARD_FUNGIBLE:
-        if (!this.brigeId) {
-          throw new ApproveAddressError(
-            `${fnTag}, Bridge ID not available for approving address`,
-          );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.log.debug(
+          `${fnTag}, Getting Approve Address for asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
+        );
+        switch (assetType) {
+          case TokenType.ERC20:
+          case TokenType.NONSTANDARD_FUNGIBLE:
+            if (!this.bridgeId) {
+              throw new ApproveAddressError(
+                `${fnTag}, Bridge ID not available for approving address`,
+              );
+            }
+            return this.bridgeId;
+          case TokenType.ERC721:
+          case TokenType.NONSTANDARD_NONFUNGIBLE:
+            //TODO implement
+            throw new ApproveAddressError(
+              `${fnTag}, Non-fungible wrapper contract not implemented`,
+            );
+          default:
+            throw new ApproveAddressError(
+              `${fnTag}, Invalid asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
+            );
         }
-        return this.brigeId;
-      case TokenType.ERC721:
-      case TokenType.NONSTANDARD_NONFUNGIBLE:
-        //TODO implement
-        throw new ApproveAddressError(
-          `${fnTag}, Non-fungible wrapper contract not implemented`,
-        );
-      default:
-        throw new ApproveAddressError(
-          `${fnTag}, Invalid asset type: ${getEnumKeyByValue(TokenType, assetType)}`,
-        );
-    }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -336,10 +371,22 @@ export class FabricLeaf
    * @returns {Promise<void>} A promise that resolves when all contracts are deployed.
    */
   public async deployContracts(): Promise<void> {
-    await Promise.all([
-      this.deployFungibleWrapperContract(),
-      // this.deployNonFungibleWrapperContract(),
-    ]);
+    const fnTag = `${FabricLeaf.CLASS_NAME}#deployContracts`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        await Promise.all([
+          this.deployFungibleWrapperContract(),
+          // this.deployNonFungibleWrapperContract(),
+        ]);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -349,8 +396,20 @@ export class FabricLeaf
    * @throws
    */
   public getDeployNonFungibleWrapperContractReceipt(): unknown {
-    //TODO implement
-    throw new Error("Method not implemented.");
+    const fnTag = `${FabricLeaf.CLASS_NAME}#getDeployNonFungibleWrapperContractReceipt`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        //TODO implement
+        throw new Error("Method not implemented.");
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -358,8 +417,20 @@ export class FabricLeaf
    *
    **/
   public deployNonFungibleWrapperContract(): Promise<void> {
-    //TODO implement
-    throw new Error("Method not implemented.");
+    const fnTag = `${FabricLeaf.CLASS_NAME}#deployNonFungibleWrapperContract`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        //TODO implement
+        throw new Error("Method not implemented.");
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -369,12 +440,24 @@ export class FabricLeaf
    * @throws {ReceiptError} If the fungible wrapper contract has not been deployed.
    */
   public getDeployFungibleWrapperContractReceipt(): DeployContractV1Response {
-    if (!this.wrapperFungibleDeployReceipt) {
-      throw new ReceiptError(
-        `${FabricLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt() Fungible Wrapper Contract Not deployed`,
-      );
-    }
-    return this.wrapperFungibleDeployReceipt;
+    const fnTag = `${FabricLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        if (!this.wrapperFungibleDeployReceipt) {
+          throw new ReceiptError(
+            `${FabricLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt() Fungible Wrapper Contract Not deployed`,
+          );
+        }
+        return this.wrapperFungibleDeployReceipt;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -389,236 +472,247 @@ export class FabricLeaf
     contractName?: string,
   ): Promise<void> {
     const fnTag = `${FabricLeaf.CLASS_NAME}#deployWrapperContract`;
-    this.log.debug(`${fnTag}, Deploying Wrapper Contract`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Deploying Wrapper Contract`);
 
-    if (!this.contractChannel) {
-      throw new ChannelNameError(`${fnTag}, Channel Name not available`);
-    }
+        if (!this.contractChannel) {
+          throw new ChannelNameError(`${fnTag}, Channel Name not available`);
+        }
 
-    if (this.wrapperContractName) {
-      throw new WrapperContractAlreadyCreatedError(fnTag);
-    }
+        if (this.wrapperContractName) {
+          throw new WrapperContractAlreadyCreatedError(fnTag);
+        }
 
-    if (
-      !(
-        this.targetOrganizations &&
-        this.caFile &&
-        this.ccSequence &&
-        this.orderer &&
-        this.ordererTLSHostnameOverride
-      )
-    ) {
-      throw new WrapperContractError(
-        `${fnTag}, Missing variables for contract creation`,
-      );
-    }
+        if (
+          !(
+            this.targetOrganizations &&
+            this.caFile &&
+            this.ccSequence &&
+            this.orderer &&
+            this.ordererTLSHostnameOverride
+          )
+        ) {
+          throw new WrapperContractError(
+            `${fnTag}, Missing variables for contract creation`,
+          );
+        }
 
-    this.wrapperContractName =
-      contractName || `${uuidv4()}-fungible-wrapper-contract`;
+        this.wrapperContractName =
+          contractName || `${uuidv4()}-fungible-wrapper-contract`;
 
-    // ├── package.json
-    // ├── src
-    // │   ├── index.ts
-    // │   ├── interaction-signature.ts
-    // │   ├── ITraceableContract.ts
-    // │   ├── satp-wrapper.ts
-    // │   └── token.ts
-    // ├── tsconfig.json
-    // --------
-    const wrapperSourceFiles: FileBase64[] = [];
-    {
-      const filename = "./tsconfig.json";
-      const relativePath = "./";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./package.json";
-      const relativePath = "./";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./index.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./interaction-signature.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./ITraceableContract.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./satp-wrapper.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
-    {
-      const filename = "./token.ts";
-      const relativePath = "./src/";
-      const filePath = path.join(
-        this.wrapperSatpContractDir,
-        relativePath,
-        filename,
-      );
-      const buffer = await fs.readFile(filePath);
-      wrapperSourceFiles.push({
-        body: buffer.toString("base64"),
-        filepath: relativePath,
-        filename,
-      });
-    }
+        // ├── package.json
+        // ├── src
+        // │   ├── index.ts
+        // │   ├── interaction-signature.ts
+        // │   ├── ITraceableContract.ts
+        // │   ├── satp-wrapper.ts
+        // │   └── token.ts
+        // ├── tsconfig.json
+        // --------
+        const wrapperSourceFiles: FileBase64[] = [];
+        {
+          const filename = "./tsconfig.json";
+          const relativePath = "./";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
+        {
+          const filename = "./package.json";
+          const relativePath = "./";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
+        {
+          const filename = "./index.ts";
+          const relativePath = "./src/";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
+        {
+          const filename = "./interaction-signature.ts";
+          const relativePath = "./src/";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
+        {
+          const filename = "./ITraceableContract.ts";
+          const relativePath = "./src/";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
+        {
+          const filename = "./satp-wrapper.ts";
+          const relativePath = "./src/";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
+        {
+          const filename = "./token.ts";
+          const relativePath = "./src/";
+          const filePath = path.join(
+            this.wrapperSatpContractDir,
+            relativePath,
+            filename,
+          );
+          const buffer = await fs.readFile(filePath);
+          wrapperSourceFiles.push({
+            body: buffer.toString("base64"),
+            filepath: relativePath,
+            filename,
+          });
+        }
 
-    const deployOutWrapperContract = await this.connector.deployContract({
-      channelId: this.contractChannel,
-      ccVersion: "1.0.0",
-      sourceFiles: wrapperSourceFiles,
-      ccName: this.wrapperContractName,
-      targetOrganizations: this.targetOrganizations,
-      caFile: this.caFile,
-      ccLabel: "fungible-wrapper-contract",
-      ccLang: ChainCodeProgrammingLanguage.Typescript,
-      ccSequence: this.ccSequence,
-      orderer: this.orderer,
-      ordererTLSHostnameOverride: this.ordererTLSHostnameOverride,
-      connTimeout: this.connTimeout,
-      signaturePolicy: this.signaturePolicy,
+        const deployOutWrapperContract = await this.connector.deployContract({
+          channelId: this.contractChannel,
+          ccVersion: "1.0.0",
+          sourceFiles: wrapperSourceFiles,
+          ccName: this.wrapperContractName,
+          targetOrganizations: this.targetOrganizations,
+          caFile: this.caFile,
+          ccLabel: "fungible-wrapper-contract",
+          ccLang: ChainCodeProgrammingLanguage.Typescript,
+          ccSequence: this.ccSequence,
+          orderer: this.orderer,
+          ordererTLSHostnameOverride: this.ordererTLSHostnameOverride,
+          connTimeout: this.connTimeout,
+          signaturePolicy: this.signaturePolicy,
+        });
+
+        if (!deployOutWrapperContract.success) {
+          throw new TransactionReceiptError(
+            `${fnTag}, Wrapper Contract deployment failed: ${safeStableStringify(deployOutWrapperContract)}`,
+          );
+        }
+
+        this.wrapperFungibleDeployReceipt = deployOutWrapperContract;
+
+        this.log.debug(
+          `${fnTag}, Wrapper Contract deployed receipt: ${safeStableStringify(deployOutWrapperContract)}`,
+        );
+
+        if (!this.mspId) {
+          throw new WrapperContractError(
+            `${fnTag}, Missing mspId for initializing the wrapper contract`,
+          );
+        }
+
+        const initializeResponse = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "Initialize",
+          params: [this.mspId],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (
+          initializeResponse == undefined ||
+          initializeResponse.transactionId == ""
+        ) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract initialization failed`,
+          );
+        }
+
+        const bridgeIdResponse = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "ClientAccountID",
+          params: [],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Call,
+        });
+
+        if (bridgeIdResponse.functionOutput == undefined) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract bridge ID retrieval failed`,
+          );
+        }
+
+        this.bridgeId = bridgeIdResponse.functionOutput;
+        this.log.debug(`${fnTag}, Bridge ID: ${this.bridgeId}`);
+
+        const setBridgeResponse = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "setBridge",
+          params: [this.mspId, this.bridgeId],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (
+          setBridgeResponse == undefined ||
+          setBridgeResponse.transactionId == ""
+        ) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract bridge setting failed`,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (!deployOutWrapperContract.success) {
-      throw new TransactionReceiptError(
-        `${fnTag}, Wrapper Contract deployment failed: ${safeStableStringify(deployOutWrapperContract)}`,
-      );
-    }
-
-    this.wrapperFungibleDeployReceipt = deployOutWrapperContract;
-
-    this.log.debug(
-      `${fnTag}, Wrapper Contract deployed receipt: ${safeStableStringify(deployOutWrapperContract)}`,
-    );
-
-    if (!this.mspId) {
-      throw new WrapperContractError(
-        `${fnTag}, Missing mspId for initializing the wrapper contract`,
-      );
-    }
-
-    const initializeResponse = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "Initialize",
-      params: [this.mspId],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
-    });
-
-    if (
-      initializeResponse == undefined ||
-      initializeResponse.transactionId == ""
-    ) {
-      throw new WrapperContractError(
-        `${fnTag}, Wrapper Contract initialization failed`,
-      );
-    }
-
-    const bridgeIdResponse = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "ClientAccountID",
-      params: [],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Call,
-    });
-
-    if (bridgeIdResponse.functionOutput == undefined) {
-      throw new WrapperContractError(
-        `${fnTag}, Wrapper Contract bridge ID retrieval failed`,
-      );
-    }
-
-    this.brigeId = bridgeIdResponse.functionOutput;
-    this.log.debug(`${fnTag}, Bridge ID: ${this.brigeId}`);
-
-    const setBridgeResponse = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "setBridge",
-      params: [this.mspId, this.brigeId],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
-    });
-
-    if (
-      setBridgeResponse == undefined ||
-      setBridgeResponse.transactionId == ""
-    ) {
-      throw new WrapperContractError(
-        `${fnTag}, Wrapper Contract bridge setting failed`,
-      );
-    }
   }
 
   /**
@@ -630,23 +724,36 @@ export class FabricLeaf
    */
   public getWrapperContract(type: "FUNGIBLE" | "NONFUNGIBLE"): string {
     const fnTag = `${FabricLeaf.CLASS_NAME}#getWrapperContract`;
-    this.log.debug(`${fnTag}, Getting Wrapper Contract Adress`);
-    switch (type) {
-      case "FUNGIBLE":
-        if (!this.wrapperContractName) {
-          throw new WrapperContractError(
-            `${fnTag}, Wrapper Contract not deployed`,
-          );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Wrapper Contract Adress`);
+        switch (type) {
+          case "FUNGIBLE":
+            if (!this.wrapperContractName) {
+              throw new WrapperContractError(
+                `${fnTag}, Wrapper Contract not deployed`,
+              );
+            }
+            return this.wrapperContractName;
+          case "NONFUNGIBLE":
+            //TODO implement
+            throw new InvalidWrapperContract(
+              `${fnTag}, Non-fungible wrapper contract not implemented`,
+            );
+          default:
+            throw new InvalidWrapperContract(
+              `${fnTag}, Invalid wrapper contract`,
+            );
         }
-        return this.wrapperContractName;
-      case "NONFUNGIBLE":
-        //TODO implement
-        throw new InvalidWrapperContract(
-          `${fnTag}, Non-fungible wrapper contract not implemented`,
-        );
-      default:
-        throw new InvalidWrapperContract(`${fnTag}, Invalid wrapper contract`);
-    }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -659,45 +766,58 @@ export class FabricLeaf
    */
   public async wrapAsset(asset: FabricAsset): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#wrapAsset`;
-    this.log.debug(
-      `${fnTag}, Wrapping Asset: {${asset.id}, ${asset.owner}, ${asset.type}}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}, Wrapping Asset: {${asset.id}, ${asset.owner}, ${asset.type}}`,
+        );
 
-    const interactions = this.ontologyManager.getOntologyInteractions(
-      LedgerType.Fabric2,
-      asset.referenceId,
-    );
+        const interactions = this.ontologyManager.getOntologyInteractions(
+          LedgerType.Fabric2,
+          asset.referenceId,
+        );
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "wrap",
-      params: [
-        asset.type.toString(),
-        asset.id,
-        asset.referenceId,
-        asset.owner,
-        asset.mspId,
-        asset.channelName,
-        asset.contractName,
-        safeStableStringify(interactions),
-      ],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "wrap",
+          params: [
+            asset.type.toString(),
+            asset.id,
+            asset.referenceId,
+            asset.owner,
+            asset.mspId,
+            asset.channelName,
+            asset.contractName,
+            safeStableStringify(interactions),
+          ],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -710,29 +830,42 @@ export class FabricLeaf
    */
   public async unwrapAsset(assetId: string): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#unwrapAsset`;
-    this.log.debug(`${fnTag}, Unwrapping Asset: ${assetId}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Unwrapping Asset: ${assetId}`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "unwrap",
-      params: [assetId],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "unwrap",
+          params: [assetId],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -749,29 +882,42 @@ export class FabricLeaf
     amount: number,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#lockAsset`;
-    this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "lock",
-      params: [assetId, amount.toString()],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "lock",
+          params: [assetId, amount.toString()],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -788,29 +934,44 @@ export class FabricLeaf
     amount: number,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#unlockAsset`;
-    this.log.debug(`${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`,
+        );
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "unlock",
-      params: [assetId, amount.toString()],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "unlock",
+          params: [assetId, amount.toString()],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -827,29 +988,42 @@ export class FabricLeaf
     amount: number,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#mintAsset`;
-    this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "mint",
-      params: [assetId, amount.toString()],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "mint",
+          params: [assetId, amount.toString()],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -866,29 +1040,42 @@ export class FabricLeaf
     amount: number,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#burnAsset`;
-    this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "burn",
-      params: [assetId, amount.toString()],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "burn",
+          params: [assetId, amount.toString()],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -907,31 +1094,44 @@ export class FabricLeaf
     amount: number,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#assignAsset`;
-    this.log.debug(
-      `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
+        );
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "assign",
-      params: [assetId, to, amount.toString()],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "assign",
+          params: [assetId, to, amount.toString()],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
   /**
    * Retrieves all asset IDs.
@@ -942,38 +1142,51 @@ export class FabricLeaf
    */
   public async getAsset(assetId: string): Promise<FabricAsset> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#getAsset`;
-    this.log.debug(`${fnTag}, Getting Asset`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Asset`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "GetAsset",
-      params: [assetId],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Call,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "GetAsset",
+          params: [assetId],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Call,
+        });
+
+        if (response == undefined) {
+          throw new TransactionError(fnTag);
+        }
+
+        const token = JSON.parse(response.functionOutput);
+
+        return {
+          type: Number(token.tokenType),
+          id: token.tokenId,
+          referenceId: token.referenceId,
+          owner: token.owner,
+          mspId: token.mspId,
+          channelName: token.channelName,
+          contractName: token.contractName,
+          amount: token.amount.toString(),
+          network: this.networkIdentification,
+        } as FabricAsset;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined) {
-      throw new TransactionError(fnTag);
-    }
-
-    const token = JSON.parse(response.functionOutput);
-
-    return {
-      type: Number(token.tokenType),
-      id: token.tokenId,
-      referenceId: token.referenceId,
-      owner: token.owner,
-      mspId: token.mspId,
-      channelName: token.channelName,
-      contractName: token.contractName,
-      amount: token.amount.toString(),
-      network: this.networkIdentification,
-    } as FabricAsset;
   }
 
   /**
@@ -992,26 +1205,39 @@ export class FabricLeaf
    */
   public async getAssets(): Promise<string[]> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#getAssets`;
-    this.log.debug(`${fnTag}, Getting Assets`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Assets`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "GetAssets",
-      params: [],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Call,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "GetAssets",
+          params: [],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Call,
+        });
+
+        if (response == undefined) {
+          throw new TransactionError(fnTag);
+        }
+
+        return JSON.parse(response.functionOutput);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined) {
-      throw new TransactionError(fnTag);
-    }
-
-    return JSON.parse(response.functionOutput);
   }
 
   /**
@@ -1025,26 +1251,39 @@ export class FabricLeaf
    */
   public async getClientId(): Promise<string> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#getClientId`;
-    this.log.debug(`${fnTag}, Getting Client Id`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Client Id`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: "ClientAccountID",
-      params: [],
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Call,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: "ClientAccountID",
+          params: [],
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Call,
+        });
+
+        if (response == undefined) {
+          throw new TransactionError(fnTag);
+        }
+
+        return response.functionOutput;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined) {
-      throw new TransactionError(fnTag);
-    }
-
-    return response.functionOutput;
   }
 
   /**
@@ -1061,31 +1300,44 @@ export class FabricLeaf
     params: string[],
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#runTransaction`;
-    this.log.debug(
-      `${fnTag}, Running Transaction: ${methodName} with params: ${params}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}, Running Transaction: ${methodName} with params: ${params}`,
+        );
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const response = await this.connector.transact({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      methodName: methodName,
-      params: params,
-      contractName: this.wrapperContractName,
-      invocationType: FabricContractInvocationType.Send,
+        const response = await this.connector.transact({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          methodName: methodName,
+          params: params,
+          contractName: this.wrapperContractName,
+          invocationType: FabricContractInvocationType.Send,
+        });
+
+        if (response == undefined || response.transactionId == "") {
+          throw new TransactionError(fnTag);
+        }
+
+        return {
+          transactionId: response.transactionId,
+          output: response.functionOutput,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    if (response == undefined || response.transactionId == "") {
-      throw new TransactionError(fnTag);
-    }
-
-    return {
-      transactionId: response.transactionId,
-      output: response.functionOutput,
-    };
   }
 
   /**
@@ -1099,43 +1351,56 @@ export class FabricLeaf
    */
   public async getView(assetId: string): Promise<string> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#getView`;
-    this.log.debug(`${fnTag}, Getting View: ${assetId}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Getting View: ${assetId}`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const networkDetails = {
-      connector: this.connector,
-      signingCredential: this.signingCredential,
-      contractName: this.wrapperContractName,
-      channelName: this.contractChannel,
-      participant: this.id,
-    };
+        const networkDetails = {
+          connector: this.connector,
+          signingCredential: this.signingCredential,
+          contractName: this.wrapperContractName,
+          channelName: this.contractChannel,
+          participant: this.id,
+        };
 
-    if (this.bungee == undefined) {
-      throw new BungeeError(`${fnTag}, Bungee not initialized`);
-    }
+        if (this.bungee == undefined) {
+          throw new BungeeError(`${fnTag}, Bungee not initialized`);
+        }
 
-    try {
-      const snapshot = await this.bungee.generateSnapshot(
-        [assetId],
-        this.networkIdentification.id,
-        networkDetails,
-      );
+        try {
+          const snapshot = await this.bungee.generateSnapshot(
+            [assetId],
+            this.networkIdentification.id,
+            networkDetails,
+          );
 
-      const generated = this.bungee.generateView(
-        snapshot,
-        "0",
-        Number.MAX_SAFE_INTEGER.toString(),
-        undefined,
-      );
+          const generated = this.bungee.generateView(
+            snapshot,
+            "0",
+            Number.MAX_SAFE_INTEGER.toString(),
+            undefined,
+          );
 
-      return safeStableStringify(generated);
-    } catch (error) {
-      console.error(error);
-      return "";
-    }
+          return safeStableStringify(generated);
+        } catch (error) {
+          console.error(error);
+          return "";
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   /**
@@ -1147,22 +1412,35 @@ export class FabricLeaf
    */
   public async getReceipt(transactionId: string): Promise<string> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#getReceipt`;
-    this.log.debug(`${fnTag}, Getting Receipt: ${transactionId}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag}, Getting Receipt: ${transactionId}`);
 
-    if (!this.contractChannel || !this.wrapperContractName) {
-      throw new WrapperContractError(`${fnTag}, Wrapper Contract not deployed`);
-    }
+        if (!this.contractChannel || !this.wrapperContractName) {
+          throw new WrapperContractError(
+            `${fnTag}, Wrapper Contract not deployed`,
+          );
+        }
 
-    const receipt = await this.connector.getTransactionReceiptByTxID({
-      signingCredential: this.signingCredential,
-      channelName: this.contractChannel,
-      contractName: "qscc",
-      invocationType: FabricContractInvocationType.Call,
-      methodName: "GetBlockByTxID",
-      params: [this.contractChannel, transactionId],
+        const receipt = await this.connector.getTransactionReceiptByTxID({
+          signingCredential: this.signingCredential,
+          channelName: this.contractChannel,
+          contractName: "qscc",
+          invocationType: FabricContractInvocationType.Call,
+          methodName: "GetBlockByTxID",
+          params: [this.contractChannel, transactionId],
+        });
+
+        return safeStableStringify(receipt);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    return safeStableStringify(receipt);
   }
 
   /**
@@ -1178,33 +1456,59 @@ export class FabricLeaf
     claimFormat: ClaimFormat,
   ): Promise<string> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#runTransaction`;
-    this.log.debug(
-      `${fnTag}, Getting Proof of asset: ${asset.id} with a format of: ${claimFormat}`,
-    );
-    switch (claimFormat) {
-      case ClaimFormat.BUNGEE:
-        if (claimFormat in this.claimFormats)
-          return await this.getView(asset.id);
-        else throw new ProofError(`Claim format not supported: ${claimFormat}`);
-      case ClaimFormat.DEFAULT:
-        return "";
-      default:
-        throw new ProofError(`Claim format not supported: ${claimFormat}`);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}, Getting Proof of asset: ${asset.id} with a format of: ${claimFormat}`,
+        );
+        switch (claimFormat) {
+          case ClaimFormat.BUNGEE:
+            if (claimFormat in this.claimFormats)
+              return await this.getView(asset.id);
+            else
+              throw new ProofError(
+                `Claim format not supported: ${claimFormat}`,
+              );
+          case ClaimFormat.DEFAULT:
+            return "";
+          default:
+            throw new ProofError(`Claim format not supported: ${claimFormat}`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async shutdownConnection(): Promise<void> {
-    try {
-      await this.connector.shutdown();
-      this.log.debug(
-        `${FabricLeaf.CLASS_NAME}#shutdownConnection, Connector shutdown successfully`,
-      );
-    } catch (error) {
-      this.log.error(
-        `${FabricLeaf.CLASS_NAME}#shutdownConnection, Error shutting down connector: ${error}`,
-      );
-      throw error;
-    }
+    const fnTag = `${FabricLeaf.CLASS_NAME}#shutdownConnection`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        try {
+          await this.connector.shutdown();
+          this.log.debug(
+            `${FabricLeaf.CLASS_NAME}#shutdownConnection, Connector shutdown successfully`,
+          );
+        } catch (error) {
+          this.log.error(
+            `${FabricLeaf.CLASS_NAME}#shutdownConnection, Error shutting down connector: ${error}`,
+          );
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private isFullPluginOptions = (

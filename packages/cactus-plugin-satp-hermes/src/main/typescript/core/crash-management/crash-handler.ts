@@ -1,5 +1,5 @@
 import type { ConnectRouter } from "@connectrpc/connect";
-import type { Logger } from "@hyperledger/cactus-common";
+import type { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   CrashRecoveryService,
   type RecoverSuccessResponse,
@@ -16,6 +16,8 @@ import type {
 } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import { type SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
 import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
+import { context, SpanStatusCode } from "@opentelemetry/api";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export class CrashRecoveryHandler implements SATPHandler {
   private readonly log: Logger;
@@ -24,9 +26,11 @@ export class CrashRecoveryHandler implements SATPHandler {
     private readonly serverService: CrashRecoveryServerService,
     private readonly clientService: CrashRecoveryClientService,
     log: Logger,
+    private readonly monitorService: MonitorService,
   ) {
     this.log = log;
     this.log.trace(`Initialized ${CrashRecoveryHandler.name}`);
+    this.monitorService = monitorService;
   }
 
   public getHandlerIdentifier(): SATPHandlerType {
@@ -47,57 +51,102 @@ export class CrashRecoveryHandler implements SATPHandler {
     req: RecoverRequest,
   ): Promise<RecoverResponse> {
     const fnTag = `${CrashRecoveryHandler.name}#recoverV2MessageImplementation`;
-    this.log.debug(`${fnTag} - Handling RecoverRequest: ${req}`);
-    try {
-      return await this.serverService.handleRecover(req);
-    } catch (error) {
-      this.log.error(`${fnTag} - Error:`, error);
-      throw error;
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag} - Handling RecoverRequest: ${req}`);
+        try {
+          return await this.serverService.handleRecover(req);
+        } catch (error) {
+          this.log.error(`${fnTag} - Error:`, error);
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private async recoverSuccessImplementation(
     req: RecoverSuccessRequest,
   ): Promise<RecoverSuccessResponse> {
     const fnTag = `${CrashRecoveryHandler.name}#recoverSuccessImplementation`;
-    this.log.debug(`${fnTag} - Handling RecoverSuccessRequest:${req}`);
-    try {
-      return await this.serverService.handleRecoverSuccess(req);
-    } catch (error) {
-      this.log.error(`${fnTag} - Error:`, error);
-      throw error;
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag} - Handling RecoverSuccessRequest:${req}`);
+        try {
+          return await this.serverService.handleRecoverSuccess(req);
+        } catch (error) {
+          this.log.error(`${fnTag} - Error:`, error);
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private async rollbackImplementation(
     req: RollbackRequest,
   ): Promise<RollbackResponse> {
     const fnTag = `${CrashRecoveryHandler.name}#rollbackImplementation`;
-    this.log.debug(`${fnTag} - Handling RollbackRequest: ${req}`);
-    try {
-      return await this.serverService.handleRollback(req);
-    } catch (error) {
-      this.log.error(`${fnTag} - Error:`, error);
-      throw error;
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(`${fnTag} - Handling RollbackRequest: ${req}`);
+        try {
+          return await this.serverService.handleRollback(req);
+        } catch (error) {
+          this.log.error(`${fnTag} - Error:`, error);
+          throw error;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public setupRouter(router: ConnectRouter): void {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    router.service(CrashRecoveryService, {
-      async recover(req) {
-        return await that.recoverImplementation(req);
-      },
-      async recoverSuccess(req) {
-        return await that.recoverSuccessImplementation(req);
-      },
-      async rollback(req) {
-        return await that.rollbackImplementation(req);
-      },
-    });
+    const fnTag = `${CrashRecoveryHandler.name}#setupRouter`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this;
+        router.service(CrashRecoveryService, {
+          async recover(req) {
+            return await that.recoverImplementation(req);
+          },
+          async recoverSuccess(req) {
+            return await that.recoverSuccessImplementation(req);
+          },
+          async rollback(req) {
+            return await that.rollbackImplementation(req);
+          },
+        });
 
-    this.log.info("Router setup completed for CrashRecoveryHandler");
+        this.log.info("Router setup completed for CrashRecoveryHandler");
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   // Client-side
@@ -106,26 +155,50 @@ export class CrashRecoveryHandler implements SATPHandler {
     session: SessionData,
   ): Promise<RecoverRequest> {
     const fnTag = `${this.constructor.name}#createRecoverRequest`;
-    try {
-      return this.clientService.createRecoverRequest(session);
-    } catch (error) {
-      this.log.error(`${fnTag} - Failed to create RecoverRequest: ${error}`);
-      throw new Error(`Error in createRecoverRequest: ${error}`);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        try {
+          return this.clientService.createRecoverRequest(session);
+        } catch (error) {
+          this.log.error(
+            `${fnTag} - Failed to create RecoverRequest: ${error}`,
+          );
+          throw new Error(`Error in createRecoverRequest: ${error}`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async sendRecoverSuccessRequest(
     session: SessionData,
   ): Promise<RecoverSuccessRequest> {
     const fnTag = `${this.constructor.name}#createRecoverSuccessRequest`;
-    try {
-      return await this.clientService.createRecoverSuccessRequest(session);
-    } catch (error) {
-      this.log.error(
-        `${fnTag} - Failed to create RecoverSuccessRequest: ${error}`,
-      );
-      throw new Error(`Error in createRecoverSuccessRequest: ${error}`);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        try {
+          return await this.clientService.createRecoverSuccessRequest(session);
+        } catch (error) {
+          this.log.error(
+            `${fnTag} - Failed to create RecoverSuccessRequest: ${error}`,
+          );
+          throw new Error(`Error in createRecoverSuccessRequest: ${error}`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async sendRollbackRequest(
@@ -133,14 +206,27 @@ export class CrashRecoveryHandler implements SATPHandler {
     rollbackState: RollbackState,
   ): Promise<RollbackRequest> {
     const fnTag = `${this.constructor.name}#createRollbackRequest`;
-    try {
-      return await this.clientService.createRollbackRequest(
-        session,
-        rollbackState,
-      );
-    } catch (error) {
-      this.log.error(`${fnTag} - Failed to create RollbackRequest: ${error}`);
-      throw new Error(`Error in createRollbackRequest: ${error}`);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        try {
+          return await this.clientService.createRollbackRequest(
+            session,
+            rollbackState,
+          );
+        } catch (error) {
+          this.log.error(
+            `${fnTag} - Failed to create RollbackRequest: ${error}`,
+          );
+          throw new Error(`Error in createRollbackRequest: ${error}`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 }

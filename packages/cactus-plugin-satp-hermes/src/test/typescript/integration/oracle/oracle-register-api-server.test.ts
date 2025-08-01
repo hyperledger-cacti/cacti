@@ -43,11 +43,15 @@ import OracleTestContract from "../../../solidity/generated/OracleTestContract.s
 import { keccak256 } from "web3-utils";
 import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
+});
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
 });
 
 let oracleApi: OracleApi;
@@ -145,6 +149,7 @@ beforeAll(async () => {
       ],
     },
     pluginRegistry: new PluginRegistry({ plugins: [] }),
+    monitorService: monitorService,
   };
   gateway = await factory.create(options);
   expect(gateway).toBeInstanceOf(SATPGateway);

@@ -1,8 +1,8 @@
 import "jest-extended";
 import {
   LogLevelDesc,
-  LoggerProvider,
   Secp256k1Keys,
+  LoggerProvider,
 } from "@hyperledger/cactus-common";
 import {
   pruneDockerAllIfGithubAction,
@@ -39,7 +39,12 @@ import {
   TransactionApi,
 } from "../../../../main/typescript";
 import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
+});
+monitorService.init();
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
@@ -82,6 +87,8 @@ afterAll(async () => {
   await besuEnv.tearDown();
   await ethereumEnv.tearDown();
   await fabricEnv.tearDown();
+
+  monitorService.shutdown();
 
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {

@@ -2,11 +2,11 @@ import { OracleAbstract, type OracleAbstractOptions } from "../oracle-abstract";
 import safeStableStringify from "safe-stable-stringify";
 import {
   ISignerKeyPair,
-  type Logger,
-  LoggerProvider,
   type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import type { SATPLogger as Logger } from "../../../core/satp-logger";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
 
@@ -36,6 +36,8 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { isWeb3SigningCredentialNone } from "../../common/utils";
 import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
+import { MonitorService } from "../../../services/monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 export interface IBesuOracleEntry extends IOracleEntryBase {
   contractAddress: string;
@@ -55,6 +57,7 @@ export class OracleBesu extends OracleAbstract {
   protected readonly bungee?: PluginBungeeHermes;
   protected readonly claimFormats: ClaimFormat[];
   protected readonly keyPair: ISignerKeyPair;
+  protected readonly monitorService: MonitorService;
 
   private readonly signingCredential:
     | Web3SigningCredentialPrivateKeyHex
@@ -68,7 +71,11 @@ export class OracleBesu extends OracleAbstract {
     super();
     const label = OracleBesu.CLASS_NAME;
     this.logLevel = options.logLevel || "INFO";
-    this.logger = LoggerProvider.getOrCreate({ label, level: this.logLevel });
+    this.monitorService = options.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      { label, level: this.logLevel },
+      this.monitorService,
+    );
 
     this.logger.debug(
       `${OracleBesu.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
@@ -135,73 +142,107 @@ export class OracleBesu extends OracleAbstract {
   }
 
   public deployContracts(): Promise<void> {
-    // TODO: Implement contract deployment logic
-    return Promise.resolve();
+    const fnTag = `${OracleBesu.CLASS_NAME}#deployContracts`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        // TODO: Implement contract deployment logic
+        return Promise.resolve();
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async updateEntry(args: IBesuOracleEntry): Promise<OracleResponse> {
     const fnTag = `${OracleBesu.CLASS_NAME}#updateEntry`;
-    this.logger.debug(`${fnTag}: Updating args}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.debug(`${fnTag}: Updating args}`);
 
-    if (!args.contractName || !args.contractAddress) {
-      throw new Error(`${fnTag}: Missing contract name or address in args`);
-    }
-    if (!args.contractAbi) {
-      throw new Error(`${fnTag}: Missing contract ABI in args`);
-    }
-    if (!args.methodName) {
-      throw new Error(`${fnTag}: Missing method name in args`);
-    }
+        if (!args.contractName || !args.contractAddress) {
+          throw new Error(`${fnTag}: Missing contract name or address in args`);
+        }
+        if (!args.contractAbi) {
+          throw new Error(`${fnTag}: Missing contract ABI in args`);
+        }
+        if (!args.methodName) {
+          throw new Error(`${fnTag}: Missing method name in args`);
+        }
 
-    const response = (await this.connector.invokeContract({
-      ...args,
-      invocationType: EthContractInvocationType.Send,
-      signingCredential: this.signingCredential,
-      gas: 6721975,
-    })) as {
-      success: boolean;
-      out: { transactionReceipt: { transactionHash?: string } };
-    };
+        const response = (await this.connector.invokeContract({
+          ...args,
+          invocationType: EthContractInvocationType.Send,
+          signingCredential: this.signingCredential,
+          gas: 6721975,
+        })) as {
+          success: boolean;
+          out: { transactionReceipt: { transactionHash?: string } };
+        };
 
-    if (!response.success) {
-      throw new Error(`${fnTag}: EVM transaction failed`);
-    }
+        if (!response.success) {
+          throw new Error(`${fnTag}: EVM transaction failed`);
+        }
 
-    const transactionResponse: OracleResponse = {
-      transactionId: response.out.transactionReceipt.transactionHash ?? "",
-      transactionReceipt: response.out.transactionReceipt,
-    };
+        const transactionResponse: OracleResponse = {
+          transactionId: response.out.transactionReceipt.transactionHash ?? "",
+          transactionReceipt: response.out.transactionReceipt,
+        };
 
-    transactionResponse.proof = undefined;
+        transactionResponse.proof = undefined;
 
-    return transactionResponse;
+        return transactionResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async readEntry(args: IBesuOracleEntry): Promise<OracleResponse> {
     const fnTag = `${OracleBesu.CLASS_NAME}#readEntry`;
-    this.logger.debug(
-      `${fnTag}: Reading entry with args: ${safeStableStringify(args)}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.debug(
+          `${fnTag}: Reading entry with args: ${safeStableStringify(args)}`,
+        );
 
-    const response = (await this.connector.invokeContract({
-      ...args,
-      invocationType: EthContractInvocationType.Call,
-      signingCredential: this.signingCredential,
-      // gas: args.gas,
-    })) as { success: boolean; callOutput: any };
+        const response = (await this.connector.invokeContract({
+          ...args,
+          invocationType: EthContractInvocationType.Call,
+          signingCredential: this.signingCredential,
+          // gas: args.gas,
+        })) as { success: boolean; callOutput: any };
 
-    if (!response.success) {
-      throw new Error(`${fnTag}: Besu read transaction failed`);
-    }
+        if (!response.success) {
+          throw new Error(`${fnTag}: Besu read transaction failed`);
+        }
 
-    const proof = undefined;
+        const proof = undefined;
 
-    return {
-      transactionId: response.callOutput.transactionHash ?? "",
-      transactionReceipt: response.callOutput.transactionReceipt ?? "",
-      output: response.callOutput,
-      proof,
-    };
+        return {
+          transactionId: response.callOutput.transactionHash ?? "",
+          transactionReceipt: response.callOutput.transactionReceipt ?? "",
+          output: response.callOutput,
+          proof,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   // TODO: Dependent on the implementation of the event listener (#3844)
@@ -214,33 +255,58 @@ export class OracleBesu extends OracleAbstract {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     filter: string[],
   ): Promise<{ unsubscribe: () => void }> {
-    throw new Error("Method not implemented.");
+    const fnTag = `${OracleBesu.CLASS_NAME}#subscribeContractEvent`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        throw new Error("Method not implemented.");
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public convertOperationToEntry(operation: OracleOperation): IBesuOracleEntry {
     const fnTag = `${OracleBesu.CLASS_NAME}#convertOperationToEntry`;
-    this.logger.debug(
-      `${fnTag}: Converting operation to entry: ${safeStableStringify(operation)}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.logger.debug(
+          `${fnTag}: Converting operation to entry: ${safeStableStringify(operation)}`,
+        );
 
-    const contract: BusinessLogicContract = operation.contract;
+        const contract: BusinessLogicContract = operation.contract;
 
-    if (!contract.contractName || !contract.contractAddress) {
-      throw new Error(`${fnTag}: Missing contract name or address in contract`);
-    }
-    if (!contract.contractAbi) {
-      throw new Error(`${fnTag}: Missing contract ABI in contract`);
-    }
-    if (!contract.methodName) {
-      throw new Error(`${fnTag}: Missing method name in contract`);
-    }
+        if (!contract.contractName || !contract.contractAddress) {
+          throw new Error(
+            `${fnTag}: Missing contract name or address in contract`,
+          );
+        }
+        if (!contract.contractAbi) {
+          throw new Error(`${fnTag}: Missing contract ABI in contract`);
+        }
+        if (!contract.methodName) {
+          throw new Error(`${fnTag}: Missing method name in contract`);
+        }
 
-    return {
-      contractName: contract.contractName,
-      contractAddress: contract.contractAddress,
-      contractAbi: contract.contractAbi,
-      methodName: contract.methodName,
-      params: contract.params!,
-    };
+        return {
+          contractName: contract.contractName,
+          contractAddress: contract.contractAddress,
+          contractAbi: contract.contractAbi,
+          methodName: contract.methodName,
+          params: contract.params!,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 }

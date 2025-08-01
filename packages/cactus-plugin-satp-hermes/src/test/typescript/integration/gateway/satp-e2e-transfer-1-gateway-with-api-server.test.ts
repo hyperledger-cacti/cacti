@@ -41,11 +41,15 @@ import path from "path";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
+});
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
 });
 
 let knexSourceRemoteClient: Knex;
@@ -193,6 +197,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
         plugins: [],
       }),
       ontologyPath: ontologiesPath,
+      monitorService: monitorService,
     };
     gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -360,6 +365,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
         plugins: [],
       }),
       ontologyPath: ontologiesPath,
+      monitorService: monitorService,
     };
     gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
@@ -528,6 +534,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
         plugins: [],
       }),
       ontologyPath: ontologiesPath,
+      monitorService: monitorService,
     };
     gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
