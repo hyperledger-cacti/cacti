@@ -1,7 +1,7 @@
 import {
-  Logger,
-  LoggerProvider,
   LogLevelDesc,
+  LoggerProvider,
+  Logger,
 } from "@hyperledger/cactus-common";
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import {
@@ -26,7 +26,6 @@ import {
   IBesuLeafNeworkOptions,
   IBesuLeafOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
-import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-besu.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
@@ -232,14 +231,10 @@ export class BesuTestEnvironment {
   }
 
   // this creates the same config as the bridge manager does
-  public createBesuLeafConfig(
-    ontologyManager: OntologyManager,
-    logLevel?: LogLevelDesc,
-  ): IBesuLeafOptions {
+  public createBesuLeafConfig(logLevel?: LogLevelDesc): IBesuLeafOptions {
     return {
       networkIdentification: this.besuConfig.networkIdentification,
       signingCredential: this.besuConfig.signingCredential,
-      ontologyManager: ontologyManager,
       wrapperContractName: this.besuConfig.wrapperContractName,
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
       gas: this.besuConfig.gas,

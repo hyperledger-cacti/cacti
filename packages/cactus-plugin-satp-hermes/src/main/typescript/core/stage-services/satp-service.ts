@@ -1,16 +1,17 @@
 import {
   type JsObjectSigner,
-  type Logger,
-  LoggerProvider,
   type ILoggerOptions,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../satp-logger-provider";
+import type { SATPLogger as Logger } from "../satp-logger";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
 import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import type { SATPLogger } from "../../logging";
+import type { GatewayPersistence } from "../../gateway-persistence";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 export enum SATPServiceType {
   Server = "Server",
@@ -26,8 +27,9 @@ export type ISATPServiceOptions = {
   signer: JsObjectSigner;
   serviceType: SATPServiceType;
   bridgeManager?: BridgeManagerClientInterface;
-  dbLogger: SATPLogger;
+  dbLogger: GatewayPersistence;
   claimFormat?: ClaimFormat;
+  monitorService: MonitorService;
 };
 
 export interface SATPServiceStatic {
@@ -60,10 +62,15 @@ export abstract class SATPService {
   readonly serviceType: SATPServiceType;
   private readonly signer: JsObjectSigner;
   readonly serviceName: string;
-  public dbLogger: SATPLogger;
+  public dbLogger: GatewayPersistence;
+  public monitorService: MonitorService;
 
   constructor(ops: ISATPServiceOptions) {
-    this.logger = LoggerProvider.getOrCreate(ops.loggerOptions);
+    this.monitorService = ops.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      ops.loggerOptions,
+      this.monitorService,
+    );
     this.serviceName = ops.serviceName;
     this.serviceType = ops.serviceType;
     this.stage = ops.stage;

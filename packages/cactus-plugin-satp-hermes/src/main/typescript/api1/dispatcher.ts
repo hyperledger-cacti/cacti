@@ -1,10 +1,11 @@
 import {
-  type Logger,
   Checks,
   type LogLevelDesc,
-  LoggerProvider,
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
+
+import { SatpLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
+import type { SATPLogger as Logger } from "../core/satp-logger";
 
 import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
 
@@ -73,6 +74,8 @@ import { GetOracleStatusEndpointV1 } from "./oracle/oracle-get-status-endpoint";
 import safeStableStringify from "safe-stable-stringify";
 import { executeAudit } from "./admin/get-audit-handler-service";
 import { AuditEndpointV1 } from "./admin/audit-endpoint";
+import { MonitorService } from "../services/monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 export interface BLODispatcherOptions {
   logger: Logger;
@@ -85,6 +88,7 @@ export interface BLODispatcherOptions {
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
   claimFormat?: ClaimFormat;
+  monitorService: MonitorService;
 }
 
 // TODO: addGateways as an admin endpoint, simply calls orchestrator
@@ -95,12 +99,13 @@ export class BLODispatcher {
   private readonly label: string;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private readonly instanceId: string;
-  private manager: SATPManager;
+  private manager?: SATPManager;
   private orchestrator: GatewayOrchestrator;
   private ccManager: SATPCrossChainManager;
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
   private isShuttingDown = false;
+  private readonly monitorService: MonitorService;
 
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
@@ -108,10 +113,16 @@ export class BLODispatcher {
 
     this.level = this.options.logLevel || "INFO";
     this.label = this.className;
-    this.logger = LoggerProvider.getOrCreate({
-      level: this.level,
-      label: this.label,
-    });
+    this.monitorService = options.monitorService;
+    this.logger = LoggerProvider.getOrCreate(
+      {
+        level: this.level,
+        label: this.label,
+      },
+      this.options.monitorService,
+    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+
     this.instanceId = options.instanceId;
     this.logger.info(`Instantiated ${this.className} OK`);
     this.orchestrator = options.orchestrator;
@@ -119,22 +130,32 @@ export class BLODispatcher {
     const ourGateway = this.orchestrator.ourGateway;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
-
     this.ccManager = options.ccManager;
 
-    const SATPManagerOpts: ISATPManagerOptions = {
-      logLevel: this.level,
-      ourGateway: ourGateway,
-      signer: signer,
-      ccManager: this.ccManager,
-      orchestrator: this.orchestrator,
-      pubKey: options.pubKey,
-      localRepository: this.localRepository,
-      remoteRepository: this.remoteRepository,
-      claimFormat: options.claimFormat,
-    };
+    context.with(ctx, () => {
+      try {
+        const SATPManagerOpts: ISATPManagerOptions = {
+          logLevel: this.level,
+          ourGateway: ourGateway,
+          signer: signer,
+          ccManager: this.ccManager,
+          orchestrator: this.orchestrator,
+          pubKey: options.pubKey,
+          localRepository: this.localRepository,
+          remoteRepository: this.remoteRepository,
+          claimFormat: options.claimFormat,
+          monitorService: this.monitorService,
+        };
 
-    this.manager = new SATPManager(SATPManagerOpts);
+        this.manager = new SATPManager(SATPManagerOpts);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public get className(): string {
@@ -143,121 +164,155 @@ export class BLODispatcher {
 
   public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
     const fnTag = `${BLODispatcher.CLASS_NAME}#getOrCreateWebServices()`;
-    this.logger.info(
-      `${fnTag}, Registering webservices on instanceId=${this.instanceId}`,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.logger.debug(
+          `${fnTag}, Registering webservices on instanceId=${this.instanceId}`,
+        );
 
-    if (Array.isArray(this.endpoints)) {
-      return this.endpoints;
-    }
-    const getStatusEndpointV1 = new GetStatusEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
+        if (Array.isArray(this.endpoints)) {
+          return this.endpoints;
+        }
+        const getStatusEndpointV1 = new GetStatusEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const getHealthCheckEndpoint = new HealthCheckEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const getIntegrationsEndpointV1 = new IntegrationsEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const getSessionIdsEndpointV1 = new GetSessionIdsEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const getApproveAddressEndpointV1 = new GetApproveAddressEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const transactEndpointV1 = new TransactEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const addCounterpartyGatewayEndpointV1 =
+          new AddCounterpartyGatewayEndpointV1({
+            dispatcher: this,
+            logLevel: this.options.logLevel,
+          });
+
+        const auditEndpointV1 = new AuditEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const oracleExecuteTaskEndpointV1 = new OracleExecuteTaskEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const oracleRegisterTaskEndpointV1 = new OracleRegisterTaskEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const oracleUnregisterTaskEndpointV1 =
+          new OracleUnregisterTaskEndpointV1({
+            dispatcher: this,
+            logLevel: this.options.logLevel,
+          });
+
+        const oracleGetStatusEndpointV1 = new GetOracleStatusEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
+        const endpoints = [
+          getStatusEndpointV1,
+          getHealthCheckEndpoint,
+          getIntegrationsEndpointV1,
+          getSessionIdsEndpointV1,
+          getApproveAddressEndpointV1,
+          transactEndpointV1,
+          addCounterpartyGatewayEndpointV1,
+          auditEndpointV1,
+          oracleExecuteTaskEndpointV1,
+          oracleRegisterTaskEndpointV1,
+          oracleUnregisterTaskEndpointV1,
+          oracleGetStatusEndpointV1,
+        ];
+        this.endpoints = endpoints;
+        this.logger.debug(`${fnTag} registered ${endpoints.length} endpoints`);
+        return endpoints;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
     });
-
-    const getHealthCheckEndpoint = new HealthCheckEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const getIntegrationsEndpointV1 = new IntegrationsEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const getSessionIdsEndpointV1 = new GetSessionIdsEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const getApproveAddressEndpointV1 = new GetApproveAddressEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const transactEndpointV1 = new TransactEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const addCounterpartyGatewayEndpointV1 =
-      new AddCounterpartyGatewayEndpointV1({
-        dispatcher: this,
-        logLevel: this.options.logLevel,
-      });
-
-    const auditEndpointV1 = new AuditEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const oracleExecuteTaskEndpointV1 = new OracleExecuteTaskEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const oracleRegisterTaskEndpointV1 = new OracleRegisterTaskEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const oracleUnregisterTaskEndpointV1 = new OracleUnregisterTaskEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    const oracleGetStatusEndpointV1 = new GetOracleStatusEndpointV1({
-      dispatcher: this,
-      logLevel: this.options.logLevel,
-    });
-
-    // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
-    const endpoints = [
-      getStatusEndpointV1,
-      getHealthCheckEndpoint,
-      getIntegrationsEndpointV1,
-      getSessionIdsEndpointV1,
-      getApproveAddressEndpointV1,
-      transactEndpointV1,
-      addCounterpartyGatewayEndpointV1,
-      auditEndpointV1,
-      oracleExecuteTaskEndpointV1,
-      oracleRegisterTaskEndpointV1,
-      oracleUnregisterTaskEndpointV1,
-      oracleGetStatusEndpointV1,
-    ];
-    this.endpoints = endpoints;
-    return endpoints;
   }
 
   private getTargetGatewayClient(id: string) {
-    const channels: [string, { toGatewayID: string }][] = Array.from(
-      this.orchestrator.getChannels(),
-    );
-    const filtered = channels.filter((ch) => {
-      return ch[0] === id && ch[1].toGatewayID === id;
-    });
+    const fnTag = `${BLODispatcher.CLASS_NAME}#getTargetGatewayClient()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        const channels: [string, { toGatewayID: string }][] = Array.from(
+          this.orchestrator.getChannels(),
+        );
+        const filtered = channels.filter((ch) => {
+          return ch[0] === id && ch[1].toGatewayID === id;
+        });
 
-    if (filtered.length === 0) {
-      throw new Error(`No channels with specified target gateway id ${id}`);
-    }
-    if (filtered.length > 1) {
-      throw new Error(
-        `Duplicated channels with specified target gateway id ${id}`,
-      );
-    }
-    return filtered[0];
+        if (filtered.length === 0) {
+          throw new Error(`No channels with specified target gateway id ${id}`);
+        }
+        if (filtered.length > 1) {
+          throw new Error(
+            `Duplicated channels with specified target gateway id ${id}`,
+          );
+        }
+        return filtered[0];
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async healthCheck(): Promise<HealthCheckResponse> {
+    if (!this.manager) {
+      throw new Error("SATPManager is not defined");
+    }
     return executeGetHealthCheck(this.level, this.manager);
   }
 
   public async getIntegrations(): Promise<IntegrationsResponse> {
+    if (!this.manager) {
+      throw new Error("SATPManager is not defined");
+    }
     return executeGetIntegrations(this.level, this.manager);
   }
 
   public async GetStatus(req: StatusRequest): Promise<StatusResponse> {
+    if (!this.manager) {
+      throw new Error("SATPManager is not defined");
+    }
     return executeGetStatus(this.level, req, this.manager);
   }
 
@@ -270,136 +325,211 @@ export class BLODispatcher {
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
     const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
-    this.logger.info(`Transact request: ${safeStableStringify(req)}`);
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.debug(`Transact request: ${safeStableStringify(req)}`);
 
-    if (this.isShuttingDown) {
-      throw new GatewayShuttingDownError(fnTag);
-    }
-    const res = await executeTransact(
-      this.level,
-      req,
-      this.manager,
-      this.orchestrator,
-    );
-    return res;
+        if (this.isShuttingDown) {
+          throw new GatewayShuttingDownError(fnTag);
+        }
+        if (!this.manager) {
+          throw new Error("SATPManager is not defined");
+        }
+        const res = await executeTransact(
+          this.level,
+          req,
+          this.manager,
+          this.orchestrator,
+        );
+        return res;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async GetApproveAddress(
     req: GetApproveAddressRequest,
   ): Promise<GetApproveAddressResponse> {
-    this.logger.info("Get Approve Address request");
-    if (!req) {
-      throw new Error(`Request is required`);
-    }
-    if (!req.networkId) {
-      throw new Error(`Network ID is required`);
-    }
-    if (!req.tokenType) {
-      throw new Error(`Token type is required`);
-    }
-    if (!req.networkId.id || !req.networkId.ledgerType) {
-      throw new Error(`Network ID and Ledger Type are required`);
-    }
-    if (typeof req.networkId.id !== "string") {
-      throw new Error(`Network ID must be a string`);
-    }
-    const res = this.ccManager
-      .getClientBridgeManagerInterface()
-      .getApproveAddress(
-        req.networkId as NetworkId,
-        (() => {
-          const tokenType = getEnumValueByKey(TokenType, req.tokenType);
-          if (tokenType === undefined) {
-            throw new Error(`Invalid token type: ${req.tokenType}`);
-          }
-          return tokenType;
-        })(),
-      );
-    return {
-      approveAddress: res,
-    } as GetApproveAddressResponse;
+    const fnTag = `${BLODispatcher.CLASS_NAME}#getApproveAddress()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.info("Get Approve Address request");
+        if (!req) {
+          throw new Error(`Request is required`);
+        }
+        if (!req.networkId) {
+          throw new Error(`Network ID is required`);
+        }
+        if (!req.tokenType) {
+          throw new Error(`Token type is required`);
+        }
+        if (!req.networkId.id || !req.networkId.ledgerType) {
+          throw new Error(`Network ID and Ledger Type are required`);
+        }
+        if (typeof req.networkId.id !== "string") {
+          throw new Error(`Network ID must be a string`);
+        }
+        const res = this.ccManager
+          .getClientBridgeManagerInterface()
+          .getApproveAddress(
+            req.networkId as NetworkId,
+            (() => {
+              const tokenType = getEnumValueByKey(TokenType, req.tokenType);
+              if (tokenType === undefined) {
+                throw new Error(`Invalid token type: ${req.tokenType}`);
+              }
+              return tokenType;
+            })(),
+          );
+        this.logger.debug(
+          `Get Approve Address response: ${safeStableStringify(res)}`,
+        );
+        return {
+          approveAddress: res,
+        } as GetApproveAddressResponse;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async AddCounterpartyGateway(
     req: AddCounterpartyGatewayRequest,
   ): Promise<AddCounterpartyGatewayResponse> {
-    this.logger.info("Add Counterparty Gateway request");
-    if (!req) {
-      throw new Error(`Request is required`);
-    }
-    if (!req.counterparty) {
-      throw new Error(`Gateway ID is required`);
-    }
-    if (!req.counterparty.id) {
-      throw new Error(`Gateway ID is required`);
-    }
-    if (!req.counterparty.version) {
-      throw new Error(`Gateway version is required`);
-    }
-    if (!req.counterparty.address) {
-      throw new Error(`Gateway address is required`);
-    }
-    if (!req.counterparty.connectedDLTs) {
-      throw new Error(`Gateway connectedDLTs is required`);
-    }
-    if (!req.counterparty.proofID) {
-      throw new Error(`Gateway proofID is required`);
-    }
-    if (!req.counterparty.gatewayServerPort) {
-      throw new Error(`Gateway gatewayServerPort is required`);
-    }
-    if (!req.counterparty.gatewayClientPort) {
-      throw new Error(`Gateway gatewayClientPort is required`);
-    }
-    if (!req.counterparty.gatewayOapiPort) {
-      throw new Error(`Gateway gatewayOapiPort is required`);
-    }
-    if (!req.counterparty.pubKey) {
-      throw new Error(`Gateway pubKey is required`);
-    }
-    if (!req.counterparty.name) {
-      throw new Error(`Gateway name is required`);
-    }
+    const fnTag = `${BLODispatcher.CLASS_NAME}#addCounterpartyGateway()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.info("Add Counterparty Gateway request");
+        if (!req) {
+          throw new Error(`Request is required`);
+        }
+        if (!req.counterparty) {
+          throw new Error(`Gateway ID is required`);
+        }
+        if (!req.counterparty.id) {
+          throw new Error(`Gateway ID is required`);
+        }
+        if (!req.counterparty.version) {
+          throw new Error(`Gateway version is required`);
+        }
+        if (!req.counterparty.address) {
+          throw new Error(`Gateway address is required`);
+        }
+        if (!req.counterparty.connectedDLTs) {
+          throw new Error(`Gateway connectedDLTs is required`);
+        }
+        if (!req.counterparty.proofID) {
+          throw new Error(`Gateway proofID is required`);
+        }
+        if (!req.counterparty.gatewayServerPort) {
+          throw new Error(`Gateway gatewayServerPort is required`);
+        }
+        if (!req.counterparty.gatewayClientPort) {
+          throw new Error(`Gateway gatewayClientPort is required`);
+        }
+        if (!req.counterparty.gatewayOapiPort) {
+          throw new Error(`Gateway gatewayOapiPort is required`);
+        }
+        if (!req.counterparty.pubKey) {
+          throw new Error(`Gateway pubKey is required`);
+        }
+        if (!req.counterparty.name) {
+          throw new Error(`Gateway name is required`);
+        }
 
-    try {
-      await this.orchestrator.addGatewayAndCreateChannel(
-        req.counterparty as GatewayIdentity,
-      );
+        try {
+          await this.orchestrator.addGatewayAndCreateChannel(
+            req.counterparty as GatewayIdentity,
+          );
 
-      this.logger.info(`Gateway ${req.counterparty.id} added successfully`);
-      return {
-        status: true,
-      } as AddCounterpartyGatewayResponse;
-    } catch (ex) {
-      this.logger.error(
-        `Error adding gateway ${req.counterparty.id}: ${ex}`,
-        ex,
-      );
-      return {
-        status: false,
-      } as AddCounterpartyGatewayResponse;
-    }
+          this.logger.info(`Gateway ${req.counterparty.id} added successfully`);
+          span.setStatus({ code: SpanStatusCode.OK });
+          return {
+            status: true,
+          } as AddCounterpartyGatewayResponse;
+        } catch (ex) {
+          this.logger.error(
+            `Error adding gateway ${req.counterparty.id}: ${ex}`,
+            ex,
+          );
+          return {
+            status: false,
+          } as AddCounterpartyGatewayResponse;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async PerformAudit(req: AuditRequest): Promise<AuditResponse> {
     this.logger.info(`Perform Audit request: ${safeStableStringify(req)}`);
+    if (!this.manager) {
+      throw new Error("SATPManager is not defined");
+    }
     return executeAudit(this.level, req, this.manager);
   }
 
   public async GetSessionIds(): Promise<string[]> {
     this.logger.info("Get Session Ids request");
+    if (!this.manager) {
+      throw new Error("SATPManager is not defined");
+    }
     const res = Array.from(await this.manager.getSessions().keys());
     return res;
   }
 
   public async getManager(): Promise<SATPManager> {
-    this.logger.info(`Get SATP Manager request`);
-    return this.manager;
+    const fnTag = `${BLODispatcher.CLASS_NAME}#getManager()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.info(`Get SATP Manager request`);
+        if (!this.manager) {
+          throw new Error("SATPManager is not defined");
+        }
+        return this.manager;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public getOracleManager(): OracleManager {
-    this.logger.info(`Get Oracle Manager request`);
-    return this.ccManager.getOracleManager();
+    const fnTag = `${BLODispatcher.CLASS_NAME}#getManager()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        this.logger.info(`Get Oracle Manager request`);
+        return this.ccManager.getOracleManager();
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async OracleExecuteTask(
