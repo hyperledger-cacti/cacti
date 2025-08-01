@@ -61,7 +61,7 @@ const testNetwork = "test-network";
 
 const gatewayAddress = "gateway.satp-hermes";
 
-const TIMEOUT = 900000; // 15 minutes
+const TIMEOUT = 9000000; // 15 minutes
 afterEach(async () => {
   if (gatewayRunner) {
     await gatewayRunner.stop();
