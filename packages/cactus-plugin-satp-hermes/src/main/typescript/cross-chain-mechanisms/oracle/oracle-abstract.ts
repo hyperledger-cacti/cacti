@@ -8,6 +8,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { NetworkId, OracleOperation, OracleResponse } from "../../public-api";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { MonitorService } from "../../services/monitoring/monitor";
 
 /**
  * Common interface options for all Oracles.
@@ -17,6 +18,7 @@ export interface OracleAbstractOptions {
   leafId?: string;
   bungee: PluginBungeeHermes;
   logLevel?: LogLevelDesc;
+  monitorService: MonitorService;
 }
 
 export abstract class OracleAbstract {

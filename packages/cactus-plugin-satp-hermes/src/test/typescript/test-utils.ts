@@ -1,4 +1,4 @@
-import { Logger, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Logger } from "@hyperledger/cactus-common";
 import {
   AdminApi,
   OracleApi,
@@ -8,6 +8,7 @@ import { TransactRequest } from "../../main/typescript";
 import { Configuration } from "../../main/typescript/generated/gateway-client/typescript-axios";
 import fs from "fs-extra";
 import path from "path";
+import { execSync } from "child_process";
 import { expect } from "@jest/globals";
 import { GatewayIdentity } from "../../main/typescript/core/types";
 import { BesuTestEnvironment } from "./environments/besu-test-environment";
@@ -23,6 +24,11 @@ import { createMigrationSource } from "../../main/typescript/database/knex-migra
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
+
+const composeFilePath = path.resolve(
+  __dirname,
+  "../../../../../packages/cactus-plugin-satp-hermes/docker-compose-satp.yml",
+);
 
 // Function overloads for creating different types of API clients
 export function createClient(
@@ -402,4 +408,25 @@ export interface IContractJson {
   bytecode: {
     object: string;
   };
+}
+
+export function startDockerComposeService(serviceName: string) {
+  if (!fs.existsSync(composeFilePath)) {
+    throw new Error(`Compose file does not exist at ${composeFilePath}`);
+  }
+  execSync(`docker compose -f ${composeFilePath} up -d ${serviceName}`, {
+    stdio: "inherit",
+  });
+}
+
+export function stopDockerComposeService(serviceName: string) {
+  if (!fs.existsSync(composeFilePath)) {
+    throw new Error(`Compose file does not exist at ${composeFilePath}`);
+  }
+  execSync(`docker compose -f ${composeFilePath} stop ${serviceName}`, {
+    stdio: "inherit",
+  });
+  execSync(`docker compose -f ${composeFilePath} rm -f ${serviceName}`, {
+    stdio: "inherit",
+  });
 }

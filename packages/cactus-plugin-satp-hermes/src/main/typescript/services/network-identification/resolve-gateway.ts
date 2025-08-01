@@ -1,6 +1,6 @@
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { GatewayIdentity } from "../../core/types";
-import { Logger } from "@hyperledger/cactus-common";
+import { SATPLogger as Logger } from "../../core/satp-logger";
 
 // gets an ID, queries a repository, returns a gateway identity
 export async function resolveGatewayID(
