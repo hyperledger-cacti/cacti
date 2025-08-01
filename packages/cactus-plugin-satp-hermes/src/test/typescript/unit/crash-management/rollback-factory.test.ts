@@ -22,9 +22,9 @@ import {
   IJsObjectSignerOptions,
   JsObjectSigner,
   type LogLevelDesc,
-  LoggerProvider,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
+import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   Address,
   GatewayIdentity,
@@ -40,12 +40,14 @@ import {
   GatewayOrchestrator,
 } from "../../../../main/typescript/services/gateway/gateway-orchestrator";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
   const mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
     server: false,
     client: true,
+    monitorService: monitorService,
   });
 
   const sessionData = mockSession.getClientSessionData();
@@ -56,10 +58,17 @@ const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
 };
 
 const logLevel: LogLevelDesc = "DEBUG";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: "RollbackStrategyFactory",
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
 });
+monitorService.init();
+const log = LoggerProvider.getOrCreate(
+  {
+    level: logLevel,
+    label: "RollbackStrategyFactory",
+  },
+  monitorService,
+);
 
 describe.skip("RollbackStrategyFactory Tests", () => {
   let factory: RollbackStrategyFactory;
@@ -92,6 +101,7 @@ describe.skip("RollbackStrategyFactory Tests", () => {
       localGateway: gatewayIdentity,
       counterPartyGateways: [],
       signer: signer,
+      monitorService: monitorService,
     };
     const gatewayOrchestrator = new GatewayOrchestrator(orchestratorOptions);
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
@@ -101,17 +111,23 @@ describe.skip("RollbackStrategyFactory Tests", () => {
       ontologyOptions: {
         ontologiesPath: ontologiesPath,
       },
+      monitorService: monitorService,
     };
     bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 
     factory = new RollbackStrategyFactory(
       bridgesManager.getClientBridgeManagerInterface(),
       log,
+      monitorService,
     );
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterAll(async () => {
+    monitorService.shutdown();
   });
 
   it("should return Stage0RollbackStrategy if no hashes are present", () => {
