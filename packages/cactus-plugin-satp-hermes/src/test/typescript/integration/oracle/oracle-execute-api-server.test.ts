@@ -1,5 +1,6 @@
 import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+
 import {
   pruneDockerAllIfGithubAction,
   Containers,
@@ -39,11 +40,15 @@ import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { keccak256 } from "web3-utils";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
+});
+const monitorService = MonitorService.createOrGetMonitorService({
+  enabled: false,
 });
 
 let oracleApi: OracleApi;
@@ -140,6 +145,7 @@ beforeAll(async () => {
       ],
     },
     pluginRegistry: new PluginRegistry({ plugins: [] }),
+    monitorService: monitorService,
   };
   gateway = await factory.create(options);
   expect(gateway).toBeInstanceOf(SATPGateway);

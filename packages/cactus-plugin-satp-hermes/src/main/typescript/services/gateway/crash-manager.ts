@@ -1,10 +1,10 @@
 import {
-  type Logger,
-  LoggerProvider,
   Checks,
   type LogLevelDesc,
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
+import { type SATPLogger as Logger } from "../../core/satp-logger";
+import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import {
   Type,
   type SessionData,
@@ -36,6 +36,8 @@ import type { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/
 import type { SATPHandler } from "../../types/satp-protocol";
 import { CrashStatus } from "../../core/types";
 import { verifySignature } from "../../gateway-utils";
+import { MonitorService } from "../monitoring/monitor";
+import { context, SpanStatusCode } from "@opentelemetry/api";
 
 export interface ICrashRecoveryManagerOptions {
   logLevel?: LogLevelDesc;
@@ -46,6 +48,7 @@ export interface ICrashRecoveryManagerOptions {
   orchestrator: GatewayOrchestrator;
   signer: JsObjectSigner;
   healthCheckInterval?: string | schedule.RecurrenceRule;
+  monitorService: MonitorService;
 }
 
 export class CrashManager {
@@ -53,18 +56,19 @@ export class CrashManager {
   private readonly log: Logger;
   private readonly instanceId: string;
   public sessions: Map<string, SATPSession>;
-  private crashRecoveryHandler: CrashRecoveryHandler;
-  private factory: RollbackStrategyFactory;
+  private crashRecoveryHandler?: CrashRecoveryHandler;
+  private factory?: RollbackStrategyFactory;
   public localRepository: ILocalLogRepository;
   public remoteRepository: IRemoteLogRepository | undefined;
   private crashScheduler?: Job;
   private isSchedulerPaused = false;
-  private crashRecoveryServerService: CrashRecoveryServerService;
-  private crashRecoveryClientService: CrashRecoveryClientService;
+  private crashRecoveryServerService?: CrashRecoveryServerService;
+  private crashRecoveryClientService?: CrashRecoveryClientService;
   private orchestrator: GatewayOrchestrator;
   private gatewaysPubKeys: Map<string, string> = new Map();
   private readonly ccManager: SATPCrossChainManager;
   private signer: JsObjectSigner;
+  private readonly monitorService: MonitorService;
 
   constructor(public readonly options: ICrashRecoveryManagerOptions) {
     const fnTag = `${CrashManager.CLASS_NAME}#constructor()`;
@@ -72,7 +76,11 @@ export class CrashManager {
 
     const level = this.options.logLevel;
     const label = this.className;
-    this.log = LoggerProvider.getOrCreate({ level, label });
+    this.monitorService = options.monitorService;
+    this.log = LoggerProvider.getOrCreate(
+      { level, label },
+      this.monitorService,
+    );
     this.log.info(`Instantiated ${this.className} OK`);
     this.instanceId = options.instanceId;
     this.sessions = new Map<string, SATPSession>();
@@ -83,33 +91,49 @@ export class CrashManager {
     this.ccManager = options.ccManager;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
 
-    this.factory = new RollbackStrategyFactory(
-      this.ccManager.getClientBridgeManagerInterface(),
-      this.log,
-    );
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
-    this.crashRecoveryServerService = new CrashRecoveryServerService(
-      this.ccManager.getClientBridgeManagerInterface(),
-      this.localRepository,
-      this.sessions,
-      this.signer,
-      this.log,
-    );
+    context.with(ctx, () => {
+      try {
+        this.factory = new RollbackStrategyFactory(
+          this.ccManager.getClientBridgeManagerInterface(),
+          this.log,
+          this.monitorService,
+        );
 
-    this.crashRecoveryClientService = new CrashRecoveryClientService(
-      this.log,
-      this.signer,
-    );
+        this.crashRecoveryServerService = new CrashRecoveryServerService(
+          this.ccManager.getClientBridgeManagerInterface(),
+          this.localRepository,
+          this.sessions,
+          this.signer,
+          this.log,
+          this.monitorService,
+        );
 
-    this.crashRecoveryHandler = new CrashRecoveryHandler(
-      this.crashRecoveryServerService,
-      this.crashRecoveryClientService,
-      this.log,
-    );
+        this.crashRecoveryClientService = new CrashRecoveryClientService(
+          this.log,
+          this.signer,
+          this.monitorService,
+        );
 
-    const crashRecoveryHandlers = new Map<string, SATPHandler>();
-    crashRecoveryHandlers.set("crash-handler", this.crashRecoveryHandler);
-    this.orchestrator.addHandlers(crashRecoveryHandlers);
+        this.crashRecoveryHandler = new CrashRecoveryHandler(
+          this.crashRecoveryServerService,
+          this.crashRecoveryClientService,
+          this.log,
+          this.monitorService,
+        );
+
+        const crashRecoveryHandlers = new Map<string, SATPHandler>();
+        crashRecoveryHandlers.set("crash-handler", this.crashRecoveryHandler);
+        this.orchestrator.addHandlers(crashRecoveryHandlers);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   get className(): string {
@@ -136,376 +160,484 @@ export class CrashManager {
 
   public stopScheduler(): void {
     const fnTag = `${this.className}#stopScheduler()`;
-
-    if (this.crashScheduler) {
-      this.crashScheduler.cancel();
-      this.crashScheduler = undefined;
-      this.log.info(`${fnTag} crash detection job stopped successfully`);
-    } else {
-      this.log.warn(`${fnTag} No active crash detection job to stop`);
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    context.with(ctx, () => {
+      try {
+        if (this.crashScheduler) {
+          this.crashScheduler.cancel();
+          this.crashScheduler = undefined;
+          this.log.info(`${fnTag} crash detection job stopped successfully`);
+        } else {
+          this.log.warn(`${fnTag} No active crash detection job to stop`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   // TODO: fetch (x) logs to recreate session (for single gateway topology)
   public async recoverSessions(): Promise<void> {
     const fnTag = `${this.className}#recoverSessions()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        try {
+          const allLogs = await this.localRepository.readLogsNotProofs();
 
-    try {
-      const allLogs = await this.localRepository.readLogsNotProofs();
+          if (allLogs.length === 0) {
+            this.log.info(`${fnTag} No logs available for recovery.`);
+            return;
+          }
 
-      if (allLogs.length === 0) {
-        this.log.info(`${fnTag} No logs available for recovery.`);
-        return;
+          const log = allLogs[0];
+          const sessionId = log.sessionId;
+          this.log.info(
+            `${fnTag} Recovering session from database: ${sessionId}`,
+          );
+
+          if (!log || !log.data) {
+            throw new Error(
+              `${fnTag} Invalid log for session ID: ${sessionId}`,
+            );
+          }
+
+          const sessionData: SessionData = JSON.parse(log.data);
+
+          const satpSession = SATPSession.recreateSession(
+            sessionData,
+            this.monitorService,
+          );
+          this.sessions.set(sessionId, satpSession);
+          this.log.info(
+            `${fnTag} Successfully reconstructed session: ${sessionId}`,
+          );
+
+          if (this.sessions.size === 0) {
+            this.log.info(`${fnTag} No active sessions!`);
+            return;
+          }
+
+          this.initializeCrashDetection(sessionId);
+        } catch (error) {
+          this.log.error(`${fnTag} Error during session recovery: ${error}`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-
-      const log = allLogs[0];
-      const sessionId = log.sessionId;
-      this.log.info(`${fnTag} Recovering session from database: ${sessionId}`);
-
-      if (!log || !log.data) {
-        throw new Error(`${fnTag} Invalid log for session ID: ${sessionId}`);
-      }
-
-      const sessionData: SessionData = JSON.parse(log.data);
-
-      const satpSession = SATPSession.recreateSession(sessionData);
-      this.sessions.set(sessionId, satpSession);
-      this.log.info(
-        `${fnTag} Successfully reconstructed session: ${sessionId}`,
-      );
-
-      if (this.sessions.size === 0) {
-        this.log.info(`${fnTag} No active sessions!`);
-        return;
-      }
-
-      this.initializeCrashDetection(sessionId);
-    } catch (error) {
-      this.log.error(`${fnTag} Error during session recovery: ${error}`);
-    }
+    });
   }
 
   private initializeCrashDetection(sessionId: string): void {
     const fnTag = `${this.className}#initializeCrashDetection()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    context.with(ctx, () => {
+      try {
+        try {
+          // Timeout checker for crash detection of counterparty
+          this.crashScheduler = schedule.scheduleJob(
+            this.options.healthCheckInterval || "*/2 * * * * *", // default 2000 ms
+            async () => {
+              if (this.isSchedulerPaused) {
+                this.log.debug(`${fnTag} Scheduler paused! Skipping check.`);
+                return;
+              }
 
-    try {
-      // Timeout checker for crash detection of counterparty
-      this.crashScheduler = schedule.scheduleJob(
-        this.options.healthCheckInterval || "*/2 * * * * *", // default 2000 ms
-        async () => {
-          if (this.isSchedulerPaused) {
-            this.log.debug(`${fnTag} Scheduler paused! Skipping check.`);
-            return;
-          }
-
-          const session = this.sessions.get(sessionId);
-          if (session) {
-            await this.checkAndResolveCrashes(session);
-          } else {
-            this.log.warn(
-              `${fnTag} No session found for session ID: ${sessionId}`,
-            );
-          }
-        },
-      );
-      this.log.info(
-        `${fnTag} Crash detection job running for session ID: ${sessionId}`,
-      );
-    } catch (error) {
-      this.log.error(
-        `${fnTag} Error initializing crash detection job: ${error}`,
-      );
-    }
+              const session = this.sessions.get(sessionId);
+              if (session) {
+                await this.checkAndResolveCrashes(session);
+              } else {
+                this.log.warn(
+                  `${fnTag} No session found for session ID: ${sessionId}`,
+                );
+              }
+            },
+          );
+          this.log.info(
+            `${fnTag} Crash detection job running for session ID: ${sessionId}`,
+          );
+        } catch (error) {
+          this.log.error(
+            `${fnTag} Error initializing crash detection job: ${error}`,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private updateSessionState(sessionId: string, newState: State): string {
-    const session = this.sessions.get(sessionId);
-    if (!session) {
-      throw new Error(`Session with ID ${sessionId} not found.`);
-    }
+    const fnTag = `${this.className}#updateSessionState()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        const session = this.sessions.get(sessionId);
+        if (!session) {
+          throw new Error(`Session with ID ${sessionId} not found.`);
+        }
 
-    const updatedState: string[] = [];
-    if (session.hasClientSessionData()) {
-      const clientSessionData = session.getClientSessionData();
-      clientSessionData.state = newState;
-      this.log.debug(
-        `Updated client session state to ${State[newState]} for session ${sessionId}`,
-      );
-      updatedState.push(State[clientSessionData.state]);
-    }
+        const updatedState: string[] = [];
+        if (session.hasClientSessionData()) {
+          const clientSessionData = session.getClientSessionData();
+          clientSessionData.state = newState;
+          this.log.debug(
+            `Updated client session state to ${State[newState]} for session ${sessionId}`,
+          );
+          updatedState.push(State[clientSessionData.state]);
+        }
 
-    if (session.hasServerSessionData()) {
-      const serverSessionData = session.getServerSessionData();
-      serverSessionData.state = newState;
-      this.log.debug(
-        `Updated server session state to ${State[newState]} for session ${sessionId}`,
-      );
-      updatedState.push(State[serverSessionData.state]);
-    }
-    this.sessions.set(sessionId, session);
-    return updatedState.join(", ");
+        if (session.hasServerSessionData()) {
+          const serverSessionData = session.getServerSessionData();
+          serverSessionData.state = newState;
+          this.log.debug(
+            `Updated server session state to ${State[newState]} for session ${sessionId}`,
+          );
+          updatedState.push(State[serverSessionData.state]);
+        }
+        this.sessions.set(sessionId, session);
+        return updatedState.join(", ");
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async checkAndResolveCrashes(session: SATPSession): Promise<void> {
     const fnTag = `${this.className}#checkAndResolveCrashes()`;
-    if (this.sessions.size === 0) {
-      this.log.info(
-        `${fnTag} No sessions to check. Waiting for new sessions...`,
-      );
-      return;
-    }
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        if (this.sessions.size === 0) {
+          this.log.info(
+            `${fnTag} No sessions to check. Waiting for new sessions...`,
+          );
+          return;
+        }
 
-    const sessionId = session.getSessionId();
+        const sessionId = session.getSessionId();
 
-    await this.checkAndResolveCrash(session);
+        await this.checkAndResolveCrash(session);
 
-    const currentSession = this.sessions.get(sessionId);
+        const currentSession = this.sessions.get(sessionId);
 
-    if (!currentSession) {
-      this.log.warn(
-        `${fnTag} Updated session with ID ${sessionId} not found after resolution!`,
-      );
-      return;
-    }
+        if (!currentSession) {
+          this.log.warn(
+            `${fnTag} Updated session with ID ${sessionId} not found after resolution!`,
+          );
+          return;
+        }
 
-    if (currentSession.hasClientSessionData()) {
-      const clientSessionData = currentSession.getClientSessionData();
-      this.log.debug(
-        `${fnTag} Client Session ${sessionId} state: ${State[clientSessionData.state]}`,
-      );
-    }
+        if (currentSession.hasClientSessionData()) {
+          const clientSessionData = currentSession.getClientSessionData();
+          this.log.debug(
+            `${fnTag} Client Session ${sessionId} state: ${State[clientSessionData.state]}`,
+          );
+        }
 
-    if (currentSession.hasServerSessionData()) {
-      const serverSessionData = currentSession.getServerSessionData();
-      this.log.debug(
-        `${fnTag} Server Session ${sessionId} state: ${State[serverSessionData.state]}`,
-      );
-    }
+        if (currentSession.hasServerSessionData()) {
+          const serverSessionData = currentSession.getServerSessionData();
+          this.log.debug(
+            `${fnTag} Server Session ${sessionId} state: ${State[serverSessionData.state]}`,
+          );
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   public async checkAndResolveCrash(session: SATPSession): Promise<void> {
     const fnTag = `${this.className}#checkAndResolveCrash()`;
-
-    const sessionDataList: SessionData[] = [];
-    if (session.hasClientSessionData()) {
-      sessionDataList.push(session.getClientSessionData());
-    }
-    if (session.hasServerSessionData()) {
-      sessionDataList.push(session.getServerSessionData());
-    }
-    if (sessionDataList.length === 0) {
-      throw new Error(
-        `${fnTag}, no session data available for session : ${session.getSessionId()}`,
-      );
-    }
-
-    for (const sessionData of sessionDataList) {
-      let attempts = 0;
-      const maxRetries = Number(sessionData.maxRetries);
-
-      while (attempts < maxRetries) {
-        const crashStatus = await this.checkCrash(sessionData);
-
-        if (crashStatus === CrashStatus.IN_RECOVERY) {
-          this.log.info(
-            `${fnTag} Crash detected! Attempting recovery for session ${sessionData.id}`,
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        const sessionDataList: SessionData[] = [];
+        if (session.hasClientSessionData()) {
+          sessionDataList.push(session.getClientSessionData());
+        }
+        if (session.hasServerSessionData()) {
+          sessionDataList.push(session.getServerSessionData());
+        }
+        if (sessionDataList.length === 0) {
+          throw new Error(
+            `${fnTag}, no session data available for session : ${session.getSessionId()}`,
           );
+        }
 
-          this.pauseScheduler();
+        for (const sessionData of sessionDataList) {
+          let attempts = 0;
+          const maxRetries = Number(sessionData.maxRetries);
 
-          const recoverySuccess = await this.handleRecovery(sessionData);
-          if (recoverySuccess) {
-            this.updateSessionState(sessionData.id, State.RECOVERED);
-            this.resumeScheduler();
-            this.log.info(
-              `${fnTag} Recovery successful for sessionID: ${sessionData.id}`,
-            );
-            break;
-          }
-          attempts++;
-          this.log.info(
-            `${fnTag} Recovery attempt ${attempts} failed for sessionID: ${sessionData.id}`,
-          );
-        } else if (crashStatus === CrashStatus.IN_ROLLBACK) {
-          this.log.warn(
-            `${fnTag} Initiating rollback for session ${sessionData.id}!`,
-          );
+          while (attempts < maxRetries) {
+            const crashStatus = await this.checkCrash(sessionData);
 
-          this.pauseScheduler();
-
-          try {
-            const rollbackSuccess = await this.initiateRollback(
-              session,
-              sessionData,
-              true,
-            );
-            if (rollbackSuccess) {
+            if (crashStatus === CrashStatus.IN_RECOVERY) {
               this.log.info(
-                `${fnTag} Rollback completed for session ${sessionData.id}`,
+                `${fnTag} Crash detected! Attempting recovery for session ${sessionData.id}`,
               );
+
+              this.pauseScheduler();
+
+              const recoverySuccess = await this.handleRecovery(sessionData);
+              if (recoverySuccess) {
+                this.updateSessionState(sessionData.id, State.RECOVERED);
+                this.resumeScheduler();
+                this.log.info(
+                  `${fnTag} Recovery successful for sessionID: ${sessionData.id}`,
+                );
+                break;
+              }
+              attempts++;
+              this.log.info(
+                `${fnTag} Recovery attempt ${attempts} failed for sessionID: ${sessionData.id}`,
+              );
+            } else if (crashStatus === CrashStatus.IN_ROLLBACK) {
+              this.log.warn(
+                `${fnTag} Initiating rollback for session ${sessionData.id}!`,
+              );
+
+              this.pauseScheduler();
+
+              try {
+                const rollbackSuccess = await this.initiateRollback(
+                  session,
+                  sessionData,
+                  true,
+                );
+                if (rollbackSuccess) {
+                  this.log.info(
+                    `${fnTag} Rollback completed for session ${sessionData.id}`,
+                  );
+                } else {
+                  this.log.error(
+                    `${fnTag} Rollback failed for session ${sessionData.id}.`,
+                  );
+                }
+              } finally {
+                this.resumeScheduler();
+              }
+              break;
+            } else if (crashStatus === CrashStatus.IDLE) {
+              this.log.info(
+                `${fnTag} No crash detected for session ID: ${sessionData.id}`,
+              );
+              break;
             } else {
-              this.log.error(
-                `${fnTag} Rollback failed for session ${sessionData.id}.`,
-              );
+              this.log.warn(`${fnTag} Unhandled crash status: ${crashStatus}`);
+              break;
             }
-          } finally {
-            this.resumeScheduler();
           }
-          break;
-        } else if (crashStatus === CrashStatus.IDLE) {
-          this.log.info(
-            `${fnTag} No crash detected for session ID: ${sessionData.id}`,
-          );
-          break;
-        } else {
-          this.log.warn(`${fnTag} Unhandled crash status: ${crashStatus}`);
-          break;
-        }
-      }
 
-      if (attempts >= maxRetries) {
-        this.log.warn(
-          `${fnTag} All recovery attempts exhausted! Initiating rollback for session ${sessionData.id}`,
-        );
+          if (attempts >= maxRetries) {
+            this.log.warn(
+              `${fnTag} All recovery attempts exhausted! Initiating rollback for session ${sessionData.id}`,
+            );
 
-        this.pauseScheduler();
-        try {
-          await this.initiateRollback(session, sessionData, true);
-        } finally {
-          this.resumeScheduler();
+            this.pauseScheduler();
+            try {
+              await this.initiateRollback(session, sessionData, true);
+            } finally {
+              this.resumeScheduler();
+            }
+            break; // exit after rollback
+          }
         }
-        break; // exit after rollback
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-    }
+    });
   }
 
   private async checkCrash(sessionData: SessionData): Promise<CrashStatus> {
     const fnTag = `${this.className}#checkCrash()`;
-
-    try {
-      if (!this.localRepository) {
-        this.log.error(
-          `${fnTag} Local repository is not available. Unable to proceed!`,
-        );
-        return CrashStatus.ERROR;
-      }
-
-      let lastLog = null;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
       try {
-        lastLog = await this.localRepository.readLastestLog(sessionData.id);
-      } catch (error) {
-        this.log.error(`${fnTag} : ${error.message}`);
-        return CrashStatus.ERROR;
-      }
+        try {
+          if (!this.localRepository) {
+            this.log.error(
+              `${fnTag} Local repository is not available. Unable to proceed!`,
+            );
+            return CrashStatus.ERROR;
+          }
 
-      if (!lastLog) {
-        this.log.warn(
-          `${fnTag} No logs found for session ID: ${sessionData.id}`,
-        );
-        return CrashStatus.ERROR;
-      }
+          let lastLog = null;
+          try {
+            lastLog = await this.localRepository.readLastestLog(sessionData.id);
+          } catch (error) {
+            this.log.error(`${fnTag} : ${error.message}`);
+            return CrashStatus.ERROR;
+          }
 
-      const logTimestamp = new Date(lastLog?.timestamp ?? 0).getTime();
-      const currentTime = Date.now();
-      const timeDifference = currentTime - logTimestamp;
+          if (!lastLog) {
+            this.log.warn(
+              `${fnTag} No logs found for session ID: ${sessionData.id}`,
+            );
+            return CrashStatus.ERROR;
+          }
 
-      switch (true) {
-        case lastLog.operation !== "done":
-          this.log.info(
-            `${fnTag} Crash detected for session ID: ${sessionData.id}, last log operation: ${lastLog.operation}`,
+          const logTimestamp = new Date(lastLog?.timestamp ?? 0).getTime();
+          const currentTime = Date.now();
+          const timeDifference = currentTime - logTimestamp;
+
+          switch (true) {
+            case lastLog.operation !== "done":
+              this.log.info(
+                `${fnTag} Crash detected for session ID: ${sessionData.id}, last log operation: ${lastLog.operation}`,
+              );
+              return CrashStatus.IN_RECOVERY;
+
+            case timeDifference > Number(sessionData.maxTimeout):
+              this.log.warn(
+                `${fnTag} Timeout exceeded by ${timeDifference} ms for session ID: ${sessionData.id}`,
+              );
+              return CrashStatus.IN_ROLLBACK;
+
+            default:
+              this.log.info(
+                `${fnTag} No crash detected for session ID: ${sessionData.id}`,
+              );
+              return CrashStatus.IDLE;
+          }
+        } catch (error) {
+          this.log.error(
+            `${fnTag} Error occurred during crash check: ${error}`,
           );
-          return CrashStatus.IN_RECOVERY;
-
-        case timeDifference > Number(sessionData.maxTimeout):
-          this.log.warn(
-            `${fnTag} Timeout exceeded by ${timeDifference} ms for session ID: ${sessionData.id}`,
-          );
-          return CrashStatus.IN_ROLLBACK;
-
-        default:
-          this.log.info(
-            `${fnTag} No crash detected for session ID: ${sessionData.id}`,
-          );
-          return CrashStatus.IDLE;
+          return CrashStatus.ERROR;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-    } catch (error) {
-      this.log.error(`${fnTag} Error occurred during crash check: ${error}`);
-      return CrashStatus.ERROR;
-    }
+    });
   }
 
   public async handleRecovery(sessionData: SessionData): Promise<boolean> {
     const fnTag = `${this.className}#handleRecovery()`;
-    this.log.debug(
-      `${fnTag} - Starting crash recovery for sessionId: ${sessionData.id}`,
-    );
-
-    try {
-      const channel = this.orchestrator.getChannel(
-        sessionData.recipientGatewayNetworkId,
-      );
-
-      if (!channel) {
-        throw new Error(
-          `${fnTag} - Channel not found for the recipient gateway network ID.`,
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag} - Starting crash recovery for sessionId: ${sessionData.id}`,
         );
-      }
 
-      const counterGatewayID = this.orchestrator.getGatewayIdentity(
-        channel.toGatewayID,
-      );
-      if (!counterGatewayID) {
-        throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
-      }
-
-      const clientCrashRecovery: PromiseConnectClient<
-        typeof CrashRecoveryService
-      > = channel.clients.get("crash") as PromiseConnectClient<
-        typeof CrashRecoveryService
-      >;
-
-      if (!clientCrashRecovery) {
-        throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
-      }
-
-      const recoverMessage =
-        await this.crashRecoveryHandler.sendRecoverRequest(sessionData);
-
-      const recoverUpdateMessage =
-        await clientCrashRecovery.recover(recoverMessage);
-
-      const sequenceNumbers = recoverUpdateMessage.recoveredLogs.map(
-        (log) => log.sequenceNumber,
-      );
-      this.log.info(
-        `${fnTag} - Received logs sequence numbers: ${sequenceNumbers}`,
-      );
-
-      const status = await this.processRecoverRequest(
-        recoverUpdateMessage,
-        sessionData,
-      );
-      if (status) {
-        const recoverSuccessMessage =
-          await this.crashRecoveryHandler.sendRecoverSuccessRequest(
-            sessionData,
+        try {
+          const channel = this.orchestrator.getChannel(
+            sessionData.recipientGatewayNetworkId,
           );
 
-        await clientCrashRecovery.recoverSuccess(recoverSuccessMessage);
+          if (!channel) {
+            throw new Error(
+              `${fnTag} - Channel not found for the recipient gateway network ID.`,
+            );
+          }
 
-        this.log.info(
-          `${fnTag} - Crash recovery completed for sessionId: ${sessionData.id}`,
-        );
+          const counterGatewayID = this.orchestrator.getGatewayIdentity(
+            channel.toGatewayID,
+          );
+          if (!counterGatewayID) {
+            throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
+          }
 
-        return true;
+          const clientCrashRecovery: PromiseConnectClient<
+            typeof CrashRecoveryService
+          > = channel.clients.get("crash") as PromiseConnectClient<
+            typeof CrashRecoveryService
+          >;
+
+          if (!clientCrashRecovery) {
+            throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
+          }
+
+          const recoverMessage =
+            await this.crashRecoveryHandler?.sendRecoverRequest(sessionData);
+
+          if (!recoverMessage) {
+            this.log.error(
+              `${fnTag} - Failed to create recover message for session ID: ${sessionData.id}`,
+            );
+            throw new Error(
+              `${fnTag} - Failed to create recover message for session ID: ${sessionData.id}`,
+            );
+          }
+          const recoverUpdateMessage =
+            await clientCrashRecovery.recover(recoverMessage);
+
+          const sequenceNumbers = recoverUpdateMessage.recoveredLogs.map(
+            (log) => log.sequenceNumber,
+          );
+          this.log.info(
+            `${fnTag} - Received logs sequence numbers: ${sequenceNumbers}`,
+          );
+
+          const status = await this.processRecoverRequest(
+            recoverUpdateMessage,
+            sessionData,
+          );
+          if (status) {
+            const recoverSuccessMessage =
+              await this.crashRecoveryHandler?.sendRecoverSuccessRequest(
+                sessionData,
+              );
+            if (!recoverSuccessMessage) {
+              this.log.error(
+                `${fnTag} - Failed to create recover success message for session ID: ${sessionData.id}`,
+              );
+              throw new Error(
+                `${fnTag} - Failed to create recover success message for session ID: ${sessionData.id}`,
+              );
+            }
+            await clientCrashRecovery.recoverSuccess(recoverSuccessMessage);
+
+            this.log.info(
+              `${fnTag} - Crash recovery completed for sessionId: ${sessionData.id}`,
+            );
+
+            return true;
+          }
+          return false;
+        } catch (error) {
+          this.log.error(
+            `${fnTag} Error during recovery process for session ID: ${sessionData.id} - ${error}`,
+          );
+          throw new Error(`Recovery failed for session ID: ${sessionData.id}`);
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-      return false;
-    } catch (error) {
-      this.log.error(
-        `${fnTag} Error during recovery process for session ID: ${sessionData.id} - ${error}`,
-      );
-      throw new Error(`Recovery failed for session ID: ${sessionData.id}`);
-    }
+    });
   }
 
   private async processRecoverRequest(
@@ -513,56 +645,74 @@ export class CrashManager {
     sessionData: SessionData,
   ): Promise<boolean> {
     const fnTag = `${this.className}#processRecoverUpdate()`;
-    try {
-      verifySignature(this.signer, message, sessionData.clientGatewayPubkey);
-
-      const recoveredLogs = message.recoveredLogs;
-
-      for (const logEntry of recoveredLogs) {
-        await this.localRepository.create({
-          sessionId: logEntry.sessionId,
-          operation: logEntry.operation,
-          data: logEntry.data,
-          timestamp: logEntry.timestamp,
-          type: logEntry.type,
-          key: logEntry.key,
-          sequenceNumber: logEntry.sequenceNumber,
-        });
-      }
-
-      for (const log of recoveredLogs) {
-        const sessionId = log.sessionId;
-        this.log.info(`${fnTag}, recovering session: ${sessionId}`);
-
-        if (!log || !log.data) {
-          throw new Error(`${fnTag}, invalid log`);
-        }
-
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
         try {
-          const updatedSessionData: SessionData = JSON.parse(log.data);
-
-          const { hashes, processedTimestamps, signatures } =
-            updatedSessionData;
-
-          sessionData.hashes = hashes;
-          sessionData.processedTimestamps = processedTimestamps;
-          sessionData.signatures = signatures;
-          const updatedSession = SATPSession.recreateSession(sessionData);
-          this.sessions.set(sessionId, updatedSession);
-          this.log.info(
-            `${fnTag} Session data successfully reconstructed for session ID: ${sessionId}`,
+          verifySignature(
+            this.signer,
+            message,
+            sessionData.clientGatewayPubkey,
           );
+
+          const recoveredLogs = message.recoveredLogs;
+
+          for (const logEntry of recoveredLogs) {
+            await this.localRepository.create({
+              sessionId: logEntry.sessionId,
+              operation: logEntry.operation,
+              data: logEntry.data,
+              timestamp: logEntry.timestamp,
+              type: logEntry.type,
+              key: logEntry.key,
+              sequenceNumber: logEntry.sequenceNumber,
+            });
+          }
+
+          for (const log of recoveredLogs) {
+            const sessionId = log.sessionId;
+            this.log.info(`${fnTag}, recovering session: ${sessionId}`);
+
+            if (!log || !log.data) {
+              throw new Error(`${fnTag}, invalid log`);
+            }
+
+            try {
+              const updatedSessionData: SessionData = JSON.parse(log.data);
+
+              const { hashes, processedTimestamps, signatures } =
+                updatedSessionData;
+
+              sessionData.hashes = hashes;
+              sessionData.processedTimestamps = processedTimestamps;
+              sessionData.signatures = signatures;
+              const updatedSession = SATPSession.recreateSession(
+                sessionData,
+                this.monitorService,
+              );
+              this.sessions.set(sessionId, updatedSession);
+              this.log.info(
+                `${fnTag} Session data successfully reconstructed for session ID: ${sessionId}`,
+              );
+            } catch (error) {
+              this.log.error(
+                `Error parsing log data for session Id: ${sessionId}: ${error}`,
+              );
+            }
+          }
+          return true;
         } catch (error) {
-          this.log.error(
-            `Error parsing log data for session Id: ${sessionId}: ${error}`,
-          );
+          this.log.error(`${fnTag} Error processing RecoverRequest: ${error}`);
+          return false;
         }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-      return true;
-    } catch (error) {
-      this.log.error(`${fnTag} Error processing RecoverRequest: ${error}`);
-      return false;
-    }
+    });
   }
 
   public async initiateRollback(
@@ -570,62 +720,96 @@ export class CrashManager {
     sessionData: SessionData,
     forceRollback?: boolean,
   ): Promise<boolean> {
-    const fnTag = "CrashManager#initiateRollback()";
-    if (!sessionData) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-    this.log.info(
-      `${fnTag} Initiating rollback for session ${session.getSessionId()}`,
-    );
-
-    try {
-      if (forceRollback) {
-        const strategy = this.factory.createStrategy(sessionData);
-        const rollbackState = await this.executeRollback(strategy, session);
-
-        if (rollbackState?.status === "COMPLETED") {
-          const cleanupSuccess = await this.performCleanup(
-            strategy,
-            session,
-            rollbackState,
+    const fnTag = `${this.className}#initiateRollback()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        if (!sessionData) {
+          throw new Error(
+            `${fnTag}, session data is not correctly initialized`,
           );
-
-          const rollbackSuccess = await this.sendRollbackMessage(
-            sessionData,
-            rollbackState,
-          );
-          return cleanupSuccess && rollbackSuccess;
         }
-        this.log.error(
-          `${fnTag} Rollback execution failed for session ${session.getSessionId()}`,
+        this.log.info(
+          `${fnTag} Initiating rollback for session ${session.getSessionId()}`,
         );
-        return false;
+
+        try {
+          if (forceRollback) {
+            const strategy = this.factory?.createStrategy(sessionData);
+            if (!strategy) {
+              this.log.error(
+                `${fnTag} Rollback strategy could not be created for session ${session.getSessionId()}`,
+              );
+              throw new Error(
+                `${fnTag} Rollback strategy could not be created for session ${session.getSessionId()}`,
+              );
+            }
+            const rollbackState = await this.executeRollback(strategy, session);
+
+            if (rollbackState?.status === "COMPLETED") {
+              const cleanupSuccess = await this.performCleanup(
+                strategy,
+                session,
+                rollbackState,
+              );
+
+              const rollbackSuccess = await this.sendRollbackMessage(
+                sessionData,
+                rollbackState,
+              );
+              return cleanupSuccess && rollbackSuccess;
+            }
+            this.log.error(
+              `${fnTag} Rollback execution failed for session ${session.getSessionId()}`,
+            );
+            return false;
+          }
+          this.log.info(
+            `${fnTag} Rollback not needed for session ${session.getSessionId()}`,
+          );
+          return true;
+        } catch (error) {
+          this.log.error(`${fnTag} Error during rollback initiation: ${error}`);
+          return false;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-      this.log.info(
-        `${fnTag} Rollback not needed for session ${session.getSessionId()}`,
-      );
-      return true;
-    } catch (error) {
-      this.log.error(`${fnTag} Error during rollback initiation: ${error}`);
-      return false;
-    }
+    });
   }
 
   private async executeRollback(
     strategy: RollbackStrategy,
     session: SATPSession,
   ): Promise<RollbackState | undefined> {
-    const fnTag = "CrashManager#executeRollback";
-    this.log.debug(
-      `${fnTag} Executing rollback strategy for sessionId: ${session.getSessionId()}`,
-    );
+    const fnTag = `${this.className}#executeRollback()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag} Executing rollback strategy for sessionId: ${session.getSessionId()}`,
+        );
 
-    try {
-      return await strategy.execute(session, Type.CLIENT);
-    } catch (error) {
-      this.log.error(`${fnTag} Error executing rollback strategy: ${error}`);
-      return undefined;
-    }
+        try {
+          return await strategy.execute(session, Type.CLIENT);
+        } catch (error) {
+          this.log.error(
+            `${fnTag} Error executing rollback strategy: ${error}`,
+          );
+          return undefined;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private async sendRollbackMessage(
@@ -633,82 +817,114 @@ export class CrashManager {
     rollbackState: RollbackState,
   ): Promise<boolean> {
     const fnTag = `${this.className}#sendRollbackMessage()`;
-    this.log.debug(
-      `${fnTag} - Starting to send RollbackMessage for sessionId: ${sessionData.id}`,
-    );
-
-    try {
-      const channel = this.orchestrator.getChannel(
-        sessionData.recipientGatewayNetworkId,
-      );
-
-      if (!channel) {
-        throw new Error(
-          `${fnTag} - Channel not found for the recipient gateway network ID.`,
-        );
-      }
-
-      const counterGatewayID = this.orchestrator.getGatewayIdentity(
-        channel.toGatewayID,
-      );
-      if (!counterGatewayID) {
-        throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
-      }
-
-      const clientCrashRecovery: PromiseConnectClient<
-        typeof CrashRecoveryService
-      > = channel.clients.get("crash") as PromiseConnectClient<
-        typeof CrashRecoveryService
-      >;
-
-      if (!clientCrashRecovery) {
-        throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
-      }
-
-      const rollbackMessage =
-        await this.crashRecoveryHandler.sendRollbackRequest(
-          sessionData,
-          rollbackState,
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag} - Starting to send RollbackMessage for sessionId: ${sessionData.id}`,
         );
 
-      const rollbackAckMessage =
-        await clientCrashRecovery.rollback(rollbackMessage);
+        try {
+          const channel = this.orchestrator.getChannel(
+            sessionData.recipientGatewayNetworkId,
+          );
 
-      this.log.info(
-        `${fnTag} - Received RollbackResponse: ${rollbackAckMessage}`,
-      );
+          if (!channel) {
+            throw new Error(
+              `${fnTag} - Channel not found for the recipient gateway network ID.`,
+            );
+          }
 
-      const rollbackStatus =
-        await this.processRollbackResponse(rollbackAckMessage);
+          const counterGatewayID = this.orchestrator.getGatewayIdentity(
+            channel.toGatewayID,
+          );
+          if (!counterGatewayID) {
+            throw new Error(`${fnTag} - Counterparty gateway ID not found.`);
+          }
 
-      return rollbackStatus;
-    } catch (error) {
-      this.log.error(
-        `${fnTag} Error during rollback message sending: ${error}`,
-      );
-      return false;
-    }
+          const clientCrashRecovery: PromiseConnectClient<
+            typeof CrashRecoveryService
+          > = channel.clients.get("crash") as PromiseConnectClient<
+            typeof CrashRecoveryService
+          >;
+
+          if (!clientCrashRecovery) {
+            throw new Error(`${fnTag} - Failed to get clientCrashRecovery.`);
+          }
+
+          const rollbackMessage =
+            await this.crashRecoveryHandler?.sendRollbackRequest(
+              sessionData,
+              rollbackState,
+            );
+
+          if (!rollbackMessage) {
+            this.log.error(
+              `${fnTag} - Failed to create rollback message for session ID: ${sessionData.id}`,
+            );
+            throw new Error(
+              `${fnTag} - Failed to create rollback message for session ID: ${sessionData.id}`,
+            );
+          }
+          const rollbackAckMessage =
+            await clientCrashRecovery.rollback(rollbackMessage);
+
+          this.log.info(
+            `${fnTag} - Received RollbackResponse: ${rollbackAckMessage}`,
+          );
+
+          const rollbackStatus =
+            await this.processRollbackResponse(rollbackAckMessage);
+
+          return rollbackStatus;
+        } catch (error) {
+          this.log.error(
+            `${fnTag} Error during rollback message sending: ${error}`,
+          );
+          return false;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private async processRollbackResponse(
     message: RollbackResponse,
   ): Promise<boolean> {
     const fnTag = `${this.className}#processRollbackResponse()`;
-    try {
-      if (message.success) {
-        this.log.info(
-          `${fnTag} Rollback acknowledged by the counterparty for session ID: ${message.sessionId}`,
-        );
-        return true;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        try {
+          if (message.success) {
+            this.log.info(
+              `${fnTag} Rollback acknowledged by the counterparty for session ID: ${message.sessionId}`,
+            );
+            return true;
+          }
+          this.log.warn(
+            `${fnTag} Rollback failed at counterparty for session ID: ${message.sessionId}`,
+          );
+          return false;
+        } catch (error) {
+          this.log.error(
+            `${fnTag} Error processing RollbackResponse: ${error}`,
+          );
+          return false;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-      this.log.warn(
-        `${fnTag} Rollback failed at counterparty for session ID: ${message.sessionId}`,
-      );
-      return false;
-    } catch (error) {
-      this.log.error(`${fnTag} Error processing RollbackResponse: ${error}`);
-      return false;
-    }
+    });
   }
 
   private async performCleanup(
@@ -716,40 +932,63 @@ export class CrashManager {
     session: SATPSession,
     state: RollbackState,
   ): Promise<boolean> {
-    const fnTag = "CrashManager#performCleanup";
-    this.log.debug(
-      `${fnTag} Performing cleanup after rollback for session ${session.getSessionId()}`,
-    );
+    const fnTag = `${this.className}#performCleanup()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag} Performing cleanup after rollback for session ${session.getSessionId()}`,
+        );
 
-    try {
-      const updatedState = await strategy.cleanup(session, state);
+        try {
+          const updatedState = await strategy.cleanup(session, state);
 
-      // TODO: Handle the updated state, perhaps update session data or perform additional actions
-      this.log.info(
-        `${fnTag} Cleanup completed. Updated state: ${JSON.stringify(updatedState)}`,
-      );
+          // TODO: Handle the updated state, perhaps update session data or perform additional actions
+          this.log.info(
+            `${fnTag} Cleanup completed. Updated state: ${JSON.stringify(updatedState)}`,
+          );
 
-      return true;
-    } catch (error) {
-      this.log.error(`${fnTag} Error during cleanup: ${error}`);
-      return false;
-    }
+          return true;
+        } catch (error) {
+          this.log.error(`${fnTag} Error during cleanup: ${error}`);
+          return false;
+        }
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   private loadPubKeys(gateways: Map<string, GatewayIdentity>): void {
-    for (const gateway of gateways.values()) {
-      if (gateway.pubKey) {
-        this.gatewaysPubKeys.set(gateway.id, gateway.pubKey);
+    const fnTag = `${this.className}#loadPubKeys()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    context.with(ctx, () => {
+      try {
+        for (const gateway of gateways.values()) {
+          if (gateway.pubKey) {
+            this.gatewaysPubKeys.set(gateway.id, gateway.pubKey);
+          }
+        }
+
+        if (!this.orchestrator.ourGateway.pubKey) {
+          throw new Error("Our gateway pubKey not found!");
+        }
+
+        this.gatewaysPubKeys.set(
+          this.orchestrator.getSelfId(),
+          this.orchestrator.ourGateway.pubKey,
+        );
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
       }
-    }
-
-    if (!this.orchestrator.ourGateway.pubKey) {
-      throw new Error("Our gateway pubKey not found!");
-    }
-
-    this.gatewaysPubKeys.set(
-      this.orchestrator.getSelfId(),
-      this.orchestrator.ourGateway.pubKey,
-    );
+    });
   }
 }
