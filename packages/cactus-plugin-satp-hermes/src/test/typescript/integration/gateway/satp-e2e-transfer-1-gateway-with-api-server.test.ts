@@ -42,6 +42,9 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -111,20 +114,44 @@ beforeAll(async () => {
 
   {
     const erc20TokenContract = "SATPContract";
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    const erc721TokenContract = "SATPNFTContract";
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        logLevel,
+      },
+      [
+        {
+          assetType: SupportedBesuContractTypes.FUNGIBLE,
+          contractName: erc20TokenContract,
+        },
+        {
+          assetType: SupportedBesuContractTypes.NONFUNGIBLE,
+          contractName: erc721TokenContract,
+        },
+      ],
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   }
   {
     const erc20TokenContract = "SATPContract";
-    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    const erc721TokenContract = "SATPNFTContract";
+    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+      {
+        logLevel,
+      },
+      [
+        {
+          assetType: SupportedEthereumContractTypes.FUNGIBLE,
+          contractName: erc20TokenContract,
+        },
+        {
+          assetType: SupportedEthereumContractTypes.NONFUNGIBLE,
+          contractName: erc721TokenContract,
+        },
+      ],
+    );
     log.info("Ethereum Ledger started successfully");
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   }
@@ -133,11 +160,11 @@ beforeAll(async () => {
 describe("SATPGateway sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should mint 100 tokens to the owner account", async () => {
-    await besuEnv.mintTokens("100");
+    await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "100",
       besuEnv.getTestOwnerSigningCredential(),
@@ -219,7 +246,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network,
-      TokenType.NonstandardFungible,
+      TokenType.Fungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -231,9 +258,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.data.approveAddress);
 
     if (reqApproveBesuAddress?.data.approveAddress) {
-      await besuEnv.approveAmount(
+      await besuEnv.approveAssets(
         reqApproveBesuAddress.data.approveAddress,
         "100",
+        TokenTypeMain.NONSTANDARD_FUNGIBLE,
       );
     } else {
       throw new Error("Approve address is undefined");
@@ -242,7 +270,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
       fabricEnv.network,
-      TokenType.NonstandardFungible,
+      TokenType.Fungible,
     );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
 
@@ -270,9 +298,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     expect(res?.status).toBe(200);
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -280,9 +308,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     log.info("Amount was transfer correctly from the Owner account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       reqApproveBesuAddress?.data.approveAddress,
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -387,7 +415,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
       fabricEnv.network,
-      TokenType.NonstandardFungible,
+      TokenType.Fungible,
     );
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
@@ -409,7 +437,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network,
-      TokenType.NonstandardFungible,
+      TokenType.Fungible,
     );
 
     expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
@@ -456,9 +484,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     log.info("Amount was transferred correctly to the Wrapper account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       reqApproveBesuAddress?.data.approveAddress,
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -466,9 +494,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     log.info("Amount was transferred correctly from the Bridge account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "100",
       besuEnv.getTestOwnerSigningCredential(),
@@ -556,7 +584,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network,
-      TokenType.NonstandardFungible,
+      TokenType.Fungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -568,9 +596,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.data.approveAddress);
 
     if (reqApproveBesuAddress?.data.approveAddress) {
-      await besuEnv.approveAmount(
+      await besuEnv.approveAssets(
         reqApproveBesuAddress.data.approveAddress,
         "100",
+        TokenTypeMain.NONSTANDARD_FUNGIBLE,
       );
     }
 
@@ -578,7 +607,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
       ethereumEnv.network,
-      TokenType.NonstandardFungible,
+      TokenType.Fungible,
     );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
@@ -609,9 +638,9 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     expect(res?.status).toBe(200);
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -619,9 +648,9 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     log.info("Amount was transfer correctly from the Owner account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -629,9 +658,9 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     log.info("Amount was transfer correctly to the Wrapper account");
 
     await ethereumEnv.checkBalance(
-      ethereumEnv.getTestContractName(),
-      ethereumEnv.getTestContractAddress(),
-      ethereumEnv.getTestContractAbi(),
+      ethereumEnv.getTestFungibleContractName(),
+      ethereumEnv.getTestFungibleContractAddress(),
+      ethereumEnv.getTestFungibleContractAbi(),
       reqApproveEthereumAddress?.data.approveAddress,
       "0",
       ethereumEnv.getTestOwnerSigningCredential(),
@@ -639,14 +668,214 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     log.info("Amount was transfer correctly from the Bridge account");
 
     await ethereumEnv.checkBalance(
-      ethereumEnv.getTestContractName(),
-      ethereumEnv.getTestContractAddress(),
-      ethereumEnv.getTestContractAbi(),
+      ethereumEnv.getTestFungibleContractName(),
+      ethereumEnv.getTestFungibleContractAddress(),
+      ethereumEnv.getTestFungibleContractAbi(),
       ethereumEnv.getTestOwnerAccount(),
       "100",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
+
+    await gateway.shutdown();
+  });
+});
+describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () => {
+  jest.setTimeout(TIMEOUT);
+  const tokenUniqueDescriptor = "1001";
+  it("should mint a non fungible token to the owner account", async () => {
+    await besuEnv.mintTokens(
+      tokenUniqueDescriptor,
+      TokenTypeMain.NONSTANDARD_NONFUNGIBLE,
+    );
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "1",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+  });
+  it("should realize a transfer", async () => {
+    //setup satp gateway
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
+
+    const gatewayIdentity = {
+      id: "mockID",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+    } as GatewayIdentity;
+
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
+
+    const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
+    const besuNetworkOptions = besuEnv.createBesuConfig();
+
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+    const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity,
+      ccConfig: {
+        bridgeConfig: [ethereumNetworkOptions, besuNetworkOptions],
+      },
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
+      pluginRegistry: new PluginRegistry({
+        plugins: [],
+      }),
+      ontologyPath: ontologiesPath,
+      monitorService: monitorService,
+    };
+    gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
+    await gateway.onPluginInit();
+
+    const identity = gateway.Identity;
+    // default servers
+    expect(identity.gatewayServerPort).toBe(3010);
+    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.gatewayOapiPort).toBe(4010);
+    expect(identity.address).toBe("http://localhost");
+
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
+
+    const approveAddressApi = new GetApproveAddressApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
+      besuEnv.network,
+      TokenType.Nonfungible,
+    );
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.data.approveAddress);
+
+    if (reqApproveBesuAddress?.data.approveAddress) {
+      await besuEnv.approveAssets(
+        reqApproveBesuAddress.data.approveAddress,
+        tokenUniqueDescriptor,
+        TokenTypeMain.NONSTANDARD_NONFUNGIBLE,
+      );
+    }
+
+    log.debug(
+      `Approved non fungible token ${tokenUniqueDescriptor} to the Besu Bridge Address`,
+    );
+
+    const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
+      ethereumEnv.network,
+      TokenType.Nonfungible,
+    );
+
+    expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveEthereumAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await ethereumEnv.giveRoleToBridge(
+      reqApproveEthereumAddress.data.approveAddress,
+    );
+
+    const satpApi = new TransactionApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    const req = getTransactRequest(
+      "mockContext",
+      besuEnv,
+      ethereumEnv,
+      tokenUniqueDescriptor,
+      tokenUniqueDescriptor,
+      TokenTypeMain.NONSTANDARD_NONFUNGIBLE,
+    );
+
+    const res = await satpApi.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non fungible token was transferred correctly from the Owner account at Besu",
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non fungible token was transferred correctly from the Wrapper account at Besu",
+    );
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestNonFungibleContractName(),
+      ethereumEnv.getTestNonFungibleContractAddress(),
+      ethereumEnv.getTestNonFungibleContractAbi(),
+      reqApproveEthereumAddress?.data.approveAddress,
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non fungible token was transferred correctly from the Bridge account at Ethereum",
+    );
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestNonFungibleContractName(),
+      ethereumEnv.getTestNonFungibleContractAddress(),
+      ethereumEnv.getTestNonFungibleContractAbi(),
+      ethereumEnv.getTestOwnerAccount(),
+      "1",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non fungible token was transferred correctly to the Owner account at Ethereum",
+    );
 
     await gateway.shutdown();
   });
