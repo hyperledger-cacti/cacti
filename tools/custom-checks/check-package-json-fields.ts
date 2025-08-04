@@ -17,8 +17,8 @@ const CACTI_BUGS = "https://github.com/hyperledger-cacti/cacti/issues";
 const CACTI_REPO = "git+https://github.com/hyperledger-cacti/cacti.git";
 const CACTI_MAIL_LIST = "cacti@lists.lfdecentralizedtrust.org";
 const CACTI_PROJECT_URI = "https://www.lfdecentralizedtrust.org/projects/cacti";
-const CACTI_NODE_REQ = ">=18";
-const CACTI_NPM_REQ = ">=8";
+// const CACTI_NODE_REQ = ">=18";
+// const CACTI_NPM_REQ = ">=8";
 
 /**
  * Common schema for all cacti packages.
@@ -57,12 +57,12 @@ const schema = Joi.object({
     })
     .required(),
   files: Joi.array().items(Joi.string()),
-  engines: Joi.object()
-    .valid({
-      node: CACTI_NODE_REQ,
-      npm: CACTI_NPM_REQ,
-    })
-    .required(),
+  // engines: Joi.object()
+  //   .valid({
+  //     node: CACTI_NODE_REQ,
+  //     npm: CACTI_NPM_REQ,
+  //   })
+  //   .required(),
   publishConfig: Joi.object({ access: Joi.string().valid("public") })
     .unknown()
     .required(),

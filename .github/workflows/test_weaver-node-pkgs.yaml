@@ -8,8 +8,8 @@
 name: Unit Test Weaver Node Packages
 
 env:
-  NODEJS_LTS_VERSION: v18.18.2
-  NODEJS_NEXT_LTS_VERSION: v20.9.0
+  NODEJS_LTS_VERSION: v22.18.0
+  NODEJS_NEXT_LTS_VERSION: v22.18.0
 
 on:
   workflow_call:
@@ -59,7 +59,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [v18.18.2, v20.9.0]
+        node-version: [v18.18.2, v22.18.0]
         exclude:
           - node-version: ${{ needs.check_code_changed.outputs.fabric_sdk_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
@@ -97,7 +97,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [v18.18.2, v20.9.0]
+        node-version: [v18.18.2, v22.18.0]
         exclude:
           - node-version: ${{ needs.check_code_changed.outputs.iin_agent_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
@@ -142,9 +142,9 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: Use Python 3.x
-        uses: actions/setup-python@d09bd5e6005b175076f227b13d9730d56e9dcfcb #v4
+        uses: actions/setup-python@v5 #v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           cache: 'pip' # caching pip dependencies
 
       - name: Install dependencies
