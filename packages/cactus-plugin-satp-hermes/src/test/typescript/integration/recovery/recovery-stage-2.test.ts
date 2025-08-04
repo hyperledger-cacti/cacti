@@ -184,7 +184,7 @@ const createMockSession = (
     sessionData.senderAsset = create(AssetSchema, {
       tokenId: "BESU_ASSET_ID",
       referenceId: "BESU_ASSET_REFERENCE_ID",
-      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
+      tokenType: TokenType.FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_SENDER_ASSET_OWNER",
       contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
@@ -194,7 +194,7 @@ const createMockSession = (
   if (!isClient) {
     sessionData.receiverAsset = create(AssetSchema, {
       tokenId: "FABRIC_ASSET_ID",
-      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
+      tokenType: TokenType.FUNGIBLE,
       amount: BigInt(100),
       owner: "MOCK_RECEIVER_ASSET_OWNER",
       contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",

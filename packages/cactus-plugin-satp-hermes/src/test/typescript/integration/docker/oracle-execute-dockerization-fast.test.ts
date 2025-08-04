@@ -41,6 +41,8 @@ import {
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
 import { keccak256 } from "web3-utils";
+import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -114,11 +116,18 @@ beforeAll(async () => {
   const businessLogicContract = "OracleTestContract";
 
   {
-    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-      contractName: businessLogicContract,
-      logLevel,
-      network: testNetwork,
-    });
+    ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+      {
+        logLevel,
+        network: testNetwork,
+      },
+      [
+        {
+          assetType: SupportedEthereumContractTypes.FUNGIBLE,
+          contractName: businessLogicContract,
+        },
+      ],
+    );
     log.info("Ethereum Ledger started successfully");
 
     ethereumContractAddress = await ethereumEnv.deployAndSetupOracleContracts(
@@ -128,11 +137,18 @@ beforeAll(async () => {
     );
   }
   {
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: businessLogicContract,
-      logLevel,
-      network: testNetwork,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        logLevel,
+        network: testNetwork,
+      },
+      [
+        {
+          assetType: SupportedBesuContractTypes.FUNGIBLE,
+          contractName: businessLogicContract,
+        },
+      ],
+    );
     log.info("Besu Ledger started successfully");
 
     besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
@@ -226,7 +242,7 @@ describe("Oracle executing UPDATE tasks successfully", () => {
     const response = await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -260,7 +276,7 @@ describe("Oracle executing READ_AND_UPDATE tasks successfully", () => {
     const response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -269,7 +285,7 @@ describe("Oracle executing READ_AND_UPDATE tasks successfully", () => {
       },
       destinationNetworkId: besuEnv.network,
       destinationContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestFungibleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         methodName: "setData",
@@ -369,7 +385,7 @@ describe("Oracle event listener for EVM working", () => {
       },
       destinationNetworkId: besuEnv.network,
       destinationContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestFungibleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -394,7 +410,7 @@ describe("Oracle event listener for EVM working", () => {
     await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -409,7 +425,7 @@ describe("Oracle event listener for EVM working", () => {
     await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestFungibleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
