@@ -78,6 +78,7 @@ paths:
                     - networkId
                     - tokenType
                     - referenceId
+                    - ercTokenStandard
                   properties:
                     id:
                       type: string
@@ -117,14 +118,19 @@ paths:
                     tokenType:
                       type: string
                       enum:
-                        - ERC20
-                        - ERC721
-                        - ERC1155
                         - NONSTANDARD_FUNGIBLE
                         - NONSTANDARD_NONFUNGIBLE
                       description: The type of token.
                     referenceId:
                       type: string
+                    ercTokenStandard:
+                      type: string
+                      enum:
+                        - UNSPECIFIED
+                        - ERC20
+                        - ERC721
+                        - ERC1155
+                      description: The ERC token standard.
                 receiverAsset:
                   description: An asset
                   type: object
@@ -135,6 +141,7 @@ paths:
                     - networkId
                     - tokenType
                     - referenceId
+                    - ercTokenStandard
                   properties:
                     id:
                       type: string
@@ -174,14 +181,19 @@ paths:
                     tokenType:
                       type: string
                       enum:
-                        - ERC20
-                        - ERC721
-                        - ERC1155
                         - NONSTANDARD_FUNGIBLE
                         - NONSTANDARD_NONFUNGIBLE
                       description: The type of token.
                     referenceId:
                       type: string
+                    ercTokenStandard:
+                      type: string
+                      enum:
+                        - UNSPECIFIED
+                        - ERC20
+                        - ERC721
+                        - ERC1155
+                      description: The ERC token standard.
       responses:
         '200':
           description: Transaction successfully queued
@@ -2009,9 +2021,6 @@ paths:
           schema:
             type: string
             enum:
-              - ERC20
-              - ERC721
-              - ERC1155
               - NONSTANDARD_FUNGIBLE
               - NONSTANDARD_NONFUNGIBLE
             description: The type of token.
@@ -3403,6 +3412,7 @@ components:
         - networkId
         - tokenType
         - referenceId
+        - ercTokenStandard
       properties:
         id:
           type: string
@@ -3442,14 +3452,19 @@ components:
         tokenType:
           type: string
           enum:
-            - ERC20
-            - ERC721
-            - ERC1155
             - NONSTANDARD_FUNGIBLE
             - NONSTANDARD_NONFUNGIBLE
           description: The type of token.
         referenceId:
           type: string
+        ercTokenStandard:
+          type: string
+          enum:
+            - UNSPECIFIED
+            - ERC20
+            - ERC721
+            - ERC1155
+          description: The ERC token standard.
     TransactRequest:
       description: 'Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks.'
       type: object
@@ -3475,6 +3490,7 @@ components:
             - networkId
             - tokenType
             - referenceId
+            - ercTokenStandard
           properties:
             id:
               type: string
@@ -3514,14 +3530,19 @@ components:
             tokenType:
               type: string
               enum:
-                - ERC20
-                - ERC721
-                - ERC1155
                 - NONSTANDARD_FUNGIBLE
                 - NONSTANDARD_NONFUNGIBLE
               description: The type of token.
             referenceId:
               type: string
+            ercTokenStandard:
+              type: string
+              enum:
+                - UNSPECIFIED
+                - ERC20
+                - ERC721
+                - ERC1155
+              description: The ERC token standard.
         receiverAsset:
           description: An asset
           type: object
@@ -3532,6 +3553,7 @@ components:
             - networkId
             - tokenType
             - referenceId
+            - ercTokenStandard
           properties:
             id:
               type: string
@@ -3571,14 +3593,19 @@ components:
             tokenType:
               type: string
               enum:
-                - ERC20
-                - ERC721
-                - ERC1155
                 - NONSTANDARD_FUNGIBLE
                 - NONSTANDARD_NONFUNGIBLE
               description: The type of token.
             referenceId:
               type: string
+            ercTokenStandard:
+              type: string
+              enum:
+                - UNSPECIFIED
+                - ERC20
+                - ERC721
+                - ERC1155
+              description: The ERC token standard.
     TransactResponse:
       description: Response schema for a transaction request. Includes the session ID and the current status of the transaction.
       type: object
@@ -6264,9 +6291,6 @@ components:
         tokenType:
           type: string
           enum:
-            - ERC20
-            - ERC721
-            - ERC1155
             - NONSTANDARD_FUNGIBLE
             - NONSTANDARD_NONFUNGIBLE
           description: The type of token.
@@ -7556,12 +7580,17 @@ components:
     TokenType:
       type: string
       enum:
-        - ERC20
-        - ERC721
-        - ERC1155
         - NONSTANDARD_FUNGIBLE
         - NONSTANDARD_NONFUNGIBLE
       description: The type of token.
+    ERCTokenStandard:
+      type: string
+      enum:
+        - UNSPECIFIED
+        - ERC20
+        - ERC721
+        - ERC1155
+      description: The ERC token standard.
     DraftVersions:
       type: object
       description: The draft versions supported by the gateway.

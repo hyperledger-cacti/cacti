@@ -407,7 +407,7 @@ export class CbdcBridgingAppDummyInfrastructure {
           id: BesuEnvironment.BESU_NETWORK_ID,
           ledgerType: LedgerType.Besu2X,
         },
-        TokenType.NonstandardFungible,
+        TokenType.Fungible,
       );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -429,7 +429,7 @@ export class CbdcBridgingAppDummyInfrastructure {
           id: FabricEnvironment.FABRIC_NETWORK_ID,
           ledgerType: LedgerType.Fabric2,
         },
-        TokenType.NonstandardFungible,
+        TokenType.Fungible,
       );
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
